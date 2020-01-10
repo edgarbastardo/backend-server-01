@@ -1,0 +1,30 @@
+config:
+  target: http://localhost:9090
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      arrivalCount: 50
+  http:
+    # Responses have to be sent within 5 seconds or the request will be aborted
+    timeout: 5
+  payload:
+      # path is relative to the location of the test script
+    path: "./files/test01.csv"
+    fields:
+      - "uri"
+    order: "sequence"
+    cast: false
+  #processor: "../../assets/js/count.js"
+scenarios:
+  - flow:
+      #- function: "setBidCount"
+      - loop:
+          - post:
+              # the value of count comes from a JavaScript function 'setCount' declared in count.js
+              url: "/system/security/authentication/{{ uri }}"
+              capture:
+              # capturing responce using reg expression
+                - regexp: "[^]*"
+                  as: "msg"
+          - log: "msg= {{msg}}"
+        count: 20

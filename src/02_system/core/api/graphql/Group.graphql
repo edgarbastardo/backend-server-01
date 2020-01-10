@@ -1,0 +1,16 @@
+
+extend type Query {
+
+  getGroup( Id: String! ): JSON!
+  searchGroup( Query: String!, MinRow: Int!, MaxRow: Int! ): JSON!
+  searchGroupCount( Query: String! ): JSON!
+
+}
+
+extend type Mutation {
+
+  addGroup( Group: JSON! ): JSON!
+  modifyGroup( Group: JSON! ): JSON!
+  deleteGroup( Id: String! ): JSON!
+
+}

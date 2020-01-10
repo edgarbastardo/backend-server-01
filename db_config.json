@@ -1,0 +1,53 @@
+{
+  "dev": {
+    "username": "root",
+    "password": "dsistemas",
+    "database": "BackendServer01DB",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "dialect": "mysql",
+    "force": false,
+    "pool": {
+      "max": 2,
+      "min": 0,
+      "idle": 20000
+    },
+    "migration": {
+      "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": "dsistemas",
+    "database": "BackendServer01DB",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "dialect": "mysql",
+    "force": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "idle": 20000
+    },
+    "migration": {
+      "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+    }
+  },
+  "prod": {
+    "username": "root",
+    "password": "dsistemas",
+    "database": "BackendServer01DB",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "dialect": "mysql",
+    "force": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "idle": 20000
+    },
+    "migration": {
+      "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+    }
+  }
+}

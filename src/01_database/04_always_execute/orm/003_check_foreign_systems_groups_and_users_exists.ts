@@ -1,0 +1,193 @@
+/*
+import uuidv4 from 'uuid/v4';
+import moment from 'moment-timezone';
+import os from 'os';
+import bcrypt from 'bcrypt';
+*/
+
+import CommonUtilities from '../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import SystemConstants from "../../../02_system/common/SystemContants";
+
+import { User } from '../../../02_system/common/database/models/User';
+import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
+import CommonConstants from '../../../02_system/common/CommonConstants';
+
+const debug = require( 'debug' )( '003_check_foreign_systems_groups_and_users_exists' );
+
+//Example file import files using code
+export default class Always {
+
+  static disabled(): boolean {
+
+    return false;
+
+  }
+
+  static async execute( dbConnection: any, context: any, logger: any ): Promise<any> {
+
+    //The dbConnection parameter is instance of ORM object (sequelize)
+    let bSuccess = false;
+    let bEmptyContent = true;
+
+    try {
+
+      const userGroupEntries = [
+                                 {
+                                   Id: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                                   Name: "Foreign_Systems",
+                                   Role: "#Foreign_Systems#",
+                                   Tag: "#Foreign_Systems#",
+                                   Comment: "Created from backend startup. Group of operators associated to persistent sessions tokens and foreign systems.",
+                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "1",
+                                 },
+                               ]
+
+      const loopUserGroupEntriesAsync = async () => {
+
+        await CommonUtilities.asyncForEach( userGroupEntries as any, async ( userGroupToCreate: any ) => {
+
+          const options = {
+
+            where: { Id: userGroupToCreate.Id },
+
+          }
+
+          const userGroup = await UserGroup.findOne( options );
+
+          if ( userGroup === null ) {
+
+            await UserGroup.create( userGroupToCreate );
+
+          }
+          else if ( !userGroup.Tag ||
+                     userGroup.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+
+            userGroup.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+            await userGroup.update( ( userGroup as any ).dataValues, options );
+
+          }
+
+        });
+
+      };
+
+      await loopUserGroupEntriesAsync();
+
+      const userEntries = [
+                            {
+                              Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
+                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 0,
+                              Name: "ForeignSystem01",
+                              Password: "@",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. Mobile App Drivers, Restaurants. System Odin.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1",
+                            },
+                            {
+                              Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
+                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 0,
+                              Name: "ForeignSystem02",
+                              Password: "@",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. System Migration command line tool.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1",
+                            },
+                            {
+                              Id: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
+                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 0,
+                              Name: "ForeignSystem03",
+                              Password: "@",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. System Migration command line tool.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1",
+                            },
+                          ]
+
+      const loopUserEntriesAsync = async () => {
+
+        await CommonUtilities.asyncForEach( userEntries as any, async ( userToCreate: any ) => {
+
+          const options = {
+
+            where: { Id: userToCreate.Id },
+
+          }
+
+          const userInDB = await User.findOne( options );
+
+          if ( userInDB === null ) {
+
+            await User.create( userToCreate );
+
+          }
+          else if ( !userInDB.Tag ||
+                    userInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+
+            userInDB.Name = userToCreate.Name;
+            userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
+            userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+            await User.update( ( userInDB as any ).dataValues,
+                               options );
+
+          }
+
+        });
+
+      };
+
+      await loopUserEntriesAsync();
+
+      bSuccess = true;
+      bEmptyContent = false;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.execute.name;
+
+      const strMark = "2E18A4C3D9F0";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return { bSuccess, bEmptyContent };
+
+  }
+
+}
