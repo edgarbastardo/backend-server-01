@@ -7,6 +7,8 @@ import fs from 'fs'; //Load the filesystem module
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
 import CommonConstants from '../CommonConstants.js';
+import BusinessQueries from "../../../01_database/05_query/mysql/BusinessQueries";
+import SystemQueries from "../../../01_database/05_query/mysql/SystemQueries";
 
 
 const debug = require( 'debug' )( 'DBConnectionManager' );
@@ -189,7 +191,7 @@ export default class DBConnectionManager {
 
   static async loadQueryStatement( logger: any ): Promise<any> {
 
-    let result = null;
+    let result = { systemQueries: null, businessQueries: null };
 
     try {
 
@@ -201,9 +203,68 @@ export default class DBConnectionManager {
 
       const dbConfig = DBConnectionManager.getDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
-      //if ( dbConfig.dialect == "mysql" ) {
+      result.systemQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/SystemQueries` ).default;
+      result.businessQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/BusinessQueries` ).default;
 
-      result = require( `../../../01_database/05_query/${dbConfig.dialect}/queries` ).default;
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.loadQueryStatement.name;
+
+      const strMark = "0449A858CFA0";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static getStatement( strName: string,
+                       params: any,
+                       logger: any ): string {
+
+    let strResult = null;
+
+    try {
+
+      if ( this.queryStatements ) {
+
+        if ( this.queryStatements.businessQueries ) {
+
+          strResult = this.queryStatements.businessQueries.getStatement( strName,
+                                                                         params,
+                                                                         logger );
+
+        }
+
+        if ( !strResult && this.queryStatements.systemQueries ) {
+
+          strResult = this.queryStatements.systemQueries.getStatement( strName,
+                                                                       params,
+                                                                       logger );
+
+        }
+
+      }
+
 
         /*
       }
@@ -241,7 +302,7 @@ export default class DBConnectionManager {
 
     }
 
-    return result;
+    return strResult;
 
   }
 

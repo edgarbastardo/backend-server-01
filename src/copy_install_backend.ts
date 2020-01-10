@@ -1,13 +1,17 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
-import fs from 'fs'; //Load the filesystem module
 //import path from 'path';
 import appRoot from 'app-root-path';
 import rimraf from 'rimraf';
+import fs from 'fs'; //Load the filesystem module
 
 import copy from 'recursive-copy';
 //import targz from 'targz';
-import zip from 'cross-zip';
+//import zip from 'cross-zip';
+
+import os from 'os'; //.homedir();
+
+import inquirer from 'inquirer';
 
 //const Client = require('ssh2').Client;
 import SSH2Promise = require( 'ssh2-promise' );
@@ -119,13 +123,69 @@ async function createInstallBundle( strProject: string ): Promise<{ path: string
     // compress files into tar.gz archive
     */
 
+    /*
     zip.zipSync( appRoot.path + `/install_distribution/${strProject}-${strCurrentDate}`,
                  appRoot.path + `/install_distribution/${strProject}-${strCurrentDate}.zip` );
+                 */
 
-    result.path = appRoot.path + `/install_distribution/`;
-    result.name = `${strProject}-${strCurrentDate}.zip`;
+    const strFileName = `${strProject}-${strCurrentDate}`;
 
-    rimraf.sync( appRoot.path + `/install_distribution/${strProject}-${strCurrentDate}` );
+    /*
+    const outputStream = fs.createWriteStream( appRoot.path + `/install_distribution/${strFileName}.zip` );
+
+    const archive = archiver( 'zip' );
+
+    // listen for all archive data to be written
+    // 'close' event is fired only when a file descriptor is involved
+    outputStream.on('close', function() {
+      console.log(archive.pointer() + ' total bytes');
+      console.log('archiver has been finalized and the output file descriptor has closed.');
+    });
+
+    // This event is fired when the data source is drained no matter what was the data source.
+    // It is not part of this library but rather from the NodeJS Stream API.
+    // @see: https://nodejs.org/api/stream.html#stream_event_end
+    outputStream.on('end', function() {
+      console.log('Data has been drained');
+    });
+
+    // good practice to catch this error explicitly
+    archive.on('error', function(err) {
+      throw err;
+    });
+
+    // good practice to catch warnings (ie stat failures and other non-blocking errors)
+    archive.on('warning', function(err) {
+      if (err.code === 'ENOENT') {
+        // log warning
+      } else {
+        // throw error
+        throw err;
+      }
+    });
+
+    archive.pipe( outputStream );
+
+    archive.directory( appRoot.path + `/install_distribution/${strFileName}`,
+                       `${strFileName}` );
+
+    await archive.finalize();
+
+    outputStream.close();
+    */
+
+    if ( await SystemUtilities.zipDirectory( appRoot.path + `/install_distribution/${strFileName}`,
+                                             appRoot.path + `/install_distribution/${strFileName}.zip`,
+                                             null ) ) {
+
+      result.path = appRoot.path + `/install_distribution/`;
+      result.name = `${strFileName}.zip`;
+
+      rimraf.sync( appRoot.path + `/install_distribution/${strFileName}` );
+
+      //process.exit( 0 );
+
+    }
 
   }
   catch ( error ) {
@@ -462,49 +522,113 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 }
 */
 
+async function askForPassword( strUser: string ): Promise<string> {
+
+  let strResult = "";
+
+  /*
+  const readline = require('readline');
+
+  const rl = readline.createInterface( {
+                                         input: process.stdin,
+                                         output: process.stdout
+                                       });
+
+  console.log( "Press enty with empty password to cancel the deploy process." );
+  rl.question( 'Please introduce the password? ', ( strPassword: string ) => {
+
+    //console.log( `Thank you for your valuable feedback: ${strPassword}` );
+    strResult = strPassword;
+
+    rl.close();
+
+  });
+
+  return strResult;
+  */
+  const results = await inquirer.prompt(
+                                         [
+                                           {
+                                             type: 'password',
+                                             name: 'password',
+                                             message: `Press enter with empty password to cancel the deploy process.\nWhat is the password for the user [${strUser}]?`,
+                                             mask: '*',
+                                             default: '',
+                                             //validate: (value = '') => 'Pass a valid hex value'
+                                           },
+                                         ]
+                                       );
+
+  if ( results.password ) {
+
+    strResult = results.password;
+
+  }
+
+  return strResult;
+
+}
+
 async function main() {
 
   try {
 
-    const strConfigFile = appRoot.path + "/deploy_target.json";
+    const strConfigFile = os.homedir() + "/copy_install_backend/.deploy.json"; //appRoot.path + "/.copy_install_backend_config.json";
 
     fs.readFileSync( strConfigFile );
 
     const deployTarget = require( strConfigFile );
 
-    const target = deployTarget[ process.env.DEPLOY_TARGET ];
+    const target = deployTarget[ process.env.APP_NAME ][ process.env.DEPLOY_TARGET ];
 
-    const resultData = await createInstallBundle( target.project );
+    const resultData = await createInstallBundle( process.env.APP_NAME );
 
     if ( resultData ) {
 
-      let bResult = await copyInstallBundleToRemoteServer( target.protocol,
-                                                            target.host,
-                                                            target.port,
-                                                            target.user,
-                                                            target.password,
-                                                            target.project,
-                                                            resultData.path,
-                                                            resultData.name );
+      if ( target.password === "!" ) {
 
-      if ( bResult ) {
+        target.password = await askForPassword( target.user );
 
-        //Execute remote install script
-        bResult = await executeInstallScriptInRemoteServer( target.protocol,
-                                                            target.host,
-                                                            target.port,
-                                                            target.user,
-                                                            target.password,
-                                                            target.password,
-                                                            target.project );
+      }
 
-                                                            /*
-        await testSUDOCommand( "scp",
-                              "192.168.2.207",
-                              22,
-                              "dsistemas",
-                              "dsistemas" );
-                              */
+      if ( target.password ) {
+
+        process.exit( 0 );
+
+        let bResult = await copyInstallBundleToRemoteServer( target.protocol,
+                                                             target.host,
+                                                             target.port,
+                                                             target.user,
+                                                             target.password,
+                                                             process.env.APP_NAME,
+                                                             resultData.path,
+                                                             resultData.name );
+
+        if ( bResult ) {
+
+          //Execute remote install script
+          bResult = await executeInstallScriptInRemoteServer( target.protocol,
+                                                              target.host,
+                                                              target.port,
+                                                              target.user,
+                                                              target.password,
+                                                              target.password,
+                                                              process.env.APP_NAME );
+
+                                                              /*
+          await testSUDOCommand( "scp",
+                                "192.168.2.207",
+                                22,
+                                "dsistemas",
+                                "dsistemas" );
+                                */
+
+        }
+
+      }
+      else {
+
+        console.log( "Empty password entered!. Deploy process canceled." );
 
       }
 

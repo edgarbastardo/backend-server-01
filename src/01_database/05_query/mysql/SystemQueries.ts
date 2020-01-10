@@ -1,9 +1,11 @@
 
-const debug = require( 'debug' )( 'queries' );
+const debug = require( 'debug' )( 'SystemQueries' );
 
-class Queries {
+export default class SystemQueries {
 
-  static getStatement( strName: string, params: any ): string {
+  static getStatement( strName: string,
+                       params: any,
+                       logger: any ): string {
 
     let strResult = "";
 
@@ -23,5 +25,3 @@ class Queries {
   }
 
 }
-
-export default Queries;

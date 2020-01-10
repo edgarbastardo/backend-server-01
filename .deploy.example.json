@@ -1,0 +1,24 @@
+{
+  "comment01": "copy this file to a folder in homedir/copy_install_backend/.deploy.json, Example: /home/dsistemas/copy_install_backend/.deploy.json",
+  "comment02": "Change the name backend-server-01 to my-project-name",
+  "comment03": "Change the host, user and password fields to right config values.",
+  "backend-server-01": {
+
+    "test": {
+      "protocol": "ssh",
+      "host": "192.168.2.207",
+      "port": 22,
+      "user": "",
+      "password": "!"
+    },
+    "prod": {
+      "protocol": "ssh",
+      "host": "remoteserver.domain.com",
+      "port": 22,
+      "user": "",
+      "password": "!"
+    }
+
+  }
+
+}

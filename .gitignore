@@ -1,10 +1,10 @@
 node_modules/
 build/
 temp/tmp-*
-logs/
+./logs/
 binary_data/temporal/
 binary_data/persistent/
 install_distribution/
-deploy_target.json
+.deploy.json
 .env.log
 

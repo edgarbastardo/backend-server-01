@@ -36,17 +36,26 @@ export default class ConfigValueDataService extends BaseService {
 
       }
 
-      const strSQL = DBConnectionManager.queryStatements.getStatement( "getConfigValueData", { ConfigMetaDataId: strConfigMetaDataId, Owner: strOnwer } );
+      const strSQL = DBConnectionManager.getStatement( "getConfigValueData",
+                                                       {
+                                                         ConfigMetaDataId: strConfigMetaDataId,
+                                                         Owner: strOnwer
+                                                       },
+                                                       logger );
 
-      const rows = await dbConnection.query( strSQL, {
-        raw: true,
-        type: QueryTypes.SELECT,
-        transaction: currentTransaction
-      } );
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
 
       if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
 
-        result = { Value: rows[ 0 ].Value ? rows[ 0 ].Value : null, Default: rows[ 0 ].Default ? rows[ 0 ].Default : null };
+        result = {
+                   Value: rows[ 0 ].Value ? rows[ 0 ].Value : null,
+                   Default: rows[ 0 ].Default ? rows[ 0 ].Default : null
+                 };
 
       }
 

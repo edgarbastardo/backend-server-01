@@ -9,6 +9,10 @@ import { Request, Response, NextFunction } from 'express';
 import { rule } from "graphql-shield";
 import { ApolloError } from "apollo-server-errors";
 //import { loggers } from "winston";
+import fs from 'fs'; //Load the filesystem module
+import path from 'path';
+
+import archiver, { ArchiverError } from 'archiver';
 
 import CommonUtilities from "./CommonUtilities";
 
@@ -1855,6 +1859,54 @@ export default class SystemUtilities {
     const dateTime = moment( strDateTime );
 
     return dateTime.isValid();
+
+  }
+
+  static zipDirectory( strSource: string,
+                       strZipFullFilePath: string,
+                       logger: any ): Promise<boolean> {
+
+    const archive = archiver(
+                              'zip',
+                              {
+                                zlib: {
+                                        level: 9
+                                      }
+                              }
+                            );
+    const stream = fs.createWriteStream( strZipFullFilePath );
+
+    return new Promise( ( resolve, reject ) => {
+
+      const strPath = path.basename( strSource );
+
+      archive.directory( strSource, strPath ).on( 'error',
+                                                  ( error: ArchiverError ) => {
+
+                                                    const strMark = "C0709DD4C024";
+
+                                                    if ( logger &&
+                                                        typeof logger.error === "function" ) {
+
+                                                      ( error as any ).mark = strMark;
+                                                      ( error as any ).logId = SystemUtilities.getUUIDv4();
+
+                                                      logger.error( error );
+
+                                                    }
+
+                                                    reject( false );
+
+                                                  }
+
+                                                )
+                                              .pipe( stream );
+
+      stream.on( 'close', () => resolve( true ) );
+
+      archive.finalize();
+
+    });
 
   }
 
