@@ -1910,4 +1910,182 @@ export default class SystemUtilities {
 
   }
 
+  static createSelectAliasFromModels( models: any[],
+                                      alias: string[],
+                                      filterKind: number = 0,
+                                      filter: string[] = [] ) {
+
+    let strResult = "";
+
+    models.map( ( model: any, intIndex: number ) => {
+
+      Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+        let bAddField: boolean = true;
+
+        if ( filterKind === 1 ) { //Include
+
+          if ( filter.indexOf( alias[ intIndex ] + "_" + attribute ) >= 0 ) {
+
+            bAddField = true;
+
+          }
+          else {
+
+            bAddField = false;
+
+          }
+
+        }
+        else if ( filterKind === -1 ) { //Exclude
+
+          if ( filter.indexOf( alias[ intIndex ] + "_" + attribute ) < 0 ) {
+
+            bAddField = true;
+
+          }
+          else {
+
+            bAddField = false;
+
+          }
+
+        }
+        //else if ( filterKind === 0 ) { } //Ignore include all fields names
+
+        if ( bAddField ) {
+
+          if ( strResult === "" ) {
+
+            strResult = alias[ intIndex ] + "." + attribute + " As " + alias[ intIndex ] + "_" + attribute;
+
+          }
+          else {
+
+            strResult = strResult + "," + alias[ intIndex ] + "." +  attribute + " As " + alias[ intIndex ] + "_" + attribute;
+
+          }
+
+        }
+
+      } );
+
+    } );
+
+    return strResult;
+
+  }
+
+  static transformRowValuesToObjectArray( rows: any[],
+                                          models: any[],
+                                          alias: string[],
+                                          bIncludeUndefined: boolean = false ) {
+
+    let result: any[] = [];
+
+    rows.map( ( row ) => {
+
+      let newRow: any[] = [];
+
+      models.map( ( model: any, intIndex: number ) => {
+
+        let newDataStruct = {};
+
+        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+          if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
+
+            newDataStruct[ attribute ] = row[ alias[ intIndex ] + "_" + attribute ];
+
+          }
+
+        } );
+
+        newRow.push( newDataStruct );
+
+      } );
+
+      result.push( newRow );
+
+    });
+
+    return result;
+
+  }
+
+  static transformRowValuesToObject( rows: any[],
+                                     models: any[],
+                                     alias: string[],
+                                     bIncludeUndefined: boolean = false ) {
+
+    let result: any[] = [];
+
+    rows.map( ( row ) => {
+
+      let newRow: any = {};
+
+      models.map( ( model: any, intIndex: number ) => {
+
+        let newDataStruct = {};
+
+        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+          if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
+
+            newDataStruct[ attribute ] = row[ alias[ intIndex ] + "_" + attribute ];
+
+          }
+
+        } );
+
+        newRow[ model.name ] = newDataStruct;
+
+      } );
+
+      result.push( newRow );
+
+    });
+
+    return result;
+
+  }
+
+  static transformRowValuesToModelArray( rows: any[],
+                                         models: any[],
+                                         alias: string[],
+                                         bIncludeUndefined: boolean = false,
+                                         dataTransformers: object[] = [] ) {
+
+    let result: any[] = [];
+
+    rows.map( ( row ) => {
+
+      let newRow: any[] = [];
+
+      models.map( ( model: any, intIndex: number ) => {
+
+        let newDataStruct = {};
+
+        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+          if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
+
+            newDataStruct[ attribute ] = row[ alias[ intIndex ] + "_" + attribute ];
+
+          }
+
+        } );
+
+        newRow.push( model.build( newDataStruct ) ); //Create the sequelize model no persited, later you can call sequealize.save make persist to the db.
+
+      } );
+
+      result.push( newRow );
+
+    });
+
+    return result;
+
+  }
+
 }
