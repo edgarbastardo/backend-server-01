@@ -12,7 +12,7 @@ import {
 import { BuildOptions } from "sequelize/types";
 //import uuidv4 from 'uuid/v4';
 import CommonUtilities from "../../CommonUtilities";
-import moment from "moment-timezone";
+//import moment from "moment-timezone";
 import { User } from "./User";
 //import SystemUtilities from "../../SystemUtilities";
 import { UserGroup } from "./UserGroup";
