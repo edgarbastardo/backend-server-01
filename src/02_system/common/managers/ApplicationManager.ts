@@ -297,10 +297,34 @@ export default class ApplicationManager {
 
       });
 
-      app.use( function (err: any, req: any, res: any, next: any ) {
+      app.use( function ( error: any, req: any, res: any, next: any ) {
 
-        console.error(err.stack);
-        res.status(500).send('Something went wrong!!');
+        const strMark = "D3C34ED42BA1";
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+        debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+
+        const result = {
+                          StatusCode: 500,
+                          Code: 'ERROR_SOMETHING_WENT_WRONG',
+                          Message: 'Something went wrong!!',
+                          LogId: null,
+                          IsError: true,
+                          Errors: [
+                                    {
+                                      Code: 'ERROR_SOMETHING_WENT_WRONG',
+                                      Message: 'Something went wrong!!',
+                                      Details: error
+                                    }
+                                  ],
+                          Warnings: [],
+                          Count: 0,
+                          Data: []
+                       };
+
+        res.status( result.StatusCode ).send( result );
 
       });
 
