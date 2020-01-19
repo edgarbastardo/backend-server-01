@@ -10,6 +10,7 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/src/server.ts",
+      "outputCapture": "std",
       "preLaunchTask": "build",
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"
@@ -20,6 +21,7 @@
       "request": "launch",
       "name": "Launch Program Deploy",
       "program": "${workspaceFolder}/src/copy_install_backend.ts",
+      "outputCapture": "std",
       "preLaunchTask": "build",
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"

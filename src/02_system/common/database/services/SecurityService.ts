@@ -540,13 +540,50 @@ export default class SecurityService {
                                                                 );
                                                                 */
 
+        let strBasicRoles = "";
+
+        if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
+
+          if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Authenticated#";
+
+          }
+          else {
+
+            strBasicRoles = "#Authenticated#";
+
+          }
+
+        }
+
+        if ( strRolesMerged.includes( "#Public#" ) === false ) {
+
+          if ( strBasicRoles.length > 0 ) {
+
+            strBasicRoles = strBasicRoles + ",#Public#";
+
+          }
+          else if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Public#";
+
+          }
+          else {
+
+            strBasicRoles = "#Public#";
+
+          }
+
+        }
+
         const userSessionStatusData = {
                                         UserId: user.Id,
                                         UserGroupId: user.GroupId,
                                         Token: strAuthorizationToken,
                                         ClientId: strClientId,
                                         SourceIPAddress: strSourceIPAddress,
-                                        Role: strRolesMerged,
+                                        Role: strRolesMerged + strBasicRoles,
                                         UserName: user.Name,
                                         ExpireKind: configData.kind,
                                         ExpireOn: configData.on,

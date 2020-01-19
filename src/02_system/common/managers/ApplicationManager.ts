@@ -297,7 +297,7 @@ export default class ApplicationManager {
 
       });
 
-      app.use( function ( error: any, req: any, res: any, next: any ) {
+      app.use( function ( error: any, req: Request, res: Response, next: NextFunction ) {
 
         const strMark = "D3C34ED42BA1";
 

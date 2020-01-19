@@ -1335,7 +1335,7 @@ export default class SystemUtilities {
 
     let userSessionStatus = ( request as any ).context.UserSessionStatus; //Context is set from previous chain function middlewareSetContext
 
-    let strPath = request.path;
+    let strPath = request.route && request.route.path ? request.route.path : request.path;
 
     if ( process.env.SERVER_ROOT_PATH ) {
 

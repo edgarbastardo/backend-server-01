@@ -24,6 +24,7 @@ export default class Always {
 
     try {
 
+      /*
       const userSessionPersistentEntries = [
                                              {
                                                Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
@@ -88,6 +89,7 @@ export default class Always {
 
       bSuccess = true;
       bEmptyContent = false;
+      */
 
     }
     catch ( error ) {

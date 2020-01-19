@@ -76,6 +76,7 @@ export default class Always {
 
       await loopUserGroupEntriesAsync();
 
+      /*
       const userEntries = [
                             {
                               Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
@@ -155,6 +156,7 @@ export default class Always {
       };
 
       await loopUserEntriesAsync();
+      */
 
       bSuccess = true;
       bEmptyContent = false;
