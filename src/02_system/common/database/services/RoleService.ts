@@ -160,11 +160,24 @@ export default class RoleService extends BaseService {
 
       }
 
+      let strSQL = DBConnectionManager.getStatement( "getRolesFromRouteId",
+                                                     {
+                                                       Id: strId
+                                                     },
+                                                     logger );
+
+      let rows = await dbConnection.query( strSQL, {
+                                                     raw: true,
+                                                     type: QueryTypes.SELECT,
+                                                     transaction: currentTransaction
+                                                   } );
+      /*
       let rows = await dbConnection.query( `Select Distinct C.Name As Role From Route As A Inner Join RoleHasRoute As B On B.RouteId = A.Id Inner Join Role As C On C.Id = B.RoleId Where ( A.Id = '${strId}' )`, {
         raw: true,
         type: QueryTypes.SELECT,
         transaction: currentTransaction
       } );
+      */
 
       for ( let row of rows ) {
 
@@ -172,11 +185,25 @@ export default class RoleService extends BaseService {
 
       }
 
+      strSQL = DBConnectionManager.getStatement( "getAllowTagAccessFromRouteId",
+                                                 {
+                                                   Id: strId
+                                                 },
+                                                 logger );
+
+      rows = await dbConnection.query( strSQL, {
+                                                 raw: true,
+                                                 type: QueryTypes.SELECT,
+                                                 transaction: currentTransaction
+                                               } );
+
+      /*
       rows = await dbConnection.query( `Select A.AllowTagAccess As AllowTagAccess From Route As A Where ( A.Id = '${strId}' )`, {
         raw: true,
         type: QueryTypes.SELECT,
         transaction: currentTransaction
       } );
+      */
 
       for ( let row of rows ) {
 
@@ -244,79 +271,6 @@ export default class RoleService extends BaseService {
     return this.getRolesFromRouteId( strId,
                                      transaction,
                                      logger );
-
-    /*
-    let result = [];
-
-    let currentTransaction = transaction;
-
-    let bApplyTansaction = false;
-
-    try {
-
-      const dbConnection = DBConnectionManager.currentInstance;
-
-      if ( currentTransaction == null ) {
-
-        currentTransaction = await dbConnection.transaction();
-
-        bApplyTansaction = true;
-
-      }
-
-      const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, logger );
-
-      //let debugMark = debug.extend( 'AC872B84A6DA' );
-      debugMark( "Id => %s", strId );
-
-      const rows = await dbConnection.query( `Select C.Name As Role From Route As A Inner Join RoleHasRoute As B On B.RouteId = A.Id Inner Join Role As C On C.Id = B.RoleId Where ( A.Id = '${strId}' )`, {
-        raw: true,
-        type: QueryTypes.SELECT,
-        transaction: currentTransaction
-      } );
-
-      for ( let row of rows ) {
-
-        result.push( row[ "Role" ] );
-
-      }
-
-      if ( currentTransaction != null &&
-           bApplyTansaction ) {
-
-         await currentTransaction.commit();
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.getRolesFromRoutePath.name;
-
-      const strMark = "0D20B0B1769D";
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-    }
-
-    return result;
-    */
 
   }
 

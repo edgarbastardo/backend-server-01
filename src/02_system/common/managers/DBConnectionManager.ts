@@ -51,6 +51,12 @@ export default class DBConnectionManager {
 
       dbConfig.password = process.env.DB_SERVER_PASSWORD;
 
+
+    }
+    if ( process.env.DB_SERVER_DIALECT ) {
+
+      dbConfig.dialect = process.env.DB_SERVER_DIALECT;
+
     }
 
     return dbConfig;
@@ -245,11 +251,14 @@ export default class DBConnectionManager {
 
     try {
 
+      let strDialect = this.currentInstance ? this.currentInstance.options.dialect : "";
+
       if ( this.queryStatements ) {
 
         if ( this.queryStatements.businessQueries ) {
 
-          strResult = this.queryStatements.businessQueries.getStatement( strName,
+          strResult = this.queryStatements.businessQueries.getStatement( strDialect,
+                                                                         strName,
                                                                          params,
                                                                          logger );
 
@@ -257,7 +266,8 @@ export default class DBConnectionManager {
 
         if ( !strResult && this.queryStatements.systemQueries ) {
 
-          strResult = this.queryStatements.systemQueries.getStatement( strName,
+          strResult = this.queryStatements.systemQueries.getStatement( strDialect,
+                                                                       strName,
                                                                        params,
                                                                        logger );
 

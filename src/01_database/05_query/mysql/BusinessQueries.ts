@@ -1,8 +1,11 @@
 const debug = require( 'debug' )( 'BusinessQueries' );
 
+import SqlString from 'sqlstring';
+
 export default class BusinessQueries {
 
-  static getStatement( strName: string,
+  static getStatement( strDialect: string,
+                       strName: string,
                        params: any,
                        logger: any ): string {
 
@@ -12,14 +15,18 @@ export default class BusinessQueries {
 
     //Example
     /*
-    if ( strName === "getConfigValueData" ) {
+    if ( strDialect === "mysql" ) {
 
-      return `Select A.Default, B.Value From ConfigMetaData As A Left Outer Join ConfigValueData As B On B.ConfigMetaDataId = A.Id Where ( A.Id = '${params.ConfigMetaDataId}' And ( B.Owner Is Null Or B.Owner = '${params.Owner}' ) )`;
+      if ( strName === "getConfigValueData" ) {
 
-    }
-    else if ( strName === "getOldUserSessionStatus" ) {
+        return SqlString.format( `Select A.Default, B.Value From ConfigMetaData As A Left Outer Join ConfigValueData As B On B.ConfigMetaDataId = A.Id Where ( A.Id = ? And ( B.Owner Is Null Or B.Owner = ? ) )`, [ params.ConfigMetaDataId, params.Owner ] );
 
-      return `Select * From UserSessionStatus As A Where A.UserId = '${params.UserId}' And A.LoggedOutAt Is Null Order By A.UpdatedAt Asc`;
+      }
+      else if ( strName === "getOldUserSessionStatus" ) {
+
+        return SqlString.format( `Select * From UserSessionStatus As A Where ( A.UserId = ? ) And A.LoggedOutAt Is Null Order By A.UpdatedAt Asc`, params.UserId );
+
+      }
 
     }
     */

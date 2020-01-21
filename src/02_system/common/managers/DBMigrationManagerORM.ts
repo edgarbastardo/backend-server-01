@@ -30,9 +30,9 @@ export class DBMigrationManagerORM {
       if ( CommonUtilities.isNotNullOrEmpty( dbConnection ) ) {
 
         await dbConnection.query( "Select * From " + strTableName, {
-          raw: true,
-          type: QueryTypes.SELECT
-        } );
+                                                                     raw: true,
+                                                                     type: QueryTypes.SELECT
+                                                                   } );
 
         bResult = true;
 
@@ -89,9 +89,9 @@ export class DBMigrationManagerORM {
       if ( CommonUtilities.isNotNullOrEmpty( dbConnection ) ) {
 
         result = await dbConnection.query( "Select * From " + strTableName, {
-          raw: true,
-          type: QueryTypes.SELECT
-        } );
+                                                                              raw: true,
+                                                                              type: QueryTypes.SELECT
+                                                                            } );
 
       }
       else {
