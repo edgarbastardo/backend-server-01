@@ -59,7 +59,7 @@ export default class Always {
           const options = {
 
             where: { Id: userGroupToCreate.Id },
-            individualHooks: true,
+            //individualHooks: true,
             transaction: currentTransaction,
 
           }

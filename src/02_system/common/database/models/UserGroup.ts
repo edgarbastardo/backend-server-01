@@ -97,11 +97,9 @@ export class UserGroup extends Model<UserGroup> {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
-    //let debugMark = debug.extend( '7B6D8B57ED8B' );
-    //debugMark( "%O", instance );
-
   }
 
+  /*
   @BeforeUpdate
   static beforeUpdateHook( instance: UserGroup, options: any ): void {
 
@@ -109,6 +107,7 @@ export class UserGroup extends Model<UserGroup> {
     //instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
   }
+  */
 
   /*
   @AfterUpdate

@@ -260,12 +260,14 @@ export class User extends Model<User> {
 
   }
 
+  /*
   @BeforeUpdate
   static beforeUpdateHook( instance: UserGroup, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
+  */
 
   static async convertFieldValues( params: any ): Promise<any> {
 

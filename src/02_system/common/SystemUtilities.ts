@@ -2109,9 +2109,17 @@ export default class SystemUtilities {
 
       }
 
-      if ( instance.isNewRecord ) {
+      /*
+      if ( options.type === "BULKUPDATE" ||
+           options.type === "UPDATE" ) {  //!options.where ) {
+      */
+      if ( !options ||
+           !options.type ||
+           options.type.toUpperCase() === "BULKCREATE" ||
+           options.type.toUpperCase() === "CREATE" ) {
 
-        if ( instance.rawAttributes[ "CreatedBy" ] !== null ) {
+        if ( instance.rawAttributes[ "CreatedBy" ] !== null &&
+             !instance.createdBy  ) {
 
           if ( options.context &&
                options.context.UserSessionStatus &&
@@ -2128,7 +2136,8 @@ export default class SystemUtilities {
 
         }
 
-        if ( instance.rawAttributes[ "CreatedAt" ] !== null ) {
+        if ( instance.rawAttributes[ "CreatedAt" ] !== null &&
+             !instance.createdAt ) {
 
           instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
