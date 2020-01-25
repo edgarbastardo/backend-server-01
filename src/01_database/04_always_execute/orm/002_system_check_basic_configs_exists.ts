@@ -14,7 +14,7 @@ import { ConfigMetaData } from "../../../02_system/common/database/models/Config
 import { ConfigValueData } from '../../../02_system/common/database/models/ConfigValueData';
 import CommonConstants from '../../../02_system/common/CommonConstants';
 
-const debug = require( 'debug' )( '002_check_basic_configs_exists' );
+const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
 
 //Example file import files using code
 export default class Always {

@@ -5,7 +5,7 @@ import SystemConstants from "../../../02_system/common/SystemContants";
 import { UserSessionPersistent } from "../../../02_system/common/database/models/UserSessionPersistent";
 import CommonConstants from '../../../02_system/common/CommonConstants';
 
-const debug = require( 'debug' )( '004_check_create_persistent_tokens_exists' );
+const debug = require( 'debug' )( '501_business_check_persistent_tokens_exists' );
 
 //Example file import files using code
 export default class Always {
@@ -26,7 +26,6 @@ export default class Always {
 
     try {
 
-      /*
       if ( currentTransaction == null ) {
 
         currentTransaction = await dbConnection.transaction();
@@ -36,33 +35,33 @@ export default class Always {
       //Migration code here
 
       const userSessionPersistentEntries = [
-                                             {
-                                               Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
-                                               UserId: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
-                                               Token: "5e187e17-ec3c-4536-bac7-593bffcba0c8",
-                                               BinaryDataToken: "593bffcba0c8",
-                                               Tag: "#ForeignSystem01#,#BinaryDataAllowToDefineId#,#BinaryDataAllowToDefineDate#",
-                                               Comment: "Migrator app token. Created from backend startup",
-                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                             },
-                                             {
-                                               Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                                               UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                                               Token: "30dd38f1-64f3-4d4f-9359-bbeb7d9750b7",
-                                               BinaryDataToken: "bbeb7d9750b7",
-                                               Tag: "#ForeignSystem02#",
-                                               Comment: "Mobile app token. Created from backend startup",
-                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                            },
-                                            {
-                                               Id: "2bc74668-bdca-49de-bc99-058f7f3a5e10",
-                                               UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
-                                               Token: "13293244-277f-46fd-8f61-22a38b6fc81e",
-                                               BinaryDataToken: "22a38b6fc81e",
-                                               Tag: "#ForeignSystem03#",
-                                               Comment: "Web app token. Created from backend startup",
-                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                             },
+                                            //  {
+                                            //    Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
+                                            //    UserId: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
+                                            //    Token: "5e187e17-ec3c-4536-bac7-593bffcba0c8",
+                                            //    BinaryDataToken: "593bffcba0c8",
+                                            //    Tag: "#ForeignSystem01#,#BinaryDataAllowToDefineId#,#BinaryDataAllowToDefineDate#",
+                                            //    Comment: "Generic authorization token (API KEY)",
+                                            //    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                            //  },
+                                            //  {
+                                            //    Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
+                                            //    UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
+                                            //    Token: "30dd38f1-64f3-4d4f-9359-bbeb7d9750b7",
+                                            //    BinaryDataToken: "bbeb7d9750b7",
+                                            //    Tag: "#ForeignSystem02#",
+                                            //    Comment: "Generic authorization token (API KEY)",
+                                            //    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                            // },
+                                            // {
+                                            //    Id: "2bc74668-bdca-49de-bc99-058f7f3a5e10",
+                                            //    UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
+                                            //    Token: "13293244-277f-46fd-8f61-22a38b6fc81e",
+                                            //    BinaryDataToken: "22a38b6fc81e",
+                                            //    Tag: "#ForeignSystem03#",
+                                            //    Comment: "Generic authorization token (API KEY)",
+                                            //    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                            //  },
                                           ]
 
       const loopUserSessionPersistentEntriesAsync = async () => {
@@ -105,7 +104,6 @@ export default class Always {
 
       bSuccess = true;
       bEmptyContent = false;
-      */
 
     }
     catch ( error ) {

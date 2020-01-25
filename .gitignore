@@ -7,4 +7,4 @@ binary_data/persistent/
 install_distribution/
 .deploy.json
 .env.log
-
+.env.email

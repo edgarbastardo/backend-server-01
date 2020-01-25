@@ -4,7 +4,7 @@ import moment from 'moment-timezone';
 import os from 'os';
 import Hashes from 'jshashes';
 */
-import bcrypt from 'bcrypt';
+//import bcrypt from 'bcrypt';
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
@@ -14,7 +14,7 @@ import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
 import { User } from '../../../02_system/common/database/models/User';
 import CommonConstants from '../../../02_system/common/CommonConstants';
 
-const debug = require( 'debug' )( '001_check_system_groups_and_users_exists' );
+const debug = require( 'debug' )( '001_system_check_groups_and_users_exists' );
 
 //Example file import files using code
 export default class Always {

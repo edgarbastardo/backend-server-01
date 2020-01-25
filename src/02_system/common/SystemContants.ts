@@ -611,6 +611,38 @@ export default class SystemConstants {
                                                       ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupProcess} }`
                                                     };
 
+  static readonly _CONFIG_ENTRY_EMail_Service = {
+                                                  Id: "c0b016a3-3fda-4c5b-be78-fa8e96398196",
+                                                  Scope: "system",
+                                                  Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                  Category: "Notification",
+                                                  Name: "system.notification.email.service",
+                                                  Default: `{ "service": "@__none__@", "#gmail#": { "type": "smtp", "server": "smtp.gmail.com", "port": "587", "auth": { "user": "myuser@gmail.com", "password": "secret" } } }`,
+                                                  Label: "Configuration for the notifications email system",
+                                                  Description: "Configuration for the notification email system",
+                                                  AllowTagAccessR: "#Administrator#",
+                                                  AllowTagAccessW: "#Administrator#",
+                                                  Example: '{ "service": "#gmail#", "#gmail#": { "type": "smtp", "server": "smtp.gmail.com", "port": "587", "auth": { "user": "myuser@gmail.com", "password": "secret" } }, "#sendgrid#": { "type": "sendgrid", "auth": { "api_user": "sendgrid_user", "api_key": "my_key" } } }',
+                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                  ExtraData: `{ "Type": "struct/json", "Schema": "" }`
+                                                };
+
+  static readonly _CONFIG_ENTRY_SMS_Service = {
+                                                Id: "71199a26-8a8a-4015-989c-4a911b18c68e",
+                                                Scope: "system",
+                                                Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                Category: "Notification",
+                                                Name: "system.notification.sms.service",
+                                                Default: `{ "service": "@__none__@", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }`,
+                                                Label: "Configuration for the notifications sms system",
+                                                Description: "Configuration for the notification sms system",
+                                                AllowTagAccessR: "#Administrator#",
+                                                AllowTagAccessW: "#Administrator#",
+                                                Example: '{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }',
+                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                ExtraData: `{ "Type": "struct/json", "Schema": "" }`
+                                              };
+
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_LoginAccessControl,
@@ -624,6 +656,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_BinaryDataProcess,
                                                SystemConstants._CONFIG_ENTRY_UserSignupControl,
                                                SystemConstants._CONFIG_ENTRY_UserSignupProcess,
+                                               SystemConstants._CONFIG_ENTRY_EMail_Service,
+                                               SystemConstants._CONFIG_ENTRY_SMS_Service,
                                              ];
 
 }
