@@ -18,10 +18,18 @@ export default class Migrate {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
 
-      //Migration code here
       /*
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      //Migration code here
       const strId = SystemUtilities.getUUIDv4();
 
       const userGroupsToCreate = [
@@ -56,6 +64,12 @@ export default class Migrate {
 
       debug( "%O", usersCreated );
 
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
+
       bSuccess = true;
       bEmptyContent = false;
       */
@@ -82,6 +96,20 @@ export default class Migrate {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

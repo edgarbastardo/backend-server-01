@@ -1,5 +1,5 @@
 import { allow, rule, and } from 'graphql-shield';
-import SystemUtilities from "../../../common/SystemUtilities";
+import SystemUtilities from "../../../../common/SystemUtilities";
 
 export const permissions = {
 

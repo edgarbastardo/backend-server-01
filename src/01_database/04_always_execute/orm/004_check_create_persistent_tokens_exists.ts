@@ -22,9 +22,19 @@ export default class Always {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
 
       /*
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      //Migration code here
+
       const userSessionPersistentEntries = [
                                              {
                                                Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
@@ -87,6 +97,12 @@ export default class Always {
 
       await loopUserSessionPersistentEntriesAsync();
 
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
+
       bSuccess = true;
       bEmptyContent = false;
       */
@@ -113,6 +129,20 @@ export default class Always {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

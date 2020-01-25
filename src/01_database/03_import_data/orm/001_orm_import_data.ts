@@ -21,11 +21,19 @@ export default class Import {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
+
+      /*
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
 
       //Migration code here
 
-      /*
       const strId = SystemUtilities.getUUIDv4();
 
       const userGroupsToCreate = [
@@ -61,6 +69,12 @@ export default class Import {
       const usersCreated = await User.bulkCreate( usersToCreate, { individualHooks: true, validate: true } );
 
       debugMark( usersCreated );
+
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
       */
 
       bSuccess = true;
@@ -88,6 +102,20 @@ export default class Import {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

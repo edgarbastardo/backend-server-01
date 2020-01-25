@@ -17,7 +17,7 @@ import {
 } from "inversify-express-utils";
 import { injectable, inject } from 'inversify';
 //import SecurityService from '../../../common/database/services/SecurityService';
-import BinaryService from "../../../common/database/services/BinaryService";
+import BinaryServiceController from "../../services/BinaryService.controller";
 import CommonConstants from '../../../common/CommonConstants';
 
 const debug = require( 'debug' )( 'Binary.controller' );
@@ -123,7 +123,7 @@ export default class BinaryController {
 
           const context = ( request as any ).context;
 
-          const result = await BinaryService.processBinaryDataDownload( request,
+          const result = await BinaryServiceController.processBinaryDataDownload( request,
                                                                         response,
                                                                         null,
                                                                         context.Logger );
@@ -187,8 +187,8 @@ export default class BinaryController {
                                   StatusCode: 500,
                                   Code: 'ERROR_UNEXPECTED',
                                   Message: 'Unexpected error. Please read the server log for more details.',
-                                  LogId: error.LogId,
                                   Mark: strMark,
+                                  LogId: error.LogId,
                                   IsError: true,
                                   Errors: [
                                             {
@@ -253,7 +253,7 @@ export default class BinaryController {
 
       const context = ( request as any ).context;
 
-      const result = await BinaryService.createBinaryDataAuthorization( request,
+      const result = await BinaryServiceController.createBinaryDataAuthorization( request,
                                                                         null,
                                                                         context.Logger );
 
@@ -281,7 +281,7 @@ export default class BinaryController {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
                        Message: 'Unexpected error. Please read the server log for more details.',
-                       Mark: error.mark,
+                       Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [
@@ -314,7 +314,7 @@ export default class BinaryController {
 
       const context = ( request as any ).context;
 
-      const result = await BinaryService.deleteBinaryDataAuthorization( request,
+      const result = await BinaryServiceController.deleteBinaryDataAuthorization( request,
                                                                         null,
                                                                         context.Logger );
 
@@ -342,7 +342,7 @@ export default class BinaryController {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
                        Message: 'Unexpected error. Please read the server log for more details.',
-                       Mark: error.mark,
+                       Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [
@@ -475,7 +475,7 @@ export default class BinaryController {
 
       const context = ( request as any ).context;
 
-      const result = await BinaryService.processBinaryDataUpload( request,
+      const result = await BinaryServiceController.processBinaryDataUpload( request,
                                                                   null,
                                                                   context.Logger );
 
@@ -503,7 +503,7 @@ export default class BinaryController {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
                        Message: 'Unexpected error. Please read the server log for more details.',
-                       Mark: error.mark,
+                       Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [

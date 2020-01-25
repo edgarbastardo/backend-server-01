@@ -31,7 +31,15 @@ export default class Always {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
 
       //Check if exists the the basic config entries defined
       const configEntries = SystemConstants._CONFIG_METADATA_ENTRIES;
@@ -50,7 +58,7 @@ export default class Always {
 
           if ( configMetaDataInDB === null ) {
 
-            //const configMetaDataCreated = 
+            //const configMetaDataCreated =
             await ConfigMetaData.create( configMetaDataToCreate );
 
             /*
@@ -101,6 +109,18 @@ export default class Always {
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: `{ "#System_Administrators#.other": { "denied": "#image/png#,#image/jpeg#", "allowed": "*" }, "#System_Administrators#": { "denied": "*", "allowed": "" }, "#Documents_Allow_01#" : { "denied": "", "allowed": "#application/pdf#" }, "#admin01@system.net#.test": { "denied": "#application/json#", "allowed": "#image/png#,#image/jpeg#" }, "@__default__@": { "denied": "", "allowed": "*" } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: "4a7819e9-712f-42e4-936b-3915b3d8a666", //system.Security.PasswordStrengthParameters
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: `{ "@__default__@": { "minLength":8,"maxLength":0,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" }, "#Drivers#": { "minLength":5,"maxLength":8,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" }, "#Final_Customers#": { "minLength":7,"maxLength":9,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" }, "#Establishments#": { "minLength":8,"maxLength":10,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" } }`,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: "aaa72b7d-9724-441d-bc28-4ae8b3e15b1c", //system.user.signup.Process
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: `{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishments#" } }`,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     }
                                   ]
 
@@ -135,7 +155,13 @@ export default class Always {
 
       };
 
-      //await loopConfigValueEntriesAsync();
+      await loopConfigValueEntriesAsync();
+
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
 
       bSuccess = true;
       bEmptyContent = false;
@@ -162,6 +188,20 @@ export default class Always {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

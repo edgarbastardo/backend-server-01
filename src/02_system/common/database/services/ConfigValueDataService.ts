@@ -327,6 +327,93 @@ export default class ConfigValueDataService extends BaseService {
 
   }
 
+  //Search for config using tags example strTags = #admin01@system.net#,#508a78a2-7906-4cb2-93ad-a7b0a80aa9a6#,#Business_Manager#,#Business_Manager#.OtherTag
+  static async getConfigValueDataFromTags( strTags: string,
+                                           strConfigId: string,
+                                           strConfigOwner: string,
+                                           transaction: any,
+                                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    const configData = await ConfigValueDataService.getConfigValueData( strConfigId,
+                                                                        strConfigOwner,
+                                                                        transaction,
+                                                                        logger );
+
+    try {
+
+      let jsonConfig = null;
+
+      if ( configData.Value ) {
+
+        jsonConfig = CommonUtilities.parseJSON( configData.Value,
+                                                logger );
+
+      }
+
+      if ( jsonConfig ) {
+
+        let searchConfigData = ConfigValueDataService.searchInTags( jsonConfig,
+                                                                    strTags,
+                                                                    "",
+                                                                    logger );
+
+
+        jsonConfig = searchConfigData;
+
+      }
+
+      if ( jsonConfig === null ) {
+
+        jsonConfig = CommonUtilities.parseJSON( configData.Default,
+                                                logger );
+
+        if ( jsonConfig ) {
+
+          jsonConfig = jsonConfig[ "@__default__@" ];
+
+        }
+
+      }
+
+      if ( jsonConfig ) {
+
+        result = jsonConfig;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigValueDataFromTags.name;
+
+      const strMark = "974B4BB8DD96";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   /*
   static async getConfigValueDataSingle( userSessionStatus: any,
                                          strConfigId: string,

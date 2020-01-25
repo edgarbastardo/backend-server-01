@@ -31,7 +31,15 @@ export default class Always {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
 
       //Check if exists the System.Administrator and Business.Managers groups
       const userGroups = SystemConstants._USER_GROUPS;
@@ -109,6 +117,7 @@ export default class Always {
             userInDB.Name = userToCreate.Name;
             userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
             userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            userInDB.DisabledBy = userToCreate.DisabledBy;
 
             //const userUpdated =
             await User.update( ( userInDB as any).dataValues,
@@ -129,6 +138,12 @@ export default class Always {
       }
 
       await loopUsersAsync();
+
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
 
       bSuccess = true;
       bEmptyContent = false;
@@ -155,6 +170,20 @@ export default class Always {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

@@ -225,9 +225,9 @@ export class DBMigrationManagerORM {
         await CommonUtilities.asyncForEach( dirs as any, async ( strFileName: string ) => {
 
           if ( this.getFileExecuted( dbMigrationContent,
-                                       strMigrationsFolder,
-                                       strFileName,
-                                       logger ) === null ) {
+                                     strMigrationsFolder,
+                                     strFileName,
+                                     logger ) === null ) {
 
             let bEmptyContent = true;
             let bSuccess = false;
@@ -573,7 +573,7 @@ export class DBMigrationManagerORM {
       const strRootPath = __dirname; //require( 'app-root-path' );
       const strImportDataFolder = strRootPath + '/../../../01_database/04_always_execute/orm/';
       const path = require('path')
-      const os = require( 'os' );
+      //const os = require( 'os' );
 
       const dirs = fs.readdirSync( strImportDataFolder );
 

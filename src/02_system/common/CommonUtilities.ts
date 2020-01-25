@@ -433,6 +433,26 @@ export default class CommonUtilities {
 
   }
 
+  static formatErrorStack( stack: String ): string[] {
+
+    let result = [];
+
+    try {
+
+      result = stack.split( "at " ); //.splice( 0, 1 );
+
+      result.splice( 0, 1 );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
   static deleteObjectFields( dataObject: any, fieldNamesToRemove: string[], logger: any ): any {
 
     let result = dataObject;
@@ -707,6 +727,104 @@ export default class CommonUtilities {
   static getFileExtension( strFileName: string ): string {
 
     return path.extname( strFileName );
+
+  }
+
+  static countLowerCasePositions( strWord: string ): number {
+
+    let intResult = -1;
+
+    try {
+
+      if ( strWord ) {
+
+        intResult = ( strWord.match(/[a-z]/g) || [] ).length;
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+  }
+
+  static countUpperCasePositions( strWord: string ): number {
+
+    let intResult = -1;
+
+    try {
+
+      if ( strWord ) {
+
+        intResult = ( strWord.match(/[A-Z]/g) || [] ).length;
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+  }
+
+  static countDigitPositions( strWord: string ): number {
+
+    let intResult = -1;
+
+    try {
+
+      if ( strWord ) {
+
+        intResult = ( strWord.match(/[0-9]/g) || [] ).length;
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+  }
+
+  static countSymbolPositions( strWord: string, strSymbols: string ): number {
+
+    let intResult = -1;
+
+    try {
+
+      if ( strWord ) {
+
+        strSymbols = !strSymbols ? "#$%&()[]{}=-_:.¿?*@|¡!*+/\\;,": strSymbols;
+
+        for ( let intPosition = 0; intPosition < strWord.length; intPosition++ ) {
+
+          if ( strSymbols.includes( strWord.charAt( intPosition ) ) ) {
+
+            intResult += 1;
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
 
   }
 

@@ -243,22 +243,23 @@ export default class SystemConstants {
                                                          `"minDigit":{"type":"number","minimum":0,"maximum":10},` +
                                                          `"maxDigit":{"type":"number","minimum":0,"maximum":10},` +
                                                          `"minSymbol":{"type":"number","minimum":0,"maximum":10},` +
-                                                         `"maxSymbol":{"type":"number","minimum":0,"maximum":10}}}}}`;
+                                                         `"maxSymbol":{"type":"number","minimum":0,"maximum":10},` +
+                                                         `"Symbols":{"type":"string"}}}}}`;
 
-  static readonly _CONFIG_ENTRY_StrengthPasswordParameters = {
+  static readonly _CONFIG_ENTRY_PasswordStrengthParameters = {
                                                                Id: "4a7819e9-712f-42e4-936b-3915b3d8a666",
                                                                Scope: "system",
                                                                Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                                Category: "Security",
-                                                               Name: "system.Security.StrengthPasswordParameters",
-                                                               Default: `{ "@__default__@": { "minLength":8,"maxLength":0,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0 } }`,
+                                                               Name: "system.Security.PasswordStrengthParameters",
+                                                               Default: `{ "@__default__@": { "minLength":8,"maxLength":0,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" } }`,
                                                                Label: "Default password strength parameters",
                                                                Description: "Default password strength parameters defined in json/struct",
                                                                AllowTagAccessR: "#Administrator#",
                                                                AllowTagAccessW: "#Administrator#",
-                                                               Example: '{ "@__default__@": { "minLength":8,"maxLength":0,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0 } }',
+                                                               Example: '{ "@__default__@": { "minLength":8,"maxLength":0,"minLowerCase":0,"maxLowerCase":0,"minUpperCase":0,"maxUpperCase":0,"minDigit":0,"maxDigit":0,"minSymbol":0,"maxSymbol":0,"symbols": "" } }',
                                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                               ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_LoginAccessControl} }`
+                                                               ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_StrengthPasswordParameters} }`
                                                              };
 
   static readonly _CONFIG_ENTRY_BinaryDataBasePath = {
@@ -309,13 +310,13 @@ export default class SystemConstants {
                                                        ExtraData: `{ "Type": "integer", "Minimal": 1, "Maximal": 150000 }`
                                                      };
 
-  static _SCHEMA_VALIDATION_Mime_Type = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
-                                        `"type":"object","additionalProperties":false,` +
-                                        `"patternProperties":{"#.*#":{"$ref":"#/definitions/validationDef"}},` +
-                                        `"definitions":{"validationDef":{"type":"object","required":["denied","allowed"],` +
-                                        `"additionalProperties":false,"properties":` +
-                                        `{"denied":{"type":"string"},` +
-                                        `"allowed":{"type":"string"}}}}}`;
+  static _SCHEMA_VALIDATION_MimeType = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
+                                       `"type":"object","additionalProperties":false,` +
+                                       `"patternProperties":{"#.*#":{"$ref":"#/definitions/validationDef"}},` +
+                                       `"definitions":{"validationDef":{"type":"object","required":["denied","allowed"],` +
+                                       `"additionalProperties":false,"properties":` +
+                                       `{"denied":{"type":"string"},` +
+                                       `"allowed":{"type":"string"}}}}}`;
 
   static readonly _CONFIG_ENTRY_BinaryDataAllowedCategory = {
                                                               Id: "c0ea3ece-277c-4490-b2c1-a06f54382520",
@@ -330,7 +331,7 @@ export default class SystemConstants {
                                                               AllowTagAccessW: "#Administrator#",
                                                               Example: '{ "#group01#": { "denied": "", "allowed": "#ticket#,#profile#,#avatar#" }, "#user01#": { "denied": "#ticket#", "allowed": "*" }, "@__default__@": { "denied": "*", "allowed": "" }, }',
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                              ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_Mime_Type} }`
+                                                              ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_MimeType} }`
                                                             };
 
   static readonly _CONFIG_ENTRY_BinaryDataAllowedMimeType = {
@@ -346,7 +347,7 @@ export default class SystemConstants {
                                                               AllowTagAccessW: "#Administrator#",
                                                               Example: '{ "#group01#": { "denied": "", "allowed": "#image/png#,#application/pdf#" }, "#user01#": { "denied": "#image/jpg#,#application/pdf#", "allowed": "*" }, "@__default__@": { "denied": "*", "allowed": "" }, }',
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                              ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_Mime_Type} }`
+                                                              ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_MimeType} }`
                                                             };
 
   /*
@@ -377,12 +378,12 @@ export default class SystemConstants {
     }
   */
 
-  static _SCHEMA_VALIDATION_Default_Owner = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
-                                            `"type":"object","additionalProperties":false,` +
-                                            `"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
-                                            `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},` +
-                                            `"definitions":{"validatonDef":{"type":"string","additionalProperties":false,},` +
-                                            `"validatonDefNotEmpty":{"type":"string","additionalProperties":false,"minLength":1},}}`;
+  static _SCHEMA_VALIDATION_BinaryDataDefaultOwner = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
+                                                     `"type":"object","additionalProperties":false,` +
+                                                     `"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
+                                                     `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},` +
+                                                     `"definitions":{"validatonDef":{"type":"string","additionalProperties":false,},` +
+                                                     `"validatonDefNotEmpty":{"type":"string","additionalProperties":false,"minLength":1},}}`;
 
   static readonly _CONFIG_ENTRY_BinaryDataDefaultOwner = {
                                                            Id: "c1befe9b-8a6a-4f3a-8d91-e1b418e2f71d",
@@ -397,7 +398,7 @@ export default class SystemConstants {
                                                            AllowTagAccessW: "#Administrator#",
                                                            Example: '{ "@__default__@": "#@@UserGroupIdUploader@@#,#@@UserGroupNameUploader@@#,#@@UserIdUploader@@#,#@@UserNameUploader@@#", "#user01#.ticket": "#user02#,#user03#,#Business_Manager#", "#user01#.avatar": "#user10#", "#Group01#": "#Group02#,#user03#" }',
                                                            CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                           ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_Default_Owner} }`
+                                                           ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_BinaryDataDefaultOwner} }`
                                                          };
 
   /*
@@ -449,14 +450,14 @@ export default class SystemConstants {
     }
   */
 
-  static _SCHEMA_VALIDATION_Thumbnail = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object",` +
-                                        `"additionalProperties":false,"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
-                                        `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},"definitions":{"validatonDef":{"type":"array",` +
-                                        `"additionalProperties":false,"items":{"$ref":"#/definitions/validatonObjectDef"},},` +
-                                        `"validatonDefNotEmpty":{"type":"array","additionalProperties":false,"minLength":1,"items":` +
-                                        `{"$ref":"#/definitions/validatonObjectDef"},"minItems":1,},"validatonObjectDef":{"type":"object",` +
-                                        `"additionalProperties":false,"required":["Mime","Factor"],"properties":{"Mime":{"type":"string","minLength":1,},` +
-                                        `"Factor":{"type":"number","minimum":50,}}}}}`;
+  static _SCHEMA_VALIDATION_BinaryDataThumbnail = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object",` +
+                                                  `"additionalProperties":false,"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
+                                                  `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},"definitions":{"validatonDef":{"type":"array",` +
+                                                  `"additionalProperties":false,"items":{"$ref":"#/definitions/validatonObjectDef"},},` +
+                                                  `"validatonDefNotEmpty":{"type":"array","additionalProperties":false,"minLength":1,"items":` +
+                                                  `{"$ref":"#/definitions/validatonObjectDef"},"minItems":1,},"validatonObjectDef":{"type":"object",` +
+                                                  `"additionalProperties":false,"required":["Mime","Factor"],"properties":{"Mime":{"type":"string","minLength":1,},` +
+                                                  `"Factor":{"type":"number","minimum":50,}}}}}`;
 
   static readonly _CONFIG_ENTRY_BinaryDataThumbnail = {
                                                         Id: "d5108be7-c79a-4b63-a7e0-022dfc26f4e5",
@@ -471,17 +472,17 @@ export default class SystemConstants {
                                                         AllowTagAccessW: "#Administrator#",
                                                         Example: '{ "@__default__@": [ { "mime": "#image/png#,#image/jpeg#", "factor": 300 } ], "#Group01#.ticket": [ { "mime": "#image/png#,#image/jpeg#", "factor": 500 } ] }',
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                        ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_Thumbnail} }`
+                                                        ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_BinaryDataThumbnail} }`
                                                       };
 
-  static _SCHEMA_VALIDATION_Process = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object",` +
-                                      `"additionalProperties":false,"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
-                                      `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},"definitions":{"validatonDef":{"type":"array",` +
-                                      `"additionalProperties":false,"items":{"$ref":"#/definitions/validatonObjectDef"},},` +
-                                      `"validatonDefNotEmpty":{"type":"array","additionalProperties":false,"minLength":1,"items":` +
-                                      `{"$ref":"#/definitions/validatonObjectDef"},"minItems":1,},"validatonObjectDef":{"type":"object",` +
-                                      `"additionalProperties":false,"required":["Mime","Factor","keepOriginal"],"properties":{"Mime":{"type":"string","minLength":1,},` +
-                                      `"Factor":{"type":"number","minimum":100,},"keepOriginal":{"type":"boolean",}}}}}`;
+  static _SCHEMA_VALIDATION_BinaryDataProcess = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object",` +
+                                                `"additionalProperties":false,"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonDef"},` +
+                                                `"#.*#":{"$ref":"#/definitions/validatonDefNotEmpty"}},"definitions":{"validatonDef":{"type":"array",` +
+                                                `"additionalProperties":false,"items":{"$ref":"#/definitions/validatonObjectDef"},},` +
+                                                `"validatonDefNotEmpty":{"type":"array","additionalProperties":false,"minLength":1,"items":` +
+                                                `{"$ref":"#/definitions/validatonObjectDef"},"minItems":1,},"validatonObjectDef":{"type":"object",` +
+                                                `"additionalProperties":false,"required":["Mime","Factor","keepOriginal"],"properties":{"Mime":{"type":"string","minLength":1,},` +
+                                                `"Factor":{"type":"number","minimum":100,},"keepOriginal":{"type":"boolean",}}}}}`;
 
   static readonly _CONFIG_ENTRY_BinaryDataProcess = {
                                                       Id: "40a2bddd-59e1-43a3-aa83-4c9775a2c298",
@@ -496,13 +497,124 @@ export default class SystemConstants {
                                                       AllowTagAccessW: "#Administrator#",
                                                       Example: '{ "@__default__@": [ { "mime": "#image/png#,#image/jpeg#", "factor": 1500, "size": 1024, "keepOriginal": true } ], "#Group01#.ticket": [ { "mime": "#image/png#,#image/jpeg#", "factor": 1000, "size": 512, "keepOriginal": true } ] }',
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                      ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_Process} }`
+                                                      ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_BinaryDataProcess} }`
+                                                    };
+
+  /*
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "additionalProperties":false,
+      "required": [ "@__default__@" ],
+      "patternProperties": {
+        "@__default__@": {
+          "$ref": "#/definitions/validatonDef"
+        },
+        "#.*#": {
+          "$ref": "#/definitions/validatonDef"
+        }
+      },
+      "definitions": {
+        "validatonDef": {
+          "type": "string",
+          "enum": [ "allowed", "denied" ]
+        },
+      }
+    }
+  */
+
+  static _SCHEMA_VALIDATION_UserSignupControl = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","additionalProperties"` +
+                                                `:false,"required":["@__default__@"],"patternProperties":{"@__default__@":` +
+                                                `{"$ref":"#/definitions/validatonDef"},"#.*#":{"$ref":"#/definitions/validatonDef"}},` +
+                                                `"definitions":{"validatonDef":{"type":"string","enum":["allowed","denied"]}}}`;
+
+  static readonly _CONFIG_ENTRY_UserSignupControl = {
+                                                      Id: "2d691d0d-95bb-443a-beb4-bb28535ad2a3",
+                                                      Scope: "system",
+                                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                      Category: "Singup",
+                                                      Name: "system.user.signup.Control",
+                                                      Default: `{ "@__default__@": "allowed" }`,
+                                                      Label: "Control the client id with access to signup service",
+                                                      Description: "Control the client id with access to signup service",
+                                                      AllowTagAccessR: "#Administrator#",
+                                                      AllowTagAccessW: "#Administrator#",
+                                                      Example: '{ "#mobile-ionic4-???#": "allowed", "#reactjs-???#": "denied", "@__default__@": "allowed" }',
+                                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                      ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupControl}  }`
+                                                    };
+
+  /*
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "additionalProperties":false,
+      "required": [ "@__default__@" ],
+      "patternProperties": {
+        "@__default__@": {
+          "$ref": "#/definitions/validatonObjectDef"
+        },
+        "#.*#": {
+          "$ref": "#/definitions/validatonObjectDef"
+        }
+      },
+      "definitions": {
+        "validatonObjectDef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [ "group", "createGroup", "groupRole", "status", "userRole" ],
+          "properties": {
+            "group": {
+              "type": "string",
+              "minLength": 2,
+            },
+            "createGroup": {
+              "type": "boolean",
+            },
+            "groupRole": {
+              "type": "string",
+            },
+            "status": {
+              "type": "number",
+            },
+            "userRole": {
+              "type": "string",
+            },
+          }
+        }
+      }
+    }
+  */
+
+  static _SCHEMA_VALIDATION_UserSignupProcess = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object",` +
+                                                `"additionalProperties":false,"required":["@__default__@"],"patternProperties":` +
+                                                `{"@__default__@":{"$ref":"#/definitions/validatonObjectDef"},".*":` +
+                                                `{"$ref":"#/definitions/validatonObjectDef"}},"definitions":{"validatonObjectDef"` +
+                                                `:{"type":"object","additionalProperties":false,"required":["group","createGroup","groupRole"` +
+                                                `,"status","userRole"],"properties":{"group":{"type":"string","minLength":2},"createGroup":{"type":` +
+                                                `"boolean"},"groupRole":{"type":"string"},"groupTag":{"type":"string"},"status":{"type":"number"},` +
+                                                `"userRole":{"type":"string"},"userTag":{"type":"string"}}}}}`
+
+  static readonly _CONFIG_ENTRY_UserSignupProcess = {
+                                                      Id: "aaa72b7d-9724-441d-bc28-4ae8b3e15b1c",
+                                                      Scope: "system",
+                                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                      Category: "Singup",
+                                                      Name: "system.user.signup.Process",
+                                                      Default: `{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameters": "" } }`,
+                                                      Label: "Process signup kind",
+                                                      Description: "Process signup of users. The group must be exists before of singup if createGroup = false. groupRole only apply if group is created first time createGroup = true",
+                                                      AllowTagAccessR: "#Administrator#",
+                                                      AllowTagAccessW: "#Administrator#",
+                                                      Example: '{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishment#" } }',
+                                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                      ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupProcess} }`
                                                     };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_LoginAccessControl,
-                                               SystemConstants._CONFIG_ENTRY_StrengthPasswordParameters,
+                                               SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataBasePath,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory,
@@ -510,6 +622,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataProcess,
+                                               SystemConstants._CONFIG_ENTRY_UserSignupControl,
+                                               SystemConstants._CONFIG_ENTRY_UserSignupProcess,
                                              ];
 
 }

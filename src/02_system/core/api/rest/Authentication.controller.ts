@@ -14,7 +14,7 @@ import {
   request
 } from "inversify-express-utils";
 import { injectable, inject } from 'inversify';
-import SecurityService from '../../../common/database/services/SecurityService';
+import SecurityServiceController from '../../services/SecurityService.controller';
 import CommonConstants from '../../../common/CommonConstants';
 
 const debug = require( 'debug' )( 'Authentication.controller' );
@@ -104,13 +104,13 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityService.login( context.TimeZoneId,
-                                                context.SourceIPAddress,
-                                                context.ClientId,
-                                                request.body.Username,
-                                                request.body.Password,
-                                                null,
-                                                context.Logger );
+    const result = await SecurityServiceController.login( context.TimeZoneId,
+                                                          context.SourceIPAddress,
+                                                          context.ClientId,
+                                                          request.body.Username,
+                                                          request.body.Password,
+                                                          null,
+                                                          context.Logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -125,9 +125,9 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityService.logout( context.Authorization,
-                                                 null,
-                                                 context.Logger );
+    const result = await SecurityServiceController.logout( context.Authorization,
+                                                           null,
+                                                           context.Logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -142,9 +142,9 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityService.tokenCheck( context.Authorization,
-                                                     null,
-                                                     context.Logger );
+    const result = await SecurityServiceController.tokenCheck( context.Authorization,
+                                                               null,
+                                                               context.Logger );
 
     response.status( result.StatusCode ).send( result );
 

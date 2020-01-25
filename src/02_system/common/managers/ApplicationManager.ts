@@ -20,7 +20,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 
 //import { UserSessionStatus } from "../database/models/UserSessionStatus";
 //import AuthenticationController from "../../core/api/rest/Authentication.controller";
-import BinaryService from "../database/services/BinaryService";
+import BinaryServiceController from "../../core/services/BinaryService.controller";
 import CommonConstants from '../CommonConstants';
 
 const debug = require( 'debug' )( 'ApplicationManager' );
@@ -44,7 +44,7 @@ export default class ApplicationManager {
       const loggerStream = CommonUtilities.isNotNullOrEmpty( logger ) &&
                            CommonUtilities.isNotNullOrEmpty( logger.stream ) ? logger.stream : null; // LoggerManager.mainLoggerIntance.stream;
 
-      const intBinaryDataMaximumSize = await BinaryService.getConfigBinaryDataMaximumSize( null,
+      const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( null,
                                                                                            logger );
       // The request handler must be the first middleware on the app
       //app.use( sentry.Handlers.requestHandler() );
@@ -189,6 +189,7 @@ export default class ApplicationManager {
                               Code: ( error.originalError as any).extensions.code,
                               Message: ( error.originalError as any).message,
                               LogId: ( error.originalError as any).extensions.LogId,
+                              Mark: "E7609E411489",
                               IsError: true,
                               Errors: errors,
                               Warnings: [],
@@ -208,6 +209,7 @@ export default class ApplicationManager {
                              Code: error.extensions.code,
                              Message: error.message,
                              LogId: strLogId,
+                             Mark: "27A869435085",
                              IsError: true,
                              Errors: [
                                        {
@@ -280,6 +282,7 @@ export default class ApplicationManager {
                          Code: 'ERROR_PATH_NOT_FOUND',
                          Message: `Requested path ${request.path} not found. Please read the server log for more details.`,
                          LogId: null,
+                         Mark: "3D6CC5FD0B5D",
                          IsError: true,
                          Errors: [
                                    {
@@ -310,13 +313,14 @@ export default class ApplicationManager {
                           StatusCode: 500,
                           Code: 'ERROR_SOMETHING_WENT_WRONG',
                           Message: 'Something went wrong!!',
-                          LogId: null,
+                          LogId: SystemUtilities.getUUIDv4(),
+                          Mark: "098675C7146B",
                           IsError: true,
                           Errors: [
                                     {
-                                      Code: 'ERROR_SOMETHING_WENT_WRONG',
-                                      Message: 'Something went wrong!!',
-                                      Details: error
+                                      Code: error.name,
+                                      Message: error.message,
+                                      Details: error.stack ? CommonUtilities.formatErrorStack( error.stack ) : error
                                     }
                                   ],
                           Warnings: [],

@@ -5,6 +5,8 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         AfterUpdate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 //import uuidv4 from 'uuid/v4';
@@ -13,6 +15,8 @@ import { BuildOptions } from "sequelize/types";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+const debug = require( 'debug' )( 'UserGroup' );
 
 @Table( {
   timestamps: false,
@@ -91,30 +95,28 @@ export class UserGroup extends Model<UserGroup> {
   @BeforeValidate
   static beforeValidateHook( instance: UserGroup, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ||
-         instance.ShortId === '0' ) {
-
-      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
-
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-    else {
-
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
+    //let debugMark = debug.extend( '7B6D8B57ED8B' );
+    //debugMark( "%O", instance );
 
   }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: UserGroup, options: any ): void {
+
+    SystemUtilities.commonBeforeValidateHook( instance, options );
+    //instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+
+  }
+
+  /*
+  @AfterUpdate
+  static afterUpdateHook( instance: UserGroup, options: any ): void {
+
+    SystemUtilities.commonBeforeValidateHook( instance, options );
+
+  }
+  */
 
 }

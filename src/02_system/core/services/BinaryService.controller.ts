@@ -4,25 +4,25 @@ import fs from 'fs'; //Load the filesystem module
 import glob from "glob";
 import cluster from 'cluster';
 
-import BaseService from "./BaseService";
-import ConfigValueDataService from "./ConfigValueDataService";
-import SystemConstants from "../../SystemContants";
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+import BaseService from "../../common/database/services/BaseService";
+import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
+import SystemConstants from "../../common/SystemContants";
+import CommonUtilities from "../../common/CommonUtilities";
+import SystemUtilities from "../../common/SystemUtilities";
 import { Request, Response } from 'express';
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import DBConnectionManager from "../../common/managers/DBConnectionManager";
 //import { BinaryIndex } from "../models/BinaryIndex";
-import BinaryIndexService from "./BinaryIndexService";
-import CacheManager from "../../managers/CacheManager";
-import { BinaryIndex } from "../models/BinaryIndex";
-import CommonConstants from "../../CommonConstants";
+import BinaryIndexService from "../../common/database/services/BinaryIndexService";
+import CacheManager from "../../common/managers/CacheManager";
+import { BinaryIndex } from "../../common/database/models/BinaryIndex";
+import CommonConstants from "../../common/CommonConstants";
 //import CommonConstants from "../../CommonConstants";
 
-const debug = require( 'debug' )( 'BinaryService' );
+const debug = require( 'debug' )( 'BinaryServiceController' );
 
-export default class BinaryService extends BaseService {
+export default class BinaryServiceController extends BaseService {
 
-  static readonly _ID = "BinaryService";
+  static readonly _ID = "BinaryServiceController";
 
   static async getConfigBinaryDataMaximumSize( transaction: any,
                                                logger: any ): Promise<number> {
@@ -489,13 +489,13 @@ export default class BinaryService extends BaseService {
 
     try {
 
-      const dataProcess = await BinaryService.getConfigBinaryDataProcess(
-                                                                          userSessionStatus,
-                                                                          strCategory,
-                                                                          strMimeType,
-                                                                          transaction,
-                                                                          logger
-                                                                        );
+      const dataProcess = await BinaryServiceController.getConfigBinaryDataProcess(
+                                                                                    userSessionStatus,
+                                                                                    strCategory,
+                                                                                    strMimeType,
+                                                                                    transaction,
+                                                                                    logger
+                                                                                  );
 
       if ( dataProcess.length > 0 ) {
 
@@ -868,7 +868,7 @@ export default class BinaryService extends BaseService {
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
-            const allowedCategory = await BinaryService.checkAllowedCategory( context.UserSessionStatus,
+            const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
                                                                               strCategory,
                                                                               transaction,
                                                                               logger );
@@ -883,7 +883,7 @@ export default class BinaryService extends BaseService {
                                                                         uploadedFile.mimetype,
                                                                         logger );
 
-                  const allowedMimeType = await BinaryService.checkAllowedMimeType( context.UserSessionStatus,
+                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
                                                                                     fileDetectedType.mime,
                                                                                     strCategory,
                                                                                     transaction,
@@ -891,7 +891,7 @@ export default class BinaryService extends BaseService {
 
                   if ( allowedMimeType.value === 1 ) {
 
-                    const strDefaultOwners = await BinaryService.getDefaultOwners( context.UserSessionStatus,
+                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
                                                                                    strCategory,
                                                                                    transaction,
                                                                                    logger );
@@ -951,7 +951,7 @@ export default class BinaryService extends BaseService {
                     let strRelativePath = "";
                     let strFullPath = "";
                     let expireAt = null;
-                    const strBasePath = await BinaryService.getConfigBinaryDataBasePath( transaction,
+                    const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
                                                                                          logger );
 
                     if ( req.body.StorageKind === "0" ) { //Persistent
@@ -999,7 +999,7 @@ export default class BinaryService extends BaseService {
 
                     debugMark( "Generating thumbnail" );
 
-                    const thumbnailData = await BinaryService.generateThumbnail( strFullPath,
+                    const thumbnailData = await BinaryServiceController.generateThumbnail( strFullPath,
                                                                                  strId + "." + fileDetectedType.ext,
                                                                                  ".data",
                                                                                  thumbnailFactor,
@@ -1007,7 +1007,7 @@ export default class BinaryService extends BaseService {
 
                     debugMark( "Detect process needed" );
 
-                    const processData = await BinaryService.detectProcessNeeded( context.UserSessionStatus,
+                    const processData = await BinaryServiceController.detectProcessNeeded( context.UserSessionStatus,
                                                                                  strCategory,
                                                                                  fileDetectedType.mime,
                                                                                  uploadedFile.size,
@@ -1067,8 +1067,8 @@ export default class BinaryService extends BaseService {
                                  StatusCode: 200,
                                  Code: 'SUCESS_BINARY_DATA_UPLOAD',
                                  Message: `The binary data has been uploaded success.`,
-                                 LogId: null,
                                  Mark: strMark,
+                                 LogId: null,
                                  IsError: false,
                                  Errors: [],
                                  Warnings: [],
@@ -1087,8 +1087,8 @@ export default class BinaryService extends BaseService {
                                  StatusCode: 500,
                                  Code: 'ERROR_UNEXPECTED',
                                  Message: 'Unexpected error. Please read the server log for more details.',
-                                 LogId: dbOperationResult.error.LogId,
                                  Mark: strMark,
+                                 LogId: dbOperationResult.error.LogId,
                                  IsError: true,
                                  Errors: [
                                            {
@@ -1111,8 +1111,8 @@ export default class BinaryService extends BaseService {
                                StatusCode: 400,
                                Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
                                Message: `The ${fileDetectedType.mime} detected for the file is invalid.`,
-                               LogId: null,
                                Mark: strMark,
+                               LogId: null,
                                IsError: true,
                                Errors: [
                                          {
@@ -1139,8 +1139,8 @@ export default class BinaryService extends BaseService {
                              StatusCode: 400,
                              Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
                              Message: 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.',
-                             LogId: null,
                              Mark: strMark,
+                             LogId: null,
                              IsError: true,
                              Errors: [
                                        {
@@ -1166,8 +1166,8 @@ export default class BinaryService extends BaseService {
                            StatusCode: 400,
                            Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
                            Message: 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.',
-                           LogId: null,
                            Mark: strMark,
+                           LogId: null,
                            IsError: true,
                            Errors: [
                                      {
@@ -1194,8 +1194,8 @@ export default class BinaryService extends BaseService {
                         StatusCode: 400,
                         Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
                         Message: 'The Category parameter is not valid.',
-                        LogId: null,
                         Mark: strMark,
+                        LogId: null,
                         IsError: true,
                         Errors: [
                                   {
@@ -1222,8 +1222,8 @@ export default class BinaryService extends BaseService {
                        StatusCode: 400,
                        Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
                        Message: 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.',
-                       LogId: null,
                        Mark: strMark,
+                       LogId: null,
                        IsError: true,
                        Errors: [
                                  {
@@ -1244,7 +1244,7 @@ export default class BinaryService extends BaseService {
         }
         else {
 
-          const intBinaryDataMaximumSize = await BinaryService.getConfigBinaryDataMaximumSize( transaction,
+          const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
                                                                                                logger );
 
           result = {
@@ -1331,8 +1331,8 @@ export default class BinaryService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
-                 LogId: error.LogId,
                  Mark: strMark,
+                 LogId: error.LogId,
                  IsError: true,
                  Errors: [
                            {
@@ -1463,6 +1463,7 @@ export default class BinaryService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1623,6 +1624,7 @@ export default class BinaryService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1888,7 +1890,7 @@ export default class BinaryService extends BaseService {
 
         }
 
-        const strBasePath = await BinaryService.getConfigBinaryDataBasePath( transaction,
+        const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
                                                                              logger );
 
         let strFullPath = "";
@@ -1927,7 +1929,7 @@ export default class BinaryService extends BaseService {
           }
           else {
 
-            binaryData = await BinaryService.selectThumbnail( strFullPath,
+            binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
                                                               path.join( strFullPath, binaryIndexInDB.FilePath ),
                                                               strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
                                                               binaryIndexInDB.FileName,
@@ -2002,7 +2004,7 @@ export default class BinaryService extends BaseService {
                 else { //Tag
 
                   //Check access using Owner or DenyAccessTag AllowAccessTag
-                  let bIsOwner = await BinaryService.checkTagIsAllowedToAccess( binaryIndexInDB.Owner,
+                  let bIsOwner = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.Owner,
                                                                                 context.UserSessionStatus.Role,
                                                                                 context.UserSessionStatus.UserId,
                                                                                 context.UserSessionStatus.UserName,
@@ -2019,7 +2021,7 @@ export default class BinaryService extends BaseService {
 
                   if ( bIsOwner === false ) {
 
-                    bDenyTagAccess = await BinaryService.checkTagIsAllowedToAccess( binaryIndexInDB.DenyTagAccess,
+                    bDenyTagAccess = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.DenyTagAccess,
                                                                                     context.UserSessionStatus.Role,
                                                                                     context.UserSessionStatus.UserId,
                                                                                     context.UserSessionStatus.UserName,
@@ -2033,7 +2035,7 @@ export default class BinaryService extends BaseService {
 
                     if ( bDenyTagAccess === false ) {
 
-                      bAllowTagAccess = await BinaryService.checkTagIsAllowedToAccess( binaryIndexInDB.AllowTagAccess,
+                      bAllowTagAccess = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.AllowTagAccess,
                                                                                        context.UserSessionStatus.Role,
                                                                                        context.UserSessionStatus.UserId,
                                                                                        context.UserSessionStatus.UserName,

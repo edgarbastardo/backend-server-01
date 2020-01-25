@@ -17,9 +17,23 @@ export default class Import {
     let bSuccess = false;
     let bEmptyContent = true;
 
+    let currentTransaction = null;
+
     try {
 
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
       //Migration code here
+
+      if ( currentTransaction != null ) {
+
+        await currentTransaction.commit();
+
+      }
 
     }
     catch ( error ) {
@@ -43,6 +57,20 @@ export default class Import {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
 
       }
 

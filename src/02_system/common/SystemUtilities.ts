@@ -14,19 +14,20 @@ import path from 'path';
 
 import archiver, { ArchiverError } from 'archiver';
 
+import CommonConstants from "./CommonConstants";
+import SystemConstants from "./SystemContants";
+
 import CommonUtilities from "./CommonUtilities";
 
-import UserGroupService from "./database/services/UserGroupService";
-import RoleService from "./database/services/RoleService";
-import CacheManager from "./managers/CacheManager";
-import UserSessionStatusService from "./database/services/UserSessionStatus";
-import SystemConstants from "./SystemContants";
-//import { UserSessionStatus } from "./database/models/UserSessionStatus";
-import LoggerManager from "./managers/LoggerManager";
-import UserService from "./database/services/UserService";
 import PersonService from "./database/services/PersonService";
+import UserGroupService from "./database/services/UserGroupService";
+import UserService from "./database/services/UserService";
+import UserSessionStatusService from "./database/services/UserSessionStatusService";
 import UserSessionPersistentService from "./database/services/UserSessionPersistentService";
-import CommonConstants from "./CommonConstants";
+import RoleService from "./database/services/RoleService";
+
+import CacheManager from "./managers/CacheManager";
+import LoggerManager from "./managers/LoggerManager";
 
 const debug = require( 'debug' )( 'SystemUtilities' );
 
@@ -1168,6 +1169,7 @@ export default class SystemUtilities {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
                        Message: 'Unexpected error. Please read the server log for more details.',
+                       Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [
@@ -1230,6 +1232,7 @@ export default class SystemUtilities {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
                  Message: `Authorization token provided is invalid`,
+                 Mark: "FAE37676EA49",
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -1251,6 +1254,7 @@ export default class SystemUtilities {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
                  Message: `Authorization token provided is logged out`,
+                 Mark: "0C28D66DFBC1",
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -1281,6 +1285,7 @@ export default class SystemUtilities {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
                  Message: `Authorization token provided is expired`,
+                 Mark: "C6E335E5DC71",
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -1359,6 +1364,7 @@ export default class SystemUtilities {
                        Code: 'ERROR_FORBIDEN_ACCESS',
                        Message: `Not authorized to access`,
                        LogId: null,
+                       Mark: "1ED45DB6E425",
                        IsError: true,
                        Errors: [
                                  {
@@ -2087,5 +2093,145 @@ export default class SystemUtilities {
     return result;
 
   }
+
+  public static commonBeforeValidateHook( instance: any, options: any ) {
+
+    try {
+
+      if ( instance.rawAttributes[ "ShortId" ] !== null &&
+           instance.rawAttributes[ "Id" ] !== null &&
+           ( !instance.ShortId ||
+             instance.ShortId === '0' ) ) {
+
+        instance.ShortId = SystemUtilities.hashString( instance.Id,
+                                                       2,
+                                                       null ); //Hashes.CRC32( instance.Id ).toString( 16 );
+
+      }
+
+      if ( instance.isNewRecord ) {
+
+        if ( instance.rawAttributes[ "CreatedBy" ] !== null ) {
+
+          if ( options.context &&
+               options.context.UserSessionStatus &&
+               options.context.UserSessionStatus.Name ) {
+
+            instance.CreatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+          }
+          else if ( instance.CreatedBy === null ) {
+
+            instance.CreatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET
+
+          }
+
+        }
+
+        if ( instance.rawAttributes[ "CreatedAt" ] !== null ) {
+
+          instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+
+        }
+
+      }
+      else {
+
+        if ( instance.rawAttributes[ "UpdatedBy" ] !== null ) {
+
+          if ( options.context &&
+               options.context.UserSessionStatus &&
+               options.context.UserSessionStatus.Name ) {
+
+            instance.dataValues.UpdatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+          }
+          else if ( instance.UpdatedBy === null ) {
+
+            instance.dataValues.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+
+        }
+
+        if ( instance.rawAttributes[ "UpdatedAt" ] !== null ) {
+
+          instance.dataValues.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+
+        }
+
+      }
+
+      if ( instance.rawAttributes[ "DisabledBy" ] !== null &&
+           ( instance.DisabledBy === "1" ||
+             ( instance.DisabledBy &&
+               instance.DisabledBy.startsWith( "1@" ) ) ) ) {
+
+        if ( options.context &&
+             options.context.UserSessionStatus &&
+             options.context.UserSessionStatus.Name ) {
+
+          instance.dataValues.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+        }
+        else if ( instance.DisabledBy.startsWith( "1@" ) ) {
+
+          const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
+
+          instance.dataValues.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+        }
+        else { //if ( instance.DisabledBy === null ) {
+
+          instance.dataValues.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+        }
+
+        if ( instance.rawAttributes[ "DisabledAt" ] !== null ) {
+
+          instance.dataValues.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.commonBeforeValidateHook.name;
+
+      const strMark = "9132A5362A48";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( options.context &&
+           options.context.logger &&
+           typeof options.context.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        options.context.logger.error( error );
+
+      }
+      else if ( LoggerManager.mainLoggerInstance &&
+                typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
 
 }

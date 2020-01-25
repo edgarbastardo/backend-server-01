@@ -1,29 +1,46 @@
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+import CommonUtilities from "../../common/CommonUtilities";
+import SystemUtilities from "../../common/SystemUtilities";
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import bcrypt from 'bcrypt';
 
-import DBConnectionManager from './../../managers/DBConnectionManager';
+import DBConnectionManager from '../../common/managers/DBConnectionManager';
 //import { Role } from "../models/Role";
-import SystemConstants from "../../SystemContants";
-import { User } from "../models/User";
+import SystemConstants from "../../common/SystemContants";
+import { User } from "../../common/database/models/User";
 //import { UserSessionStatus } from "../models/UserSessionStatus";
-import { UserGroup } from "../models/UserGroup";
-import { Person } from "../models/Person";
-import ConfigValueDataService from "./ConfigValueDataService";
-import UserSessionStatusService from "./UserSessionStatus";
-import CacheManager from "../../managers/CacheManager";
-import UserService from "./UserService";
-import CommonConstants from "../../CommonConstants";
+import { UserGroup } from "../../common/database/models/UserGroup";
+import { Person } from "../../common/database/models/Person";
+import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
+import UserSessionStatusService from "../../common/database/services/UserSessionStatusService";
+import CacheManager from "../../common/managers/CacheManager";
+import UserService from "../../common/database/services/UserService";
+import CommonConstants from "../../common/CommonConstants";
 
-const debug = require( 'debug' )( 'SecurityService' );
+const debug = require( 'debug' )( 'SecurityServiceController' );
 
-export default class SecurityService {
 
-  static readonly _ID = "SecurityService";
+export interface PasswordParameters {
+
+  minLength: number;
+  maxLength: number;
+  minLowerCase?: number;
+  maxLowerCase?: number;
+  minUpperCase?: number;
+  maxUpperCase?: number;
+  minDigit?: number;
+  maxDigit?: number;
+  minSymbol?: number;
+  maxSymbol?: number;
+  symbols?: string;
+
+}
+
+export default class SecurityServiceController {
+
+  static readonly _ID = "SecurityServiceController";
 
   static async getConfigExpireTimeAuthentication( strGroupId: string,
                                                   strGroupName: string,
@@ -166,9 +183,9 @@ export default class SecurityService {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( loginAccessControlConfigValue.default ) ) {
+          CommonUtilities.isNotNullOrEmpty( loginAccessControlConfigValue.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.default,
+        const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.Default,
                                                            logger );
 
         if ( jsonConfigValue[ "@__default__@" ] ) {
@@ -225,9 +242,9 @@ export default class SecurityService {
 
     try {
 
-      const configData = await SecurityService.getConfigLoginAccessControl( strClientId,
-                                                                            transaction,
-                                                                            logger );
+      const configData = await SecurityServiceController.getConfigLoginAccessControl( strClientId,
+                                                                                      transaction,
+                                                                                      logger );
 
       let strDeniedValue = configData.denied;
       let strAllowedValue = configData.allowed;
@@ -307,6 +324,245 @@ export default class SecurityService {
     }
 
     return intResult;
+
+  }
+
+  static async getConfigPasswordStrengthParameters( strTags: string,
+                                                    transaction: any,
+                                                    logger: any ): Promise<any> {
+
+    let result = {
+                   "@__default__@": {
+                                      minLength: 8,
+                                      maxLength: 0,
+                                      minLowerCase: 0,
+                                      maxLowerCase: 0,
+                                      minUpperCase: 0,
+                                      maxUpperCase: 0,
+                                      minDigit: 0,
+                                      maxDigit: 0,
+                                      minSymbol: 0,
+                                      maxSymbol: 0,
+                                      symbols: ""
+                                    }
+                 };
+
+    try {
+
+      result = await ConfigValueDataService.getConfigValueDataFromTags( strTags,
+                                                                        SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters.Id,
+                                                                        SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                        transaction,
+                                                                        logger );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigPasswordStrengthParameters.name;
+
+      const strMark = "0A832F2FD3AC";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async checkPasswordStrength( passwordParameters: PasswordParameters,
+                                      strPassword: string,
+                                      logger: any ): Promise<any> {
+
+    let result = { code: -1000, message: "" };
+
+    try {
+
+      //result = await SecurityServiceController.getConfigPasswordStrengthParameters( strTags,
+      //                                                                              transaction,
+      //                                                                              logger );
+
+      if ( passwordParameters.minLength === 0 ||
+           strPassword.length >= passwordParameters.minLength ) {
+
+        if ( passwordParameters.maxLength === 0 ||
+             strPassword.length <= passwordParameters.maxLength ) {
+
+          const intCountLowerChars = passwordParameters.minLowerCase > 0 ||
+                                     passwordParameters.maxLowerCase > 0 ?
+                                     CommonUtilities.countLowerCasePositions( strPassword ) : 0;
+
+          if ( !passwordParameters.minLowerCase ||
+               passwordParameters.minLowerCase === 0 ||
+               intCountLowerChars >= passwordParameters.minLowerCase ) {
+
+            if ( !passwordParameters.maxLowerCase ||
+                 passwordParameters.maxLowerCase === 0 ||
+                 intCountLowerChars <= passwordParameters.maxLowerCase ) {
+
+              const intCountUpperChars = passwordParameters.minUpperCase > 0 ||
+                                         passwordParameters.maxUpperCase > 0 ?
+                                         CommonUtilities.countUpperCasePositions( strPassword ) : 0;
+
+              if ( !passwordParameters.minUpperCase ||
+                   passwordParameters.minUpperCase === 0 ||
+                   intCountUpperChars >= passwordParameters.minUpperCase ) {
+
+                if ( !passwordParameters.maxUpperCase ||
+                     passwordParameters.maxUpperCase === 0 ||
+                     intCountUpperChars <= passwordParameters.maxUpperCase ) {
+
+                  const intCountDigit = passwordParameters.minDigit > 0 ||
+                                        passwordParameters.maxDigit > 0 ?
+                                        CommonUtilities.countDigitPositions( strPassword ) : 0;
+
+                  if ( !passwordParameters.minDigit ||
+                       passwordParameters.minDigit === 0 ||
+                       intCountDigit >= passwordParameters.minDigit ) {
+
+                    if ( !passwordParameters.maxDigit ||
+                         passwordParameters.maxDigit === 0 ||
+                         intCountDigit <= passwordParameters.maxDigit ) {
+
+                      const intCountSymbol = passwordParameters.minSymbol > 0 ||
+                                             passwordParameters.maxSymbol > 0 ?
+                                             CommonUtilities.countSymbolPositions( strPassword, passwordParameters.symbols ) : 0;
+
+                      if ( !passwordParameters.minSymbol ||
+                           passwordParameters.minSymbol === 0 ||
+                           intCountSymbol >= passwordParameters.minSymbol ) {
+
+                        if ( !passwordParameters.maxSymbol ||
+                             passwordParameters.maxSymbol === 0 ||
+                             intCountSymbol <= passwordParameters.maxSymbol ) {
+
+                          result.code = 1;
+                          result.message = `The Password is ok`;
+
+                        }
+                        else {
+
+                          result.code = -10;
+                          result.message = `The password contains ${intCountDigit} symbols chars, is too much. The maximun is ${passwordParameters.maxDigit} positions`;
+
+                        }
+
+                      }
+                      else {
+
+                        result.code = -9;
+                        result.message = `The password contains ${intCountDigit} symbols chars, is not enough. The minimun is ${passwordParameters.maxDigit} positions`;
+
+                      }
+
+                    }
+                    else {
+
+                      result.code = -8;
+                      result.message = `The password contains ${intCountDigit} digit numbers, is too much. The maximun is ${passwordParameters.maxDigit} positions`;
+
+                    }
+
+                  }
+                  else {
+
+                    result.code = -7;
+                    result.message = `The password contains ${intCountDigit} digit numbers, is not enough. The minimun is ${passwordParameters.minDigit} positions`;
+
+                  }
+
+                }
+                else {
+
+                  result.code = -6;
+                  result.message = `The password contains ${intCountUpperChars} upper case chars, is too much. The maximun is ${passwordParameters.maxUpperCase} positions`;
+
+                }
+
+              }
+              else {
+
+                result.code = -5;
+                result.message = `The password contains ${intCountUpperChars} upper case chars, is not enough. The minimun is ${passwordParameters.minUpperCase} positions`;
+
+              }
+
+            }
+            else {
+
+              result.code = -4;
+              result.message = `The password contains ${intCountLowerChars} lower case chars, is too much. The maximun is ${passwordParameters.maxLowerCase} positions`;
+
+            }
+
+          }
+          else {
+
+            result.code = -3;
+            result.message = `The password contains ${intCountLowerChars} lower case chars, is not enough. The minimun is ${passwordParameters.minLowerCase} positions`;
+
+          }
+
+        }
+        else {
+
+          result.code = -2;
+          result.message = `The password length is ${strPassword.length}, is too long. The maximun length is ${passwordParameters.maxLength} positions`;
+
+        }
+
+      }
+      else {
+
+        result.code = -1;
+        result.message = `The password length is ${strPassword.length}, is too short. The minimun length is ${passwordParameters.minLength} positions`;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkPasswordStrength.name;
+
+      const strMark = "D06C7846BDFA";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
 
   }
 
@@ -477,7 +733,7 @@ export default class SecurityService {
 
         }
 
-        const configData = await SecurityService.getConfigExpireTimeAuthentication( user.UserGroup.Id,
+        const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( user.UserGroup.Id,
                                                                                     user.UserGroup.Name,
                                                                                     user.Id,
                                                                                     user.Name,
@@ -668,8 +924,14 @@ export default class SecurityService {
                    Code: 'ERROR_USER_DISABLED',
                    Message: 'Login failed (User disabled)',
                    LogId: null,
-                   IsError: false,
-                   Errors: [],
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_DISABLED',
+                               Message: `Login failed (User disabled)`,
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []
@@ -683,8 +945,14 @@ export default class SecurityService {
                    Code: 'ERROR_USER_GROUP_DISABLED',
                    Message: 'Login failed (User group disabled)',
                    LogId: null,
-                   IsError: false,
-                   Errors: [],
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_GROUP_DISABLED',
+                               Message: `Login failed (User group disabled)`,
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []
@@ -698,8 +966,14 @@ export default class SecurityService {
                    Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
                    Message: 'Not allowed to login from this the kind of client',
                    LogId: null,
-                   IsError: false,
-                   Errors: [],
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
+                               Message: `Not allowed to login from this the kind of client`,
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []
@@ -713,8 +987,14 @@ export default class SecurityService {
                    Code: 'ERROR_LOGIN_FAILED',
                    Message: 'Login failed (Username and/or Password are invalid)',
                    LogId: null,
-                   IsError: false,
-                   Errors: [],
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_LOGIN_FAILED',
+                               Message: `Login failed (Username and/or Password are invalid)`,
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []
@@ -755,23 +1035,23 @@ export default class SecurityService {
       }
 
       result = {
-        StatusCode: 500,
-        Code: 'ERROR_UNEXPECTED',
-        Message: 'Unexpected error. Please read the server log for more details.',
-        LogId: error.LogId,
-        Mark: strMark,
-        IsError: true,
-        Errors: [
-                  {
-                    Code: error.name,
-                    Message: error.message,
-                    Details: error
-                  }
-                ],
-        Warnings: [],
-        Count: 0,
-        Data: []
-      };
+                 StatusCode: 500,
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
 
       if ( currentTransaction != null ) {
 
@@ -908,8 +1188,8 @@ export default class SecurityService {
                         StatusCode: 500,
                         Code: 'ERROR_LOGOUT_FAILED',
                         Message: `Cannot complete the logout`,
-                        LogId: error.LogId,
                         Mark: strMark,
+                        LogId: error.LogId,
                         IsError: true,
                         Errors: [
                                   {
@@ -1004,23 +1284,23 @@ export default class SecurityService {
       }
 
       result = {
-        StatusCode: 500,
-        Code: 'ERROR_UNEXPECTED',
-        Message: 'Unexpected error. Please read the server log for more details.',
-        LogId: error.LogId,
-        Mark: strMark,
-        IsError: true,
-        Errors: [
-                  {
-                    Code: error.name,
-                    Message: error.message,
-                    Details: error
-                  }
-                ],
-        Warnings: [],
-        Count: 0,
-        Data: []
-      };
+                 StatusCode: 500,
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
 
       if ( currentTransaction != null ) {
 

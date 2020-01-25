@@ -124,4 +124,120 @@ export default class UserGroupService extends BaseService {
 
   }
 
+  static async getByName( strName: string,
+                          strTimeZoneId: string,
+                          transaction: any,
+                          logger: any ): Promise<UserGroup> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const options = {
+
+        where: { "Name": strName },
+        transaction: currentTransaction,
+
+      }
+
+      result = await UserGroup.findOne( options );
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getByName.name;
+
+      const strMark = "8E36301230F7";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async checkExitsByName( strName: string,
+                                 transaction: any,
+                                 logger: any ): Promise<boolean> {
+
+    return await this.getByName( strName,
+                                 null,
+                                 transaction,
+                                 logger ) !== null;
+
+  }
+
+  static async checkDisabledByName( strName: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    const userGroup = await this.getByName( strName,
+                                            null,
+                                            transaction,
+                                            logger );
+
+    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+
+  }
+
 }

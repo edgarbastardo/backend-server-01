@@ -15,6 +15,7 @@ import {
          NotEmpty,
          IsUUID,
          Unique,
+         Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 //import uuidv4 from 'uuid/v4';
@@ -143,6 +144,7 @@ export class User extends Model<User> {
   */
   @NotNull
   @NotEmpty
+  @Default( "null" )
   @Column( { type: DataType.STRING( 30 ), allowNull: false })
   CreatedAt: string;
 
@@ -220,17 +222,10 @@ export class User extends Model<User> {
   @BeforeValidate
   static beforeValidateHook( instance: User, options: any ): any {
 
-    let debugMark = debug.extend( 'A4A8FE#63F0C' );
-    debugMark( "User -> beforeValidateHook -> context -> %O", options.context );
+    //let debugMark = debug.extend( 'A4A8FE#63F0C' );
+    //debugMark( "context:\n %O", options.context );
 
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ||
-         instance.ShortId === '0' ) {
-
-      instance.ShortId = SystemUtilities.hashString( instance.Id,
-                                                     2,
-                                                     null ); //Hashes.CRC32( instance.Id ).toString( 16 );
-
-    }
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
     if ( instance.Password &&
          instance.Password.startsWith( "$2b$10$" ) === false ) {
@@ -240,18 +235,6 @@ export class User extends Model<User> {
     }
 
     if ( instance.isNewRecord ) {
-
-      if ( options.context &&
-           options.context.UserSessionStatus ) {
-
-        instance.CreatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
-
-      }
-      else if ( !instance.CreatedBy ) {
-
-        instance.CreatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET
-
-      }
 
       if ( !instance.ForceChangePassword ) {
 
@@ -271,66 +254,16 @@ export class User extends Model<User> {
 
       }
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
-      instance.PasswordSetAt = instance.CreatedAt; //SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-    else {
-
-      if ( options.context &&
-           options.context.UserSessionStatus ) {
-
-        instance.UpdatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
-
-      }
-
-      instance.UpdatedAt = ( instance as any )._previousDataValues.CreatedAt;
+      instance.PasswordSetAt = instance.CreatedAt;
 
     }
 
-    if ( instance.DisabledBy === "1" ) {
+  }
 
-      if ( options.context &&
-           options.context.UserSessionStatus ) {
+  @BeforeUpdate
+  static beforeUpdateHook( instance: UserGroup, options: any ): void {
 
-        instance.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
-
-      }
-
-      instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-
-    /*
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
-
-      instance.Id = SystemUtilities.getUUIDv4();
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ||
-         instance.ShortId === '0' ) {
-
-      instance.ShortId = SystemUtilities.hashString( instance.Id,
-                                                     2,
-                                                     null ); //Hashes.CRC32( instance.Id ).toString( 16 );
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
-
-      instance.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
-      instance.CreatedAt = instance.PasswordSetAt;
-
-    }
-    else {
-
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-
-    return new Error( "Error" );
-    */
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 

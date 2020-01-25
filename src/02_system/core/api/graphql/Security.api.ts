@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 //import { bookService } from '../services/book.service';
 //import { AuthorByBookDataLoader } from '../dataloaders/author.dataloader';
 //import { UserDataLoader } from '../dataloaders/user.dataloader';
-import SecurityService from "../../../common/database/services/SecurityService";
+import SecurityServiceController from "../../services/SecurityService.controller";
 
 export const typeDefs = readFileSync( `${ __dirname }/Security.graphql`, 'utf8' );
 
@@ -12,7 +12,7 @@ export const resolvers = {
 
     login: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityService.login( context.TimeZoneId,
+      return await SecurityServiceController.login( context.TimeZoneId,
                                           context.SourceIPAddress,
                                           context.ClientId,
                                           args.Username,
@@ -24,7 +24,7 @@ export const resolvers = {
 
     logout: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityService.logout( context.Autorization,
+      return await SecurityServiceController.logout( context.Autorization,
                                            null,
                                            context.Logger );
 
@@ -32,7 +32,7 @@ export const resolvers = {
 
     tokenCheck: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityService.tokenCheck( context.Autorization,
+      return await SecurityServiceController.tokenCheck( context.Autorization,
                                                null,
                                                context.Logger );
 

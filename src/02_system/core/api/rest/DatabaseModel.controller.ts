@@ -6,7 +6,7 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import RouteService from '../../../common/database/services/RouteService';
 //import ModelServiceLoader from "../../../common/database/ModelServiceLoader";
-import { ModelToRestAPIService } from '../../../common/database/services/ModelToRestAPIService';
+import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPIService.controller';
 //import dbConnection from "../../../common/managers/DBConnectionManager";
 import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
 import ModelServiceManager from "../../../common/managers/ModelServiceManager";
@@ -142,7 +142,7 @@ export default class DatabaseModelController {
 
       result = Router();
 
-      ModelToRestAPIService.sequelizeModelList = DBConnectionManager.currentInstance.models;
+      ModelToRestAPIServiceController.sequelizeModelList = DBConnectionManager.currentInstance.models;
 
       // -> /database/model/:name
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 0 ].Path,
@@ -165,10 +165,10 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.get( model,
-                                                            request,
-                                                            null,
-                                                            logger );
+            const result = await ModelToRestAPIServiceController.get( model,
+                                                                      request,
+                                                                      null,
+                                                                      logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -226,8 +226,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -268,11 +268,11 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.search( model,
-                                                               request,
-                                                               null,
-                                                               undefined,
-                                                               logger );
+            const result = await ModelToRestAPIServiceController.search( model,
+                                                                         request,
+                                                                         null,
+                                                                         undefined,
+                                                                         logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -330,8 +330,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -374,9 +374,9 @@ export default class DatabaseModelController {
 
             //ModelToRestAPI.sequelizeModelList = DBConnectionManager.currentInstance.models;
 
-            const result = await ModelToRestAPIService.searchCount( model,
-                                                                    request,
-                                                                    logger );
+            const result = await ModelToRestAPIServiceController.searchCount( model,
+                                                                              request,
+                                                                              logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -434,8 +434,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -478,10 +478,10 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.create( model,
-                                                               request,
-                                                               null,
-                                                               logger );
+            const result = await ModelToRestAPIServiceController.create( model,
+                                                                         request,
+                                                                         null,
+                                                                         logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -539,8 +539,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -581,11 +581,11 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.bulkCreate( model,
-                                                                   request,
-                                                                   null,
-                                                                   undefined,
-                                                                   logger );
+            const result = await ModelToRestAPIServiceController.bulkCreate( model,
+                                                                             request,
+                                                                             null,
+                                                                             undefined,
+                                                                             logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -643,8 +643,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -685,10 +685,10 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.update( model,
-                                                               request,
-                                                               null,
-                                                               logger );
+            const result = await ModelToRestAPIServiceController.update( model,
+                                                                         request,
+                                                                         null,
+                                                                         logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -746,8 +746,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -788,11 +788,11 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.bulkUpdate( model,
-                                                                   request,
-                                                                   null,
-                                                                   undefined,
-                                                                   logger );
+            const result = await ModelToRestAPIServiceController.bulkUpdate( model,
+                                                                             request,
+                                                                             null,
+                                                                             undefined,
+                                                                             logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -850,8 +850,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -892,9 +892,9 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.delete( model,
-                                                               request,
-                                                               logger );
+            const result = await ModelToRestAPIServiceController.delete( model,
+                                                                         request,
+                                                                         logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -952,8 +952,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {
@@ -994,10 +994,10 @@ export default class DatabaseModelController {
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
                model ) {
 
-            const result = await ModelToRestAPIService.bulkDelete( model,
-                                                                   request,
-                                                                   undefined,
-                                                                   logger );
+            const result = await ModelToRestAPIServiceController.bulkDelete( model,
+                                                                             request,
+                                                                             undefined,
+                                                                             logger );
 
             response.status( result.StatusCode ).send( result );
 
@@ -1055,8 +1055,8 @@ export default class DatabaseModelController {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
                            Message: 'Unexpected error. Please read the server log for more details.',
-                           LogId: error.LogId,
                            Mark: strMark,
+                           LogId: error.LogId,
                            IsError: true,
                            Errors: [
                                      {

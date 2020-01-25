@@ -1,6 +1,6 @@
 import { UserInputError } from 'apollo-server-express';
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from '../../../common/SystemUtilities';
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from '../../../../common/SystemUtilities';
 //import { extensions } from 'sequelize/types/lib/utils/validator-extras';
 
 export const validators = {

@@ -25,12 +25,12 @@
 import { Request } from 'express';
 import { Model, FindOptions, Includeable, FindAttributeOptions } from 'sequelize';
 //import { Sequelize } from 'sequelize-typescript';
-import CommonUtilities from '../../CommonUtilities';
-import SystemUtilities from '../../SystemUtilities';
-import BaseService from './BaseService';
-import CommonConstants from '../../CommonConstants';
+import CommonUtilities from '../../common/CommonUtilities';
+import SystemUtilities from '../../common/SystemUtilities';
+import BaseService from '../../common/database/services/BaseService';
+import CommonConstants from '../../common/CommonConstants';
 
-const debug = require( 'debug' )( 'ModelToRestAPIService' );
+const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
 
 export class CustomModel extends Model {
 
@@ -38,9 +38,9 @@ export class CustomModel extends Model {
 
 }
 
-export class ModelToRestAPIService extends BaseService {
+export class ModelToRestAPIServiceController extends BaseService {
 
-  static readonly _ID = "ModelToRestAPIService";
+  static readonly _ID = "ModelToRestAPIServiceController";
 
   //private model: typeof ExModel = null;
 
@@ -300,6 +300,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -629,6 +630,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -779,6 +781,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -810,7 +813,22 @@ export class ModelToRestAPIService extends BaseService {
 
       const options = { context: ( req as any ).context };
 
-      const modelCreatedInDB = await model.create( req.body, options as any );
+      const bodyData = req.body;
+
+      delete bodyData[ "CreatedBy" ];
+      delete bodyData[ "CreatedAt" ];
+      delete bodyData[ "UpdatedBy" ];
+      delete bodyData[ "UpdatedAt" ];
+
+      if ( bodyData[ "DisabledBy" ] !== "1" ) {
+
+        delete bodyData[ "DisabledBy" ];
+
+      }
+
+      delete bodyData[ "DisabledAt" ];
+
+      const modelCreatedInDB = await model.create( bodyData, options as any );
 
       let createdData = modelCreatedInDB.get();
 
@@ -828,6 +846,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 201,
                  Code: 'SUCCESS_CREATE',
                  Message: 'Sucess created the information',
+                 Mark: "275AF508CF64",
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -932,7 +951,22 @@ export class ModelToRestAPIService extends BaseService {
 
             try {
 
-              const modelCreatedInDB = await model.create( req.body.bulk[ intIndex ] );
+              const bodyData = req.body.bulk[ intIndex ];
+
+              delete bodyData[ "CreatedBy" ];
+              delete bodyData[ "CreatedAt" ];
+              delete bodyData[ "UpdatedBy" ];
+              delete bodyData[ "UpdatedAt" ];
+
+              if ( bodyData[ "DisabledBy" ] !== "1" ) {
+
+                delete bodyData[ "DisabledBy" ];
+
+              }
+
+              delete bodyData[ "DisabledAt" ];
+
+              const modelCreatedInDB = await model.create( bodyData );
 
               let data = modelCreatedInDB.get();
 
@@ -1108,6 +1142,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1181,27 +1216,42 @@ export class ModelToRestAPIService extends BaseService {
         if ( !modelInDB ) {
 
           result = {
-            StatusCode: 404,
-            Code: 'ERROR_RECORD_NOT_FOUND',
-            Message: 'Record not found',
-            LogId: null,
-            IsError: true,
-            Errors: [
-                      {
-                        Code: 'ERROR_RECORD_NOT_FOUND',
-                        Message: 'Record not found',
-                        Details: null
-                      }
-                    ],
-            Warnings: [],
-            Count: 0,
-            Data: []
-          };
+                      StatusCode: 404,
+                      Code: 'ERROR_RECORD_NOT_FOUND',
+                      Message: 'Record not found',
+                      LogId: null,
+                      IsError: true,
+                      Errors: [
+                                {
+                                  Code: 'ERROR_RECORD_NOT_FOUND',
+                                  Message: 'Record not found',
+                                  Details: null
+                                }
+                              ],
+                      Warnings: [],
+                      Count: 0,
+                      Data: []
+                    };
 
         }
         else {
 
-          const modelUpdatedInDB = await modelInDB.update( req.body.data );
+          const bodyData = req.body.data;
+
+          delete bodyData[ "CreatedBy" ];
+          delete bodyData[ "CreatedAt" ];
+          delete bodyData[ "UpdatedBy" ];
+          delete bodyData[ "UpdatedAt" ];
+
+          if ( bodyData[ "DisabledBy" ] !== "1" ) {
+
+            delete bodyData[ "DisabledBy" ];
+
+          }
+
+          delete bodyData[ "DisabledAt" ];
+
+          const modelUpdatedInDB = await modelInDB.update( bodyData );
 
           let updatedData = modelUpdatedInDB.get();
 
@@ -1216,16 +1266,16 @@ export class ModelToRestAPIService extends BaseService {
           }
 
           result = {
-            StatusCode: 200,
-            Code: 'SUCCESS_UPDATE',
-            Message: 'Sucess updated the information',
-            LogId: null,
-            IsError: false,
-            Errors: [],
-            Warnings: [],
-            Count: 1,
-            Data: [ updatedData ]
-          };
+                     StatusCode: 200,
+                     Code: 'SUCCESS_UPDATE',
+                     Message: 'Sucess updated the information',
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [ updatedData ]
+                   };
 
         }
 
@@ -1260,6 +1310,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1272,7 +1323,7 @@ export class ModelToRestAPIService extends BaseService {
                  Warnings: [],
                  Count: 0,
                  Data: []
-                };
+               };
 
     }
 
@@ -1386,7 +1437,22 @@ export class ModelToRestAPIService extends BaseService {
                 }
                 else {
 
-                  const modelUpdatedInDB = await modelInDB.update( req.body.bulk[ intIndex ].data );
+                  const bodyData = req.body.bulk[ intIndex ].data;
+
+                  delete bodyData[ "CreatedBy" ];
+                  delete bodyData[ "CreatedAt" ];
+                  delete bodyData[ "UpdatedBy" ];
+                  delete bodyData[ "UpdatedAt" ];
+
+                  if ( bodyData[ "DisabledBy" ] !== "1" ) {
+
+                    delete bodyData[ "DisabledBy" ];
+
+                  }
+
+                  delete bodyData[ "DisabledAt" ];
+
+                  const modelUpdatedInDB = await modelInDB.update( bodyData );
 
                   let data = modelUpdatedInDB.get();
 
@@ -1566,6 +1632,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1705,6 +1772,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -1995,6 +2063,7 @@ export class ModelToRestAPIService extends BaseService {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
                  Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
                  Errors: [
@@ -2078,7 +2147,7 @@ export class ModelToRestAPIService extends BaseService {
 
           let includeItem: Includeable = {
 
-            model: ModelToRestAPIService.sequelizeModelList[ includeArray[i].model ],
+            model: ModelToRestAPIServiceController.sequelizeModelList[ includeArray[i].model ],
             as: includeArray[i].as ? includeArray[i].as : includeArray[i].model,
             attributes: includeArray[i].attributes ? includeArray[i].attributes : undefined,
             where: includeArray[i].where ? includeArray[i].where : undefined,
@@ -2153,7 +2222,7 @@ export class ModelToRestAPIService extends BaseService {
             let index = orderArray[ i ][ 0 ].indexOf( '.' );
             let arr = [];
 
-            arr.push( ModelToRestAPIService.sequelizeModelList[ orderArray[ i ][ 0 ].substring( 0, index ) ] );
+            arr.push( ModelToRestAPIServiceController.sequelizeModelList[ orderArray[ i ][ 0 ].substring( 0, index ) ] );
 
             arr.push( orderArray[ i ][ 0 ].substring( index + 1 ) );
 
