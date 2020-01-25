@@ -144,7 +144,9 @@ export default class GraphQLAPIManager {
 
       for ( const dir of dirs ) {
 
-        if ( dir !== "template" && dir.startsWith( "disabled_" ) === false ) {
+        if ( dir !== "template" &&
+             dir !== "disabled" &&
+             dir.startsWith( "disabled_" ) === false ) {
 
           await this._scan( path.join( directory, dir ), logger );
 
