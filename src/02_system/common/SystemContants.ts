@@ -617,12 +617,12 @@ export default class SystemConstants {
                                                   Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                   Category: "Notification",
                                                   Name: "system.notification.email.service",
-                                                  Default: `{ "service": "@__none__@", "#gmail#": { "type": "smtp", "server": "smtp.gmail.com", "port": "587", "auth": { "user": "myuser@gmail.com", "password": "secret" } } }`,
-                                                  Label: "Configuration for the notifications email system",
-                                                  Description: "Configuration for the notification email system",
+                                                  Default: `{ "service": "@__none__@", "#gmail#": { "type": "smtp", "host": "smtp.gmail.com", "port": 465, "secure": true, "auth": { "user": "myuser@gmail.com", "pass": "secret" } } }`,
+                                                  Label: "Configuration for the notifications email transport",
+                                                  Description: "Configuration for the notification email transport",
                                                   AllowTagAccessR: "#Administrator#",
                                                   AllowTagAccessW: "#Administrator#",
-                                                  Example: '{ "service": "#gmail#", "#gmail#": { "type": "smtp", "server": "smtp.gmail.com", "port": "587", "auth": { "user": "myuser@gmail.com", "password": "secret" } }, "#sendgrid#": { "type": "sendgrid", "auth": { "api_user": "sendgrid_user", "api_key": "my_key" } } }',
+                                                  Example: '{ "service": "#gmail#", "#gmail#": { "type": "smtp", "host": "smtp.gmail.com", "port": 465, "secure": true, "auth": { "user": "myuser@gmail.com", "pass": "secret" } }, "#send_grid#": { "type": "send_grid", "host": "api.sendgrid.com/v3/mail/send", "port": 443, "auth": { "api_key": "my_key" } } }',
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                   ExtraData: `{ "Type": "struct/json", "Schema": "" }`
                                                 };
@@ -633,15 +633,31 @@ export default class SystemConstants {
                                                 Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                 Category: "Notification",
                                                 Name: "system.notification.sms.service",
-                                                Default: `{ "service": "@__none__@", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }`,
-                                                Label: "Configuration for the notifications sms system",
-                                                Description: "Configuration for the notification sms system",
+                                                Default: `{ "service": "@__none__@", "#sms_gateway#": { "type": "sms_gateway", "host": "https://domain.com/backend-sms-gateway", "port": 443, "device_id": "*", "context": "AMERICA/NEW_YORK", "auth": { "api_key": "my_key" } } }`,
+                                                Label: "Configuration for the notifications sms transport",
+                                                Description: "Configuration for the notification sms transport",
                                                 AllowTagAccessR: "#Administrator#",
                                                 AllowTagAccessW: "#Administrator#",
-                                                Example: '{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }',
+                                                Example: '{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "host": "https://domain.com/backend-sms-gateway", "port": 443, "device_id": "*", "context": "AMERICA/NEW_YORK", "auth": { "api_key": "my_key" } } }',
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                 ExtraData: `{ "Type": "struct/json", "Schema": "" }`
                                               };
+
+  static readonly _CONFIG_ENTRY_Push_Service = {
+                                                 Id: "56e70807-9f65-4679-b9e6-9327df438e1e",
+                                                 Scope: "system",
+                                                 Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                 Category: "Notification",
+                                                 Name: "system.notification.push.service",
+                                                 Default: `{ "service": "@__none__@", "#one_signal#": { "type": "one_signal", "host": "https://onesignal.com/api/v1/notifications", "port": 443, "auth": { "appId": "my_app_id", "apiKey": "my_key" } } }`,
+                                                 Label: "Configuration for the notifications push transport",
+                                                 Description: "Configuration for the notification push transport",
+                                                 AllowTagAccessR: "#Administrator#",
+                                                 AllowTagAccessW: "#Administrator#",
+                                                 Example: `{ "service": "#one_signal#", "#one_signal#": { "type": "one_signal", "host": "https://onesignal.com/api/v1/notifications", "port": 443, "auth": { "appId": "my_app_id", "apiKey": "my_key" } } }`,
+                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: `{ "Type": "struct/json", "Schema": "" }`
+                                               };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -658,6 +674,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_UserSignupProcess,
                                                SystemConstants._CONFIG_ENTRY_EMail_Service,
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
+                                               SystemConstants._CONFIG_ENTRY_Push_Service,
                                              ];
 
 }

@@ -6,6 +6,8 @@ import bcrypt from 'bcrypt';
 import Hashes from 'jshashes';
 */
 
+import appRoot from 'app-root-path';
+
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 import SystemConstants from "../../../02_system/common/SystemContants";
@@ -15,6 +17,8 @@ import { ConfigValueData } from '../../../02_system/common/database/models/Confi
 import CommonConstants from '../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
+
+require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
 
 //Example file import files using code
 export default class Always {
@@ -51,24 +55,54 @@ export default class Always {
           const options = {
 
             where: { Name: configMetaDataToCreate.Name },
+            transaction: currentTransaction,
 
           }
 
           const configMetaDataInDB = await ConfigMetaData.findOne( options );
 
-          if ( configMetaDataInDB === null ) {
+          try {
 
-            //const configMetaDataCreated =
-            await ConfigMetaData.create( configMetaDataToCreate );
+            if ( configMetaDataInDB === null ) {
 
-            /*
-            if ( configMetaDataCreated ) {
+              //const configMetaDataCreated =
+              await ConfigMetaData.create( configMetaDataToCreate );
 
-              let debugMark = debug.extend( "A7103054FB0D" );
-              debugMark( configMetaDataCreated );
+              /*
+              if ( configMetaDataCreated ) {
+
+                let debugMark = debug.extend( "A7103054FB0D" );
+                debugMark( configMetaDataCreated );
+
+              }
+              */
 
             }
-            */
+
+          }
+          catch ( error ) {
+
+            const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+            sourcePosition.method = this.name + "." + this.execute.name;
+
+            const strMark = "E3156CF22D57";
+
+            const debugMark = debug.extend( strMark );
+
+            debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Catched on: %O", sourcePosition );
+
+            error.mark = strMark;
+            error.logId = SystemUtilities.getUUIDv4();
+
+            if ( logger && typeof logger.error === "function" ) {
+
+              error.catchedOn = sourcePosition;
+              logger.error( error );
+
+            }
 
           }
 
@@ -121,7 +155,25 @@ export default class Always {
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: `{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishments#" } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                    }
+                                    },
+                                    {
+                                      ConfigMetaDataId: "c0b016a3-3fda-4c5b-be78-fa8e96398196", //system.notification.email.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: `{ "service": "#send_grid#", "#gmail#": { "type": "smtp", "host": "smtp.gmail.com", "port": 465, "secure": true, "auth": { "user": "${process.env.NOTIFICATION_TRANSPORT_SMTP_USER}", "pass": "${process.env.NOTIFICATION_TRANSPORT_SMTP_PASSWORD}" } }, "#send_grid#": { "type": "send_grid", "host": "api.sendgrid.com/v3/mail/send", "port": 443, "auth": { "api_key": "${process.env.NOTIFICATION_TRANSPORT_SEND_GRID_API_KEY}" } } }`,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: "71199a26-8a8a-4015-989c-4a911b18c68e", //system.notification.sms.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: `{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "host": "https://www.weknock-tech.com/backend-sms-gateway/kk/it4systems/sms/gateway/dev007/message/sms/send", "port": 443, "deviceId": "*", "context": "AMERICA/NEW_YORK", "auth": { "api_key": "${process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY}", "api_key1": "${process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY1}" } } }`,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: "56e70807-9f65-4679-b9e6-9327df438e1e", //system.notification.push.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: `{ "service": "#one_signal#", "#one_signal#": { "type": "one_signal", "host": "https://onesignal.com/api/v1/notifications", "port": 443, "auth": { "app_id": "${process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_APP_ID}", "api_key": "${process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_API_KEY}" } } }`,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
                                   ]
 
       const loopConfigValueEntriesAsync = async () => {
@@ -131,23 +183,53 @@ export default class Always {
           const options = {
 
             where: { ConfigMetaDataId: configValueToCreate.ConfigMetaDataId },
+            transaction: currentTransaction,
 
           }
 
           const configValueDataInDB = await ConfigValueData.findOne( options );
 
-          if ( configValueDataInDB === null ) {
+          try {
 
-            await ConfigValueData.create( configValueToCreate );
+            if ( configValueDataInDB === null ) {
+
+              await ConfigValueData.create( configValueToCreate );
+
+            }
+            else if ( !configValueDataInDB.Tag ||
+                      configValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+
+              configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+              configValueDataInDB.Value = configValueToCreate.Value;
+
+              await ConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+
+            }
 
           }
-          else if ( !configValueDataInDB.Tag ||
-                    configValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          catch ( error ) {
 
-            configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            configValueDataInDB.Value = configValueToCreate.Value;
+            const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-            await ConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+            sourcePosition.method = this.name + "." + this.execute.name;
+
+            const strMark = "D107DB7B7C79";
+
+            const debugMark = debug.extend( strMark );
+
+            debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Catched on: %O", sourcePosition );
+
+            error.mark = strMark;
+            error.logId = SystemUtilities.getUUIDv4();
+
+            if ( logger && typeof logger.error === "function" ) {
+
+              error.catchedOn = sourcePosition;
+              logger.error( error );
+
+            }
 
           }
 

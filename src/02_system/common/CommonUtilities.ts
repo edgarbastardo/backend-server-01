@@ -828,4 +828,26 @@ export default class CommonUtilities {
 
   }
 
+  static toLowerCase( data: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      if ( data ) {
+
+        strResult = data.toLowerCase();
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
 }

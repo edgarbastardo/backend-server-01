@@ -18,7 +18,7 @@ export default class ConfigValueDataService extends BaseService {
                                    transaction: any,
                                    logger: any ): Promise<any> {
 
-    let result = null;
+    let result = { Value: null, Default: null };
 
     let currentTransaction = transaction;
 

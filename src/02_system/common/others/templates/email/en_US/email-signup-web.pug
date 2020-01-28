@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    style
+        include ./email-signup-web.css
+  body
+      h2 SIGNUP FOR NEW USER ACCOUNT
+      p Hello!. This email is for your new user account #[strong #{userName}]
+      p Your activation code is
+      h3 #{activationCode}
+      p If you not recognize this email please ignore and archive it.
