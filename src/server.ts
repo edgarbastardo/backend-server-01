@@ -1,30 +1,26 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
+import appRoot from 'app-root-path';
+
 //import { createServer } from 'http';
 //import { Route } from './system/database/models/Route';
 import cluster from 'cluster';
 import os from 'os';
 
+import CommonConstants from './02_system/common/CommonConstants';
+import SystemConstants from "./02_system/common/SystemContants";
+
 import CommonUtilities from "./02_system/common/CommonUtilities";
+import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from './02_system/common/managers/LoggerManager';
-
 import ApplicationManager from './02_system/common/managers/ApplicationManager';
 import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
-
-import SystemUtilities from "./02_system/common/SystemUtilities";
-//import moment = require('moment-timezone');
-//import Route from './02_system/common/database/models/Route';
-
-//import uuidv4 from 'uuid/v4';
-import SystemConstants from "./02_system/common/SystemContants";
 import ModelServiceManager from "./02_system/common/managers/ModelServiceManager";
-import appRoot from 'app-root-path';
 import ClusterNetworkManager from "./02_system/common/managers/ClusterNetworkManager";
-import CommonConstants from './02_system/common/CommonConstants';
-import NotificationManager from "./02_system/common/managers/NotificationManager";
+//import NotificationManager from "./02_system/common/managers/NotificationManager";
 
 const debug = require( 'debug' )( 'server' );
 
@@ -232,6 +228,7 @@ async function main() {
     const ast = parser.astify( `SELECT * FROM t Where ( A = 'Hola' Or A = 'c' ) And B Is Not Null` ); // mysql sql grammer parsed by default
 
     */
+    //import appRoot from 'app-root-path';
 
     /*
     await NotificationManager.send(
@@ -271,6 +268,7 @@ async function main() {
                                   );
     */
 
+    /*
     if ( await NotificationManager.getConfigServiceType( "push",
                                                          LoggerManager.mainLoggerInstance ) === "one_signal" ) {
 
@@ -296,6 +294,7 @@ async function main() {
                                     );
 
     }
+    */
 
     if ( intProccessWorkers > 0 &&
          cluster.isMaster ) {

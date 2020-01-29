@@ -14,6 +14,8 @@ import path from 'path';
 
 import archiver, { ArchiverError } from 'archiver';
 
+import NodeRSA from 'node-rsa';
+
 import CommonConstants from "./CommonConstants";
 import SystemConstants from "./SystemContants";
 
@@ -2231,7 +2233,7 @@ export default class SystemUtilities {
 
       }
       else if ( LoggerManager.mainLoggerInstance &&
-                typeof LoggerManager.mainLoggerInstance === "function" ) {
+                typeof LoggerManager.mainLoggerInstance.error === "function" ) {
 
         error.catchedOn = sourcePosition;
         LoggerManager.mainLoggerInstance.error( error );
@@ -2242,5 +2244,137 @@ export default class SystemUtilities {
 
   }
 
+  public static async generateRSAKey( intBits: number,
+                                      logger: any ):Promise<string> {
+
+    let strResult = null;
+
+    try {
+
+      const key = new NodeRSA( { b: intBits } );
+
+      strResult = key.exportKey( "pkcs1" );
+
+      strResult = strResult.replace( /\n/g, "\\n" );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.encryptRSA.name;
+
+      const strMark = "E08D2A4FF967";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+ }
+
+  public static async encryptRSA( strDecryptedData: string,
+                                  strKey: string,
+                                  logger: any ):Promise<string> {
+
+    let strResult = null;
+
+    try {
+
+      const key = new NodeRSA( strKey ); // NodeRSA( { b: 512 } );
+
+      strResult = key.encrypt( strDecryptedData, "base64" );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.encryptRSA.name;
+
+      const strMark = "B6B697C1A31A";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+  public static async decryptRSA( strEncryptedData: string,
+                                  strKey: string,
+                                  logger: any ):Promise<string> {
+
+    let strResult = null;
+
+    try {
+
+      const key = new NodeRSA( strKey );
+
+      strResult = key.decrypt( strEncryptedData, "utf8" );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.decryptRSA.name;
+
+      const strMark = "EB50EEE59B04";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
 
 }
