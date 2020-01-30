@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise';
 //import uuidv4 from 'uuid/v4';
 //import moment from 'moment-timezone';
 import fs from 'fs';
-import os from "os";
+//import os from "os";
 
 import minify from 'pg-minify';
 

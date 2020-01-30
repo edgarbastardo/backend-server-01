@@ -16,6 +16,8 @@ import archiver, { ArchiverError } from 'archiver';
 
 import NodeRSA from 'node-rsa';
 
+import Validator from 'validatorjs';
+
 import CommonConstants from "./CommonConstants";
 import SystemConstants from "./SystemContants";
 
@@ -2374,6 +2376,121 @@ export default class SystemUtilities {
     }
 
     return strResult;
+
+  }
+
+  public static createCustomValidatorSync( data: any,
+                                           rules: any,
+                                           registerCallback: Function,
+                                           logger: any ): any {
+
+    let result = null;
+
+    try {
+
+      Validator.register(
+                          'emailList',
+                          function( value: any, requirement, attribute ) {
+
+                            let bResult: boolean;
+
+                            const valueList = value ? value.split( "," ) : [];
+
+                            for ( let currentValue of valueList ) {
+
+                              const matchResult = currentValue.trim().match( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g );
+
+                              bResult = matchResult && matchResult.length === 1;
+
+                              if ( bResult === false ) {
+
+                                break;
+
+                              }
+
+                            };
+
+                            return bResult;
+
+                          },
+                          'The :attribute is not in the format of list user1@domain.com, user2@domain.com or user1@domain.com.'
+                        );
+
+      Validator.register(
+                          'phoneUS',
+                          function( value: any, requirement, attribute ) {
+
+                            return value.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); //  /^\d{1-3}-\d{3}-\d{3}-\d{4}$/ );
+
+                          },
+                          'The :attribute phone number is not in the format XXX-XXX-XXXX.'
+                        );
+
+      Validator.register(
+                          'phoneUSList',
+                          function( value: any, requirement, attribute ) {
+
+                            let bResult: boolean;
+
+                            const valueList = value ? value.split( "," ) : [];
+
+                            for ( let currentValue of valueList ) {
+
+                              const matchResult = currentValue.trim().match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); ///^\d{3}-\d{3}-\d{4}$/g );
+
+                              bResult = matchResult && matchResult.length === 1;
+
+                              if ( bResult === false ) {
+
+                                break;
+
+                              }
+
+                            };
+
+                            return bResult;
+
+                          },
+                          'The :attribute phone number is not in the format of list XXX-XXX-XXXX, XXX-XXX-XXXX or XXX-XXX-XXXX.'
+                        );
+
+      if ( registerCallback ) {
+
+        registerCallback( Validator, logger );
+
+      }
+
+      result = new Validator( data, rules );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.createCustomValidatorSync.name;
+
+      const strMark = "BA9782941B37";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return result;
 
   }
 

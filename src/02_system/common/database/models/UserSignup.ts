@@ -18,21 +18,20 @@ import {
          Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-import { UserGroup } from "./UserGroup";
-import { Person } from "./Person";
 import bcrypt from 'bcrypt';
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import CipherManager from "../../managers/CipherManager";
 
-const debug = require( 'debug' )( 'User' );
+const debug = require( 'debug' )( 'UserSignup' );
 
 @Table( {
   timestamps: false,
 } )
-export class User extends Model<User> {
+export class UserSignup extends Model<UserSignup> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -46,51 +45,46 @@ export class User extends Model<User> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @Unique
-  @Column( { type: DataType.STRING( 20 ), unique: true } )
-  ShortId: string;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 75 ) } )
+  ClientId: string;
 
   @NotNull
   @NotEmpty
-  @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => UserGroup )
-  GroupId: string;
-
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  @ForeignKey( () => Person )
-  PersonId: string;
-
-  @Column( { type: DataType.TINYINT, allowNull: false } )
-  ForceChangePassword: number;
+  Token: string;
 
   @Column( { type: DataType.SMALLINT, allowNull: false } )
-  ChangePasswordEvery: number;
-
-  @Column( { type: DataType.SMALLINT, allowNull: false } )
-  SessionsLimit: number;
-
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
-  Avatar: string;
+  Status: number;
 
   @NotNull
   @NotEmpty
-  @Unique
-  @Column( { type: DataType.STRING( 150 ), unique: true, allowNull: false } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Name: string;
 
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
+  FirstName: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
+  LastName: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  EMail: string;
+
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  Phone: string;
+
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   Password: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
-  PasswordSetAt: string;
-
-  @Column( { type: DataType.TEXT, allowNull: true } )
-  Role: string;
-
-  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
-  Tag: string;
 
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
@@ -120,14 +114,8 @@ export class User extends Model<User> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => UserGroup, "GroupId" )
-  UserGroup: UserGroup;
-
-  @BelongsTo( () => Person, "PersonId" )
-  UserPerson: Person;
-
   @BeforeValidate
-  static beforeValidateHook( instance: User, options: any ): any {
+  static async beforeValidateHook( instance: UserSignup, options: any ): Promise<any> {
 
     //let debugMark = debug.extend( 'A4A8FE#63F0C' );
     //debugMark( "context:\n %O", options.context );
@@ -135,37 +123,9 @@ export class User extends Model<User> {
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
     if ( instance.Password &&
-         instance.Password.startsWith( "$2b$10$" ) === false ) {
+         instance.Password.startsWith( CommonConstants._PREFIX_CRYPTED ) === false ) {
 
-      instance.Password = bcrypt.hashSync( instance.Password, 10 );
-
-    }
-
-    //if ( instance.isNewRecord ) {
-    if ( !options ||
-         !options.type ||
-         options.type.toUpperCase() === "BULKCREATE" ||
-         options.type.toUpperCase() === "CREATE" ) {
-
-      if ( !instance.ForceChangePassword ) {
-
-        instance.ForceChangePassword = 0;
-
-      }
-
-      if ( !instance.ChangePasswordEvery ) {
-
-        instance.ChangePasswordEvery = 0;
-
-      }
-
-      if ( !instance.SessionsLimit ) {
-
-        instance.SessionsLimit = 0;
-
-      }
-
-      instance.PasswordSetAt = instance.CreatedAt;
+      instance.Password = await CipherManager.encrypt( instance.Password, null );
 
     }
 
@@ -181,16 +141,11 @@ export class User extends Model<User> {
 
       if ( params.TimeZoneId ) {
 
-        const strTimeZoneId = params.TimeZoneId; //params.ExtraInfo.Request.header( "timezoneid" );
+        const strTimeZoneId = params.TimeZoneId;
 
         result = SystemUtilities.transformObjectToTimeZone( params.Data,
                                                             strTimeZoneId,
                                                             params.Logger );
-
-        result.PasswordSetAt = SystemUtilities.transformToTimeZone( result.PassswordSetAt,
-                                                                    strTimeZoneId,
-                                                                    undefined,
-                                                                    params.logger );
 
         if ( Array.isArray( params.Include ) ) {
 
@@ -224,7 +179,7 @@ export class User extends Model<User> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "FED919C942E0";
+      const strMark = "458C892909DB";
 
       const debugMark = debug.extend( strMark );
 
@@ -246,7 +201,6 @@ export class User extends Model<User> {
     }
 
     return result;
-    //return null; //return null for not show the row
 
   }
 

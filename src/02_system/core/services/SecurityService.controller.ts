@@ -154,7 +154,7 @@ export default class SecurityServiceController {
 
     try {
 
-      const loginAccessControlConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
+      const loginAccessControlConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
                                                                                              SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                                                              transaction,
                                                                                              logger );
@@ -165,17 +165,19 @@ export default class SecurityServiceController {
         const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.Value,
                                                            logger );
 
-        if ( jsonConfigValue[ "#" + strClientId + "#" ] ) {
+        if ( jsonConfigValue[ "#" + strClientId + "#" ] &&
+             jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl ) {
 
-          result.denied = jsonConfigValue[ "#" + strClientId + "#" ].denied;
-          result.allowed = jsonConfigValue[ "#" + strClientId + "#" ].allowed;
+          result.denied = jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl.denied;
+          result.allowed = jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl.allowed;
           bSet = true;
 
         }
-        else if ( jsonConfigValue[ "@__default__@" ] ) {
+        else if ( jsonConfigValue[ "@__default__@" ] &&
+                  jsonConfigValue[ "@__default__@" ].userLoginControl  ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].allowed;
+          result.denied = jsonConfigValue[ "@__default__@" ].userLoginControl.denied;
+          result.allowed = jsonConfigValue[ "@__default__@" ].userLoginControl.allowed;
           bSet = true;
 
         }
@@ -188,10 +190,11 @@ export default class SecurityServiceController {
         const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.Default,
                                                            logger );
 
-        if ( jsonConfigValue[ "@__default__@" ] ) {
+        if ( jsonConfigValue[ "@__default__@" ] &&
+             jsonConfigValue[ "@__default__@" ].userLoginControl ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].allowed;
+          result.denied = jsonConfigValue[ "@__default__@" ].userLoginControl.denied;
+          result.allowed = jsonConfigValue[ "@__default__@" ].userLoginControl.allowed;
 
         }
 

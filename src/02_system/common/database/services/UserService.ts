@@ -104,60 +104,93 @@ export default class UserService extends BaseService {
     return result;
 
   }
+  static async getByName( strName: string,
+                          strTimeZoneId: string,
+                          transaction: any,
+                          logger: any ): Promise<User> {
 
-  /*
-  static readonly _ID = "User";
+    let result = null;
 
-  getRelations(): any[] {
+    let currentTransaction = transaction;
 
-    return [
-      { model: UserGroup },
-      { model: Person },
-    ];
+    let bApplyTansaction = false;
 
-  }
+    try {
 
-  toDTO( instance: any, params: any, logger: any ): any {
+      const dbConnection = DBConnectionManager.currentInstance;
 
-    if ( CommonUtilities.isNotNullOrEmpty( instance ) ) {
+      if ( currentTransaction == null ) {
 
-      delete ( instance as any ).dataValues[ "Password" ];
+        currentTransaction = await dbConnection.transaction();
 
-      if ( CommonUtilities.isValidTimeZone( params.TimeZoneId ) ) {
+        bApplyTansaction = true;
 
-        SystemUtilities.transformModelToTimeZone( instance,
-                                                  params.TimeZoneId,
+      }
+
+      const options = {
+
+        where: { Name: strName },
+        transaction: currentTransaction,
+
+      }
+
+      result = await User.findOne( options );
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
                                                   logger );
 
-        SystemUtilities.transformModelToTimeZone( instance.dataValues.UserGroup,
-                                                  params.TimeZoneId,
-                                                  logger );
+      }
 
-        if ( CommonUtilities.isNotNullOrEmpty( instance.dataValues.Person ) ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
-          SystemUtilities.transformModelToTimeZone( instance.dataValues.Person,
-                                                    params.TimeZoneId,
-                                                    logger );
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = UserService.name + "." + this.getByName.name;
+
+      const strMark = "E8DDEF95875E";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
 
         }
 
       }
 
-      return instance.dataValues;
-
-    }
-
-  }
-  */
-
-  /*
-  static async cleanModel( instance : User ): Promise<any> {
-
-    let result = null;
-
-    if ( CommonUtilities.isNotNullOrEmpty( instance ) ) {
-
-      delete ( instance as any ).dataValues[ "Password" ];
+      result = error;
 
     }
 
@@ -165,20 +198,52 @@ export default class UserService extends BaseService {
 
   }
 
-  static async cleanData( data : any ): Promise<any> {
+  static async checkExistsById( strId: string,
+                                transaction: any,
+                                logger: any ): Promise<boolean> {
 
-    let result = null;
-
-    if ( CommonUtilities.isNotNullOrEmpty( data ) ) {
-
-      delete data[ "Password" ];
-
-    }
-
-    return result;
+    return await this.getById( strId,
+                               null,
+                               transaction,
+                               logger ) !== null;
 
   }
-  */
 
+  static async checkDisabledById( strId: string,
+                                  transaction: any,
+                                  logger: any ): Promise<boolean> {
+
+    const user = await this.getById( strId,
+                                     null,
+                                     transaction,
+                                     logger );
+
+    return user ? user.DisabledBy !== null || user.DisabledAt !== null : false;
+
+  }
+
+  static async checkExistsByName( strName: string,
+                                  transaction: any,
+                                  logger: any ): Promise<boolean> {
+
+    return await this.getByName( strName,
+                                 null,
+                                 transaction,
+                                 logger ) !== null;
+
+  }
+
+  static async checkDisabledByName( strName: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    const user = await this.getByName( strName,
+                                       null,
+                                       transaction,
+                                       logger );
+
+    return user ? user.DisabledBy !== null || user.DisabledAt !== null : false;
+
+  }
 
 }

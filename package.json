@@ -14,7 +14,8 @@
     "copy:resources-v": "copyfiles -V -u 1 src/**/*.sql src/**/*.graphql src/**/*.pug src/**/*.css src/**/*.scss src/**/.dont_delete build/",
     "deploy": "npm run build && node build/copy_install_backend.js",
     "deploy:dev": "nodemon src/copy_install_backend.ts --exec ts-node",
-    "deploy:clean": "rimraf install_distribution/*"
+    "deploy:clean": "rimraf install_distribution/*",
+    "count:source-lines": "cloc src/"
   },
   "keywords": [],
   "author": "",
@@ -78,6 +79,7 @@
     "strong-error-handler": "^3.4.0",
     "uuid": "^3.3.3",
     "validator": "^12.0.0",
+    "validatorjs": "^3.18.1",
     "winston": "^3.2.1",
     "winston-console-format": "^1.0.5",
     "winston-papertrail": "^1.0.5",
@@ -110,7 +112,9 @@
     "@types/request-promise-native": "^1.0.17",
     "@types/sqlstring": "^2.2.1",
     "@types/uuid": "^3.4.5",
+    "@types/validatorjs": "^3.15.0",
     "@types/xxhashjs": "^0.2.1",
+    "cloc": "^2.5.1",
     "copyfiles": "^2.1.1",
     "cross-zip": "^2.1.6",
     "inquirer": "^7.0.3",

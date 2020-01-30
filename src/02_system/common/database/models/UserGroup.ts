@@ -5,16 +5,15 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
-         BeforeUpdate,
-         AfterUpdate,
+         //BeforeUpdate,
+         //AfterUpdate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-//import uuidv4 from 'uuid/v4';
-//import Hashes from 'jshashes';
-//import moment from "moment-timezone";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'UserGroup' );
 
@@ -27,6 +26,7 @@ export class UserGroup extends Model<UserGroup> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
 
       if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
@@ -43,6 +43,7 @@ export class UserGroup extends Model<UserGroup> {
       }
 
     }
+    */
 
   }
 
@@ -99,23 +100,77 @@ export class UserGroup extends Model<UserGroup> {
 
   }
 
-  /*
-  @BeforeUpdate
-  static beforeUpdateHook( instance: UserGroup, options: any ): void {
+  static async convertFieldValues( params: any ): Promise<any> {
 
-    SystemUtilities.commonBeforeValidateHook( instance, options );
-    //instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+    let result = null;
+
+    try {
+
+      result = params.Data;
+
+      if ( params.TimeZoneId ) {
+
+        const strTimeZoneId = params.TimeZoneId;
+
+        result = SystemUtilities.transformObjectToTimeZone( params.Data,
+                                                            strTimeZoneId,
+                                                            params.Logger );
+
+        if ( Array.isArray( params.Include ) ) {
+
+          for ( const modelIncluded of params.Include ) {
+
+            if ( modelIncluded.model &&
+                 result[ modelIncluded.model.name ] ) {
+
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues,
+                                                                                              strTimeZoneId,
+                                                                                              params.Logger );
+
+            }
+
+          }
+
+        }
+
+      }
+
+      if ( params.FilterFields === 1 ) {
+
+        delete result.Password; //Not return the password
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.convertFieldValues.name;
+
+      const strMark = "27F7649A0248";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( params.logger &&
+           typeof params.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        params.logger.error( error );
+
+      }
+
+    }
+
+    return result;
 
   }
-  */
-
-  /*
-  @AfterUpdate
-  static afterUpdateHook( instance: UserGroup, options: any ): void {
-
-    SystemUtilities.commonBeforeValidateHook( instance, options );
-
-  }
-  */
 
 }

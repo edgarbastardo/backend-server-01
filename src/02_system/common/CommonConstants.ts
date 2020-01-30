@@ -22,4 +22,7 @@ export default class CommonConstants {
   static readonly _DATE_TIME_LONG_FORMAT_01 = "YYYY-MM-DD HH:mm:ss.SSS ZZ";
   static readonly _DATE_TIME_LONG_FORMAT_02 = "YYYY-MM-DDTHH:mm:ss.SSS@ZZ";
 
+  static readonly _PREFIX_CRYPTED = "crypted://";
+  static readonly _PREFIX_RSA = "RSA://";
+
 }

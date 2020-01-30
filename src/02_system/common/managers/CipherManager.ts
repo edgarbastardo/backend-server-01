@@ -25,9 +25,12 @@ export default class CipherManager {
 
       const strKey = process.env[ "PRIVATE_KEY_" + intKeyNumber ];
 
-      strResult = "crypted://RSA://" + intKeyNumber + "://" + await SystemUtilities.encryptRSA( strUncryptedData,
-                                                                                                strKey,
-                                                                                                logger );
+      strResult = CommonConstants._PREFIX_CRYPTED +
+                  CommonConstants._PREFIX_RSA +
+                  intKeyNumber + "://" +
+                  await SystemUtilities.encryptRSA( strUncryptedData,
+                                                    strKey,
+                                                    logger );
 
     }
     catch ( error ) {
@@ -67,7 +70,7 @@ export default class CipherManager {
 
     try {
 
-      if ( strEncryptedData.startsWith( "crypted://" ) ) {
+      if ( strEncryptedData.startsWith( CommonConstants._PREFIX_CRYPTED ) ) {
 
         let encryptedDataSections = strEncryptedData.split( "://" );
 

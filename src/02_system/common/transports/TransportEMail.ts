@@ -1,12 +1,14 @@
+
+//import nodemailer from "nodemailer";
+import fs from 'fs';
+import pug from "pug";
+import juice from "juice";
+import htmlToText from "html-to-text";
+
 import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
-
-//import nodemailer from "nodemailer";
-import pug from "pug";
-import juice from "juice";
-import htmlToText from "html-to-text";
 
 const debug = require( 'debug' )( 'TransportEMail' );
 
@@ -19,7 +21,15 @@ export default class TransportEMail {
 
     try {
 
-      const strHTML = pug.renderFile( `${__dirname}/../others/templates/email/${body.language}/${body.file}`,
+      let strFullFilePath = `${__dirname}/../others/templates/email/${body.language}/${body.file}`;
+
+      if ( fs.existsSync( strFullFilePath ) === false ) {
+
+        strFullFilePath = `${__dirname}/../others/templates/email/en_US/${body.file}`;
+
+      }
+
+      const strHTML = pug.renderFile( strFullFilePath,
                                       body.variables );
 
       result.html = juice( strHTML );

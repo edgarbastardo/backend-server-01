@@ -216,9 +216,33 @@ export default class UserGroupService extends BaseService {
 
   }
 
-  static async checkExitsByName( strName: string,
-                                 transaction: any,
-                                 logger: any ): Promise<boolean> {
+  static async checkExistsById( strId: string,
+                                transaction: any,
+                                logger: any ): Promise<boolean> {
+
+    return await this.getById( strId,
+                               null,
+                               transaction,
+                               logger ) !== null;
+
+  }
+
+  static async checkDisabledById( strId: string,
+                                  transaction: any,
+                                  logger: any ): Promise<boolean> {
+
+    const userGroup = await this.getById( strId,
+                                          null,
+                                          transaction,
+                                          logger );
+
+    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+
+  }
+
+  static async checkExistsByName( strName: string,
+                                  transaction: any,
+                                  logger: any ): Promise<boolean> {
 
     return await this.getByName( strName,
                                  null,

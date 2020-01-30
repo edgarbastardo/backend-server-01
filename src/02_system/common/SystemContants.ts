@@ -204,7 +204,7 @@ export default class SystemConstants {
                                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                              ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_ExpireTimeAuthentication} }`
                                                            };
-
+  /*
   static _SCHEMA_VALIDATION_LoginAccessControl = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
                                                    `"type":"object","additionalProperties":false,` +
                                                    `"patternProperties":{"#.*#":{"$ref":"#/definitions/validationDef"}},` +
@@ -228,6 +228,7 @@ export default class SystemConstants {
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                         ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_LoginAccessControl} }`
                                                      };
+                                                     */
 
   static _SCHEMA_VALIDATION_StrengthPasswordParameters = `{"$schema":"http://json-schema.org/draft-07/schema#",` +
                                                          `"type":"object","additionalProperties":false,` +
@@ -523,6 +524,7 @@ export default class SystemConstants {
     }
   */
 
+  /*
   static _SCHEMA_VALIDATION_UserSignupControl = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","additionalProperties"` +
                                                 `:false,"required":["@__default__@"],"patternProperties":{"@__default__@":` +
                                                 `{"$ref":"#/definitions/validatonDef"},"#.*#":{"$ref":"#/definitions/validatonDef"}},` +
@@ -539,10 +541,11 @@ export default class SystemConstants {
                                                       Description: "Control the client id with access to signup service",
                                                       AllowTagAccessR: "#Administrator#",
                                                       AllowTagAccessW: "#Administrator#",
-                                                      Example: '{ "#mobile-ionic4-???#": "allowed", "#reactjs-???#": "denied", "@__default__@": "allowed" }',
+                                                      Example: '{ "#mobile-ionic4-???#": "allowed", "#web-reactjs-???#": "denied", "@__default__@": "allowed" }',
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                       ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupControl}  }`
                                                     };
+                                                    */
 
   /*
     {
@@ -606,7 +609,7 @@ export default class SystemConstants {
                                                       Description: "Process signup of users. The group must be exists before of singup if createGroup = false. groupRole only apply if group is created first time createGroup = true",
                                                       AllowTagAccessR: "#Administrator#",
                                                       AllowTagAccessW: "#Administrator#",
-                                                      Example: '{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishment#" } }',
+                                                      Example: '{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers_01", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishment#" } }',
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                       ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupProcess} }`
                                                     };
@@ -659,9 +662,173 @@ export default class SystemConstants {
                                                  ExtraData: `{ "Type": "struct/json", "Schema": "" }`
                                                };
 
+  /*
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "additionalProperties":false,
+      "required": [ "@__default__@" ],
+      "patternProperties": {
+        "@__default__@": {
+          "$ref": "#/definitions/validatonObjectDef"
+        },
+        "#.*#": {
+          "$ref": "#/definitions/validatonObjectDef"
+        }
+      },
+      "definitions": {
+        "validatonObjectDef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [ "userLoginControl", "userSignupControl", "tag", "excludeRoutes" ],
+          "properties": {
+            "userLoginControl": {
+              "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
+              "optional":false
+            },
+            "userSignupControl": {
+              "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
+              "optional":false
+            },
+            "tag": {
+              "type": "string",
+              "optional":false
+            },
+            "excludeRoutes": {
+              "type": "array",
+              "optional":false
+            },
+          }
+        },
+        "validatonObjectDefDeniedAllowed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [ "denied", "allowed" ],
+          "properties": {
+            "denied": {
+              "type": "string",
+              "optional":false
+            },
+            "allowed": {
+              "type": "string",
+              "optional":false
+            },
+          }
+        }
+      }
+    }
+  */
+
+  static _SCHEMA_VALIDATION_Frontend_Rules = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","additionalProperties":false,` +
+                                             `"required":["@__default__@"],"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonObjectDef"},` +
+                                             `"#.*#":{"$ref":"#/definitions/validatonObjectDef"}},"definitions":{"validatonObjectDef":{"type":"object",` +
+                                             `"additionalProperties":false,"required":["userLoginControl","userSignupControl","tag","excludeRoutes"],` +
+                                             `"properties":{"userLoginControl":{"$ref":"#/definitions/validatonObjectDefDeniedAllowed","optional":false},` +
+                                             `"userSignupControl":{"$ref":"#/definitions/validatonObjectDefDeniedAllowed","optional":false},"tag":{"type":"string",` +
+                                             `"optional":false},"excludeRoutes":{"type":"array","optional":false},}},"validatonObjectDefDeniedAllowed":{"type":"object",` +
+                                             `"additionalProperties":false,"required":["denied","allowed"],"properties":{"denied":{"type":"string","optional":false},` +
+                                             `"allowed":{"type":"string","optional":false},}}}}`;
+
+  /*
+    {
+      "#mobile-ionic4-sales-???#": {
+        "userLoginControl": {
+          "denied": "",
+          "allowed": "#Final_Customers_01#,#Administrator#"
+        },
+        "userSignupControl": {
+          "denied": "",
+          "allowed": "#finalCustomer#"
+        },
+        "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
+        "excludeRoutes": [
+          "/my/service/",
+          "/my/service2/"
+        ]
+      },
+      "#web-reactjs-establisment-???#": {
+        "userLoginControl": {
+          "denied": "",
+          "allowed": "#Establishment#,#Administrator#"
+        },
+        "userSignupControl": {
+          "denied": "",
+          "allowed": "#establishment#"
+        },
+        "tag": "#web#,#web_desktop#",
+        "excludeRoutes": [
+          "/my/service/",
+          "/my/service2/"
+        ]
+      },
+      "#web-reactjs-delivery-???#": {
+        "userLoginControl": {
+          "denied": "",
+          "allowed": "#Dispachers#,#Administrator#"
+        },
+        "userSignupControl": {
+          "denied": "*",
+          "allowed": ""
+        },
+        "tag": "#web#,#web_desktop#",
+        "excludeRoutes": [
+          "/my/service/",
+          "/my/service2/"
+        ]
+
+      },
+      "@__default__@": {
+        "userLoginControl": {
+          "denied": "",
+          "allowed": "*"
+        },
+        "userSignupControl": {
+          "denied": "",
+          "allowed": "*"
+        },
+        "tag": "#web#,#mobile#,#phone#,#tablet#",
+        "excludeRoutes": [
+          "*"
+        ]
+      }
+    }
+  */
+
+  static readonly _CONFIG_ENTRY_Frontend_Rules = {
+                                                   Id: "70835d21-afdd-4f5b-9a56-61762ba55013",
+                                                   Scope: "system",
+                                                   Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                   Category: "Frontend Rules",
+                                                   Name: "system.frontend.rules",
+                                                   Default: `{ "@__default__@": { "userLoginControl": { "denied": "", "allowed": "*" }, "userSignupControl": { "denied": "", "allowed": "*" }, "tag": "#web#,#mobile#,#phone#,#tablet#", "excludeRoutes": [ "*" ] } }`,
+                                                   Label: "Configuration for different frontend clients id rules",
+                                                   Description: "Configuration for different frontend clients id rules",
+                                                   AllowTagAccessR: "#Administrator#",
+                                                   AllowTagAccessW: "#Administrator#",
+                                                   Example: `{ "#mobile-ionic4-sales-???#": { "userLoginControl": { "denied": "", "allowed": "#Final_Customers_01#,#Administrator#" }, "userSignupControl": { "denied": "", "allowed": "#finalCustomer#" }, "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#", "excludeRoutes": [ "/my/service/", "/my/service2/" ] }, "#web-reactjs-establisment-???#": { "userLoginControl": { "denied": "", "allowed": "#Establishment#,#Administrator#" }, "userSignupControl": { "denied": "", "allowed": "#establishment#" }, "tag": "#web#,#web_desktop#", "excludeRoutes": [ "/my/service/", "/my/service2/" ] }, "#web-reactjs-delivery-???#": { "userLoginControl": { "denied": "", "allowed": "#Dispachers#,#Administrator#" }, "userSignupControl": { "denied": "*", "allowed": "" }, "tag": "#web#,#web_desktop#", "excludeRoutes": [ "/my/service/", "/my/service2/" ] }, "@__default__@": { "userLoginControl": { "denied": "", "allowed": "*" }, "userSignupControl": { "denied": "", "allowed": "*" }, "tag": "#web#,#mobile#,#phone#,#tablet#", "excludeRoutes": [ "*" ] } }`,
+                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                   ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._SCHEMA_VALIDATION_Frontend_Rules}" }`
+                                                 };
+
+  static readonly _CONFIG_ENTRY_General_Default_Information = {
+                                                                Id: "e3383f42-9f78-40c5-8415-42b51da54196",
+                                                                Scope: "system",
+                                                                Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                Category: "General",
+                                                                Name: "system.general.default.information",
+                                                                Default: `{ "default_no_response_email": "no-response@mycompany.com", "default_company_name": "MY COMPANY LLC", "default_company_address": "1234N Murdock St, Coral Gables, FL98284, Office 102", "default_company_zip_code": "FL98284", "default_company_phone": "1-989-345-6789, 1-456-345-678", "default_company_web": "https://www.mycompany.com, https://www.othercompany.com", "default_company_email": "admin@mycompany.com. other@mydomain.com" }`,
+                                                                Label: "Configuration for default values",
+                                                                Description: "Configuration for default values",
+                                                                AllowTagAccessR: "#Administrator#",
+                                                                AllowTagAccessW: "#Administrator#",
+                                                                Example: `{ "default_no_response_email": "no-response@mycompany.com", "default_company_name": "MY COMPANY LLC", "default_company_address": "1234N Murdock St, Coral Gables, FL98284, Office 102", "default_company_zip_code": "FL98284", "default_company_phone": "1-989-345-6789, 1-456-345-678", "default_company_web": "https://www.mycompany.com, https://www.othercompany.com", "default_company_email": "admin@mycompany.com. other@mydomain.com" }`,
+                                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                ExtraData: `{ "Type": "struct/json", "Schema": "" }`
+                                                              };
+
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
-                                               SystemConstants._CONFIG_ENTRY_LoginAccessControl,
+                                               //SystemConstants._CONFIG_ENTRY_LoginAccessControl,
                                                SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataBasePath,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize,
@@ -670,11 +837,13 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataProcess,
-                                               SystemConstants._CONFIG_ENTRY_UserSignupControl,
+                                               //SystemConstants._CONFIG_ENTRY_UserSignupControl,
                                                SystemConstants._CONFIG_ENTRY_UserSignupProcess,
                                                SystemConstants._CONFIG_ENTRY_EMail_Service,
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
                                                SystemConstants._CONFIG_ENTRY_Push_Service,
+                                               SystemConstants._CONFIG_ENTRY_Frontend_Rules,
+                                               SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                              ];
 
 }
