@@ -47,7 +47,12 @@ export class UserSignup extends Model<UserSignup> {
 
   @NotNull
   @NotEmpty
-  @Column( { type: DataType.STRING( 75 ) } )
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
+  Kind: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
   ClientId: string;
 
   @NotNull
@@ -110,6 +115,11 @@ export class UserSignup extends Model<UserSignup> {
 
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   DisabledAt: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  ExpireAt: string;
 
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;

@@ -66,6 +66,9 @@ export class UserGroup extends Model<UserGroup> {
   @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
   AllowTagAccess: string;
 
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  ExpireAt: string;
+
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
 

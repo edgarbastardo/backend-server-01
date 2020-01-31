@@ -25,6 +25,7 @@ import { PasswordParameters } from "./SecurityService.controller";
 import UserGroupService from "../../common/database/services/UserGroupService";
 import { UserSignup } from "../../common/database/models/UserSignup";
 import NotificationManager from "../../common/managers/NotificationManager";
+import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -40,30 +41,31 @@ export default class UserServiceController {
 
     try {
 
-      const userSignupConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_UserSignupControl.Id,
-                                                                                     SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                     transaction,
-                                                                                     logger );
+      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_UserSignupControl.Id,
+                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                          transaction,
+                                                                          logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( userSignupConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( userSignupConfigValue.Value,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
 
-        if ( jsonConfigValue[ "#" + strClientId + "#" ] &&
-             jsonConfigValue[ "#" + strClientId + "#" ].userSignupControl ) {
+        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
+             jsonConfigData[ "#" + strClientId + "#" ].userSignupControl ) {
 
-          result.denied = jsonConfigValue[ "#" + strClientId + "#" ].userSignupControl.denied;
-          result.allowed = jsonConfigValue[ "#" + strClientId + "#" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "#" + strClientId + "#" ].userSignupControl.denied;
+          result.allowed = jsonConfigData[ "#" + strClientId + "#" ].userSignupControl.allowed;
           bSet = true;
 
         }
-        else if ( jsonConfigValue[ "@__default__@" ] ) {
+        else if ( jsonConfigData[ "@__default__@" ] &&
+                  jsonConfigData[ "@__default__@" ].userSignupControl ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].userSignupControl.denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].userSignupControl.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].userSignupControl.allowed;
           bSet = true;
 
         }
@@ -71,16 +73,16 @@ export default class UserServiceController {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( userSignupConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( userSignupConfigValue.Default,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
 
-        if ( jsonConfigValue[ "@__default__@" ] &&
-             jsonConfigValue[ "@__default__@" ].userSignupControl ) {
+        if ( jsonConfigData[ "@__default__@" ] &&
+             jsonConfigData[ "@__default__@" ].userSignupControl ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].userSignupControl.denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].userSignupControl.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].userSignupControl.allowed;
 
         }
 
@@ -202,52 +204,37 @@ export default class UserServiceController {
 
   }
 
-  static async getConfigSignupProcess( strKind: string,
-                                       transaction: any,
-                                       logger: any ): Promise<any> {
+  static async getConfigGeneralDefaultInformation( transaction: any,
+                                                   logger: any ): Promise<any> {
 
     let result = null;
 
     try {
 
-      const userSignupConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id,
-                                                                                     SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                     transaction,
-                                                                                     logger );
+      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_Default_Information.Id,
+                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                          transaction,
+                                                                          logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( userSignupConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( userSignupConfigValue.Value,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
 
-        if ( jsonConfigValue[ "#" + strKind + "#" ] ) {
-
-          result = jsonConfigValue[ "#" + strKind + "#" ];
-          bSet = true;
-
-        }
-        else if ( jsonConfigValue[ "@__default__@" ] ) {
-
-          result = jsonConfigValue[ "@__default__@" ];
-          bSet = true;
-
-        }
+        result = jsonConfigData !== null ? jsonConfigData : null;
+        bSet = true;
 
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( userSignupConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( userSignupConfigValue.Default,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
 
-        if ( jsonConfigValue[ "@__default__@" ] ) {
-
-          result = jsonConfigValue[ "@__default__@" ];
-
-        }
+        result = jsonConfigData !== null ? jsonConfigData : null;
 
       }
 
@@ -256,9 +243,9 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getConfigSignupProcess.name;
+      sourcePosition.method = this.name + "." + this.getConfigGeneralDefaultInformation.name;
 
-      const strMark = "13C1DB2F817E";
+      const strMark = "08E4E489430A";
 
       const debugMark = debug.extend( strMark );
 
@@ -279,6 +266,265 @@ export default class UserServiceController {
     }
 
     return result;
+
+  }
+
+  static async getConfigSignupProcess( strKind: string,
+                                       transaction: any,
+                                       logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id,
+                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                          transaction,
+                                                                          logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                           logger );
+
+        if ( jsonConfigData[ "#" + strKind + "#" ] ) {
+
+          result = jsonConfigData[ "#" + strKind + "#" ];
+          bSet = true;
+
+        }
+        else if ( jsonConfigData[ "@__default__@" ] ) {
+
+          result = jsonConfigData[ "@__default__@" ];
+          bSet = true;
+
+        }
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
+
+        if ( jsonConfigData[ "@__default__@" ] ) {
+
+          result = jsonConfigData[ "@__default__@" ];
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigSignupProcess.name;
+
+      const strMark = "0CCFCCA4180C";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigFrontendRules( strClientId: string,
+                                       strFieldName: string,
+                                       transaction: any,
+                                       logger: any ): Promise<string> {
+
+    let strResult = "";
+
+    try {
+
+      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id,
+                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                          transaction,
+                                                                          logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
+
+        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
+             jsonConfigData[ "#" + strClientId + "#" ][ strFieldName ] ) {
+
+          strResult = jsonConfigData[ "#" + strClientId + "#" ][ strFieldName ];
+          bSet = true;
+
+        }
+        else if ( jsonConfigData[ "@__default__@" ] &&
+                  jsonConfigData[ "@__default__@" ][ strFieldName ] ) {
+
+          strResult = jsonConfigData[ "@__default__@" ][ strFieldName ];
+          bSet = true;
+
+        }
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
+
+        if ( jsonConfigData[ "@__default__@" ] &&
+             jsonConfigData[ "@__default__@" ].tag ) {
+
+          strResult = jsonConfigData[ "@__default__@" ].tag;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigFrontendRules.name;
+
+      const strMark = "B7DACA6CCE2F";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+
+  static async isWebFrontendClient( strClientId: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const strTag = await this.getConfigFrontendRules( strClientId,
+                                                        "tag",
+                                                        transaction,
+                                                        logger );
+
+      bResult = strTag.includes( "#web#" );
+
+    }
+    catch ( error ) {
+
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.isWebFrontendClient.name;
+
+      const strMark = "08A795BE10E0";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  static async isMobileFrontendClient( strClientId: string,
+                                       transaction: any,
+                                       logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const strTag = await this.getConfigFrontendRules( strClientId,
+                                                        "tag",
+                                                        transaction,
+                                                        logger );
+
+      bResult = strTag.includes( "#mobile#" );
+
+    }
+    catch ( error ) {
+
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.isWebFrontendClient.name;
+
+      const strMark = "08A795BE10E0";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
 
   }
 
@@ -309,7 +555,7 @@ export default class UserServiceController {
       const bClientIdIsAllowed = await this.getClientIdIsAllowed( context.ClientId,
                                                                   request.body.Kind,
                                                                   currentTransaction,
-                                                                  logger );
+                                                                  logger ) >= 0;
 
       if ( bClientIdIsAllowed ) {
 
@@ -463,10 +709,15 @@ export default class UserServiceController {
 
               if ( validator.passes() ) { //Validate reqeust.body field values
 
+                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                              "UserName",
+                                                                              logger );
                 const strId = SystemUtilities.getUUIDv4();
                 const strToken = SystemUtilities.hashString( strId,
                                                              2,
                                                              logger ); //CRC32
+
+                const strExpireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.expireAt ).format();
 
                 const userSignup = await UserSignup.create(
                                                             {
@@ -474,7 +725,7 @@ export default class UserServiceController {
                                                               Kind: request.body.Kind,
                                                               ClientId: context.ClientId,
                                                               Token: strToken,
-                                                              Status: signupProcessData.Status,
+                                                              Status: signupProcessData.status,
                                                               Name: request.body.Name,
                                                               FirstName: request.body.FirstName,
                                                               LastName: request.body.LastName,
@@ -482,37 +733,112 @@ export default class UserServiceController {
                                                               Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
                                                               Password: request.body.Password,
                                                               Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
+                                                              CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                              ExpireAt: strExpireAt
                                                             }
                                                           );
 
                 if ( userSignup !== null ) {
 
-                  if ( signupProcessData.Status === 1 ) {
+                  if ( signupProcessData.status === 1 ) { //Automatic send activation code to email address
 
-                    const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_Default_Information.Id,
-                                                                                        SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                        transaction,
-                                                                                        logger );
+                    const configData = await this.getConfigGeneralDefaultInformation( transaction,
+                                                                                      logger );
+
+                    const strTemplateKind = await this.isWebFrontendClient( context.ClientId,
+                                                                            transaction,
+                                                                            logger ) ? "web" : "mobile";
+
+                    const strWebAppURL = await this.getConfigFrontendRules( context.ClientId,
+                                                                            "url",
+                                                                            transaction,
+                                                                            logger );
+
+                    const strExpireAtInTimeZone = SystemUtilities.transformToTimeZone( strExpireAt,
+                                                                                       context.TimeZoneId,
+                                                                                       CommonConstants._DATE_TIME_LONG_FORMAT_04,
+                                                                                       logger );
 
                     //Send immediately the mail for auto activate the new user account
-                    await NotificationManager.send(
-                                                    "email",
-                                                    {
-                                                      from: configData[ "default_no_response_email" ] || "no-response@no-response.com",
-                                                      to: request.body.EMail,
-                                                      subject: "SIGNUP FOR NEW USER ACCOUNT",
-                                                      body: {
-                                                              kind: "template",
-                                                              file: "email-signup-web.pug",
-                                                              language: context.Language,
-                                                              variables: { userName: request.body.Name, activationCode: strToken }
-                                                              //kind: "embedded",
-                                                              //text: "Hello",
-                                                              //html: "<b>Hello</b>"
-                                                            }
-                                                    },
-                                                    logger
-                                                  );
+                    if ( await NotificationManager.send(
+                                                         "email",
+                                                         {
+                                                           from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                           to: request.body.EMail,
+                                                           subject: "SIGNUP FOR NEW USER ACCOUNT",
+                                                           body: {
+                                                                   kind: "template",
+                                                                   file: `email-signup-${strTemplateKind}.pug`,
+                                                                   language: context.Language,
+                                                                   variables: {
+                                                                                user_name: request.body.Name,
+                                                                                activation_code: strToken,
+                                                                                web_app_url: strWebAppURL,
+                                                                                expire_at: strExpireAtInTimeZone,
+                                                                                ... configData
+                                                                              }
+                                                                   //kind: "embedded",
+                                                                   //text: "Hello",
+                                                                   //html: "<b>Hello</b>"
+                                                                 }
+                                                         },
+                                                         logger
+                                                       ) ) {
+
+                      result = {
+                                 StatusCode: 200, //ok
+                                 Code: 'SUCCESS_USER_SIGNUP',
+                                 Message: `Success to made the user signup. Now you need check for your mailbox`,
+                                 Mark: 'B3F0B0AF21AC',
+                                 LogId: null,
+                                 IsError: false,
+                                 Errors: [],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+                    else {
+
+                      result = {
+                                 StatusCode: 500, //ok
+                                 Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
+                                 Message: `Error cannot send the email to requested address`,
+                                 Mark: '5B91FA66FE6D',
+                                 LogId: null,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
+                                             Message: `Error cannot send the email to requested address`,
+                                             Details: {
+                                                        "EMails": request.body.EMail
+                                                      }
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+
+                  }
+                  else { //Manual activation
+
+                    result = {
+                               StatusCode: 200, //ok
+                               Code: 'SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION',
+                               Message: `Success to made the user signup. But you need wait to system administrator activate your new account`,
+                               Mark: 'AE4751429BC8',
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
 
                   }
 

@@ -820,7 +820,8 @@ export class ModelToRestAPIServiceController extends BaseService {
       delete bodyData[ "UpdatedBy" ];
       delete bodyData[ "UpdatedAt" ];
 
-      if ( bodyData[ "DisabledBy" ] !== "1" ) {
+      if ( bodyData[ "DisabledBy" ] !== "1" &&
+           bodyData[ "DisabledBy" ] !== "0" ) {
 
         delete bodyData[ "DisabledBy" ];
 
@@ -958,7 +959,8 @@ export class ModelToRestAPIServiceController extends BaseService {
               delete bodyData[ "UpdatedBy" ];
               delete bodyData[ "UpdatedAt" ];
 
-              if ( bodyData[ "DisabledBy" ] !== "1" ) {
+              if ( bodyData[ "DisabledBy" ] !== "1" &&
+                   bodyData[ "DisabledBy" ] !== "0" ) {
 
                 delete bodyData[ "DisabledBy" ];
 
@@ -1243,7 +1245,8 @@ export class ModelToRestAPIServiceController extends BaseService {
           delete bodyData[ "UpdatedBy" ];
           delete bodyData[ "UpdatedAt" ];
 
-          if ( bodyData[ "DisabledBy" ] !== "1" ) {
+          if ( bodyData[ "DisabledBy" ] !== "1" &&
+               bodyData[ "DisabledBy" ] !== "0" ) {
 
             delete bodyData[ "DisabledBy" ];
 
@@ -1444,7 +1447,8 @@ export class ModelToRestAPIServiceController extends BaseService {
                   delete bodyData[ "UpdatedBy" ];
                   delete bodyData[ "UpdatedAt" ];
 
-                  if ( bodyData[ "DisabledBy" ] !== "1" ) {
+                  if ( bodyData[ "DisabledBy" ] !== "1" &&
+                       bodyData[ "DisabledBy" ] !== "0" ) {
 
                     delete bodyData[ "DisabledBy" ];
 

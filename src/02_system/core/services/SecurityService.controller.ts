@@ -150,34 +150,34 @@ export default class SecurityServiceController {
                                             transaction: any,
                                             logger: any ): Promise<any> {
 
-    let result = { denied: null, allowed: "*" }
+    let result = { denied: null, allowed: "*" };
 
     try {
 
-      const loginAccessControlConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
-                                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                             transaction,
-                                                                                             logger );
+      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
+                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                          transaction,
+                                                                          logger );
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( loginAccessControlConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.Value,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
 
-        if ( jsonConfigValue[ "#" + strClientId + "#" ] &&
-             jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl ) {
+        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
+             jsonConfigData[ "#" + strClientId + "#" ].userLoginControl ) {
 
-          result.denied = jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl.denied;
-          result.allowed = jsonConfigValue[ "#" + strClientId + "#" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "#" + strClientId + "#" ].userLoginControl.denied;
+          result.allowed = jsonConfigData[ "#" + strClientId + "#" ].userLoginControl.allowed;
           bSet = true;
 
         }
-        else if ( jsonConfigValue[ "@__default__@" ] &&
-                  jsonConfigValue[ "@__default__@" ].userLoginControl  ) {
+        else if ( jsonConfigData[ "@__default__@" ] &&
+                  jsonConfigData[ "@__default__@" ].userLoginControl  ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].userLoginControl.denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].userLoginControl.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].userLoginControl.allowed;
           bSet = true;
 
         }
@@ -185,16 +185,16 @@ export default class SecurityServiceController {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( loginAccessControlConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( loginAccessControlConfigValue.Default,
-                                                           logger );
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
 
-        if ( jsonConfigValue[ "@__default__@" ] &&
-             jsonConfigValue[ "@__default__@" ].userLoginControl ) {
+        if ( jsonConfigData[ "@__default__@" ] &&
+             jsonConfigData[ "@__default__@" ].userLoginControl ) {
 
-          result.denied = jsonConfigValue[ "@__default__@" ].userLoginControl.denied;
-          result.allowed = jsonConfigValue[ "@__default__@" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].userLoginControl.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].userLoginControl.allowed;
 
         }
 
@@ -617,7 +617,9 @@ export default class SecurityServiceController {
 
       const bUserFound = CommonUtilities.isNotNullOrEmpty( user );
       const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.DisabledAt );
+      const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
       const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
+      const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
       const bClientIdIsAllowed = bUserFound && await this.getClientIdIsAllowed( strClientId,
                                                                                 user.UserGroup.Id,
                                                                                 user.UserGroup.Name,
@@ -631,7 +633,9 @@ export default class SecurityServiceController {
 
       if ( bUserFound &&
            bUserDisabled === false &&
+           bUserExpired === false &&
            bUserGroupDisabled === false &&
+           bUserGroupExpired === false &&
            await bcrypt.compare( strPassword, user.Password ) ) {
 
         bUserPasswordIsValid = true;
@@ -641,7 +645,9 @@ export default class SecurityServiceController {
       if ( bUserFound &&
            bClientIdIsAllowed &&
            bUserDisabled === false &&
+           bUserExpired === false &&
            bUserGroupDisabled === false &&
+           bUserGroupExpired === false &&
            bUserPasswordIsValid ) {
 
         const fieldsToDelete = [
@@ -737,42 +743,43 @@ export default class SecurityServiceController {
         }
 
         const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( user.UserGroup.Id,
-                                                                                    user.UserGroup.Name,
-                                                                                    user.Id,
-                                                                                    user.Name,
-                                                                                    transaction,
-                                                                                    logger  );
-        /*
-        let bSet = false;
+                                                                                              user.UserGroup.Name,
+                                                                                              user.Id,
+                                                                                              user.Name,
+                                                                                              transaction,
+                                                                                              logger );
 
-        if ( CommonUtilities.isNotNullOrEmpty( expireTimeConfigValue.Value ) ) {
+        const expireAt = SystemUtilities.selectBeforeFromTwoDateAndTime( user.ExpireAt,
+                                                                         user.UserGroup.ExpireAt );
 
-          const jsonConfigValue = CommonUtilities.parseJSON( expireTimeConfigValue.Value, logger );
+        if ( expireAt !== null ) {
 
-          if ( jsonConfigValue[ "#" + user.UserGroup.Name + "#" ] ) {
+          if ( configData.kind === 0 ||   //Calculated from UpdatedAt
+               configData.kind === 1 ) {  //Calculated from CreatedAt
 
-            intExpireKind = jsonConfigValue[ "#" + user.UserGroup.Name + "#" ].Kind;
-            intExpireOn = jsonConfigValue[ "#" + user.UserGroup.Name + "#" ].On;
-            bSet = true;
+            const expireOn = SystemUtilities.getCurrentDateAndTimeIncMinutes( configData.on );
 
+            if ( expireOn.isAfter( expireAt ) ) {
+
+              configData.kind = 2;
+              configData.on = expireAt;
+
+            }
+
+          }
+          else if ( configData.kind === 2 ) { //Fixed expire Date and Time
+
+            const expireOn = SystemUtilities.getCurrentDateAndTimeFrom( configData.on )
+
+            if ( expireOn.isAfter( expireAt ) ) {
+
+              configData.kind = 2;
+              configData.on = expireAt;
+
+            }
           }
 
         }
-
-        if ( bSet === false &&
-             CommonUtilities.isNotNullOrEmpty( expireTimeConfigValue.Default ) ) {
-
-          const jsonConfigValue = CommonUtilities.parseJSON( expireTimeConfigValue.Default, logger );
-
-          if ( jsonConfigValue[ "@__default__@" ] ) {
-
-            intExpireKind = jsonConfigValue[ "@__default__@" ].Kind;
-            intExpireOn = jsonConfigValue[ "@__default__@" ].On;
-
-          }
-
-        }
-        */
 
         const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
                                                             userRoles,
@@ -941,6 +948,27 @@ export default class SecurityServiceController {
                  }
 
       }
+      else if ( bUserExpired ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_EXPIRED',
+                   Message: 'Login failed (User expired)',
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_EXPIRED',
+                               Message: `Login failed (User expired)`,
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
       else if ( bUserGroupDisabled ) {
 
         result = {
@@ -953,6 +981,27 @@ export default class SecurityServiceController {
                              {
                                Code: 'ERROR_USER_GROUP_DISABLED',
                                Message: `Login failed (User group disabled)`,
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bUserGroupExpired ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                   Message: 'Login failed (User group expired)',
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_GROUP_EXPIRED',
+                               Message: `Login failed (User group expired)`,
                                Details: null
                              }
                            ],

@@ -87,6 +87,81 @@ export default class SystemUtilities {
 
   }
 
+  static selectBeforeFromTwoDateAndTime( strDateTime1: string,
+                                         strDateTime2: string ): any {
+
+    let result = null;
+
+    try {
+
+      let dateTime1 = null;
+      let dateTime2 = null;
+
+      if ( strDateTime1 ) {
+
+        dateTime1 = moment( strDateTime1 );
+
+      }
+
+      if ( strDateTime2 ) {
+
+        dateTime2 = moment( strDateTime2 );
+
+      }
+
+      if ( dateTime1 && dateTime2 ) {
+
+        if ( dateTime1.isBefore( dateTime2 ) ) {
+
+          result = strDateTime1;
+
+        }
+        else if ( dateTime2.isBefore( dateTime1 ) ) {
+
+          result = strDateTime2;
+
+        }
+
+      }
+      else if ( dateTime1 ) {
+
+        result = strDateTime1;
+
+      }
+      else if ( dateTime2 ) {
+
+        result = strDateTime2;
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
+  static isDateAndTimeAfter( strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      bResult = strDateTime ? moment().tz( CommonUtilities.getCurrentTimeZoneId() ).isAfter( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
   static getCurrentDateAndTimeIncDays( intDays: number ): any {
 
     let result = null;
@@ -112,6 +187,24 @@ export default class SystemUtilities {
     try {
 
       result = moment().tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intDays, "days" ); //moment().format( CommonUtilities.getCurrentTimeZoneId() );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
+  static getCurrentDateAndTimeIncMinutes( intMinutes: number ): any {
+
+    let result = null;
+
+    try {
+
+      result = moment().tz( CommonUtilities.getCurrentTimeZoneId() ).add( intMinutes, "minutes" );
 
     }
     catch ( error ) {
@@ -387,6 +480,13 @@ export default class SystemUtilities {
         const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" ) } );
 
         result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn, Duration: duration };
+
+      }
+      else if ( sessionStatus.ExpireKind === 2 ) { //Fixed date and time to expire
+
+        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.ExpireOn, "seconds" ) } );
+
+        result = { Expired: duration.asSeconds() > 0, Duration: duration };
 
       }
 
@@ -1193,6 +1293,51 @@ export default class SystemUtilities {
     }
 
     return response;
+
+  }
+
+  static getInfoFromSessionStatus( sessionStatus: any,
+                                   strFieldName: string,
+                                   logger: any ): string {
+
+    let strResult = null;
+
+    try {
+
+      if ( sessionStatus !== null ) {
+
+        strResult = sessionStatus[ strFieldName ] ? sessionStatus[ strFieldName ] : null;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.middlewareSetContext.name;
+
+      const strMark = "AEBB674F7EA8";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
 
   }
 
@@ -2175,34 +2320,43 @@ export default class SystemUtilities {
 
       }
 
-      if ( instance.rawAttributes[ "DisabledBy" ] !== null &&
-           ( instance.DisabledBy === "1" ||
+      if ( instance.rawAttributes[ "DisabledBy" ] !== null ) {
+
+        if ( instance.DisabledBy === "1" ||
              ( instance.DisabledBy &&
-               instance.DisabledBy.startsWith( "1@" ) ) ) ) {
+               instance.DisabledBy.startsWith( "1@" ) ) ) {
 
-        if ( options.context &&
-             options.context.UserSessionStatus &&
-             options.context.UserSessionStatus.Name ) {
+          if ( options.context &&
+              options.context.UserSessionStatus &&
+              options.context.UserSessionStatus.Name ) {
 
-          instance.dataValues.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+            instance.dataValues.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+          }
+          else if ( instance.DisabledBy.startsWith( "1@" ) ) {
+
+            const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
+
+            instance.dataValues.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+          else { //if ( instance.DisabledBy === null ) {
+
+            instance.dataValues.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+
+          if ( instance.rawAttributes[ "DisabledAt" ] !== null ) {
+
+            instance.dataValues.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+
+          }
 
         }
-        else if ( instance.DisabledBy.startsWith( "1@" ) ) {
+        else if ( instance.DisabledBy === "0" ) {
 
-          const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
-
-          instance.dataValues.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
-
-        }
-        else { //if ( instance.DisabledBy === null ) {
-
-          instance.dataValues.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
-
-        }
-
-        if ( instance.rawAttributes[ "DisabledAt" ] !== null ) {
-
-          instance.dataValues.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+          instance.dataValues.DisabledBy = null;
+          instance.dataValues.DisabledAt = null;
 
         }
 
@@ -2423,7 +2577,7 @@ export default class SystemUtilities {
                             return value.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); //  /^\d{1-3}-\d{3}-\d{3}-\d{4}$/ );
 
                           },
-                          'The :attribute phone number is not in the format XXX-XXX-XXXX.'
+                          'The :attribute phone number is not in the format X-XXX-XXX-XXXX.'
                         );
 
       Validator.register(
@@ -2451,7 +2605,7 @@ export default class SystemUtilities {
                             return bResult;
 
                           },
-                          'The :attribute phone number is not in the format of list XXX-XXX-XXXX, XXX-XXX-XXXX or XXX-XXX-XXXX.'
+                          'The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX.'
                         );
 
       if ( registerCallback ) {

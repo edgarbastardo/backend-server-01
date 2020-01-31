@@ -89,6 +89,9 @@ export class User extends Model<User> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   Role: string;
 
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  ExpireAt: string;
+
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
 

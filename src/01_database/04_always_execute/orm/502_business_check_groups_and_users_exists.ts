@@ -48,7 +48,7 @@ export default class Always {
                                    Tag: "#Drivers#",
                                    Comment: "Created from backend startup. Group of users for testing.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                   DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0" // "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                  },
                                ]
 

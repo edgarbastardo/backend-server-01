@@ -120,12 +120,14 @@ export default class Always {
                                       Value: `{ "#System_Administrators#": { "kind": 1, "on": 2880 } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
+                                    /*
                                     {
                                       ConfigMetaDataId: "df6f1488-cf2c-40bd-be26-134ca3381e12", //system.authentication.LoginAccessControl
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                      Value: `{ "#ccc#": { "denied": "*", "allowed": null } }`,
+                                      Value: `{  "#ccc#": { "denied": "*", "allowed": null } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
+                                    */
                                     {
                                       ConfigMetaDataId: "f318f541-8367-42e7-ac71-904cab35bac1", //system.binary.data.BinaryDataMaximumSize
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
@@ -153,7 +155,7 @@ export default class Always {
                                     {
                                       ConfigMetaDataId: "aaa72b7d-9724-441d-bc28-4ae8b3e15b1c", //system.user.signup.Process
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                      Value: `{ "@__default__@": { "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 1, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 1, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 1, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishments#" } }`,
+                                      Value: `{ "@__default__@": { "expireAt": 60, "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "expireAt": 60, "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 1, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "expireAt": 60, "group": "Final_Customers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 1, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "expireAt": 60, "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 1, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishments#" } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
@@ -174,6 +176,53 @@ export default class Always {
                                       Value: `{ "service": "#one_signal#", "#one_signal#": { "type": "one_signal", "host": "https://onesignal.com/api/v1/notifications", "port": 443, "auth": { "app_id": "${process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_APP_ID}", "api_key": "${process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_API_KEY}" } } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
+                                    {
+                                      ConfigMetaDataId: "70835d21-afdd-4f5b-9a56-61762ba55013", //system.frontend.rules
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: JSON.stringify( {
+                                                               "#ccc#": {
+                                                                          "userLoginControl": {
+                                                                                                "denied": "*",
+                                                                                                "allowed": ""
+                                                                                              },
+                                                                          "userSignupControl": {
+                                                                                                 "denied": "*",
+                                                                                                 "allowed": ""
+                                                                                               },
+                                                                          "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                          "url": "http://mycompany.com/myapp/url/",
+                                                                          "route": {
+                                                                                      "exclude": [
+                                                                                                   "*"
+                                                                                                 ],
+                                                                                      "include": [
+
+                                                                                                 ]
+                                                                                   }
+                                                                        },
+                                                               "@__default__@": {
+                                                                                  "userLoginControl": {
+                                                                                                        "denied": "",
+                                                                                                        "allowed": "*"
+                                                                                                      },
+                                                                                  "userSignupControl": {
+                                                                                                         "denied": "",
+                                                                                                         "allowed": "*"
+                                                                                                       },
+                                                                                  "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                                  "url": "http://mycompany.com/myapp/url/",
+                                                                                  "route": {
+                                                                                             "exclude": [
+                                                                                                          "*"
+                                                                                                        ],
+                                                                                             "include": [
+
+                                                                                                        ]
+                                                                                           }
+                                                                                }
+                                                              } ),
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    }
                                   ]
 
       const loopConfigValueEntriesAsync = async () => {

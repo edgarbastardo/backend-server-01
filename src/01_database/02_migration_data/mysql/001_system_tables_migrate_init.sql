@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `UserGroup` (
   `Role` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name of roles. Example:\n\n #Roles01#, #Roles02#',
   `DenyTagAccess` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to deny access this group\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated first with the allow groups counterpart\n\n* Indicate nobody access to this group from outside server',
   `AllowTagAccess` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to allow access this group\n\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated later with the deny groups counterpart\n\n* = Any access to this group if not * or listed in DenyTagAccess',
+  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this user group',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
@@ -144,6 +145,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'User password.',
   `PasswordSetAt` varchar(30) NOT NULL COMMENT 'Last Date and time password set, default the same when created.',
   `Role` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name of roles, no prefix #Role01# to allow, and -#Role03# to deny.\n\nExample:\n\n #Roles01#, #Roles02#, -#Roles03#',
+  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this user',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
@@ -177,7 +179,7 @@ CREATE TABLE IF NOT EXISTS `UserRecover` (
 
 CREATE TABLE IF NOT EXISTS `UserSignup` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
-  `Kind` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Depend of type of user to activate',
+  `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Depend of type of user to activate',
   `ClientId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Client id code',
   `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Activation token',
   `Status` smallint(6) NOT NULL COMMENT '0 = Waiting activation\n25 = Manual activation\n50 = Activated',
@@ -192,6 +194,7 @@ CREATE TABLE IF NOT EXISTS `UserSignup` (
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
+  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Set the expire date and time for this user signup',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user auto signup table information';
@@ -349,7 +352,7 @@ CREATE TABLE IF NOT EXISTS `ConfigMetaData` (
   `ListOrder` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Indicate the list order\n\nUses full for UI screen in logical order for final user.',
   `Hidden` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = Not hidden\n1 = Hidden, Never listed in search or list result services',
   `Private` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = Not private\n1 = Private, Only fo use in the backend never writed or readed using services',
-  `Default` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Default value for this config',
+  `Default` longtext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Default value for this config',
   `DefaultLabel` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the meaning of a value\n\nExample:\nWhen Default = 0, DefaultLabel = Deny\n\nWhen Default = 1, DefaultLabel = Allow\n',
   `DenyTagAccessR` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to deny read access this config entry\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated first with the allow read counterpart\n\n* Indicate nobody access to this config entry from outside server',
   `DenyTagAccessW` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to deny write access this config entry\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated first with the allow write counterpart\n\n* Indicate nobody access to this config entry from outside server',
@@ -378,7 +381,7 @@ CREATE TABLE IF NOT EXISTS `ConfigMetaData` (
   -- `DenyWrite` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of users id or users names separated by ; use * for all.\n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
   -- `AllowRead` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table ConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
   -- `AllowWrite` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table ConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
-  `Example` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Example data',
+  `Example` longtext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Example data',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Commentary configuration data input , usually created from ui.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',

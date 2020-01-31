@@ -8,7 +8,14 @@ html(lang="en")
         include ./email-signup-web.css
   body
       h2 SIGNUP FOR NEW USER ACCOUNT
-      p Hello!. This email is for your new user account #[strong #{userName}]
+      p Hello!. This email is for your new user account #[strong #{user_name}]
       p Your activation code is
-      h3 #{activationCode}
+      h3 #{activation_code}
+      p The activation code work until #[strong #{expire_at}]
+      p To made login #[a(href=`${web_app_url}`) #{web_app_url}]
       p If you not recognize this email please ignore and archive it.
+      p #[strong #{company_name}]
+      p #[strong #{company_address}]
+      p #[strong #{company_phone}]
+      p #[strong #{company_email}]
+      p #[strong #{company_web}]

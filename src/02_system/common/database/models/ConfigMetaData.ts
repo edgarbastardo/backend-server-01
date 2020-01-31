@@ -75,7 +75,7 @@ export class ConfigMetaData extends Model<ConfigMetaData> {
   @Column( { type: DataType.TINYINT } )
   Private: number;
 
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  @Column( { type: DataType.TEXT, allowNull: true } )
   Default: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
@@ -93,7 +93,7 @@ export class ConfigMetaData extends Model<ConfigMetaData> {
   @Column( { type: DataType.STRING( 2048 ) } )
   AllowTagAccessW: string;
 
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  @Column( { type: DataType.TEXT, allowNull: true } )
   Example: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
