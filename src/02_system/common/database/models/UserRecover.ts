@@ -54,6 +54,9 @@ export class UserRecover extends Model<UserRecover> {
   @Column( { type: DataType.STRING( 30 ) } )
   CreatedAt: string;
 
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  ExpireAt: string;
+
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 

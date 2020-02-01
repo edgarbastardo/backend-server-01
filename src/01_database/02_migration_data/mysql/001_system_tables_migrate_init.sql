@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS `UserRecover` (
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this user recover token',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   KEY `FK_RecoverToken_UserId_idx` (`UserId`),

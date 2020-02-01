@@ -1,7 +1,7 @@
 import { UserGroup } from "../models/UserGroup";
 import DBConnectionManager from "../../managers/DBConnectionManager";
 import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from '../../SystemUtilities';
+import SystemUtilities from "../../SystemUtilities";
 import BaseService from "./BaseService";
 import CommonConstants from "../../CommonConstants";
 
@@ -261,6 +261,32 @@ export default class UserGroupService extends BaseService {
                                             logger );
 
     return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+
+  }
+
+  static async checkExpiredById( strId: string,
+                                 transaction: any,
+                                 logger: any ): Promise<boolean> {
+
+    const userGroup = await this.getById( strId,
+                                          null,
+                                          transaction,
+                                          logger );
+
+    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+
+  }
+
+  static async checkExpiredByName( strName: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    const userGroup = await this.getByName( strName,
+                                            null,
+                                            transaction,
+                                            logger );
+
+    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
 
   }
 

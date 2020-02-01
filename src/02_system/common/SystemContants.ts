@@ -565,7 +565,7 @@ export default class SystemConstants {
         "validatonObjectDef": {
           "type": "object",
           "additionalProperties": false,
-          "required": [ "expireAt", "group", "createGroup", "groupRole", "status", "userRole" ],
+          "required": [ "expireAt", "group", "createGroup", "groupRole", "status", "userRole", "userTag" ],
           "properties": {
             "expireAt": {
               "type": "number",
@@ -582,12 +582,25 @@ export default class SystemConstants {
             "groupRole": {
               "type": "string"
             },
+            "groupExpireAt": {
+              "type": "number",
+              "multipleOf": 1.0,
+              "minimum": -1
+            },
             "status": {
               "type": "number"
             },
             "userRole": {
               "type": "string"
             },
+            "userTag": {
+              "type": "string"
+            },
+            "userExpireAt": {
+              "type": "number",
+              "multipleOf": 1.0,
+              "minimum": -1
+            }
           }
         }
       }
@@ -598,11 +611,13 @@ export default class SystemConstants {
                                                 `"additionalProperties":false,"required":["@__default__@"],"patternProperties":` +
                                                 `{"@__default__@":{"$ref":"#/definitions/validatonObjectDef"},".*":` +
                                                 `{"$ref":"#/definitions/validatonObjectDef"}},"definitions":{"validatonObjectDef"` +
-                                                `:{"type":"object","additionalProperties":false,"required":["expireAt","group","createGroup","groupRole"` +
-                                                `,"status","userRole"],"properties":{"expireAt":{"type":"number","multipleOf":1.0,"minimum": 5},` +
-                                                `"group":{"type":"string","minLength":2},"createGroup":{"type":"boolean"},"groupRole"` +
+                                                `:{"type":"object","additionalProperties":false,"required":["expireAt","group","createGroup", "groupExpireAt","groupRole"` +
+                                                `,"status","userRole","userTag","userExpireAt"],"properties":{"expireAt":{"type":"number","multipleOf":1.0,"minimum": 5},` +
+                                                `"group":{"type":"string","minLength":2},"createGroup":{"type":"boolean"},` +
+                                                `"groupExpireAt":{"type":"number","multipleOf":1.0,"minimum": -1},"groupRole"` +
                                                 `:{"type":"string"},"groupTag":{"type":"string"},"status":{"type":"number"},` +
-                                                `"userRole":{"type":"string"},"userTag":{"type":"string"}}}}}`
+                                                `"userRole":{"type":"string"},"userTag":{"type":"string"},"userExpireAt":` +
+                                                `{"type":"number","multipleOf":1.0,"minimum": -1}}}}}`
 
   static readonly _CONFIG_ENTRY_UserSignupProcess = {
                                                       Id: "aaa72b7d-9724-441d-bc28-4ae8b3e15b1c",
@@ -610,12 +625,12 @@ export default class SystemConstants {
                                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                       Category: "Singup",
                                                       Name: "system.user.signup.Process",
-                                                      Default: `{ "@__default__@": { "expireAt": 60, "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameters": "" } }`,
+                                                      Default: `{ "@__default__@": { "expireAt": 60, "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "groupExpireAt": -1, "status": -1, "userRole": "", "userTag": "", "userExpireAt": -1, "passwordParameters": "" } }`,
                                                       Label: "Process signup kind",
                                                       Description: "Process signup of users. The group must be exists before of singup if createGroup = false. groupRole only apply if group is created first time createGroup = true",
                                                       AllowTagAccessR: "#Administrator#",
                                                       AllowTagAccessW: "#Administrator#",
-                                                      Example: '{ "@__default__@": { "expireAt": 60, "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "status": -1, "userRole": "", "userTag": "", "passwordParameterTag": "" }, "#driver#": { "expireAt": 60, "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#Driver#", "userTag": "", "passwordParameterTag": "" }, "#finalCustomer#": { "expireAt": 60, "group": "Final_Customers_01", "createGroup": false, "groupRole": "", "groupTag": "", "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "passwordParameterTag": "" }, "#establishment#": { "expireAt": 60 "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "status": 0, "userRole": "#Master#", "userTag": "", "passwordParameterTag": "#Establishment#" } }',
+                                                      Example: '{ "@__default__@": { "expireAt": 60, "group": "@__error__@", "createGroup": false, "groupRole": "", "groupTag": "", "groupExpireAt": -1, "status": -1, "userRole": "", "userTag": "", "userExpireAt": -1, "passwordParameterTag": "" }, "#driver#": { "expireAt": 60, "group": "Drivers", "createGroup": false, "groupRole": "", "groupTag": "", "groupExpireAt": -1, "status": 0, "userRole": "#Driver#", "userTag": "", "userExpireAt": -1, "passwordParameterTag": "" }, "#finalCustomer#": { "expireAt": 60, "group": "Final_Customers_01", "createGroup": false, "groupRole": "", "groupTag": "", "groupExpireAt": -1, "status": 0, "userRole": "#FinalCustomer#", "userTag": "", "userExpireAt": -1, "passwordParameterTag": "" }, "#establishment#": { "expireAt": 60 "group": "@__FromName__@", "createGroup": true, "groupRole": "#@__FromName__@#,#Establishment#", "groupTag": "", "groupExpireAt": -1, "status": 0, "userRole": "#Master#", "userTag": "", "userExpireAt": -1, "passwordParameterTag": "#Establishment#" } }',
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                       ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._SCHEMA_VALIDATION_UserSignupProcess} }`
                                                     };

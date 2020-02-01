@@ -144,6 +144,24 @@ export default class SystemUtilities {
 
   }
 
+  static isDateAndTimeBefore( strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      bResult = strDateTime ? moment().tz( CommonUtilities.getCurrentTimeZoneId() ).isBefore( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
   static isDateAndTimeAfter( strDateTime: string ): boolean {
 
     let bResult = false;

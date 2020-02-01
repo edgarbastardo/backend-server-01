@@ -668,6 +668,31 @@ export default class UserServiceController {
                        }
 
             }
+            else if ( bUserGroupExists &&
+                      await UserGroupService.checkExpiredByName( signupProcessData.group,
+                                                                 transaction,
+                                                                 logger ) ) {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_EXPIRED',
+                         Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                         Mark: '53EC3D039492',
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_EXPIRED',
+                                     Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
             else if ( await UserService.checkExistsByName( request.body.Name,
                                                            transaction,
                                                            logger ) ) {
@@ -972,6 +997,300 @@ export default class UserServiceController {
       sourcePosition.method = this.name + "." + this.signup.name;
 
       const strMark = "309DBDE7EEAF";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500,
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+    static async signupActivate( request: Request,
+                                 transaction: any,
+                                 logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const context = ( request as any ).context;
+
+      const bClientIdIsAllowed = await this.getClientIdIsAllowed( context.ClientId,
+                                                                  request.body.Kind,
+                                                                  currentTransaction,
+                                                                  logger ) >= 0;
+
+      if ( bClientIdIsAllowed ) {
+
+        const signupProcessData = await this.getConfigSignupProcess( request.body.Kind,
+                                                                     currentTransaction,
+                                                                     logger );
+
+        if ( signupProcessData &&
+             signupProcessData.group &&
+             signupProcessData.group.trim() !== "" &&
+             signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+
+          const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group,
+                                                                              transaction,
+                                                                              logger );
+
+          if ( signupProcessData.createGroup === false &&
+               bUserGroupExists === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                       Message: `The user group ${signupProcessData.group} defined by signup kind ${request.body.Kind} not exists`,
+                       Mark: '0EA9AC54E217',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                   Message: `The user group ${signupProcessData.group} defined by signup kind ${request.body.Kind} not exists`,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( signupProcessData.createGroup &&
+                    bUserGroupExists ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] already exists`,
+                       Mark: '832157FFA57C',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                                   Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] already exists`,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( bUserGroupExists &&
+                    await UserGroupService.checkDisabledByName( signupProcessData.group,
+                                                                transaction,
+                                                                logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is disabled. You cannot signup new users`,
+                       Mark: '74E11EE1CFE2',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is disabled. You cannot signup new users`,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( bUserGroupExists &&
+                    await UserGroupService.checkExpiredByName( signupProcessData.group,
+                                                               transaction,
+                                                               logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                       Mark: '2E99F86FF13B',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkExistsByName( request.body.Name,
+                                                          transaction,
+                                                          logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                       Message: `The user name [${request.body.Name}] already exists.`,
+                       Mark: '46F913842BF5',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                                   Message: `The user name [${request.body.Name}] already exists.`,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            if ( signupProcessData.createGroup ) {
+
+              //Create new group
+              //
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                     Message: `The singup kind ${request.body.Kind} for singup is not valid`,
+                     Mark: 'C632418EF717',
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                                 Message: `The singup kind ${request.body.Kind} is not valid`,
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
+                   Message: 'Not allowed to signup from this the kind of client',
+                   Mark: '2A8CD841F553',
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
+                               Message: `Not allowed to signup from this the kind of client`,
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.signupActivate.name;
+
+      const strMark = "5362D0AECBD3";
 
       const debugMark = debug.extend( strMark );
 

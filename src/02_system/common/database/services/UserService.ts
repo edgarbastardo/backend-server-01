@@ -246,4 +246,30 @@ export default class UserService extends BaseService {
 
   }
 
+  static async checkExpiredById( strId: string,
+                                 transaction: any,
+                                 logger: any ): Promise<boolean> {
+
+    const user = await this.getById( strId,
+                                     null,
+                                     transaction,
+                                     logger );
+
+    return user ? SystemUtilities.isDateAndTimeAfter( user.ExpireAt ) : false;
+
+  }
+
+  static async checkExpiredByName( strName: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    const user = await this.getByName( strName,
+                                       null,
+                                       transaction,
+                                       logger );
+
+    return user ? SystemUtilities.isDateAndTimeAfter( user.ExpireAt ) : false;
+
+  }
+
 }

@@ -120,15 +120,11 @@ export default class UserController {
            )
   async signupActivate( request: Request, response: Response ) {
 
-    const context = ( request as any ).context;
-
-    /*
-    const result = await SecurityService.logout( context.Authorization,
-                                                 null,
-                                                 context.Logger );
+    const result = await UserServiceController.signupActivate( request,
+                                                               null,
+                                                               this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
-    */
 
   }
 
