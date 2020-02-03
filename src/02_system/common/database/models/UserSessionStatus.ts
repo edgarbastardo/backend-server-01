@@ -39,15 +39,15 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   }
 
   @PrimaryKey
-  @Column( { type: DataType.STRING( 40 ) } )
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserId: string;
 
   @PrimaryKey
-  @Column( { type: DataType.STRING( 40 ) } )
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserGroupId: string;
 
   @PrimaryKey
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Token: string;
 
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
@@ -56,37 +56,40 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   SocketToken: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   ClientId: string;
 
   @Column( { type: DataType.STRING( 75 ), allowNull: true } )
   SourceIPAddress: string;
 
-  @Column( { type: DataType.TEXT } )
+  @Column( { type: DataType.TEXT, allowNull: false } )
   Role: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   UserName: string;
 
-  @Column( { type: DataType.TINYINT } )
+  @Column( { type: DataType.TINYINT, allowNull: false } )
   ExpireKind: number;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   ExpireOn: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  HardLimit: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )

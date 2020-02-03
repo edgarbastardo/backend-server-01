@@ -124,6 +124,7 @@ export default class ApplicationManager {
             userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
                                                                             context,
                                                                             true,
+                                                                            false,
                                                                             null,
                                                                             logger );
 

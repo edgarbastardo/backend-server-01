@@ -87,8 +87,8 @@ export default class SystemUtilities {
 
   }
 
-  static selectBeforeFromTwoDateAndTime( strDateTime1: string,
-                                         strDateTime2: string ): any {
+  static selectMoreCloseTimeBetweenTwo( strDateTime1: string,
+                                        strDateTime2: string ): any {
 
     let result = null;
 
@@ -403,6 +403,7 @@ export default class SystemUtilities {
 
   }
 
+  /*
   //checkUserSessionStatusPersistentExpired
   static checkUserSessionStatusPersistentExpired( sessionPersistenStatus: any,
                                                   logger: any ): any {
@@ -411,16 +412,19 @@ export default class SystemUtilities {
 
     try {
 
-      if ( sessionPersistenStatus.ExpireAt ) { //Expired time calculated from ExpireAt
+      / *
+      if ( sessionPersistenStatus.HardLimit ) { //Expired time calculated from Limit
 
         //Check ExpireAt field not more old to current date time
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionPersistenStatus.ExpireAt, "seconds" ) } );
+        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionPersistenStatus.HardLimit, "seconds" ) } );
 
         result = { Expired: duration.asSeconds() >= 0, Duration: duration };
 
       }
-      else if ( sessionPersistenStatus.ExpireKind === 2 &&
-                sessionPersistenStatus.ExpireOn ) { //Expired time calculated unsing ExpireOn field
+      else
+      * /
+      if ( sessionPersistenStatus.ExpireKind === 3 &&
+           sessionPersistenStatus.ExpireOn ) { //Expired time calculated unsing ExpireOn field
 
         const expireOn = moment( sessionPersistenStatus.ExpireOn );
 
@@ -435,7 +439,7 @@ export default class SystemUtilities {
 
       }
 
-      /*
+      / *
       if ( result.Expired === false &&
            CommonUtilities.isNotNullOrEmpty( sessionStatus.LoggedOutAt ) ) {
 
@@ -444,14 +448,14 @@ export default class SystemUtilities {
         result = { Expired: true, Duration: duration };
 
       }
-      */
+      * /
 
     }
     catch ( error ) {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.checkUserSessionStatusTemporalExpired.name;
+      sourcePosition.method = this.name + "." + this.checkUserSessionStatusPersistentExpired.name;
 
       const strMark = "645AC1C7F0D2";
 
@@ -476,9 +480,10 @@ export default class SystemUtilities {
     return result;
 
   }
+  */
 
-  static checkUserSessionStatusTemporalExpired( sessionStatus: any,
-                                                logger: any ): any {
+  static checkUserSessionStatusExpired( sessionStatus: any,
+                                        logger: any ): any {
 
     let result = { Expired: false, Duration: null };
 
@@ -486,18 +491,44 @@ export default class SystemUtilities {
 
       if ( sessionStatus.ExpireKind === 0 ) { //Expired time calculated from UpdatedAt
 
-        //Check UpdateAt field not more old to ExpireOn minutes
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.UpdatedAt, "seconds" ) } );
+        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( sessionStatus.HardLimit );
 
-        result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn, Duration: duration };
+        if ( bLimitIsExpired ) {
+
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" ) } );
+
+          result = { Expired: bLimitIsExpired, Duration: duration };
+
+        }
+        else {
+
+          //Check UpdateAt field not more old to ExpireOn minutes
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.UpdatedAt, "seconds" ) } );
+
+          result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn || bLimitIsExpired, Duration: duration };
+
+        }
 
       }
       else if ( sessionStatus.ExpireKind === 1 ) { //Expired time calculated from CreatedAt
 
-        //Check CreatedAt field not more old to ExpireOn minutes
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" ) } );
+        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( sessionStatus.HardLimit );
 
-        result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn, Duration: duration };
+        if ( bLimitIsExpired ) {
+
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" ) } );
+
+          result = { Expired: bLimitIsExpired, Duration: duration };
+
+        }
+        else {
+
+          //Check CreatedAt field not more old to ExpireOn minutes
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" ) } );
+
+          result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn, Duration: duration };
+
+        }
 
       }
       else if ( sessionStatus.ExpireKind === 2 ) { //Fixed date and time to expire
@@ -507,24 +538,28 @@ export default class SystemUtilities {
         result = { Expired: duration.asSeconds() > 0, Duration: duration };
 
       }
+      else if ( sessionStatus.ExpireKind === 3 &&  //Persistent session token
+                sessionStatus.ExpireOn ) {         //Expired time calculated unsing ExpireOn field
 
-      /*
-      if ( result.Expired === false &&
-           CommonUtilities.isNotNullOrEmpty( sessionStatus.LoggedOutAt ) ) {
+        const expireOn = moment( sessionStatus.ExpireOn );
 
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.LoggedOutAt, "seconds" ) } );
+        if ( expireOn.isValid() ) {
 
-        result = { Expired: true, Duration: duration };
+          //Check CreatedAt field not more old to ExpireOn minutes
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( expireOn, "seconds" ) } );
+
+          result = { Expired: duration.asSeconds() >= 0, Duration: duration };
+
+        }
 
       }
-      */
 
     }
     catch ( error ) {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.checkUserSessionStatusTemporalExpired.name;
+      sourcePosition.method = this.name + "." + this.checkUserSessionStatusExpired.name;
 
       const strMark = "48F8E318CD0B";
 
@@ -553,6 +588,7 @@ export default class SystemUtilities {
   static async getUserSessionStatusPersistent( strToken: string,
                                                requestContext: any,
                                                bUpdateAt: boolean,
+                                               bForceReadFromDB: boolean,
                                                transaction: any,
                                                logger: any ):Promise<any> {
 
@@ -562,7 +598,8 @@ export default class SystemUtilities {
 
     if ( CommonUtilities.isNotNullOrEmpty( strToken ) ) {
 
-      if ( process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
+      if ( bForceReadFromDB === false ||
+           process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
 
         const strJSONUserSessionStatus = await CacheManager.getData( strToken,
                                                                      logger ); //First try with cache
@@ -640,7 +677,7 @@ export default class SystemUtilities {
 
         if ( CommonUtilities.isNotNullOrEmpty( sessionPersistent ) &&
              CommonUtilities.isNullOrEmpty( sessionPersistent.DisabledAt ) &&
-             SystemUtilities.checkUserSessionStatusPersistentExpired( sessionPersistent, logger ).Expired === false &&
+             SystemUtilities.checkUserSessionStatusExpired( sessionPersistent, logger ).Expired === false &&
              bUpdateAt ) {
 
           result = UserSessionStatusService.getUserSessionStatusByToken( strToken,
@@ -651,6 +688,9 @@ export default class SystemUtilities {
                                                               userRoles,
                                                               true,
                                                               logger );
+
+          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sessionPersistent.DisabledAt,
+                                                                          sessionPersistent.ExpireAt );
 
           if ( CommonUtilities.isNullOrEmpty( result ) ) {
 
@@ -666,7 +706,8 @@ export default class SystemUtilities {
                        Role: strRolesMerged,
                        UserName: sessionPersistent[ "User" ],
                        ExpireKind: 3,
-                       ExpireOn: sessionPersistent.ExpireAt ? sessionPersistent.ExpireAt : 999999999,
+                       ExpireOn: expireAt,
+                       HardLimit: null,
                        Tag: sessionPersistent[ "Tag" ],
                        CreatedBy: sessionPersistent[ "User" ],
                        UpdatedBy: sessionPersistent[ "User" ],
@@ -679,8 +720,9 @@ export default class SystemUtilities {
 
             //Update the entry in the session status table
             result.Role = strRolesMerged;
-            result.ExpireKind = 3,
-            result.ExpireOn = sessionPersistent.ExpireAt ? sessionPersistent.ExpireAt : 999999999;
+            result.ExpireKind = 3;
+            result.ExpireOn = expireAt;
+            result.HardLimit = null;
 
           }
 
@@ -699,7 +741,7 @@ export default class SystemUtilities {
       }
 
       if ( CommonUtilities.isNotNullOrEmpty( result ) &&
-           SystemUtilities.checkUserSessionStatusPersistentExpired( result, logger ).Expired === false &&
+           SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
         SystemUtilities.createOrUpdateUserSessionStatus( strToken,
@@ -712,92 +754,6 @@ export default class SystemUtilities {
                                                          7 * 1000, //Second
                                                          transaction,
                                                          logger );
-
-        /*
-        //Check UpdateAt field not more old to 15 seconds aprox
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( result.UpdatedAt, "seconds" ) } );
-
-        if ( duration.asSeconds() >= 15 || //The updated is old to 15 seconds
-             !result.UpdatedAt ) { //Not update field is new entry
-
-          if ( bFromCache === false ) { //Only if not taked from cache
-
-            const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
-                                                                userRoles,
-                                                                true,
-                                                                logger );
-
-            result.Role = strRolesMerged; //Update the roles
-
-          }
-
-          result.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //Update to current date and time
-
-          let lockedResource = null;
-
-          try {
-
-            //We need write the shared resource and going to block temporally the write access
-            lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
-                                                              SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS,
-                                                              7 * 1000, //7 seconds
-                                                              1, //Only one try
-                                                              undefined, //Default 5000 milliseconds
-                                                              logger );
-
-            if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) { //Stay sure we had the resource locked
-
-              await CacheManager.setDataWithTTL( strToken,
-                                                 JSON.stringify( result ),
-                                                 300, //5 minutes in seconds
-                                                 logger ); //Refresh the token in the central cache
-
-              await UserSessionStatusService.createOrUpdate( result.UserId,
-                                                             strToken,
-                                                             result,
-                                                             true,
-                                                             null,
-                                                             logger ); //Refresh the UpdatedAt field in central db
-
-            }
-
-          }
-          catch ( error ) {
-
-            const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-            sourcePosition.method = this.name + "." + this.getUserSessionStatus.name;
-
-            const strMark = "B9DAAE7CB7ED";
-
-            const debugMark = debug.extend( strMark );
-
-            debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-            debugMark( "Catched on: %O", sourcePosition );
-
-            error.mark = strMark;
-            error.logId = SystemUtilities.getUUIDv4();
-
-            if ( logger && typeof logger.error === "function" ) {
-
-              error.catchedOn = sourcePosition;
-              logger.error( error );
-
-            }
-
-          }
-
-          //Release the write access for another process. VERY IMPORTANT!!!
-          if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) {
-
-            await CacheManager.unlockResource( lockedResource,
-                                              logger );
-
-          }
-
-        }
-        */
 
       }
 
@@ -816,6 +772,7 @@ export default class SystemUtilities {
   static async getUserSessionStatusTemporal( strToken: string,
                                              requestContext: any,
                                              bUpdateAt: boolean,
+                                             bForceReadFromDB: boolean,
                                              transaction: any,
                                              logger: any ):Promise<any> {
 
@@ -825,7 +782,8 @@ export default class SystemUtilities {
 
     if ( CommonUtilities.isNotNullOrEmpty( strToken ) ) {
 
-      if ( process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
+      if ( bForceReadFromDB === false ||
+           process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
 
         const strJSONUserSessionStatus = await CacheManager.getData( strToken,
                                                                      logger ); //First try with cache
@@ -906,7 +864,7 @@ export default class SystemUtilities {
 
       if ( CommonUtilities.isNotNullOrEmpty( result ) &&
            CommonUtilities.isNullOrEmpty( result.LoggedOutAt ) &&
-           SystemUtilities.checkUserSessionStatusTemporalExpired( result, logger ).Expired === false &&
+           SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
         SystemUtilities.createOrUpdateUserSessionStatus( strToken,
@@ -944,13 +902,6 @@ export default class SystemUtilities {
                                                 intLockSeconds: number,
                                                 transaction: any,
                                                 logger: any ) {
-
-    /*
-    if ( CommonUtilities.isNotNullOrEmpty( userSessionStatus ) &&
-         CommonUtilities.isNullOrEmpty( userSessionStatus.LoggedOutAt ) &&
-         SystemUtilities.checkUserSessionStatusTemporalExpired( userSessionStatus, logger ).Expired === false &&
-         bUpdateAt ) {
-    */
 
     //Check UpdateAt field not more old to 15 seconds aprox
     var duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.UpdatedAt, "seconds" ) } );
@@ -1066,16 +1017,18 @@ export default class SystemUtilities {
   static async getUserSessionStatus( strToken: string,
                                      requestContext: any,
                                      bUpdateAt: boolean,
+                                     bForceReadFromDB: boolean,
                                      transaction: any,
                                      logger: any ):Promise<any> {
 
     let result = null;
 
-    if ( strToken.startsWith( "p." ) ) {
+    if ( strToken.startsWith( "p:" ) ) {
 
       result = await SystemUtilities.getUserSessionStatusPersistent( strToken,
                                                                      requestContext,
                                                                      bUpdateAt,
+                                                                     bForceReadFromDB,
                                                                      transaction,
                                                                      logger )
 
@@ -1085,6 +1038,7 @@ export default class SystemUtilities {
       result = await SystemUtilities.getUserSessionStatusTemporal( strToken,
                                                                    requestContext,
                                                                    bUpdateAt,
+                                                                   bForceReadFromDB,
                                                                    transaction,
                                                                    logger )
 
@@ -1203,6 +1157,51 @@ export default class SystemUtilities {
 
   }
 
+  static getInfoFromSessionStatus( sessionStatus: any,
+                                   strFieldName: string,
+                                   logger: any ): string {
+
+    let strResult = null;
+
+    try {
+
+      if ( sessionStatus !== null ) {
+
+        strResult = sessionStatus[ strFieldName ] ? sessionStatus[ strFieldName ] : null;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.middlewareSetContext.name;
+
+      const strMark = "AEBB674F7EA8";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
   //Anchor middlewareSetContext
   static async middlewareSetContext( request: Request,
                                      response: Response,
@@ -1253,6 +1252,7 @@ export default class SystemUtilities {
         userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
                                                                         ( request as any ).context,
                                                                         true,
+                                                                        false,
                                                                         null,
                                                                         logger );
 
@@ -1314,51 +1314,6 @@ export default class SystemUtilities {
 
   }
 
-  static getInfoFromSessionStatus( sessionStatus: any,
-                                   strFieldName: string,
-                                   logger: any ): string {
-
-    let strResult = null;
-
-    try {
-
-      if ( sessionStatus !== null ) {
-
-        strResult = sessionStatus[ strFieldName ] ? sessionStatus[ strFieldName ] : null;
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.middlewareSetContext.name;
-
-      const strMark = "AEBB674F7EA8";
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-    }
-
-    return strResult;
-
-  }
-
   // ANCHOR middlewareCheckIsAuthenticated
   static async middlewareCheckIsAuthenticated( request: Request,
                                                response: Response,
@@ -1377,7 +1332,7 @@ export default class SystemUtilities {
 
       if ( CommonUtilities.isNullOrEmpty( userSessionStatus.LoggedOutAt ) ) {
 
-        authorization = SystemUtilities.checkUserSessionStatusTemporalExpired( userSessionStatus, logger );
+        authorization = SystemUtilities.checkUserSessionStatusExpired( userSessionStatus, logger );
 
       }
       else {
@@ -1577,7 +1532,7 @@ export default class SystemUtilities {
 
         if ( CommonUtilities.isNullOrEmpty( userSessionStatus.LoggedOutAt ) ) {
 
-          session = SystemUtilities.checkUserSessionStatusTemporalExpired( userSessionStatus, logger );
+          session = SystemUtilities.checkUserSessionStatusExpired( userSessionStatus, logger );
 
         }
         else {

@@ -1510,7 +1510,7 @@ export default class BinaryServiceController extends BaseService {
 
       const userSessionStatus = context.UserSessionStatus;
 
-      if ( userSessionStatus.Token.startsWith( "p." ) === false ) {
+      if ( userSessionStatus.Token.startsWith( "p:" ) === false ) {
 
         if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ) {
 
@@ -1930,14 +1930,14 @@ export default class BinaryServiceController extends BaseService {
           else {
 
             binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
-                                                              path.join( strFullPath, binaryIndexInDB.FilePath ),
-                                                              strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
-                                                              binaryIndexInDB.FileName,
-                                                              binaryIndexInDB.FileExtension,
-                                                              binaryIndexInDB.MimeType,
-                                                              binaryIndexInDB.FileSize,
-                                                              strThumbnail,
-                                                              logger );
+                                                                        path.join( strFullPath, binaryIndexInDB.FilePath ),
+                                                                        strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
+                                                                        binaryIndexInDB.FileName,
+                                                                        binaryIndexInDB.FileExtension,
+                                                                        binaryIndexInDB.MimeType,
+                                                                        binaryIndexInDB.FileSize,
+                                                                        strThumbnail,
+                                                                        logger );
 
           }
 
@@ -1969,6 +1969,7 @@ export default class BinaryServiceController extends BaseService {
                 userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
                                                                                 context,
                                                                                 true,
+                                                                                false,
                                                                                 null,
                                                                                 logger );
 

@@ -39,10 +39,10 @@ export class UserSessionPersistent extends Model<UserSessionPersistent> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @Column( { type: DataType.STRING( 40 ) } )
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserId: string;
 
-  @Column( { type: DataType.STRING( 175 ), unique: true } )
+  @Column( { type: DataType.STRING( 175 ), allowNull: false, unique: true } )
   Token: string;
 
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
@@ -57,10 +57,10 @@ export class UserSessionPersistent extends Model<UserSessionPersistent> {
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )

@@ -63,21 +63,7 @@ export default class SecurityServiceController {
 
         const jsonConfigValue = CommonUtilities.parseJSON( expireTimeConfigValue.Value, logger );
 
-        if ( jsonConfigValue[ "#" + strGroupId + "#" ] ) {
-
-          result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
-          bSet = true;
-
-        }
-        else if ( jsonConfigValue[ "#" + strGroupName + "#" ] ) {
-
-          result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
-          bSet = true;
-
-        }
-        else if ( jsonConfigValue[ "#" + strOperatorId + "#" ] ) {
+        if ( jsonConfigValue[ "#" + strOperatorId + "#" ] ) {
 
           result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
           result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
@@ -85,6 +71,20 @@ export default class SecurityServiceController {
 
         }
         else if ( jsonConfigValue[ "#" + strOperatorName + "#" ] ) {
+
+          result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
+          result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
+          bSet = true;
+
+        }
+        else if ( jsonConfigValue[ "#" + strGroupId + "#" ] ) {
+
+          result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
+          result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
+          bSet = true;
+
+        }
+        else if ( jsonConfigValue[ "#" + strGroupName + "#" ] ) {
 
           result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
           result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
@@ -749,8 +749,11 @@ export default class SecurityServiceController {
                                                                                               transaction,
                                                                                               logger );
 
-        const expireAt = SystemUtilities.selectBeforeFromTwoDateAndTime( user.ExpireAt,
-                                                                         user.UserGroup.ExpireAt );
+        configData.hardLimit = null; //Limit by default is null not hard limit for to session
+
+        //Select more close data time to current date time
+        const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( user.ExpireAt,
+                                                                        user.UserGroup.ExpireAt );
 
         if ( expireAt !== null ) {
 
@@ -761,10 +764,12 @@ export default class SecurityServiceController {
 
             if ( expireOn.isAfter( expireAt ) ) {
 
-              configData.kind = 2;
-              configData.on = expireAt;
+              configData.kind = 2;     //Overwrite and use the value of 2
+              configData.on = expireAt; //Use now this fixed date time
 
             }
+
+            configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
 
           }
           else if ( configData.kind === 2 ) { //Fixed expire Date and Time
@@ -774,9 +779,11 @@ export default class SecurityServiceController {
             if ( expireOn.isAfter( expireAt ) ) {
 
               configData.kind = 2;
-              configData.on = expireAt;
+              configData.on = expireAt;    //Overwrite and use now the value defined in ExpireAt and not in the config
+              configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
 
             }
+
           }
 
         }
@@ -799,6 +806,7 @@ export default class SecurityServiceController {
                                                                     Name: user.Name,
                                                                     ExpireKind: ExpireKind,
                                                                     ExpireOn: ExpireOn,
+                                                                    HardLimit: ExpireOn,
                                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                     UpdatedBy: SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
                                                                   },
@@ -853,6 +861,7 @@ export default class SecurityServiceController {
                                         UserName: user.Name,
                                         ExpireKind: configData.kind,
                                         ExpireOn: configData.on,
+                                        HardLimit: configData.hardLimit,
                                         Tag: null,
                                         CreatedBy: strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                         UpdatedBy: strUserName //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
@@ -1153,7 +1162,7 @@ export default class SecurityServiceController {
 
       if ( CommonUtilities.isNotNullOrEmpty( userSessionStatus ) ) {
 
-        if ( strToken.startsWith( "p." ) === false ) {
+        if ( strToken.startsWith( "p:" ) === false ) {
 
           const UserInfo = await UserService.getById( userSessionStatus.UserId,
                                                       null,

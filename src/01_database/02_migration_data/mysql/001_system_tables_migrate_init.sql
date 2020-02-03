@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS `UserSessionStatus` (
   `UserName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name (login). Must be unique will can apply a restriction (Unique).',
   `ExpireKind` tinyint(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'Expire kind 0 = Calculated from UpdatedAt, 1 = Calculated from CreatedAt, 2 = Calculated from ExpireOn',
   `ExpireOn` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '60' COMMENT 'Expire time on minutes or defined date time YYYY-MM-DDTHH:MM:SS +z',
+  `HardLimit` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Defined date time YYYY-MM-DDTHH:MM:SS +z maximum of session',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',

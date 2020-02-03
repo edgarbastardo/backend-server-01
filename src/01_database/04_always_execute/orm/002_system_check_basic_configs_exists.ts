@@ -117,7 +117,7 @@ export default class Always {
                                     {
                                       ConfigMetaDataId: "9272d39a-4545-40e2-802f-5913998cbb20", //system.authentication.ExpireTimeAuthentication
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                      Value: `{ "#System_Administrators#": { "kind": 1, "on": 2880 } }`,
+                                      Value: `{ "#System_Administrators#": { "kind": 0, "on": 2 } }`,
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     /*
