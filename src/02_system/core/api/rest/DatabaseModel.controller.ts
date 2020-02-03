@@ -233,7 +233,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -337,7 +337,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -441,7 +441,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -546,7 +546,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -650,7 +650,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -753,7 +753,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -857,7 +857,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -959,7 +959,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],
@@ -1062,7 +1062,7 @@ export default class DatabaseModelController {
                                      {
                                        Code: error.name,
                                        Message: error.message,
-                                       Details: error
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                      }
                                    ],
                            Warnings: [],

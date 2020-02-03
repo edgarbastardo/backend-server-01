@@ -113,9 +113,6 @@ export class UserSignup extends Model<UserSignup> {
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   DisabledBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
-
   @NotNull
   @NotEmpty
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )

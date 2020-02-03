@@ -1298,7 +1298,7 @@ export default class SystemUtilities {
                                  {
                                    Code: error.name,
                                    Message: error.message,
-                                   Details: error
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
                                ],
                        Warnings: [],
@@ -1676,6 +1676,7 @@ export default class SystemUtilities {
         debugMark( "%O", roles );
 
         if ( currentTransaction != null &&
+             currentTransaction.finished !== "rollback" &&
              bApplyTansaction ) {
 
            await currentTransaction.commit();
@@ -2614,6 +2615,143 @@ export default class SystemUtilities {
         LoggerManager.mainLoggerInstance.error( error );
 
       }
+
+    }
+
+    return result;
+
+  }
+
+  public static async processErrorDetails( error: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      if ( error &&
+           error instanceof Error ) {
+
+        if ( process.env.ENV !== "prod" ) {
+
+          if ( ( error as any ).extensions.exception ) {
+
+            result = ( error as any ).extensions.exception
+
+          }
+          else {
+
+            result = error;
+
+          }
+
+        }
+        else {
+
+          result = null;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.processErrorDetails.name;
+
+      const strMark = "4130BD6D754D";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+    }
+
+    return result
+
+  }
+
+  public static async processErrorListDetails( errors: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      if ( errors ) {
+
+        if ( process.env.ENV !== "prod" ) {
+
+          result = errors;
+
+        }
+        else {
+
+          result = null;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.processErrorListDetails.name;
+
+      const strMark = "A5C68BF888B6";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+    }
+
+    return result
+
+  }
+
+  public static async processErrorDetailsStack( error: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      if ( error &&
+           error instanceof Error ) {
+
+        if ( process.env.ENV !== "prod" ) {
+
+          result = error.stack ? CommonUtilities.formatErrorStack( error.stack ) : error
+
+        }
+        else {
+
+          result = null;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.processErrorDetails.name;
+
+      const strMark = "CD80D976E0AD";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
 
     }
 

@@ -94,6 +94,7 @@ export default class RouteService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -120,7 +121,8 @@ export default class RouteService extends BaseService {
         });
 
         if ( currentTransaction != null &&
-            bApplyTansaction ) {
+             currentTransaction.finished !== "rollback" &&
+             bApplyTansaction ) {
 
           await currentTransaction.commit();
 
@@ -158,7 +160,8 @@ export default class RouteService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -245,6 +248,7 @@ export default class RouteService extends BaseService {
       await loopAsync();
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -276,7 +280,8 @@ export default class RouteService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 

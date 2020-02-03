@@ -1024,14 +1024,14 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
-                   Message: 'Not allowed to login from this the kind of client',
+                   Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                   Message: 'Not allowed to login from this the kind of frontend',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CLIENT_KIND_NOT_ALLOWED',
-                               Message: `Not allowed to login from this the kind of client`,
+                               Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                               Message: `Not allowed to login from this the kind of frontend`,
                                Details: null
                              }
                            ],
@@ -1064,6 +1064,7 @@ export default class SecurityServiceController {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -1106,7 +1107,7 @@ export default class SecurityServiceController {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1114,7 +1115,8 @@ export default class SecurityServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -1256,7 +1258,7 @@ export default class SecurityServiceController {
                                   {
                                     Code: 'ERROR_LOGOUT_FAILED',
                                     Message: `Cannot complete the logout`,
-                                    Details: error
+                                    Details: await SystemUtilities.processErrorDetails( error ) //error
                                   }
                                 ],
                         Warnings: [],
@@ -1313,6 +1315,7 @@ export default class SecurityServiceController {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -1355,7 +1358,7 @@ export default class SecurityServiceController {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1363,7 +1366,8 @@ export default class SecurityServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 

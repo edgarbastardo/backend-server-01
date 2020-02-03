@@ -307,7 +307,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -637,7 +637,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -788,7 +788,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -893,7 +893,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                              {
                                Code: error.name,
                                Message: error.message,
-                               Details: error.errors
+                               Details:  await SystemUtilities.processErrorListDetails( error.errors ) //error.errors
                              }
                            ],
                    Warnings: [],
@@ -914,7 +914,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                             {
                               Code: error.name,
                               Message: error.message,
-                              Details: error
+                              Details: await SystemUtilities.processErrorDetails( error ) //error
                             }
                           ],
                   Warnings: [],
@@ -1021,7 +1021,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                             {
                               Code: error.name,
                               Message: error.message,
-                              Details: error
+                              Details: await SystemUtilities.processErrorDetails( error ) //error
                             }
                         );
 
@@ -1151,7 +1151,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1320,7 +1320,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1513,7 +1513,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          );
 
@@ -1643,7 +1643,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1783,7 +1783,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1944,7 +1944,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          );
 
@@ -2074,7 +2074,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],

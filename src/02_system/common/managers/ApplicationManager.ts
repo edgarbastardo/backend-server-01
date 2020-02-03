@@ -186,17 +186,17 @@ export default class ApplicationManager {
             }
 
             const result = {
-                              StatusCode: intStatusCode, //Bad request
-                              Code: ( error.originalError as any).extensions.code,
-                              Message: ( error.originalError as any).message,
-                              LogId: ( error.originalError as any).extensions.LogId,
-                              Mark: "E7609E411489",
-                              IsError: true,
-                              Errors: errors,
-                              Warnings: [],
-                              Count: 0,
-                              Data: []
-                            };
+                             StatusCode: intStatusCode, //Bad request
+                             Code: ( error.originalError as any).extensions.code,
+                             Message: ( error.originalError as any).message,
+                             LogId: ( error.originalError as any).extensions.LogId,
+                             Mark: "E7609E411489",
+                             IsError: true,
+                             Errors: errors,
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           };
 
             return result;
 
@@ -216,7 +216,7 @@ export default class ApplicationManager {
                                        {
                                          Code: error.extensions.code,
                                          Message: error.message,
-                                         Details: error.extensions.exception
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error.extensions.exception
                                        }
                                      ],
                              Warnings: [],
@@ -301,7 +301,7 @@ export default class ApplicationManager {
 
       });
 
-      app.use( function ( error: any, req: Request, res: Response, next: NextFunction ) {
+      app.use( async ( error: any, req: Request, res: Response, next: NextFunction ) {
 
         const strMark = "D3C34ED42BA1";
 
@@ -311,22 +311,22 @@ export default class ApplicationManager {
         debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
         const result = {
-                          StatusCode: 500,
-                          Code: 'ERROR_SOMETHING_WENT_WRONG',
-                          Message: 'Something went wrong!!',
-                          LogId: SystemUtilities.getUUIDv4(),
-                          Mark: "098675C7146B",
-                          IsError: true,
-                          Errors: [
-                                    {
-                                      Code: error.name,
-                                      Message: error.message,
-                                      Details: error.stack ? CommonUtilities.formatErrorStack( error.stack ) : error
-                                    }
-                                  ],
-                          Warnings: [],
-                          Count: 0,
-                          Data: []
+                         StatusCode: 500,
+                         Code: 'ERROR_SOMETHING_WENT_WRONG',
+                         Message: 'Something went wrong!!',
+                         LogId: SystemUtilities.getUUIDv4(),
+                         Mark: "098675C7146B",
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: error.name,
+                                     Message: error.message,
+                                     Details: await SystemUtilities.processErrorDetailsStack( error ) //error.stack ? CommonUtilities.formatErrorStack( error.stack ) : error
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
                        };
 
         res.status( result.StatusCode ).send( result );

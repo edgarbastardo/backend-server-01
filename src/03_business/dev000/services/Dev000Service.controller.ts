@@ -48,6 +48,7 @@ export default class Dev000ServicesController extends BaseService {
       //
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -89,7 +90,7 @@ export default class Dev000ServicesController extends BaseService {
                                  {
                                    Code: error.name,
                                    Message: error.message,
-                                   Details: error
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
                                ],
                        Warnings: [],

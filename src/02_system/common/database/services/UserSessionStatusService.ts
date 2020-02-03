@@ -45,6 +45,7 @@ export default class UserSessionStatusService extends BaseService {
       result = await UserSessionStatus.findOne( options );
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -76,7 +77,8 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -155,6 +157,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -188,7 +191,8 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -249,6 +253,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -280,7 +285,8 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -368,6 +374,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -401,7 +408,8 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 

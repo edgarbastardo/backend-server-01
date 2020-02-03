@@ -142,6 +142,7 @@ export default abstract class BaseService {
       * /
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();

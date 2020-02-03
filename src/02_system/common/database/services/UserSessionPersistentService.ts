@@ -46,6 +46,7 @@ export default class UserSessionPersistentService extends BaseService {
       result = await UserSessionPersistent.findOne( options );
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -77,7 +78,8 @@ export default class UserSessionPersistentService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 

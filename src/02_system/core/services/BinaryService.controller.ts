@@ -1094,7 +1094,7 @@ export default class BinaryServiceController extends BaseService {
                                            {
                                              Code: dbOperationResult.error.name,
                                              Message: dbOperationResult.error.message,
-                                             Details: dbOperationResult.error
+                                             Details:  await SystemUtilities.processErrorDetails( dbOperationResult.error ) //dbOperationResult.error
                                            }
                                          ],
                                  Warnings: [],
@@ -1296,6 +1296,7 @@ export default class BinaryServiceController extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -1338,7 +1339,7 @@ export default class BinaryServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1428,6 +1429,7 @@ export default class BinaryServiceController extends BaseService {
                 };
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -1470,7 +1472,7 @@ export default class BinaryServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -1589,6 +1591,7 @@ export default class BinaryServiceController extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -1631,7 +1634,7 @@ export default class BinaryServiceController extends BaseService {
                            {
                              Code: error.name,
                              Message: error.message,
-                             Details: error
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
                            }
                          ],
                  Warnings: [],
@@ -2258,6 +2261,7 @@ export default class BinaryServiceController extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -2299,7 +2303,7 @@ export default class BinaryServiceController extends BaseService {
                                         {
                                           Code: error.name,
                                           Message: error.message,
-                                          Details: error
+                                          Details: await SystemUtilities.processErrorDetails( error ) //error
                                         }
                                       ],
                               Warnings: [],

@@ -73,6 +73,7 @@ export default class UserGroupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -104,7 +105,8 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
@@ -165,6 +167,7 @@ export default class UserGroupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
            bApplyTansaction ) {
 
         await currentTransaction.commit();
@@ -196,7 +199,8 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
 
         try {
 
