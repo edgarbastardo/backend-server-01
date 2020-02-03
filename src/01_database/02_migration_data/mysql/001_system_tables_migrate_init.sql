@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `UserRecover` (
 CREATE TABLE IF NOT EXISTS `UserSignup` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Depend of type of user to activate',
-  `ClientId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Client id code',
+  `FrontendId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frontend id code, to help to identify the frontend. Example: web-reactjs-???? or mobile-ionic5-driver-???',
   `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Activation token',
   `Status` smallint(6) NOT NULL COMMENT '0 = Waiting activation\n25 = Manual activation\n50 = Activated',
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name (username).',
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `UserSessionStatus` (
   `UserGroupId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of UserGroup table.',
   `BinaryDataToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Binary token, used in get petition pass to url, in binary data',
   `SocketToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Web socket authentication token, pass on connect event to websocket server',
-  `ClientId` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Exclusive id string to indeitify the client kind',
+  `FrontendId` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frontend id code, to help to identify the frontend. Example: web-reactjs-???? or mobile-ionic5-driver-???',
   `SourceIPAddress` varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Source network IP address',
   `Role` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'Role efective taken from Group.Role, User.Role and merged on list',
   `UserName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name (login). Must be unique will can apply a restriction (Unique).',

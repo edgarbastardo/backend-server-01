@@ -1037,7 +1037,7 @@ export default class BinaryServiceController extends BaseService {
                                               FileExtension: fileDetectedType.ext,
                                               FileSize: uploadedFile.size, //In bytes
                                               Tag: CommonUtilities.isNotNullOrEmpty( req.body.Tag ) ? req.body.Tag: null,
-                                              System: CommonUtilities.isNotNullOrEmpty( context.ClientId ) ? context.ClientId: null,
+                                              System: CommonUtilities.isNotNullOrEmpty( context.FrontendId ) ? context.FrontendId: null,
                                               Context: CommonUtilities.isNotNullOrEmpty( req.body.Context ) ? req.body.Context: null,
                                               Comment: CommonUtilities.isNotNullOrEmpty( req.body.Comment ) ? req.body.Comment : null,
                                               DenyTagAccess: CommonUtilities.isNotNullOrEmpty( req.body.DenyTagAccess ) ? req.body.DenyTagAccess: null,

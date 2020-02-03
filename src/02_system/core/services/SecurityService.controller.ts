@@ -146,7 +146,7 @@ export default class SecurityServiceController {
 
   }
 
-  static async getConfigLoginAccessControl( strClientId: string,
+  static async getConfigLoginAccessControl( strFrontendId: string,
                                             transaction: any,
                                             logger: any ): Promise<any> {
 
@@ -165,11 +165,11 @@ export default class SecurityServiceController {
         const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
                                                           logger );
 
-        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
-             jsonConfigData[ "#" + strClientId + "#" ].userLoginControl ) {
+        if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
+             jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl ) {
 
-          result.denied = jsonConfigData[ "#" + strClientId + "#" ].userLoginControl.denied;
-          result.allowed = jsonConfigData[ "#" + strClientId + "#" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl.denied;
+          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl.allowed;
           bSet = true;
 
         }
@@ -231,21 +231,21 @@ export default class SecurityServiceController {
 
   }
 
-  static async getClientIdIsAllowed( strClientId: string,
-                                     strGroupId: string,
-                                     strGroupName: string,
-                                     strGroupTag: string,
-                                     strUserId: string,
-                                     strUserName: string,
-                                     strUserTag: string,
-                                     transaction: any,
-                                     logger: any ): Promise<number> {
+  static async getFrontendIdIsAllowed( strFrontendId: string,
+                                       strGroupId: string,
+                                       strGroupName: string,
+                                       strGroupTag: string,
+                                       strUserId: string,
+                                       strUserName: string,
+                                       strUserTag: string,
+                                       transaction: any,
+                                       logger: any ): Promise<number> {
 
     let intResult = 0;
 
     try {
 
-      const configData = await SecurityServiceController.getConfigLoginAccessControl( strClientId,
+      const configData = await SecurityServiceController.getConfigLoginAccessControl( strFrontendId,
                                                                                       transaction,
                                                                                       logger );
 
@@ -304,7 +304,7 @@ export default class SecurityServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getClientIdIsAllowed.name;
+      sourcePosition.method = this.name + "." + this.getFrontendIdIsAllowed.name;
 
       const strMark = "D89E1D59A97B";
 
@@ -571,7 +571,7 @@ export default class SecurityServiceController {
 
   static async login( strTimeZoneId: string,
                       strSourceIPAddress: string,
-                      strClientId: string,
+                      strFrontendId: string,
                       strUserName: string,
                       strPassword: string,
                       transaction: any,
@@ -620,15 +620,15 @@ export default class SecurityServiceController {
       const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
       const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
       const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
-      const bClientIdIsAllowed = bUserFound && await this.getClientIdIsAllowed( strClientId,
-                                                                                user.UserGroup.Id,
-                                                                                user.UserGroup.Name,
-                                                                                user.UserGroup.Tag,
-                                                                                user.Id,
-                                                                                user.Name,
-                                                                                user.Tag,
-                                                                                transaction,
-                                                                                logger ) >= 0;
+      const bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( strFrontendId,
+                                                                                    user.UserGroup.Id,
+                                                                                    user.UserGroup.Name,
+                                                                                    user.UserGroup.Tag,
+                                                                                    user.Id,
+                                                                                    user.Name,
+                                                                                    user.Tag,
+                                                                                    transaction,
+                                                                                    logger ) >= 0;
       let bUserPasswordIsValid = false;
 
       if ( bUserFound &&
@@ -643,7 +643,7 @@ export default class SecurityServiceController {
       }
 
       if ( bUserFound &&
-           bClientIdIsAllowed &&
+           bFrontendIdIsAllowed &&
            bUserDisabled === false &&
            bUserExpired === false &&
            bUserGroupDisabled === false &&
@@ -800,7 +800,7 @@ export default class SecurityServiceController {
                                                                     UserId: user.Id,
                                                                     GroupId: user.GroupId,
                                                                     Token: strAuthorizationToken,
-                                                                    ClientId: strClientId,
+                                                                    FrontendId: strFrontendId,
                                                                     SourceIPAddress: strSourceIPAddress,
                                                                     Role: strMergedRoles,
                                                                     Name: user.Name,
@@ -855,7 +855,7 @@ export default class SecurityServiceController {
                                         UserId: user.Id,
                                         UserGroupId: user.GroupId,
                                         Token: strAuthorizationToken,
-                                        ClientId: strClientId,
+                                        FrontendId: strFrontendId,
                                         SourceIPAddress: strSourceIPAddress,
                                         Role: strRolesMerged + strBasicRoles,
                                         UserName: user.Name,
@@ -1020,7 +1020,7 @@ export default class SecurityServiceController {
                  }
 
       }
-      else if ( bClientIdIsAllowed === false ) {
+      else if ( bFrontendIdIsAllowed === false ) {
 
         result = {
                    StatusCode: 401, //Unauthorized

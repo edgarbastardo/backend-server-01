@@ -701,7 +701,7 @@ export default class SystemUtilities {
                        Token: strToken,
                        BinaryDataToken: sessionPersistent[ "BinaryDataToken" ],
                        SocketToken: sessionPersistent[ "SocketToken" ],
-                       ClientId: requestContext && requestContext.ClientId ? requestContext.ClientId: "Unknown_ClientId",
+                       FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
                        Role: strRolesMerged,
                        UserName: sessionPersistent[ "User" ],
@@ -1214,7 +1214,7 @@ export default class SystemUtilities {
       const strAuthorization = request.header( "authorization" );
       let strTimeZoneId = request.header( "timezoneid" );
       let strLanguage = request.header( "language" );
-      let strClientId = request.header( "clientid" ) || "";
+      let strFrontendId = request.header( "frontendid" ) || "";
       let strSourceIPAddress = request.header( "x-forwarded-for" ) || request.header( "X-Forwarded-For" ); //req.ip;
 
       if ( CommonUtilities.isNullOrEmpty( strTimeZoneId ) ) {
@@ -1243,7 +1243,7 @@ export default class SystemUtilities {
                                      TimeZoneId: strTimeZoneId,
                                      Language: strLanguage,
                                      SourceIPAddress:  strSourceIPAddress,
-                                     ClientId: strClientId,
+                                     FrontendId: strFrontendId,
                                      UserSessionStatus: userSessionStatus
                                    };
 

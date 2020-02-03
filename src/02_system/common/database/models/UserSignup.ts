@@ -53,7 +53,7 @@ export class UserSignup extends Model<UserSignup> {
   @NotNull
   @NotEmpty
   @Column( { type: DataType.STRING( 75 ), allowNull: false } )
-  ClientId: string;
+  FrontendId: string;
 
   @NotNull
   @NotEmpty

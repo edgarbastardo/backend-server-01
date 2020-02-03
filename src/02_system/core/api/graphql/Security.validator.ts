@@ -12,9 +12,9 @@ export const validators = {
 
       const errors = [];
 
-      if ( CommonUtilities.isNullOrEmpty( context.ClientId ) ) {
+      if ( CommonUtilities.isNullOrEmpty( context.FrontendId ) ) {
 
-        errors.push( { Code: "ERROR_BAD_USER_INPUT", Message: "The ClientId parameter value cannot be empty", Details: { Field: "ClientId" } } );
+        errors.push( { Code: "ERROR_BAD_USER_INPUT", Message: "The FrontendId parameter value cannot be empty", Details: { Field: "FrontendId" } } );
 
       }
 

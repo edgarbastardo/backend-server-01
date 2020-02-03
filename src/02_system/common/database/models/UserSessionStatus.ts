@@ -57,7 +57,7 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   SocketToken: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
-  ClientId: string;
+  FrontendId: string;
 
   @Column( { type: DataType.STRING( 75 ), allowNull: true } )
   SourceIPAddress: string;

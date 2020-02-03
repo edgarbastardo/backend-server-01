@@ -26,6 +26,7 @@ import UserGroupService from "../../common/database/services/UserGroupService";
 import { UserSignup } from "../../common/database/models/UserSignup";
 import NotificationManager from "../../common/managers/NotificationManager";
 import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
+import UserSignupService from "../../common/database/services/UserSignupService";
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -33,7 +34,7 @@ export default class UserServiceController {
 
   static readonly _ID = "UserServiceController";
 
-  static async getConfigUserSignupControl( strClientId: string,
+  static async getConfigUserSignupControl( strFrontendId: string,
                                            transaction: any,
                                            logger: any ): Promise<any> {
 
@@ -53,11 +54,11 @@ export default class UserServiceController {
         const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
                                                           logger );
 
-        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
-             jsonConfigData[ "#" + strClientId + "#" ].userSignupControl ) {
+        if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
+             jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl ) {
 
-          result.denied = jsonConfigData[ "#" + strClientId + "#" ].userSignupControl.denied;
-          result.allowed = jsonConfigData[ "#" + strClientId + "#" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl.denied;
+          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl.allowed;
           bSet = true;
 
         }
@@ -119,16 +120,16 @@ export default class UserServiceController {
 
   }
 
-  static async getClientIdIsAllowed( strClientId: string,
-                                     strKind: string,
-                                     transaction: any,
-                                     logger: any ): Promise<number> {
+  static async getFrontendIdIsAllowed( strFrontendId: string,
+                                       strKind: string,
+                                       transaction: any,
+                                       logger: any ): Promise<number> {
 
     let intResult = 0;
 
     try {
 
-      const configData = await this.getConfigUserSignupControl( strClientId,
+      const configData = await this.getConfigUserSignupControl( strFrontendId,
                                                                 transaction,
                                                                 logger );
 
@@ -177,7 +178,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getClientIdIsAllowed.name;
+      sourcePosition.method = this.name + "." + this.getFrontendIdIsAllowed.name;
 
       const strMark = "D3DD67D5851E";
 
@@ -349,7 +350,7 @@ export default class UserServiceController {
 
   }
 
-  static async getConfigFrontendRules( strClientId: string,
+  static async getConfigFrontendRules( strFrontendId: string,
                                        strFieldName: string,
                                        transaction: any,
                                        logger: any ): Promise<string> {
@@ -370,10 +371,10 @@ export default class UserServiceController {
         const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
                                                           logger );
 
-        if ( jsonConfigData[ "#" + strClientId + "#" ] &&
-             jsonConfigData[ "#" + strClientId + "#" ][ strFieldName ] ) {
+        if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
+             jsonConfigData[ "#" + strFrontendId + "#" ][ strFieldName ] ) {
 
-          strResult = jsonConfigData[ "#" + strClientId + "#" ][ strFieldName ];
+          strResult = jsonConfigData[ "#" + strFrontendId + "#" ][ strFieldName ];
           bSet = true;
 
         }
@@ -434,7 +435,7 @@ export default class UserServiceController {
   }
 
 
-  static async isWebFrontendClient( strClientId: string,
+  static async isWebFrontendClient( strFrontendId: string,
                                     transaction: any,
                                     logger: any ): Promise<boolean> {
 
@@ -442,7 +443,7 @@ export default class UserServiceController {
 
     try {
 
-      const strTag = await this.getConfigFrontendRules( strClientId,
+      const strTag = await this.getConfigFrontendRules( strFrontendId,
                                                         "tag",
                                                         transaction,
                                                         logger );
@@ -481,7 +482,7 @@ export default class UserServiceController {
 
   }
 
-  static async isMobileFrontendClient( strClientId: string,
+  static async isMobileFrontendClient( strFrontendId: string,
                                        transaction: any,
                                        logger: any ): Promise<boolean> {
 
@@ -489,7 +490,7 @@ export default class UserServiceController {
 
     try {
 
-      const strTag = await this.getConfigFrontendRules( strClientId,
+      const strTag = await this.getConfigFrontendRules( strFrontendId,
                                                         "tag",
                                                         transaction,
                                                         logger );
@@ -552,12 +553,12 @@ export default class UserServiceController {
 
       const context = ( request as any ).context;
 
-      const bClientIdIsAllowed = await this.getClientIdIsAllowed( context.ClientId,
-                                                                  request.body.Kind,
-                                                                  currentTransaction,
-                                                                  logger ) >= 0;
+      const bFrontendIdIsAllowed = await this.getFrontendIdIsAllowed( context.FrontendId,
+                                                                      request.body.Kind,
+                                                                      currentTransaction,
+                                                                      logger ) >= 0;
 
-      if ( bClientIdIsAllowed ) {
+      if ( bFrontendIdIsAllowed ) {
 
         const signupProcessData = await this.getConfigSignupProcess( request.body.Kind,
                                                                      currentTransaction,
@@ -748,7 +749,7 @@ export default class UserServiceController {
                                                             {
                                                               Id: strId,
                                                               Kind: request.body.Kind,
-                                                              ClientId: context.ClientId,
+                                                              FrontendId: context.FrontendId,
                                                               Token: strToken,
                                                               Status: signupProcessData.status,
                                                               Name: request.body.Name,
@@ -770,11 +771,11 @@ export default class UserServiceController {
                     const configData = await this.getConfigGeneralDefaultInformation( transaction,
                                                                                       logger );
 
-                    const strTemplateKind = await this.isWebFrontendClient( context.ClientId,
+                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
                                                                             transaction,
                                                                             logger ) ? "web" : "mobile";
 
-                    const strWebAppURL = await this.getConfigFrontendRules( context.ClientId,
+                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
                                                                             "url",
                                                                             transaction,
                                                                             logger );
@@ -1077,12 +1078,17 @@ export default class UserServiceController {
 
       const context = ( request as any ).context;
 
-      const bClientIdIsAllowed = await this.getClientIdIsAllowed( context.ClientId,
-                                                                  request.body.Kind,
-                                                                  currentTransaction,
-                                                                  logger ) >= 0;
+      const signupProcess = await UserSignupService.getByToken( request.body.Activation,
+                                                                context.TimeZoneId,
+                                                                currentTransaction,
+                                                                logger );
 
-      if ( bClientIdIsAllowed ) {
+      const bFrontendIdIsAllowed = await this.getFrontendIdIsAllowed( context.FrontendId,
+                                                                      request.body.Kind,
+                                                                      currentTransaction,
+                                                                      logger ) >= 0;
+
+      if ( bFrontendIdIsAllowed ) {
 
         const signupProcessData = await this.getConfigSignupProcess( request.body.Kind,
                                                                      currentTransaction,
@@ -1094,8 +1100,8 @@ export default class UserServiceController {
              signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
           const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group,
-                                                                              transaction,
-                                                                              logger );
+                                                                             transaction,
+                                                                             logger );
 
           if ( signupProcessData.createGroup === false &&
                bUserGroupExists === false ) {
@@ -1222,7 +1228,7 @@ export default class UserServiceController {
             if ( signupProcessData.createGroup ) {
 
               //Create new group
-              //
+              
 
             }
 

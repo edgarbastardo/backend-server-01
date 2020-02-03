@@ -106,7 +106,7 @@ export default class AuthenticationController {
 
     const result = await SecurityServiceController.login( context.TimeZoneId,
                                                           context.SourceIPAddress,
-                                                          context.ClientId,
+                                                          context.FrontendId,
                                                           request.body.Username,
                                                           request.body.Password,
                                                           null,

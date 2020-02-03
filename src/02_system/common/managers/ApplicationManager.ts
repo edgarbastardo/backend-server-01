@@ -84,7 +84,7 @@ export default class ApplicationManager {
           const strAuthorization = req.header( "authorization" );
           let strTimeZoneId = req.header( "timezoneid" );
           let strLanguage = req.header( "language" );
-          let strClientId = req.header( "clientid" );
+          let strFrontendId = req.header( "frontendid" );
           let strSourceIPAddress = req.header( "x-forwarded-for" ) || req.header( "X-Forwarded-For" ); //req.ip;
 
           if ( CommonUtilities.isNullOrEmpty( strTimeZoneId ) ) {
@@ -115,7 +115,7 @@ export default class ApplicationManager {
                             TimeZoneId: strTimeZoneId,
                             Language: strLanguage,
                             SourceIPAddress:  strSourceIPAddress,
-                            ClientId: strClientId,
+                            FrontendId: strFrontendId,
                             UserSessionStatus: userSessionStatus
                           };
 

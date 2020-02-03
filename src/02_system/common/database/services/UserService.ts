@@ -104,6 +104,7 @@ export default class UserService extends BaseService {
     return result;
 
   }
+
   static async getByName( strName: string,
                           strTimeZoneId: string,
                           transaction: any,

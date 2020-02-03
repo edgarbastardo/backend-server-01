@@ -13,12 +13,12 @@ export const resolvers = {
     login: async ( obj: any, args: any, context: any, info: any ) => {
 
       return await SecurityServiceController.login( context.TimeZoneId,
-                                          context.SourceIPAddress,
-                                          context.ClientId,
-                                          args.Username,
-                                          args.Password,
-                                          null,
-                                          context.Logger );
+                                                    context.SourceIPAddress,
+                                                    context.FrontendId,
+                                                    args.Username,
+                                                    args.Password,
+                                                    null,
+                                                    context.Logger );
 
     },
 
