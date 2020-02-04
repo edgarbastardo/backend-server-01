@@ -32,6 +32,7 @@ import RoleService from "./database/services/RoleService";
 
 import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
+import I18NManager from "./managers/I18Manager";
 
 const debug = require( 'debug' )( 'SystemUtilities' );
 
@@ -1209,13 +1210,15 @@ export default class SystemUtilities {
 
     const logger = LoggerManager.mainLoggerInstance;
 
+    let strLanguage = "";
+
     try {
 
       const strAuthorization = request.header( "authorization" );
       let strTimeZoneId = request.header( "timezoneid" );
-      let strLanguage = request.header( "language" );
       let strFrontendId = request.header( "frontendid" ) || "";
       let strSourceIPAddress = request.header( "x-forwarded-for" ) || request.header( "X-Forwarded-For" ); //req.ip;
+      strLanguage = request.header( "language" );
 
       if ( CommonUtilities.isNullOrEmpty( strTimeZoneId ) ) {
 
@@ -1290,7 +1293,7 @@ export default class SystemUtilities {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: 'Unexpected error. Please read the server log for more details.',
+                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -2619,6 +2622,58 @@ export default class SystemUtilities {
     }
 
     return result;
+
+  }
+
+  public static processErrorDetailsSync( error: any ):any {
+
+    let result = null;
+
+    try {
+
+      if ( error &&
+           error instanceof Error ) {
+
+        if ( process.env.ENV !== "prod" ) {
+
+          if ( ( error as any ).extensions.exception ) {
+
+            result = ( error as any ).extensions.exception
+
+          }
+          else {
+
+            result = error;
+
+          }
+
+        }
+        else {
+
+          result = null;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.processErrorDetails.name;
+
+      const strMark = "4130BD6D754D";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+    }
+
+    return result
 
   }
 

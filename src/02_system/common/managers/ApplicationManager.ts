@@ -22,6 +22,8 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 //import AuthenticationController from "../../core/api/rest/Authentication.controller";
 import BinaryServiceController from "../../core/services/BinaryService.controller";
 import CommonConstants from '../CommonConstants';
+import { GraphQLFormattedError } from 'graphql/error';
+import I18NManager from "./I18Manager";
 
 const debug = require( 'debug' )( 'ApplicationManager' );
 
@@ -216,7 +218,7 @@ export default class ApplicationManager {
                                        {
                                          Code: error.extensions.code,
                                          Message: error.message,
-                                         Details: await SystemUtilities.processErrorDetails( error ) //error.extensions.exception
+                                         Details: SystemUtilities.processErrorDetailsSync( error ) //error.extensions.exception
                                        }
                                      ],
                              Warnings: [],
@@ -301,7 +303,9 @@ export default class ApplicationManager {
 
       });
 
-      app.use( async ( error: any, req: Request, res: Response, next: NextFunction ) {
+      app.use( async ( error: any, req: Request, res: Response, next: NextFunction ) => {
+
+        let strLanguage = req.header( "language" );
 
         const strMark = "D3C34ED42BA1";
 
@@ -313,9 +317,9 @@ export default class ApplicationManager {
         const result = {
                          StatusCode: 500,
                          Code: 'ERROR_SOMETHING_WENT_WRONG',
-                         Message: 'Something went wrong!!',
+                         Message: I18NManager.translateSync( strLanguage, 'Something went wrong!!' ),
                          LogId: SystemUtilities.getUUIDv4(),
-                         Mark: "098675C7146B",
+                         Mark: strMark,
                          IsError: true,
                          Errors: [
                                    {

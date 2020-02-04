@@ -1,6 +1,7 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
 import appRoot from 'app-root-path';
+import I18NManager from "./02_system/common/managers/I18Manager";
 
 //import { createServer } from 'http';
 //import { Route } from './system/database/models/Route';
@@ -13,7 +14,7 @@ import SystemConstants from "./02_system/common/SystemContants";
 import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
-import LoggerManager from './02_system/common/managers/LoggerManager';
+import LoggerManager from "./02_system/common/managers/LoggerManager";
 import ApplicationManager from './02_system/common/managers/ApplicationManager';
 import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
@@ -294,6 +295,16 @@ async function main() {
                                     );
 
     }
+    */
+
+    await I18NManager.create( {},
+                              LoggerManager.createMainLogger );
+
+    /*
+    let debugMark = debug.extend( '50D1D04698D1' );
+    debugMark( await I18NManager.translate( "es_ES", "Hello World" ) );
+    debugMark( await I18NManager.translate( "es_ES", "Hello World %s", "Again" ) );
+    debugMark( I18NManager.translateSync( "es_ES", "Hello" ) );
     */
 
     if ( intProccessWorkers > 0 &&

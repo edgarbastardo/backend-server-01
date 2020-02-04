@@ -4,6 +4,7 @@ import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 import BaseService from "./BaseService";
 import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
 
 const debug = require( 'debug' )( 'UserService' );
 
@@ -274,6 +275,115 @@ export default class UserService extends BaseService {
                                        logger );
 
     return user ? SystemUtilities.isDateAndTimeAfter( user.ExpireAt ) : false;
+
+  }
+
+  static async createOrUpdate( createOrUpdateData: any,
+                               bUpdate: boolean,
+                               transaction: any,
+                               logger: any ): Promise<User> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const options = {
+
+        where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
+        transaction: currentTransaction,
+
+      }
+
+      result = await User.findOne( options );
+
+      if ( result !== null ) {
+
+        result = await User.create(
+                                    createOrUpdateData,
+                                    { transaction: currentTransaction }
+                                  );
+
+      }
+      else if ( bUpdate ) {
+
+        const currentValues = ( result as any ).dataValues;
+
+        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
+
+          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+        }
+
+        await User.update( currentValues,
+                           options );
+
+      }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.createOrUpdate.name;
+
+      const strMark = "B6EAD2FBE1A5";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
 
   }
 

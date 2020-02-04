@@ -19,6 +19,7 @@ import { injectable, inject } from 'inversify';
 //import SecurityService from '../../../common/database/services/SecurityService';
 import BinaryServiceController from "../../services/BinaryService.controller";
 import CommonConstants from '../../../common/CommonConstants';
+import I18NManager from "../../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Binary.controller' );
 
@@ -119,14 +120,18 @@ export default class BinaryController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
+        let strLanguage = "";
+
         try {
 
           const context = ( request as any ).context;
 
+          strLanguage = context.Language;
+
           const result = await BinaryServiceController.processBinaryDataDownload( request,
-                                                                        response,
-                                                                        null,
-                                                                        context.Logger );
+                                                                                  response,
+                                                                                  null,
+                                                                                  context.Logger );
 
           /*
           if ( result.statusCode === 200 ||  //Ok
@@ -186,7 +191,7 @@ export default class BinaryController {
           const resultHeaders = {
                                   StatusCode: 500,
                                   Code: 'ERROR_UNEXPECTED',
-                                  Message: 'Unexpected error. Please read the server log for more details.',
+                                  Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                   Mark: strMark,
                                   LogId: error.LogId,
                                   IsError: true,
@@ -249,9 +254,13 @@ export default class BinaryController {
            )
   async createAuth( request: Request, response: Response ) {
 
+    let strLanguage = "";
+
     try {
 
       const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const result = await BinaryServiceController.createBinaryDataAuthorization( request,
                                                                         null,
@@ -280,7 +289,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: 'Unexpected error. Please read the server log for more details.',
+                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -310,9 +319,13 @@ export default class BinaryController {
              )
   async deleteAuth( request: Request, response: Response ) {
 
+    let strLanguage = "";
+
     try {
 
       const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const result = await BinaryServiceController.deleteBinaryDataAuthorization( request,
                                                                         null,
@@ -341,7 +354,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: 'Unexpected error. Please read the server log for more details.',
+                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -471,9 +484,13 @@ export default class BinaryController {
            )
   async uploadBinaryData( request: Request, response: Response ) {
 
+    let strLanguage = "";
+
     try {
 
       const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const result = await BinaryServiceController.processBinaryDataUpload( request,
                                                                   null,
@@ -502,7 +519,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: 'Unexpected error. Please read the server log for more details.',
+                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,

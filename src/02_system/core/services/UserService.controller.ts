@@ -27,6 +27,8 @@ import { UserSignup } from "../../common/database/models/UserSignup";
 import NotificationManager from "../../common/managers/NotificationManager";
 import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
 import UserSignupService from "../../common/database/services/UserSignupService";
+import CipherManager from "../../common/managers/CipherManager";
+import PersonService from "../../common/database/services/PersonService";
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -1056,9 +1058,9 @@ export default class UserServiceController {
 
   }
 
-    static async signupActivate( request: Request,
-                                 transaction: any,
-                                 logger: any ): Promise<any> {
+  static async signupActivate( request: Request,
+                               transaction: any,
+                               logger: any ): Promise<any> {
 
     let result = null;
 
@@ -1207,21 +1209,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkExistsByName( request.body.Name,
+              else if ( await UserService.checkExistsByName( userSignup.Name,
                                                              transaction,
                                                              logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                           Message: `The user name [${request.body.Name}] already exists.`,
+                           Message: `The user name [${userSignup.Name}] already exists.`,
                            Mark: '46F913842BF5',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                       Message: `The user name [${request.body.Name}] already exists.`,
+                                       Message: `The user name [${userSignup.Name}] already exists.`,
                                        Details: null
                                      }
                                    ],
@@ -1233,10 +1235,157 @@ export default class UserServiceController {
               }
               else {
 
+                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                              "UserName",
+                                                                              logger );
+
+                let userGroup = null;
+                let person = null;
+                let user = null;
+
                 if ( signupProcessData.createGroup ) {
 
                   //Create new group
-                  
+                  userGroup = await UserGroupService.createOrUpdate(
+                                                                     {
+                                                                       Name: userSignup.Name,
+                                                                       Role: signupProcessData.groupRole,
+                                                                       Tag: signupProcessData.groupTag,
+                                                                       ExpireAt: SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.groupExpireAt ),
+                                                                       CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                       Comment: userSignup.Comment
+                                                                     },
+                                                                     false,
+                                                                     transaction,
+                                                                     logger
+                                                                   );
+
+                }
+                else {
+
+                  userGroup = await UserGroupService.getByName( signupProcessData.group,
+                                                                context.TimeZoneId,
+                                                                transaction,
+                                                                logger );
+
+                }
+
+                if ( userGroup &&
+                     userGroup instanceof Error === false ) {
+
+                  person = PersonService.createOrUpdate(
+                                                         {
+                                                           FirstName: userSignup.FirstName,
+                                                           LastName: userSignup.LastName,
+                                                           Phone: userSignup.Phone,
+                                                           EMail: userSignup.EMail,
+                                                           Comment: userSignup.Comment
+                                                         },
+                                                         false,
+                                                         transaction,
+                                                         logger
+                                                       );
+
+                  if ( person instanceof Error === false ) {
+
+                    //Create new user
+                    user = await UserService.createOrUpdate(
+                                                             {
+                                                               Id: person.Id,
+                                                               PersonId: person.Id,
+                                                               GroupId: userGroup.Id,
+                                                               Name: userSignup.Name,
+                                                               Password: await CipherManager.decrypt( userSignup.Password, logger ),
+                                                               Role: signupProcessData.userRole ? signupProcessData.userRole : null,
+                                                               Tag: signupProcessData.userTag ? signupProcessData.userTag : null,
+                                                               ExpireAt: SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.userExpireAt ),
+                                                               Comment: userSignup.Comment,
+                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                             },
+                                                             false,
+                                                             transaction,
+                                                             logger
+                                                           );
+
+                    if ( user instanceof Error === false ) {
+
+                      //
+
+                    }
+                    else {
+
+                      let error = user as any;
+
+                      result = {
+                                 StatusCode: 500,
+                                 Code: 'ERROR_UNEXPECTED',
+                                 Message: 'Unexpected error. Please read the server log for more details.',
+                                 Mark: '0FA42BB1DE80',
+                                 LogId: error.logId,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: error.name,
+                                             Message: error.Message,
+                                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+
+                  }
+                  else {
+
+                    let error = person as any;
+
+                    result = {
+                               StatusCode: 500,
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: 'Unexpected error. Please read the server log for more details.',
+                               Mark: 'AB370C6C4B51',
+                               LogId: error.logId,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.Message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+
+                }
+                else if ( userGroup instanceof Error  ) {
+
+                  let error = userGroup as any;
+
+                  result = {
+                             StatusCode: 500,
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: 'Unexpected error. Please read the server log for more details.',
+                             Mark: '91F9DE73ECDB',
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
 
                 }
 
@@ -1304,7 +1453,7 @@ export default class UserServiceController {
                                {
                                  Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
                                  Message: `Activation code is expired`,
-                                 Details: null
+                                 Details: userSignup.ExpireAt
                                }
                              ],
                      Warnings: [],
@@ -1328,7 +1477,7 @@ export default class UserServiceController {
                              {
                                Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
                                Message: `Activation code is not found`,
-                               Details: null
+                               Details: { ExpiredAt: userSignup.ExpireAt }
                              }
                            ],
                    Warnings: [],
