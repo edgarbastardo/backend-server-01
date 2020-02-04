@@ -13,6 +13,7 @@ import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize
 
 import DBConnectionManager from '../../../02_system/common/managers/DBConnectionManager';
 import BaseService from "../../../02_system/common/database/services/BaseService";
+import I18NManager from "../../../02_system/common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Dev000ServicesController' );
 
@@ -20,8 +21,8 @@ export default class Dev000ServicesController extends BaseService {
 
     //Common business services
 
-  static async processDev000Example( req: Request,
-                                     resp: Response,
+  static async processDev000Example( request: Request,
+                                     response: Response,
                                      transaction: any,
                                      logger: any ):Promise<any> {
 
@@ -31,7 +32,13 @@ export default class Dev000ServicesController extends BaseService {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context; //context is injected by SystemUtilities.middlewareSetContext function
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -42,8 +49,6 @@ export default class Dev000ServicesController extends BaseService {
         bApplyTansaction = true;
 
       }
-
-      const context = ( req as any ).context;
 
       //
 
@@ -83,7 +88,7 @@ export default class Dev000ServicesController extends BaseService {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: 'Unexpected error. Please read the server log for more details.',
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [

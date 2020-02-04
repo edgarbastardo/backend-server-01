@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 //import { bookService } from '../services/book.service';
 //import { AuthorByBookDataLoader } from '../dataloaders/author.dataloader';
 //import { UserDataLoader } from '../dataloaders/user.dataloader';
+import I18NManager from "../../../../../02_system/common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Dev000.api' );
 
@@ -13,10 +14,16 @@ export const resolvers = {
 
     getDev000: ( obj: any, args: any, context: any, info: any ) => {
 
+      const strLanguage = context.Language;
+
       let debugMark = debug.extend( 'BB7111103C74' );
       debugMark( "Resolver => %s", "getDev000" );
 
-      return { Code: 1, Message: "Dev000", Errors: [] };
+      return {
+               Code: 1,
+               Message: I18NManager.translate( strLanguage, "Dev000" ),
+               Errors: []
+             };
 
     },
 
@@ -26,10 +33,16 @@ export const resolvers = {
 
     addDev000: ( obj: any, args: any, context: any, info: any ) => {
 
+      const strLanguage = context.Language;
+
       let debugMark = debug.extend( 'CCEA3BAE4A60' );
       debugMark( "Resolver => %s", "addDev000" );
 
-      return { Code: 1, Message: "Dev000", Errors: [] };
+      return {
+               Code: 1,
+               Message: I18NManager.translate( strLanguage, "Dev000" ),
+               Errors: []
+             };
 
     },
 

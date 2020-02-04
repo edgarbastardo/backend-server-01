@@ -104,7 +104,8 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityServiceController.login( context.TimeZoneId,
+    const result = await SecurityServiceController.login( context.Language,
+                                                          context.TimeZoneId,
                                                           context.SourceIPAddress,
                                                           context.FrontendId,
                                                           request.body.Username,
@@ -125,7 +126,8 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityServiceController.logout( context.Authorization,
+    const result = await SecurityServiceController.logout( context.Language,
+                                                           context.Authorization,
                                                            null,
                                                            context.Logger );
 
@@ -142,7 +144,8 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityServiceController.tokenCheck( context.Authorization,
+    const result = await SecurityServiceController.tokenCheck( context.Language,
+                                                               context.Authorization,
                                                                null,
                                                                context.Logger );
 

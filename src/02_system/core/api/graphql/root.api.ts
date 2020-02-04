@@ -42,6 +42,7 @@ import {
   JSONResolver,
   //JSONObjectResolver,
 } from 'graphql-scalars';
+import I18NManager from '../../../common/managers/I18Manager';
 
 export const typeDefs = readFileSync(`${ __dirname }/root.graphql`, 'utf8');
 
@@ -96,7 +97,9 @@ export const resolvers = {
 
     status: ( obj: any, args : any, context: any, info: any ) => {
 
-      return { Code: 1, Message: "Ok" };
+      const strLanguage = context.Language;
+
+      return { Code: 1, Message: I18NManager.translateSync( strLanguage, "Ok" ) };
 
     }
 
@@ -106,7 +109,9 @@ export const resolvers = {
 
     status: ( obj: any, args: any, context: any, info: any ) => {
 
-      return { Code: 1, Message: "Ok" };
+      const strLanguage = context.Language;
+
+      return { Code: 1, Message: I18NManager.translateSync( strLanguage, "Ok" ) };
 
     }
 

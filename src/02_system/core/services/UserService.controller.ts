@@ -29,6 +29,7 @@ import { UserSessionStatus } from "../../common/database/models/UserSessionStatu
 import UserSignupService from "../../common/database/services/UserSignupService";
 import CipherManager from "../../common/managers/CipherManager";
 import PersonService from "../../common/database/services/PersonService";
+import I18NManager from "../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -541,7 +542,13 @@ export default class UserServiceController {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -552,8 +559,6 @@ export default class UserServiceController {
         bApplyTansaction = true;
 
       }
-
-      const context = ( request as any ).context;
 
       const bFrontendIdIsAllowed = await this.getFrontendIdIsAllowed( context.FrontendId,
                                                                       request.body.Kind,
@@ -606,14 +611,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                         Message: `The user group ${signupProcessData.group} defined by signup kind ${request.body.Kind} not exists`,
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
                          Mark: '49EEF768004F',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                     Message: `The user group ${signupProcessData.group} defined by signup kind ${request.body.Kind} not exists`,
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
                                      Details: null
                                    }
                                  ],
@@ -629,14 +634,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                         Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] already exists`,
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
                          Mark: '3BAC1FA1D2A2',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                     Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] already exists`,
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
                                      Details: null
                                    }
                                  ],
@@ -654,14 +659,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_USER_GROUP_DISABLED',
-                         Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is disabled. You cannot signup new users`,
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
                          Mark: '88C3AE24AB5E',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_GROUP_DISABLED',
-                                     Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is disabled. You cannot signup new users`,
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
                                      Details: null
                                    }
                                  ],
@@ -679,14 +684,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_USER_GROUP_EXPIRED',
-                         Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
                          Mark: '53EC3D039492',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_GROUP_EXPIRED',
-                                     Message: `The user group [${signupProcessData.group}] defined by signup kind [${request.body.Kind}] is expired. You cannot signup new users`,
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
                                      Details: null
                                    }
                                  ],
@@ -703,14 +708,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                         Message: `The user name [${request.body.Name}] already exists.`,
+                         Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
                          Mark: 'B43E4A5C0D8D',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                     Message: `The user name [${request.body.Name}] already exists.`,
+                                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
                                      Details: null
                                    }
                                  ],
@@ -816,7 +821,7 @@ export default class UserServiceController {
                       result = {
                                  StatusCode: 200, //ok
                                  Code: 'SUCCESS_USER_SIGNUP',
-                                 Message: `Success to made the user signup. Now you need check for your mailbox`,
+                                 Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. Now you need check for your mailbox' ),
                                  Mark: 'B3F0B0AF21AC',
                                  LogId: null,
                                  IsError: false,
@@ -832,14 +837,14 @@ export default class UserServiceController {
                       result = {
                                  StatusCode: 500, //ok
                                  Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                 Message: `Error cannot send the email to requested address`,
+                                 Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                  Mark: '5B91FA66FE6D',
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
                                              Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                             Message: `Error cannot send the email to requested address`,
+                                             Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                              Details: {
                                                         "EMails": request.body.EMail
                                                       }
@@ -858,7 +863,7 @@ export default class UserServiceController {
                     result = {
                                StatusCode: 200, //ok
                                Code: 'SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION',
-                               Message: `Success to made the user signup. But you need wait to system administrator activate your new account`,
+                               Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. But you need wait to system administrator activate your new account' ),
                                Mark: 'AE4751429BC8',
                                LogId: null,
                                IsError: false,
@@ -878,14 +883,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                           Message: `One or more field values are invalid`,
+                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
                            Mark: 'F01229E593EE',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                       Message: `One or more field values are invalid`,
+                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
                                        Details: validator.errors.all()
                                      }
                                    ],
@@ -919,7 +924,7 @@ export default class UserServiceController {
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_PASSWORD_NOT_VALID',
-                       Message: `The password is not valid`,
+                       Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
                        Mark: '24742802D110',
                        LogId: null,
                        IsError: true,
@@ -943,14 +948,14 @@ export default class UserServiceController {
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                     Message: `The singup kind ${request.body.Kind} for singup is not valid`,
+                     Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
                      Mark: 'E0E3A7CC1A6A',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                 Message: `The singup kind ${request.body.Kind} is not valid`,
+                                 Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
                                  Details: null
                                }
                              ],
@@ -967,14 +972,14 @@ export default class UserServiceController {
         result = {
                    StatusCode: 400, //Bad request
                    Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                   Message: 'Not allowed to signup from this the kind of frontend',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
                    Mark: '9333A33809AD',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                               Message: `Not allowed to signup from this the kind of frontend`,
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
                                Details: null
                              }
                            ],
@@ -1021,7 +1026,7 @@ export default class UserServiceController {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1068,7 +1073,13 @@ export default class UserServiceController {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -1079,8 +1090,6 @@ export default class UserServiceController {
         bApplyTansaction = true;
 
       }
-
-      const context = ( request as any ).context;
 
       const userSignup = await UserSignupService.getByToken( request.body.Activation,
                                                              context.TimeZoneId,
@@ -1119,14 +1128,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                           Message: `The user group ${signupProcessData.group} defined by signup kind ${userSignup.Kind} not exists`,
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, userSignup.Kind ),
                            Mark: '0EA9AC54E217',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                       Message: `The user group ${signupProcessData.group} defined by signup kind ${userSignup.Kind} not exists`,
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, userSignup.Kind ),
                                        Details: null
                                      }
                                    ],
@@ -1142,14 +1151,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                           Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] already exists`,
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, userSignup.Kind ),
                            Mark: '832157FFA57C',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] already exists`,
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, userSignup.Kind ),
                                        Details: null
                                      }
                                    ],
@@ -1167,14 +1176,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] is disabled. You cannot signup new users`,
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
                            Mark: '74E11EE1CFE2',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] is disabled. You cannot signup new users`,
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
                                        Details: null
                                      }
                                    ],
@@ -1192,14 +1201,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] is expired. You cannot signup new users`,
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
                            Mark: '2E99F86FF13B',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: `The user group [${signupProcessData.group}] defined by signup kind [${userSignup.Kind}] is expired. You cannot signup new users`,
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
                                        Details: null
                                      }
                                    ],
@@ -1216,14 +1225,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                           Message: `The user name [${userSignup.Name}] already exists.`,
+                           Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', userSignup.Name ),
                            Mark: '46F913842BF5',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                       Message: `The user name [${userSignup.Name}] already exists.`,
+                                       Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', userSignup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -1319,7 +1328,7 @@ export default class UserServiceController {
                       result = {
                                  StatusCode: 500,
                                  Code: 'ERROR_UNEXPECTED',
-                                 Message: 'Unexpected error. Please read the server log for more details.',
+                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                  Mark: '0FA42BB1DE80',
                                  LogId: error.logId,
                                  IsError: true,
@@ -1345,7 +1354,7 @@ export default class UserServiceController {
                     result = {
                                StatusCode: 500,
                                Code: 'ERROR_UNEXPECTED',
-                               Message: 'Unexpected error. Please read the server log for more details.',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                Mark: 'AB370C6C4B51',
                                LogId: error.logId,
                                IsError: true,
@@ -1371,7 +1380,7 @@ export default class UserServiceController {
                   result = {
                              StatusCode: 500,
                              Code: 'ERROR_UNEXPECTED',
-                             Message: 'Unexpected error. Please read the server log for more details.',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                              Mark: '91F9DE73ECDB',
                              LogId: error.logId,
                              IsError: true,
@@ -1397,14 +1406,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                         Message: `The singup kind ${request.body.Kind} for singup is not valid`,
+                         Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', userSignup.Kind ),
                          Mark: 'C632418EF717',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                     Message: `The singup kind ${request.body.Kind} is not valid`,
+                                     Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', userSignup.Kind ),
                                      Details: null
                                    }
                                  ],
@@ -1421,14 +1430,14 @@ export default class UserServiceController {
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                       Message: 'Not allowed to signup from this the kind of frontend',
+                       Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
                        Mark: '2A8CD841F553',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                   Message: `Not allowed to signup from this the kind of frontend`,
+                                   Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
                                    Details: null
                                  }
                                ],
@@ -1445,14 +1454,14 @@ export default class UserServiceController {
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                     Message: 'Activation code is expired',
+                     Message: await I18NManager.translate( strLanguage, 'Activation code is expired' ),
                      Mark: 'B212EA552AEA',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                                 Message: `Activation code is expired`,
+                                 Message: await I18NManager.translate( strLanguage, 'Activation code is expired' ),
                                  Details: userSignup.ExpireAt
                                }
                              ],
@@ -1469,14 +1478,14 @@ export default class UserServiceController {
         result = {
                    StatusCode: 404, //Not found
                    Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                   Message: 'Activation code is not found',
+                   Message: await I18NManager.translate( strLanguage, 'Activation code is not found' ),
                    Mark: '7A446BC21A83',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                               Message: `Activation code is not found`,
+                               Message: await I18NManager.translate( strLanguage, 'Activation code is not found' ),
                                Details: { ExpiredAt: userSignup.ExpireAt }
                              }
                            ],
@@ -1523,7 +1532,7 @@ export default class UserServiceController {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

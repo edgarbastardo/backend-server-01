@@ -13,9 +13,12 @@ import {
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 import RouteService from '../../../../../02_system/common/database/services/RouteService';
+import CommonConstants from '../../../../../02_system/common/CommonConstants';
+
+import I18NManager from '../../../../../02_system/common/managers/I18Manager';
+
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
-import CommonConstants from '../../../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( 'Dev000.controller' );
 
@@ -103,10 +106,12 @@ export default class Dev000Controller {
 
     const context = ( request as any ).context;
 
+    let strLanguage = context.Language;
+
     const result = {
                      StatusCode: 200,
                      Code: 'SUCCESS_DEV000_EXAMPLE',
-                     Message: 'Sucess get the information',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
                      LogId: null,
                      IsError: false,
                      Errors: [],

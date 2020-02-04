@@ -280,17 +280,21 @@ export default class ApplicationManager {
 
       serverInstance.use( ( request: Request, response: Response ) => {
 
+        const context = ( request as any ).context;
+
+        let strLanguage = context.Language;
+
         const result = {
                          StatusCode: 404,
                          Code: 'ERROR_PATH_NOT_FOUND',
-                         Message: `Requested path ${request.path} not found. Please read the server log for more details.`,
+                         Message: I18NManager.translateSync( strLanguage, 'Requested path %s not found. Please read the server log for more details.', request.path ),
                          LogId: null,
-                         Mark: "3D6CC5FD0B5D",
+                         Mark: '3D6CC5FD0B5D',
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_PATH_NOT_FOUND',
-                                     Message: `Requested path ${request.path} not found. Please read the server log for more details.`,
+                                     Message: I18NManager.translateSync( strLanguage, 'Requested path %s not found. Please read the server log for more details.', request.path ),
                                      Details: null
                                    }
                                  ],
@@ -303,9 +307,11 @@ export default class ApplicationManager {
 
       });
 
-      app.use( async ( error: any, req: Request, res: Response, next: NextFunction ) => {
+      app.use( async ( error: any, request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = req.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         const strMark = "D3C34ED42BA1";
 
@@ -333,7 +339,7 @@ export default class ApplicationManager {
                          Data: []
                        };
 
-        res.status( result.StatusCode ).send( result );
+        response.status( result.StatusCode ).send( result );
 
       });
 

@@ -16,6 +16,7 @@ import BinaryIndexService from "../../common/database/services/BinaryIndexServic
 import CacheManager from "../../common/managers/CacheManager";
 import { BinaryIndex } from "../../common/database/models/BinaryIndex";
 import CommonConstants from "../../common/CommonConstants";
+import I18NManager from '../../common/managers/I18Manager';
 //import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
@@ -822,7 +823,7 @@ export default class BinaryServiceController extends BaseService {
   }
   */
 
-  static async processBinaryDataUpload( req: Request,
+  static async processBinaryDataUpload( request: Request,
                                         transaction: any,
                                         logger: any ):Promise<any> {
 
@@ -832,7 +833,13 @@ export default class BinaryServiceController extends BaseService {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const strMark = "9B7197376B5B";
 
@@ -850,20 +857,19 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      if ( req.files &&
-           Object.keys( req.files ).length > 0 ) {
+      if ( request.files &&
+           Object.keys( request.files ).length > 0 ) {
 
-        const context = ( req as any ).context;
 
         let uploadedFile = null;
 
-        uploadedFile = req.files.File;
+        uploadedFile = request.files.File;
 
         if ( uploadedFile.truncated === false ) {
 
-          if ( CommonUtilities.isNotNullOrEmpty( req.body.Category ) ) {
+          if ( CommonUtilities.isNotNullOrEmpty( request.body.Category ) ) {
 
-            let strCategory = CommonUtilities.clearSpecialChars( req.body.Category,
+            let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` ).toLowerCase();
 
             strCategory = CommonUtilities.unaccent( strCategory );
@@ -875,9 +881,9 @@ export default class BinaryServiceController extends BaseService {
 
             if ( allowedCategory.value === 1 ) {
 
-              if ( req.body.AccessKind >= 1 && req.body.AccessKind <= 3 ) {
+              if ( request.body.AccessKind >= 1 && request.body.AccessKind <= 3 ) {
 
-                if ( req.body.StorageKind >= 0 && req.body.StorageKind <= 1 ) {
+                if ( request.body.StorageKind >= 0 && request.body.StorageKind <= 1 ) {
 
                   const fileDetectedType = SystemUtilities.getMimeType( uploadedFile.tempFilePath,
                                                                         uploadedFile.mimetype,
@@ -896,7 +902,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                    transaction,
                                                                                    logger );
 
-                    let strId = req.body.Id;
+                    let strId = request.body.Id;
 
                     if ( !strId ||
                          !context.UserSessionStatus.UserTag ||
@@ -918,7 +924,7 @@ export default class BinaryServiceController extends BaseService {
 
                     }
 
-                    let date = SystemUtilities.getCurrentDateAndTimeFrom( req.body.Date );
+                    let date = SystemUtilities.getCurrentDateAndTimeFrom( request.body.Date );
                     let strDate = null;
 
                     if ( date ) {
@@ -954,16 +960,16 @@ export default class BinaryServiceController extends BaseService {
                     const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
                                                                                          logger );
 
-                    if ( req.body.StorageKind === "0" ) { //Persistent
+                    if ( request.body.StorageKind === "0" ) { //Persistent
 
                       strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + context.UserSessionStatus.UserName + "/";
 
                     }
-                    else if ( req.body.Storagekind === "1" ) { //Temporal
+                    else if ( request.body.Storagekind === "1" ) { //Temporal
 
                       strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + context.UserSessionStatus.UserName + "/";
 
-                      expireAt = SystemUtilities.isValidDateTime( req.body.ExpireAt ) ? req.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format();
+                      expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format();
 
                     }
 
@@ -974,7 +980,9 @@ export default class BinaryServiceController extends BaseService {
                     }
                     else {
 
-                      strFullPath = path.join( SystemUtilities.baseRootPath, strBasePath, strRelativePath );
+                      strFullPath = path.join( SystemUtilities.baseRootPath,
+                                               strBasePath,
+                                               strRelativePath );
 
                     }
 
@@ -1000,19 +1008,19 @@ export default class BinaryServiceController extends BaseService {
                     debugMark( "Generating thumbnail" );
 
                     const thumbnailData = await BinaryServiceController.generateThumbnail( strFullPath,
-                                                                                 strId + "." + fileDetectedType.ext,
-                                                                                 ".data",
-                                                                                 thumbnailFactor,
-                                                                                 logger );
+                                                                                           strId + "." + fileDetectedType.ext,
+                                                                                           ".data",
+                                                                                           thumbnailFactor,
+                                                                                           logger );
 
                     debugMark( "Detect process needed" );
 
                     const processData = await BinaryServiceController.detectProcessNeeded( context.UserSessionStatus,
-                                                                                 strCategory,
-                                                                                 fileDetectedType.mime,
-                                                                                 uploadedFile.size,
-                                                                                 transaction,
-                                                                                 logger );
+                                                                                           strCategory,
+                                                                                           fileDetectedType.mime,
+                                                                                           uploadedFile.size,
+                                                                                           transaction,
+                                                                                           logger );
 
                     const strCurrentFileExtension = CommonUtilities.getFileExtension( uploadedFile.name );
 
@@ -1025,24 +1033,24 @@ export default class BinaryServiceController extends BaseService {
 
                     const binaryIndexData = {
                                               Id: strId,
-                                              AccessKind: req.body.AccessKind,
-                                              StorageKind: req.body.StorageKind,
+                                              AccessKind: request.body.AccessKind,
+                                              StorageKind: request.body.StorageKind,
                                               ExpireAt: expireAt,
                                               Category: strCategory,
                                               Hash: "md5://" + uploadedFile.md5,
                                               MimeType: fileDetectedType.mime,
-                                              Label: CommonUtilities.isNotNullOrEmpty( req.body.Label ) ? req.body.Label: strFinalFileName,
+                                              Label: CommonUtilities.isNotNullOrEmpty( request.body.Label ) ? request.body.Label: strFinalFileName,
                                               FilePath: strRelativePath,
                                               FileName: strFinalFileName,
                                               FileExtension: fileDetectedType.ext,
                                               FileSize: uploadedFile.size, //In bytes
-                                              Tag: CommonUtilities.isNotNullOrEmpty( req.body.Tag ) ? req.body.Tag: null,
+                                              Tag: CommonUtilities.isNotNullOrEmpty( request.body.Tag ) ? request.body.Tag: null,
                                               System: CommonUtilities.isNotNullOrEmpty( context.FrontendId ) ? context.FrontendId: null,
-                                              Context: CommonUtilities.isNotNullOrEmpty( req.body.Context ) ? req.body.Context: null,
-                                              Comment: CommonUtilities.isNotNullOrEmpty( req.body.Comment ) ? req.body.Comment : null,
-                                              DenyTagAccess: CommonUtilities.isNotNullOrEmpty( req.body.DenyTagAccess ) ? req.body.DenyTagAccess: null,
-                                              AllowTagAccess: CommonUtilities.isNotNullOrEmpty( req.body.AllowTagAccess ) ? req.body.AllowTagAccess: null,
-                                              ShareCode: CommonUtilities.isNotNullOrEmpty( req.body.ShareCode ) ? req.body.ShareCode: null,
+                                              Context: CommonUtilities.isNotNullOrEmpty( request.body.Context ) ? request.body.Context: null,
+                                              Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
+                                              DenyTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.DenyTagAccess ) ? request.body.DenyTagAccess: null,
+                                              AllowTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.AllowTagAccess ) ? request.body.AllowTagAccess: null,
+                                              ShareCode: CommonUtilities.isNotNullOrEmpty( request.body.ShareCode ) ? request.body.ShareCode: null,
                                               Owner: strDefaultOwners,
                                               ProcessNeeded: processData && processData.value ? processData.value : 0,
                                               CreatedBy: context.UserSessionStatus.UserName,
@@ -1066,7 +1074,7 @@ export default class BinaryServiceController extends BaseService {
                       result = {
                                  StatusCode: 200,
                                  Code: 'SUCESS_BINARY_DATA_UPLOAD',
-                                 Message: `The binary data has been uploaded success.`,
+                                 Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
                                  Mark: strMark,
                                  LogId: null,
                                  IsError: false,
@@ -1086,7 +1094,7 @@ export default class BinaryServiceController extends BaseService {
                       result = {
                                  StatusCode: 500,
                                  Code: 'ERROR_UNEXPECTED',
-                                 Message: 'Unexpected error. Please read the server log for more details.',
+                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                  Mark: strMark,
                                  LogId: dbOperationResult.error.LogId,
                                  IsError: true,
@@ -1110,14 +1118,14 @@ export default class BinaryServiceController extends BaseService {
                     result = {
                                StatusCode: 400,
                                Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                               Message: `The ${fileDetectedType.mime} detected for the file is invalid.`,
+                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid.', fileDetectedType.mime ),
                                Mark: strMark,
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                                           Message: `The ${fileDetectedType.mime} detected for the file is invalid.`,
+                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid.', fileDetectedType.mime ),
                                            Details: {
                                                       Detected: fileDetectedType.mime,
                                                       Denied: allowedMimeType.denied,
@@ -1138,14 +1146,14 @@ export default class BinaryServiceController extends BaseService {
                   result = {
                              StatusCode: 400,
                              Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                             Message: 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.',
+                             Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
                              Mark: strMark,
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                                         Message: 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.',
+                                         Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
                                          Details: {
                                                     0: "Persistent",
                                                     1: "Temporal",
@@ -1165,14 +1173,14 @@ export default class BinaryServiceController extends BaseService {
                 result = {
                            StatusCode: 400,
                            Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                           Message: 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.',
+                           Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
                            Mark: strMark,
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                                       Message: 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.',
+                                       Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
                                        Details: {
                                                   1: "Public",
                                                   2: "Authenticated",
@@ -1193,14 +1201,14 @@ export default class BinaryServiceController extends BaseService {
               result = {
                         StatusCode: 400,
                         Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                        Message: 'The Category parameter is not valid.',
+                        Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
                         Mark: strMark,
                         LogId: null,
                         IsError: true,
                         Errors: [
                                   {
                                     Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                                    Message: 'The Category parameter is not valid.',
+                                    Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
                                     Details: {
                                                Category: strCategory,
                                                Denied: allowedCategory.denied,
@@ -1221,14 +1229,14 @@ export default class BinaryServiceController extends BaseService {
             result = {
                        StatusCode: 400,
                        Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                       Message: 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.',
+                       Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
                        Mark: strMark,
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                                   Message: 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z 0-9 _ - are valid.',
+                                   Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
                                    Details: {
                                               Valid: [ "A-Z", "a-z", "0-9", "_", "-" ],
                                             }
@@ -1250,14 +1258,14 @@ export default class BinaryServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_FILE_TOO_BIG',
-                     Message: 'The file is too big.',
+                     Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
                      Mark: strMark,
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_FILE_TOO_BIG',
-                                 Message: 'The file is too big.',
+                                 Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
                                  Details: {
                                             Maximum: intBinaryDataMaximumSize / 1024,
                                             Unit: "kilobytes"
@@ -1277,14 +1285,14 @@ export default class BinaryServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_NOT_FILE_UPLOADED',
-                   Message: 'No file uploaded.',
+                   Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
                    Mark: strMark,
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_NOT_FILE_UPLOADED',
-                               Message: 'No file uploaded.',
+                               Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
                                Details: null
                              }
                            ],
@@ -1331,7 +1339,7 @@ export default class BinaryServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1353,7 +1361,7 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
-  static async createBinaryDataAuthorization( req: Request,
+  static async createBinaryDataAuthorization( request: Request,
                                               transaction: any,
                                               logger: any ):Promise<any> {
 
@@ -1363,7 +1371,13 @@ export default class BinaryServiceController extends BaseService {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -1374,8 +1388,6 @@ export default class BinaryServiceController extends BaseService {
         bApplyTansaction = true;
 
       }
-
-      const context = ( req as any ).context;
 
       const userSessionStatus = context.UserSessionStatus;
 
@@ -1415,7 +1427,7 @@ export default class BinaryServiceController extends BaseService {
       result = {
                   StatusCode: 200,
                   Code: 'SUCESS_AUTH_TOKEN_CREATED',
-                  Message: `The binary data auth token has been success created.`,
+                  Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success created.' ),
                   LogId: null,
                   IsError: false,
                   Errors: [],
@@ -1464,7 +1476,7 @@ export default class BinaryServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1486,7 +1498,7 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
-  static async deleteBinaryDataAuthorization( req: Request,
+  static async deleteBinaryDataAuthorization( request: Request,
                                               transaction: any,
                                               logger: any ):Promise<any> {
 
@@ -1496,7 +1508,13 @@ export default class BinaryServiceController extends BaseService {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -1507,8 +1525,6 @@ export default class BinaryServiceController extends BaseService {
         bApplyTansaction = true;
 
       }
-
-      const context = ( req as any ).context;
 
       const userSessionStatus = context.UserSessionStatus;
 
@@ -1536,7 +1552,8 @@ export default class BinaryServiceController extends BaseService {
           result = {
                      StatusCode: 200,
                      Code: 'SUCESS_AUTH_TOKEN_DELETED',
-                     Message: `The binary data auth token has been success deleted.`,
+                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success deleted.' ),
+                     Mark: '473D6FEA3F86',
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1551,13 +1568,14 @@ export default class BinaryServiceController extends BaseService {
           result = {
                      StatusCode: 404,
                      Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                     Message: `The binary data auth token not found.`,
+                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                     Mark: '3B11E61CDD49',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                                 Message: `The binary data auth token not found.`,
+                                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
                                }
                              ],
                      Warnings: [],
@@ -1573,13 +1591,14 @@ export default class BinaryServiceController extends BaseService {
         result = {
                    StatusCode: 400, //Bad request
                    Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                   Message: `Auth token provided is persistent. You cannot delete it`,
+                   Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
+                   Mark: '88EE1E318404',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                               Message: `Auth token provided is persistent. You cannot delete it`,
+                               Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
                                Details: null
                              }
                            ],
@@ -1626,7 +1645,7 @@ export default class BinaryServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1855,8 +1874,8 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
-  static async processBinaryDataDownload( req: Request,
-                                          resp: Response,
+  static async processBinaryDataDownload( request: Request,
+                                          response: Response,
                                           transaction: any,
                                           logger: any ):Promise<any> {
 
@@ -1866,7 +1885,13 @@ export default class BinaryServiceController extends BaseService {
 
     let bApplyTansaction = false;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
@@ -1878,11 +1903,10 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const context = ( req as any ).context;
       //const userSessionStatus = context.UserSessionStatus;
-      const strId = req.params.id;
-      const strAuth = req.params.auth;
-      const strThumbnail = req.params.thumbnail;
+      const strId = request.params.id;
+      const strAuth = request.params.auth;
+      const strThumbnail = request.params.thumbnail;
 
       if ( CommonUtilities.isNotNullOrEmpty( strId ) ) {
 
@@ -1984,10 +2008,10 @@ export default class BinaryServiceController extends BaseService {
 
               }
 
-              ( req as any ).returnResult = 1; //Force to return the result
+              ( request as any ).returnResult = 1; //Force to return the result
 
               //Check for valid session token
-              let resultData = await SystemUtilities.middlewareCheckIsAuthenticated( req,
+              let resultData = await SystemUtilities.middlewareCheckIsAuthenticated( request,
                                                                                      null, //Not write response back
                                                                                      null );
 
@@ -2088,12 +2112,14 @@ export default class BinaryServiceController extends BaseService {
                                    StatusCode: 403, //Forbiden
                                    Code: strCode,
                                    Message: strMessage,
+                                   Mark: 'B429C5C08377',
                                    LogId: null,
                                    IsError: true,
                                    Errors: [
                                              {
                                                Code: strCode,
                                                Message: strMessage,
+                                               Details: null,
                                              }
                                            ],
                                     Warnings: [],
@@ -2101,7 +2127,7 @@ export default class BinaryServiceController extends BaseService {
                                     Data: []
                                  };
 
-                    resp.setHeader( "X-Body-Response",
+                    response.setHeader( "X-Body-Response",
                                     JSON.stringify( resultData ) );
 
                     //ANCHOR binary data download Fobidden
@@ -2120,7 +2146,7 @@ export default class BinaryServiceController extends BaseService {
               }
               else {
 
-                resp.setHeader( "X-Body-Response",
+                response.setHeader( "X-Body-Response",
                                 JSON.stringify( resultData ) );
 
                 //ANCHOR binary data download Unauthorized
@@ -2140,14 +2166,15 @@ export default class BinaryServiceController extends BaseService {
               const resultHeaders = {
                                       StatusCode: 400,
                                       Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                      Message: `The id parameter cannot be empty.`,
+                                      Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
                                       LogId: null,
-                                      Mark: null,
+                                      Mark: 'B0D3A4067071',
                                       IsError: true,
                                       Errors: [
                                                 {
                                                   Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                                  Message: `The id parameter cannot be empty.`,
+                                                  Message: await I18NManager.translate( strLanguage, `The id parameter cannot be empty.` ),
+                                                  Details: null,
                                                 }
                                               ],
                                       Warnings: [],
@@ -2155,7 +2182,7 @@ export default class BinaryServiceController extends BaseService {
                                       Data: []
                                     };
 
-              resp.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+              response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
 
               result = {
                          StatusCode: 400, //Bad request
@@ -2169,14 +2196,15 @@ export default class BinaryServiceController extends BaseService {
             const resultHeaders = {
                                     StatusCode: 404,
                                     Code: 'ERROR_FILE_NOT_FOUND',
-                                    Message: `The binary data file not found.`,
+                                    Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
                                     LogId: null,
-                                    Mark: null,
+                                    Mark: '1109E2A671E8',
                                     IsError: true,
                                     Errors: [
                                               {
                                                 Code: 'ERROR_FILE_NOT_FOUND',
-                                                Message: `The binary data file not found.`,
+                                                Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                                Details: null,
                                               }
                                             ],
                                     Warnings: [],
@@ -2184,7 +2212,7 @@ export default class BinaryServiceController extends BaseService {
                                     Data: []
                                   };
 
-            resp.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+            response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
 
             //ANCHOR binary data download FILE NOT FOUND
             result = {
@@ -2203,14 +2231,15 @@ export default class BinaryServiceController extends BaseService {
           const resultHeaders = {
                                   StatusCode: 404,
                                   Code: 'ERROR_DB_NOT_FOUND',
-                                  Message: `The binary data db not found.`,
+                                  Message: await I18NManager.translate( strLanguage, 'The binary data db not found.' ),
                                   LogId: null,
-                                  Mark: null,
+                                  Mark: 'E4650CE42D99',
                                   IsError: true,
                                   Errors: [
                                             {
                                               Code: 'ERROR_DB_NOT_FOUND',
-                                              Message: `The binary data db not found.`,
+                                              Message: await I18NManager.translate( strLanguage, 'The binary data db not found.' ),
+                                              Details: null,
                                             }
                                           ],
                                   Warnings: [],
@@ -2218,7 +2247,7 @@ export default class BinaryServiceController extends BaseService {
                                   Data: []
                                 };
 
-          resp.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+          response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
 
           //ANCHOR binary data download DB NOT FOUND
           result = {
@@ -2237,14 +2266,15 @@ export default class BinaryServiceController extends BaseService {
         const resultHeaders = {
                                 StatusCode: 400,
                                 Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                Message: `The id parameter cannot be empty.`,
+                                Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
                                 LogId: null,
-                                Mark: null,
+                                Mark: '67F2D64A113E',
                                 IsError: true,
                                 Errors: [
                                           {
                                             Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                            Message: `The id parameter cannot be empty.`,
+                                            Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
+                                            Details: null,
                                           }
                                         ],
                                 Warnings: [],
@@ -2252,7 +2282,7 @@ export default class BinaryServiceController extends BaseService {
                                 Data: []
                               };
 
-        resp.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+        response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
 
         result = {
                    StatusCode: 400, //Bad request
@@ -2296,7 +2326,8 @@ export default class BinaryServiceController extends BaseService {
       const resultHeaders = {
                               StatusCode: 500,
                               Code: 'ERROR_UNEXPECTED',
-                              Message: 'Unexpected error. Please read the server log for more details.',
+                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                              Mark: strMark,
                               LogId: error.LogId,
                               IsError: true,
                               Errors: [
@@ -2311,7 +2342,7 @@ export default class BinaryServiceController extends BaseService {
                               Data: []
                             };
 
-      resp.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+      response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
 
       result = {
                  StatusCode: 500,

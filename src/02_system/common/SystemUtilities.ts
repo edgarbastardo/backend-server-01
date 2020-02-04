@@ -1293,7 +1293,7 @@ export default class SystemUtilities {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -1322,9 +1322,13 @@ export default class SystemUtilities {
                                                response: Response,
                                                next: NextFunction ): Promise<any> {
 
-    const logger = ( request as any ).context.Logger; //Context is set from previous chain function middlewareSetContext
+    const context = ( request as any ).context; //context is injected by SystemUtilities.middlewareSetContext function
 
-    let userSessionStatus = ( request as any ).context.UserSessionStatus; //Context is set from previous chain function middlewareSetContext
+    const strLanguage = context ? context.Language : null; //Context is set from previous chain function middlewareSetContext
+
+    const logger = context ? context.Logger : null; //Context is set from previous chain function middlewareSetContext
+
+    let userSessionStatus = context ? context.UserSessionStatus : null; //Context is set from previous chain function middlewareSetContext
 
     let authorization: { Expired: false, Duration: any };
     let bAuthorizationInvalidLoggedOut = false;
@@ -1356,14 +1360,14 @@ export default class SystemUtilities {
       result = {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                 Message: `Authorization token provided is invalid`,
-                 Mark: "FAE37676EA49",
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
+                 Mark: 'FAE37676EA49',
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
                              Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                             Message: `Authorization token provided is invalid`,
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
                              Details: null
                            }
                          ],
@@ -1378,14 +1382,14 @@ export default class SystemUtilities {
       result = {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
-                 Message: `Authorization token provided is logged out`,
-                 Mark: "0C28D66DFBC1",
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is logged out' ),
+                 Mark: '0C28D66DFBC1',
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
                              Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
-                             Message: `Authorization token provided is logged out`,
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is logged out' ),
                              Details: null
                            }
                          ],
@@ -1409,14 +1413,14 @@ export default class SystemUtilities {
       result = {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
-                 Message: `Authorization token provided is expired`,
-                 Mark: "C6E335E5DC71",
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
+                 Mark: 'C6E335E5DC71',
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
                              Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
-                             Message: `Authorization token provided is expired`,
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
                              Details: timeAgo
                            }
                           ],
@@ -1461,9 +1465,13 @@ export default class SystemUtilities {
                                             response: Response,
                                             next: NextFunction ) {
 
-    const logger = ( request as any ).context.Logger; //Context is set from previous chain function middlewareSetContext
+    const context = ( request as any ).context; //context is injected by SystemUtilities.middlewareSetContext function
 
-    let userSessionStatus = ( request as any ).context.UserSessionStatus; //Context is set from previous chain function middlewareSetContext
+    const strLanguage = context ? context.Language : null; //Context is set from previous chain function middlewareSetContext
+
+    const logger = context ? context.Logger : null; //Context is set from previous chain function middlewareSetContext
+
+    let userSessionStatus = context ? context.UserSessionStatus : null; //Context is set from previous chain function middlewareSetContext
 
     let strPath = request.route && request.route.path ? request.route.path : request.path;
 
@@ -1487,14 +1495,14 @@ export default class SystemUtilities {
       const result = {
                        StatusCode: 403, //Forbiden
                        Code: 'ERROR_FORBIDEN_ACCESS',
-                       Message: `Not authorized to access`,
+                       Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
                        LogId: null,
-                       Mark: "1ED45DB6E425",
+                       Mark: '1ED45DB6E425',
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_FORBIDEN_ACCESS',
-                                   Message: `Not authorized to access`,
+                                   Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
                                  }
                                ],
                        Warnings: [],
@@ -1525,6 +1533,9 @@ export default class SystemUtilities {
       let session: { Expired: false, Duration: any };
       let bSessionInvalidLoggedOut = false;
       let bSessionInvalid = false;
+
+      const strLanguage = context.Language;
+
       const logger = context.Logger;
 
       //const strAuthorization = context.Authorization;
@@ -1555,14 +1566,22 @@ export default class SystemUtilities {
 
         const extensions = { StatusCode: 401, LogId: SystemUtilities.getUUIDv4() };
 
-        result = new ApolloError( "Authorization token provided is invalid", "ERROR_INVALID_AUTHORIZATION_TOKEN", extensions );
+        result = new ApolloError(
+                                  await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                                  "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                                  extensions
+                                );
 
       }
       else if ( bSessionInvalidLoggedOut ) {
 
         const extensions = { StatusCode: 401, "LogId": SystemUtilities.getUUIDv4() };
 
-        result = new ApolloError( "Authorization token provided is logged out", "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN", extensions );
+        result = new ApolloError(
+                                  await I18NManager.translate( strLanguage, "Authorization token provided is logged out" ),
+                                  "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                                  extensions
+                                );
 
       }
       else if ( session.Expired ) {
@@ -1574,18 +1593,38 @@ export default class SystemUtilities {
 
           const timeAgo = session.Duration.humanize();
 
-          errors.push( { Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN", Message: "Authorization token provided is expired", Details: timeAgo } );
+          errors.push(
+                       {
+                         Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN",
+                         Message: await I18NManager.translate( strLanguage, "Authorization token provided is expired" ),
+                         Details: timeAgo
+                       }
+                      );
 
         }
         else {
 
-          errors.push( { Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN", Message: "Authorization token provided is expired", Details: null } );
+          errors.push(
+                       {
+                         Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN",
+                         Message: await I18NManager.translate( strLanguage, "Authorization token provided is expired" ),
+                         Details: null
+                       }
+                      );
 
         }
 
-        const extensions = { StatusCode: 401, "LogId": SystemUtilities.getUUIDv4(), "errors": errors };
+        const extensions = {
+                             StatusCode: 401,
+                             "LogId": SystemUtilities.getUUIDv4(),
+                             "errors": errors
+                           };
 
-        result = new ApolloError( "Authorization token provided is expired", "ERROR_EXPIRED_AUTHORIZATION_TOKEN", extensions );
+        result = new ApolloError(
+                                  await I18NManager.translate( strLanguage, "Authorization token provided is expired" ),
+                                  "ERROR_EXPIRED_AUTHORIZATION_TOKEN",
+                                  extensions
+                                );
 
       }
       else {
@@ -1845,7 +1884,8 @@ export default class SystemUtilities {
 
   }
 
-  static dectectUserWarnings( userDataResponse: any,
+  static dectectUserWarnings( strLanguage: string,
+                              userDataResponse: any,
                               logger: any ) {
 
     let result = [];
@@ -1857,7 +1897,7 @@ export default class SystemUtilities {
         result.push(
                      {
                        Code: "WARNING_FORCE_CHANGE_PASSSWORD",
-                       Message: "Change of password is required by the system",
+                       Message: I18NManager.translateSync( strLanguage, "Change of password is required by the system" ),
                        Details: {
                                   ForceChangePassword: 1
                                 },
@@ -1875,7 +1915,7 @@ export default class SystemUtilities {
           result.push(
                        {
                          Code: "WARNING_PASSSWORD_EXPIRED",
-                         Message: "Change of password is required by it is expired",
+                         Message: I18NManager.translateSync( strLanguage, "Change of password is required by it is expired" ),
                          Details: duration.humanize()
                        }
                      );

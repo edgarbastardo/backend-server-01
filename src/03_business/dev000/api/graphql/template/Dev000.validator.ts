@@ -1,6 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+import I18NManager from '../../../../../02_system/common/managers/I18Manager';
 //import { extensions } from 'sequelize/types/lib/utils/validator-extras';
 
 const debug = require( 'debug' )( 'Dev000.validator' );
@@ -11,26 +12,44 @@ export const validators = {
 
     getDev000: ( resolve: any, obj: any, args: any, context: any ) => {
 
+      const strLanguage = context.Language;
+
       const { Id } = args;
 
       const errors = [];
 
       if ( CommonUtilities.isNullOrEmpty( Id ) ) {
 
-        errors.push( { Code: "ERROR_BAD_USER_INPUT", Message: "The Id parameter value cannot be empty", Details: { Field: "Id" } } );
+        errors.push(
+                     {
+                       Code: "ERROR_BAD_USER_INPUT",
+                       Message: I18NManager.translateSync( strLanguage, "The Id parameter value cannot be empty" ),
+                       Details: { Field: "Id" }
+                     }
+                   );
 
       }
 
       /*
       if ( CommonUtilities.isNotNullOrEmpty( TimeZoneId ) ) {
 
-        errors.push( { Code: -1002, Description: "The TimeZoneId param cannot be empty" } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, "The TimeZoneId param cannot be empty" )
+                     }
+                   );
 
       }
 
       if ( CommonUtilities.isValidTimeZone( TimeZoneId ) === false ) {
 
-        errors.push( { Code: -1002, Description: `The TimeZoneId parameter value [${TimeZoneId}] is invalid` } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, 'The TimeZoneId parameter value [%s] is invalid', TimeZoneId )
+                     }
+                   );
 
       }
       */
@@ -39,7 +58,10 @@ export const validators = {
 
       if ( errors.length > 0 ) {
 
-        const userInputError = new UserInputError( 'Invalid user input parameter values', extensions );
+        const userInputError = new UserInputError(
+                                                   I18NManager.translateSync( strLanguage, 'Invalid user input parameter values' ),
+                                                   extensions
+                                                 );
 
         //userInputerror.logId = SystemUtilities.getUUIDv4();
 
@@ -60,26 +82,44 @@ export const validators = {
 
     addDev000: ( resolve: any, obj: any, args: any, context: any ) => {
 
+      const strLanguage = context.Language;
+
       const { Id } = args;
 
       const errors = [];
 
       if ( CommonUtilities.isNullOrEmpty( Id ) ) {
 
-        errors.push( { Code: "ERROR_BAD_USER_INPUT", Message: "The Id parameter value cannot be empty", Details: { Field: "Id" } } );
+        errors.push(
+                     {
+                       Code: "ERROR_BAD_USER_INPUT",
+                       Message: I18NManager.translateSync( strLanguage, "The Id parameter value cannot be empty" ),
+                       Details: { Field: "Id" }
+                     }
+                   );
 
       }
 
       /*
       if ( CommonUtilities.isNotNullOrEmpty( TimeZoneId ) ) {
 
-        errors.push( { Code: -1002, Description: "The TimeZoneId param cannot be empty" } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, "The TimeZoneId param cannot be empty" )
+                     }
+                   );
 
       }
 
       if ( CommonUtilities.isValidTimeZone( TimeZoneId ) === false ) {
 
-        errors.push( { Code: -1002, Description: `The TimeZoneId parameter value [${TimeZoneId}] is invalid` } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, 'The TimeZoneId parameter value [%s] is invalid', TimeZoneId )
+                     }
+                   );
 
       }
       */
@@ -88,7 +128,10 @@ export const validators = {
 
       if ( errors.length > 0 ) {
 
-        const userInputError = new UserInputError( 'Invalid user input parameter values', extensions );
+        const userInputError = new UserInputError(
+                                                   I18NManager.translateSync( strLanguage, 'Invalid user input parameter values' ),
+                                                   extensions
+                                                 );
 
         //userInputerror.logId = SystemUtilities.getUUIDv4();
 

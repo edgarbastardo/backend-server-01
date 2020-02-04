@@ -209,17 +209,21 @@ export default class I18NManager {
 
     try {
 
-      strResult = this._translations[ strLanguage ][ strSentence ];
+      if ( strLanguage ) {
 
-      if ( param &&
-           param.length > 0 ) {
+        strResult = this._translations[ strLanguage ][ strSentence ];
 
-        strResult = util.format( strResult, ...param );
+        if ( param &&
+            param.length > 0 ) {
 
-      }
-      else if ( !strResult ) {
+          strResult = util.format( strResult, ...param );
 
-        strResult = strSentence;
+        }
+        else if ( !strResult ) {
+
+          strResult = strSentence;
+
+        }
 
       }
 

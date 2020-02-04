@@ -29,6 +29,7 @@ import CommonUtilities from '../../common/CommonUtilities';
 import SystemUtilities from '../../common/SystemUtilities';
 import BaseService from '../../common/database/services/BaseService';
 import CommonConstants from '../../common/CommonConstants';
+import I18NManager from '../../common/managers/I18Manager';
 
 const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
 
@@ -60,13 +61,19 @@ export class ModelToRestAPIServiceController extends BaseService {
   */
 
   static async get( model: typeof CustomModel,
-                    req: Request,
+                    request: Request,
                     attributesExclude: string[] = null,
                     logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       let whereFnResult = null;
       let includeFnResult = null;
@@ -74,7 +81,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       whereFnResult = this.formatWhereStr(
 
-        req.query && req.query.where ? req.query.where: {},
+        request.query && request.query.where ? request.query.where: {},
         logger
 
       );
@@ -84,14 +91,15 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: `Query parameter 'where' format error`,
+                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                   Mark: '3308D6A4C648',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
-                               Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -105,7 +113,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         // Include
         includeFnResult = this.formatIncludeStr(
 
-          req.query && req.query.include ? req.query.include : [],
+          request.query && request.query.include ? request.query.include : [],
           logger
 
         );
@@ -115,13 +123,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: `Query parameter 'include' format error`,
+                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                     Mark: 'A17D19DAF07E',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: `Query parameter 'include' format error`,
+                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
                                  Details: null
                                }
                              ],
@@ -135,7 +144,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           attributesFnResult = this.formatAttributesStr(
 
-            req.query && req.query.attributes ? req.query.attributes: [],
+            request.query && request.query.attributes ? request.query.attributes: [],
             logger
 
           );
@@ -145,13 +154,14 @@ export class ModelToRestAPIServiceController extends BaseService {
             result = {
                        StatusCode: 400,
                        Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                       Message: `Query parameter "attributes" format error`,
+                       Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
+                       Mark: '73178B2D81D5',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                                   Message: `Query parameter 'attributes' format error`,
+                                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
                                    Details: `The right format is atributes=[ "valid_field_name_1", "valid_field_name_2" ] in the url. Use ?atributes=... for only one parameter or &atributes=... for concatenate more of one query parameters`
                                  }
                                ],
@@ -170,7 +180,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             };
 
-            if ( req.query.attributes ) {
+            if ( request.query.attributes ) {
 
               filter.attributes = attributesFnResult.Result; //JSON.parse( req.query.attributes );
 
@@ -222,11 +232,11 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                                 {
                                                                                   Data: modelData,
                                                                                   FilterFields: 1, //Force to remove fields like password and value
-                                                                                  TimeZoneId: req.header( "timezoneid" ),
+                                                                                  TimeZoneId: request.header( "timezoneid" ),
                                                                                   Include: includeFnResult.Result,
                                                                                   Logger: logger,
                                                                                   ExtraInfo: {
-                                                                                              Request: req
+                                                                                              Request: request
                                                                                             }
                                                                                 }
                                                                               );
@@ -255,7 +265,8 @@ export class ModelToRestAPIServiceController extends BaseService {
             result = {
                        StatusCode: 200,
                        Code: 'SUCCESS_GET',
-                       Message: 'Sucess get the information',
+                       Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
+                       Mark: '17BC08C03272',
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -299,7 +310,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -322,14 +333,20 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async search( model: typeof CustomModel,
-                       req: Request,
+                       request: Request,
                        attributesExclude: string[] = null,
                        intDefaultMaxRows: number = 200,
                        logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       let includeFnResult = null;
       let orderFnResult = null;
@@ -338,7 +355,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       whereFnResult = this.formatWhereStr(
 
-        req.query && req.query.where ? req.query.where: {},
+        request.query && request.query.where ? request.query.where: {},
         logger
 
       );
@@ -348,14 +365,15 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: `Query parameter 'where' format error`,
+                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                   Mark: 'B81F215FB722',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
-                               Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -369,7 +387,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         // Include
         includeFnResult = this.formatIncludeStr(
 
-          req.query && req.query.include ? req.query.include : [],
+          request.query && request.query.include ? request.query.include : [],
           logger
 
         );
@@ -379,13 +397,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: `Query parameter 'include' format error`,
+                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                     Mark: '5B06A3DD6871',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: `Query parameter 'include' format error`,
+                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
                                  Details: null
                                }
                              ],
@@ -400,7 +419,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           // Order
           orderFnResult = this.formatOrderStr(
 
-            req.query && req.query.order ? req.query.order : [],
+            request.query && request.query.order ? request.query.order : [],
             logger
 
           );
@@ -410,13 +429,14 @@ export class ModelToRestAPIServiceController extends BaseService {
             result = {
                        StatusCode: 400,
                        Code: 'ERROR_WRONG_ORDER_FORMAT',
-                       Message: `Query parameter 'order' format error`,
+                       Message: await I18NManager.translate( strLanguage, 'Query parameter \'order\' format error' ),
+                       Mark: '7E2B9BB2C8D1',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_WRONG_ORDER_FORMAT',
-                                   Message: `Query parameter 'order' format error`,
+                                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'order\' format error' ),
                                    Details: null
                                  }
                                ],
@@ -430,7 +450,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             attributesFnResult = this.formatAttributesStr(
 
-              req.query && req.query.attributes ? req.query.attributes: [],
+              request.query && request.query.attributes ? request.query.attributes: [],
               logger
 
             );
@@ -440,13 +460,14 @@ export class ModelToRestAPIServiceController extends BaseService {
               result = {
                          StatusCode: 400,
                          Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                         Message: `Query parameter 'attributes' format error`,
+                         Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
+                         Mark: '00E981270A7E',
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                                     Message: `Query parameter 'attributes' format error`,
+                                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
                                      Details: `The right format is atributes=[ "valid_field_name_1", "valid_field_name_2" ] in the url. Use ?atributes=... for only one parameter or &atributes=... for concatenate more of one query parameters in the url.`
                                    }
                                  ],
@@ -469,9 +490,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         const warnings = [];
 
-        if ( req.query.limit && isNaN( req.query.limit ) === false && parseInt( req.query.limit ) <= intDefaultMaxRows ) {
+        if ( request.query.limit && isNaN( request.query.limit ) === false && parseInt( request.query.limit ) <= intDefaultMaxRows ) {
 
-          intLimit = parseInt( req.query.limit );
+          intLimit = parseInt( request.query.limit );
 
         }
         else {
@@ -479,8 +500,8 @@ export class ModelToRestAPIServiceController extends BaseService {
           warnings.push(
                          {
                            Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                           Message: `Data limited to the maximun of ${intLimit} rows`,
-                           Details: `To protect to server and client of large result set of data, the default maximun rows is ${intLimit}, you must use 'offset' and 'limit' query parameters to paginate large result set of data.`
+                           Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
+                           Details: I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
                          }
                        );
 
@@ -489,14 +510,14 @@ export class ModelToRestAPIServiceController extends BaseService {
         let filter: FindOptions = {
 
           where: whereFnResult.Result,
-          offset: req.query.offset && !isNaN( req.query.offset ) ? parseInt( req.query.offset ) : 0,
+          offset: request.query.offset && !isNaN( request.query.offset ) ? parseInt( request.query.offset ) : 0,
           limit:  intLimit,
           order: orderFnResult.Result,
           include: includeFnResult.Result,
 
         };
 
-        if ( req.query.attributes ) {
+        if ( request.query.attributes ) {
 
           filter.attributes = attributesFnResult.Result; //JSON.parse( req.query.attributes );
 
@@ -550,11 +571,11 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                               {
                                                                                 Data: modelData,
                                                                                 FilterFields: 1, //Force to remove fields like password and value
-                                                                                TimeZoneId: req.header( "timezoneid" ),
+                                                                                TimeZoneId: request.header( "timezoneid" ),
                                                                                 Include: includeFnResult.Result,
                                                                                 Logger: logger,
                                                                                 ExtraInfo: {
-                                                                                             Request: req
+                                                                                             Request: request
                                                                                            }
                                                                               }
                                                                             );
@@ -590,7 +611,8 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 200,
                    Code: 'SUCCESS_SEARCH',
-                   Message: 'Sucess search the information',
+                   Message: await I18NManager.translate( strLanguage, 'Sucess search the information' ),
+                   Mark: '545F8DE9950F',
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -629,7 +651,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -652,19 +674,25 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async searchCount( model: typeof CustomModel,
-                            req: Request,
+                            request: Request,
                             logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       let includeFnResult = null;
       let whereFnResult = null;
 
       whereFnResult = this.formatWhereStr(
 
-        req.query && req.query.where ? req.query.where: {},
+        request.query && request.query.where ? request.query.where: {},
         logger
 
       );
@@ -674,14 +702,15 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: `Query parameter 'where' format error`,
+                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                   Mark: '126F342F0F0E',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
-                               Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -695,7 +724,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         // Include
         includeFnResult = this.formatIncludeStr(
 
-          req.query && req.query.include ? req.query.include : [],
+          request.query && request.query.include ? request.query.include : [],
           logger
 
         );
@@ -705,13 +734,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: `Query parameter 'include' format error`,
+                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                     Mark: 'DB99B13E8999',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: `Query parameter 'include' format error`,
+                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
                                  Details: null
                                }
                              ],
@@ -735,7 +765,8 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 200,
                      Code: 'SUCCESS_SEARCH_COUNT',
-                     Message: 'Sucess count the information',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess count the information' ),
+                     Mark: 'D0C4F28783EA',
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -780,7 +811,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -803,17 +834,23 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async create( model: typeof CustomModel,
-                       req: Request,
+                       request: Request,
                        attributesExclude: string[] = null,
                        logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
 
-      const options = { context: ( req as any ).context };
+      const context = ( request as any ).context;
 
-      const bodyData = req.body;
+      strLanguage = context.Language;
+
+      const options = { context: context };
+
+      const bodyData = request.body;
 
       delete bodyData[ "CreatedBy" ];
       delete bodyData[ "CreatedAt" ];
@@ -846,7 +883,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 201,
                  Code: 'SUCCESS_CREATE',
-                 Message: 'Sucess created the information',
+                 Message: await I18NManager.translate( strLanguage, 'Sucess created the information' ),
                  Mark: "275AF508CF64",
                  LogId: null,
                  IsError: false,
@@ -887,6 +924,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                    StatusCode: 400,
                    Code: error.code,
                    Message: error.message,
+                   Mark: strMark,
                    LogId: error.LogId,
                    IsError: true,
                    Errors: [
@@ -905,22 +943,23 @@ export class ModelToRestAPIServiceController extends BaseService {
       else {
 
         result = {
-                  StatusCode: 500,
-                  Code: 'ERROR_UNEXPECTED',
-                  Message: 'Unexpected error. Please read the server log for more details.',
-                  LogId: error.LogId,
-                  IsError: true,
-                  Errors: [
-                            {
-                              Code: error.name,
-                              Message: error.message,
-                              Details: await SystemUtilities.processErrorDetails( error ) //error
-                            }
-                          ],
-                  Warnings: [],
-                  Count: 0,
-                  Data: []
-                };
+                   StatusCode: 500,
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: strMark,
+                   LogId: error.LogId,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
 
       }
 
@@ -931,28 +970,34 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async bulkCreate( model: typeof CustomModel,
-                           req: Request,
+                           request: Request,
                            attributesExclude: string[] = null,
                            intDefaultMaxRows: number = 200,
                            logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
 
-      if ( req.body.bulk && req.body.bulk.length > 0 ) {
+      const context = ( request as any ).context;
 
-        if ( req.body.bulk.length <= intDefaultMaxRows ) {
+      strLanguage = context.Language;
+
+      if ( request.body.bulk && request.body.bulk.length > 0 ) {
+
+        if ( request.body.bulk.length <= intDefaultMaxRows ) {
 
           const createdData = [];
           const warnings = [];
           const errors = [];
 
-          for ( let intIndex = 0; intIndex < req.body.bulk.length; intIndex++ ) {
+          for ( let intIndex = 0; intIndex < request.body.bulk.length; intIndex++ ) {
 
             try {
 
-              const bodyData = req.body.bulk[ intIndex ];
+              const bodyData = request.body.bulk[ intIndex ];
 
               delete bodyData[ "CreatedBy" ];
               delete bodyData[ "CreatedAt" ];
@@ -1012,7 +1057,7 @@ export class ModelToRestAPIServiceController extends BaseService {
               warnings.push(
                             {
                               Code: 'WARNING_CANNOT_CREATE_DATA',
-                              Message: `Cannot create the information at the index ${intIndex}`,
+                              Message: await I18NManager.translate( strLanguage, 'Cannot create the information at the index %s', intIndex ),
                               Details: { Index: intIndex }
                             }
                           );
@@ -1038,14 +1083,14 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_CREATE_BULK';
-            strMessage = 'Sucess created ALL information';
+            strMessage = await I18NManager.translate( strLanguage, 'Sucess created ALL information' );
 
           }
-          else if ( errors.length === req.body.bulk.length ) {
+          else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
             strCode = 'ERROR_CREATE_BULK';
-            strMessage = 'Cannot create ANY new information. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Cannot create ANY new information. Please check the errors and warnings section' );
             bIsError = true;
 
           }
@@ -1053,7 +1098,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 202
             strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = 'Not all information has been created. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been created. Please check the errors and warnings section' );
 
           }
 
@@ -1061,11 +1106,12 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
+                     Mark: '05C1A40B10F9',
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
                      Warnings: warnings,
-                     Count: req.body.bulk.length - errors.length,
+                     Count: request.body.bulk.length - errors.length,
                      Data: createdData
                    };
 
@@ -1075,13 +1121,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                     Mark: 'C8D2D8FD1BAE',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -1098,13 +1145,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with at less 1 element`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                     Mark: 'D56ECA63D091',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with at less 1 element`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
                                  Details: null
                                }
                              ],
@@ -1143,7 +1191,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1166,19 +1214,25 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async update( model: typeof CustomModel,
-                       req: Request,
+                       request: Request,
                        attributesExclude: string[] = null,
                        logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       let whereFnResult =  null;
 
       whereFnResult = this.formatWhereStr(
 
-        req.body && req.body.where ? req.body.where: {},
+        request.body && request.body.where ? request.body.where: {},
         logger
 
       );
@@ -1189,14 +1243,15 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: `Query parameter 'where' format error`,
+                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                   Mark: '69C56831D2F1',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
-                               Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -1220,13 +1275,13 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                       StatusCode: 404,
                       Code: 'ERROR_RECORD_NOT_FOUND',
-                      Message: 'Record not found',
+                      Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
                                   Code: 'ERROR_RECORD_NOT_FOUND',
-                                  Message: 'Record not found',
+                                  Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                                   Details: null
                                 }
                               ],
@@ -1238,7 +1293,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         }
         else {
 
-          const bodyData = req.body.data;
+          const bodyData = request.body.data;
 
           delete bodyData[ "CreatedBy" ];
           delete bodyData[ "CreatedAt" ];
@@ -1271,7 +1326,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 200,
                      Code: 'SUCCESS_UPDATE',
-                     Message: 'Sucess updated the information',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess updated the information' ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1312,7 +1367,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1335,24 +1390,30 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async bulkUpdate( model: typeof CustomModel,
-                           req: Request,
+                           request: Request,
                            attributesExclude: string[] = null,
                            intDefaultMaxRows: number = 200,
                            logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
 
-      if ( req.body.bulk && req.body.bulk.length > 0 ) {
+      const context = ( request as any ).context;
 
-        if ( req.body.bulk.length <= intDefaultMaxRows ) {
+      strLanguage = context.Language;
+
+      if ( request.body.bulk && request.body.bulk.length > 0 ) {
+
+        if ( request.body.bulk.length <= intDefaultMaxRows ) {
 
           const updatedData = [];
           const warnings = [];
           const errors = [];
 
-          for ( let intIndex = 0; intIndex < req.body.bulk.length; intIndex++ ) {
+          for ( let intIndex = 0; intIndex < request.body.bulk.length; intIndex++ ) {
 
             try {
 
@@ -1360,7 +1421,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               whereFnResult = this.formatWhereStr(
 
-                req.body.bulk[ intIndex ].where ? req.body.bulk[ intIndex ].where: {},
+                request.body.bulk[ intIndex ].where ? request.body.bulk[ intIndex ].where: {},
                 logger
 
               );
@@ -1371,7 +1432,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                 warnings.push(
                                {
                                  Code: 'WARNING_CANNOT_UPDATE_DATA',
-                                 Message: `Cannot update the information at the index ${intIndex}`,
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
                                  Details: { Index: intIndex }
                                }
                              );
@@ -1380,14 +1441,15 @@ export class ModelToRestAPIServiceController extends BaseService {
                              {
                                StatusCode: 400,
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Mark: '46EA0B6920D8',
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_WRONG_WHERE_FORMAT',
-                                           Message: `Query parameter 'where' format error`,
-                                           Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                                           Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                                           }
                                        ],
                                Warnings: [],
@@ -1412,7 +1474,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                   warnings.push(
                                 {
                                   Code: 'WARNING_CANNOT_UPDATE_DATA',
-                                  Message: `Cannot update the information at the index ${intIndex}`,
+                                  Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
                                   Details: { Index: intIndex }
                                 }
                               );
@@ -1421,13 +1483,13 @@ export class ModelToRestAPIServiceController extends BaseService {
                                {
                                  StatusCode: 404,
                                  Code: 'ERROR_RECORD_NOT_FOUND',
-                                 Message: 'Record not found',
+                                 Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
                                              Code: 'ERROR_RECORD_NOT_FOUND',
-                                             Message: 'Record not found',
+                                             Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                                              Details: null
                                            }
                                          ],
@@ -1440,7 +1502,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                 }
                 else {
 
-                  const bodyData = req.body.bulk[ intIndex ].data;
+                  const bodyData = request.body.bulk[ intIndex ].data;
 
                   delete bodyData[ "CreatedBy" ];
                   delete bodyData[ "CreatedAt" ];
@@ -1504,7 +1566,7 @@ export class ModelToRestAPIServiceController extends BaseService {
               warnings.push(
                              {
                                Code: 'WARNING_CANNOT_UPDATE_DATA',
-                               Message: `Cannot update the information at the index ${intIndex}`,
+                               Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
                                Details: { Index: intIndex }
                              }
                            );
@@ -1530,14 +1592,14 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_UPDATE_BULK';
-            strMessage = 'Sucess updated ALL information';
+            strMessage = await I18NManager.translate( strLanguage, 'Sucess updated ALL information' );
 
           }
-          else if ( errors.length === req.body.bulk.length ) {
+          else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
             strCode = 'ERROR_UPDATE_BULK';
-            strMessage = 'Cannot update ANY information. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Cannot update ANY information. Please check the errors and warnings section' );
             bIsError = true;
 
           }
@@ -1545,7 +1607,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 202
             strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = 'Not all information has been updated. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been updated. Please check the errors and warnings section' );
 
           }
 
@@ -1557,7 +1619,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      IsError: bIsError,
                      Errors: errors,
                      Warnings: warnings,
-                     Count: req.body.bulk.length - errors.length,
+                     Count: request.body.bulk.length - errors.length,
                      Data: updatedData
                    };
 
@@ -1567,13 +1629,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                     Mark: 'FFCD9E96FB0E',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -1590,13 +1653,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with at less 1 element`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                     Mark: '85D4A82588B9',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with at less 1 element`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
                                  Details: null
                                }
                              ],
@@ -1635,7 +1699,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1658,18 +1722,24 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async delete( model: typeof CustomModel,
-                       req: Request,
+                       request: Request,
                        logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
 
       let whereFnResult =  null;
 
       whereFnResult = this.formatWhereStr(
 
-        req.body && req.body.where ? req.body.where: {},
+        request.body && request.body.where ? request.body.where: {},
         logger
 
       );
@@ -1680,14 +1750,15 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 400,
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: `Query parameter 'where' format error`,
+                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                   Mark: '101C16C68A46',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
-                               Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -1711,13 +1782,13 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
             StatusCode: 404,
             Code: 'ERROR_RECORD_NOT_FOUND',
-            Message: 'Record not found',
+            Message: await I18NManager.translate( strLanguage, 'Record not found' ),
             LogId: null,
             IsError: true,
             Errors: [
               {
                 Code: 'ERROR_RECORD_NOT_FOUND',
-                Message: 'Record not found',
+                Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                 Details: null
               }
             ],
@@ -1734,7 +1805,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
             StatusCode: 200,
             Code: 'SUCCESS_DELETE',
-            Message: 'Sucess delete the information',
+            Message: await I18NManager.translate( strLanguage, 'Sucess delete the information' ),
             LogId: null,
             IsError: false,
             Errors: [],
@@ -1775,7 +1846,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1798,22 +1869,28 @@ export class ModelToRestAPIServiceController extends BaseService {
   }
 
   static async bulkDelete( model: typeof CustomModel,
-                           req: Request,
+                           request: Request,
                            intDefaultMaxRows: number = 200,
                            logger: any = null ): Promise<any> {
 
     let result = null;
 
+    let strLanguage = "";
+
     try {
 
-      if ( req.body.bulk && req.body.bulk.length > 0 ) {
+      const context = ( request as any ).context;
 
-        if ( req.body.bulk.length <= intDefaultMaxRows ) {
+      strLanguage = context.Language;
+
+      if ( request.body.bulk && request.body.bulk.length > 0 ) {
+
+        if ( request.body.bulk.length <= intDefaultMaxRows ) {
 
           const warnings = [];
           const errors = [];
 
-          for ( let intIndex = 0; intIndex < req.body.bulk.length; intIndex++ ) {
+          for ( let intIndex = 0; intIndex < request.body.bulk.length; intIndex++ ) {
 
             try {
 
@@ -1821,7 +1898,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               whereFnResult = this.formatWhereStr(
 
-                req.body.bulk[ intIndex ].where ? req.body.bulk[ intIndex ].where: {},
+                request.body.bulk[ intIndex ].where ? request.body.bulk[ intIndex ].where: {},
                 logger
 
               );
@@ -1832,7 +1909,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                 warnings.push(
                                {
                                  Code: 'WARNING_CANNOT_DELETE_DATA',
-                                 Message: `Cannot delete the information at the index ${intIndex}`,
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
                                  Details: { Index: intIndex }
                                }
                              );
@@ -1841,14 +1918,15 @@ export class ModelToRestAPIServiceController extends BaseService {
                              {
                                StatusCode: 400,
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: `Query parameter 'where' format error`,
+                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                               Mark: 'DF7908C22E32',
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_WRONG_WHERE_FORMAT',
-                                           Message: `Query parameter 'where' format error`,
-                                           Details: `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }`
+                                           Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
+                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
                                          }
                                        ],
                                Warnings: [],
@@ -1873,7 +1951,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                   warnings.push(
                                 {
                                   Code: 'WARNING_CANNOT_DELETE_DATA',
-                                  Message: `Cannot delete the information at the index ${intIndex}`,
+                                  Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
                                   Details: { Index: intIndex }
                                 }
                               );
@@ -1882,13 +1960,13 @@ export class ModelToRestAPIServiceController extends BaseService {
                                {
                                  StatusCode: 404,
                                  Code: 'ERROR_RECORD_NOT_FOUND',
-                                 Message: 'Record not found',
+                                 Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
                                              Code: 'ERROR_RECORD_NOT_FOUND',
-                                             Message: 'Record not found',
+                                             Message: await I18NManager.translate( strLanguage, 'Record not found' ),
                                              Details: null
                                            }
                                          ],
@@ -1935,7 +2013,7 @@ export class ModelToRestAPIServiceController extends BaseService {
               warnings.push(
                              {
                                Code: 'WARNING_CANNOT_DELETE_DATA',
-                               Message: `Cannot update the information at the index ${intIndex}`,
+                               Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
                                Details: { Index: intIndex }
                              }
                            );
@@ -1961,14 +2039,14 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_DELETE_BULK';
-            strMessage = 'Sucess deleted the ALL information';
+            strMessage = await I18NManager.translate( strLanguage, 'Sucess deleted the ALL information' );
 
           }
-          else if ( errors.length === req.body.bulk.length ) {
+          else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
             strCode = 'ERROR_DELETE_BULK';
-            strMessage = 'Cannot delete ANY information. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Cannot delete ANY information. Please check the errors and warnings section' );
             bIsError = true;
 
           }
@@ -1976,7 +2054,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 202
             strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = 'Not all information has been deleted. Please check the errors and warnings section';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been deleted. Please check the errors and warnings section' );
 
           }
 
@@ -1984,11 +2062,12 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
+                     Mark: 'D29E6A276E7E',
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
                      Warnings: warnings,
-                     Count: req.body.bulk.length - errors.length,
+                     Count: request.body.bulk.length - errors.length,
                      Data: []
                    };
 
@@ -1998,13 +2077,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                     Mark: 'EE06E3FE408C',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with maximun ${intDefaultMaxRows} elements`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -2021,13 +2101,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 400,
                      Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: `The field 'bulk' must be a array with at less 1 element`,
+                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                     Mark: '5736792DDB37',
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: `The field 'bulk' must be a array with at less 1 element`,
+                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
                                  Details: null
                                }
                              ],
@@ -2066,7 +2147,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

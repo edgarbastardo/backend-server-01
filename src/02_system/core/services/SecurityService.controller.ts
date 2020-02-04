@@ -18,6 +18,7 @@ import UserSessionStatusService from "../../common/database/services/UserSession
 import CacheManager from "../../common/managers/CacheManager";
 import UserService from "../../common/database/services/UserService";
 import CommonConstants from "../../common/CommonConstants";
+import I18NManager from "../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 
@@ -569,7 +570,8 @@ export default class SecurityServiceController {
 
   }
 
-  static async login( strTimeZoneId: string,
+  static async login( strLanguage: string,
+                      strTimeZoneId: string,
                       strSourceIPAddress: string,
                       strFrontendId: string,
                       strUserName: string,
@@ -909,7 +911,8 @@ export default class SecurityServiceController {
                                            300, //5 minutes in seconds
                                            logger );
 
-        const warnings = SystemUtilities.dectectUserWarnings( userDataResponse,
+        const warnings = SystemUtilities.dectectUserWarnings( strLanguage,
+                                                              userDataResponse,
                                                               logger );
 
         if ( userSessionStatus !== null ) {
@@ -917,7 +920,7 @@ export default class SecurityServiceController {
           result = {
                      StatusCode: 200,
                      Code: 'SUCCESS_LOGIN',
-                     Message: 'Sucess login',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess login' ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -941,13 +944,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_DISABLED',
-                   Message: 'Login failed (User disabled)',
+                   Message: await I18NManager.translate( strLanguage, 'Login failed (User disabled)' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_DISABLED',
-                               Message: `Login failed (User disabled)`,
+                               Message: await I18NManager.translate( strLanguage, 'Login failed (User disabled)' ),
                                Details: null
                              }
                            ],
@@ -962,13 +965,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_EXPIRED',
-                   Message: 'Login failed (User expired)',
+                   Message: await I18NManager.translate( strLanguage, 'Login failed (User expired)' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_EXPIRED',
-                               Message: `Login failed (User expired)`,
+                               Message: await I18NManager.translate( strLanguage, 'Login failed (User expired)' ),
                                Details: null
                              }
                            ],
@@ -983,13 +986,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_DISABLED',
-                   Message: 'Login failed (User group disabled)',
+                   Message: await I18NManager.translate( strLanguage, 'Login failed (User group disabled)' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: `Login failed (User group disabled)`,
+                               Message: await I18NManager.translate( strLanguage, 'Login failed (User group disabled)' ),
                                Details: null
                              }
                            ],
@@ -1004,13 +1007,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                   Message: 'Login failed (User group expired)',
+                   Message: await I18NManager.translate( strLanguage, 'Login failed (User group expired)' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: `Login failed (User group expired)`,
+                               Message: await I18NManager.translate( strLanguage, 'Login failed (User group expired)' ),
                                Details: null
                              }
                            ],
@@ -1025,13 +1028,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                   Message: 'Not allowed to login from this the kind of frontend',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to login from this the kind of frontend' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                               Message: `Not allowed to login from this the kind of frontend`,
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to login from this the kind of frontend' ),
                                Details: null
                              }
                            ],
@@ -1046,13 +1049,13 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_LOGIN_FAILED',
-                   Message: 'Login failed (Username and/or Password are invalid)',
+                   Message: await I18NManager.translate( strLanguage, 'Login failed (Username and/or Password are invalid)' ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_LOGIN_FAILED',
-                               Message: `Login failed (Username and/or Password are invalid)`,
+                               Message: await I18NManager.translate( strLanguage, 'Login failed (Username and/or Password are invalid)' ),
                                Details: null
                              }
                            ],
@@ -1099,7 +1102,7 @@ export default class SecurityServiceController {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1136,7 +1139,8 @@ export default class SecurityServiceController {
 
   }
 
-  static async logout( strToken: string,
+  static async logout( strLanguage: string,
+                       strToken: string,
                        transaction: any,
                        logger: any ): Promise<any> {
 
@@ -1145,6 +1149,7 @@ export default class SecurityServiceController {
     let currentTransaction = transaction;
 
     let bApplyTansaction = false;
+
 
     try {
 
@@ -1211,7 +1216,7 @@ export default class SecurityServiceController {
               result = {
                          StatusCode: 200,
                          Code: 'SUCCESS_LOGOUT',
-                         Message: 'Sucess logout',
+                         Message: await I18NManager.translate( strLanguage, 'Sucess logout' ),
                          LogId: null,
                          IsError: false,
                          Errors: [],
@@ -1250,14 +1255,14 @@ export default class SecurityServiceController {
             result = {
                         StatusCode: 500,
                         Code: 'ERROR_LOGOUT_FAILED',
-                        Message: `Cannot complete the logout`,
+                        Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
                         Mark: strMark,
                         LogId: error.LogId,
                         IsError: true,
                         Errors: [
                                   {
                                     Code: 'ERROR_LOGOUT_FAILED',
-                                    Message: `Cannot complete the logout`,
+                                    Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
                                     Details: await SystemUtilities.processErrorDetails( error ) //error
                                   }
                                 ],
@@ -1274,13 +1279,14 @@ export default class SecurityServiceController {
           result = {
                       StatusCode: 400, //Bad request
                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                      Message: `Authorization token provided is persistent. You cannot made logout`,
+                      Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made logout' ),
+                      Mark: '2EA2C0E7ACEF',
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
                                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                  Message: `Authorization token provided is persistent. You cannot made logout`,
+                                  Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made logout' ),
                                   Details: null
                                 }
                               ],
@@ -1297,13 +1303,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                   Message: `Authorization token provided is invalid`,
+                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
+                   Mark: '3EF6C35B0645',
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                               Message: `Authorization token provided is invalid`,
+                               Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
                                Details: null
                              }
                            ],
@@ -1350,7 +1357,7 @@ export default class SecurityServiceController {
       result = {
                  StatusCode: 500,
                  Code: 'ERROR_UNEXPECTED',
-                 Message: 'Unexpected error. Please read the server log for more details.',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1387,14 +1394,15 @@ export default class SecurityServiceController {
 
   }
 
-  static async tokenCheck( strToken: string,
+  static async tokenCheck( strLanguage: string,
+                           strToken: string,
                            transaction: any,
                            logger: any ): Promise<any> {
 
     const result = {
                      StatusCode: 200,
                      Code: 'SUCCESS_TOKEN_IS_VALID',
-                     Message: 'The token is valid',
+                     Message: await I18NManager.translate( strLanguage, 'The token is valid' ),
                      LogId: null,
                      IsError: false,
                      Errors: [],

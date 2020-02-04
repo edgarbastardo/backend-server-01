@@ -154,7 +154,9 @@ export default class DatabaseModelController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -179,13 +181,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: `Unknown model name ${strModelName}`,
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -226,7 +228,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -257,7 +259,9 @@ export default class DatabaseModelController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -285,13 +289,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: `Unknown model name ${strModelName}`,
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -332,7 +336,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -363,7 +367,9 @@ export default class DatabaseModelController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -389,13 +395,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unknown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -436,7 +442,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -467,7 +473,9 @@ export default class DatabaseModelController {
                    ], //Midddlewares
                    async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -492,13 +500,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unkown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -539,7 +547,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -570,7 +578,9 @@ export default class DatabaseModelController {
                    ], //Midddlewares
                    async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -598,13 +608,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: `Unknown model name ${strModelName}`,
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -645,7 +655,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -676,7 +686,9 @@ export default class DatabaseModelController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -701,13 +713,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unknown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -748,7 +760,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -779,7 +791,9 @@ export default class DatabaseModelController {
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -805,13 +819,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unknown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -852,7 +866,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -883,7 +897,9 @@ export default class DatabaseModelController {
                      ], //Midddlewares
                      async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -907,13 +923,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unknown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -954,7 +970,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -985,7 +1001,9 @@ export default class DatabaseModelController {
                      ], //Midddlewares
                      async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let strLanguage = request.header( "language" );
+        const context = (request as any).context;
+
+        let strLanguage = context ? context.Language : null;
 
         try {
 
@@ -1010,13 +1028,13 @@ export default class DatabaseModelController {
             const result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: `Unknown model name ${strModelName}`,
+                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -1057,7 +1075,7 @@ export default class DatabaseModelController {
           const result = {
                            StatusCode: 500,
                            Code: 'ERROR_UNEXPECTED',
-                           Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,

@@ -191,7 +191,7 @@ export default class BinaryController {
           const resultHeaders = {
                                   StatusCode: 500,
                                   Code: 'ERROR_UNEXPECTED',
-                                  Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                   Mark: strMark,
                                   LogId: error.LogId,
                                   IsError: true,
@@ -289,7 +289,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -354,7 +354,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -519,7 +519,7 @@ export default class BinaryController {
       const result = {
                        StatusCode: 500,
                        Code: 'ERROR_UNEXPECTED',
-                       Message: I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,

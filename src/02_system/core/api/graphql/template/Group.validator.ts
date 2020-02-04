@@ -1,6 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
 import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from '../../../../common/SystemUtilities';
+import I18NManager from '../../../../common/managers/I18Manager';
 //import { extensions } from 'sequelize/types/lib/utils/validator-extras';
 
 export const validators = {
@@ -9,26 +10,44 @@ export const validators = {
 
     getGroup: ( resolve: any, obj: any, args: any, context: any ) => {
 
+      const strLanguage = context.Language;
+
       const { Id } = args;
 
       const errors = [];
 
       if ( CommonUtilities.isNullOrEmpty( Id ) ) {
 
-        errors.push( { Code: "ERROR_BAD_USER_INPUT", Message: "The Id parameter value cannot be empty", Details: { Field: "Id" } } );
+        errors.push(
+                     {
+                       Code: "ERROR_BAD_USER_INPUT",
+                       Message: I18NManager.translateSync( strLanguage, "The Id parameter value cannot be empty" ),
+                       Details: { Field: "Id" }
+                     }
+                   );
 
       }
 
       /*
       if ( CommonUtilities.isNotNullOrEmpty( TimeZoneId ) ) {
 
-        errors.push( { Code: -1002, Description: "The TimeZoneId param cannot be empty" } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, "The TimeZoneId param cannot be empty" )
+                      }
+                    );
 
       }
       elseif ( CommonUtilities.isNotNullOrEmpty( TimeZoneId ) &&
                CommonUtilities.isValidTimeZone( TimeZoneId ) === false ) {
 
-        errors.push( { Code: -1002, Description: `The TimeZoneId parameter value [${TimeZoneId}] is invalid` } );
+        errors.push(
+                     {
+                       Code: -1002,
+                       Description: I18NManager.translateSync( strLanguage, `The TimeZoneId parameter value [${TimeZoneId}] is invalid` )
+                     }
+                   );
 
       }
       */
@@ -37,7 +56,10 @@ export const validators = {
 
       if ( errors.length > 0 ) {
 
-        const userInputError = new UserInputError( 'Invalid user input parameter values', extensions );
+        const userInputError = new UserInputError(
+                                                   I18NManager.translateSync( strLanguage, 'Invalid user input parameter values' ),
+                                                   extensions
+                                                 );
 
         //userInputerror.logId = SystemUtilities.getUUIDv4();
 
