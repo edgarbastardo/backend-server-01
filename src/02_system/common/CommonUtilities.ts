@@ -850,4 +850,245 @@ export default class CommonUtilities {
 
   }
 
+  public static isValidPhoneNumber( strPhone: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const matchResult = strPhone.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g );
+
+      bResult = matchResult && matchResult.length === 1;
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public static isValidPhoneNumberList( strPhoneList: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const valueList = strPhoneList ? strPhoneList.split( "," ): [];
+
+      for ( let strCurrentValue of valueList ) {
+
+        const matchResult = strCurrentValue.trim().match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); ///^\d{3}-\d{3}-\d{4}$/g );
+
+        bResult = matchResult && matchResult.length === 1;
+
+        if ( bResult === false ) {
+
+          break;
+
+        }
+
+      };
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public static isValidEMail( strEMail: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const matchResult = strEMail.match( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g );
+
+      bResult = matchResult && matchResult.length === 1;
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public static isValidEMailList( strEMailList: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const valueList = strEMailList ? strEMailList.split( "," ): [];
+
+      for ( let strCurrentValue of valueList ) {
+
+        const matchResult = strCurrentValue.trim().match( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g );
+
+        bResult = matchResult && matchResult.length === 1;
+
+        if ( bResult === false ) {
+
+          break;
+
+        }
+
+      };
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public static normalizeWhitespaces( strValue: string ): string {
+
+    // Replace all whitespace blocks with single spaces.
+    return strValue != null ? strValue.trim().replace( / +/g, " " ) : "";
+
+  }
+
+  public static maskEMailList( strEMail: string ): string {
+
+    let strResult = "";
+
+    if ( strEMail ) {
+
+      const emailList = strEMail.split( "," );
+
+      for ( let intIndex = 0; intIndex < emailList.length; intIndex++ ) {
+
+          let strCurrentEmail = emailList[ intIndex ].trim();
+
+          if ( strCurrentEmail != null && strCurrentEmail.includes( " " ) ) {
+
+            strCurrentEmail = this.normalizeWhitespaces( strCurrentEmail ).split( " " )[ 0 ]; //Asumme the format "sirlordt@gmail.com Name"
+
+          }
+
+          if ( this.isValidEMail( strCurrentEmail ) ) {
+
+            strResult = strResult + ", " + strCurrentEmail.replace( /(?<=.{3}).(?=[^@]*?.@)/g, "*" );
+
+          }
+
+      }
+
+      strResult = strResult.substring( 2 );
+
+    }
+
+    return strResult;
+
+  }
+
+  public static replaceRange( strExpression: string,
+                              intStart: number,
+                              intEnd: number,
+                              strSubstitute: string ): string {
+
+    return strExpression.substring( 0, intStart ) +
+           strSubstitute +
+           strExpression.substring( intEnd );
+
+  }
+
+  public static maskPhoneList( strPhone: string ): string {
+
+    let strResult = "";
+
+    if ( strPhone ) {
+
+      const phoneList = strPhone.split( "," );
+
+      for ( let intIndex = 0; intIndex < phoneList.length; intIndex++ ) {
+
+          let strCurrentPhone = phoneList[ intIndex ].trim();
+
+          if ( strCurrentPhone != null && strCurrentPhone.includes( " " ) ) {
+
+            strCurrentPhone = this.normalizeWhitespaces( strCurrentPhone ).split( " " )[ 0 ]; //Asumme the format "sirlordt@gmail.com Name"
+
+          }
+
+          if ( this.isValidPhoneNumber( strCurrentPhone ) ) {
+
+            strResult = strResult + ", " + this.replaceRange( strCurrentPhone,
+                                                              5,
+                                                              strCurrentPhone.length - 2,
+                                                              "*".repeat( strCurrentPhone.length - 7 ) );
+
+          }
+
+      }
+
+      strResult = strResult.substring( 2 );
+
+    }
+
+    return strResult;
+
+  }
+
+  /*
+
+  public static String maskPhones( final String strPhone ) {
+
+      String strResult = "";
+
+      if ( isNotNullAndEmpty( strPhone ) ) {
+
+          final String[] phones = strPhone.split( "," );
+
+          for ( int intIndex = 0; intIndex < phones.length; intIndex++ ) {
+
+              final StringBuilder strCurrentPhone = new StringBuilder( phones[ intIndex ].trim() );
+
+              if ( strCurrentPhone.length() >= 7 ) {
+
+                  final char[] chars = new char[ strCurrentPhone.length() - 6 ];
+
+                  Arrays.fill( chars, '*' );
+
+                  strCurrentPhone.replace( 4, strCurrentPhone.length() - 2, new String( chars ) );
+
+                  strResult = strResult + ", " + strCurrentPhone.toString();  //replaceAll( "(?<=.{3}).(?=[^@]*?.@)", "*" );
+
+              }
+              else {
+
+                  strResult = strResult + ", " + strCurrentPhone;
+
+              }
+
+          }
+
+          strResult = strResult.substring( 2 );
+
+      }
+
+      return strResult;
+
+  }
+
+  
+  */
+
 }

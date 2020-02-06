@@ -164,26 +164,27 @@ CREATE TABLE IF NOT EXISTS `User` (
   CONSTRAINT `FK_User_PersonId_From_Person_Id` FOREIGN KEY (`PersonId`) REFERENCES `Person` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all Users.';
 
-CREATE TABLE IF NOT EXISTS `UserRecover` (
-  `Id` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
-  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of User table.',
-  `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Recover token',
+CREATE TABLE IF NOT EXISTS `ActionToken` (
+  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
+  `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Kind of token example: recover_password, change_email, change_phone',
+  `Owner` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Owner of token, generally user id',
+  `Token` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Recover token',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this user recover token',
+  `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this token',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  KEY `FK_RecoverToken_UserId_idx` (`UserId`),
-  CONSTRAINT `FK_RecoverToken_UserId_From_User_Id` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the recover token created by system/security/sendRecoverToken service, expire on 30 min atfer createdAt date/time';
+  KEY `ActionToken_Token_idx` (`Owner`),
+  UNIQUE KEY `UNQ_ActionToken_Token_idx` (`Token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the action token created by diferent routes, like /password/recover/token/send, /email/change/token/send, /phone/change/token/send';
 
 CREATE TABLE IF NOT EXISTS `UserSignup` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Depend of type of user to activate',
   `FrontendId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frontend id code, to help to identify the frontend. Example: web-reactjs-???? or mobile-ionic5-driver-???',
   `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Activation token',
-  `Status` smallint(6) NOT NULL COMMENT '0 = Waiting activation\n25 = Manual activation\n50 = Activated',
+  `Status` smallint(6) NOT NULL COMMENT '1 = Waiting activation\n25 = Manual activation\n50 = Activated',
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name (username).',
   `FirstName` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
   `LastName` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
@@ -246,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `UserSessionStatus` (
 CREATE TABLE IF NOT EXISTS `UserSessionPersistent` (
   `Id` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of User table. Partially identifies the restriction to which the user belongs.',
-  `Token` varchar(175) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Clear or crypted authentication token. Must by start with p.',
+  `Token` varchar(175) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Clear or crypted authentication token. Must by start with p:',
   `BinaryDataToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Binary token, used in get petition pass to url, in binary data',
   `SocketToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Web socket authentication token, pass on connect event to websocket server',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
@@ -261,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `UserSessionPersistent` (
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   KEY `FK_SessionPersistent_UserId_idx` (`UserId`),
-  UNIQUE KEY `FK_SessionPersistent_Token_idx` (`Token`),
+  UNIQUE KEY `UNQ_SessionPersistent_Token_idx` (`Token`),
   CONSTRAINT `FK_SessionPersistent_UserId_From_User_Id` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the persistent user session for access with only session token and not with username/password';
 

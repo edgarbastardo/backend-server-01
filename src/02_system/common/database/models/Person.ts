@@ -10,8 +10,10 @@ import { BuildOptions } from "sequelize/types";
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
 import CommonUtilities from "../../CommonUtilities";
-//import moment from "moment-timezone";
 import SystemUtilities from "../../SystemUtilities";
+import CommonConstants from "../../CommonConstants";
+
+const debug = require( 'debug' )( 'Person' );
 
 @Table( {
   timestamps: false,
@@ -21,22 +23,6 @@ export class Person extends Model<Person> {
   constructor( values?: any, options?: BuildOptions ) {
 
     super( values, options );
-
-    if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
-
-      if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
-
-        this.Id = SystemUtilities.getUUIDv4();
-
-      }
-
-      if ( CommonUtilities.isNullOrEmpty( values.ShortId ) ) {
-
-        this.ShortId = SystemUtilities.hashString( this.id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
-
-      }
-
-    }
 
   }
 
@@ -104,28 +90,74 @@ export class Person extends Model<Person> {
   @BeforeValidate
   static beforeValidateHook( instance: Person, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
+
+  static async convertFieldValues( params: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      result = params.Data;
+
+      if ( params.TimeZoneId ) {
+
+        const strTimeZoneId = params.TimeZoneId;
+
+        result = SystemUtilities.transformObjectToTimeZone( params.Data,
+                                                            strTimeZoneId,
+                                                            params.Logger );
+
+        if ( Array.isArray( params.Include ) ) {
+
+          for ( const modelIncluded of params.Include ) {
+
+            if ( modelIncluded.model &&
+                 result[ modelIncluded.model.name ] ) {
+
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues,
+                                                                                              strTimeZoneId,
+                                                                                              params.Logger );
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.convertFieldValues.name;
+
+      const strMark = "98805E57AE91";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( params.logger &&
+           typeof params.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        params.logger.error( error );
+
+      }
 
     }
 
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ) {
-
-      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
-
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-    else {
-
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
+    return result;
 
   }
 

@@ -42,8 +42,15 @@ export default class UserController {
                                   //{ Path: AuthenticationController._BASE_PATH + "/signup/google", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using google account" },
                                   //{ Path: AuthenticationController._BASE_PATH + "/signup/facebook", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using facebook account" },
                                   { Path: UserController._BASE_PATH + "/signup/activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
-                                  { Path: UserController._BASE_PATH + "/password/recover/token/send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password token to registered user email" },
-                                  { Path: UserController._BASE_PATH + "/password/recover/set", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the recover token" }
+                                  { Path: UserController._BASE_PATH + "/password/recover/code/send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
+                                  { Path: UserController._BASE_PATH + "/password/recover", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the password recover code" },
+                                  { Path: UserController._BASE_PATH + "/password/change", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the password to user using the current password" },
+                                  { Path: UserController._BASE_PATH + "/email/change/token/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change email token to the current user email or phone" },
+                                  { Path: UserController._BASE_PATH + "/email/change", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change email to the current user using the token" },
+                                  { Path: UserController._BASE_PATH + "/phone/change/token/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change phone token to the current user email or phone" },
+                                  { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the token" },
+                                  { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
+                                  { Path: UserController._BASE_PATH + "/profile/change", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
                                 ]
 
   _controllerLogger = null;
@@ -129,20 +136,16 @@ export default class UserController {
   }
 
   @httpPost(
-             "/password/recover/token/send",
+             "/password/recover/code/send",
              SystemUtilities.middlewareSetContext
            )
-  async passwordRecoverTokenSend( request: Request, response: Response ) {
+  async passwordRecoverCodeSend( request: Request, response: Response ) {
 
-    const context = ( request as any ).context;
-
-    /*
-    const result = await SecurityService.tokenCheck( context.Authorization,
-                                                     null,
-                                                     context.Logger );
+    const result = await UserServiceController.passwordRecoverCodeSend( request,
+                                                                         null,
+                                                                         this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
-    */
 
   }
 

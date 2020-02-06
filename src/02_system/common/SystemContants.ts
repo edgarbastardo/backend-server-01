@@ -683,180 +683,171 @@ export default class SystemConstants {
                                                  ExtraData: `{ "Type": "struct/json", "Schema": "" }`
                                                };
 
-  /*
-    {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "type": "object",
-      "additionalProperties":false,
-      "required": [ "@__default__@" ],
-      "patternProperties": {
-        "@__default__@": {
-          "$ref": "#/definitions/validatonObjectDef"
-        },
-        "#.*#": {
-          "$ref": "#/definitions/validatonObjectDef"
-        }
-      },
-      "definitions": {
-        "validatonObjectDef": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [ "userLoginControl", "userSignupControl", "tag", "url", "route" ],
-          "properties": {
-            "userLoginControl": {
-              "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
-              "optional":false
-            },
-            "userSignupControl": {
-              "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
-              "optional":false
-            },
-            "tag": {
-              "type": "string",
-              "optional":false
-            },
-            "url": {
-              "type": "string",
-              "optional":false
-            },
-            "route": {
-              "$ref": "#/definitions/validatonObjectDefExcludeInclude",
-              "optional":false
-            }
-          }
-        },
-        "validatonObjectDefDeniedAllowed": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [ "denied", "allowed" ],
-          "properties": {
-            "denied": {
-              "type": "string",
-              "optional":false
-            },
-            "allowed": {
-              "type": "string",
-              "optional":false
-            }
-          }
-        },
-        "validatonObjectDefExcludeInclude": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [ "exclude", "include" ],
-          "properties": {
-            "exclude": {
-              "type": "array",
-              "optional":false,
-              "items": {
-                "type": "string"
-              }
-            },
-            "include": {
-              "type": "array",
-              "optional":false,
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    }
-  */
+  static readonly _CONFIG_ENTRY_Frontend_Rules_SCHEMA = JSON.stringify(
+                                                                        {
+                                                                          "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                          "type": "object",
+                                                                          "additionalProperties":false,
+                                                                          "required": [ "@__default__@" ],
+                                                                          "patternProperties": {
+                                                                            "@__default__@": {
+                                                                              "$ref": "#/definitions/validatonObjectDef"
+                                                                            },
+                                                                            "#.*#": {
+                                                                              "$ref": "#/definitions/validatonObjectDef"
+                                                                            }
+                                                                          },
+                                                                          "definitions": {
+                                                                            "validatonObjectDef": {
+                                                                              "type": "object",
+                                                                              "additionalProperties": false,
+                                                                              "required": [ "userLoginControl", "userSignupControl", "tag", "url", "route" ],
+                                                                              "properties": {
+                                                                                "userLoginControl": {
+                                                                                  "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "userSignupControl": {
+                                                                                  "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "userRecoverPasswordControl": {
+                                                                                  "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "tag": {
+                                                                                  "type": "string",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "url": {
+                                                                                  "type": "string",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "route": {
+                                                                                  "$ref": "#/definitions/validatonObjectDefExcludeInclude",
+                                                                                  "optional":false
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "validatonObjectDefDeniedAllowed": {
+                                                                              "type": "object",
+                                                                              "additionalProperties": false,
+                                                                              "required": [ "denied", "allowed" ],
+                                                                              "properties": {
+                                                                                "denied": {
+                                                                                  "type": "string",
+                                                                                  "optional":false
+                                                                                },
+                                                                                "allowed": {
+                                                                                  "type": "string",
+                                                                                  "optional":false
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "validatonObjectDefExcludeInclude": {
+                                                                              "type": "object",
+                                                                              "additionalProperties": false,
+                                                                              "required": [ "exclude", "include" ],
+                                                                              "properties": {
+                                                                                "exclude": {
+                                                                                  "type": "array",
+                                                                                  "optional":false,
+                                                                                  "items": {
+                                                                                    "type": "string"
+                                                                                  }
+                                                                                },
+                                                                                "include": {
+                                                                                  "type": "array",
+                                                                                  "optional":false,
+                                                                                  "items": {
+                                                                                    "type": "string"
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      );
 
-  static _SCHEMA_VALIDATION_Frontend_Rules = `{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","additionalProperties":false,` +
-                                             `"required":["@__default__@"],"patternProperties":{"@__default__@":{"$ref":"#/definitions/validatonObjectDef"}` +
-                                             `,"#.*#":{"$ref":"#/definitions/validatonObjectDef"}},"definitions":{"validatonObjectDef":{"type":"object",` +
-                                             `"additionalProperties":false,"required":["userLoginControl","userSignupControl","tag","url","route"],"properties":` +
-                                             `{"userLoginControl":{"$ref":"#/definitions/validatonObjectDefDeniedAllowed","optional":false},"userSignupControl":` +
-                                             `{"$ref":"#/definitions/validatonObjectDefDeniedAllowed","optional":false},"tag":{"type":"string","optional":false},` +
-                                             `"url":{"type":"string","optional":false},"route":{"$ref":"#/definitions/validatonObjectDefExcludeInclude","optional":` +
-                                             `false}}},"validatonObjectDefDeniedAllowed":{"type":"object","additionalProperties":false,"required":["denied","allowed"],` +
-                                             `"properties":{"denied":{"type":"string","optional":false},"allowed":{"type":"string","optional":false}}},` +
-                                             `"validatonObjectDefExcludeInclude":{"type":"object","additionalProperties":false,"required":["exclude","include"],` +
-                                             `"properties":{"exclude":{"type":"array","optional":false,"items":{"type":"string"}},"include":{"type":"array","optional"` +
-                                             `:false,"items":{"type":"string"}}}}}}`;
-
-  /*
-    {
-      "#mobile-ionic4-sales-???#": {
-        "userLoginControl": {
-          "denied": "",
-          "allowed": "#Final_Customers_01#,#Administrator#"
-        },
-        "userSignupControl": {
-          "denied": "",
-          "allowed": "#finalCustomer#"
-        },
-        "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
-        "url": "http://mycompany.com/myapp/url/",
-        "route": {
-          "exclude": [
-            "/my/service/",
-            "/my/service2/"
-          ],
-          "include": []
-        }
-      },
-      "#web-reactjs-establisment-???#": {
-        "userLoginControl": {
-          "denied": "",
-          "allowed": "#Establishment#,#Administrator#"
-        },
-        "userSignupControl": {
-          "denied": "",
-          "allowed": "#establishment#"
-        },
-        "tag": "#web#,#web_desktop#",
-        "url": "http://mycompany.com/myapp/url/",
-        "route": {
-          "exclude": [
-            "/my/service/",
-            "/my/service2/"
-          ],
-          "include": []
-        }
-      },
-      "#web-reactjs-delivery-???#": {
-        "userLoginControl": {
-          "denied": "",
-          "allowed": "#Dispachers#,#Administrator#"
-        },
-        "userSignupControl": {
-          "denied": "*",
-          "allowed": ""
-        },
-        "tag": "#web#,#web_desktop#",
-        "url": "http://mycompany.com/myapp/url/",
-        "route": {
-          "exclude": [
-            "/my/service/",
-            "/my/service2/"
-          ],
-          "include": []
-        }
-      },
-      "@__default__@": {
-        "userLoginControl": {
-          "denied": "",
-          "allowed": "*"
-        },
-        "userSignupControl": {
-          "denied": "",
-          "allowed": "*"
-        },
-        "tag": "#web#,#mobile#,#phone#,#tablet#",
-        "url": "http://mycompany.com/myapp/url/",
-        "route": {
-          "exclude": [
-            "*"
-          ],
-          "include": []
-        }
-      }
-    }
-  */
+    static readonly _CONFIG_ENTRY_Frontend_Rules_EXAMPLE = JSON.stringify(
+                                                                           {
+                                                                              "#mobile-ionic4-sales-???#": {
+                                                                                "userLoginControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "#Final_Customers_01#,#Administrator#"
+                                                                                },
+                                                                                "userSignupControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "#finalCustomer#"
+                                                                                },
+                                                                                "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
+                                                                                "url": "http://mycompany.com/myapp/url/",
+                                                                                "route": {
+                                                                                  "exclude": [
+                                                                                    "/my/service/",
+                                                                                    "/my/service2/"
+                                                                                  ],
+                                                                                  "include": []
+                                                                                }
+                                                                              },
+                                                                              "#web-reactjs-establisment-???#": {
+                                                                                "userLoginControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "#Establishment#,#Administrator#"
+                                                                                },
+                                                                                "userSignupControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "#establishment#"
+                                                                                },
+                                                                                "tag": "#web#,#web_desktop#",
+                                                                                "url": "http://mycompany.com/myapp/url/",
+                                                                                "route": {
+                                                                                  "exclude": [
+                                                                                    "/my/service/",
+                                                                                    "/my/service2/"
+                                                                                  ],
+                                                                                  "include": []
+                                                                                }
+                                                                              },
+                                                                              "#web-reactjs-delivery-???#": {
+                                                                                "userLoginControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "#Dispachers#,#Administrator#"
+                                                                                },
+                                                                                "userSignupControl": {
+                                                                                  "denied": "*",
+                                                                                  "allowed": ""
+                                                                                },
+                                                                                "tag": "#web#,#web_desktop#",
+                                                                                "url": "http://mycompany.com/myapp/url/",
+                                                                                "route": {
+                                                                                  "exclude": [
+                                                                                    "/my/service/",
+                                                                                    "/my/service2/"
+                                                                                  ],
+                                                                                  "include": []
+                                                                                }
+                                                                              },
+                                                                              "@__default__@": {
+                                                                                "userLoginControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "*"
+                                                                                },
+                                                                                "userSignupControl": {
+                                                                                  "denied": "",
+                                                                                  "allowed": "*"
+                                                                                },
+                                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                                "url": "http://mycompany.com/myapp/url/",
+                                                                                "route": {
+                                                                                  "exclude": [
+                                                                                    "*"
+                                                                                  ],
+                                                                                  "include": []
+                                                                                }
+                                                                              }
+                                                                           }
+                                                                         );
 
   static readonly _CONFIG_ENTRY_Frontend_Rules = {
                                                    Id: "70835d21-afdd-4f5b-9a56-61762ba55013",
@@ -864,14 +855,14 @@ export default class SystemConstants {
                                                    Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                    Category: "Frontend Rules",
                                                    Name: "system.frontend.rules",
-                                                   Default: `{ "@__default__@": { "userLoginControl": { "denied": "", "allowed": "*" }, "userSignupControl": { "denied": "", "allowed": "*" }, "tag": "#web#,#mobile#,#phone#,#tablet#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "*" ], "include": [] } } }`,
+                                                   Default: `{ "@__default__@": { "userLoginControl": { "denied": "", "allowed": "*" }, "userSignupControl": { "denied": "", "allowed": "*" }, "userRecoverPasswordControl": { "denied": "", "allowed": "*" }, "tag": "#web#,#mobile#,#phone#,#tablet#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "*" ], "include": [] } } }`,
                                                    Label: "Configuration for different frontend clients id rules",
                                                    Description: "Configuration for different frontend clients id rules",
                                                    AllowTagAccessR: "#Administrator#",
                                                    AllowTagAccessW: "#Administrator#",
-                                                   Example: `{ "#mobile-ionic4-sales-???#": { "userLoginControl": { "denied": "", "allowed": "#Final_Customers_01#,#Administrator#" }, "userSignupControl": { "denied": "", "allowed": "#finalCustomer#" }, "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "/my/service/", "/my/service2/" ], "include": [] } }, "#web-reactjs-establisment-???#": { "userLoginControl": { "denied": "", "allowed": "#Establishment#,#Administrator#" }, "userSignupControl": { "denied":"", "allowed": "#establishment#" }, "tag": "#web#,#web_desktop#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "/my/service/", "/my/service2/" ], "include": [] } }, "#web-reactjs-delivery-???#": { "userLoginControl": { "denied": "", "allowed": "#Dispachers#,#Administrator#" }, "userSignupControl": { "denied": "*", "allowed": "" }, "tag": "#web#,#web_desktop#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "/my/service/", "/my/service2/" ], "include": [] } }, "@__default__@": { "userLoginControl": { "denied": "", "allowed": "*" }, "userSignupControl": { "denied": "", "allowed": "*" }, "tag": "#web#,#mobile#,#phone#,#tablet#", "url": "http://mycompany.com/myapp/url/", "route": { "exclude": [ "*" ], "include": [] } } }`,
+                                                   Example: SystemConstants._CONFIG_ENTRY_Frontend_Rules_EXAMPLE,
                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                   ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._SCHEMA_VALIDATION_Frontend_Rules}" }`
+                                                   ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_Frontend_Rules_SCHEMA}" }`
                                                  };
 
   static readonly _CONFIG_ENTRY_General_Default_Information = {

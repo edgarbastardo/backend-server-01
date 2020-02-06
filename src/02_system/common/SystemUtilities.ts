@@ -2264,6 +2264,13 @@ export default class SystemUtilities {
 
     try {
 
+      if ( instance.rawAttributes[ "Id" ] !== null &&
+           !instance.Id ) {
+
+        instance.Id = SystemUtilities.getUUIDv4();
+
+      }
+
       if ( instance.rawAttributes[ "ShortId" ] !== null &&
            instance.rawAttributes[ "Id" ] !== null &&
            ( !instance.ShortId ||
@@ -2565,11 +2572,11 @@ export default class SystemUtilities {
 
                             let bResult: boolean;
 
-                            const valueList = value ? value.split( "," ) : [];
+                            const valueList = value ? value.split( "," ): [];
 
-                            for ( let currentValue of valueList ) {
+                            for ( let strCurrentValue of valueList ) {
 
-                              const matchResult = currentValue.trim().match( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g );
+                              const matchResult = strCurrentValue.trim().match( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g );
 
                               bResult = matchResult && matchResult.length === 1;
 
@@ -2603,11 +2610,11 @@ export default class SystemUtilities {
 
                             let bResult: boolean;
 
-                            const valueList = value ? value.split( "," ) : [];
+                            const valueList = value ? value.split( "," ): [];
 
-                            for ( let currentValue of valueList ) {
+                            for ( let strCurrentValue of valueList ) {
 
-                              const matchResult = currentValue.trim().match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); ///^\d{3}-\d{3}-\d{4}$/g );
+                              const matchResult = strCurrentValue.trim().match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); ///^\d{3}-\d{3}-\d{4}$/g );
 
                               bResult = matchResult && matchResult.length === 1;
 

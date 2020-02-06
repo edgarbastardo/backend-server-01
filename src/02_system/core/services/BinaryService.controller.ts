@@ -988,7 +988,8 @@ export default class BinaryServiceController extends BaseService {
 
                     debugMark( "Put binary data file in folder [%s]", strFullPath );
 
-                    if ( logger && typeof logger.info === "function" ) {
+                    if ( logger &&
+                         typeof logger.info === "function" ) {
 
                       logger.info( "Put binary data file in folder [%s]", strFullPath );
 

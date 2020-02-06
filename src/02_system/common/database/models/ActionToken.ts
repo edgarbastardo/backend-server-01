@@ -5,22 +5,23 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
-         //BeforeUpdate,
-         //AfterUpdate,
+         //HasOne,
+         //ForeignKey,
+         //BelongsTo,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
+import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import CommonConstants from "../../CommonConstants";
-
-const debug = require( 'debug' )( 'UserGroup' );
+const debug = require( 'debug' )( 'ActionToken' );
 
 @Table( {
   timestamps: false,
 } )
-export class UserGroup extends Model<UserGroup> {
+export class ActionToken extends Model<ActionToken> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -32,53 +33,32 @@ export class UserGroup extends Model<UserGroup> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @Column( { type: DataType.STRING( 20 ), unique: true } )
-  ShortId: string;
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
+  Kind: string;
 
-  @Column( { type: DataType.STRING( 75 ), unique: true } )
-  Name: string;
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  Owner: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
-  Role: string;
-
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  DenyTagAccess: string;
-
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  AllowTagAccess: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  ExpireAt: string;
-
-  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
-  Tag: string;
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  Token: string;
 
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  UpdatedBy: string;
-
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  UpdatedAt: string;
-
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  DisabledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
+  ExpireAt: string;
 
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: UserGroup, options: any ): void {
+  static beforeValidateHook( instance: ActionToken, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
@@ -99,6 +79,11 @@ export class UserGroup extends Model<UserGroup> {
         result = SystemUtilities.transformObjectToTimeZone( params.Data,
                                                             strTimeZoneId,
                                                             params.Logger );
+
+        result.PasswordSetAt = SystemUtilities.transformToTimeZone( result.PassswordSetAt,
+                                                                    strTimeZoneId,
+                                                                    undefined,
+                                                                    params.logger );
 
         if ( Array.isArray( params.Include ) ) {
 
@@ -126,7 +111,7 @@ export class UserGroup extends Model<UserGroup> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "8238D9F1619E";
+      const strMark = "5B65F2D8D331";
 
       const debugMark = debug.extend( strMark );
 

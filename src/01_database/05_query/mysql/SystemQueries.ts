@@ -34,6 +34,11 @@ export default class SystemQueries {
         return SqlString.format( `Select A.AllowTagAccess As AllowTagAccess From Route As A Where ( A.Id = ? )`, params.Id );
 
       }
+      else if ( strName === "getCountActionTokenOnLastMinutes" ) {
+
+        return SqlString.format( `Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = ? And A.Owner = ? And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL ? MINUTE ) )`, [ params.Kind, params.Owner, params.MinutesAgo ] );
+
+      }
 
     }
 

@@ -7,12 +7,12 @@ html(lang="en")
     style
         include ./email-signup-web.css
   body
-      h2 SIGNUP FOR NEW USER ACCOUNT
+      h2 USER ACCOUNT ACTIVATION SUCCESS
       p Hello!. This email is for your new user account #[strong #{user_name}]
-      p Your activation code is
-      h3 #{activation_code}
-      p The activation code work until #[strong #{expire_at}]
-      p To made login #[a(href=`${web_app_url}`) #{web_app_url}]
+      p Your account information is:
+      h3 User: #[strong #{user_name}]
+      h3 Password: #[strong #{user_password}]
+      p You can login #[a(href=`${web_app_url}`) #{web_app_url}]
       p If you not recognize this email please ignore and archive it.
       p #[strong #{company_name}]
       p #[strong #{company_address}]

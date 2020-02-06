@@ -110,7 +110,8 @@ export class DBMigrationManagerMYSQL {
       if ( SystemUtilities.isNetworkLeader &&
            bFileExists ) {
 
-        if ( logger && typeof logger.info === "function" ) {
+        if ( logger &&
+             typeof logger.info === "function" ) {
 
           logger.info( "Executing 00_one_time_execute.sql file" );
 
@@ -178,7 +179,8 @@ export class DBMigrationManagerMYSQL {
       }
       else if ( bFileExists ) {
 
-        if ( logger && typeof logger.info === "function" ) {
+        if ( logger &&
+             typeof logger.info === "function" ) {
 
           logger.info( "00_one_time_execute.sql file execution canceled. Is NOT the network leader" );
 
@@ -217,7 +219,8 @@ export class DBMigrationManagerMYSQL {
         debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( "00_one_time_execute.sql file not exists!" );
 
-        if ( logger && typeof logger.info === "function" ) {
+        if ( logger &&
+             typeof logger.info === "function" ) {
 
           logger.info( "00_one_time_execute.sql file not exists!" );
 

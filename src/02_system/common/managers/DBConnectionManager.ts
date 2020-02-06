@@ -316,6 +316,50 @@ export default class DBConnectionManager {
 
   }
 
+  static async close( logger: any ):Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      if ( DBConnectionManager.currentInstance ) {
+
+        await DBConnectionManager.currentInstance.close();
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.close.name;
+
+      const strMark = "0F07800FD89B";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
 }
 
 //export default dbConnection;

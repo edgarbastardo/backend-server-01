@@ -1,4 +1,5 @@
-import { UserGroup } from "../models/UserGroup";
+import { ActionToken } from "../models/ActionToken";
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
@@ -9,16 +10,16 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-const debug = require( 'debug' )( 'UserGroupService' );
+const debug = require( 'debug' )( 'ActionTokenService' );
 
-export default class UserGroupService extends BaseService {
+export default class ActionTokenService extends BaseService {
 
-  static readonly _ID = "UserGroupService";
+  static readonly _ID = "ActionTokenService";
 
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<UserGroup> {
+                        logger: any ): Promise<ActionToken> {
 
     let result = null;
 
@@ -45,7 +46,7 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await ActionToken.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -70,7 +71,7 @@ export default class UserGroupService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getById.name;
 
-      const strMark = "E0F4B6151C3C";
+      const strMark = "15BB80A06D61";
 
       const debugMark = debug.extend( strMark );
 
@@ -109,10 +110,10 @@ export default class UserGroupService extends BaseService {
 
   }
 
-  static async getByName( strName: string,
-                          strTimeZoneId: string,
-                          transaction: any,
-                          logger: any ): Promise<UserGroup> {
+  static async getByToken( strToken: string,
+                           strTimeZoneId: string,
+                           transaction: any,
+                           logger: any ): Promise<ActionToken> {
 
     let result = null;
 
@@ -134,12 +135,12 @@ export default class UserGroupService extends BaseService {
 
       const options = {
 
-        where: { "Name": strName },
+        where: { "Token": strToken },
         transaction: currentTransaction,
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await ActionToken.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -162,9 +163,9 @@ export default class UserGroupService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getByName.name;
+      sourcePosition.method = this.name + "." + this.getByToken.name;
 
-      const strMark = "8E36301230F7";
+      const strMark = "652467D1ABE6";
 
       const debugMark = debug.extend( strMark );
 
@@ -203,84 +204,109 @@ export default class UserGroupService extends BaseService {
 
   }
 
-  static async checkExistsById( strId: string,
-                                transaction: any,
-                                logger: any ): Promise<boolean> {
+  static async getCountActionTokenOnLastMinutes( strKind: string,
+                                                 strOnwer: string,
+                                                 intMinutesAgo: number,
+                                                 transaction: any,
+                                                 logger: any ): Promise<number> {
 
-    return await this.getById( strId,
-                               null,
-                               transaction,
-                               logger ) !== null;
+    let intResult = 0;
 
-  }
+    let currentTransaction = transaction;
 
-  static async checkDisabledById( strId: string,
-                                  transaction: any,
-                                  logger: any ): Promise<boolean> {
+    let bApplyTansaction = false;
 
-    const userGroup = await this.getById( strId,
-                                          null,
-                                          transaction,
-                                          logger );
+    try {
 
-    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+      const dbConnection = DBConnectionManager.currentInstance;
 
-  }
+      if ( currentTransaction == null ) {
 
-  static async checkExistsByName( strName: string,
-                                  transaction: any,
-                                  logger: any ): Promise<boolean> {
+        currentTransaction = await dbConnection.transaction();
 
-    return await this.getByName( strName,
-                                 null,
-                                 transaction,
-                                 logger ) !== null;
+        bApplyTansaction = true;
 
-  }
+      }
 
-  static async checkDisabledByName( strName: string,
-                                    transaction: any,
-                                    logger: any ): Promise<boolean> {
+      const strSQL = DBConnectionManager.getStatement( "getCountActionTokenOnLastMinutes",
+                                                       {
+                                                         Kind: strKind, //"recover_password",
+                                                         Owner: strOnwer,
+                                                         MinutesAgo: intMinutesAgo //10,
+                                                       },
+                                                       logger );
 
-    const userGroup = await this.getByName( strName,
-                                            null,
-                                            transaction,
-                                            logger );
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
 
-    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+      if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
 
-  }
+        intResult = rows[ 0 ].Count;
 
-  static async checkExpiredById( strId: string,
-                                 transaction: any,
-                                 logger: any ): Promise<boolean> {
+      }
 
-    const userGroup = await this.getById( strId,
-                                          null,
-                                          transaction,
-                                          logger );
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
 
-    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+        await currentTransaction.commit();
 
-  }
+      }
 
-  static async checkExpiredByName( strName: string,
-                                    transaction: any,
-                                    logger: any ): Promise<boolean> {
+    }
+    catch ( error ) {
 
-    const userGroup = await this.getByName( strName,
-                                            null,
-                                            transaction,
-                                            logger );
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+      sourcePosition.method = this.name + "." + this.getCountActionTokenOnLastMinutes.name;
+
+      const strMark = "234C0028238B";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return intResult;
 
   }
 
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<UserGroup> {
+                               logger: any ): Promise<ActionToken> {
 
     let result = null;
 
@@ -307,14 +333,14 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await ActionToken.findOne( options );
 
       if ( result === null ) {
 
-        result = await UserGroup.create(
-                                         createOrUpdateData,
-                                         { transaction: currentTransaction }
-                                       );
+        result = await ActionToken.create(
+                                           createOrUpdateData,
+                                           { transaction: currentTransaction }
+                                         );
 
       }
       else if ( bUpdate ) {
@@ -327,8 +353,8 @@ export default class UserGroupService extends BaseService {
 
         }
 
-        await UserGroup.update( currentValues,
-                                options );
+        await ActionToken.update( currentValues,
+                                  options );
 
       }
 
@@ -347,7 +373,7 @@ export default class UserGroupService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "1CC6DB5BA1E2";
+      const strMark = "0BC308EDEE2F";
 
       const debugMark = debug.extend( strMark );
 

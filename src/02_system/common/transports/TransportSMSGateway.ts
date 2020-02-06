@@ -23,7 +23,7 @@ export default class TransportSMSGateway {
                         uri: transportOptions.host, //'https://www.weknock-tech.com/backend-sms-gateway/kk/it4systems/sms/gateway/dev007/message/sms/send',
                         form: {
                                 "request.SecurityTokenId": transportOptions.auth.api_key, //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
-                                "request.DeviceId": messageOptions.device_id || transportOptions.device_id,
+                                "request.DeviceId": messageOptions.device_id || transportOptions.deviceId,
                                 "request.PhoneNumber": messageOptions.to, //"3057769594",
                                 "request.Message": messageOptions.body.text,  //"Test message",
                                 "request.ForeignData": messageOptions.foreign_data,  //`{ "user": "myuser" }`,

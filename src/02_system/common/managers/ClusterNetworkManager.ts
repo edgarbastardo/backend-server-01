@@ -34,7 +34,8 @@ export default class ClusterNetworkManager {
           SystemUtilities.isNetworkLeaderAt = dateTime;
           process.env.IS_NETWORK_LEADER = "1";
 
-          if ( logger && typeof logger.info === "function" ) {
+          if ( logger &&
+               typeof logger.info === "function" ) {
 
             logger.info( "I was promoted to network leader." );
 
@@ -56,7 +57,8 @@ export default class ClusterNetworkManager {
           SystemUtilities.isNetworkLeaderAt = dateTime;
           process.env.IS_NETWORK_LEADER = "1";
 
-          if ( logger && typeof logger.info === "function" ) {
+          if ( logger &&
+               typeof logger.info === "function" ) {
 
             logger.info( "I was demoted from being a network leader." );
 
@@ -74,7 +76,8 @@ export default class ClusterNetworkManager {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
-          if ( logger && typeof logger.info === "function" ) {
+          if ( logger &&
+               typeof logger.info === "function" ) {
 
             logger.info( "A new node has been added." );
 
@@ -92,7 +95,8 @@ export default class ClusterNetworkManager {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
-          if ( logger && typeof logger.info === "function" ) {
+          if ( logger &&
+               typeof logger.info === "function" ) {
 
             logger.info( "A node has been removed." );
 
@@ -110,7 +114,8 @@ export default class ClusterNetworkManager {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
-          if ( logger && typeof logger.info === "function" ) {
+          if ( logger &&
+               typeof logger.info === "function" ) {
 
             logger.info( "A new network leader is in control." );
 

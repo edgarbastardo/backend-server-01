@@ -12,7 +12,8 @@ export const resolvers = {
 
     login: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityServiceController.login( context.TimeZoneId,
+      return await SecurityServiceController.login( context.Language,
+                                                    context.TimeZoneId,
                                                     context.SourceIPAddress,
                                                     context.FrontendId,
                                                     args.Username,
@@ -24,17 +25,19 @@ export const resolvers = {
 
     logout: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityServiceController.logout( context.Autorization,
-                                           null,
-                                           context.Logger );
+      return await SecurityServiceController.logout( context.Language,
+                                                     context.Autorization,
+                                                     null,
+                                                     context.Logger );
 
     },
 
     tokenCheck: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityServiceController.tokenCheck( context.Autorization,
-                                               null,
-                                               context.Logger );
+      return await SecurityServiceController.tokenCheck( context.Language,
+                                                         context.Autorization,
+                                                         null,
+                                                         context.Logger );
 
     },
 

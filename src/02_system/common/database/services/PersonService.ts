@@ -141,17 +141,17 @@ export default class PersonService extends BaseService {
 
       result = await Person.findOne( options );
 
-      if ( result !== null ) {
+      if ( result === null ) {
 
-        result = await UserGroup.create(
-                                         createOrUpdateData,
-                                         { transaction: currentTransaction }
-                                       );
+        result = await Person.create(
+                                      createOrUpdateData,
+                                      { transaction: currentTransaction }
+                                    );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = ( result as any ).dataValues;
+        const currentValues = createOrUpdateData; //( result as any ).dataValues;
 
         if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
 
@@ -211,6 +211,8 @@ export default class PersonService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 
