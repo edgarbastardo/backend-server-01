@@ -42,6 +42,9 @@ export class ActionToken extends Model<ActionToken> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Token: string;
 
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Status: number;
+
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 
@@ -50,6 +53,12 @@ export class ActionToken extends Model<ActionToken> {
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
+
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
+  UpdatedBy: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ExpireAt: string;

@@ -2,6 +2,8 @@
 const debug = require( 'debug' )( 'SystemQueries' );
 
 import SqlString from 'sqlstring';
+import SystemUtilities from "../../../02_system/common/SystemUtilities";
+import CommonConstants from '../../../02_system/common/CommonConstants';
 
 export default class SystemQueries {
 
@@ -36,7 +38,9 @@ export default class SystemQueries {
       }
       else if ( strName === "getCountActionTokenOnLastMinutes" ) {
 
-        return SqlString.format( `Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = ? And A.Owner = ? And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL ? MINUTE ) )`, [ params.Kind, params.Owner, params.MinutesAgo ] );
+        const strNow = !params.Now ? SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ) : params.Now;
+
+        return SqlString.format( `Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = ? And A.Owner = ? And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( ?, INTERVAL ? MINUTE ) )`, [ params.Kind, params.Owner, strNow, params.MinutesAgo ] );
 
       }
 

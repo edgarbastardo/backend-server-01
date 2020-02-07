@@ -142,28 +142,24 @@ export default class UserController {
   async passwordRecoverCodeSend( request: Request, response: Response ) {
 
     const result = await UserServiceController.passwordRecoverCodeSend( request,
-                                                                         null,
-                                                                         this._controllerLogger );
+                                                                        null,
+                                                                        this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
   @httpPost(
-             "/password/recover/set",
+             "/password/recover",
              SystemUtilities.middlewareSetContext
            )
-  async passwordRecoverSet( request: Request, response: Response ) {
+  async passwordRecover( request: Request, response: Response ) {
 
-    const context = ( request as any ).context;
-
-    /*
-    const result = await SecurityService.tokenCheck( context.Authorization,
-                                                     null,
-                                                     context.Logger );
+    const result = await UserServiceController.passwordRecover( request,
+                                                                null,
+                                                                this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
-    */
 
   }
 

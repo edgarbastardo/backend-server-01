@@ -5,6 +5,8 @@ import SystemUtilities from '../../SystemUtilities';
 import BaseService from "./BaseService";
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
+import { UserGroup } from "../models/UserGroup";
+import { Person } from "../models/Person";
 
 const debug = require( 'debug' )( 'UserService' );
 
@@ -39,6 +41,14 @@ export default class UserService extends BaseService {
 
         where: { Id: strId },
         transaction: currentTransaction,
+        include: [
+                   {
+                     model: UserGroup,
+                   },
+                   {
+                     model: Person,
+                   }
+                 ]
 
       }
 
@@ -135,6 +145,14 @@ export default class UserService extends BaseService {
 
         where: { Name: strName },
         transaction: currentTransaction,
+        include: [
+                   {
+                     model: UserGroup,
+                   },
+                   {
+                     model: Person,
+                   }
+                 ]
 
       }
 

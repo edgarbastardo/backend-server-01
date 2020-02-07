@@ -496,7 +496,11 @@ export default class SystemUtilities {
 
         if ( bLimitIsExpired ) {
 
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" )
+                                            }
+                                          );
 
           result = { Expired: bLimitIsExpired, Duration: duration };
 
@@ -506,7 +510,10 @@ export default class SystemUtilities {
           //Check UpdateAt field not more old to ExpireOn minutes
           const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.UpdatedAt, "seconds" ) } );
 
-          result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn || bLimitIsExpired, Duration: duration };
+          result = {
+                     Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn || bLimitIsExpired,
+                     Duration: duration
+                   };
 
         }
 
@@ -517,24 +524,42 @@ export default class SystemUtilities {
 
         if ( bLimitIsExpired ) {
 
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" )
+                                            }
+                                          );
 
-          result = { Expired: bLimitIsExpired, Duration: duration };
+          result = {
+                     Expired: bLimitIsExpired,
+                     Duration: duration
+                   };
 
         }
         else {
 
           //Check CreatedAt field not more old to ExpireOn minutes
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" )
+                                            }
+                                          );
 
-          result = { Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn, Duration: duration };
+          result = {
+                     Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn,
+                     Duration: duration
+                   };
 
         }
 
       }
       else if ( sessionStatus.ExpireKind === 2 ) { //Fixed date and time to expire
 
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.ExpireOn, "seconds" ) } );
+        const duration = moment.duration(
+                                          {
+                                            seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.ExpireOn, "seconds" )
+                                          }
+                                        );
 
         result = { Expired: duration.asSeconds() > 0, Duration: duration };
 
@@ -547,9 +572,16 @@ export default class SystemUtilities {
         if ( expireOn.isValid() ) {
 
           //Check CreatedAt field not more old to ExpireOn minutes
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( expireOn, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( expireOn, "seconds" )
+                                            }
+                                          );
 
-          result = { Expired: duration.asSeconds() >= 0, Duration: duration };
+          result = {
+                     Expired: duration.asSeconds() >= 0,
+                     Duration: duration
+                   };
 
         }
 
@@ -573,7 +605,8 @@ export default class SystemUtilities {
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
 
-      if ( logger && typeof logger.error === "function" ) {
+      if ( logger &&
+           typeof logger.error === "function" ) {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
@@ -905,7 +938,11 @@ export default class SystemUtilities {
                                                 logger: any ) {
 
     //Check UpdateAt field not more old to 15 seconds aprox
-    var duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.UpdatedAt, "seconds" ) } );
+    const duration = moment.duration(
+                                      {
+                                        seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.UpdatedAt, "seconds" )
+                                      }
+                                    );
 
     if ( duration.asSeconds() >= 15 ||
          bForceUpdate ) { //The updated is old to 15 seconds or force update set to true
@@ -2861,4 +2898,25 @@ export default class SystemUtilities {
 
   }
 
+  public static async dateTimeIsAfterToSeconds( dateTime: any, intCount: number ): Promise<boolean> {
+
+    let bResult = false;
+
+    const duration = moment.duration(
+                                      {
+                                        seconds: SystemUtilities.getCurrentDateAndTime().diff( dateTime, "seconds" )
+                                      }
+                                    );
+
+    const intSeconds = duration.asSeconds();
+
+    if ( intSeconds >= intCount ) {
+
+      bResult = true;
+
+    }
+
+    return bResult;
+
+  }
 }

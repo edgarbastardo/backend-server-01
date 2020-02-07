@@ -7,23 +7,22 @@ import depthLimit from 'graphql-depth-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
 //import CoreGraphQLApiLoader from '../../core/api/ModelToRestAPI/CoreGraphQLAPILoader';
-import GraphQLAPIManager from './GraphQLAPIManager';
-import RestAPIManager from './RestAPIManager';
 //import ModelServiceLoader from '../database/services/ModelServiceLoader';
 import { Request, Response, NextFunction } from 'express';
 import fileUpload from 'express-fileupload';
 import { Container } from 'inversify';
+import { InversifyExpressServer } from 'inversify-express-utils';
+import BinaryServiceController from "../../core/services/BinaryService.controller";
+import { GraphQLFormattedError } from 'graphql/error';
+
+import CommonConstants from '../CommonConstants';
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
-import { InversifyExpressServer } from 'inversify-express-utils';
 
-//import { UserSessionStatus } from "../database/models/UserSessionStatus";
-//import AuthenticationController from "../../core/api/rest/Authentication.controller";
-import BinaryServiceController from "../../core/services/BinaryService.controller";
-import CommonConstants from '../CommonConstants';
-import { GraphQLFormattedError } from 'graphql/error';
 import I18NManager from "./I18Manager";
+import GraphQLAPIManager from './GraphQLAPIManager';
+import RestAPIManager from './RestAPIManager';
 
 const debug = require( 'debug' )( 'ApplicationManager' );
 
@@ -282,7 +281,7 @@ export default class ApplicationManager {
 
         const context = ( request as any ).context;
 
-        let strLanguage = context.Language;
+        let strLanguage = context ? context.Language : request.header( "language" );
 
         const result = {
                          StatusCode: 404,
@@ -311,7 +310,7 @@ export default class ApplicationManager {
 
         const context = (request as any).context;
 
-        let strLanguage = context ? context.Language : null;
+        let strLanguage = context ? context.Language : request.header( "language" );
 
         const strMark = "D3C34ED42BA1";
 

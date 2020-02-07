@@ -1047,48 +1047,21 @@ export default class CommonUtilities {
 
   }
 
-  /*
+  public static maskPassword( strPassword: string ): string {
 
-  public static String maskPhones( final String strPhone ) {
+    let strResult = "";
 
-      String strResult = "";
+    if ( strPassword ) {
 
-      if ( isNotNullAndEmpty( strPhone ) ) {
+      strResult = strResult + ", " + this.replaceRange( strPassword,
+                                                        2,
+                                                        strPassword.length - 2,
+                                                        "*".repeat( strPassword.length - 4 ) );
 
-          final String[] phones = strPhone.split( "," );
+    }
 
-          for ( int intIndex = 0; intIndex < phones.length; intIndex++ ) {
-
-              final StringBuilder strCurrentPhone = new StringBuilder( phones[ intIndex ].trim() );
-
-              if ( strCurrentPhone.length() >= 7 ) {
-
-                  final char[] chars = new char[ strCurrentPhone.length() - 6 ];
-
-                  Arrays.fill( chars, '*' );
-
-                  strCurrentPhone.replace( 4, strCurrentPhone.length() - 2, new String( chars ) );
-
-                  strResult = strResult + ", " + strCurrentPhone.toString();  //replaceAll( "(?<=.{3}).(?=[^@]*?.@)", "*" );
-
-              }
-              else {
-
-                  strResult = strResult + ", " + strCurrentPhone;
-
-              }
-
-          }
-
-          strResult = strResult.substring( 2 );
-
-      }
-
-      return strResult;
+    return strResult;
 
   }
-
-  
-  */
 
 }

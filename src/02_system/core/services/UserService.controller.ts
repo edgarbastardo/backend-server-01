@@ -592,10 +592,10 @@ export default class UserServiceController {
 
           strTag = signupProcessData.passwordParameterTag ? signupProcessData.passwordParameterTag : strTag;
 
+          //ANCHOR check password Strength
           const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
                                                                                                                   currentTransaction,
                                                                                                                   logger );
-
 
           const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
                                                                                                      request.body.Password,
@@ -775,7 +775,8 @@ export default class UserServiceController {
                                                                            logger
                                                                          );
 
-                if ( userSignup !== null ) {
+                if ( userSignup !== null &&
+                     userSignup instanceof Error === false ) {
 
                   if ( signupProcessData.status === 1 ) { //Automatic send activation code to email address
 
@@ -878,6 +879,30 @@ export default class UserServiceController {
                              }
 
                   }
+
+                }
+                else if ( userSignup instanceof Error  ) {
+
+                  const error = userSignup as any;
+
+                  result = {
+                             StatusCode: 500,
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: '619404BC65B1',
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
 
                 }
 
@@ -1355,6 +1380,7 @@ export default class UserServiceController {
                                    Data: []
                                  }
 
+                        //ANCHOR send email sucess
                         const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                           logger );
 
@@ -1379,7 +1405,7 @@ export default class UserServiceController {
                                                                   language: context.Language,
                                                                   variables: {
                                                                               user_name: userSignup.Name,
-                                                                              user_password: strPassword,
+                                                                              user_password: CommonUtilities.maskPassword( strPassword ),
                                                                               web_app_url: strWebAppURL,
                                                                               ... configData
                                                                             }
@@ -1394,7 +1420,7 @@ export default class UserServiceController {
                       }
                       else {
 
-                        let error = user as any;
+                        const error = user as any;
 
                         result = {
                                    StatusCode: 500,
@@ -1420,7 +1446,7 @@ export default class UserServiceController {
                     }
                     else {
 
-                      let error = person as any;
+                      const error = person as any;
 
                       result = {
                                  StatusCode: 500,
@@ -1446,7 +1472,7 @@ export default class UserServiceController {
                   }
                   else if ( userGroup instanceof Error  ) {
 
-                    let error = userGroup as any;
+                    const error = userGroup as any;
 
                     result = {
                                StatusCode: 500,
@@ -1720,7 +1746,7 @@ export default class UserServiceController {
                                                                                   currentTransaction,
                                                                                   logger );
 
-      if ( intCount > 20 ) {
+      if ( intCount < 20 ) {
 
         const userInDB = await UserService.getByName( request.body.Name,
                                                       context.TimeZoneId,
@@ -1730,76 +1756,22 @@ export default class UserServiceController {
         if ( userInDB != null &&
              userInDB instanceof Error === false ) {
 
-          const strTransport = CommonUtilities.toLowerCase( request.body.Transport );
-
-          if ( strTransport === "email" ) {
-
-            if ( !userInDB.UserPerson ||
-                 CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) === false ) {
-
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_NOT_VALID_EMAIL',
-                         Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
-                         Mark: "CBFE3C19AA9C",
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_NOT_VALID_EMAIL',
-                                     Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
-                                     Details: null,
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
-
-            }
-
-          }
-          else if ( strTransport === "sms" ) {
-
-            if ( !userInDB.UserPerson ||
-                 CommonUtilities.isValidPhoneNumberList( userInDB.UserPerson.Phone ) === false ) {
-
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
-                         Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
-                         Mark: "CBFE3C19AA9C",
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
-                                     Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
-                                     Details: null,
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
-
-            }
-
-          }
-          else {
+          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
-                       Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
-                       Mark: "2E4BC9D07111",
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Mark: '39212A25A17D',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
-                                   Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
-                                   Details: null,
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Details: null
                                  }
                                ],
                        Warnings: [],
@@ -1808,216 +1780,128 @@ export default class UserServiceController {
                      }
 
           }
+          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                                currentTransaction,
+                                                                logger ) ) {
 
-          if ( result === null ) {
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Mark: '2E99F86FF13B',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
 
-            //Use the config of _CONFIG_ENTRY_Frontend_Rules.userLoginControl
-            const bFrontendIdIsAllowed = await SecurityServiceController.getFrontendIdIsAllowed( context.FrontendId,
-                                                                                                 userInDB.UserGroup.Id,
-                                                                                                 userInDB.UserGroup.Name,
-                                                                                                 userInDB.UserGroup.Tag,
-                                                                                                 userInDB.Id,
-                                                                                                 userInDB.Name,
-                                                                                                 userInDB.Tag,
-                                                                                                 currentTransaction,
-                                                                                                 logger ) >= 0;
+          }
+          else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
 
-            if ( bFrontendIdIsAllowed ) {
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                       Mark: '231463F16B95',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
 
-              //ANCHOR 
-              const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
-                                                                            "UserName",
-                                                                            logger );
+          }
+          else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                          currentTransaction,
+                                                          logger ) ) {
 
-              const strRecoverCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 2, logger );
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                       Mark: '55C127F50C3B',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
 
-              const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
+          }
+          else {
 
-              const actionToken = await ActionTokenService.createOrUpdate(
-                                                                           {
-                                                                             Kind: "recover_password",
-                                                                             Owner: userInDB.Name,
-                                                                             Token: strRecoverCode,
-                                                                             CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                             ExpireAt: expireAt.format(),
-                                                                           },
-                                                                           false,
-                                                                           currentTransaction,
-                                                                           logger
-                                                                         );
+            //ANCHOR userInDB
+            const strTransport = CommonUtilities.toLowerCase( request.body.Transport );
 
-              if ( actionToken &&
-                   actionToken instanceof Error === false ) {
+            if ( !strTransport ||
+                 strTransport === "email" ) {
 
-                if ( strTransport === "email" ) {
-
-                  const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                    logger );
-
-                  const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                          currentTransaction,
-                                                                          logger ) ? "web" : "mobile";
-
-                  const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                          "url",
-                                                                          currentTransaction,
-                                                                          logger );
-
-                  const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
-                                                                                                context.TimeZoneId,
-                                                                                                CommonConstants._DATE_TIME_LONG_FORMAT_04,
-                                                                                                logger ): null;
-
-                  //Send immediately the mail for auto activate the new user account
-                  if ( await NotificationManager.send(
-                                                       "email",
-                                                       {
-                                                         from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                         to: userInDB.UserPerson.EMail,
-                                                         subject: await I18NManager.translate( strLanguage, "PASSWORD RECOVER CODE" ),
-                                                         body: {
-                                                                 kind: "template",
-                                                                 file: `email-user-recover-password-${strTemplateKind}.pug`,
-                                                                 language: context.Language,
-                                                                 variables: {
-                                                                              user_name: request.body.Name,
-                                                                              web_app_url: strWebAppURL,
-                                                                              recover_code: strRecoverCode,
-                                                                              expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
-                                                                              ... configData
-                                                                            }
-                                                                  //kind: "embedded",
-                                                                  //text: "Hello",
-                                                                  //html: "<b>Hello</b>"
-                                                               }
-                                                       },
-                                                       logger
-                                                     ) ) {
-
-                    result = {
-                               StatusCode: 200, //ok
-                               Code: 'SUCCESS_SEND_RECOVER_PASSWORD_EMAIL',
-                               Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
-                               Mark: 'C4F1AF9E67C3',
-                               LogId: null,
-                               IsError: false,
-                               Errors: [],
-                               Warnings: [],
-                               Count: 0,
-                               Data: [
-                                       {
-                                         EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
-                                       }
-                                     ]
-                             }
-
-                  }
-                  else {
-
-                    result = {
-                               StatusCode: 500, //ok
-                               Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
-                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                               Mark: 'D77EDF617B8B',
-                               LogId: null,
-                               IsError: true,
-                               Errors: [
-                                         {
-                                           Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
-                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                                           Details: {
-                                                      EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
-                                                    }
-                                         }
-                                       ],
-                               Warnings: [],
-                               Count: 0,
-                               Data: []
-                             }
-
-                  }
-
-                }
-                else if ( strTransport === "sms" ) {
-
-                  if ( await NotificationManager.send(
-                                                       "sms",
-                                                       {
-                                                         to: userInDB.UserPerson.Phone,
-                                                         //context: "AMERICA/NEW_YORK",
-                                                         foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
-                                                         //device_id: "*",
-                                                         body: {
-                                                                 kind: "self",
-                                                                 text: await I18NManager.translate( strLanguage, 'Your recover password token is: %s', strRecoverCode )
-                                                               }
-                                                       },
-                                                       logger
-                                                     ) ) {
-
-                    result = {
-                               StatusCode: 200, //ok
-                               Code: 'SUCCESS_SEND_RECOVER_PASSWORD_SMS',
-                               Message: await I18NManager.translate( strLanguage, 'Success to send recover password token. Please check your phone' ),
-                               Mark: 'C4F1AF9E67C3',
-                               LogId: null,
-                               IsError: false,
-                               Errors: [],
-                               Warnings: [],
-                               Count: 0,
-                               Data: [
-                                       {
-                                         Phone: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
-                                       }
-                                     ]
-                             }
-
-
-                  }
-                  else {
-
-                    result = {
-                               StatusCode: 500, //ok
-                               Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
-                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
-                               Mark: 'C21B85AD2EE1',
-                               LogId: null,
-                               IsError: true,
-                               Errors: [
-                                         {
-                                           Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
-                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
-                                           Details: {
-                                                      EMail: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
-                                                    }
-                                         }
-                                       ],
-                               Warnings: [],
-                               Count: 0,
-                               Data: []
-                             }
-
-                  }
-
-                }
-
-              }
-              else {
-
-                let error = actionToken as any;
+              if ( !userInDB.UserPerson ||
+                   CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) === false ) {
 
                 result = {
-                           StatusCode: 500,
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                           Mark: 'DF70E9F0151D',
-                           LogId: error.logId,
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_NOT_VALID_EMAIL',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
+                           Mark: "CBFE3C19AA9C",
+                           LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: error.name,
-                                       Message: error.Message,
-                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       Code: 'ERROR_NOT_VALID_EMAIL',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
+                                       Details: null,
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+
+            }
+            else if ( strTransport === "sms" ) {
+
+              if ( !userInDB.UserPerson ||
+                  CommonUtilities.isValidPhoneNumberList( userInDB.UserPerson.Phone ) === false ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
+                           Mark: "CBFE3C19AA9C",
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
+                                       Details: null,
                                      }
                                    ],
                            Warnings: [],
@@ -2032,21 +1916,265 @@ export default class UserServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                         Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
+                         Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
+                         Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
+                         Mark: "2E4BC9D07111",
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                     Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
-                                     Details: null
+                                     Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
+                                     Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
+                                     Details: null,
                                    }
                                  ],
                          Warnings: [],
                          Count: 0,
                          Data: []
                        }
+
+            }
+
+            if ( result === null ) {
+
+              //Use the config of _CONFIG_ENTRY_Frontend_Rules.userLoginControl
+              const bFrontendIdIsAllowed = await SecurityServiceController.getFrontendIdIsAllowed( context.FrontendId,
+                                                                                                   userInDB.UserGroup.Id,
+                                                                                                   userInDB.UserGroup.Name,
+                                                                                                   userInDB.UserGroup.Tag,
+                                                                                                   userInDB.Id,
+                                                                                                   userInDB.Name,
+                                                                                                   userInDB.Tag,
+                                                                                                   currentTransaction,
+                                                                                                   logger ) >= 0;
+
+              if ( bFrontendIdIsAllowed ) {
+
+                //ANCHOR
+                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                              "UserName",
+                                                                              logger );
+
+                const strRecoverCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+
+                const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
+
+                const actionToken = await ActionTokenService.createOrUpdate(
+                                                                             {
+                                                                               Kind: "recover_password",
+                                                                               Owner: userInDB.Id,
+                                                                               Token: strRecoverCode,
+                                                                               Status: 1,
+                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                               ExpireAt: expireAt.format(),
+                                                                             },
+                                                                             false,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+                if ( actionToken &&
+                     actionToken instanceof Error === false ) {
+
+                  if ( strTransport === "email" ) {
+
+                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                      logger );
+
+                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                            currentTransaction,
+                                                                            logger ) ? "web" : "mobile";
+
+                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                            "url",
+                                                                            currentTransaction,
+                                                                            logger );
+
+                    const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                                                                                                  context.TimeZoneId,
+                                                                                                  CommonConstants._DATE_TIME_LONG_FORMAT_04,
+                                                                                                  logger ): null;
+
+                    //Send immediately the mail for auto activate the new user account
+                    if ( await NotificationManager.send(
+                                                        "email",
+                                                        {
+                                                          from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                          to: userInDB.UserPerson.EMail,
+                                                          subject: await I18NManager.translate( strLanguage, "PASSWORD RECOVER CODE" ),
+                                                          body: {
+                                                                  kind: "template",
+                                                                  file: `email-user-recover-password-${strTemplateKind}.pug`,
+                                                                  language: context.Language,
+                                                                  variables: {
+                                                                               user_name: request.body.Name,
+                                                                               web_app_url: strWebAppURL,
+                                                                               recover_code: strRecoverCode,
+                                                                               expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
+                                                                               ... configData
+                                                                             }
+                                                                  //kind: "embedded",
+                                                                  //text: "Hello",
+                                                                  //html: "<b>Hello</b>"
+                                                                }
+                                                        },
+                                                        logger
+                                                      ) ) {
+
+                      result = {
+                                StatusCode: 200, //ok
+                                Code: 'SUCCESS_SEND_RECOVER_PASSWORD_EMAIL',
+                                Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
+                                Mark: 'C4F1AF9E67C3',
+                                LogId: null,
+                                IsError: false,
+                                Errors: [],
+                                Warnings: [],
+                                Count: 0,
+                                Data: [
+                                        {
+                                          EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
+                                        }
+                                      ]
+                              }
+
+                    }
+                    else {
+
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
+                                 Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                 Mark: 'D77EDF617B8B',
+                                 LogId: null,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
+                                             Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                             Details: {
+                                                        EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
+                                                      }
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+
+                  }
+                  else if ( strTransport === "sms" ) {
+
+                    if ( await NotificationManager.send(
+                                                         "sms",
+                                                         {
+                                                           to: userInDB.UserPerson.Phone,
+                                                           //context: "AMERICA/NEW_YORK",
+                                                           foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                           //device_id: "*",
+                                                           body: {
+                                                                   kind: "self",
+                                                                   text: await I18NManager.translate( strLanguage, 'Your recover password token is: %s', strRecoverCode )
+                                                                 }
+                                                         },
+                                                         logger
+                                                       ) ) {
+
+                      result = {
+                                 StatusCode: 200, //ok
+                                 Code: 'SUCCESS_SEND_RECOVER_PASSWORD_SMS',
+                                 Message: await I18NManager.translate( strLanguage, 'Success to send recover password token. Please check your phone' ),
+                                 Mark: 'C4F1AF9E67C3',
+                                 LogId: null,
+                                 IsError: false,
+                                 Errors: [],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: [
+                                         {
+                                           Phone: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
+                                         }
+                                       ]
+                               }
+
+                    }
+                    else {
+
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
+                                 Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                                 Mark: 'C21B85AD2EE1',
+                                 LogId: null,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
+                                             Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                                             Details: {
+                                                        EMail: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
+                                                      }
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+
+                  }
+
+                }
+                else {
+
+                  const error = actionToken as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: 'DF70E9F0151D',
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+              else {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                           Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                                       Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
 
             }
 
@@ -2148,7 +2276,480 @@ export default class UserServiceController {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async passwordRecover( request: Request,
+                                transaction: any,
+                                logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Token,
+                                                                   context.TimeZoneId,
+                                                                   transaction,
+                                                                   logger );
+
+      if ( actionTokenInDB !== null &&
+           actionTokenInDB instanceof Error === false ) {
+
+        if ( actionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+
+          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+
+            const userInDB = await UserService.getById( actionTokenInDB.Owner,
+                                                        context.TimeZoneId,
+                                                        transaction,
+                                                        logger );
+
+            if ( userInDB != null &&
+                userInDB instanceof Error === false ) {
+
+              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                           Mark: '63C9C6FBCB8F',
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                           Mark: '9471EA8763E3',
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                           Mark: 'D013A4C4C1D6',
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                           Mark: '5EE4EEA9A907',
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else {
+
+                const strTag = "#" + userInDB.Id + "#,#" + userInDB.Name + "#,#" + userInDB.UserGroup.Id + "#,#" + userInDB.UserGroup.Name + "#";
+
+                //ANCHOR check password Strength
+                const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
+                                                                                                                        currentTransaction,
+                                                                                                                        logger );
+
+                const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
+                                                                                                          request.body.Password,
+                                                                                                          logger );
+                if ( checkPasswordStrengthResult.code === 1 ) {
+
+                  const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                                "UserName",
+                                                                                logger );
+
+                  userInDB.Password = request.body.Password;
+                  userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+                  const userWithPasswordChanged = UserService.createOrUpdate( ( userInDB as any ).dataValues,
+                                                                              true,
+                                                                              currentTransaction,
+                                                                              logger );
+
+                  if ( userWithPasswordChanged !== null &&
+                      userWithPasswordChanged instanceof Error === false ) {
+
+                    actionTokenInDB.Status = 0;
+                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+                    const warnings = [];
+
+                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
+                                                                                        true,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
+                    if ( actionTokenUpdated instanceof Error ) {
+
+                      const error = userWithPasswordChanged as any;
+
+                      warnings.push(
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                    }
+
+                    result = {
+                               StatusCode: 200, //ok
+                               Code: 'SUCCESS_PASSWORD_CHANGE',
+                               Message: await I18NManager.translate( strLanguage, 'Success to change the password' ),
+                               Mark: '49E15D297D10',
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 0,
+                               Data: []
+                             }
+
+                    if ( userInDB.UserPerson &&
+                         CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) ) {
+
+                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                        logger );
+
+                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                              currentTransaction,
+                                                                              logger ) ? "web" : "mobile";
+
+                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                              "url",
+                                                                              currentTransaction,
+                                                                              logger );
+
+                      await NotificationManager.send(
+                                                      "email",
+                                                      {
+                                                        from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                        to: userInDB.UserPerson.EMail,
+                                                        subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
+                                                        body: {
+                                                                kind: "template",
+                                                                file: `email-user-password-change-${strTemplateKind}.pug`,
+                                                                language: context.Language,
+                                                                variables: {
+                                                                             user_name: userInDB.Name,
+                                                                             user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                             web_app_url: strWebAppURL,
+                                                                             ... configData
+                                                                           }
+                                                                //kind: "embedded",
+                                                                //text: "Hello",
+                                                                //html: "<b>Hello</b>"
+                                                              }
+                                                      },
+                                                      logger
+                                                    );
+
+                    }
+
+                  }
+                  else if ( userWithPasswordChanged instanceof Error  ) {
+
+                    const error = userWithPasswordChanged as any;
+
+                    result = {
+                               StatusCode: 500,
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'D5659A5825AC',
+                               LogId: error.logId,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.Message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+
+                }
+                else {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_PASSWORD_NOT_VALID',
+                             Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
+                             Mark: '77B7830DEB04',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: checkPasswordStrengthResult.code,
+                                         Message: checkPasswordStrengthResult.message,
+                                         Details: passwordStrengthParameters
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 404, //Not found
+                         Code: 'ERROR_USER_NOT_FOUND',
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Mark: "7DDC6B0761EE",
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_NOT_FOUND',
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_ACTIVATION_CODE_ALREADY_USED',
+                       Message: await I18NManager.translate( strLanguage, 'The activation code %s already used', request.body.Token ),
+                       Mark: "9CF443283D5F",
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The activation code %s already used', request.body.Token ),
+                                   Details: null,
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                      StatusCode: 400, //Bad request
+                      Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
+                      Message: await I18NManager.translate( strLanguage, 'The activation code %s is expired', request.body.Token ),
+                      Mark: "17328B104012",
+                      LogId: null,
+                      IsError: true,
+                      Errors: [
+                                {
+                                  Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
+                                  Message: await I18NManager.translate( strLanguage, 'The activation code %s is expired', request.body.Token ),
+                                  Details: null,
+                                }
+                              ],
+                      Warnings: [],
+                      Count: 0,
+                      Data: []
+                    }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The activation code %s not found in database', request.body.Token ),
+                   Mark: "3A23B2C2199B",
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The activation code %s not found in database', request.body.Token ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.passwordRecoverCodeSend.name;
+
+      const strMark = "0E2B5CC808F4";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,

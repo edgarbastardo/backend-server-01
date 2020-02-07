@@ -232,15 +232,20 @@ export default class ActionTokenService extends BaseService {
                                                        {
                                                          Kind: strKind, //"recover_password",
                                                          Owner: strOnwer,
-                                                         MinutesAgo: intMinutesAgo //10,
+                                                         //Now: ,
+                                                         MinutesAgo: intMinutesAgo, //10,
                                                        },
                                                        logger );
 
-      const rows = await dbConnection.query( strSQL,
+
+      //const intCount = await ActionToken.count();
+
+      const rows = await dbConnection.query( strSQL, //'2020-02-06 11:45:41' //"Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = 'recover_password' And A.Owner = 'test01' And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( now(), INTERVAL 60 MINUTE ) )", 
                                              {
+                                               logging: console.log,
                                                raw: true,
                                                type: QueryTypes.SELECT,
-                                               transaction: currentTransaction
+                                               transaction: currentTransaction,
                                              } );
 
       if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
