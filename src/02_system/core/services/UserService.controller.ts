@@ -577,257 +577,309 @@ export default class UserServiceController {
              signupProcessData.group.trim() !== "" &&
              signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
-          let strTag = "";
+          let rules = {
+                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
+                        EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                        Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                        FirstName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        LastName:  [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                      };
 
-          if ( signupProcessData.group !== "@__FromName__@" ) {
+          const validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                       rules,
+                                                                       null,
+                                                                       logger );
 
-            strTag = !signupProcessData.passwordParameterTag ? "#" + signupProcessData.group + "#" : "";
+          if ( validator.passes() ) { //Validate reqeust.body field values
 
-          }
-          else {
+            const checkFieldValueResults = {};
 
-            strTag = !signupProcessData.passwordParameterTag ? "#" + request.body.Name + "#" : "";
+            if ( request.body.Name.includes( "@system.net" ) ) {
 
-          };
-
-          strTag = signupProcessData.passwordParameterTag ? signupProcessData.passwordParameterTag : strTag;
-
-          //ANCHOR check password Strength
-          const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
-                                                                                                                  currentTransaction,
-                                                                                                                  logger );
-
-          const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
-                                                                                                     request.body.Password,
-                                                                                                     logger );
-          if ( checkPasswordStrengthResult.code === 1 ) {
-
-            const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group,
-                                                                               currentTransaction,
-                                                                               logger );
-
-            if ( signupProcessData.createGroup === false &&
-                 bUserGroupExists === false ) {
-
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
-                         Mark: '49EEF768004F',
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
-                                     Details: null
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
+              checkFieldValueResults[ "Name" ] = await I18NManager.translate( strLanguage, 'The user name %s is invalid', request.body.Name );
 
             }
-            else if ( signupProcessData.createGroup &&
-                      bUserGroupExists ) {
 
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
-                         Mark: '3BAC1FA1D2A2',
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
-                                     Details: null
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
+            if ( Object.keys( checkFieldValueResults ).length === 0 ) {
 
-            }
-            else if ( bUserGroupExists &&
-                      await UserGroupService.checkDisabledByName( signupProcessData.group,
-                                                                  currentTransaction,
-                                                                  logger ) ) {
+              let strTag = "";
 
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_DISABLED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
-                         Mark: '88C3AE24AB5E',
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_USER_GROUP_DISABLED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
-                                     Details: null
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
+              if ( signupProcessData.group !== "@__FromName__@" ) {
 
-            }
-            else if ( bUserGroupExists &&
-                      await UserGroupService.checkExpiredByName( signupProcessData.group,
-                                                                 currentTransaction,
-                                                                 logger ) ) {
+                strTag = !signupProcessData.passwordParameterTag ? "#" + signupProcessData.group + "#" : "";
 
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_EXPIRED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
-                         Mark: '53EC3D039492',
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_USER_GROUP_EXPIRED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
-                                     Details: null
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
+              }
+              else {
 
-            }
-            else if ( await UserService.checkExistsByName( request.body.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+                strTag = !signupProcessData.passwordParameterTag ? "#" + request.body.Name + "#" : "";
 
-              result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                         Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
-                         Mark: 'B43E4A5C0D8D',
-                         LogId: null,
-                         IsError: true,
-                         Errors: [
-                                   {
-                                     Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
-                                     Details: null
-                                   }
-                                 ],
-                         Warnings: [],
-                         Count: 0,
-                         Data: []
-                       }
+              };
 
-            }
-            else {
+              strTag = signupProcessData.passwordParameterTag ? signupProcessData.passwordParameterTag : strTag;
 
-              let rules = {
-                            Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                            EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                            Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                            FirstName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            LastName:  [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          };
+              //ANCHOR check password Strength
+              const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
+                                                                                                                      currentTransaction,
+                                                                                                                      logger );
 
-              const validator = SystemUtilities.createCustomValidatorSync( request.body,
-                                                                           rules,
-                                                                           null,
-                                                                           logger );
+              const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
+                                                                                                         request.body.Password,
+                                                                                                         logger );
+              if ( checkPasswordStrengthResult.code === 1 ) {
 
-              if ( validator.passes() ) { //Validate reqeust.body field values
+                const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                                   currentTransaction,
+                                                                                   logger );
 
-                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
-                                                                              "UserName",
+                if ( signupProcessData.createGroup === false &&
+                     bUserGroupExists === false ) {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
+                             Mark: '49EEF768004F',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
+                                         Details: null
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+                else if ( signupProcessData.createGroup &&
+                          bUserGroupExists ) {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
+                             Mark: '3BAC1FA1D2A2',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
+                                         Details: null
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+                else if ( bUserGroupExists &&
+                          await UserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                      currentTransaction,
+                                                                      logger ) ) {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_USER_GROUP_DISABLED',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                             Mark: '88C3AE24AB5E',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_USER_GROUP_DISABLED',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                                         Details: null
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+                else if ( bUserGroupExists &&
+                          await UserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                     currentTransaction,
+                                                                     logger ) ) {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_USER_GROUP_EXPIRED',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                             Mark: '53EC3D039492',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_USER_GROUP_EXPIRED',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                                         Details: null
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+                else if ( await UserService.checkExistsByName( request.body.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                             Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                             Mark: 'B43E4A5C0D8D',
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                                         Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                         Details: null
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+                else {
+
+                  const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                                "UserName",
+                                                                                logger );
+                  const strId = SystemUtilities.getUUIDv4();
+                  const strToken = SystemUtilities.hashString( strId,
+                                                               2,
+                                                               logger ); //CRC32
+
+                  const expireAt = signupProcessData.expireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.expireAt ): null;
+
+                  const userSignup = await UserSignupService.createOrUpdate(
+                                                                             {
+                                                                               Id: strId,
+                                                                               Kind: request.body.Kind,
+                                                                               FrontendId: context.FrontendId,
+                                                                               Token: strToken,
+                                                                               Status: signupProcessData.status,
+                                                                               Name: request.body.Name,
+                                                                               FirstName: request.body.FirstName,
+                                                                               LastName: request.body.LastName,
+                                                                               EMail: request.body.EMail,
+                                                                               Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
+                                                                               Password: request.body.Password,
+                                                                               Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
+                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                               ExpireAt: expireAt ? expireAt.format(): null
+                                                                             },
+                                                                             false,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+                  if ( userSignup !== null &&
+                       userSignup instanceof Error === false ) {
+
+                    if ( signupProcessData.status === 1 ) { //Automatic send activation code to email address
+
+                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                        logger );
+
+                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                              currentTransaction,
+                                                                              logger ) ? "web" : "mobile";
+
+                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                              "url",
+                                                                              currentTransaction,
                                                                               logger );
-                const strId = SystemUtilities.getUUIDv4();
-                const strToken = SystemUtilities.hashString( strId,
-                                                             2,
-                                                             logger ); //CRC32
 
-                const expireAt = signupProcessData.expireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.expireAt ): null;
+                      const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                                                                                                    context.TimeZoneId,
+                                                                                                    CommonConstants._DATE_TIME_LONG_FORMAT_04,
+                                                                                                    logger ): null;
 
-                const userSignup = await UserSignupService.createOrUpdate(
-                                                                           {
-                                                                             Id: strId,
-                                                                             Kind: request.body.Kind,
-                                                                             FrontendId: context.FrontendId,
-                                                                             Token: strToken,
-                                                                             Status: signupProcessData.status,
-                                                                             Name: request.body.Name,
-                                                                             FirstName: request.body.FirstName,
-                                                                             LastName: request.body.LastName,
-                                                                             EMail: request.body.EMail,
-                                                                             Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
-                                                                             Password: request.body.Password,
-                                                                             Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
-                                                                             CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                             ExpireAt: expireAt ? expireAt.format(): null
-                                                                           },
-                                                                           false,
-                                                                           currentTransaction,
-                                                                           logger
-                                                                         );
+                      //ANCHOR Send immediately the mail for auto activate the new user account
+                      if ( await NotificationManager.send(
+                                                           "email",
+                                                           {
+                                                             from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                             to: request.body.EMail,
+                                                             subject: await I18NManager.translate( strLanguage, "SIGNUP FOR NEW USER ACCOUNT" ),
+                                                             body: {
+                                                                     kind: "template",
+                                                                     file: `email-user-signup-${strTemplateKind}.pug`,
+                                                                     language: context.Language,
+                                                                     variables: {
+                                                                                  user_name: request.body.Name,
+                                                                                  activation_code: strToken,
+                                                                                  web_app_url: strWebAppURL,
+                                                                                  expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
+                                                                                  ... configData
+                                                                                }
+                                                                     //kind: "embedded",
+                                                                     //text: "Hello",
+                                                                     //html: "<b>Hello</b>"
+                                                                   }
+                                                           },
+                                                           logger
+                                                         ) ) {
 
-                if ( userSignup !== null &&
-                     userSignup instanceof Error === false ) {
+                        result = {
+                                   StatusCode: 200, //ok
+                                   Code: 'SUCCESS_USER_SIGNUP',
+                                   Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. Now you need check for your mailbox' ),
+                                   Mark: 'B3F0B0AF21AC',
+                                   LogId: null,
+                                   IsError: false,
+                                   Errors: [],
+                                   Warnings: [],
+                                   Count: 0,
+                                   Data: []
+                                 }
 
-                  if ( signupProcessData.status === 1 ) { //Automatic send activation code to email address
+                      }
+                      else {
 
-                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                      logger );
+                        result = {
+                                   StatusCode: 500, //ok
+                                   Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
+                                   Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                   Mark: '5B91FA66FE6D',
+                                   LogId: null,
+                                   IsError: true,
+                                   Errors: [
+                                             {
+                                               Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
+                                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                               Details: {
+                                                         EMail: request.body.EMail
+                                                       }
+                                             }
+                                           ],
+                                   Warnings: [],
+                                   Count: 0,
+                                   Data: []
+                                 }
 
-                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                            currentTransaction,
-                                                                            logger ) ? "web" : "mobile";
+                      }
 
-                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                            "url",
-                                                                            currentTransaction,
-                                                                            logger );
-
-                    const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
-                                                                                                  context.TimeZoneId,
-                                                                                                  CommonConstants._DATE_TIME_LONG_FORMAT_04,
-                                                                                                  logger ): null;
-
-                    //ANCHOR Send immediately the mail for auto activate the new user account
-                    if ( await NotificationManager.send(
-                                                         "email",
-                                                         {
-                                                           from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                           to: request.body.EMail,
-                                                           subject: await I18NManager.translate( strLanguage, "SIGNUP FOR NEW USER ACCOUNT" ),
-                                                           body: {
-                                                                   kind: "template",
-                                                                   file: `email-user-signup-${strTemplateKind}.pug`,
-                                                                   language: context.Language,
-                                                                   variables: {
-                                                                                user_name: request.body.Name,
-                                                                                activation_code: strToken,
-                                                                                web_app_url: strWebAppURL,
-                                                                                expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
-                                                                                ... configData
-                                                                              }
-                                                                   //kind: "embedded",
-                                                                   //text: "Hello",
-                                                                   //html: "<b>Hello</b>"
-                                                                 }
-                                                         },
-                                                         logger
-                                                       ) ) {
+                    }
+                    else { //Manual activation
 
                       result = {
                                  StatusCode: 200, //ok
-                                 Code: 'SUCCESS_USER_SIGNUP',
-                                 Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. Now you need check for your mailbox' ),
-                                 Mark: 'B3F0B0AF21AC',
+                                 Code: 'SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION',
+                                 Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. But you need wait to system administrator activate your new account' ),
+                                 Mark: 'AE4751429BC8',
                                  LogId: null,
                                  IsError: false,
                                  Errors: [],
@@ -837,42 +889,26 @@ export default class UserServiceController {
                                }
 
                     }
-                    else {
-
-                      result = {
-                                 StatusCode: 500, //ok
-                                 Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                 Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                                 Mark: '5B91FA66FE6D',
-                                 LogId: null,
-                                 IsError: true,
-                                 Errors: [
-                                           {
-                                             Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                             Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                                             Details: {
-                                                        EMail: request.body.EMail
-                                                      }
-                                           }
-                                         ],
-                                 Warnings: [],
-                                 Count: 0,
-                                 Data: []
-                               }
-
-                    }
 
                   }
-                  else { //Manual activation
+                  else if ( userSignup instanceof Error  ) {
+
+                    const error = userSignup as any;
 
                     result = {
-                               StatusCode: 200, //ok
-                               Code: 'SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION',
-                               Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. But you need wait to system administrator activate your new account' ),
-                               Mark: 'AE4751429BC8',
-                               LogId: null,
-                               IsError: false,
-                               Errors: [],
+                               StatusCode: 500,
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: '619404BC65B1',
+                               LogId: error.logId,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.Message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
                                Warnings: [],
                                Count: 0,
                                Data: []
@@ -881,46 +917,22 @@ export default class UserServiceController {
                   }
 
                 }
-                else if ( userSignup instanceof Error  ) {
-
-                  const error = userSignup as any;
-
-                  result = {
-                             StatusCode: 500,
-                             Code: 'ERROR_UNEXPECTED',
-                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: '619404BC65B1',
-                             LogId: error.logId,
-                             IsError: true,
-                             Errors: [
-                                       {
-                                         Code: error.name,
-                                         Message: error.Message,
-                                         Details: await SystemUtilities.processErrorDetails( error ) //error
-                                       }
-                                     ],
-                             Warnings: [],
-                             Count: 0,
-                             Data: []
-                           }
-
-                }
 
               }
               else {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                           Mark: 'F01229E593EE',
+                           Code: 'ERROR_PASSWORD_NOT_VALID',
+                           Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
+                           Mark: '24742802D110',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                                       Details: validator.errors.all()
+                                       Code: checkPasswordStrengthResult.code,
+                                       Message: checkPasswordStrengthResult.message,
+                                       Details: passwordStrengthParameters
                                      }
                                    ],
                            Warnings: [],
@@ -930,20 +942,27 @@ export default class UserServiceController {
 
               }
 
-              /*
-              if ( bUserGroupExists === false ) {
+            }
+            else {
 
-                await UserGroup.create(
-                                        {
-                                          Name: request.body.Name,
-                                          Role: signupProcessData.groupRole,
-                                          Comment: "Created by signup process",
-                                          Tag: signupProcessData.groupTag
-                                        }
-                                      );
-
-              }
-              */
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_CHECK_FIELD_VALUES_FAILED',
+                         Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                         Mark: '2AE9478D6D22',
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CHECK_FIELD_VALUES_FAILED',
+                                     Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                     Details: checkFieldValueResults
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
             }
 
@@ -952,16 +971,16 @@ export default class UserServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_PASSWORD_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
-                       Mark: '24742802D110',
+                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                       Mark: 'F01229E593EE',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: checkPasswordStrengthResult.code,
-                                   Message: checkPasswordStrengthResult.message,
-                                   Details: passwordStrengthParameters
+                                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                   Details: validator.errors.all()
                                  }
                                ],
                        Warnings: [],
@@ -1149,7 +1168,7 @@ export default class UserServiceController {
                    signupProcessData.group.trim() !== "" &&
                    signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
-                const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group,
+                const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
                                                                                    currentTransaction,
                                                                                    logger );
 
@@ -1200,7 +1219,7 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkDisabledByName( signupProcessData.group,
+                          await UserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
                                                                       currentTransaction,
                                                                       logger ) ) {
 
@@ -1225,7 +1244,7 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkExpiredByName( signupProcessData.group,
+                          await UserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
                                                                      currentTransaction,
                                                                      logger ) ) {
 
@@ -1288,20 +1307,24 @@ export default class UserServiceController {
 
                     const expireAt = signupProcessData.groupExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.groupExpireAt ): null;
 
+                    const strRole = signupProcessData.groupRole.replace( "@__FromName__@", userSignup.Name );
+
+                    const strTag = signupProcessData.groupTag.replace( "@__FromName__@", userSignup.Name );
+
                     //Create new group
                     userGroup = await UserGroupService.createOrUpdate(
-                                                                      {
-                                                                        Name: userSignup.Name,
-                                                                        Role: signupProcessData.groupRole,
-                                                                        Tag: signupProcessData.groupTag,
-                                                                        ExpireAt: expireAt ? expireAt.format(): null,
-                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                        Comment: userSignup.Comment
-                                                                      },
-                                                                      false,
-                                                                      currentTransaction,
-                                                                      logger
-                                                                    );
+                                                                       {
+                                                                         Name: userSignup.Name,
+                                                                         Role: strRole ? strRole: null,
+                                                                         Tag: strTag ? strTag: null,
+                                                                         ExpireAt: expireAt ? expireAt.format(): null,
+                                                                         CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                         Comment: userSignup.Comment
+                                                                       },
+                                                                       false,
+                                                                       currentTransaction,
+                                                                       logger
+                                                                     );
 
                   }
                   else {
@@ -1317,18 +1340,18 @@ export default class UserServiceController {
                        userGroup instanceof Error === false ) {
 
                     person = await PersonService.createOrUpdate(
-                                                                {
-                                                                  FirstName: userSignup.FirstName,
-                                                                  LastName: userSignup.LastName,
-                                                                  Phone: userSignup.Phone ? userSignup.Phone : null,
-                                                                  EMail: userSignup.EMail,
-                                                                  Comment: userSignup.Comment ? userSignup.Comment : null,
-                                                                  CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                },
-                                                                false,
-                                                                currentTransaction,
-                                                                logger
-                                                              );
+                                                                 {
+                                                                   FirstName: userSignup.FirstName,
+                                                                   LastName: userSignup.LastName,
+                                                                   Phone: userSignup.Phone ? userSignup.Phone : null,
+                                                                   EMail: userSignup.EMail,
+                                                                   Comment: userSignup.Comment ? userSignup.Comment : null,
+                                                                   CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                 },
+                                                                 false,
+                                                                 currentTransaction,
+                                                                 logger
+                                                               );
 
                     if ( person &&
                          person instanceof Error === false ) {
@@ -1336,6 +1359,10 @@ export default class UserServiceController {
                       const strPassword = await CipherManager.decrypt( userSignup.Password, logger );
 
                       const expireAt = signupProcessData.userExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.userExpireAt ) : null;
+
+                      const strRole = signupProcessData.userRole.replace( "@__FromName__@", userSignup.Name );
+
+                      const strTag = signupProcessData.userTag.replace( "@__FromName__@", userSignup.Name );
 
                       //Create new user
                       user = await UserService.createOrUpdate(
@@ -1345,8 +1372,8 @@ export default class UserServiceController {
                                                                  GroupId: userGroup.Id,
                                                                  Name: userSignup.Name,
                                                                  Password: strPassword,
-                                                                 Role: signupProcessData.userRole ? signupProcessData.userRole : null,
-                                                                 Tag: signupProcessData.userTag ? signupProcessData.userTag : null,
+                                                                 Role: strRole ? strRole : null,
+                                                                 Tag: strTag ? strTag : null,
                                                                  ExpireAt: expireAt ? expireAt.format(): null,
                                                                  Comment: userSignup.Comment,
                                                                  CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -1404,11 +1431,11 @@ export default class UserServiceController {
                                                                   file: `email-user-activation-${strTemplateKind}.pug`,
                                                                   language: context.Language,
                                                                   variables: {
-                                                                              user_name: userSignup.Name,
-                                                                              user_password: CommonUtilities.maskPassword( strPassword ),
-                                                                              web_app_url: strWebAppURL,
-                                                                              ... configData
-                                                                            }
+                                                                               user_name: userSignup.Name,
+                                                                               user_password: CommonUtilities.maskPassword( strPassword ),
+                                                                               web_app_url: strWebAppURL,
+                                                                               ... configData
+                                                                             }
                                                                   //kind: "embedded",
                                                                   //text: "Hello",
                                                                   //html: "<b>Hello</b>"
@@ -1583,7 +1610,7 @@ export default class UserServiceController {
                                {
                                  Code: 'ERROR_ACTIVATION_CODE_ALREADY_USED',
                                  Message: await I18NManager.translate( strLanguage, 'Activation code is already used' ),
-                                 Details: userSignup.ExpireAt
+                                 Details: null
                                }
                              ],
                      Warnings: [],
@@ -1605,7 +1632,7 @@ export default class UserServiceController {
                                {
                                  Code: 'ERROR_ACTIVATION_CODE_INVALID_STATUS',
                                  Message: await I18NManager.translate( strLanguage, 'Activation code has invalid status' ),
-                                 Details: userSignup.ExpireAt
+                                 Details: null
                                }
                              ],
                      Warnings: [],
@@ -1629,7 +1656,7 @@ export default class UserServiceController {
                              {
                                Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
                                Message: await I18NManager.translate( strLanguage, 'Activation code is not found' ),
-                               Details: { ExpiredAt: userSignup.ExpireAt }
+                               Details: null
                              }
                            ],
                    Warnings: [],
@@ -1834,14 +1861,14 @@ export default class UserServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Code: 'ERROR_USER_EXPIRED',
                        Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
                        Mark: '55C127F50C3B',
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Code: 'ERROR_USER_EXPIRED',
                                    Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
                                    Details: null
                                  }
@@ -2442,14 +2469,14 @@ export default class UserServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_GROUP_EXPIRED',
+                           Code: 'ERROR_USER_EXPIRED',
                            Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
                            Mark: '5EE4EEA9A907',
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                                       Code: 'ERROR_USER_EXPIRED',
                                        Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
                                        Details: null
                                      }
@@ -2648,15 +2675,15 @@ export default class UserServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_ACTIVATION_CODE_ALREADY_USED',
-                       Message: await I18NManager.translate( strLanguage, 'The activation code %s already used', request.body.Token ),
-                       Mark: "9CF443283D5F",
+                       Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
+                       Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Token ),
+                       Mark: "9512C5FEBECA",
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The activation code %s already used', request.body.Token ),
+                                   Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
+                                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Token ),
                                    Details: null,
                                  }
                                ],
@@ -2672,15 +2699,15 @@ export default class UserServiceController {
 
           result = {
                       StatusCode: 400, //Bad request
-                      Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                      Message: await I18NManager.translate( strLanguage, 'The activation code %s is expired', request.body.Token ),
-                      Mark: "17328B104012",
+                      Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
+                      Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Token ),
+                      Mark: "42E47D603396",
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
-                                  Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                                  Message: await I18NManager.translate( strLanguage, 'The activation code %s is expired', request.body.Token ),
+                                  Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
+                                  Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Token ),
                                   Details: null,
                                 }
                               ],
@@ -2696,15 +2723,15 @@ export default class UserServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The activation code %s not found in database', request.body.Token ),
-                   Mark: "3A23B2C2199B",
+                   Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Token ),
+                   Mark: "567B7A76F7BB",
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The activation code %s not found in database', request.body.Token ),
+                               Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Token ),
                                Details: null,
                              }
                            ],

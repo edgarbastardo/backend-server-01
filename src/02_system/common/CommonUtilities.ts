@@ -1053,10 +1053,10 @@ export default class CommonUtilities {
 
     if ( strPassword ) {
 
-      strResult = strResult + ", " + this.replaceRange( strPassword,
-                                                        2,
-                                                        strPassword.length - 2,
-                                                        "*".repeat( strPassword.length - 4 ) );
+      strResult = this.replaceRange( strPassword,
+                                     2,
+                                     strPassword.length - 2,
+                                     "*".repeat( strPassword.length - 4 ) );
 
     }
 
