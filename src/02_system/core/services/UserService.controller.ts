@@ -438,7 +438,6 @@ export default class UserServiceController {
 
   }
 
-
   static async isWebFrontendClient( strFrontendId: string,
                                     transaction: any,
                                     logger: any ): Promise<boolean> {
@@ -2755,9 +2754,730 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.passwordRecoverCodeSend.name;
+      sourcePosition.method = this.name + "." + this.passwordRecover.name;
 
       const strMark = "0E2B5CC808F4";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async passwordChange( request: Request,
+                               transaction: any,
+                               logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.passwordChange.name;
+
+      const strMark = "987FA955F3CC";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async emailChangeTokenSend( request: Request,
+                                     transaction: any,
+                                     logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.emailChangeTokenSend.name;
+
+      const strMark = "DA4AC49BB19C";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async emailChange( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.emailChange.name;
+
+      const strMark = "00CBBF80A7C0";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async phoneChangeTokenSend( request: Request,
+                                     transaction: any,
+                                     logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.phoneChangeTokenSend.name;
+
+      const strMark = "C05ECD83072C";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async phoneChange( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.phoneChange.name;
+
+      const strMark = "540DF2DAAA60";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async profile( request: Request,
+                        transaction: any,
+                        logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profile.name;
+
+      const strMark = "DBA7E36C5D40";
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async profileChange( request: Request,
+                              transaction: any,
+                              logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileChange.name;
+
+      const strMark = "59582149A69D";
 
       const debugMark = debug.extend( strMark );
 

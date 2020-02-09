@@ -17,6 +17,7 @@ import CacheManager from "../../common/managers/CacheManager";
 import { BinaryIndex } from "../../common/database/models/BinaryIndex";
 import CommonConstants from "../../common/CommonConstants";
 import I18NManager from '../../common/managers/I18Manager';
+import MiddlewareManager from '../../common/managers/MiddlewareManager';
 //import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
@@ -2012,9 +2013,9 @@ export default class BinaryServiceController extends BaseService {
               ( request as any ).returnResult = 1; //Force to return the result
 
               //Check for valid session token
-              let resultData = await SystemUtilities.middlewareCheckIsAuthenticated( request,
-                                                                                     null, //Not write response back
-                                                                                     null );
+              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request,
+                                                                                       null, //Not write response back
+                                                                                       null );
 
               if ( resultData &&
                    resultData.StatusCode == 200 ) { //Ok the authorization token is valid

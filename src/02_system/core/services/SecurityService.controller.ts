@@ -668,6 +668,7 @@ export default class SecurityServiceController {
                                  "DenyTagAccess",
                                  "Role",
                                  "Tag",
+                                 "ExpireAt",
                                ];
 
         let groupRoles = "";
@@ -853,6 +854,10 @@ export default class SecurityServiceController {
 
         }
 
+        const detectedWarnings = SystemUtilities.dectectUserWarnings( strLanguage,
+                                                                      userDataResponse,
+                                                                      logger );
+
         const userSessionStatusData = {
                                         UserId: user.Id,
                                         UserGroupId: user.GroupId,
@@ -864,7 +869,7 @@ export default class SecurityServiceController {
                                         ExpireKind: configData.kind,
                                         ExpireOn: configData.on,
                                         HardLimit: configData.hardLimit,
-                                        Tag: null,
+                                        Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
                                         CreatedBy: strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                         UpdatedBy: strUserName //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
                                       };
@@ -911,10 +916,6 @@ export default class SecurityServiceController {
                                            300, //5 minutes in seconds
                                            logger );
 
-        const warnings = SystemUtilities.dectectUserWarnings( strLanguage,
-                                                              userDataResponse,
-                                                              logger );
-
         if ( userSessionStatus !== null ) {
 
           result = {
@@ -924,7 +925,7 @@ export default class SecurityServiceController {
                      LogId: null,
                      IsError: false,
                      Errors: [],
-                     Warnings: warnings,
+                     Warnings: detectedWarnings.warnings,
                      Count: 1,
                      Data: [
                              {

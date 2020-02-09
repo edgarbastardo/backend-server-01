@@ -1,17 +1,18 @@
 import { allow, rule, and } from 'graphql-shield';
 import SystemUtilities from "../../../../common/SystemUtilities";
+import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
 
 export const permissions = {
 
   Query: {
 
-    getGroup: and( SystemUtilities.ruleCheckIsAuthenticated, SystemUtilities.ruleCheckIsAuthorized ), //allow,
+    getGroup: and( MiddlewareManager.ruleCheckIsAuthenticated, MiddlewareManager.ruleCheckIsAuthorized ), //allow,
 
   },
 
   Mutation: {
 
-    addGroup: and( SystemUtilities.ruleCheckIsAuthenticated, SystemUtilities.ruleCheckIsAuthorized ), //allow,
+    addGroup: and( MiddlewareManager.ruleCheckIsAuthenticated, MiddlewareManager.ruleCheckIsAuthorized ), //allow,
 
   }
 

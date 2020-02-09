@@ -20,6 +20,7 @@ import { injectable, inject } from 'inversify';
 import BinaryServiceController from "../../services/BinaryService.controller";
 import CommonConstants from '../../../common/CommonConstants';
 import I18NManager from "../../../common/managers/I18Manager";
+import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Binary.controller' );
 
@@ -116,7 +117,7 @@ export default class BinaryController {
 
       result.get( process.env.SERVER_ROOT_PATH + BinaryController._ROUTE_INFO[ 4 ].Path + "/:id?/:auth?/:thumbnail?",
                   [
-                    SystemUtilities.middlewareSetContext,
+                    MiddlewareManager.middlewareSetContext,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -248,9 +249,9 @@ export default class BinaryController {
 
   @httpPost(
              "/auth",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated,
-             SystemUtilities.middlewareCheckIsAuthorized
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized
            )
   async createAuth( request: Request, response: Response ) {
 
@@ -313,9 +314,9 @@ export default class BinaryController {
 
   @httpDelete(
                "/auth",
-               SystemUtilities.middlewareSetContext,
-               SystemUtilities.middlewareCheckIsAuthenticated,
-               SystemUtilities.middlewareCheckIsAuthorized
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized
              )
   async deleteAuth( request: Request, response: Response ) {
 
@@ -378,9 +379,9 @@ export default class BinaryController {
 
   @httpGet(
              "/search",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated,
-             SystemUtilities.middlewareCheckIsAuthorized
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized
            )
   async search( request: Request, response: Response ) {
 
@@ -398,9 +399,9 @@ export default class BinaryController {
 
   @httpGet(
              "/search/count",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated,
-             SystemUtilities.middlewareCheckIsAuthorized
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized
            )
   async searchCount( request: Request, response: Response ) {
 
@@ -478,9 +479,9 @@ export default class BinaryController {
 
   @httpPost(
              "/",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated,
-             SystemUtilities.middlewareCheckIsAuthorized
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized
            )
   async uploadBinaryData( request: Request, response: Response ) {
 

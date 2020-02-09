@@ -21,7 +21,7 @@ export const validators = {
                      {
                        Code: "ERROR_BAD_USER_INPUT",
                        Message: I18NManager.translateSync( strLanguage, "The FrontendId parameter value cannot be empty" ),
-                       Details: { Field: "FrontendId" } 
+                       Details: { Field: "FrontendId" }
                      }
                    );
 

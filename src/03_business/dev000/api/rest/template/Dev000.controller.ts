@@ -19,6 +19,7 @@ import I18NManager from '../../../../../02_system/common/managers/I18Manager';
 
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Dev000.controller' );
 
@@ -99,8 +100,8 @@ export default class Dev000Controller {
 
   @httpGet(
             "/",
-            SystemUtilities.middlewareSetContext,
-            SystemUtilities.middlewareCheckIsAuthenticated
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
           )
   async getDev000Example( request: Request, response: Response ) {
 

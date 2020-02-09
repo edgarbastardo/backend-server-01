@@ -1,13 +1,16 @@
 import SystemUtilities from "../../../common/SystemUtilities";
 import { allow } from "graphql-shield";
+import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+
+const debug = require( 'debug' )( 'Security.permission' );
 
 export const permissions = {
 
   Mutation: {
 
     login: allow,
-    logout: SystemUtilities.ruleCheckIsAuthenticated, //allow,
-    tokenCheck: SystemUtilities.ruleCheckIsAuthenticated, //allow,
+    logout: MiddlewareManager.ruleCheckIsAuthenticated, //allow,
+    tokenCheck: MiddlewareManager.ruleCheckIsAuthenticated, //allow,
 
   }
 
@@ -22,5 +25,12 @@ export const roles = {
   login: { AccessKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },
   logout: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Made the authentication token invalid" },
   tokenCheck: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Check if authentication token is valid" }
+
+}
+
+export async function init( logger: any ): Promise<void> {
+
+  let debugMark = debug.extend( '315832C57E6C' );
+  debugMark( "Init called" );
 
 }

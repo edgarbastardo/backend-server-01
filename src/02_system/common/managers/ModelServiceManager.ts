@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import CommonConstants from '../CommonConstants';
+
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
-import CommonConstants from '../CommonConstants';
 
 const debug = require( 'debug' )( 'ModelServiceManager' );
 

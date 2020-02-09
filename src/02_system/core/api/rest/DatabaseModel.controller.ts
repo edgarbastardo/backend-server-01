@@ -11,6 +11,7 @@ import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPISe
 import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
 import ModelServiceManager from "../../../common/managers/ModelServiceManager";
 import I18NManager from "../../../common/managers/I18Manager";
+import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'DatabaseModel.controller' );
 
@@ -148,9 +149,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 0 ].Path,
                   [
-                    SystemUtilities.middlewareSetContext,
-                    SystemUtilities.middlewareCheckIsAuthenticated,
-                    SystemUtilities.middlewareCheckIsAuthorized,
+                    MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareCheckIsAuthenticated,
+                    MiddlewareManager.middlewareCheckIsAuthorized,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -253,9 +254,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name/search
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 1 ].Path,
                   [
-                    SystemUtilities.middlewareSetContext,
-                    SystemUtilities.middlewareCheckIsAuthenticated,
-                    SystemUtilities.middlewareCheckIsAuthorized,
+                    MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareCheckIsAuthenticated,
+                    MiddlewareManager.middlewareCheckIsAuthorized,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -361,9 +362,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name/search/count
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 2 ].Path,
                   [
-                    SystemUtilities.middlewareSetContext,
-                    SystemUtilities.middlewareCheckIsAuthenticated,
-                    SystemUtilities.middlewareCheckIsAuthorized,
+                    MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareCheckIsAuthenticated,
+                    MiddlewareManager.middlewareCheckIsAuthorized,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -467,7 +468,7 @@ export default class DatabaseModelController {
       // -> /database/model/:name (Create)
       result.post( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 3 ].Path,
                    [
-                     SystemUtilities.middlewareSetContext,
+                     MiddlewareManager.middlewareSetContext,
                      //SystemUtilities.middlewareCheckIsAuthenticated,
                      //SystemUtilities.middlewareCheckIsAuthorized,
                    ], //Midddlewares
@@ -572,9 +573,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name/bulk (Create)
       result.post( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 4 ].Path,
                    [
-                     SystemUtilities.middlewareSetContext,
-                     SystemUtilities.middlewareCheckIsAuthenticated,
-                     SystemUtilities.middlewareCheckIsAuthorized,
+                     MiddlewareManager.middlewareSetContext,
+                     MiddlewareManager.middlewareCheckIsAuthenticated,
+                     MiddlewareManager.middlewareCheckIsAuthorized,
                    ], //Midddlewares
                    async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -680,9 +681,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name (Update)
       result.put( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 5 ].Path,
                   [
-                    SystemUtilities.middlewareSetContext,
-                    SystemUtilities.middlewareCheckIsAuthenticated,
-                    SystemUtilities.middlewareCheckIsAuthorized,
+                    MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareCheckIsAuthenticated,
+                    MiddlewareManager.middlewareCheckIsAuthorized,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -785,9 +786,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name/bulk (Update)
       result.put( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 6 ].Path,
                   [
-                    SystemUtilities.middlewareSetContext,
-                    SystemUtilities.middlewareCheckIsAuthenticated,
-                    SystemUtilities.middlewareCheckIsAuthorized,
+                    MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareCheckIsAuthenticated,
+                    MiddlewareManager.middlewareCheckIsAuthorized,
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -891,9 +892,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name (Delete)
       result.delete( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 7 ].Path,
                      [
-                       SystemUtilities.middlewareSetContext,
-                       SystemUtilities.middlewareCheckIsAuthenticated,
-                       SystemUtilities.middlewareCheckIsAuthorized,
+                       MiddlewareManager.middlewareSetContext,
+                       MiddlewareManager.middlewareCheckIsAuthenticated,
+                       MiddlewareManager.middlewareCheckIsAuthorized,
                      ], //Midddlewares
                      async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -995,9 +996,9 @@ export default class DatabaseModelController {
       // -> /database/model/:name/bulk (Delete)
       result.delete( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 8 ].Path,
                      [
-                       SystemUtilities.middlewareSetContext,
-                       SystemUtilities.middlewareCheckIsAuthenticated,
-                       SystemUtilities.middlewareCheckIsAuthorized,
+                       MiddlewareManager.middlewareSetContext,
+                       MiddlewareManager.middlewareCheckIsAuthenticated,
+                       MiddlewareManager.middlewareCheckIsAuthorized,
                      ], //Midddlewares
                      async ( request: Request, response: Response, next: NextFunction ) => {
 

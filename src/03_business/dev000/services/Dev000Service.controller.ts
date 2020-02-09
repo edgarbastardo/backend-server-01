@@ -36,7 +36,7 @@ export default class Dev000ServicesController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context; //context is injected by SystemUtilities.middlewareSetContext function
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
 
       strLanguage = context.Language;
 

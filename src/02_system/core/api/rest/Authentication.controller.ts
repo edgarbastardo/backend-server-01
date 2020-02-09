@@ -16,6 +16,7 @@ import {
 import { injectable, inject } from 'inversify';
 import SecurityServiceController from '../../services/SecurityService.controller';
 import CommonConstants from '../../../common/CommonConstants';
+import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Authentication.controller' );
 
@@ -98,7 +99,7 @@ export default class AuthenticationController {
 
   @httpPost(
              "/login",
-             SystemUtilities.middlewareSetContext
+             MiddlewareManager.middlewareSetContext
            )
   async login( request: Request, response: Response ) {
 
@@ -119,8 +120,8 @@ export default class AuthenticationController {
 
   @httpPost(
              "/logout",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
            )
   async logout( request: Request, response: Response ) {
 
@@ -137,8 +138,8 @@ export default class AuthenticationController {
 
   @httpPost(
              "/token/check",
-             SystemUtilities.middlewareSetContext,
-             SystemUtilities.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
            )
   async tokenCheck( request: Request, response: Response ) {
 

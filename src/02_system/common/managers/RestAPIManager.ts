@@ -54,14 +54,20 @@ export default class RestAPIManager {
 
             const controller = new importModule.default( logger );
 
-            if ( controller.registerInDataBase &&
+            if ( typeof controller.init === "function" ) {
+
+              await controller.init( logger );
+
+            }
+
+            if ( typeof controller.registerInDataBase === "function" &&
                  process.env.IS_NETWORK_LEADER === "1" ) {
 
               await controller.registerInDataBase( logger );
 
             }
 
-            if ( controller.createRoutes ) {
+            if ( typeof controller.createRoutes === "function" ) {
 
               const routes = await controller.createRoutes( logger );
 

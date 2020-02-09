@@ -140,6 +140,13 @@ export default class GraphQLAPIManager {
 
         }
 
+        if ( obj.init &&
+             typeof obj.init === "function" ) {
+
+          obj.init( logger );
+
+        }
+
       }
 
       for ( const dir of dirs ) {
