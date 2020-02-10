@@ -59,28 +59,28 @@ export default class RouteService extends BaseService {
 
       }
 
-      let route = await Route.findOne( options );
+      let routeInDB = await Route.findOne( options );
 
-      //debugMark( "1 =>", route );
+      //debugMark( "1 =>", routeInDB );
 
-      if ( CommonUtilities.isNullOrEmpty( route ) ) {
+      if ( CommonUtilities.isNullOrEmpty( routeInDB ) ) {
 
-        route = await Route.create(
-                                    {
-                                      AccessKind: intAccessKind,
-                                      RequestKind: intRequestKind,
-                                      Path: strPath,
-                                      AllowTagAccess: strAllowTagAccess,
-                                      Description: strDescription,
-                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                    },
-                                    { transaction: currentTransaction }
-                                  );
+        result = await Route.create(
+                                     {
+                                       AccessKind: intAccessKind,
+                                       RequestKind: intRequestKind,
+                                       Path: strPath,
+                                       AllowTagAccess: strAllowTagAccess,
+                                       Description: strDescription,
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                     },
+                                     { transaction: currentTransaction }
+                                   );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = ( route as any ).dataValues;
+        const currentValues = ( routeInDB as any ).dataValues;
         currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         currentValues.AllowTagAccess = SystemUtilities.mergeTokens( currentValues.AllowTagAccess,
@@ -88,8 +88,15 @@ export default class RouteService extends BaseService {
                                                                     false,
                                                                     logger );
 
-        await Route.update( currentValues,
-                            options );
+        const updateResult = await Route.update( currentValues,
+                                                 options );
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await Route.findOne( options );
+
+        }
 
       }
 
@@ -100,40 +107,6 @@ export default class RouteService extends BaseService {
         await currentTransaction.commit();
 
       }
-
-      result = route;
-
-      /*
-      const loopAsync = async () => {
-
-        await CommonUtilities.asyncForEach( roles, async ( strRoleName: string, intIndex: number ) => {
-
-          const role = await RoleService.createOrUpdate( strRoleName,
-                                                         "Auto created by backend at startup",
-                                                         currentTransaction,
-                                                         logger );
-
-          await RoleHasRouteService.createOrUpdate( ( role as any ).dataValues.Id,
-                                                    ( route as any ).dataValues.Id,
-                                                    currentTransaction,
-                                                    logger );
-
-        });
-
-        if ( currentTransaction != null &&
-             currentTransaction.finished !== "rollback" &&
-             bApplyTansaction ) {
-
-          await currentTransaction.commit();
-
-        }
-
-        result = route;
-
-      }
-
-      await loopAsync();
-      */
 
     }
     catch ( error ) {
@@ -174,6 +147,8 @@ export default class RouteService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 

@@ -159,8 +159,15 @@ export default class PersonService extends BaseService {
 
         }
 
-        await Person.update( currentValues,
-                             options );
+        result = await Person.update( currentValues,
+                                      options );
+
+        if ( result.length > 0 &&
+             result[ 0 ] >= 1 ) {
+
+          result = await Person.findOne( options );
+
+        }
 
       }
 

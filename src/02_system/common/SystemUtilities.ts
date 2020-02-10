@@ -30,6 +30,7 @@ import RoleService from "./database/services/RoleService";
 import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
+import { UserSessionStatus } from "./database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'SystemUtilities' );
 
@@ -629,7 +630,7 @@ export default class SystemUtilities {
 
     if ( CommonUtilities.isNotNullOrEmpty( strToken ) ) {
 
-      if ( bForceReadFromDB === false ||
+      if ( bForceReadFromDB === false &&
            process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
 
         const strJSONUserSessionStatus = await CacheManager.getData( strToken,
@@ -813,7 +814,7 @@ export default class SystemUtilities {
 
     if ( CommonUtilities.isNotNullOrEmpty( strToken ) ) {
 
-      if ( bForceReadFromDB === false ||
+      if ( bForceReadFromDB === false &&
            process.env.USER_SESION_STATUS_FROM_CACHE === "1" ) {
 
         const strJSONUserSessionStatus = await CacheManager.getData( strToken,
@@ -932,7 +933,9 @@ export default class SystemUtilities {
                                                 intTryLock: number,
                                                 intLockSeconds: number,
                                                 transaction: any,
-                                                logger: any ) {
+                                                logger: any ):Promise<UserSessionStatus> {
+
+    let result = null;
 
     //Check UpdateAt field not more old to 15 seconds aprox
     const duration = moment.duration(
@@ -999,12 +1002,24 @@ export default class SystemUtilities {
 
           }
 
-          await UserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
-                                                         strToken,
-                                                         dataToWriteToDB,
-                                                         true,
-                                                         transaction,
-                                                         logger ); //Refresh the UpdatedAt field in central db
+          if ( userSessionStatus.Tag ) {
+
+            dataToWriteToDB[ 'Tag' ] = userSessionStatus.Tag;
+
+          }
+
+          if ( userSessionStatus.ExtraData ) {
+
+            dataToWriteToDB[ 'ExtraData' ] = userSessionStatus.ExtraData;
+
+          }
+
+          result = await UserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
+                                                                  strToken,
+                                                                  dataToWriteToDB,
+                                                                  true,
+                                                                  transaction,
+                                                                  logger ); //Refresh the UpdatedAt field in central db
 
         }
 
@@ -1045,7 +1060,7 @@ export default class SystemUtilities {
 
     }
 
-    //}
+    return result;
 
   }
 
@@ -1391,7 +1406,7 @@ export default class SystemUtilities {
                                 }
                               );
 
-          result.tag = !result.tag ? "#PASSSWORD_EXPIRED#" : result.tag + "#PASSSWORD_EXPIRED#";
+          result.tag = !result.tag ? "#PASSSWORD_EXPIRED#" : result.tag + ",#PASSSWORD_EXPIRED#";
 
         }
 

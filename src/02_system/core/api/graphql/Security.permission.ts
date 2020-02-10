@@ -30,7 +30,9 @@ export const roles = {
 
 export async function init( logger: any ): Promise<void> {
 
-  let debugMark = debug.extend( '315832C57E6C' );
-  debugMark( "Init called" );
+  //let debugMark = debug.extend( '315832C57E6C' );
+  //debugMark( "Init called" );
+  await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( "tokenCheck" );
+  await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( "logout" );
 
 }

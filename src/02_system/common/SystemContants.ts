@@ -347,6 +347,32 @@ export default class SystemConstants {
                                                                                             "minSymbol":0,
                                                                                             "maxSymbol":0,
                                                                                             "symbols":""
+                                                                                          },
+                                                                                          "#System_Administrators#": {
+                                                                                            "minLength":8,
+                                                                                            "maxLength":0,
+                                                                                            "minLowerCase":4,
+                                                                                            "maxLowerCase":0,
+                                                                                            "minUpperCase":0,
+                                                                                            "maxUpperCase":0,
+                                                                                            "minDigit":2,
+                                                                                            "maxDigit":0,
+                                                                                            "minSymbol":2,
+                                                                                            "maxSymbol":0,
+                                                                                            "symbols":""
+                                                                                          },
+                                                                                          "#Business_Managers#": {
+                                                                                            "minLength":8,
+                                                                                            "maxLength":0,
+                                                                                            "minLowerCase":4,
+                                                                                            "maxLowerCase":0,
+                                                                                            "minUpperCase":0,
+                                                                                            "maxUpperCase":0,
+                                                                                            "minDigit":2,
+                                                                                            "maxDigit":0,
+                                                                                            "minSymbol":1,
+                                                                                            "maxSymbol":0,
+                                                                                            "symbols":""
                                                                                           }
                                                                                         }
                                                                                       ),
@@ -366,6 +392,32 @@ export default class SystemConstants {
                                                                                             "minDigit":0,
                                                                                             "maxDigit":0,
                                                                                             "minSymbol":0,
+                                                                                            "maxSymbol":0,
+                                                                                            "symbols":""
+                                                                                          },
+                                                                                          "#System_Administrators#": {
+                                                                                            "minLength":8,
+                                                                                            "maxLength":0,
+                                                                                            "minLowerCase":4,
+                                                                                            "maxLowerCase":0,
+                                                                                            "minUpperCase":0,
+                                                                                            "maxUpperCase":0,
+                                                                                            "minDigit":2,
+                                                                                            "maxDigit":0,
+                                                                                            "minSymbol":2,
+                                                                                            "maxSymbol":0,
+                                                                                            "symbols":""
+                                                                                          },
+                                                                                          "#Business_Managers#": {
+                                                                                            "minLength":8,
+                                                                                            "maxLength":0,
+                                                                                            "minLowerCase":4,
+                                                                                            "maxLowerCase":0,
+                                                                                            "minUpperCase":0,
+                                                                                            "maxUpperCase":0,
+                                                                                            "minDigit":2,
+                                                                                            "maxDigit":0,
+                                                                                            "minSymbol":1,
                                                                                             "maxSymbol":0,
                                                                                             "symbols":""
                                                                                           },

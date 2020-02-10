@@ -48,10 +48,10 @@ export default class ConfigMetaDataService extends BaseService {
 
       if ( CommonUtilities.isNullOrEmpty( configMetaDataInDB ) ) {
 
-        configMetaDataInDB = await ConfigMetaData.create(
-                                                          configMetaDataToCreate,
-                                                          { transaction: currentTransaction }
-                                                        );
+        result = await ConfigMetaData.create(
+                                              configMetaDataToCreate,
+                                              { transaction: currentTransaction }
+                                            );
 
       }
       else if ( bUpdate ) {
@@ -64,9 +64,15 @@ export default class ConfigMetaDataService extends BaseService {
 
         }
 
-        await ConfigMetaData.update( currentValues,
-                                     options );
+        const updateResult = await ConfigMetaData.update( currentValues,
+                                                          options );
 
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await ConfigMetaData.findOne( options );
+
+        }
 
       }
 
@@ -77,8 +83,6 @@ export default class ConfigMetaDataService extends BaseService {
         await currentTransaction.commit();
 
       }
-
-      result = configMetaDataInDB;
 
     }
     catch ( error ) {
@@ -119,6 +123,8 @@ export default class ConfigMetaDataService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 

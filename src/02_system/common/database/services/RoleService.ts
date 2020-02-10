@@ -60,14 +60,14 @@ export default class RoleService extends BaseService {
 
       if ( CommonUtilities.isNullOrEmpty( roleInDB ) ) {
 
-        roleInDB = await Role.create(
-                                      {
-                                        Name: strName,
-                                        Comment: strComment,
-                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                      },
-                                      { transaction: currentTransaction }
-                                    );
+        result = await Role.create(
+                                    {
+                                      Name: strName,
+                                      Comment: strComment,
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                    },
+                                    { transaction: currentTransaction }
+                                  );
 
       }
       else if ( bUpdate &&
@@ -79,8 +79,15 @@ export default class RoleService extends BaseService {
 
         //debugMark( "2 => %O", role );
 
-        await Role.update( currentValues,
-                           options );
+        const updateResult = await Role.update( currentValues,
+                                                options );
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await Role.findOne( options );
+
+        }
 
       }
 
@@ -91,8 +98,6 @@ export default class RoleService extends BaseService {
         await currentTransaction.commit();
 
       }
-
-      result = roleInDB;
 
     }
     catch ( error ) {
@@ -133,6 +138,8 @@ export default class RoleService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 

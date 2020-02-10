@@ -327,8 +327,15 @@ export default class UserGroupService extends BaseService {
 
         }
 
-        await UserGroup.update( currentValues,
-                                options );
+        const updateResult = await UserGroup.update( currentValues,
+                                                     options );
+
+        if ( updateResult.length > 0 &&
+          updateResult[ 0 ] >= 1 ) {
+
+          result = await UserGroup.findOne( options );
+
+        }
 
       }
 

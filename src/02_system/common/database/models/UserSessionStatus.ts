@@ -17,6 +17,7 @@ import { User } from "./User";
 //import SystemUtilities from "../../SystemUtilities";
 import { UserGroup } from "./UserGroup";
 import SystemUtilities from "../../SystemUtilities";
+import SystemConstants from "../../SystemContants";
 
 @Table( {
   timestamps: false,
@@ -49,6 +50,9 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   @PrimaryKey
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Token: string;
+
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  ShortToken: string;
 
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   BinaryDataToken: string;
@@ -86,10 +90,10 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
@@ -110,16 +114,31 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   @BeforeValidate
   static beforeValidateHook( instance: UserSessionStatus, options: any ): void {
 
+    SystemUtilities.commonBeforeValidateHook( instance, options );
+
+    if ( !instance.ShortToken ) {
+
+      instance.ShortToken =  SystemUtilities.hashString( instance.Token, 2, null ) + SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 2, null ).substring( 4 );
+
+    }
+
+    /*
     if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
 
       instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
     }
+    */
 
-    if ( CommonUtilities.isNullOrEmpty( instance.LoggedOutAt ) ||
-         CommonUtilities.isNullOrEmpty( instance.UpdatedAt ) ) {
+    if ( !instance.UpdatedAt ) {
 
       instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+
+    }
+
+    if ( !instance.UpdatedBy ) {
+
+      instance.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
 
     }
 

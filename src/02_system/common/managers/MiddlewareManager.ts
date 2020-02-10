@@ -18,6 +18,7 @@ export default class MiddlewareManager {
 
   private static middlewareInterceptorList = [];
   private static bypassMiddlewareInterceptorPathList = [];
+  private static realPathList = [];
 
   public static async registerToCallMiddlewareInterceptor( middlewareFunction: Function ) {
 
@@ -46,7 +47,31 @@ export default class MiddlewareManager {
 
       }
 
-      this.bypassMiddlewareInterceptorPathList = [ ...this.bypassMiddlewareInterceptorPathList, strPath ];
+      if ( this.bypassMiddlewareInterceptorPathList.includes( strPath ) === false ) {
+
+        this.bypassMiddlewareInterceptorPathList = [ ...this.bypassMiddlewareInterceptorPathList, strPath ];
+
+      }
+
+    }
+
+  }
+
+  public static async registerRealPath( strPath: string ) {
+
+    if ( strPath ) {
+
+      if ( !this.realPathList ) {
+
+        this.realPathList = [];
+
+      }
+
+      if ( this.realPathList.includes( strPath ) === false ) {
+
+        this.realPathList = [ ...this.realPathList, strPath ];
+
+      }
 
     }
 
@@ -470,7 +495,18 @@ export default class MiddlewareManager {
     let userSessionStatus = context ? context.UserSessionStatus : null; //Context is set from previous chain function middlewareSetContext
 
     //ANCHOR get path route requested
-    let strPath = request.route && request.route.path ? request.route.path : request.path;
+    let strPath = "";
+
+    if ( MiddlewareManager.realPathList.includes( request.path ) ) {
+
+      strPath = request.path;
+
+    }
+    else {
+
+      strPath = request.route && request.route.path ? request.route.path : request.path;
+
+    }
 
     if ( process.env.SERVER_ROOT_PATH ) {
 
@@ -636,7 +672,8 @@ export default class MiddlewareManager {
 
         }
 
-        if ( result === null ) {
+        if ( result === false ||
+             result === null ) {
 
           result = true;
 

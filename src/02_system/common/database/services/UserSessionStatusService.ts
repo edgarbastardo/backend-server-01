@@ -368,8 +368,15 @@ export default class UserSessionStatusService extends BaseService {
 
         }
 
-        await UserSessionStatus.update( data,
-                                        options );
+        const updateResult = await UserSessionStatus.update( data,
+                                                             options );
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await UserSessionStatus.findOne( options );
+
+        }
 
       }
 
@@ -422,6 +429,8 @@ export default class UserSessionStatusService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 

@@ -11,7 +11,7 @@ import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPISe
 import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
 import ModelServiceManager from "../../../common/managers/ModelServiceManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import MiddlewareManager from "../../../common/managers/MiddlewareManager";
 
 const debug = require( 'debug' )( 'DatabaseModel.controller' );
 
@@ -91,6 +91,7 @@ export default class DatabaseModelController {
 
             }
 
+            MiddlewareManager.registerRealPath( process.env.SERVER_ROOT_PATH + strRealPath );
 
             await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                             routeInfo.RequestKind,

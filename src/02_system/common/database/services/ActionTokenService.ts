@@ -358,8 +358,15 @@ export default class ActionTokenService extends BaseService {
 
         }
 
-        await ActionToken.update( currentValues,
-                                  options );
+        const updateResult = await ActionToken.update( currentValues,
+                                                       options );
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await ActionToken.findOne( options );
+
+        }
 
       }
 

@@ -1404,16 +1404,16 @@ export default class BinaryServiceController extends BaseService {
         userSessionStatus.BinaryDataToken = strBinaryDataToken;
 
         //Update the cache and database
-        SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
-                                                         userSessionStatus,
-                                                         false, //Set roles?
-                                                         null,
-                                                         null,
-                                                         true,    //Force update?
-                                                         2,        //Only 1 try
-                                                         4 * 1000, //Second
-                                                         transaction,
-                                                         logger );
+        await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
+                                                               userSessionStatus,
+                                                               false, //Set roles?
+                                                               null,
+                                                               null,
+                                                               true,    //Force update?
+                                                               2,        //Only 1 try
+                                                               4 * 1000, //Second
+                                                               transaction,
+                                                               logger );
 
         await CacheManager.setData( strBinaryDataToken,
                                     userSessionStatus.Token,

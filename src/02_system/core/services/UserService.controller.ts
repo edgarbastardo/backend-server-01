@@ -1807,8 +1807,8 @@ export default class UserServiceController {
 
           }
           else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                                currentTransaction,
-                                                                logger ) ) {
+                                                               currentTransaction,
+                                                               logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -2388,11 +2388,11 @@ export default class UserServiceController {
                                                         logger );
 
             if ( userInDB != null &&
-                userInDB instanceof Error === false ) {
+                 userInDB instanceof Error === false ) {
 
               if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+                                                               currentTransaction,
+                                                               logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -2415,8 +2415,8 @@ export default class UserServiceController {
 
               }
               else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                                  currentTransaction,
-                                                                  logger ) ) {
+                                                                   currentTransaction,
+                                                                   logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -2439,8 +2439,8 @@ export default class UserServiceController {
 
               }
               else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+                                                               currentTransaction,
+                                                               logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -2505,6 +2505,7 @@ export default class UserServiceController {
                                                                                 logger );
 
                   userInDB.Password = request.body.Password;
+                  userInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
                   userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
                   const userWithPasswordChanged = UserService.createOrUpdate( ( userInDB as any ).dataValues,
@@ -2525,6 +2526,7 @@ export default class UserServiceController {
                                                                                         currentTransaction,
                                                                                         logger );
 
+                    //ANCHOR update the token
                     if ( actionTokenUpdated instanceof Error ) {
 
                       const error = userWithPasswordChanged as any;
@@ -2542,7 +2544,7 @@ export default class UserServiceController {
                     result = {
                                StatusCode: 200, //ok
                                Code: 'SUCCESS_PASSWORD_CHANGE',
-                               Message: await I18NManager.translate( strLanguage, 'Success to change the password' ),
+                               Message: await I18NManager.translate( strLanguage, 'Success to change the password. Remember use it in the next login' ),
                                Mark: '49E15D297D10',
                                LogId: null,
                                IsError: false,
@@ -2824,6 +2826,8 @@ export default class UserServiceController {
 
     let bApplyTansaction = false;
 
+    let bCheckCurrentPassword = true;
+
     let strLanguage = "";
 
     try {
@@ -2842,7 +2846,463 @@ export default class UserServiceController {
 
       }
 
-      //
+      if ( context.Authorization.startsWith( "p:" ) === false ) {
+
+        let userSessionStatus = context.UserSessionStatus;
+
+        let bIsNotAuthorized = false;
+
+        let bUpdateSessionStatus = true;
+
+        let userInDB = null;
+
+        if ( request.body.User ||
+             request.body.UserId ) {
+
+          if ( request.body.UserId ) {
+
+            userInDB = await UserService.getById( request.body.UserId,
+                                                  null,
+                                                  currentTransaction,
+                                                  logger );
+
+          }
+          else {
+
+            userInDB = await UserService.getByName( request.body.User,
+                                                    null,
+                                                    currentTransaction,
+                                                    logger );
+
+          }
+
+          const bIsAdministrator = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ): false;
+          let bIsMaster = false;
+
+          if ( bIsAdministrator === false ) {
+
+            bIsMaster = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master#" ) ||
+                                                 userSessionStatus.Role.includes( "#" +  userInDB.UserGroup.Name + "#" ): false;
+
+            if ( bIsMaster &&
+                 userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+
+              //Uhathorized
+              bIsNotAuthorized = true;
+
+            }
+
+          }
+
+          if ( userInDB.Id !== userSessionStatus.UserId ) {
+
+            if ( bIsAdministrator ||
+                bIsMaster ) {
+
+              bUpdateSessionStatus = false;
+              bCheckCurrentPassword = false;
+
+            }
+
+          }
+
+        }
+        else {
+
+          //Force to read from DB the user session status. To try to get more fresh version possible
+          userSessionStatus = await SystemUtilities.getUserSessionStatus( context.Authorization,
+                                                                          context,
+                                                                          false,    //No update at field
+                                                                          true,     //Force from db
+                                                                          currentTransaction,
+                                                                          logger );
+
+          userInDB = await UserService.getById( userSessionStatus.UserId,
+                                                null,
+                                                currentTransaction,
+                                                logger );
+
+        }
+
+        if ( bIsNotAuthorized ) {
+
+          result = {
+                     StatusCode: 401, //Unauthorized
+                     Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
+                     Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', userInDB.Name ),
+                     Mark: "CD5990E0CBD1",
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
+                                 Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', userInDB.Name ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( userInDB != null &&
+                  userInDB instanceof Error === false ) {
+
+          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Mark: '34B74D7BDF33',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Mark: '933C3B47067B',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                       Mark: '57D0268A40C3',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                          currentTransaction,
+                                                          logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                       Mark: 'C90533CFEFF0',
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( bCheckCurrentPassword === false ||
+                 await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
+
+              const strNewPassword = request.body.NewPassword;
+
+              //ANCHOR check password Strength
+              const strTag = "#" + userInDB.Id + "#,#" + userInDB.Name + "#,#" + userInDB.UserGroup.Id + "#,#" + userInDB.UserGroup.Name + "#";
+
+              const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
+                                                                                                                      currentTransaction,
+                                                                                                                      logger );
+
+              const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
+                                                                                                         strNewPassword,
+                                                                                                         logger );
+
+              if ( checkPasswordStrengthResult.code === 1 ) {
+
+                userInDB.Password = strNewPassword;
+                userInDB.ForceChangePassword = 0;
+                userInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
+                userInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+                const userWithPasswordChanged = await UserService.createOrUpdate( ( userInDB as any).dataValues,
+                                                                                  true,
+                                                                                  currentTransaction,
+                                                                                  logger );
+
+                if ( userWithPasswordChanged !== null &&
+                     userWithPasswordChanged instanceof Error === false ) {
+
+                  const warnings = [];
+
+                  if ( bUpdateSessionStatus ) {
+
+                    userSessionStatus.Tag = userSessionStatus.Tag.replace( /#FORCE_CHANGE_PASSSWORD#(,)?/g, "" );
+                    userSessionStatus.Tag = userSessionStatus.Tag.replace( /(,)?#FORCE_CHANGE_PASSSWORD#/g, "" );
+                    userSessionStatus.Tag = userSessionStatus.Tag.replace( /#PASSSWORD_EXPIRED#(,)?/g, "" );
+                    userSessionStatus.Tag = userSessionStatus.Tag.replace( /(,)?#PASSSWORD_EXPIRED#/g, "" );
+                    userSessionStatus.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+
+                    //ANCHOR update the session
+                    const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
+                                                                                                            userSessionStatus,
+                                                                                                            false, //Set roles?
+                                                                                                            null,
+                                                                                                            null,
+                                                                                                            true,     //Force update?
+                                                                                                            3,        //3 tries
+                                                                                                            3 * 1000, //Second
+                                                                                                            transaction,
+                                                                                                            logger );
+
+                    if ( userSessionStatusUpdated instanceof Error ) {
+
+                      const error = userWithPasswordChanged as any;
+
+                      warnings.push(
+                                    {
+                                      Code: error.name,
+                                      Message: error.message,
+                                      Details: await SystemUtilities.processErrorDetails( error )
+                                    }
+                                  );
+
+                      warnings.push(
+                                    {
+                                      Code: "WARNING_FAILED_UPDATE_USER_SESSION_STATUS",
+                                      Message: "Failed to update the user session status. You are required to close the session and start another",
+                                      Details: null
+                                    }
+                                  );
+
+                    }
+
+                  }
+
+                  result = {
+                             StatusCode: 200, //ok
+                             Code: 'SUCCESS_PASSWORD_CHANGE',
+                             Message: await I18NManager.translate( strLanguage, 'Success to change the password. Remember use it in the next login' ),
+                             Mark: 'EDCDE884CDA5',
+                             LogId: null,
+                             IsError: false,
+                             Errors: [],
+                             Warnings: warnings,
+                             Count: 0,
+                             Data: []
+                           }
+
+                  if ( userInDB.UserPerson &&
+                       CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) ) {
+
+                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                      logger );
+
+                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                            currentTransaction,
+                                                                            logger ) ? "web" : "mobile";
+
+                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                            "url",
+                                                                            currentTransaction,
+                                                                            logger );
+
+                    await NotificationManager.send(
+                                                    "email",
+                                                    {
+                                                      from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                      to: userInDB.UserPerson.EMail,
+                                                      subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
+                                                      body: {
+                                                              kind: "template",
+                                                              file: `email-user-password-change-${strTemplateKind}.pug`,
+                                                              language: context.Language,
+                                                              variables: {
+                                                                           user_name: userInDB.Name,
+                                                                           user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                           web_app_url: strWebAppURL,
+                                                                           ... configData
+                                                                         }
+                                                              //kind: "embedded",
+                                                              //text: "Hello",
+                                                              //html: "<b>Hello</b>"
+                                                            }
+                                                    },
+                                                    logger
+                                                  );
+
+                  }
+
+                }
+                else if ( userWithPasswordChanged instanceof Error ) {
+
+                  const error = userWithPasswordChanged as any;
+
+                  result = {
+                             StatusCode: 500,
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: '9F94B6BFC8F5',
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+              else {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
+                           Message: await I18NManager.translate( strLanguage, 'The new password is not valid' ),
+                           Mark: 'A5DCC6ACADE4',
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: checkPasswordStrengthResult.code,
+                                       Message: checkPasswordStrengthResult.message,
+                                       Details: passwordStrengthParameters
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: 'ERROR_WRONG_PASSWORD',
+                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                         Mark: "CD291726B853",
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_WRONG_PASSWORD',
+                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_USER_NOT_FOUND',
+                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', userSessionStatus.UserName ),
+                     Mark: "1533BE3C3918",
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_FOUND',
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', userSessionStatus.UserName ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made change password' ),
+                   Mark: '43977750A573',
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                               Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change password' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                };
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&

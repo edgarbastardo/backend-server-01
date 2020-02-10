@@ -158,8 +158,16 @@ export default class UserSignupService extends BaseService {
 
         }
 
-        await UserSignup.update( currentValues,
-                                 options );
+        const updateResult = await UserSignup.update( currentValues,
+                                                      options );
+
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          result = await UserSignup.findOne( options );
+
+        }
 
       }
 

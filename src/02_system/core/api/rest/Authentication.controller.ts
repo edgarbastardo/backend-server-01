@@ -51,6 +51,13 @@ export default class AuthenticationController {
 
   }
 
+  async init( logger: any ) {
+
+    await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( process.env.SERVER_ROOT_PATH + AuthenticationController._BASE_PATH + "/logout" );
+    await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( process.env.SERVER_ROOT_PATH + AuthenticationController._BASE_PATH + "/token/check" );
+
+  }
+
   async registerInDataBase( logger: any ) {
 
     try {

@@ -463,7 +463,7 @@ export default class SecurityServiceController {
                         else {
 
                           result.code = -10;
-                          result.message = `The password contains ${intCountDigit} symbols chars, is too much. The maximun is ${passwordParameters.maxDigit} positions`;
+                          result.message = `The password contains ${intCountSymbol} symbols chars, is too much. The maximun is ${passwordParameters.maxSymbol} positions`;
 
                         }
 
@@ -471,7 +471,7 @@ export default class SecurityServiceController {
                       else {
 
                         result.code = -9;
-                        result.message = `The password contains ${intCountDigit} symbols chars, is not enough. The minimun is ${passwordParameters.maxDigit} positions`;
+                        result.message = `The password contains ${intCountSymbol} symbols chars, is not enough. The minimun is ${passwordParameters.minSymbol} positions`;
 
                       }
 
@@ -930,6 +930,7 @@ export default class SecurityServiceController {
                      Data: [
                              {
                                Authorization: strAuthorizationToken,
+                               SupportToken: userSessionStatus.ShortToken,
                                User: userDataResponse,
                                Group: userGroupDataResponse,
                                Person: userPersonDataResponse

@@ -57,6 +57,8 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the token" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
                                   { Path: UserController._BASE_PATH + "/profile/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
+                                  { Path: UserController._BASE_PATH + "/session/reload", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Force reload the session information from the user, from database to cache" },
+                                  { Path: UserController._BASE_PATH + "/route/allowed", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
   _controllerLogger = null;

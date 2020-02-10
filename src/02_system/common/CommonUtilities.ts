@@ -804,17 +804,21 @@ export default class CommonUtilities {
 
       if ( strWord ) {
 
+        let intCount = 0;
+
         strSymbols = !strSymbols ? "#$%&()[]{}=-_:.¿?*@|¡!*+/\\;,": strSymbols;
 
         for ( let intPosition = 0; intPosition < strWord.length; intPosition++ ) {
 
           if ( strSymbols.includes( strWord.charAt( intPosition ) ) ) {
 
-            intResult += 1;
+            intCount += 1;
 
           }
 
         }
+
+        intResult = intCount;
 
       }
 
@@ -837,6 +841,28 @@ export default class CommonUtilities {
       if ( data ) {
 
         strResult = data.toLowerCase();
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
+  static toUpperCase( data: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      if ( data ) {
+
+        strResult = data.toUpperCase();
 
       }
 

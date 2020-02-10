@@ -57,8 +57,15 @@ export default class BinaryIndexService extends BaseService {
       }
       else if ( bUpdate ) {
 
-        await BinaryIndex.update( data,
-                                  options );
+        const updateResult = await BinaryIndex.update( data,
+                                                       options );
+
+        if ( updateResult.length > 0 &&
+             updateResult[ 0 ] >= 1 ) {
+
+          binaryIndexInDB = await BinaryIndex.findOne( options );
+
+        }
 
       }
 
