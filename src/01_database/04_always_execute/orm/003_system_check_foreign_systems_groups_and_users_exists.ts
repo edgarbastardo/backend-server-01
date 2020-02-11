@@ -4,14 +4,16 @@ import moment from 'moment-timezone';
 import os from 'os';
 import bcrypt from 'bcrypt';
 */
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
+import SystemConstants from "../../../02_system/common/SystemContants";
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import SystemConstants from "../../../02_system/common/SystemContants";
 
 import { User } from '../../../02_system/common/database/models/User';
 import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( '003_system_check_foreign_systems_groups_and_users_exists' );
 
@@ -206,7 +208,7 @@ export default class Always {
 
       sourcePosition.method = this.name + "." + this.execute.name;
 
-      const strMark = "2E18A4C3D9F0";
+      const strMark = "2E18A4C3D9F0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

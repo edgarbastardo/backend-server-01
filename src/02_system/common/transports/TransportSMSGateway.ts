@@ -1,4 +1,5 @@
 import request from 'request-promise-native';
+import cluster from "cluster";
 
 import CommonConstants from "../CommonConstants";
 
@@ -37,7 +38,7 @@ export default class TransportSMSGateway {
 
       const strResult = await request( options );
 
-      let debugMark = debug.extend( '9D18E07D936A' );
+      let debugMark = debug.extend( '9D18E07D936A' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( strResult );
 
       bResult = true;
@@ -49,7 +50,7 @@ export default class TransportSMSGateway {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "03F50BEB002D";
+      const strMark = "03F50BEB002D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

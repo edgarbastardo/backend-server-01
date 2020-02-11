@@ -1,24 +1,36 @@
+import cluster from 'cluster';
 
-import { Router, Request, Response, NextFunction } from 'express';
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
-import RouteService from '../../../common/database/services/RouteService';
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction
+} from 'express';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
   //httpGet,
   httpPost,
-  response,
+  //response,
   //requestParam,
   //requestBody,
-  request,
+  //request,
   httpDelete,
   httpGet
 } from "inversify-express-utils";
-import { injectable, inject } from 'inversify';
-//import SecurityService from '../../../common/database/services/SecurityService';
-import BinaryServiceController from "../../services/BinaryService.controller";
+import {
+  //injectable,
+  inject
+} from 'inversify';
+
 import CommonConstants from '../../../common/CommonConstants';
+
+import CommonUtilities from '../../../common/CommonUtilities';
+import SystemUtilities from "../../../common/SystemUtilities";
+
+//import SecurityService from '../../../common/database/services/SecurityService';
+import RouteService from '../../../common/database/services/RouteService';
+import BinaryServiceController from "../../services/BinaryService.controller";
 import I18NManager from "../../../common/managers/I18Manager";
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
@@ -85,7 +97,7 @@ export default class BinaryController {
 
       sourcePosition.method = BinaryController.name + "." + this.registerInDataBase.name;
 
-      const strMark = "CD8713A8B03E";
+      const strMark = "CD8713A8B03E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -171,7 +183,7 @@ export default class BinaryController {
 
           sourcePosition.method = BinaryController.name + "." + this.createRoutes.name + ".result.get";
 
-          const strMark = "0BFE8904C747";
+          const strMark = "0BFE8904C747" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -190,7 +202,7 @@ export default class BinaryController {
           }
 
           const resultHeaders = {
-                                  StatusCode: 500,
+                                  StatusCode: 500, //Internal server error
                                   Code: 'ERROR_UNEXPECTED',
                                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                   Mark: strMark,
@@ -223,7 +235,7 @@ export default class BinaryController {
 
       sourcePosition.method = BinaryController.name + "." + this.createRoutes.name;
 
-      const strMark = "E0981AC18F3A";
+      const strMark = "E0981AC18F3A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -276,7 +288,7 @@ export default class BinaryController {
 
       sourcePosition.method = BinaryController.name + "." + this.deleteAuth.name;
 
-      const strMark = "0E1FDD49C065";
+      const strMark = "0E1FDD49C065" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -288,7 +300,7 @@ export default class BinaryController {
       error.logId = SystemUtilities.getUUIDv4();
 
       const result = {
-                       StatusCode: 500,
+                       StatusCode: 500, //Internal server error
                        Code: 'ERROR_UNEXPECTED',
                        Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
@@ -341,7 +353,7 @@ export default class BinaryController {
 
       sourcePosition.method = BinaryController.name + "." + this.deleteAuth.name;
 
-      const strMark = "E61AAB21A831";
+      const strMark = "E61AAB21A831" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -353,7 +365,7 @@ export default class BinaryController {
       error.logId = SystemUtilities.getUUIDv4();
 
       const result = {
-                       StatusCode: 500,
+                       StatusCode: 500, //Internal server error
                        Code: 'ERROR_UNEXPECTED',
                        Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
@@ -465,7 +477,7 @@ export default class BinaryController {
       if (err) {
         next(err)
       } else {
-        let debugMark = debug.extend( 'A4F269DA1563' );
+        let debugMark = debug.extend( 'A4F269DA1563' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         debugMark( 'Sent: %s', fileName );
       }
     })
@@ -506,7 +518,7 @@ export default class BinaryController {
 
       sourcePosition.method = BinaryController.name + "." + this.createAuth.name;
 
-      const strMark = "A773B579AA28";
+      const strMark = "A773B579AA28" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -518,7 +530,7 @@ export default class BinaryController {
       error.logId = SystemUtilities.getUUIDv4();
 
       const result = {
-                       StatusCode: 500,
+                       StatusCode: 500, //Internal server error
                        Code: 'ERROR_UNEXPECTED',
                        Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,

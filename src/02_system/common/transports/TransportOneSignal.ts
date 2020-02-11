@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 //import OneSignal from 'onesignal-node';
 
 import CommonConstants from "../CommonConstants";
@@ -33,7 +35,7 @@ export default class TransportOneSignal {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "38DEB864775D";
+      const strMark = "38DEB864775D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

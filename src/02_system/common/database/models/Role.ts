@@ -125,7 +125,7 @@ export class Role extends Model<Role> {
 
       if ( CommonUtilities.isValidTimeZone( options.context.TimeZoneId ) ) {
 
-        let debugMark = debug.extend( '615BE55AAB16' );
+        let debugMark = debug.extend( '615BE55AAB16' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         debugMark( "Before => %O", results );
 
         if ( Array.isArray( results ) ) {

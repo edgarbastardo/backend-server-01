@@ -1,7 +1,10 @@
+import cluster from 'cluster';
+import util from 'util';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import os from "os";
 import path from 'path';
+
 import appRoot from 'app-root-path';
 
 import CommonConstants from "../CommonConstants";
@@ -10,8 +13,6 @@ import SystemUtilities from "../SystemUtilities";
 import CommonUtilities from "../CommonUtilities";
 
 import LoggerManager from "./LoggerManager";
-
-import util from 'util';
 
 const debug = require( 'debug' )( 'I18Manager' );
 
@@ -44,7 +45,7 @@ export default class I18NManager {
 
           const jsonData = ( await import( path.join( directory, file ) ) ).default; //.then( module => module.default );
 
-          //let debugMark = debug.extend( '09B016268A87' );
+          //let debugMark = debug.extend( '09B016268A87' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
           //debugMark( "%O", jsonData );
 
           const strLanguage = pathParts[ pathParts.length - 1 ];
@@ -87,7 +88,7 @@ export default class I18NManager {
 
       sourcePosition.method = I18NManager.name + "." + this._scan.name;
 
-      const strMark = "BC31EEF04EBD";
+      const strMark = "BC31EEF04EBD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -131,7 +132,7 @@ export default class I18NManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "5B41B4AB9161";
+      const strMark = "5B41B4AB9161" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -189,7 +190,7 @@ export default class I18NManager {
 
       sourcePosition.method = this.name + "." + this.saveMissingTranslationsToFile.name;
 
-      const strMark = "3E36A9D53D84";
+      const strMark = "3E36A9D53D84" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -253,7 +254,7 @@ export default class I18NManager {
 
       sourcePosition.method = this.name + "." + this.addToMissingTranslations.name;
 
-      const strMark = "3D10A7FB3D6E";
+      const strMark = "3D10A7FB3D6E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -311,7 +312,7 @@ export default class I18NManager {
 
       sourcePosition.method = this.name + "." + this.translate.name;
 
-      const strMark = "5B41B4AB9161";
+      const strMark = "5B41B4AB9161" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -369,7 +370,7 @@ export default class I18NManager {
 
       sourcePosition.method = this.name + "." + this.translateSync.name;
 
-      const strMark = "6859CB85F886";
+      const strMark = "6859CB85F886" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

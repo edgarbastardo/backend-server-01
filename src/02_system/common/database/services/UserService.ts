@@ -1,12 +1,17 @@
-import { User } from "../models/User";
-import DBConnectionManager from "../../managers/DBConnectionManager";
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from '../../SystemUtilities';
-import BaseService from "./BaseService";
+import cluster from 'cluster';
+
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
+
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from '../../SystemUtilities';
+
+import { User } from "../models/User";
 import { UserGroup } from "../models/UserGroup";
 import { Person } from "../models/Person";
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
+import BaseService from "./BaseService";
 
 const debug = require( 'debug' )( 'UserService' );
 
@@ -77,7 +82,7 @@ export default class UserService extends BaseService {
 
       sourcePosition.method = UserService.name + "." + this.getById.name;
 
-      const strMark = "552640F5364C";
+      const strMark = "552640F5364C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -181,7 +186,7 @@ export default class UserService extends BaseService {
 
       sourcePosition.method = UserService.name + "." + this.getByName.name;
 
-      const strMark = "E8DDEF95875E";
+      const strMark = "E8DDEF95875E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -373,7 +378,7 @@ export default class UserService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "B6EAD2FBE1A5";
+      const strMark = "B6EAD2FBE1A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

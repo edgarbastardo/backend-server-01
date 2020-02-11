@@ -11,6 +11,8 @@ import {
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
+import cluster from 'cluster';
+
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
@@ -120,7 +122,7 @@ export class ActionToken extends Model<ActionToken> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "5B65F2D8D331";
+      const strMark = "5B65F2D8D331" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

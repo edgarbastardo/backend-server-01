@@ -1,10 +1,14 @@
+import cluster from 'cluster';
+
+import CommonConstants from "../CommonConstants";
+import SystemConstants from "../SystemContants";
+
 import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
-import CommonConstants from "../CommonConstants";
-import SystemUtilities from "../SystemUtilities";
-import SystemConstants from "../SystemContants";
 import ConfigValueDataService from "../database/services/ConfigValueDataService";
+
 import TransportSMTP from "../transports/TransportSMTP";
 import TransportSendGrid from "../transports/TransportSendGrid";
 import TransportSMSGateway from "../transports/TransportSMSGateway";
@@ -80,7 +84,7 @@ export default class NotificationManager {
 
       sourcePosition.method = this.name + "." + this.getConfigEMailService.name;
 
-      const strMark = "6DA3F5292248";
+      const strMark = "6DA3F5292248" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -165,7 +169,7 @@ export default class NotificationManager {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "13F8EAE54A0F";
+      const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -270,7 +274,7 @@ export default class NotificationManager {
 
       sourcePosition.method = this.name + "." + this.getConfigSMSService.name;
 
-      const strMark = "6DA3F5292248";
+      const strMark = "6DA3F5292248" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -360,7 +364,7 @@ export default class NotificationManager {
 
       sourcePosition.method = this.name + "." + this.getConfigPushService.name;
 
-      const strMark = "5A34CC07602A";
+      const strMark = "5A34CC07602A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -394,7 +398,7 @@ export default class NotificationManager {
 
       const strDateTime = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 );
       const strMessage = `Explicit '@__none__@' defined for the config of ${strService} transport service`
-      const strMark = "DF30C39CD6E8";
+      const strMark = "DF30C39CD6E8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -423,7 +427,7 @@ export default class NotificationManager {
 
       const strDateTime = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 );
       const strMessage = `Not defined config found. For the ${strService} transport service`
-      const strMark = "FC6AE18234CA";
+      const strMark = "FC6AE18234CA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -452,7 +456,7 @@ export default class NotificationManager {
 
       const strDateTime = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 );
       const strMessage = `Not config defined for transport ${strService} service`
-      const strMark = "02DC7A63CC72";
+      const strMark = "02DC7A63CC72" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -601,7 +605,7 @@ export default class NotificationManager {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "13F8EAE54A0F";
+      const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

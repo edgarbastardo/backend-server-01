@@ -1,4 +1,6 @@
 
+import cluster from 'cluster';
+
 import appRoot from 'app-root-path';
 
 import CommonConstants from "../CommonConstants";
@@ -39,7 +41,7 @@ export default class CipherManager {
 
       sourcePosition.method = this.name + "." + this.encrypt.name;
 
-      const strMark = "8EF4FDF7E929";
+      const strMark = "8EF4FDF7E929" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -112,7 +114,7 @@ export default class CipherManager {
 
       sourcePosition.method = this.name + "." + this.encrypt.name;
 
-      const strMark = "8EF4FDF7E929";
+      const strMark = "8EF4FDF7E929" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

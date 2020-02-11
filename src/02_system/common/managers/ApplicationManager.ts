@@ -1,26 +1,34 @@
+import cluster from 'cluster';
 
-import { ApolloServer, ApolloError } from 'apollo-server-express';
+import {
+  ApolloServer,
+  //ApolloError
+} from 'apollo-server-express';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import depthLimit from 'graphql-depth-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-//import CoreGraphQLApiLoader from '../../core/api/ModelToRestAPI/CoreGraphQLAPILoader';
-//import ModelServiceLoader from '../database/services/ModelServiceLoader';
-import { Request, Response, NextFunction } from 'express';
+import {
+  Request,
+  Response,
+  NextFunction
+} from 'express';
 import fileUpload from 'express-fileupload';
-import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
-import BinaryServiceController from "../../core/services/BinaryService.controller";
-import { GraphQLFormattedError } from 'graphql/error';
+import { Container } from 'inversify';
+//import { GraphQLFormattedError } from 'graphql/error';
 
 import CommonConstants from '../CommonConstants';
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
+//import CoreGraphQLApiLoader from '../../core/api/ModelToRestAPI/CoreGraphQLAPILoader';
+//import ModelServiceLoader from '../database/services/ModelServiceLoader';
 import I18NManager from "./I18Manager";
+import BinaryServiceController from "../../core/services/BinaryService.controller";
 import GraphQLAPIManager from './GraphQLAPIManager';
 import RestAPIManager from './RestAPIManager';
 
@@ -190,8 +198,8 @@ export default class ApplicationManager {
                              StatusCode: intStatusCode, //Bad request
                              Code: ( error.originalError as any).extensions.code,
                              Message: ( error.originalError as any).message,
+                             Mark: 'E7609E411489' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: ( error.originalError as any).extensions.LogId,
-                             Mark: "E7609E411489",
                              IsError: true,
                              Errors: errors,
                              Warnings: [],
@@ -210,8 +218,8 @@ export default class ApplicationManager {
                              StatusCode: 500, //Internal server error
                              Code: error.extensions.code,
                              Message: error.message,
+                             Mark: '27A869435085' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: strLogId,
-                             Mark: "27A869435085",
                              IsError: true,
                              Errors: [
                                        {
@@ -284,11 +292,11 @@ export default class ApplicationManager {
         let strLanguage = context ? context.Language : request.header( "language" );
 
         const result = {
-                         StatusCode: 404,
+                         StatusCode: 404, //Not found
                          Code: 'ERROR_PATH_NOT_FOUND',
                          Message: I18NManager.translateSync( strLanguage, 'Requested path %s not found. Please read the server log for more details.', request.path ),
+                         Mark: '3D6CC5FD0B5D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
-                         Mark: '3D6CC5FD0B5D',
                          IsError: true,
                          Errors: [
                                    {
@@ -312,7 +320,7 @@ export default class ApplicationManager {
 
         let strLanguage = context ? context.Language : request.header( "language" );
 
-        const strMark = "D3C34ED42BA1";
+        const strMark = "D3C34ED42BA1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
@@ -320,11 +328,11 @@ export default class ApplicationManager {
         debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
         const result = {
-                         StatusCode: 500,
+                         StatusCode: 500, //Internal server error
                          Code: 'ERROR_SOMETHING_WENT_WRONG',
                          Message: I18NManager.translateSync( strLanguage, 'Something went wrong!!' ),
-                         LogId: SystemUtilities.getUUIDv4(),
                          Mark: strMark,
+                         LogId: SystemUtilities.getUUIDv4(),
                          IsError: true,
                          Errors: [
                                    {
@@ -362,7 +370,7 @@ export default class ApplicationManager {
       /*
       result.use( async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let debugMark = debug.extend( '24AD820F26C5' );
+        let debugMark = debug.extend( '24AD820F26C5' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         debugMark( "Method => " + request.method );
         debugMark( "Url => " + request.url );
 
@@ -372,7 +380,7 @@ export default class ApplicationManager {
                                                                    request.url,
                                                                    logger );
 
-        let debugMark = debug.extend( '5CF923A81A94' );
+        let debugMark = debug.extend( '5CF923A81A94' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         debugMark( "%O", roles );
         response.status( 200 ).json( roles );
 
@@ -380,7 +388,7 @@ export default class ApplicationManager {
 
       });
 
-      //let debugMark = debug.extend( '4826155137AA' );
+      //let debugMark = debug.extend( '4826155137AA' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( "Id => %O", SystemRoutes );
 
       for ( let systemRoute of SystemRoutes ) {
@@ -412,7 +420,7 @@ export default class ApplicationManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "6F7BA4D6A31B";
+      const strMark = "6F7BA4D6A31B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

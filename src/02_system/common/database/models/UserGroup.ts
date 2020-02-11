@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -126,7 +128,7 @@ export class UserGroup extends Model<UserGroup> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "8238D9F1619E";
+      const strMark = "8238D9F1619E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

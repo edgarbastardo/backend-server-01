@@ -1,15 +1,17 @@
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from '../../SystemUtilities';
-
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 //import uuidv4 from 'uuid/v4';
 
-import { RoleHasRoute } from "../models/RoleHasRoute";
-import SystemConstants from "../../SystemContants";
-import BaseService from "./BaseService";
 import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from '../../SystemUtilities';
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
+import { RoleHasRoute } from "../models/RoleHasRoute";
+import BaseService from "./BaseService";
 
 const debug = require( 'debug' )( 'RoleHasRouteService' );
 
@@ -79,7 +81,7 @@ export default class RoleHasRouteService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "DD097AC25659";
+      const strMark = "DD097AC25659" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

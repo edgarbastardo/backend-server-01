@@ -1,7 +1,10 @@
+import cluster from 'cluster';
 import { User } from "../models/User";
-import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
 
 export default abstract class BaseService {
 
@@ -156,7 +159,7 @@ export default abstract class BaseService {
 
       sourcePosition.method = BaseService.name + "." + this.getOneByJSONQuery.name;
 
-      const strMark = "260807FFEFE7";
+      const strMark = "260807FFEFE7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

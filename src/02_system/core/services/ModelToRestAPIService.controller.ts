@@ -1,14 +1,35 @@
-/**
- * err format;
- * {
- *      message:'Err message',
- *      name ' 'ERROR_CODE,
- *      ...
- * }
- */
+import cluster from 'cluster';
 
-/**
- *  Request Query format
+//import { Sequelize } from 'sequelize-typescript';
+import { Request } from 'express';
+import {
+  Model,
+  FindOptions,
+  Includeable,
+  FindAttributeOptions
+} from 'sequelize';
+
+import CommonConstants from '../../common/CommonConstants';
+
+import CommonUtilities from '../../common/CommonUtilities';
+import SystemUtilities from '../../common/SystemUtilities';
+
+import BaseService from '../../common/database/services/BaseService';
+import I18NManager from '../../common/managers/I18Manager';
+
+const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
+
+/*
+  err format;
+  {
+       message:'Err message',
+       name ' 'ERROR_CODE,
+       ...
+  }
+*/
+
+/*
+  Request Query format
 
  {
    where:{},
@@ -19,19 +40,7 @@
    include:[]
 
  }
-
- */
-
-import { Request } from 'express';
-import { Model, FindOptions, Includeable, FindAttributeOptions } from 'sequelize';
-//import { Sequelize } from 'sequelize-typescript';
-import CommonUtilities from '../../common/CommonUtilities';
-import SystemUtilities from '../../common/SystemUtilities';
-import BaseService from '../../common/database/services/BaseService';
-import CommonConstants from '../../common/CommonConstants';
-import I18NManager from '../../common/managers/I18Manager';
-
-const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
+*/
 
 export class CustomModel extends Model {
 
@@ -89,10 +98,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       if ( whereFnResult.IsError ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
                    Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '3308D6A4C648',
+                   Mark: '3308D6A4C648' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -121,10 +130,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         if ( includeFnResult.IsError ) {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: 'A17D19DAF07E',
+                     Mark: 'A17D19DAF07E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -152,10 +161,10 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( attributesFnResult.IsError ) {
 
             result = {
-                       StatusCode: 400,
+                       StatusCode: 400, //Bad request
                        Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
                        Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
-                       Mark: '73178B2D81D5',
+                       Mark: '73178B2D81D5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -263,10 +272,10 @@ export class ModelToRestAPIServiceController extends BaseService {
             }
 
             result = {
-                       StatusCode: 200,
+                       StatusCode: 200, //Ok
                        Code: 'SUCCESS_GET',
                        Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
-                       Mark: '17BC08C03272',
+                       Mark: '17BC08C03272' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -289,7 +298,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.get.name;
 
-      const strMark = "775973814907";
+      const strMark = "775973814907" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -308,7 +317,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -363,10 +372,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       if ( whereFnResult.IsError ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
                    Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: 'B81F215FB722',
+                   Mark: 'B81F215FB722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -395,10 +404,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         if ( includeFnResult.IsError ) {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: '5B06A3DD6871',
+                     Mark: '5B06A3DD6871' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -427,10 +436,10 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( orderFnResult.IsError ) {
 
             result = {
-                       StatusCode: 400,
+                       StatusCode: 400, //Bad request
                        Code: 'ERROR_WRONG_ORDER_FORMAT',
                        Message: await I18NManager.translate( strLanguage, 'Query parameter \'order\' format error' ),
-                       Mark: '7E2B9BB2C8D1',
+                       Mark: '7E2B9BB2C8D1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -458,10 +467,10 @@ export class ModelToRestAPIServiceController extends BaseService {
             if ( attributesFnResult.IsError ) {
 
               result = {
-                         StatusCode: 400,
+                         StatusCode: 400, //Bad request
                          Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
                          Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
-                         Mark: '00E981270A7E',
+                         Mark: '00E981270A7E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -609,10 +618,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         }
 
         result = {
-                   StatusCode: 200,
+                   StatusCode: 200, //Ok
                    Code: 'SUCCESS_SEARCH',
                    Message: await I18NManager.translate( strLanguage, 'Sucess search the information' ),
-                   Mark: '545F8DE9950F',
+                   Mark: '545F8DE9950F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -630,7 +639,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.search.name;
 
-      const strMark = "70A15A967313";
+      const strMark = "70A15A967313" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -649,7 +658,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -700,10 +709,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       if ( whereFnResult.IsError ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
                    Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '126F342F0F0E',
+                   Mark: '126F342F0F0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -732,10 +741,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         if ( includeFnResult.IsError ) {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_INCLUDE_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: 'DB99B13E8999',
+                     Mark: 'DB99B13E8999' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -763,10 +772,10 @@ export class ModelToRestAPIServiceController extends BaseService {
           const intCount = await model.count( filter );
 
           result = {
-                     StatusCode: 200,
+                     StatusCode: 200, //Ok
                      Code: 'SUCCESS_SEARCH_COUNT',
                      Message: await I18NManager.translate( strLanguage, 'Sucess count the information' ),
-                     Mark: 'D0C4F28783EA',
+                     Mark: 'D0C4F28783EA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -790,7 +799,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.searchCount.name;
 
-      const strMark = "D7CA4FF281CD";
+      const strMark = "D7CA4FF281CD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -809,7 +818,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -881,10 +890,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 201,
+                 StatusCode: 201, //Accepted
                  Code: 'SUCCESS_CREATE',
                  Message: await I18NManager.translate( strLanguage, 'Sucess created the information' ),
-                 Mark: "275AF508CF64",
+                 Mark: '275AF508CF64' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -900,7 +909,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "51EF4BAB9FB3";
+      const strMark = "51EF4BAB9FB3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -921,7 +930,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       if ( error.name === "SequelizeValidationError" ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: error.code,
                    Message: error.message,
                    Mark: strMark,
@@ -943,7 +952,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       else {
 
         result = {
-                   StatusCode: 500,
+                   StatusCode: 500, //Internal server error
                    Code: 'ERROR_UNEXPECTED',
                    Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                    Mark: strMark,
@@ -1036,7 +1045,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               sourcePosition.method = this.name + "." + this.bulkCreate.name;
 
-              const strMark = "DDA7B927197F";
+              const strMark = "DDA7B927197F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
@@ -1106,7 +1115,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
-                     Mark: '05C1A40B10F9',
+                     Mark: '05C1A40B10F9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -1119,10 +1128,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'C8D2D8FD1BAE',
+                     Mark: 'C8D2D8FD1BAE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1143,10 +1152,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: 'D56ECA63D091',
+                     Mark: 'D56ECA63D091' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1170,7 +1179,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.bulkCreate.name;
 
-      const strMark = "033EE1274C6D";
+      const strMark = "033EE1274C6D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1189,7 +1198,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1241,10 +1250,10 @@ export class ModelToRestAPIServiceController extends BaseService {
            Object.keys( whereFnResult.Result ).length == 0 ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
                    Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '69C56831D2F1',
+                   Mark: '69C56831D2F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1273,9 +1282,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         if ( !modelInDB ) {
 
           result = {
-                      StatusCode: 404,
+                      StatusCode: 404, //Not found
                       Code: 'ERROR_RECORD_NOT_FOUND',
                       Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                      Mark: 'B3FD90CAC12C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                       LogId: null,
                       IsError: true,
                       Errors: [
@@ -1324,9 +1334,10 @@ export class ModelToRestAPIServiceController extends BaseService {
           }
 
           result = {
-                     StatusCode: 200,
+                     StatusCode: 200, //Ok
                      Code: 'SUCCESS_UPDATE',
                      Message: await I18NManager.translate( strLanguage, 'Sucess updated the information' ),
+                     Mark: 'CC6466005703' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1346,7 +1357,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.update.name;
 
-      const strMark = "2C530E9EC49B";
+      const strMark = "2C530E9EC49B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1365,7 +1376,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1439,10 +1450,10 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                 errors.push(
                              {
-                               StatusCode: 400,
+                               StatusCode: 400, //Bad request
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
                                Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Mark: '46EA0B6920D8',
+                               Mark: '46EA0B6920D8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -1481,9 +1492,10 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                   errors.push(
                                {
-                                 StatusCode: 404,
+                                 StatusCode: 404, //Not found
                                  Code: 'ERROR_RECORD_NOT_FOUND',
                                  Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                                 Mark: '77C1515A83D2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
@@ -1545,7 +1557,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               sourcePosition.method = this.name + "." + this.bulkUpdate.name;
 
-              const strMark = "05404E6E4238";
+              const strMark = "05404E6E4238" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
@@ -1615,6 +1627,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
+                     Mark: '86C6647E8920' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -1627,10 +1640,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'FFCD9E96FB0E',
+                     Mark: 'FFCD9E96FB0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1651,10 +1664,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: '85D4A82588B9',
+                     Mark: '85D4A82588B9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1678,7 +1691,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.bulkUpdate.name;
 
-      const strMark = "24CB5D02D407";
+      const strMark = "24CB5D02D407" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1697,7 +1710,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1748,10 +1761,10 @@ export class ModelToRestAPIServiceController extends BaseService {
            Object.keys( whereFnResult.Result ).length == 0 ) {
 
         result = {
-                   StatusCode: 400,
+                   StatusCode: 400, //Bad request
                    Code: 'ERROR_WRONG_WHERE_FORMAT',
                    Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '101C16C68A46',
+                   Mark: '101C16C68A46' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1780,9 +1793,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         if ( !modelInDB ) {
 
           result = {
-            StatusCode: 404,
+            StatusCode: 404, //Not found
             Code: 'ERROR_RECORD_NOT_FOUND',
             Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+            Mark: 'C7BCDD44280D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
             LogId: null,
             IsError: true,
             Errors: [
@@ -1803,9 +1817,10 @@ export class ModelToRestAPIServiceController extends BaseService {
           modelInDB.destroy()
 
           result = {
-            StatusCode: 200,
+            StatusCode: 200, //Ok
             Code: 'SUCCESS_DELETE',
             Message: await I18NManager.translate( strLanguage, 'Sucess delete the information' ),
+            Mark: '1F6F499BCA5D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
             LogId: null,
             IsError: false,
             Errors: [],
@@ -1825,7 +1840,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.delete.name;
 
-      const strMark = "464594DE5A13";
+      const strMark = "464594DE5A13" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1844,7 +1859,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1916,10 +1931,10 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                 errors.push(
                              {
-                               StatusCode: 400,
+                               StatusCode: 400, //Bad request
                                Code: 'ERROR_WRONG_WHERE_FORMAT',
                                Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Mark: 'DF7908C22E32',
+                               Mark: 'DF7908C22E32' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -1958,9 +1973,10 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                   errors.push(
                                {
-                                 StatusCode: 404,
+                                 StatusCode: 404, //Not found
                                  Code: 'ERROR_RECORD_NOT_FOUND',
                                  Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                                 Mark: '4F7813BFB2D7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
@@ -1992,7 +2008,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               sourcePosition.method = this.name + "." + this.bulkDelete.name;
 
-              const strMark = "5CA65932A193";
+              const strMark = "5CA65932A193" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
@@ -2062,7 +2078,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
-                     Mark: 'D29E6A276E7E',
+                     Mark: 'D29E6A276E7E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -2075,10 +2091,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'EE06E3FE408C',
+                     Mark: 'EE06E3FE408C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -2099,10 +2115,10 @@ export class ModelToRestAPIServiceController extends BaseService {
       else {
 
           result = {
-                     StatusCode: 400,
+                     StatusCode: 400, //Bad request
                      Code: 'ERROR_WRONG_BULK_FORMAT',
                      Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: '5736792DDB37',
+                     Mark: '5736792DDB37' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -2126,7 +2142,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.bulkDelete.name;
 
-      const strMark = "EBFF5CC4163A";
+      const strMark = "EBFF5CC4163A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2145,7 +2161,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,

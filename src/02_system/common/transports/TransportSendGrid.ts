@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import sendgridMail from '@sendgrid/mail';
 
 import CommonConstants from "../CommonConstants";
@@ -57,7 +59,7 @@ export default class TransportSendGrid extends TransportEMail {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "AFB4511A8749";
+      const strMark = "AFB4511A8749" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import cluster from 'cluster';
 
 import CommonConstants from '../CommonConstants';
 
@@ -109,7 +110,7 @@ export default class RestAPIManager {
 
       sourcePosition.method = RestAPIManager.name + "." + this._scan.name;
 
-      const strMark = "392C958EF3CB";
+      const strMark = "392C958EF3CB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -161,7 +162,7 @@ export default class RestAPIManager {
 
             sourcePosition.method = RestAPIManager.name + "." + this.getRoutes.name;
 
-            const strMark = "3BADA45D6489";
+            const strMark = "3BADA45D6489" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -194,7 +195,7 @@ export default class RestAPIManager {
 
       sourcePosition.method = RestAPIManager.name + "." + this.getRoutes.name;
 
-      const strMark = "83452ADB368B";
+      const strMark = "83452ADB368B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -5,14 +5,16 @@ import os from 'os';
 import Hashes from 'jshashes';
 */
 //import bcrypt from 'bcrypt';
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
+import SystemConstants from "../../../02_system/common/SystemContants";
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import SystemConstants from "../../../02_system/common/SystemContants";
 
 import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
 import { User } from '../../../02_system/common/database/models/User';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( '001_system_check_groups_and_users_exists' );
 
@@ -64,7 +66,7 @@ export default class Always {
             /*
             if ( userGroupCreated ) {
 
-              let debugMark = debug.extend( "7BC3695ECE8D" );
+              let debugMark = debug.extend( "7BC3695ECE8D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
               debugMark( userGroupCreated );
 
             }
@@ -155,7 +157,7 @@ export default class Always {
 
       sourcePosition.method = this.name + "." + this.execute.name;
 
-      const strMark = "67045A015FA4";
+      const strMark = "67045A015FA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

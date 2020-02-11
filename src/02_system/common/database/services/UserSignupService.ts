@@ -1,10 +1,14 @@
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
+
+import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
-import CommonConstants from "../../CommonConstants";
 import { UserSignup } from "../models/UserSignup";
-import SystemConstants from "../../SystemContants";
 
 const debug = require( 'debug' )( 'UserSignupService' );
 
@@ -67,7 +71,7 @@ export default class UserSignupService extends BaseService {
 
       sourcePosition.method = UserSignupService.name + "." + this.getByToken.name;
 
-      const strMark = "4709E07DF47B";
+      const strMark = "4709E07DF47B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -186,7 +190,7 @@ export default class UserSignupService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "94B087425704";
+      const strMark = "94B087425704" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

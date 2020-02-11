@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -15,17 +17,18 @@ import {
          NotEmpty,
          IsUUID,
          Unique,
-         Default,
+         //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-import { UserGroup } from "./UserGroup";
-import { Person } from "./Person";
 import bcrypt from 'bcrypt';
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+import { UserGroup } from "./UserGroup";
+import { Person } from "./Person";
 
 const debug = require( 'debug' )( 'User' );
 
@@ -132,7 +135,7 @@ export class User extends Model<User> {
   @BeforeValidate
   static beforeValidateHook( instance: User, options: any ): any {
 
-    //let debugMark = debug.extend( 'A4A8FE#63F0C' );
+    //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "context:\n %O", options.context );
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
@@ -227,7 +230,7 @@ export class User extends Model<User> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "FED919C942E0";
+      const strMark = "FED919C942E0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

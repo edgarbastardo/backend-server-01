@@ -1,23 +1,26 @@
-import CommonUtilities from "../../common/CommonUtilities";
-import SystemUtilities from "../../common/SystemUtilities";
+import cluster from 'cluster';
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import bcrypt from 'bcrypt';
 
-import DBConnectionManager from '../../common/managers/DBConnectionManager';
-//import { Role } from "../models/Role";
+import CommonConstants from "../../common/CommonConstants";
 import SystemConstants from "../../common/SystemContants";
-import { User } from "../../common/database/models/User";
+
+import SystemUtilities from "../../common/SystemUtilities";
+import CommonUtilities from "../../common/CommonUtilities";
+
+//import { Role } from "../models/Role";
 //import { UserSessionStatus } from "../models/UserSessionStatus";
+import DBConnectionManager from '../../common/managers/DBConnectionManager';
+import { User } from "../../common/database/models/User";
 import { UserGroup } from "../../common/database/models/UserGroup";
 import { Person } from "../../common/database/models/Person";
 import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
 import UserSessionStatusService from "../../common/database/services/UserSessionStatusService";
 import CacheManager from "../../common/managers/CacheManager";
 import UserService from "../../common/database/services/UserService";
-import CommonConstants from "../../common/CommonConstants";
 import I18NManager from "../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
@@ -123,7 +126,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.getConfigExpireTimeAuthentication.name;
 
-      const strMark = "4736C360538E";
+      const strMark = "4736C360538E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -208,7 +211,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.getConfigLoginAccessControl.name;
 
-      const strMark = "13C1DB2F817E";
+      const strMark = "13C1DB2F817E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -307,7 +310,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.getFrontendIdIsAllowed.name;
 
-      const strMark = "D89E1D59A97B";
+      const strMark = "D89E1D59A97B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -366,7 +369,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.getConfigPasswordStrengthParameters.name;
 
-      const strMark = "0A832F2FD3AC";
+      const strMark = "0A832F2FD3AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -546,7 +549,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.checkPasswordStrength.name;
 
-      const strMark = "D06C7846BDFA";
+      const strMark = "D06C7846BDFA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -919,9 +922,10 @@ export default class SecurityServiceController {
         if ( userSessionStatus !== null ) {
 
           result = {
-                     StatusCode: 200,
+                     StatusCode: 200, //Ok
                      Code: 'SUCCESS_LOGIN',
                      Message: await I18NManager.translate( strLanguage, 'Sucess login' ),
+                     Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -947,6 +951,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_DISABLED',
                    Message: await I18NManager.translate( strLanguage, 'Login failed (User disabled)' ),
+                   Mark: 'C2344BE0E051' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -968,6 +973,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_EXPIRED',
                    Message: await I18NManager.translate( strLanguage, 'Login failed (User expired)' ),
+                   Mark: '5E65F3A6BB84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -989,6 +995,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_DISABLED',
                    Message: await I18NManager.translate( strLanguage, 'Login failed (User group disabled)' ),
+                   Mark: 'C0631A69B6F6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1010,6 +1017,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_EXPIRED',
                    Message: await I18NManager.translate( strLanguage, 'Login failed (User group expired)' ),
+                   Mark: 'B621392319E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1031,6 +1039,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
                    Message: await I18NManager.translate( strLanguage, 'Not allowed to login from this the kind of frontend' ),
+                   Mark: 'D8E7BA64792D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1052,6 +1061,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_LOGIN_FAILED',
                    Message: await I18NManager.translate( strLanguage, 'Login failed (Username and/or Password are invalid)' ),
+                   Mark: '22E89FB65D2B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1083,7 +1093,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.login.name;
 
-      const strMark = "B211BBDAF77B";
+      const strMark = "B211BBDAF77B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1102,7 +1112,7 @@ export default class SecurityServiceController {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1216,9 +1226,10 @@ export default class SecurityServiceController {
                                                 logger );
 
               result = {
-                         StatusCode: 200,
+                         StatusCode: 200, //Ok
                          Code: 'SUCCESS_LOGOUT',
                          Message: await I18NManager.translate( strLanguage, 'Sucess logout' ),
+                         Mark: '86B853E96517' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,
                          Errors: [],
@@ -1236,7 +1247,7 @@ export default class SecurityServiceController {
 
             sourcePosition.method = this.name + "." + this.logout.name;
 
-            const strMark = "2EBC43CE5C63";
+            const strMark = "2EBC43CE5C63" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -1255,7 +1266,7 @@ export default class SecurityServiceController {
             }
 
             result = {
-                        StatusCode: 500,
+                        StatusCode: 500, //Internal server error
                         Code: 'ERROR_LOGOUT_FAILED',
                         Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
                         Mark: strMark,
@@ -1282,7 +1293,7 @@ export default class SecurityServiceController {
                       StatusCode: 400, //Bad request
                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made logout' ),
-                      Mark: '2EA2C0E7ACEF',
+                      Mark: '2EA2C0E7ACEF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                       LogId: null,
                       IsError: true,
                       Errors: [
@@ -1306,7 +1317,7 @@ export default class SecurityServiceController {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
                    Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
-                   Mark: '3EF6C35B0645',
+                   Mark: '3EF6C35B0645' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1338,7 +1349,7 @@ export default class SecurityServiceController {
 
       sourcePosition.method = this.name + "." + this.logout.name;
 
-      const strMark = "2D5BBA7D7BDF";
+      const strMark = "2D5BBA7D7BDF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1357,7 +1368,7 @@ export default class SecurityServiceController {
       }
 
       result = {
-                 StatusCode: 500,
+                 StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
@@ -1402,9 +1413,10 @@ export default class SecurityServiceController {
                            logger: any ): Promise<any> {
 
     const result = {
-                     StatusCode: 200,
+                     StatusCode: 200, //Ok
                      Code: 'SUCCESS_TOKEN_IS_VALID',
                      Message: await I18NManager.translate( strLanguage, 'The token is valid' ),
+                     Mark: '789A41A512E5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],

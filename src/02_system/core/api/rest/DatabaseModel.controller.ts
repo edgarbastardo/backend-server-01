@@ -1,14 +1,18 @@
+import cluster from 'cluster';
 
-import { Router, Request, Response, NextFunction } from 'express';
+import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
+
 import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from "../../../common/SystemUtilities";
+
+import { Router, Request, Response, NextFunction } from 'express';
+
 //import { Route } from '../../../common/database/models/Route';
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import RouteService from '../../../common/database/services/RouteService';
 //import ModelServiceLoader from "../../../common/database/ModelServiceLoader";
 import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPIService.controller';
 //import dbConnection from "../../../common/managers/DBConnectionManager";
-import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
 import ModelServiceManager from "../../../common/managers/ModelServiceManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import MiddlewareManager from "../../../common/managers/MiddlewareManager";
@@ -46,7 +50,7 @@ export default class DatabaseModelController {
 
   constructor( logger: any ) {
 
-    //let debugMark = debug.extend( "F840F4C8EB20" );
+    //let debugMark = debug.extend( "F840F4C8EB20" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
     //debugMark( "DatabaseModel -> constructor %O", logger );
 
@@ -115,7 +119,7 @@ export default class DatabaseModelController {
 
       sourcePosition.method = DatabaseModelController.name + "." + this.registerInDataBase.name;
 
-      const strMark = "91C782C4EAA4";
+      const strMark = "91C782C4EAA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -184,6 +188,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: '5AA705EE0690' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -209,7 +214,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "A437102ECBE8";
+          const strMark = "A437102ECBE8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -228,7 +233,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -292,6 +297,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: '443D8E18870B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -317,7 +323,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "C3E23B80740C";
+          const strMark = "C3E23B80740C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -336,7 +342,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -398,6 +404,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: '8DC756579436' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -423,7 +430,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "DDF1DBA373A8";
+          const strMark = "DDF1DBA373A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -442,7 +449,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -503,6 +510,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
+                             Mark: '41587FD16BEE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -528,7 +536,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "30D70322D93B";
+          const strMark = "30D70322D93B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -547,7 +555,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -611,6 +619,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: 'C21B6321CD80' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -636,7 +645,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "31455C0BA53B";
+          const strMark = "31455C0BA53B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -655,7 +664,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -716,6 +725,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: 'A5FE807FE07E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -741,7 +751,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "F5E9CC4BFBDD";
+          const strMark = "F5E9CC4BFBDD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -760,7 +770,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -822,6 +832,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: 'F1D8627ABF2C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -847,7 +858,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "FB03C3F8DA16";
+          const strMark = "FB03C3F8DA16" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -866,7 +877,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -926,6 +937,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: 'A938DC0DAD71' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -951,7 +963,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "1527BF211FAD";
+          const strMark = "1527BF211FAD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -970,7 +982,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -1031,6 +1043,7 @@ export default class DatabaseModelController {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_UNKNOWN_MODEL',
                              Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                             Mark: '7B5730193E81' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -1056,7 +1069,7 @@ export default class DatabaseModelController {
 
           sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-          const strMark = "40D7BC5B2D60";
+          const strMark = "40D7BC5B2D60" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -1075,7 +1088,7 @@ export default class DatabaseModelController {
           }
 
           const result = {
-                           StatusCode: 500,
+                           StatusCode: 500, //Internal server error
                            Code: 'ERROR_UNEXPECTED',
                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                            Mark: strMark,
@@ -1106,7 +1119,7 @@ export default class DatabaseModelController {
 
       sourcePosition.method = DatabaseModelController.name + "." + this.createRoutes.name;
 
-      const strMark = "CF8FECABF995";
+      const strMark = "CF8FECABF995" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

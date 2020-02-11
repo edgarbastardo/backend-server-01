@@ -1,3 +1,4 @@
+import cluster from 'cluster';
 import {
          Table,
          Model,
@@ -6,8 +7,8 @@ import {
          Column,
          BeforeValidate,
          //HasOne,
-         ForeignKey,
-         BelongsTo,
+         //ForeignKey,
+         //BelongsTo,
          //BeforeCreate,
          //BeforeUpdate,
          //Is,
@@ -15,15 +16,16 @@ import {
          NotEmpty,
          IsUUID,
          Unique,
-         Default,
+         //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-import bcrypt from 'bcrypt';
+//import bcrypt from 'bcrypt';
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
 import CipherManager from "../../managers/CipherManager";
 
 const debug = require( 'debug' )( 'UserSignup' );
@@ -121,7 +123,7 @@ export class UserSignup extends Model<UserSignup> {
   @BeforeValidate
   static async beforeValidateHook( instance: UserSignup, options: any ): Promise<any> {
 
-    //let debugMark = debug.extend( 'A4A8FE#63F0C' );
+    //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "context:\n %O", options.context );
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
@@ -183,7 +185,7 @@ export class UserSignup extends Model<UserSignup> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "458C892909DB";
+      const strMark = "458C892909DB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -1,9 +1,12 @@
 //import uuidv4 from 'uuid/v4';
 //import moment from 'moment-timezone';
 //import os from 'os';
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
+
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 //import Hashes from 'jshashes';
 
 const debug = require( 'debug' )( '000_orm_before_import_init' );
@@ -42,7 +45,7 @@ export default class Import {
 
       sourcePosition.method = this.name + "." + this.importUp.name;
 
-      const strMark = "0CB80D137209";
+      const strMark = "0CB80D137209" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

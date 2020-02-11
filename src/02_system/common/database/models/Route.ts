@@ -133,7 +133,7 @@ export class Route extends Model<Route> {
 
     }
 
-    //let debugMark = debug.extend( 'B54E0A8CEE1F' );
+    //let debugMark = debug.extend( 'B54E0A8CEE1F' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "BeforeSave => %O", instance );
 
   }
@@ -143,7 +143,7 @@ export class Route extends Model<Route> {
   @BeforeUpdate
   static beforeUpdate( target: any, propertyName: string ): void {
 
-    //let debugMark = debug.extend( '1D1840C32CA9' );
+    //let debugMark = debug.extend( '1D1840C32CA9' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "BeforeSave => %O", target );
 
   }
@@ -153,7 +153,7 @@ export class Route extends Model<Route> {
   @AfterFind
   static afterFindHook( results: any, options: any ): void {
 
-    //let debugMark = debug.extend( '86EEE23D9F5E' );
+    //let debugMark = debug.extend( '86EEE23D9F5E' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "afterFindHook => %O", options );
     //debugMark( CommonUtilities.isNotNullOrEmpty( options.context ) );
     //debugMark( CommonUtilities.isNotNullOrEmpty( options.context.TimeZoneId ) );
@@ -164,7 +164,7 @@ export class Route extends Model<Route> {
 
       if ( CommonUtilities.isValidTimeZone( options.context.TimeZoneId ) ) {
 
-        //let debugMark = debug.extend( '2DDF16CE7935' );
+        //let debugMark = debug.extend( '2DDF16CE7935' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         //debugMark( "Before => %O", results );
 
         if ( Array.isArray( results ) ) {

@@ -1,15 +1,19 @@
 
-import SystemConstants from "../../../02_system/common/SystemContants";
+import cluster from 'cluster';
+
+import {
+  Request,
+  Response
+} from 'express';
+//import { OriginalSequelize } from "sequelize"; //Original sequelize
+//import uuidv4 from 'uuid/v4';
+//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
+//import SystemConstants from "../../../02_system/common/SystemContants";
 import CommonConstants from "../../../02_system/common/CommonConstants";
 
 import SystemUtilities from "../../../02_system/common/SystemUtilities";
 import CommonUtilities from "../../../02_system/common/CommonUtilities";
-
-import { Request, Response } from 'express';
-
-//import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
-import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import DBConnectionManager from '../../../02_system/common/managers/DBConnectionManager';
 import BaseService from "../../../02_system/common/database/services/BaseService";
@@ -67,7 +71,7 @@ export default class Dev000ServicesController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.processDev000Example.name;
 
-      const strMark = "A92208DF733";
+      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -86,10 +90,11 @@ export default class Dev000ServicesController extends BaseService {
       }
 
       const result = {
-                       StatusCode: 500,
+                       StatusCode: 500, //Internal server error
                        Code: 'ERROR_UNEXPECTED',
                        Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        LogId: error.LogId,
+                       Mark: 'A141D683118A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        IsError: true,
                        Errors: [
                                  {

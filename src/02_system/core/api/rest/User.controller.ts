@@ -1,28 +1,40 @@
+import cluster from 'cluster';
 
-import { Router, Request, Response, NextFunction } from 'express';
+import {
+  //Router,
+  Request,
+  Response,
+  //NextFunction
+} from 'express';
+
+import CommonConstants from '../../../common/CommonConstants';
+
 import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from "../../../common/SystemUtilities";
+
+import { ApolloError } from 'apollo-server-express';
 import RouteService from '../../../common/database/services/RouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
   //httpGet,
   httpPost,
-  response,
+  //response,
   //requestParam,
   //requestBody,
   request,
   httpPut,
   httpGet
 } from "inversify-express-utils";
-import { injectable, inject } from 'inversify';
+import {
+  //injectable,
+  inject
+} from 'inversify';
 //import SecurityServiceController from '../../services/SecurityService.controller';
-import CommonConstants from '../../../common/CommonConstants';
 import UserServiceController from '../../services/UserService.controller';
 import MiddlewareManager from "../../../common/managers/MiddlewareManager";
-import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
+//import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 import I18NManager from '../../../common/managers/I18Manager';
-import { ApolloError } from 'apollo-server-express';
 
 const debug = require( 'debug' )( 'User.controller' );
 
@@ -57,7 +69,6 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the token" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
                                   { Path: UserController._BASE_PATH + "/profile/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
-                                  { Path: UserController._BASE_PATH + "/session/reload", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Force reload the session information from the user, from database to cache" },
                                   { Path: UserController._BASE_PATH + "/route/allowed", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
@@ -98,6 +109,7 @@ export default class UserController {
                      StatusCode: 401, //Unauthorized
                      Code: 'ERROR_USER_CHANGE_PASSWORD_REQUIRED',
                      Message: await I18NManager.translate( strLanguage, 'The user must be change the password before to continue' ),
+                     Mark: '829072DD0A36' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -119,6 +131,7 @@ export default class UserController {
                      StatusCode: 401, //Unauthorized
                      Code: 'ERROR_USER_PASSWORD_EXPIRED',
                      Message: await I18NManager.translate( strLanguage, 'The user must be change the password to before continue' ),
+                     Mark: 'B5C138D68DF9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -149,7 +162,11 @@ export default class UserController {
 
         if ( userSessionStatus.Tag.includes( "#FORCE_CHANGE_PASSSWORD#" ) ) {
 
-          const extensions = { StatusCode: 401, LogId: SystemUtilities.getUUIDv4() };
+          const extensions = {
+                               StatusCode: 401, //Unauthorized
+                               Mark: 'BA10403FE3D1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: SystemUtilities.getUUIDv4()
+                             };
 
           result = new ApolloError(
                                     await I18NManager.translate( strLanguage, "The user must be change the password before to continue" ),
@@ -160,7 +177,11 @@ export default class UserController {
         }
         else if ( userSessionStatus.Tag.includes( "#PASSSWORD_EXPIRED#" ) ) {
 
-          const extensions = { StatusCode: 401, LogId: SystemUtilities.getUUIDv4() };
+          const extensions = {
+                               StatusCode: 401, //Unauthorized
+                               Mark: 'B019A967D26A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: SystemUtilities.getUUIDv4()
+                             };
 
           result = new ApolloError(
                                     await I18NManager.translate( strLanguage, "The user must be change the password before to continue" ),
@@ -202,7 +223,7 @@ export default class UserController {
 
       sourcePosition.method = UserController.name + "." + this.registerInDataBase.name;
 
-      const strMark = "68A833778764";
+      const strMark = "68A833778764" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

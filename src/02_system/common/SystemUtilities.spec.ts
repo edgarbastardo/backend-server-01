@@ -47,3 +47,14 @@ test( `Generate RSA key`, async () => {
   expect( strKey ).toMatch( /^-----BEGIN RSA PRIVATE KEY-----\\n/ );
 
 })
+
+    /*
+    if ( cluster.isMaster && SystemUtilities.isNetworkLeader ) {
+
+      await JobQueueManager.addJobToQueue( "SampleJob",
+                                           { mydata: "my data" },
+                                           null, //{ repeat: { cron: '* * * * *' } },
+                                           ApplicationManager.currentInstance );
+
+    }
+    */

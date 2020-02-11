@@ -30,7 +30,7 @@ export const roles = {
 
 export async function init( logger: any ): Promise<void> {
 
-  //let debugMark = debug.extend( '315832C57E6C' );
+  //let debugMark = debug.extend( '315832C57E6C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
   //debugMark( "Init called" );
   await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( "tokenCheck" );
   await MiddlewareManager.registerToBypassMiddlewareInterceptorsByPath( "logout" );

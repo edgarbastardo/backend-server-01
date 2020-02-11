@@ -6,15 +6,17 @@ import bcrypt from 'bcrypt';
 import Hashes from 'jshashes';
 */
 
+import cluster from 'cluster';
 import appRoot from 'app-root-path';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
+import SystemConstants from "../../../02_system/common/SystemContants";
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import SystemConstants from "../../../02_system/common/SystemContants";
 
 import { ConfigMetaData } from "../../../02_system/common/database/models/ConfigMetaData";
 import { ConfigValueData } from '../../../02_system/common/database/models/ConfigValueData';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
 
@@ -71,7 +73,7 @@ export default class Always {
               /*
               if ( configMetaDataCreated ) {
 
-                let debugMark = debug.extend( "A7103054FB0D" );
+                let debugMark = debug.extend( "A7103054FB0D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
                 debugMark( configMetaDataCreated );
 
               }
@@ -86,7 +88,7 @@ export default class Always {
 
             sourcePosition.method = this.name + "." + this.execute.name;
 
-            const strMark = "E3156CF22D57";
+            const strMark = "E3156CF22D57" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -481,7 +483,7 @@ export default class Always {
 
             sourcePosition.method = this.name + "." + this.execute.name;
 
-            const strMark = "D107DB7B7C79";
+            const strMark = "D107DB7B7C79" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -523,7 +525,7 @@ export default class Always {
 
       sourcePosition.method = this.name + "." + this.execute.name;
 
-      const strMark = "F0170E86ADF5";
+      const strMark = "F0170E86ADF5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

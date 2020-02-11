@@ -1,13 +1,18 @@
 import fs from 'fs';
 import path from 'path';
+import cluster from 'cluster';
+
 import { ForbiddenError } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import { shield } from 'graphql-shield';
-import CommonUtilities from '../CommonUtilities';
-import RouteService from '../database/services/RouteService';
-import SystemUtilities from "../SystemUtilities";
+
 import CommonConstants from '../CommonConstants';
+
+import CommonUtilities from '../CommonUtilities';
+import SystemUtilities from "../SystemUtilities";
+
+import RouteService from '../database/services/RouteService';
 
 const debug = require( 'debug' )( 'GraphQLAPIManager' );
 
@@ -91,7 +96,7 @@ export default class GraphQLAPIManager {
 
           //this._resolvers.push( obj.resolvers );
           /*
-          let debugMark = debug.extend( "983A73D8C9C7" );
+          let debugMark = debug.extend( "983A73D8C9C7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
           debugMark( obj.roles );
           Object.keys( obj.roles ).map( ( strResolverName: string, intIndex: number ) => {
@@ -168,7 +173,7 @@ export default class GraphQLAPIManager {
 
       sourcePosition.method = GraphQLAPIManager.name + "." + this._scan.name;
 
-      const strMark = "ACADE67D8340";
+      const strMark = "ACADE67D8340" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -215,7 +220,7 @@ export default class GraphQLAPIManager {
 
             sourcePosition.method = GraphQLAPIManager.name + "." + this.getSchema.name;
 
-            const strMark = "C7B8B342E1E6";
+            const strMark = "C7B8B342E1E6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -268,7 +273,7 @@ export default class GraphQLAPIManager {
 
       sourcePosition.method = GraphQLAPIManager.name + "." + this.getSchema.name;
 
-      const strMark = "14CB3EAD860F";
+      const strMark = "14CB3EAD860F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

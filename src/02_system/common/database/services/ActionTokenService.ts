@@ -1,14 +1,16 @@
+import cluster from 'cluster';
+
 import { ActionToken } from "../models/ActionToken";
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
-
-import DBConnectionManager from "../../managers/DBConnectionManager";
-import BaseService from "./BaseService";
 
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
+import BaseService from "./BaseService";
 
 const debug = require( 'debug' )( 'ActionTokenService' );
 
@@ -71,7 +73,7 @@ export default class ActionTokenService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getById.name;
 
-      const strMark = "15BB80A06D61";
+      const strMark = "15BB80A06D61" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -165,7 +167,7 @@ export default class ActionTokenService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getByToken.name;
 
-      const strMark = "652467D1ABE6";
+      const strMark = "652467D1ABE6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -269,7 +271,7 @@ export default class ActionTokenService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getCountActionTokenOnLastMinutes.name;
 
-      const strMark = "234C0028238B";
+      const strMark = "234C0028238B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -385,7 +387,7 @@ export default class ActionTokenService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "0BC308EDEE2F";
+      const strMark = "0BC308EDEE2F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

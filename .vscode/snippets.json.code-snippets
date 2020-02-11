@@ -19,7 +19,7 @@
 	  "scope": "javascript,typescript",
 	  "prefix": "logmark",
 	  "body": [
-	 		"let debugMark = debug.extend( 'changueme' );",
+	 		"let debugMark = debug.extend( 'changueme' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );",
 	 		"debugMark( $1 );"
 	  ],
 	  "description": "Log output to console usgin debug library"

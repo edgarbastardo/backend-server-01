@@ -1,12 +1,16 @@
-import { User } from "../models/User";
-import DBConnectionManager from "../../managers/DBConnectionManager";
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from '../../SystemUtilities';
-import { UserGroup } from "../models/UserGroup";
-import { Person } from "../models/Person";
-import BaseService from "./BaseService";
+import cluster from 'cluster';
+
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
+
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from '../../SystemUtilities';
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
+//import { User } from "../models/User";
+//import { UserGroup } from "../models/UserGroup";
+import { Person } from "../models/Person";
+import BaseService from "./BaseService";
 
 const debug = require( 'debug' )( 'PersonService' );
 
@@ -69,7 +73,7 @@ export default class PersonService extends BaseService {
 
       sourcePosition.method = PersonService.name + "." + this.getById.name;
 
-      const strMark = "DC96C7888421";
+      const strMark = "DC96C7888421" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -186,7 +190,7 @@ export default class PersonService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "7315FDCB28DA";
+      const strMark = "7315FDCB28DA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

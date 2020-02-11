@@ -1,6 +1,7 @@
+import fs from 'fs';
+import cluster from 'cluster';
 
 //import nodemailer from "nodemailer";
-import fs from 'fs';
 import pug from "pug";
 import juice from "juice";
 import htmlToText from "html-to-text";
@@ -54,7 +55,7 @@ export default class TransportEMail {
 
       sourcePosition.method = this.name + "." + this.processMessageFromTemplate.name;
 
-      const strMark = "9B2D695AE0D4";
+      const strMark = "9B2D695AE0D4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -52,7 +52,7 @@ export default class DBMigrationManager {
 
       sourcePosition.method = this.name + "." + this.createDatabaseIfNotExits.name;
 
-      const strMark = "D0190FC9A11C";
+      const strMark = "D0190FC9A11C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -113,7 +113,7 @@ export default class DBMigrationManager {
 
       sourcePosition.method = this.name + "." + this.migrateUsingRawConnection.name;
 
-      const strMark = "402833EA35A3";
+      const strMark = "402833EA35A3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -163,7 +163,7 @@ export default class DBMigrationManager {
 
       sourcePosition.method = this.name + "." + this.migrateUsingORMConnection.name;
 
-      const strMark = "328A3440E32F";
+      const strMark = "328A3440E32F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

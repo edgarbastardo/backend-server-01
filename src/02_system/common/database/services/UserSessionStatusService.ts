@@ -1,11 +1,16 @@
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
+
+//import moment = require("moment-timezone");
+
+import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
+
 import { UserSessionStatus } from "../models/UserSessionStatus";
-import SystemConstants from "../../SystemContants";
+import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
-import CommonConstants from "../../CommonConstants";
-//import moment = require("moment-timezone");
 
 const debug = require( 'debug' )( 'UserSessionStatus' );
 
@@ -59,7 +64,7 @@ export default class UserSessionStatusService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getUserSessionStatusByToken.name;
 
-      const strMark = "235192CBAB6D";
+      const strMark = "235192CBAB6D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -173,7 +178,7 @@ export default class UserSessionStatusService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.invalidateOldUserSessions.name;
 
-      const strMark = "52765EC3737C";
+      const strMark = "52765EC3737C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -267,7 +272,7 @@ export default class UserSessionStatusService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getLastUserLogin.name;
 
-      const strMark = "E97357DBB438";
+      const strMark = "E97357DBB438" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -333,7 +338,7 @@ export default class UserSessionStatusService extends BaseService {
 
       //const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
 
-      //let debugMark = debug.extend( '3ADAB615F2D9' );
+      //let debugMark = debug.extend( '3ADAB615F2D9' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( strId );
 
       const options = {
@@ -397,7 +402,7 @@ export default class UserSessionStatusService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "07EBDB32C37A";
+      const strMark = "07EBDB32C37A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

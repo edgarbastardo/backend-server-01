@@ -1,12 +1,17 @@
-import BaseService from "./BaseService";
-//import ConfigValueDataService from "./ConfigValueDataService";
+import cluster from 'cluster';
+
+//import { Request } from 'express';
+
 //import SystemConstants from "../../SystemContants";
+import CommonConstants from "../../CommonConstants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
-//import { Request } from 'express';
+
+//import ConfigValueDataService from "./ConfigValueDataService";
 import DBConnectionManager from "../../managers/DBConnectionManager";
 import { BinaryIndex } from "../models/BinaryIndex";
-import CommonConstants from "../../CommonConstants";
+import BaseService from "./BaseService";
 
 const debug = require( 'debug' )( 'BinaryIndexService' );
 
@@ -86,7 +91,7 @@ export default class BinaryIndexService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "76F8246923EB";
+      const strMark = "76F8246923EB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

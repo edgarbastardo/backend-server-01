@@ -5,8 +5,11 @@ import os from 'os';
 import bcrypt from 'bcrypt';
 import Hashes from 'jshashes';
 */
+import cluster from 'cluster';
+
 import CommonConstants from '../../../02_system/common/CommonConstants';
 import SystemConstants from "../../../02_system/common/SystemContants";
+
 import BusinessConstants from '../../../03_business/common/BusinessConstants';
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
@@ -65,7 +68,7 @@ export default class Always {
             /*
             if ( configMetaDataCreated ) {
 
-              let debugMark = debug.extend( "A7103054FB0D" );
+              let debugMark = debug.extend( "A7103054FB0D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
               debugMark( configMetaDataCreated );
 
             }
@@ -174,7 +177,7 @@ export default class Always {
 
       sourcePosition.method = this.name + "." + this.execute.name;
 
-      const strMark = "F0170E86ADF5";
+      const strMark = "F0170E86ADF5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

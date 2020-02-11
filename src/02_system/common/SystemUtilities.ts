@@ -8,6 +8,8 @@ import fileType from 'file-type';
 //import { loggers } from "winston";
 import fs from 'fs'; //Load the filesystem module
 import path from 'path';
+import os from "os";
+import cluster from "cluster";
 
 import archiver, { ArchiverError } from 'archiver';
 
@@ -262,7 +264,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.transformObjectToTimeZone.name;
 
-      const strMark = "22B953090E53";
+      const strMark = "22B953090E53" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -317,7 +319,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.transformToTimeZone.name;
 
-      const strMark = "698D544926FD";
+      const strMark = "698D544926FD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -372,7 +374,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.hashString.name;
 
-      const strMark = "272864A729F7";
+      const strMark = "272864A729F7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -456,7 +458,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.checkUserSessionStatusPersistentExpired.name;
 
-      const strMark = "645AC1C7F0D2";
+      const strMark = "645AC1C7F0D2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -592,7 +594,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.checkUserSessionStatusExpired.name;
 
-      const strMark = "48F8E318CD0B";
+      const strMark = "48F8E318CD0B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1030,7 +1032,7 @@ export default class SystemUtilities {
 
         sourcePosition.method = this.name + "." + this.getUserSessionStatus.name;
 
-        const strMark = "815DAACA4B52";
+        const strMark = "815DAACA4B52" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
@@ -1165,7 +1167,7 @@ export default class SystemUtilities {
 
             sourcePosition.method = this.name + "." + this.getRoleOfRoute.name;
 
-            const strMark = "F2B3156AC7C2";
+            const strMark = "F2B3156AC7C2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             const debugMark = debug.extend( strMark );
 
@@ -1228,7 +1230,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.getInfoFromSessionStatus.name;
 
-      const strMark = "AEBB674F7EA8";
+      const strMark = "AEBB674F7EA8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1344,7 +1346,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.mergeTokens.name;
 
-      const strMark = "49AE680B4870";
+      const strMark = "49AE680B4870" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1419,7 +1421,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.dectectUserWarnings.name;
 
-      const strMark = "C3322F4A5AD7";
+      const strMark = "C3322F4A5AD7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1490,7 +1492,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.dectectUserWarnings.name;
 
-      const strMark = "23879CF471D9";
+      const strMark = "23879CF471D9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1543,7 +1545,7 @@ export default class SystemUtilities {
       archive.directory( strSource, strPath ).on( 'error',
                                                   ( error: ArchiverError ) => {
 
-                                                    const strMark = "C0709DD4C024";
+                                                    const strMark = "C0709DD4C024" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                                                     if ( logger &&
                                                         typeof logger.error === "function" ) {
@@ -1881,7 +1883,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.commonBeforeValidateHook.name;
 
-      const strMark = "9132A5362A48";
+      const strMark = "9132A5362A48" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1932,7 +1934,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.encryptRSA.name;
 
-      const strMark = "E08D2A4FF967";
+      const strMark = "E08D2A4FF967" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1976,7 +1978,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.encryptRSA.name;
 
-      const strMark = "B6B697C1A31A";
+      const strMark = "B6B697C1A31A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2020,7 +2022,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.decryptRSA.name;
 
-      const strMark = "EB50EEE59B04";
+      const strMark = "EB50EEE59B04" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2135,7 +2137,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.createCustomValidatorSync.name;
 
-      const strMark = "BA9782941B37";
+      const strMark = "BA9782941B37" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2198,7 +2200,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.processErrorDetails.name;
 
-      const strMark = "4130BD6D754D";
+      const strMark = "4130BD6D754D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2250,7 +2252,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.processErrorDetails.name;
 
-      const strMark = "4130BD6D754D";
+      const strMark = "4130BD6D754D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2292,7 +2294,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.processErrorListDetails.name;
 
-      const strMark = "A5C68BF888B6";
+      const strMark = "A5C68BF888B6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2335,7 +2337,7 @@ export default class SystemUtilities {
 
       sourcePosition.method = this.name + "." + this.processErrorDetails.name;
 
-      const strMark = "CD80D976E0AD";
+      const strMark = "CD80D976E0AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -2370,4 +2372,61 @@ export default class SystemUtilities {
     return bResult;
 
   }
+
+  static countWorkers( workers: any ): number {
+
+    let intResult = 0;
+
+    for ( const intId in workers ) {
+
+      intResult += 1;
+
+    }
+
+    return intResult;
+
+  }
+
+  static getHTTPWorkerProcessCount(): number {
+
+    let intResult = 0;
+
+    let strHTTPWorkerProcessCount = process.env.HTTP_WORKER_PROCESS_COUNT;
+
+    if ( strHTTPWorkerProcessCount === "detect" ) {
+
+      intResult = os.cpus().length;
+
+    }
+    else if ( parseInt( strHTTPWorkerProcessCount ) !== NaN ) {
+
+      intResult = parseInt( strHTTPWorkerProcessCount );
+
+    }
+
+    return intResult
+
+  }
+
+  static getJOBWorkerProcessCount(): number {
+
+    let intResult = 0;
+
+    let strJOBWorkerProcessCount = process.env.JOB_WORKER_PROCESS_COUNT;
+
+    if ( strJOBWorkerProcessCount === "detect" ) {
+
+      intResult = os.cpus().length;
+
+    }
+    else if ( parseInt( strJOBWorkerProcessCount ) !== NaN ) {
+
+      intResult = parseInt( strJOBWorkerProcessCount );
+
+    }
+
+    return intResult
+
+  }
+
 }

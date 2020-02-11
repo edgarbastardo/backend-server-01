@@ -58,7 +58,7 @@ export class RoleHasRoute extends Model<RoleHasRoute> {
 
       if ( CommonUtilities.isValidTimeZone( options.context.TimeZoneId ) ) {
 
-        let debugMark = debug.extend( 'FE44B7906E09' );
+        let debugMark = debug.extend( 'FE44B7906E09' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         debugMark( "Before => %O", results );
 
         if ( Array.isArray( results ) ) {

@@ -1,17 +1,19 @@
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+import cluster from 'cluster';
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-
 //import uuidv4 from 'uuid/v4';
+
+import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
 
 import DBConnectionManager from './../../managers/DBConnectionManager';
 import { Route } from "../models/Route";
 import RoleService from "./RoleService";
 import RoleHasRouteService from "./RoleHasRouteService";
-import SystemConstants from "../../SystemContants";
 import BaseService from "./BaseService";
-import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'RouteService' );
 
@@ -48,7 +50,7 @@ export default class RouteService extends BaseService {
 
       const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
 
-      //let debugMark = debug.extend( '7287EB53C0BF' );
+      //let debugMark = debug.extend( '7287EB53C0BF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( strId );
 
       const options = {
@@ -115,7 +117,7 @@ export default class RouteService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "1C741F130111";
+      const strMark = "1C741F130111" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -237,7 +239,7 @@ export default class RouteService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdateRouteAndRoles.name;
 
-      const strMark = "B8567B7FDE27";
+      const strMark = "B8567B7FDE27" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

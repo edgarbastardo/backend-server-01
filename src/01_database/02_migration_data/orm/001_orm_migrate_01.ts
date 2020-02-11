@@ -1,9 +1,12 @@
 //import uuidv4 from 'uuid/v4';
 //import moment from 'moment-timezone';
 //import os from 'os';
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
+
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 //import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
 //import Hashes from 'jshashes';
 
@@ -81,7 +84,7 @@ export default class Migrate {
 
       sourcePosition.method = this.name + "." + this.migrateUp.name;
 
-      const strMark = "1B45E615BAFF";
+      const strMark = "1B45E615BAFF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -1,13 +1,15 @@
+import fs from 'fs'; //Load the filesystem module
+import cluster from 'cluster';
+
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import appRoot from 'app-root-path';
-import fs from 'fs'; //Load the filesystem module
 
-//import config from '../../../01_database/00_config/config.json';
-import CommonUtilities from '../CommonUtilities';
 import CommonConstants from '../CommonConstants';
 
+import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
+//import config from '../../../01_database/00_config/config.json';
 //import BusinessQueries from "../../../01_database/05_query/mysql/BusinessQueries";
 //import SystemQueries from "../../../01_database/05_query/mysql/SystemQueries";
 
@@ -102,7 +104,7 @@ export default class DBConnectionManager {
 
       dbConfig.logging = ( param01: any, param02: any ) => {
 
-        //let debugMark = debug.extend( "960C40D97F5F" );
+        //let debugMark = debug.extend( "960C40D97F5F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         //debugMark( param01 );
         //debugMark( param02 );
@@ -164,6 +166,20 @@ export default class DBConnectionManager {
 
       await result.sync( { force: false } );
 
+      const strMark = "C134AF0B2662" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Success connected to database: [%s]", dbConfig.database );
+
+      if ( logger &&
+           typeof logger.info === "function" ) {
+
+        logger.info( "Success connected to database: [%s]", dbConfig.database );
+
+      }
+
     }
     catch ( error ) {
 
@@ -171,7 +187,7 @@ export default class DBConnectionManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "5B41B4AB9161";
+      const strMark = "5B41B4AB9161" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -182,7 +198,8 @@ export default class DBConnectionManager {
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
 
-      if ( logger && typeof logger.error === "function" ) {
+      if ( logger &&
+           typeof logger.error === "function" ) {
 
         error.catchedOn = sourcePosition;
         logger.error( error );
@@ -219,7 +236,7 @@ export default class DBConnectionManager {
 
       sourcePosition.method = this.name + "." + this.loadQueryStatement.name;
 
-      const strMark = "0449A858CFA0";
+      const strMark = "0449A858CFA0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -292,7 +309,7 @@ export default class DBConnectionManager {
 
       sourcePosition.method = this.name + "." + this.loadQueryStatement.name;
 
-      const strMark = "0449A858CFA0";
+      const strMark = "0449A858CFA0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -337,7 +354,7 @@ export default class DBConnectionManager {
 
       sourcePosition.method = this.name + "." + this.close.name;
 
-      const strMark = "0F07800FD89B";
+      const strMark = "0F07800FD89B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

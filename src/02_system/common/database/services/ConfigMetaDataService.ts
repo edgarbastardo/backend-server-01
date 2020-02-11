@@ -1,10 +1,14 @@
-import { UserGroup } from "../models/UserGroup";
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
+
+import SystemConstants from "../../SystemContants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
-import { ConfigMetaData } from "../models/ConfigMetaData";
-import SystemConstants from "../../SystemContants";
+
 import BaseService from "./BaseService";
+import { ConfigMetaData } from "../models/ConfigMetaData";
+import { UserGroup } from "../models/UserGroup";
+import DBConnectionManager from "../../managers/DBConnectionManager";
 
 const debug = require( 'debug' )( 'ConfigMetaDataService' );
 
@@ -91,7 +95,7 @@ export default class ConfigMetaDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "A1B775C96F91";
+      const strMark = "A1B775C96F91" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

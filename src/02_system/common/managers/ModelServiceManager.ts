@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import cluster from 'cluster';
+
 import CommonConstants from '../CommonConstants';
 
 import CommonUtilities from '../CommonUtilities';
@@ -77,7 +79,7 @@ export default class ModelServiceManager {
 
       sourcePosition.method = ModelServiceManager.name + "." + this._scan.name;
 
-      const strMark = "9CFCDA4E7357";
+      const strMark = "9CFCDA4E7357" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

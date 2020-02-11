@@ -9,9 +9,12 @@ import {
 import { BuildOptions } from "sequelize/types";
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
+import cluster from 'cluster';
+
+import CommonConstants from "../../CommonConstants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
-import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'Person' );
 
@@ -136,7 +139,7 @@ export class Person extends Model<Person> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "98805E57AE91";
+      const strMark = "98805E57AE91" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

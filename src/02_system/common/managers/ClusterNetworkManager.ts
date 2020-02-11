@@ -1,10 +1,12 @@
 import Discover from '@dashersw/node-discover';
 import os from "os";
+import cluster from "cluster";
+//import uuidv4 from 'uuid/v4';
+
+import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
-//import uuidv4 from 'uuid/v4';
 import SystemUtilities from "../SystemUtilities";
-import CommonConstants from "../CommonConstants";
 
 const debug = require( 'debug' )( 'ClusterNetworkManager' );
 
@@ -20,7 +22,7 @@ export default class ClusterNetworkManager {
 
       await new Promise<any>( function( resolve, reject ) {
 
-        let debugMark = debug.extend( "AA21700D550C" );
+        let debugMark = debug.extend( "AA21700D550C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         result = new Discover();
 
@@ -138,7 +140,7 @@ export default class ClusterNetworkManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "02B23FBC8D15";
+      const strMark = "02B23FBC8D15" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

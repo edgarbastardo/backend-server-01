@@ -45,7 +45,7 @@ test( `Test validatorjs library 001`, async () => {
 
   const bResult = validator.passes();
 
-  //let debugMark = debug.extend( '5EE41A799E09' );
+  //let debugMark = debug.extend( '5EE41A799E09' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
   //debugMark( "%O", validation.errors.all() );
   //console.log( validation.errors.all() );
   const x = validator.errors.all();

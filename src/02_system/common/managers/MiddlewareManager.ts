@@ -1,5 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+//import fs from 'fs';
+//import path from 'path';
+import cluster from 'cluster';
 import { Request, Response, NextFunction } from 'express';
 import { rule } from "graphql-shield";
 import { ApolloError } from "apollo-server-errors";
@@ -108,7 +109,7 @@ export default class MiddlewareManager {
 
       sourcePosition.method = this.name + "." + this.callToMiddlewareInterceptors.name;
 
-      const strMark = "BEC076D0844A";
+      const strMark = "BEC076D0844A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -181,7 +182,7 @@ export default class MiddlewareManager {
 
       sourcePosition.method = this.name + "." + this.bypassMiddlewareInterceptorsCallByRoute.name;
 
-      const strMark = "BEC076D0844A";
+      const strMark = "BEC076D0844A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -274,7 +275,7 @@ export default class MiddlewareManager {
 
       sourcePosition.method = this.name + "." + this.middlewareSetContext.name;
 
-      const strMark = "A7BA900D7B56";
+      const strMark = "A7BA900D7B56" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -293,7 +294,7 @@ export default class MiddlewareManager {
       }
 
       const result = {
-                       StatusCode: 500,
+                       StatusCode: 500, //Internal server error
                        Code: 'ERROR_UNEXPECTED',
                        Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                        Mark: strMark,
@@ -363,7 +364,7 @@ export default class MiddlewareManager {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
                  Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
-                 Mark: 'FAE37676EA49',
+                 Mark: 'FAE37676EA49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -385,7 +386,7 @@ export default class MiddlewareManager {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
                  Message: await I18NManager.translate( strLanguage, 'Authorization token provided is logged out' ),
-                 Mark: '0C28D66DFBC1',
+                 Mark: '0C28D66DFBC1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -416,7 +417,7 @@ export default class MiddlewareManager {
                  StatusCode: 401, //Unauthorized
                  Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
                  Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
-                 Mark: 'C6E335E5DC71',
+                 Mark: 'C6E335E5DC71' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
@@ -529,8 +530,8 @@ export default class MiddlewareManager {
                        StatusCode: 403, //Forbiden
                        Code: 'ERROR_FORBIDEN_ACCESS',
                        Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
+                       Mark: '1ED45DB6E425' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
-                       Mark: '1ED45DB6E425',
                        IsError: true,
                        Errors: [
                                  {
@@ -597,7 +598,11 @@ export default class MiddlewareManager {
 
       if ( bSessionInvalid ) {
 
-        const extensions = { StatusCode: 401, LogId: SystemUtilities.getUUIDv4() };
+        const extensions = {
+                             StatusCode: 401, //Unauthorized
+                             Mark: '9751B88C389C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: SystemUtilities.getUUIDv4()
+                           };
 
         result = new ApolloError(
                                   await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
@@ -608,7 +613,11 @@ export default class MiddlewareManager {
       }
       else if ( bSessionInvalidLoggedOut ) {
 
-        const extensions = { StatusCode: 401, "LogId": SystemUtilities.getUUIDv4() };
+        const extensions = {
+                             StatusCode: 401, //Unauthorized
+                             Mark: '3006DA613507' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: SystemUtilities.getUUIDv4()
+                           };
 
         result = new ApolloError(
                                   await I18NManager.translate( strLanguage, "Authorization token provided is logged out" ),
@@ -648,9 +657,10 @@ export default class MiddlewareManager {
         }
 
         const extensions = {
-                             StatusCode: 401,
-                             "LogId": SystemUtilities.getUUIDv4(),
-                             "errors": errors
+                             StatusCode: 401, //Unauthorized
+                             Mark: '8B9F98C1AB76' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: SystemUtilities.getUUIDv4(),
+                             errors: errors
                            };
 
         result = new ApolloError(
@@ -707,7 +717,11 @@ export default class MiddlewareManager {
 
       if ( result === false ) {
 
-        const extensions = { StatusCode: 403, "LogId": SystemUtilities.getUUIDv4() };
+        const extensions = {
+                             StatusCode: 403, //Forbiden
+                             Mark: '74EC582F0760' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: SystemUtilities.getUUIDv4()
+                           };
 
         result = new ApolloError( "Not authorized to access", "ERROR_FORBIDEN_ACCESS", extensions );
 

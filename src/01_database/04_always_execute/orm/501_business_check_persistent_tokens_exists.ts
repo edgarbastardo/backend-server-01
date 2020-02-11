@@ -1,9 +1,12 @@
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
 import SystemConstants from "../../../02_system/common/SystemContants";
 
+import CommonUtilities from '../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../02_system/common/SystemUtilities';
+
 import { UserSessionPersistent } from "../../../02_system/common/database/models/UserSessionPersistent";
-import CommonConstants from '../../../02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( '501_business_check_persistent_tokens_exists' );
 
@@ -112,7 +115,7 @@ export default class Always {
 
       sourcePosition.method = this.name + "." + this.execute.name;
 
-      const strMark = "06FA91985E8E";
+      const strMark = "06FA91985E8E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

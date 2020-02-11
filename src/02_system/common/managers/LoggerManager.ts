@@ -7,10 +7,10 @@ import fs from 'fs';
 
 import safeStringify from 'fast-safe-stringify';
 
-import SystemUtilities from '../SystemUtilities';
-
-import CommonUtilities from '../CommonUtilities';
 import CommonConstants from '../CommonConstants';
+
+import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from '../CommonUtilities';
 
 import { PapertrailConnection, PapertrailTransport } from '../others/logs/winston/papertrail/winston-papertrail';
 
@@ -108,7 +108,7 @@ export default class LoggerManager {
 
                 try {
 
-                  let debugMark = debug.extend( '948014A902B0' );
+                  let debugMark = debug.extend( '948014A902B0' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
                   //debugMark( "%O", logData );
 
                   delete logData[ Symbol.for( 'level' ) ];
@@ -148,7 +148,7 @@ export default class LoggerManager {
 
                   const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-                  const strMark = "407668BA0C97";
+                  const strMark = "407668BA0C97" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                   const debugMark = debug.extend( strMark );
 
@@ -247,7 +247,7 @@ export default class LoggerManager {
           if ( result &&
                cluster.isMaster ) {
 
-            const strMark = "ECC59FC6D91D";
+            const strMark = "ECC59FC6D91D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
             result.info( "Logger success configured", { mark: strMark } );
 
@@ -266,7 +266,7 @@ export default class LoggerManager {
 
         const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-        const strMark = "48EC1617E459";
+        const strMark = "48EC1617E459" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
@@ -280,7 +280,7 @@ export default class LoggerManager {
     }
     else {
 
-      const strMark = "CCF62026BB7C";
+      const strMark = "CCF62026BB7C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

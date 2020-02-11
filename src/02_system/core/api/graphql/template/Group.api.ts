@@ -1,4 +1,6 @@
 import { readFileSync } from 'fs';
+import cluster from "cluster";
+
 import I18NManager from '../../../../common/managers/I18Manager';
 //import { bookService } from '../services/book.service';
 //import { AuthorByBookDataLoader } from '../dataloaders/author.dataloader';
@@ -16,7 +18,7 @@ export const resolvers = {
 
       const strLanguage = context.Language;
 
-      let debugMark = debug.extend( 'FE44B7906E09' );
+      let debugMark = debug.extend( 'FE44B7906E09' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( "Resolver => %s", "getGroup" );
 
       return {
@@ -35,7 +37,7 @@ export const resolvers = {
 
       const strLanguage = context.Language;
 
-      let debugMark = debug.extend( '1375D08305F2' );
+      let debugMark = debug.extend( '1375D08305F2' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( "%s", args.Group.Name );
       debugMark( "%s", args.Group.Comment );
 

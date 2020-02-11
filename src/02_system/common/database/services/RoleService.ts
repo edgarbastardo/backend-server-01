@@ -1,15 +1,18 @@
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+import cluster from 'cluster';
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
+import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
+
 import DBConnectionManager from './../../managers/DBConnectionManager';
 import { Role } from "../models/Role";
-import SystemConstants from "../../SystemContants";
 import BaseService from "./BaseService";
-import CommonConstants from "../../CommonConstants";
 
 const debug = require( 'debug' )( 'RoleService' );
 
@@ -43,7 +46,7 @@ export default class RoleService extends BaseService {
 
       //const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
 
-      //let debugMark = debug.extend( 'B5F561459005' );
+      //let debugMark = debug.extend( 'B5F561459005' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( "%s", strId );
 
       const options = {
@@ -106,7 +109,7 @@ export default class RoleService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "7F5EAEA4FFEA";
+      const strMark = "7F5EAEA4FFEA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -245,7 +248,7 @@ export default class RoleService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getRolesFromRouteId.name;
 
-      const strMark = "C173DD10EDE3";
+      const strMark = "C173DD10EDE3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

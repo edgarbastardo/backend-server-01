@@ -1,21 +1,33 @@
+import cluster from 'cluster';
 
-import { Router, Request, Response, NextFunction } from 'express';
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
-import RouteService from '../../../common/database/services/RouteService';
-//import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
+import {
+  //Router,
+  Request,
+  Response,
+  //NextFunction
+} from 'express';
 import {
   controller,
   //httpGet,
   httpPost,
-  response,
+  //response,
   //requestParam,
   //requestBody,
-  request
+  //request
 } from "inversify-express-utils";
-import { injectable, inject } from 'inversify';
-import SecurityServiceController from '../../services/SecurityService.controller';
+import {
+  //injectable,
+  inject
+} from 'inversify';
+
 import CommonConstants from '../../../common/CommonConstants';
+
+import CommonUtilities from '../../../common/CommonUtilities';
+import SystemUtilities from "../../../common/SystemUtilities";
+
+//import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
+import RouteService from '../../../common/database/services/RouteService';
+import SecurityServiceController from '../../services/SecurityService.controller';
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Authentication.controller' );
@@ -82,7 +94,7 @@ export default class AuthenticationController {
 
       sourcePosition.method = AuthenticationController.name + "." + this.registerInDataBase.name;
 
-      const strMark = "89E2AABC167A";
+      const strMark = "89E2AABC167A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

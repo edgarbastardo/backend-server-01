@@ -4,6 +4,7 @@ require( 'dotenv' ).config(); //Read the .env file, in the root folder of projec
 import appRoot from 'app-root-path';
 import rimraf from 'rimraf';
 import fs from 'fs'; //Load the filesystem module
+import cluster from "cluster";
 
 import copy from 'recursive-copy';
 //import targz from 'targz';
@@ -110,7 +111,7 @@ async function createInstallBundle( strProject: string ): Promise<{ path: string
 
           rimraf.sync( appRoot.path + `/install_distribution/${_PROJECT_NAME}-${strCurrentDate}` );
 
-          let debugMark = debug.extend( '6572E49553C8' );
+          let debugMark = debug.extend( '6572E49553C8' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
           debugMark( "Install bundle created!" );
 
           resolve( result );
@@ -263,7 +264,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "78B85E29B6FA";
+    const strMark = "78B85E29B6FA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 
@@ -289,7 +290,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "1B29091E23A6";
+    const strMark = "1B29091E23A6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 
@@ -315,7 +316,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "BD51738C27B1";
+    const strMark = "BD51738C27B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 
@@ -340,7 +341,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 
   let bResult = await new Promise<boolean>( function( resolve, reject ) {
 
-    let debugMark = debug.extend( '0D9333291CCF' );
+    let debugMark = debug.extend( '0D9333291CCF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
 
     const sshConnection = new SSHClient();
 
@@ -440,7 +441,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 
     //const strCommandResult = await sshConnection.exec( strCommand );
 
-    let debugMark = debug.extend( '1DEF610F7B90' );
+    let debugMark = debug.extend( '1DEF610F7B90' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
 
     sshConnection.spawn( strCommand ).then( ( socket: any ) => {
 
@@ -480,7 +481,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "A7CB1D8AF61C";
+    const strMark = "A7CB1D8AF61C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 
@@ -506,7 +507,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "4BC174FB12FA";
+    const strMark = "4BC174FB12FA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 
@@ -641,7 +642,7 @@ async function main() {
 
     sourcePosition.method = "server." + main.name;
 
-    const strMark = "AFD51D995A67";
+    const strMark = "AFD51D995A67" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 

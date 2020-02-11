@@ -2,10 +2,12 @@
 //import moment from 'moment-timezone';
 //import os from 'os';
 //import bcrypt from 'bcrypt';
+import cluster from 'cluster';
+
+import CommonConstants from '../../../02_system/common/CommonConstants';
 
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import CommonConstants from '../../../02_system/common/CommonConstants';
 //import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
 //import { User } from '../../../02_system/common/database/models/User';
 //import Hashes from 'jshashes';
@@ -48,7 +50,7 @@ export default class Import {
 
       const groupsCreated = await UserGroup.bulkCreate( userGroupsToCreate, { individualHooks: true, validate: true } );
 
-      let debugMark = debug.extend( "C1E0B7A71391" );
+      let debugMark = debug.extend( "C1E0B7A71391" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( groupsCreated );
 
@@ -87,7 +89,7 @@ export default class Import {
 
       sourcePosition.method = this.name + "." + this.importUp.name;
 
-      const strMark = "64364DD8AC1E";
+      const strMark = "64364DD8AC1E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -1,9 +1,23 @@
+import cluster from 'cluster';
+
 import { AccessKind, HTTPMethod } from "./CommonConstants";
 import path from 'path';
 
 const debug = require( 'debug' )( 'CommonUtilities' );
 
 export default class CommonUtilities {
+
+  static msleep( n: number ) {
+
+    Atomics.wait( new Int32Array( new SharedArrayBuffer( 4 ) ), 0, 0, n );
+
+  }
+
+  static sleep( n: number ) {
+
+    CommonUtilities.msleep( n * 1000 );
+
+  }
 
   static isNotNullOrEmpty( value: any ): boolean {
 
@@ -254,7 +268,7 @@ export default class CommonUtilities {
       if ( tz ) {
 
         Intl.DateTimeFormat( undefined, { timeZone:  tz } ).format( new Date() );
-        //let debugMark = debug.extend( '39AE8190588D' );
+        //let debugMark = debug.extend( '39AE8190588D' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
         //debugMark( "Valid!!" );
         bResult = true;
 
@@ -263,7 +277,7 @@ export default class CommonUtilities {
     }
     catch ( ex ) {
 
-      //let debugMark = debug.extend( 'BDA1708B1AAE' );
+      //let debugMark = debug.extend( 'BDA1708B1AAE' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( "Invalid!!" );
       //return false;
 
@@ -360,7 +374,7 @@ export default class CommonUtilities {
 
       const stack = new Error().stack;
 
-      //let debugMark = debug.extend( 'B4FC6014F2E3' );
+      //let debugMark = debug.extend( 'B4FC6014F2E3' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( "%O", stack );
 
       // package.json => build: --async-stack-trace node build/server.js And tsconfig.json => "target": "es2018"
@@ -403,7 +417,7 @@ export default class CommonUtilities {
     }
     catch ( error ) {
 
-      const strMark = "F0FCDAA2D175";
+      const strMark = "F0FCDAA2D175" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -478,7 +492,7 @@ export default class CommonUtilities {
 
       sourcePosition.method = this.name + "." + this.deleteObjectFields.name;
 
-      const strMark = "1DFC6EF03869";
+      const strMark = "1DFC6EF03869" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -516,7 +530,7 @@ export default class CommonUtilities {
 
       sourcePosition.method = this.name + "." + this.parseJSON.name;
 
-      const strMark = "D72A94FD3E4B";
+      const strMark = "D72A94FD3E4B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -554,7 +568,7 @@ export default class CommonUtilities {
 
       sourcePosition.method = this.name + "." + this.parseArray.name;
 
-      const strMark = "76DCD9E795FB";
+      const strMark = "76DCD9E795FB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -614,7 +628,7 @@ export default class CommonUtilities {
 
       sourcePosition.method = this.name + "." + this.isInMultiSimpleList.name;
 
-      const strMark = "94B310399AF5";
+      const strMark = "94B310399AF5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -667,7 +681,7 @@ export default class CommonUtilities {
 
       sourcePosition.method = this.name + "." + this.isInList.name;
 
-      const strMark = "4AB0242741A9";
+      const strMark = "4AB0242741A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

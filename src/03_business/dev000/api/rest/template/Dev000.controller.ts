@@ -1,24 +1,31 @@
+import cluster from 'cluster';
 
-import { Router, Request, Response, NextFunction } from 'express';
+import {
+  //Router,
+  Request,
+  Response,
+  //NextFunction
+} from 'express';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
   //httpGet,
-  httpPost,
-  response,
+  //httpPost,
+  //response,
   //requestParam,
   //requestBody,
-  request,
+  //request,
   httpGet
 } from "inversify-express-utils";
 import { inject } from 'inversify';
-import RouteService from '../../../../../02_system/common/database/services/RouteService';
-import CommonConstants from '../../../../../02_system/common/CommonConstants';
 
-import I18NManager from '../../../../../02_system/common/managers/I18Manager';
+import CommonConstants from '../../../../../02_system/common/CommonConstants';
 
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+
+import RouteService from '../../../../../02_system/common/database/services/RouteService';
+import I18NManager from '../../../../../02_system/common/managers/I18Manager';
 import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Dev000.controller' );
@@ -76,7 +83,7 @@ export default class Dev000Controller {
 
       sourcePosition.method = Dev000Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "8A2FEACAB2BE";
+      const strMark = "8A2FEACAB2BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -110,9 +117,10 @@ export default class Dev000Controller {
     let strLanguage = context.Language;
 
     const result = {
-                     StatusCode: 200,
+                     StatusCode: 200, //Ok
                      Code: 'SUCCESS_DEV000_EXAMPLE',
                      Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
+                     Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],

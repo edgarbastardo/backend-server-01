@@ -1,12 +1,17 @@
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
+
+//import moment = require("moment-timezone");
+
+import CommonConstants from "../../CommonConstants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
+
 //import { UserSessionStatus } from "../models/UserSessionStatus";
 //import SystemConstants from "../../SystemContants";
+import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
 import { UserSessionPersistent } from "../models/UserSessionPersistent";
-import CommonConstants from "../../CommonConstants";
-//import moment = require("moment-timezone");
 
 const debug = require( 'debug' )( 'UserSessionPersistentService' );
 
@@ -60,7 +65,7 @@ export default class UserSessionPersistentService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getUserSessionPersistentByToken.name;
 
-      const strMark = "1AEE003BC0F1";
+      const strMark = "1AEE003BC0F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

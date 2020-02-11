@@ -40,7 +40,7 @@ export default class BusinessUtilities {
 
       sourcePosition.method = this.name + "." + this.myUtil.name;
 
-      const strMark = "E4D7C40DBF57"; //This number is unique. See vs code random extension. Generate random hex color.
+      const strMark = "E4D7C40DBF57" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ); //This number is unique. See vs code random extension. Generate random hex color.
 
       const debugMark = debug.extend( strMark );
 

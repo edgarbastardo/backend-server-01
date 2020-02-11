@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import nodemailer from "nodemailer";
 
 import CommonConstants from "../CommonConstants";
@@ -56,7 +58,7 @@ export default class TransportSMTP extends TransportEMail {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "980C4F98C1FF";
+      const strMark = "980C4F98C1FF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -5,12 +5,14 @@ import mysql from 'mysql2/promise';
 //import moment from 'moment-timezone';
 import fs from 'fs';
 //import os from "os";
+import cluster from "cluster";
 
 import minify from 'pg-minify';
 
+import CommonConstants from '../CommonConstants';
+
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
-import CommonConstants from '../CommonConstants';
 //import config from "../database/00_config/config.json"
 
 const debug = require( 'debug' )( 'DBMigrationManagerMYSQL' );
@@ -40,7 +42,7 @@ export class DBMigrationManagerMYSQL {
       });
 
       //dbConnection.end();
-      let debugMark = debug.extend( "E39C1722F64A" );
+      let debugMark = debug.extend( "E39C1722F64A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( `Success connected to database ${dbConfig[ "database" ]}!` );
@@ -52,7 +54,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.connectToDatabase.name;
 
-      const strMark = "620274B3F533";
+      const strMark = "620274B3F533" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -117,7 +119,7 @@ export class DBMigrationManagerMYSQL {
 
         }
 
-        let debugMark = debug.extend( "89B7EABE381B" );
+        let debugMark = debug.extend( "89B7EABE381B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( "Executing 00_one_time_execute.sql file" );
@@ -149,7 +151,7 @@ export class DBMigrationManagerMYSQL {
 
                 bException = true;
 
-                const strMark = "8CD33B3D9F6C";
+                const strMark = "8CD33B3D9F6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -186,7 +188,7 @@ export class DBMigrationManagerMYSQL {
 
         }
 
-        let debugMark = debug.extend( "43F85A59123C" );
+        let debugMark = debug.extend( "43F85A59123C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( "00_one_time_execute.sql file execution canceled. Is NOT the network leader" );
@@ -214,7 +216,7 @@ export class DBMigrationManagerMYSQL {
       }
       else {
 
-        let debugMark = debug.extend( "83CCC3EBB0B0" );
+        let debugMark = debug.extend( "83CCC3EBB0B0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( "00_one_time_execute.sql file not exists!" );
@@ -235,7 +237,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.oneTimeExecute.name;
 
-      const strMark = "12B380393A00";
+      const strMark = "12B380393A00" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -310,7 +312,7 @@ export class DBMigrationManagerMYSQL {
 
                 bException = true;
 
-                const strMark = "5D1B35896BE5";
+                const strMark = "5D1B35896BE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -369,7 +371,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.allTimeExecute.name;
 
-      const strMark = "3C139C08EF15";
+      const strMark = "3C139C08EF15" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -403,7 +405,7 @@ export class DBMigrationManagerMYSQL {
     let { dbCode, dbConnection } = await this.connectToDatabase( dbConfig,
                                                                  logger );
 
-    //let debugMark = debug.extend( "F1843CB142D4" );
+    //let debugMark = debug.extend( "F1843CB142D4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
     //debugMark( "DBCode => ", dbCode );
     //debugMark( "DBConnection => ", dbCode );
     //process.exit( 0 );
@@ -437,7 +439,7 @@ export class DBMigrationManagerMYSQL {
 
         bResult = true;
 
-        let debugMark = debug.extend( "153D3F412FC7" );
+        let debugMark = debug.extend( "153D3F412FC7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `Database %s created!`, dbConfig[ "database" ] );
@@ -449,7 +451,7 @@ export class DBMigrationManagerMYSQL {
 
         sourcePosition.method = this.name + "." + this.createDatabaseIfNotExits.name;
 
-        const strMark = "46A2A0FAC6D0";
+        const strMark = "46A2A0FAC6D0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
@@ -489,7 +491,7 @@ export class DBMigrationManagerMYSQL {
 
         sourcePosition.method = this.name + "." + this.createDatabaseIfNotExits.name;
 
-        const strMark = "C72838D56BF9";
+        const strMark = "C72838D56BF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
@@ -532,7 +534,7 @@ export class DBMigrationManagerMYSQL {
       }
       else {
 
-        let debugMark = debug.extend( "0BC54529C028" );
+        let debugMark = debug.extend( "0BC54529C028" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -546,7 +548,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.checkTableExits.name;
 
-      const strMark = "BE9C7187F2AC";
+      const strMark = "BE9C7187F2AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -586,7 +588,7 @@ export class DBMigrationManagerMYSQL {
       }
       else {
 
-        let debugMark = debug.extend( "A09F15562CCB" );
+        let debugMark = debug.extend( "A09F15562CCB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -600,7 +602,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.getTableContent.name;
 
-      const strMark = "6F0F15FF494D";
+      const strMark = "6F0F15FF494D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -651,7 +653,7 @@ export class DBMigrationManagerMYSQL {
         /*
         tableContent[ 0 ].map( ( row: any, intIndex: number ) => {
 
-          let debugMark = debug.extend( "F42473B14422" );
+          let debugMark = debug.extend( "F42473B14422" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "FilePath => ", strFilePath );
           debugMark( "FileName => ", strFileName );
           debugMark( "Row FP => ", row[ 'FilePath' ] );
@@ -669,7 +671,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.checkFileExecuted.name;
 
-      const strMark = "5F8D44B544BA";
+      const strMark = "5F8D44B544BA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -730,7 +732,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.executeSQLFile.name;
 
-      const strMark = "65897C93FC1C";
+      const strMark = "65897C93FC1C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -831,7 +833,7 @@ export class DBMigrationManagerMYSQL {
 
                 sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-                const strMark = "63A1BFFBD80C";
+                const strMark = "63A1BFFBD80C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -839,7 +841,7 @@ export class DBMigrationManagerMYSQL {
                 debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
                 debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
                 debugMark( "Catched on: %O", sourcePosition );
-  
+
                 error.mark = strMark;
                 error.logId = SystemUtilities.getUUIDv4();
 
@@ -873,7 +875,7 @@ export class DBMigrationManagerMYSQL {
 
                 sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-                const strMark = "A6AD6A129C3B";
+                const strMark = "A6AD6A129C3B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -881,7 +883,7 @@ export class DBMigrationManagerMYSQL {
                 debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
                 debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
                 debugMark( "Catched on: %O", sourcePosition );
-  
+
                 error.mark = strMark;
                 error.logId = SystemUtilities.getUUIDv4();
 
@@ -915,7 +917,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-      const strMark = "1AA4D8876852";
+      const strMark = "1AA4D8876852" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1016,7 +1018,7 @@ export class DBMigrationManagerMYSQL {
 
                 sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-                const strMark = "5DEB105335BB";
+                const strMark = "5DEB105335BB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -1058,7 +1060,7 @@ export class DBMigrationManagerMYSQL {
 
                 sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-                const strMark = "25B384A39488";
+                const strMark = "25B384A39488" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -1100,7 +1102,7 @@ export class DBMigrationManagerMYSQL {
 
       sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-      const strMark = "9E5AA5DC9F86";
+      const strMark = "9E5AA5DC9F86" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

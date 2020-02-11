@@ -1,11 +1,15 @@
-//import { UserGroup } from "../models/UserGroup";
-import DBConnectionManager from "../../managers/DBConnectionManager";
+import cluster from 'cluster';
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
+import CommonConstants from "../../CommonConstants";
+import SystemConstants from "../../SystemContants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
-import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
-import SystemConstants from "../../SystemContants";
-import CommonConstants from "../../CommonConstants";
+//import { UserGroup } from "../models/UserGroup";
 
 const debug = require( 'debug' )( 'ConfigValueDataService' );
 
@@ -74,7 +78,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getConfigValueData.name;
 
-      const strMark = "0AFC109A813E";
+      const strMark = "0AFC109A813E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -148,7 +152,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.searchInTags.name;
 
-      const strMark = "9BD05E9C665D";
+      const strMark = "9BD05E9C665D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -305,7 +309,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getConfigValueDataFromSession.name;
 
-      const strMark = "DEDAE9D19840";
+      const strMark = "DEDAE9D19840" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -392,7 +396,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getConfigValueDataFromTags.name;
 
-      const strMark = "974B4BB8DD96";
+      const strMark = "974B4BB8DD96" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -550,7 +554,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getConfigValueDataSingle.name;
 
-      const strMark = "F93ACA141D7E";
+      const strMark = "F93ACA141D7E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -716,7 +720,7 @@ export default class ConfigValueDataService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.checkAllowed.name;
 
-      const strMark = "537A7376C91E";
+      const strMark = "537A7376C91E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

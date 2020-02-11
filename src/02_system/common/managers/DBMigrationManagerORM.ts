@@ -4,16 +4,20 @@
 //import uuidv4 from 'uuid/v4';
 //import moment from 'moment-timezone';
 import fs from 'fs';
+import cluster from "cluster";
 //import minify from 'pg-minify';
+
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
+import CommonConstants from '../CommonConstants';
+import SystemConstants from "../SystemContants";
 
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
-import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 //import config from "../database/00_config/config.json"
 import { DBMigratedData } from '../database/models/DBMigratedData';
 import { DBImportedData } from '../database/models/DBImportedData';
-import SystemConstants from "../SystemContants";
-import CommonConstants from '../CommonConstants';
 
 const debug = require( 'debug' )( 'DBMigrationManagerORM' );
 
@@ -39,7 +43,7 @@ export class DBMigrationManagerORM {
       }
       else {
 
-        let debugMark = debug.extend( '2F866EBC3283' );
+        let debugMark = debug.extend( '2F866EBC3283' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -53,7 +57,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.checkTableExits.name;
 
-      const strMark = "ADEC7F415353";
+      const strMark = "ADEC7F415353" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -96,7 +100,7 @@ export class DBMigrationManagerORM {
       }
       else {
 
-        let debugMark = debug.extend( '3EFDDB863595' );
+        let debugMark = debug.extend( '3EFDDB863595' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -110,7 +114,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.getTableContent.name;
 
-      const strMark = "77674D0CF60D";
+      const strMark = "77674D0CF60D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -161,7 +165,7 @@ export class DBMigrationManagerORM {
         /*
         tableContent[ 0 ].map( ( row: any, intIndex: number ) => {
 
-          let debugMark = debug.extend( '3F31461C084F' );
+          let debugMark = debug.extend( '3F31461C084F' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
           debugMark( "FilePath => ", strFilePath );
           debugMark( "FileName => ", strFileName );
           debugMark( "Row FP => ", row[ 'FilePath' ] );
@@ -179,7 +183,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.getFileExecuted.name;
 
-      const strMark = "7EE5480378AB";
+      const strMark = "7EE5480378AB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -264,7 +268,7 @@ export class DBMigrationManagerORM {
 
                 sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-                const strMark = "5F3DE434B7C2";
+                const strMark = "5F3DE434B7C2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -316,7 +320,7 @@ export class DBMigrationManagerORM {
 
                 sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-                const strMark = "2DD9427C1C90";
+                const strMark = "2DD9427C1C90" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -356,7 +360,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.migrateDatabase.name;
 
-      const strMark = "D57A07564F39";
+      const strMark = "D57A07564F39" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -442,7 +446,7 @@ export class DBMigrationManagerORM {
 
                 sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-                const strMark = "A2FF434B0B5F";
+                const strMark = "A2FF434B0B5F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -495,7 +499,7 @@ export class DBMigrationManagerORM {
 
                 sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-                const strMark = "1B86A993C171";
+                const strMark = "1B86A993C171" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
                 const debugMark = debug.extend( strMark );
 
@@ -535,7 +539,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.importDataToDatabase.name;
 
-      const strMark = "BB9C524DB6B6";
+      const strMark = "BB9C524DB6B6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -626,7 +630,7 @@ export class DBMigrationManagerORM {
 
               sourcePosition.method = this.name + "." + this.alwaysExecute.name;
 
-              const strMark = "C4D455C1E245";
+              const strMark = "C4D455C1E245" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
@@ -682,7 +686,7 @@ export class DBMigrationManagerORM {
 
               sourcePosition.method = this.name + "." + this.alwaysExecute.name;
 
-              const strMark = "D44D194323A5";
+              const strMark = "D44D194323A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
@@ -720,7 +724,7 @@ export class DBMigrationManagerORM {
 
       sourcePosition.method = this.name + "." + this.alwaysExecute.name;
 
-      const strMark = "599C839FB8B4";
+      const strMark = "599C839FB8B4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

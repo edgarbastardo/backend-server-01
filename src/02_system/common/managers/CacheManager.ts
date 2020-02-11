@@ -1,8 +1,11 @@
-import CommonUtilities from "../CommonUtilities";
+import cluster from "cluster";
 import Redlock from "redlock";
 //import uuidv4 from 'uuid/v4';
-import SystemUtilities from "../SystemUtilities";
+
 import CommonConstants from "../CommonConstants";
+
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
 const debug = require( 'debug' )( 'CacheManager' );
 
@@ -27,7 +30,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "39FEEE47CC45";
+      const strMark = "39FEEE47CC45" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -95,7 +98,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.lockResource.name;
 
-      const strMark = "FDDE29A4E794";
+      const strMark = "FDDE29A4E794" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -128,7 +131,7 @@ export default class CacheManager {
 
       await redLock.unlock();
 
-      let debugMark = debug.extend( "DAD04DE7C94F" );
+      let debugMark = debug.extend( "DAD04DE7C94F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( `Success unlock the redis resource` );
@@ -140,7 +143,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.unlockResource.name;
 
-      const strMark = "95A71EC38900";
+      const strMark = "95A71EC38900" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -180,7 +183,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.setData.name;
 
-      const strMark = "9CEDB846E59A";
+      const strMark = "9CEDB846E59A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -221,7 +224,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.setDataWithTTL.name;
 
-      const strMark = "5771EB786591";
+      const strMark = "5771EB786591" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -259,7 +262,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.getData.name;
 
-      const strMark = "A60AFEB4BD531";
+      const strMark = "A60AFEB4BD531" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -299,7 +302,7 @@ export default class CacheManager {
 
       sourcePosition.method = this.name + "." + this.getData.name;
 
-      const strMark = "69489A614583";
+      const strMark = "69489A614583" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
