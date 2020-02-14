@@ -122,12 +122,9 @@ export default class AuthenticationController {
            )
   async login( request: Request, response: Response ) {
 
-    const context = ( request as any ).context;
+    const context = ( request as any ).context; //Context is injected by the middleware middlewareSetContext
 
-    const result = await SecurityServiceController.login( context.Language,
-                                                          context.TimeZoneId,
-                                                          context.SourceIPAddress,
-                                                          context.FrontendId,
+    const result = await SecurityServiceController.login( context,
                                                           request.body.Username,
                                                           request.body.Password,
                                                           null,

@@ -8,13 +8,48 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/src/server.ts",
+      "name": "Debug Backend Server Process (Main)",
+      //"program": "${workspaceFolder}/src/server.ts",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start:debug"],
       "outputCapture": "std",
       "preLaunchTask": "build",
+      "port": 9229,
+      //"autoAttachChildProcesses": true,
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"
-      ]
+      ],
+      "trace": true
+    },
+    {
+      "type": "node",
+      "request":"attach",
+      "name": "Debug Backend Server Process (Fork 01)",
+      "processId": "${command:PickProcess}"
+    },
+    {
+      "type": "node",
+      "request":"attach",
+      "name": "Debug Backend Server Process (Fork 02)",
+      "processId": "${command:PickProcess}"
+    },
+    {
+      "type": "node",
+      "request":"attach",
+      "name": "Debug Backend Server Process (Fork 03)",
+      "processId": "${command:PickProcess}"
+    },
+    {
+      "type": "node",
+      "request":"attach",
+      "name": "Debug Backend Server Process (Fork 04)",
+      "processId": "${command:PickProcess}"
+    },
+    {
+      "type": "node",
+      "request":"attach",
+      "name": "Debug Backend Server Process (Fork 05)",
+      "processId": "${command:PickProcess}"
     },
     {
       "type": "node",

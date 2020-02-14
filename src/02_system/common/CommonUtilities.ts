@@ -944,6 +944,115 @@ export default class CommonUtilities {
 
   }
 
+  public static clearFormatPhoneNumberList( strPhoneList: string ): string {
+
+    let strResult = strPhoneList;
+
+    try {
+
+      let clearFormatedPhoneList = [];
+
+      const phoneList = strPhoneList.split( "," );
+
+      for ( const strPhone of phoneList ) {
+
+        if ( strPhone ) {
+
+          const strPhoneTrimed = strPhone.trim();
+
+          if ( strPhoneTrimed ) {
+
+            clearFormatedPhoneList.push( strPhoneTrimed.trim().replace( /\-/g, "" ) );
+
+          }
+
+        }
+
+      }
+
+      strResult = clearFormatedPhoneList.join( "," );
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  public static formatPhoneNumber( strPhoneNumber: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      const strCleaned = ( '' + strPhoneNumber ).replace( /\D/g, '' );
+
+      const match = strCleaned.match( /^(\d{1,3})?(\d{3})(\d{3})(\d{4})$/ );
+      //const match = strCleaned.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g );
+      //const match = strCleaned.match( /^(1|)?(\d{3})(\d{3})(\d{4})$/ );
+
+      if ( match ) {
+
+        const strInternationalCode = ( !match[ 1 ] ? '1' : match[ 1 ] );
+
+        strResult = [ strInternationalCode, '-', match[ 2 ], '-', match[ 3 ], '-', match[ 4 ] ].join( '' );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  public static wellFormatedPhoneNumberList( strPhoneList: string ): string {
+
+    let strResult = strPhoneList;
+
+    try {
+
+      let wellFormatedPhoneList = [];
+
+      const phoneList = strPhoneList.split( "," );
+
+      for ( const strPhone of phoneList ) {
+
+        if ( strPhone ) {
+
+          const strPhoneFormated = CommonUtilities.formatPhoneNumber( strPhone.trim() );
+
+          if ( strPhoneFormated ) {
+
+            wellFormatedPhoneList.push( strPhoneFormated );
+
+          }
+
+        }
+
+      }
+
+      strResult = wellFormatedPhoneList.join( "," );
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
   public static isValidEMail( strEMail: string ): boolean {
 
     let bResult = false;
@@ -1104,4 +1213,26 @@ export default class CommonUtilities {
 
   }
 
+  public static trimArray( array: string[] ): string[] {
+
+    let result = [];
+
+    try {
+
+      for ( const strItem of array ) {
+
+        result.push( strItem.trim() );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return result;
+
+  }
 }

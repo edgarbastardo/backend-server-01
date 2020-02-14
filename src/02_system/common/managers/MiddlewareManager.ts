@@ -426,7 +426,99 @@ export default class MiddlewareManager {
                              Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
                              Details: timeAgo
                            }
-                          ],
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+    }
+    else if ( userSessionStatus.Tag &&
+              userSessionStatus.Tag.includes( "#USER_GROUP_DISABLED#" ) ) {
+
+      result = {
+                 StatusCode: 401, //Unauthorized
+                 Code: 'ERROR_USER_GROUP_DISABLED',
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group disabled' ),
+                 Mark: '957309DC4730' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: 'ERROR_USER_GROUP_DISABLED',
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group disabled' ),
+                             Details: null
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+    }
+    else if ( userSessionStatus.Tag &&
+              userSessionStatus.Tag.includes( "#USER_GROUP_EXPIRED#" ) ) {
+
+      result = {
+                 StatusCode: 401, //Unauthorized
+                 Code: 'ERROR_USER_GROUP_EXPIRED',
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group expired' ),
+                 Mark: '6812FDB55733' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: 'ERROR_USER_GROUP_EXPIRED',
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group expired' ),
+                             Details: null
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+    }
+    else if ( userSessionStatus.Tag &&
+              userSessionStatus.Tag.includes( "#USER_DISABLED#" ) ) {
+
+      result = {
+                 StatusCode: 401, //Unauthorized
+                 Code: 'ERROR_USER_DISABLED',
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user disabled' ),
+                 Mark: '3479CB7BE4BE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: 'ERROR_USER_DISABLED',
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user disabled' ),
+                             Details: null
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+    }
+    else if ( userSessionStatus.Tag &&
+              userSessionStatus.Tag.includes( "#USER_EXPIRED#" ) ) {
+
+      result = {
+                 StatusCode: 401, //Unauthorized
+                 Code: 'ERROR_USER_EXPIRED',
+                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user expired' ),
+                 Mark: '757B13FB8742' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: 'ERROR_USER_EXPIRED',
+                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user expired' ),
+                             Details: null
+                           }
+                         ],
                  Warnings: [],
                  Count: 0,
                  Data: []

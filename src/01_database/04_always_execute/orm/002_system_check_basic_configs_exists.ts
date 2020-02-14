@@ -320,7 +320,7 @@ export default class Always {
                                                                  "groupTag":"",
                                                                  "groupExpireAt":-1,
                                                                  "status":1,
-                                                                 "userRole":"#Master#",
+                                                                 "userRole":"#MasterL01#",
                                                                  "userTag":"",
                                                                  "userExpireAt":-1,
                                                                  "passwordParameterTag":"#Establishments#"

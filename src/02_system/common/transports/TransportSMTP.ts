@@ -23,9 +23,11 @@ export default class TransportSMTP extends TransportEMail {
 
       const transport = nodemailer.createTransport( transportOptions );
 
+      const toList = CommonUtilities.trimArray( messageOptions.to.split( "," ) );
+
       const messageToSend = {
                               from: messageOptions.from,
-                              to: messageOptions.to,
+                              to: toList,
                               subject: messageOptions.subject,
                               text: "",
                               html: ""

@@ -1754,15 +1754,17 @@ export default class SystemUtilities {
 
     try {
 
-      if ( instance.rawAttributes[ "Id" ] !== null &&
+      //options.skip = [];
+
+      if ( instance.rawAttributes[ "Id" ] &&
            !instance.Id ) {
 
         instance.Id = SystemUtilities.getUUIDv4();
 
       }
 
-      if ( instance.rawAttributes[ "ShortId" ] !== null &&
-           instance.rawAttributes[ "Id" ] !== null &&
+      if ( instance.rawAttributes[ "ShortId" ] &&
+           instance.rawAttributes[ "Id" ] &&
            ( !instance.ShortId ||
              instance.ShortId === '0' ) ) {
 
@@ -1781,7 +1783,7 @@ export default class SystemUtilities {
            options.type.toUpperCase() === "BULKCREATE" ||
            options.type.toUpperCase() === "CREATE" ) {
 
-        if ( instance.rawAttributes[ "CreatedBy" ] !== null &&
+        if ( instance.rawAttributes[ "CreatedBy" ] &&
              !instance.createdBy  ) {
 
           if ( options.context &&
@@ -1799,7 +1801,7 @@ export default class SystemUtilities {
 
         }
 
-        if ( instance.rawAttributes[ "CreatedAt" ] !== null &&
+        if ( instance.rawAttributes[ "CreatedAt" ] &&
              !instance.createdAt ) {
 
           instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
@@ -1809,68 +1811,110 @@ export default class SystemUtilities {
       }
       else {
 
-        if ( instance.rawAttributes[ "UpdatedBy" ] !== null ) {
+        instance.isNewRecord = false;
+
+        if ( instance.rawAttributes[ "UpdatedBy" ] ) {
 
           if ( options.context &&
                options.context.UserSessionStatus &&
                options.context.UserSessionStatus.Name ) {
 
-            instance.dataValues.UpdatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
+            instance.UpdatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
 
           }
           else if ( instance.UpdatedBy === null ) {
 
-            instance.dataValues.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+            instance.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+
+          const intIndexUpdatedBy = options.skip.indexOf( "UpdatedBy" );
+
+          if ( intIndexUpdatedBy >= 0 ) {
+
+            options.skip.splice( intIndexUpdatedBy, 1 );
 
           }
 
         }
 
-        if ( instance.rawAttributes[ "UpdatedAt" ] !== null ) {
+        if ( instance.rawAttributes[ "UpdatedAt" ] ) {
 
-          instance.dataValues.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+
+          const intIndexUpdatedAt = options.skip.indexOf( "UpdatedAt" );
+
+          if ( intIndexUpdatedAt >= 0 ) {
+
+            options.skip.splice( intIndexUpdatedAt, 1 );
+
+          }
 
         }
 
       }
 
-      if ( instance.rawAttributes[ "DisabledBy" ] !== null ) {
+      if ( instance.rawAttributes[ "DisabledBy" ] ) {
 
         if ( instance.DisabledBy === "1" ||
              ( instance.DisabledBy &&
                instance.DisabledBy.startsWith( "1@" ) ) ) {
 
           if ( options.context &&
-              options.context.UserSessionStatus &&
-              options.context.UserSessionStatus.Name ) {
+               options.context.UserSessionStatus &&
+               options.context.UserSessionStatus.Name ) {
 
-            instance.dataValues.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+            instance.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
 
           }
           else if ( instance.DisabledBy.startsWith( "1@" ) ) {
 
             const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
 
-            instance.dataValues.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+            instance.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
 
           }
           else { //if ( instance.DisabledBy === null ) {
 
-            instance.dataValues.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+            instance.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
 
           }
 
-          if ( instance.rawAttributes[ "DisabledAt" ] !== null ) {
+          if ( instance.rawAttributes[ "DisabledAt" ] ) {
 
-            instance.dataValues.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+
+            const intIndexDisabledAt = options.skip.indexOf( "DisabledAt" );
+
+            if ( intIndexDisabledAt >= 0 ) {
+
+              options.skip.splice( intIndexDisabledAt, 1 );
+
+            }
 
           }
 
         }
         else if ( instance.DisabledBy === "0" ) {
 
-          instance.dataValues.DisabledBy = null;
-          instance.dataValues.DisabledAt = null;
+          instance.DisabledBy = null;
+          instance.DisabledAt = null;
+
+          const intIndexDisabledBy = options.skip.indexOf( "DisabledBy" );
+
+          if ( intIndexDisabledBy >= 0 ) {
+
+            options.skip.splice( intIndexDisabledBy, 1 );
+
+          }
+
+          const intIndexDisabledAt = options.skip.indexOf( "DisabledAt" );
+
+          if ( intIndexDisabledAt >= 0 ) {
+
+            options.skip.splice( intIndexDisabledAt, 1 );
+
+          }
 
         }
 
@@ -2173,7 +2217,8 @@ export default class SystemUtilities {
 
         if ( process.env.ENV !== "prod" ) {
 
-          if ( ( error as any ).extensions.exception ) {
+          if ( ( error as any ).extensions &&
+               ( error as any ).extensions.exception ) {
 
             result = ( error as any ).extensions.exception
 
@@ -2225,7 +2270,8 @@ export default class SystemUtilities {
 
         if ( process.env.ENV !== "prod" ) {
 
-          if ( ( error as any ).extensions.exception ) {
+          if ( ( error as any ).extensions &&
+               ( error as any ).extensions.exception ) {
 
             result = ( error as any ).extensions.exception
 

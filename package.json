@@ -8,6 +8,7 @@
     "start:dev-old": "nodemon src/server.ts --exec ts-node",
     "start:dev": "nodemon",
     "start": "node --expose-gc build/server.js",
+    "start:debug": "node --inspect-brk=9229 build/server.js",
     "test": "jest",
     "build:clean": "rimraf build/*",
     "copy:resources": "copyfiles -u 1 src/**/*.sql src/**/*.graphql src/**/*.pug src/**/*.css src/**/*.scss src/**/*.json src/**/.dont_delete build/",

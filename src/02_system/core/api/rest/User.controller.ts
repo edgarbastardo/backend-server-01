@@ -51,6 +51,7 @@ export default class UserController {
   //RequestKind: 3 PUT
   //RequestKind: 4 DELETE
 
+  //Not for me: The secondary role for the user can be defined ExtraData
   static readonly _TO_IOC_CONTAINER = true;
 
   static readonly _BASE_PATH = "/system/user";
@@ -62,14 +63,18 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/signup/activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
                                   { Path: UserController._BASE_PATH + "/password/recover/code/send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
                                   { Path: UserController._BASE_PATH + "/password/recover", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the password recover code" },
-                                  { Path: UserController._BASE_PATH + "/password/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the password to user using the current password" },
-                                  { Path: UserController._BASE_PATH + "/email/change/token/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change email token to the current user email or phone" },
-                                  { Path: UserController._BASE_PATH + "/email/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change email to the current user using the token" },
-                                  { Path: UserController._BASE_PATH + "/phone/change/token/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change phone token to the current user email or phone" },
-                                  { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the token" },
+                                  { Path: UserController._BASE_PATH + "/password/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set new password to user using the current password" },
+                                  { Path: UserController._BASE_PATH + "/email/change/code/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change email code to the new email. Using the current user password" },
+                                  { Path: UserController._BASE_PATH + "/email/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change email to the current user using the code" },
+                                  { Path: UserController._BASE_PATH + "/phone/change/code/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change phone code to the phone number. Using the current user password" },
+                                  { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the code" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
-                                  { Path: UserController._BASE_PATH + "/profile/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
-                                  { Path: UserController._BASE_PATH + "/route/allowed", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
+                                  { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
+                                  { Path: UserController._BASE_PATH + "/role/routes/allowed", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#CreateUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "CreateUserL01" ], Description: "Create new user information" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#UpdateUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "UpdateUserL01" ], Description: "Update existent user information" },
+                                  { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#SearchUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "SearchUserL01" ], Description: "Search for users" },
+                                  { Path: UserController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#SearchUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "SearchUserL01" ], Description: "Count search users result" },
                                 ]
 
   _controllerLogger = null;
@@ -317,15 +322,15 @@ export default class UserController {
   }
 
   @httpPost(
-             "/email/change/token/send",
+             "/email/change/code/send",
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
            )
   async emailChangeTokenSend( request: Request, response: Response ) {
 
-    const result = await UserServiceController.emailChangeTokenSend( request,
-                                                                     null,
-                                                                     this._controllerLogger );
+    const result = await UserServiceController.emailChangeCodeSend( request,
+                                                                    null,
+                                                                    this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -347,13 +352,13 @@ export default class UserController {
   }
 
   @httpPost(
-             "/phone/change/token/send",
+             "/phone/change/code/send",
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
            )
   async phoneChangeTokenSend( request: Request, response: Response ) {
 
-    const result = await UserServiceController.phoneChangeTokenSend( request,
+    const result = await UserServiceController.phoneChangeCodeSend( request,
                                                                      null,
                                                                      this._controllerLogger );
 
@@ -368,7 +373,7 @@ export default class UserController {
           )
   async phoneChange( request: Request, response: Response ) {
 
-    const result = await UserServiceController.phoneChange( request,
+    const result = await UserServiceController.phoneNumberChange( request,
                                                             null,
                                                             this._controllerLogger );
 
@@ -383,22 +388,22 @@ export default class UserController {
           )
   async profile( request: Request, response: Response ) {
 
-    const result = await UserServiceController.profile( request,
-                                                        null,
-                                                        this._controllerLogger );
+    const result = await UserServiceController.profileGet( request,
+                                                           null,
+                                                           this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
   @httpPut(
-            "/profile/change",
+            "/profile",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
           )
   async profileChange( request: Request, response: Response ) {
 
-    const result = await UserServiceController.profileChange( request,
+    const result = await UserServiceController.profileSet( request,
                                                               null,
                                                               this._controllerLogger );
 

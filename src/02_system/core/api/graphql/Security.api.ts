@@ -12,10 +12,7 @@ export const resolvers = {
 
     login: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityServiceController.login( context.Language,
-                                                    context.TimeZoneId,
-                                                    context.SourceIPAddress,
-                                                    context.FrontendId,
+      return await SecurityServiceController.login( context,
                                                     args.Username,
                                                     args.Password,
                                                     null,

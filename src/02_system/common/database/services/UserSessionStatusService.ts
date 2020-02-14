@@ -103,6 +103,91 @@ export default class UserSessionStatusService extends BaseService {
 
   }
 
+  static async getUserSessionStatusByShortToken( strShortToken: string = "",
+                                                 transaction: any,
+                                                 logger: any ): Promise<UserSessionStatus> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const options = {
+
+        where: { ShortToken: strShortToken },
+        transaction: currentTransaction,
+
+      }
+
+      result = await UserSessionStatus.findOne( options );
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserSessionStatusByToken.name;
+
+      const strMark = "79EDCF769FB8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async invalidateOldUserSessions( strUserId: string,
                                           intMaxSessionsAllowed: number,
                                           transaction: any,
@@ -218,6 +303,7 @@ export default class UserSessionStatusService extends BaseService {
   }
 
   static async getLastUserLogin( strUserId: string,
+                                 strToken: string,
                                  transaction: any,
                                  logger: any ): Promise<string> {
 
@@ -241,7 +327,15 @@ export default class UserSessionStatusService extends BaseService {
 
       const options = {
 
-        where: { UserId: strUserId, LoggedOutAt: null },
+        where: {
+                 UserId: {
+                           $eq: strUserId
+                         },
+                 Token: {
+                          $ne: strToken
+                        },
+                LoggedOutAt: null
+               },
         transaction: currentTransaction,
         order: [
           [ 'CreatedAt', 'DESC' ]
@@ -367,9 +461,21 @@ export default class UserSessionStatusService extends BaseService {
       }
       else if ( bUpdate ) {
 
-        if ( CommonUtilities.isNullOrEmpty( data.UpdatedBy ) ) {
+        if ( userSessionStatusInDB.CreatedBy && !data.CreatedBy ) {
 
-          data.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          data.CreatedBy = userSessionStatusInDB.CreatedBy;
+
+        }
+
+        if ( userSessionStatusInDB.CreatedAt && !data.CreatedAt ) {
+
+          data.CreatedAt = userSessionStatusInDB.CreatedAt;
+
+        }
+
+        if ( userSessionStatusInDB.UpdatedBy && !data.UpdatedBy ) {
+
+          data.UpdatedBy = userSessionStatusInDB.UpdatedBy; //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 

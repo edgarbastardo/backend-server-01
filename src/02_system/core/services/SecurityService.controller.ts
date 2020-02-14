@@ -573,10 +573,674 @@ export default class SecurityServiceController {
 
   }
 
-  static async login( strLanguage: string,
-                      strTimeZoneId: string,
-                      strSourceIPAddress: string,
-                      strFrontendId: string,
+  static async processSessionStatus( context: any,
+                                     processOptions: any,
+                                     strUserName: string,
+                                     strPassword: string,
+                                     strSecondaryUser: string,
+                                     transaction: any,
+                                     logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      let user = await UserService.getByName( strUserName,
+                                              null,
+                                              currentTransaction,
+                                              logger ); // await User.findOne( options );
+
+      const bUserFound = user && user instanceof Error === false;
+      const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.DisabledAt );
+      const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
+      const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
+      const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
+
+      let bFrontendIdIsAllowed = processOptions.checkFrontendId === false;
+
+      if ( processOptions.checkFrontendId === undefined ||
+           processOptions.checkFrontendId === false ) {
+
+        bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( context.FrontendId,
+                                                                                user.UserGroup.Id,
+                                                                                user.UserGroup.Name,
+                                                                                user.UserGroup.Tag,
+                                                                                user.Id,
+                                                                                user.Name,
+                                                                                user.Tag,
+                                                                                transaction,
+                                                                                logger ) >= 0;
+
+      }
+
+      let bUserPasswordIsValid = processOptions.checkPassword === false;
+
+      if (
+           (
+             processOptions.checkPassword === undefined ||
+             processOptions.checkPassword === false
+           ) &&
+           bUserFound &&
+           bUserDisabled === false &&
+           bUserExpired === false &&
+           bUserGroupDisabled === false &&
+           bUserGroupExpired === false &&
+           await bcrypt.compare( strPassword, user.Password ) ) {
+
+        bUserPasswordIsValid = true;
+
+      }
+
+      if (
+           bUserFound &&
+           bFrontendIdIsAllowed &&
+           bUserPasswordIsValid &&
+           (
+             processOptions.useSoftCheck === true ||
+             (
+               bUserDisabled === false &&
+               bUserExpired === false &&
+               bUserGroupDisabled === false &&
+               bUserGroupExpired === false
+             )
+           )
+         ) {
+
+        const fieldsToDelete = [
+                                 "Comment",
+                                 "CreatedBy",
+                                 "CreatedAt",
+                                 "UpdatedBy",
+                                 "UpdatedAt",
+                                 "DisabledBy",
+                                 "DisabledAt",
+                                 "Password",
+                                 "ExtraData",
+                                 "UserGroup",
+                                 "UserPerson",
+                                 "AllowTagAccess",
+                                 "DenyTagAccess",
+                                 "Role",
+                                 "Tag",
+                                 //"PasswordSetAt",
+                                 "ExpireAt",
+                                 "ImageId"
+                               ];
+
+        let groupRoles = "";
+        let groupTags = "";
+
+        let userGroupDataResponse = null;
+
+        if ( ( user as any ).dataValues.UserGroup &&
+             ( user as any ).dataValues.UserGroup.dataValues ) {
+
+          groupRoles = ( user as any ).dataValues.UserGroup.dataValues.Role;
+          groupTags = ( user as any ).dataValues.UserGroup.dataValues.Tag;
+
+          userGroupDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserGroup.dataValues,
+                                                                      fieldsToDelete,
+                                                                      logger );
+
+        }
+
+        let userPersonDataResponse = null;
+
+        if ( ( user as any ).dataValues.UserPerson &&
+             ( user as any ).dataValues.UserPerson.dataValues ) {
+
+          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserPerson.dataValues,
+                                                                       fieldsToDelete,
+                                                                       logger );
+
+        }
+
+        const userRoles = ( user as any ).dataValues.Role; //Save the role field value
+        const userTags = ( user as any ).dataValues.Tag; //Save the role field value
+
+        const createdAt = ( user as any ).dataValues.CreatedAt; //Save the CreatedAt field value
+
+        const userDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues,
+                                                                     fieldsToDelete,
+                                                                     logger );
+        userDataResponse.CreatedAt = createdAt; //Restore the field to main object struct
+
+        SystemUtilities.transformObjectToTimeZone( userDataResponse,
+                                                   context.TimeZoneId,
+                                                   logger ); //Convert to local timezoneId
+
+        const strAuthorization = !processOptions.authorization ? SystemUtilities.getUUIDv4() : processOptions.authorization;
+
+        if ( ( !processOptions.checkOldSession ||
+               processOptions.checkOldSession ) &&
+             userDataResponse.SessionsAllowed > 0 ) {
+
+          await UserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
+                                                                    userDataResponse.SessionsAllowed - 1,
+                                                                    currentTransaction,
+                                                                    logger );
+
+        }
+
+        const lastLoginAt = await UserSessionStatusService.getLastUserLogin( userDataResponse.Id,
+                                                                             strAuthorization,
+                                                                             currentTransaction,
+                                                                             logger );
+
+        /*
+        if ( lastLoggedAt ) {
+
+          userDataResponse.LastLoggerAt = SystemUtilities.transformToTimeZone( lastLoggedAt,
+                                                                               context.TimeZoneId,
+                                                                               undefined,
+                                                                               logger );
+
+        }
+        else {
+
+          userDataResponse.LastLoggerAt = null; //Never
+
+        }
+        */
+
+        const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( user.UserGroup.Id,
+                                                                                              user.UserGroup.Name,
+                                                                                              user.Id,
+                                                                                              user.Name,
+                                                                                              transaction,
+                                                                                              logger );
+
+        configData.hardLimit = null; //Limit by default is null not hard limit for to session
+
+        //Select more close data time to current date time
+        const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( user.ExpireAt,
+                                                                        user.UserGroup.ExpireAt );
+
+        if ( expireAt !== null ) {
+
+          if ( configData.kind === 0 ||   //Calculated from UpdatedAt
+               configData.kind === 1 ) {  //Calculated from CreatedAt
+
+            const expireOn = processOptions.notProcessExpireOn === true ? null: SystemUtilities.getCurrentDateAndTimeIncMinutes( configData.on );
+
+            if ( expireOn &&
+                 expireOn.isAfter( expireAt ) ) {
+
+              configData.kind = 2;      //Overwrite and use the value of 2
+              configData.on = expireAt; //Use now this fixed date time
+
+            }
+
+            configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
+
+          }
+          else if ( configData.kind === 2 ) { //Fixed expire Date and Time
+
+            const expireOn = SystemUtilities.getCurrentDateAndTimeFrom( configData.on )
+
+            if ( expireOn.isAfter( expireAt ) ) {
+
+              configData.kind = 2;
+              configData.on = expireAt;    //Overwrite and use now the value defined in ExpireAt and not in the config
+              configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
+
+            }
+
+          }
+
+        }
+
+        const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
+                                                            userRoles,
+                                                            true,
+                                                            logger );
+
+        let strBasicRoles = "";
+
+        if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
+
+          if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Authenticated#";
+
+          }
+          else {
+
+            strBasicRoles = "#Authenticated#";
+
+          }
+
+        }
+
+        if ( strRolesMerged.includes( "#Public#" ) === false ) {
+
+          if ( strBasicRoles.length > 0 ) {
+
+            strBasicRoles = strBasicRoles + ",#Public#";
+
+          }
+          else if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Public#";
+
+          }
+          else {
+
+            strBasicRoles = "#Public#";
+
+          }
+
+        }
+
+        const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
+                                                                      userDataResponse,
+                                                                      logger );
+
+        if ( processOptions.useSoftCheck === true ) {
+
+          if ( bUserDisabled &&
+               strAuthorization.startsWith( "p:" ) === false ) {
+
+            detectedWarnings.warnings.push(
+                                            {
+                                              Code: "WARNING_USER_DISABLED",
+                                              Message: I18NManager.translateSync( context.Language, "The user is disabled" ),
+                                              Details: null,
+                                            }
+                                          );
+
+            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_DISABLED#" : "#USER_DISABLED#";
+
+          }
+
+          if ( bUserExpired &&
+               strAuthorization.startsWith( "p:" ) === false ) {
+
+            detectedWarnings.warnings.push(
+                                            {
+                                              Code: "WARNING_USER_EXPIRED",
+                                              Message: I18NManager.translateSync( context.Language, "The user is expired" ),
+                                              Details: null,
+                                            }
+                                          );
+
+            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_EXPIRED#" : "#USER_EXPIRED#";
+
+          }
+
+          if ( bUserGroupDisabled &&
+               strAuthorization.startsWith( "p:" ) === false  ) {
+
+            detectedWarnings.warnings.push(
+                                            {
+                                              Code: "WARNING_USER_GROUP_DISABLED",
+                                              Message: I18NManager.translateSync( context.Language, "The group is disabled" ),
+                                              Details: null,
+                                            }
+                                          );
+
+            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_DISABLED#" : "#USER_GROUP_DISABLED#";
+
+          }
+
+          if ( bUserGroupExpired &&
+               strAuthorization.startsWith( "p:" ) === false  ) {
+
+            detectedWarnings.warnings.push(
+                                            {
+                                              Code: "WARNING_USER_GROUP_EXPIRED",
+                                              Message: I18NManager.translateSync( context.Language, "The group is expired" ),
+                                              Details: null,
+                                            }
+                                          );
+
+            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_EXPIRED#" : "#USER_GROUP_EXPIRED#";
+
+          }
+
+        }
+
+        const userSessionStatusData = {
+                                        UserId: user.Id,
+                                        UserGroupId: user.GroupId,
+                                        Token: strAuthorization,
+                                        FrontendId: context.FrontendId,
+                                        SourceIPAddress: context.SourceIPAddress,
+                                        Role: strRolesMerged + strBasicRoles,
+                                        UserName: user.Name,
+                                        ExpireKind: configData.kind,
+                                        ExpireOn: configData.on,
+                                        HardLimit: configData.hardLimit,
+                                        Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
+                                        CreatedBy: processOptions.useSecondaryUserToCreatedBy === true && strSecondaryUser ? strSecondaryUser : strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                        CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format(): null,
+                                        UpdatedBy: !strSecondaryUser ? strUserName : strSecondaryUser, //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+                                        UpdatedAt: null
+                                      };
+
+        const userSessionStatus = await UserSessionStatusService.createOrUpdate( user.Id, //UserId
+                                                                                 strAuthorization, //Token created
+                                                                                 userSessionStatusData, //The data
+                                                                                 true, //Force Only create
+                                                                                 currentTransaction, //Continue the current transaction
+                                                                                 logger );
+
+        if ( userPersonDataResponse !== null ) {
+
+          userSessionStatusData[ "PersonId" ] = userPersonDataResponse.PersonId;
+          userSessionStatusData[ "Title" ] = userPersonDataResponse.Title;
+          userSessionStatusData[ "FirstName" ] = userPersonDataResponse.FirstName;
+          userSessionStatusData[ "LastName" ] = userPersonDataResponse.LastName;
+          userSessionStatusData[ "EMail" ] = userPersonDataResponse.EMail;
+          userSessionStatusData[ "Phone" ] = userPersonDataResponse.Phone;
+
+        }
+        else {
+
+          userSessionStatusData[ "PersonId" ] = "";
+          userSessionStatusData[ "Title" ] = "";
+          userSessionStatusData[ "FirstName" ] = "";
+          userSessionStatusData[ "LastName" ] = "";
+          userSessionStatusData[ "EMail" ] = "";
+          userSessionStatusData[ "Phone" ] = "";
+
+        }
+
+        userSessionStatusData[ "UserTag" ] = userTags;
+        //userSessionStatusData[ "User" ] = user.Name;
+        userSessionStatusData[ "UserGroupTag" ] = groupTags;
+        userSessionStatusData[ "UserGroupName" ] = userGroupDataResponse.Name;
+        userSessionStatusData[ "CreatedAt" ] = userSessionStatus.CreatedAt;
+        userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
+        userSessionStatusData[ "LoggedOutBy" ] = null;
+        userSessionStatusData[ "LoggedOutAt" ] = null;
+
+        await CacheManager.setDataWithTTL( strAuthorization,
+                                           JSON.stringify( userSessionStatusData ),
+                                           300, //5 minutes in seconds
+                                           logger );
+
+        if ( userSessionStatus !== null ) {
+
+          if ( !processOptions.useCustomResponse ||
+               processOptions.useCustomResponse === false ) {
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: 'SUCCESS_LOGIN',
+                       Message: await I18NManager.translate( context.Language, 'Sucess login' ),
+                       Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: detectedWarnings.warnings,
+                       Count: 1,
+                       Data: [
+                               {
+                                 Authorization: strAuthorization,
+                                 SupportToken: userSessionStatus.ShortToken,
+                                 Role: strRolesMerged + strBasicRoles,
+                                 LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                 User: userDataResponse,
+                                 Group: userGroupDataResponse,
+                                 Person: userPersonDataResponse
+                               }
+                             ]
+                     };
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: processOptions.code,
+                       Message: I18NManager.translateSync( context.Language, processOptions.message ),
+                       Mark: processOptions.mark + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: detectedWarnings.warnings,
+                       Count: 1,
+                       Data: [
+                               {
+                                 Authorization: strAuthorization,
+                                 SupportToken: userSessionStatus.ShortToken,
+                                 Role: strRolesMerged + strBasicRoles,
+                                 LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                 User: userDataResponse,
+                                 Group: userGroupDataResponse,
+                                 Person: userPersonDataResponse
+                               }
+                             ]
+                     };
+
+          }
+
+        }
+
+      }
+      else if ( bUserDisabled ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_DISABLED',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
+                   Mark: 'C2344BE0E051' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_DISABLED',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bUserExpired ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_EXPIRED',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
+                   Mark: '5E65F3A6BB84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_EXPIRED',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bUserGroupDisabled ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_GROUP_DISABLED',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
+                   Mark: 'C0631A69B6F6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_GROUP_DISABLED',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bUserGroupExpired ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
+                   Mark: 'B621392319E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_GROUP_EXPIRED',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bFrontendIdIsAllowed === false ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                   Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
+                   Mark: 'D8E7BA64792D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                               Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_LOGIN_FAILED',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
+                   Mark: '22E89FB65D2B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_LOGIN_FAILED',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.processSessionStatus.name;
+
+      const strMark = "00FCA8D75EFC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
+  static async login( context: any,
                       strUserName: string,
                       strPassword: string,
                       transaction: any,
@@ -600,8 +1264,15 @@ export default class SecurityServiceController {
 
       }
 
-      //const strCryptedPassword = await bcrypt.hash( strPassword, 10 );
+      result = await SecurityServiceController.processSessionStatus( context,
+                                                                     {},
+                                                                     strUserName,
+                                                                     strPassword,
+                                                                     null,
+                                                                     currentTransaction,
+                                                                     logger );
 
+      /*
       const options = {
 
         where: { Name: strUserName },
@@ -625,7 +1296,7 @@ export default class SecurityServiceController {
       const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
       const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
       const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
-      const bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( strFrontendId,
+      const bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( context.FrontendId,
                                                                                     user.UserGroup.Id,
                                                                                     user.UserGroup.Name,
                                                                                     user.UserGroup.Tag,
@@ -713,7 +1384,7 @@ export default class SecurityServiceController {
         userDataResponse.CreatedAt = createdAt; //Restore the field to main object struct
 
         SystemUtilities.transformObjectToTimeZone( userDataResponse,
-                                                   strTimeZoneId,
+                                                   context.TimeZoneId,
                                                    logger ); //Convert to local timezoneId
 
         const strAuthorizationToken = SystemUtilities.getUUIDv4();
@@ -737,7 +1408,7 @@ export default class SecurityServiceController {
         if ( lastLoggedAt ) {
 
           userDataResponse.LastLoggerAt = SystemUtilities.transformToTimeZone( lastLoggedAt,
-                                                                               strTimeZoneId,
+                                                                               context.TimeZoneId,
                                                                                undefined,
                                                                                logger );
 
@@ -799,27 +1470,6 @@ export default class SecurityServiceController {
                                                             true,
                                                             logger );
 
-        //Only create the new user session status
-        /*
-        const userSessionStatus = await UserSessionStatus.create(
-                                                                  {
-                                                                    UserId: user.Id,
-                                                                    GroupId: user.GroupId,
-                                                                    Token: strAuthorizationToken,
-                                                                    FrontendId: strFrontendId,
-                                                                    SourceIPAddress: strSourceIPAddress,
-                                                                    Role: strMergedRoles,
-                                                                    Name: user.Name,
-                                                                    ExpireKind: ExpireKind,
-                                                                    ExpireOn: ExpireOn,
-                                                                    HardLimit: ExpireOn,
-                                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                    UpdatedBy: SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
-                                                                  },
-                                                                  options
-                                                                );
-                                                                */
-
         let strBasicRoles = "";
 
         if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
@@ -857,7 +1507,7 @@ export default class SecurityServiceController {
 
         }
 
-        const detectedWarnings = SystemUtilities.dectectUserWarnings( strLanguage,
+        const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
                                                                       userDataResponse,
                                                                       logger );
 
@@ -865,8 +1515,8 @@ export default class SecurityServiceController {
                                         UserId: user.Id,
                                         UserGroupId: user.GroupId,
                                         Token: strAuthorizationToken,
-                                        FrontendId: strFrontendId,
-                                        SourceIPAddress: strSourceIPAddress,
+                                        FrontendId: context.FrontendId,
+                                        SourceIPAddress: context.SourceIPAddress,
                                         Role: strRolesMerged + strBasicRoles,
                                         UserName: user.Name,
                                         ExpireKind: configData.kind,
@@ -924,7 +1574,7 @@ export default class SecurityServiceController {
           result = {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_LOGIN',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess login' ),
+                     Message: await I18NManager.translate( context.Language, 'Sucess login' ),
                      Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -950,14 +1600,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Login failed (User disabled)' ),
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
                    Mark: 'C2344BE0E051' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Login failed (User disabled)' ),
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
                                Details: null
                              }
                            ],
@@ -972,14 +1622,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_EXPIRED',
-                   Message: await I18NManager.translate( strLanguage, 'Login failed (User expired)' ),
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
                    Mark: '5E65F3A6BB84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_EXPIRED',
-                               Message: await I18NManager.translate( strLanguage, 'Login failed (User expired)' ),
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
                                Details: null
                              }
                            ],
@@ -994,14 +1644,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Login failed (User group disabled)' ),
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
                    Mark: 'C0631A69B6F6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Login failed (User group disabled)' ),
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
                                Details: null
                              }
                            ],
@@ -1016,14 +1666,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                   Message: await I18NManager.translate( strLanguage, 'Login failed (User group expired)' ),
+                   Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
                    Mark: 'B621392319E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( strLanguage, 'Login failed (User group expired)' ),
+                               Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
                                Details: null
                              }
                            ],
@@ -1038,14 +1688,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to login from this the kind of frontend' ),
+                   Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
                    Mark: 'D8E7BA64792D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to login from this the kind of frontend' ),
+                               Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
                                Details: null
                              }
                            ],
@@ -1060,14 +1710,14 @@ export default class SecurityServiceController {
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_LOGIN_FAILED',
-                   Message: await I18NManager.translate( strLanguage, 'Login failed (Username and/or Password are invalid)' ),
+                   Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
                    Mark: '22E89FB65D2B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_LOGIN_FAILED',
-                               Message: await I18NManager.translate( strLanguage, 'Login failed (Username and/or Password are invalid)' ),
+                               Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
                                Details: null
                              }
                            ],
@@ -1077,6 +1727,7 @@ export default class SecurityServiceController {
                  }
 
       }
+      */
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -1114,7 +1765,7 @@ export default class SecurityServiceController {
       result = {
                  StatusCode: 500, //Internal server error
                  Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

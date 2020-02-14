@@ -23,9 +23,13 @@ export default class TransportSendGrid extends TransportEMail {
 
       sendgridMail.setApiKey( transportOptions.auth.api_key ); // "SG.KynVbsHCSMyi????.???" );
 
+      const toList = CommonUtilities.trimArray( messageOptions.to.split( "," ) );
+      //const strTo = toList.splice( 0, 1 );
+
       const messageToSend = {
                               from: messageOptions.from,
-                              to: messageOptions.to,
+                              to: toList,
+                              //cc: toList.join( "," ),
                               subject: messageOptions.subject,
                               text: "",
                               html: ""

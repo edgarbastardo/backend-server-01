@@ -18,28 +18,37 @@ export default class TransportSMSGateway {
 
     try {
 
-      const options = {
+      const toList = CommonUtilities.trimArray( messageOptions.to.split( "," ) );
 
-                        method: 'POST',
-                        uri: transportOptions.host, //'https://www.weknock-tech.com/backend-sms-gateway/kk/it4systems/sms/gateway/dev007/message/sms/send',
-                        form: {
-                                "request.SecurityTokenId": transportOptions.auth.api_key, //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
-                                "request.DeviceId": messageOptions.device_id || transportOptions.deviceId,
-                                "request.PhoneNumber": messageOptions.to, //"3057769594",
-                                "request.Message": messageOptions.body.text,  //"Test message",
-                                "request.ForeignData": messageOptions.foreign_data,  //`{ "user": "myuser" }`,
-                                "request.Context": messageOptions.context || transportOptions.context || "AMERICA/NEW_YORK"
-                              },
-                        headers: {
-                                   /* 'content-type': 'application/x-www-form-urlencoded' */ // Is set automatically
-                                 }
+      for ( const strTo of toList ) {
 
-                      };
+        const options = {
+                          method: 'POST',
+                          uri: transportOptions.host,
+                          form: {
+                                  "request.SecurityTokenId": transportOptions.auth.api_key, //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
+                                  "request.DeviceId": messageOptions.device_id || transportOptions.deviceId,
+                                  "request.PhoneNumber": strTo, //"3057769594",
+                                  "request.Message": messageOptions.body.text,  //"Test message",
+                                  "request.ForeignData": messageOptions.foreign_data,  //`{ "user": "myuser" }`,
+                                  "request.Context": messageOptions.context || transportOptions.context || "AMERICA/NEW_YORK"
+                                },
+                          headers: {
+                                    /* 'content-type': 'application/x-www-form-urlencoded' */ // Is set automatically
+                                   }
 
-      const strResult = await request( options );
+                        };
 
-      let debugMark = debug.extend( '9D18E07D936A' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-      debugMark( strResult );
+        const strResult = await request( options );
+
+        if ( process.env.ENV === "dev" ) {
+
+          let debugMark = debug.extend( '9D18E07D936A' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          debugMark( strResult );
+
+        }
+
+      }
 
       bResult = true;
 

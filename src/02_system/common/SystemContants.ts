@@ -1034,7 +1034,7 @@ export default class SystemConstants {
                                                                                    "groupTag":"",
                                                                                    "groupExpireAt":-1,
                                                                                    "status":0,
-                                                                                   "userRole":"#Master#",
+                                                                                   "userRole":"#MasterL01#",
                                                                                    "userTag":"",
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":"#Establishment#"

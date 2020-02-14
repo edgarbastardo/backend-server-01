@@ -5,13 +5,14 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style
-        include ./email-user-activation-mobile.css
+        include ./email-user-email-change-mobile.css
   body
-      h2 USER ACCOUNT ACTIVATION SUCCESS
-      p Hello!. This email is for your new user account #[strong #{user_name}]
-      p Your account information is:
-      h3 User: #[strong #{user_name}]
-      h3 Password: #[strong #{user_password}]
+      h2 EMAIL CHANGE CODE
+      p Hello!. This email is for your email change code for the user account #[strong #{user_name}]
+      p Your email change code is
+      h3 #{change_code}
+      if expire_at
+        p The email change code work until #[strong #{expire_at}]
       p If you not recognize this email please ignore and archive it.
       p #[strong #{company_name}]
       p #[strong #{company_address}]

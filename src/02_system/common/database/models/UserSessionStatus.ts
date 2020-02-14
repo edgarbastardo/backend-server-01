@@ -130,15 +130,15 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
     }
     */
 
-    if ( !instance.UpdatedAt ) {
-
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-
     if ( !instance.UpdatedBy ) {
 
       instance.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+    }
+
+    if ( !instance.UpdatedAt ) {
+
+      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
     }
 

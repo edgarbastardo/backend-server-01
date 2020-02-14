@@ -322,6 +322,14 @@ async function main() {
 
       const logger = DBConnectionManager.currentInstance;
 
+      if ( !cluster.settings.execArgv ) {
+
+        cluster.settings.execArgv = [];
+
+      }
+
+      let intDebugPort = 9229; //Default debug port for nodejs
+
       if ( intHTTPWorkerProcessCount > 0 ) { //Launch the http worker process
 
         let debugMark = debug.extend( "8DC0B75CB0A0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
@@ -343,7 +351,24 @@ async function main() {
           await new Promise<boolean>( ( resolve, reject ) => {
 
             debugMark( "Forking main process" );
+
+            if ( process.env.ENV === "dev" ) {
+
+              intDebugPort = intDebugPort + 1;
+
+              debugMark( "Child process debug port: %d", intDebugPort );
+
+              cluster.settings.execArgv.push( "--inspect-brk=" + intDebugPort );
+
+            }
+
             const httpWorker = cluster.fork( { WORKER_KIND: "http_worker_process", WORKER_INDEX: intWorker, ...process.env } ); //Start the first http worker
+
+            if ( process.env.ENV === "dev" ) {
+
+              cluster.settings.execArgv.pop();
+
+            }
 
             httpWorker.on( "message", async ( msg: any ) => {
 
@@ -420,7 +445,23 @@ async function main() {
 
             debugMark( "Forking main process" );
 
+            if ( process.env.ENV === "dev" ) {
+
+              intDebugPort = intDebugPort + 1;
+
+              debugMark( "Child process debug port: %d", intDebugPort );
+
+              cluster.settings.execArgv.push( "--inspect-brk" ); // + intDebugPort );
+
+            }
+
             const jobWorker = cluster.fork( { WORKER_KIND: "job_worker_process", WORKER_INDEX: intWorker, ...process.env } ); //Start the job worker
+
+            if ( process.env.ENV === "dev" ) {
+
+              cluster.settings.execArgv.pop();
+
+            }
 
             jobWorker.on( "message", async ( msg: any ) => {
 

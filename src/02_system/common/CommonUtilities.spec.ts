@@ -29,3 +29,59 @@ test( `Test maskPhoneList 001`, async () => {
   expect( strResult ).toMatch( "1-305*******95, 1-786*******88, 1-786*******21" );
 
 });
+
+test( `Test formatPhoneNumber 001`, async () => {
+
+  const strResult = CommonUtilities.formatPhoneNumber( "3058869192" );
+
+  expect( strResult ).toMatch( "1-305-886-9192" );
+
+});
+
+test( `Test formatPhoneNumber 002`, async () => {
+
+  const strResult = CommonUtilities.formatPhoneNumber( "8869192" );
+
+  expect( strResult ).toMatch( "" );
+
+});
+
+test( `Test formatPhoneNumber 003`, async () => {
+
+  const strResult = CommonUtilities.formatPhoneNumber( "13058869192" );
+
+  expect( strResult ).toMatch( "1-305-886-9192" );
+
+});
+
+test( `Test wellFormatedPhoneNumberList 001`, async () => {
+
+  const strResult = CommonUtilities.wellFormatedPhoneNumberList( "3058869192, 8869192, 17861239192" );
+
+  expect( strResult ).toMatch( "1-305-886-9192,1-786-123-9192" );
+
+});
+
+test( `Test wellFormatedPhoneNumberList 002`, async () => {
+
+  const strResult = CommonUtilities.wellFormatedPhoneNumberList( "3058869192" );
+
+  expect( strResult ).toMatch( "1-305-886-9192" );
+
+});
+
+test( `Test wellFormatedPhoneNumberList 003`, async () => {
+
+  const strResult = CommonUtilities.wellFormatedPhoneNumberList( "  3058869192,     er ,   , 23485  " );
+
+  expect( strResult ).toMatch( "1-305-886-9192" );
+
+});
+
+test( `Test clearFormatPhoneNumberList 001`, async () => {
+
+  const strResult = CommonUtilities.clearFormatPhoneNumberList( "1-305-886-9192,1-786-123-9192" );
+
+  expect( strResult ).toMatch( "13058869192,17861239192" );
+
+});

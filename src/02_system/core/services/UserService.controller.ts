@@ -39,6 +39,7 @@ import PersonService from "../../common/database/services/PersonService";
 import I18NManager from "../../common/managers/I18Manager";
 import ActionTokenService from "../../common/database/services/ActionTokenService";
 import JobQueueManager from "../../common/managers/JobQueueManager";
+import UserSessionStatusService from '../../common/database/services/UserSessionStatusService';
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -1774,7 +1775,7 @@ export default class UserServiceController {
 
       }
 
-      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "recover_password",
+      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "password_recover",
                                                                                   request.body.Name,
                                                                                   10,
                                                                                   currentTransaction,
@@ -1995,8 +1996,8 @@ export default class UserServiceController {
 
                 const actionToken = await ActionTokenService.createOrUpdate(
                                                                              {
-                                                                               Kind: "recover_password",
-                                                                               Owner: userInDB.Id,
+                                                                               Kind: "password_recover",
+                                                                               Owner: userInDB.Name,
                                                                                Token: strRecoverCode,
                                                                                Status: 1,
                                                                                CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -2057,7 +2058,7 @@ export default class UserServiceController {
 
                       result = {
                                 StatusCode: 200, //Ok
-                                Code: 'SUCCESS_SEND_RECOVER_PASSWORD_EMAIL',
+                                Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL',
                                 Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
                                 Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                 LogId: null,
@@ -2077,14 +2078,14 @@ export default class UserServiceController {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
+                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
                                  Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                  Mark: 'D77EDF617B8B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
-                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_EMAIL',
+                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                              Details: {
                                                         EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
@@ -2110,7 +2111,7 @@ export default class UserServiceController {
                                                            //device_id: "*",
                                                            body: {
                                                                    kind: "self",
-                                                                   text: await I18NManager.translate( strLanguage, 'Your recover password token is: %s', strRecoverCode )
+                                                                   text: await I18NManager.translate( strLanguage, 'Your recover password code is: %s', strRecoverCode )
                                                                  }
                                                          },
                                                          logger
@@ -2118,8 +2119,8 @@ export default class UserServiceController {
 
                       result = {
                                  StatusCode: 200, //Ok
-                                 Code: 'SUCCESS_SEND_RECOVER_PASSWORD_SMS',
-                                 Message: await I18NManager.translate( strLanguage, 'Success to send recover password token. Please check your phone' ),
+                                 Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS',
+                                 Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your phone' ),
                                  Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: false,
@@ -2138,14 +2139,14 @@ export default class UserServiceController {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
+                                 Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
                                  Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
                                  Mark: 'C21B85AD2EE1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
-                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_SMS',
+                                             Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
                                              Details: {
                                                         EMail: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
@@ -2378,7 +2379,8 @@ export default class UserServiceController {
 
       }
 
-      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Token,
+      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
+                                                                   "password_recover",
                                                                    context.TimeZoneId,
                                                                    transaction,
                                                                    logger );
@@ -2538,7 +2540,7 @@ export default class UserServiceController {
                     //ANCHOR update the token
                     if ( actionTokenUpdated instanceof Error ) {
 
-                      const error = userWithPasswordChanged as any;
+                      const error = actionTokenUpdated as any;
 
                       warnings.push(
                                      {
@@ -2686,14 +2688,14 @@ export default class UserServiceController {
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
-                       Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Token ),
+                       Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Code ),
                        Mark: '9512C5FEBECA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
-                                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Token ),
+                                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Code ),
                                    Details: null,
                                  }
                                ],
@@ -2710,14 +2712,14 @@ export default class UserServiceController {
           result = {
                       StatusCode: 400, //Bad request
                       Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
-                      Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Token ),
+                      Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Code ),
                       Mark: '42E47D603396' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
                                   Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
-                                  Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Token ),
+                                  Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Code ),
                                   Details: null,
                                 }
                               ],
@@ -2734,14 +2736,14 @@ export default class UserServiceController {
         result = {
                    StatusCode: 404, //Not found
                    Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Token ),
+                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Code ),
                    Mark: '567B7A76F7BB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Token ),
+                               Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Code ),
                                Details: null,
                              }
                            ],
@@ -2886,14 +2888,14 @@ export default class UserServiceController {
           }
 
           const bIsAdministrator = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ): false;
-          let bIsMaster = false;
+          let bIsMasterL01 = false;
 
           if ( bIsAdministrator === false ) {
 
-            bIsMaster = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master#" ) ||
+            bIsMasterL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
                                                  userSessionStatus.Role.includes( "#" +  userInDB.UserGroup.Name + "#" ): false;
 
-            if ( bIsMaster &&
+            if ( bIsMasterL01 &&
                  userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
 
               //Uhathorized
@@ -2906,7 +2908,7 @@ export default class UserServiceController {
           if ( userInDB.Id !== userSessionStatus.UserId ) {
 
             if ( bIsAdministrator ||
-                bIsMaster ) {
+                bIsMasterL01 ) {
 
               bUpdateSessionStatus = false;
               bCheckCurrentPassword = false;
@@ -3386,9 +3388,9 @@ export default class UserServiceController {
 
   }
 
-  static async emailChangeTokenSend( request: Request,
-                                     transaction: any,
-                                     logger: any ): Promise<any> {
+  static async emailChangeCodeSend( request: Request,
+                                    transaction: any,
+                                    logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3414,7 +3416,380 @@ export default class UserServiceController {
 
       }
 
-      //
+      const userSessionStatus = context.UserSessionStatus;
+
+      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "email_change",
+                                                                                  userSessionStatus ? userSessionStatus.UserId : "",
+                                                                                  10,
+                                                                                  currentTransaction,
+                                                                                  logger );
+
+      if ( intCount < 20 ) {
+
+        const userInDB = await UserService.getByName( userSessionStatus.UserName,
+                                                      context.TimeZoneId,
+                                                      transaction,
+                                                      logger );
+
+        if ( userInDB != null &&
+             userInDB instanceof Error === false ) {
+
+          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                       Mark: 'B308899A1A43' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                       Mark: '0A4F7A24E7F9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                       Mark: 'E5543FAB4485' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                          currentTransaction,
+                                                          logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                       Mark: '1BD2335313DC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
+
+              if ( CommonUtilities.isValidEMailList( request.body.EMail ) ) {
+
+                //ANCHOR getInfoFromSessionStatus
+                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                              "UserName",
+                                                                              logger );
+
+                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+
+                const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
+
+                const actionToken = await ActionTokenService.createOrUpdate(
+                                                                             {
+                                                                               Kind: "email_change",
+                                                                               Owner: userInDB.Id,
+                                                                               Token: strChangeCode,
+                                                                               Status: 1,
+                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                               ExpireAt: expireAt.format(),
+                                                                               ExtraData: `{ "NewEMail": "${request.body.EMail}" }`
+                                                                             },
+                                                                             false,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+                if ( actionToken &&
+                    actionToken instanceof Error === false ) {
+
+                  const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                    logger );
+
+                  const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                          currentTransaction,
+                                                                          logger ) ? "web" : "mobile";
+
+                  const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                          "url",
+                                                                          currentTransaction,
+                                                                          logger );
+
+                  const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                                                                                                context.TimeZoneId,
+                                                                                                CommonConstants._DATE_TIME_LONG_FORMAT_04,
+                                                                                                logger ): null;
+
+                  //Send immediately the mail for auto activate the new user account
+                  if ( await NotificationManager.send(
+                                                       "email",
+                                                       {
+                                                         from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                         to: request.body.EMail,
+                                                         subject: await I18NManager.translate( strLanguage, "EMAIL CHANGE CODE" ),
+                                                         body: {
+                                                                 kind: "template",
+                                                                 file: `email-user-email-change-${strTemplateKind}.pug`,
+                                                                 language: context.Language,
+                                                                 variables: {
+                                                                              user_name: request.body.Name,
+                                                                              web_app_url: strWebAppURL,
+                                                                              change_code: strChangeCode,
+                                                                              expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
+                                                                              ... configData
+                                                                            }
+                                                                 //kind: "embedded",
+                                                                 //text: "Hello",
+                                                                 //html: "<b>Hello</b>"
+                                                               }
+                                                       },
+                                                       logger
+                                                     ) ) {
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_SEND_EMAIL_CHANGE_CODE_EMAIL',
+                               Message: await I18NManager.translate( strLanguage, 'Success to send email change code. Please check your mailbox' ),
+                               Mark: '9145ACBE178E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: [],
+                               Count: 0,
+                               Data: [
+                                       {
+                                         EMail: CommonUtilities.maskEMailList( request.body.EMail )
+                                       }
+                                     ]
+                             }
+
+                  }
+                  else {
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL',
+                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                               Mark: '150A614E67B7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: 'ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL',
+                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                           Details: {
+                                                      EMail: CommonUtilities.maskEMailList( request.body.EMail )
+                                                    }
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+
+                }
+                else {
+
+                  const error = actionToken as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: 'E739AB104B52' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+              else {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_EMAIL_IS_INVALID',
+                           Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                           Mark: '01E51F2FB37F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_EMAIL_IS_INVALID',
+                                       Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                                       Details: {
+                                                  EMail: request.body.EMail
+                                                }
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: 'ERROR_WRONG_PASSWORD',
+                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                         Mark: '70AFDA615BD7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_WRONG_PASSWORD',
+                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_USER_NOT_FOUND',
+                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                     Mark: '4FC2BD9354AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_FOUND',
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        const strMark = "DD514B770B97" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST',
+                   Message: await I18NManager.translate( strLanguage, 'The user %s has too many email change requests', request.body.Name ),
+                   Mark: strMark,
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST',
+                               Message: await I18NManager.translate( strLanguage, 'The user %s has too many email change requests', request.body.Name ),
+                               Details: { Count: intCount, Comment: "In last 10 minutes" }
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+        debugMark( 'The user %s has too many email change requests', request.body.Name );
+
+        if ( logger &&
+             typeof logger.warning === "function" ) {
+
+          logger.warning( 'The user %s has too many email change requests', request.body.Name );
+
+        }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -3429,9 +3804,9 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.emailChangeTokenSend.name;
+      sourcePosition.method = this.name + "." + this.emailChangeCodeSend.name;
 
-      const strMark = "DA4AC49BB19C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "41A535450035" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -3517,7 +3892,439 @@ export default class UserServiceController {
 
       }
 
-      //
+      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
+                                                                   "email_change",
+                                                                   context.TimeZoneId,
+                                                                   transaction,
+                                                                   logger );
+
+      if ( actionTokenInDB !== null &&
+           actionTokenInDB instanceof Error === false ) {
+
+        if ( actionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+
+          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+
+            let userInDB = await UserService.getById( actionTokenInDB.Owner,
+                                                      context.TimeZoneId,
+                                                      transaction,
+                                                      logger );
+
+            if ( userInDB != null &&
+                 userInDB instanceof Error === false ) {
+
+              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                           Mark: 'C29DB5D3E5B9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                                   currentTransaction,
+                                                                   logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                           Mark: '3C05036866E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                           Mark: 'D70CB73D33AB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                           Mark: 'EE18C1A52A3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else {
+
+                const jsonExtraData = CommonUtilities.parseJSON( actionTokenInDB.ExtraData, logger );
+
+                if ( jsonExtraData &&
+                     CommonUtilities.isValidEMailList( jsonExtraData.NewEMail ) ) {
+
+                  const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                                "UserName",
+                                                                                logger );
+
+                  let personInDB = null;
+                  let personWithEMailChanged = null;
+
+                  if ( !userInDB.UserPerson ) {
+
+                    jsonExtraData.OldEmail = ""; //Create empty field, no old person assoicated
+
+                    personWithEMailChanged = await PersonService.createOrUpdate(
+                                                                                 {
+                                                                                   Id: userInDB.Id,
+                                                                                   FirstName: " ",
+                                                                                   EMail: jsonExtraData.NewEMail,
+                                                                                   CreatedBy: strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+                                                                                   CreatedAt: null
+                                                                                 },
+                                                                                 false,
+                                                                                 currentTransaction,
+                                                                                 logger
+                                                                               );
+
+                    personInDB = personWithEMailChanged;
+
+                    if ( personInDB &&
+                         personInDB instanceof Error === false ) {
+
+                      userInDB.PersonId = personInDB.Id;
+                      userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                      userInDB.UpdatedAt = null;
+
+                      userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger );
+
+                    }
+
+                  }
+                  else {
+
+                    personInDB = userInDB.UserPerson;
+
+                    jsonExtraData.OldEmail = personInDB.EMail; //Save the the current person email
+
+                    personInDB.EMail = jsonExtraData.NewEMail;
+                    personInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    personInDB.UpdatedAt = null;
+
+                    personWithEMailChanged = await PersonService.createOrUpdate( ( personInDB as any ).dataValues,
+                                                                                 true,
+                                                                                 currentTransaction,
+                                                                                 logger );
+
+                  }
+
+                  if ( personWithEMailChanged instanceof Error  ) {
+
+                    const error = personWithEMailChanged as any;
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'D111D4B14F3D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: error.logId,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+                  else if ( userInDB instanceof Error ) {
+
+                    const error = userInDB as any;
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'A73E92AF2757' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+                  else {
+
+                    actionTokenInDB.Status = 0;
+                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    actionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old email and new email
+
+                    const warnings = [];
+
+                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
+                                                                                        true,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
+                    //ANCHOR update the token
+                    if ( actionTokenUpdated instanceof Error ) {
+
+                      const error = actionTokenUpdated as any;
+
+                      warnings.push(
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                    }
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_EMAIL_CHANGE',
+                               Message: await I18NManager.translate( strLanguage, 'Success to change the user email.' ),
+                               Mark: 'D460632D4A2E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 0,
+                               Data: []
+                             }
+
+                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                      logger );
+
+                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                            currentTransaction,
+                                                                            logger ) ? "web" : "mobile";
+
+                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                            "url",
+                                                                            currentTransaction,
+                                                                            logger );
+
+                    await NotificationManager.send(
+                                                    "email",
+                                                    {
+                                                      from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                      to: jsonExtraData.NewEMail,
+                                                      subject: await I18NManager.translate( strLanguage, "USER EMAIL CHANGE SUCCESS" ),
+                                                      body: {
+                                                              kind: "template",
+                                                              file: `email-user-email-change-success-${strTemplateKind}.pug`,
+                                                              language: context.Language,
+                                                              variables: {
+                                                                           user_name: userInDB.Name,
+                                                                           user_email: CommonUtilities.maskPassword( jsonExtraData.NewEMail ),
+                                                                           web_app_url: strWebAppURL,
+                                                                           ... configData
+                                                                         }
+                                                              //kind: "embedded",
+                                                              //text: "Hello",
+                                                              //html: "<b>Hello</b>"
+                                                            }
+                                                    },
+                                                    logger
+                                                  );
+
+                  }
+
+                }
+                else {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_EMAIL_NOT_VALID',
+                             Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                             Mark: 'B4A37DF40A10' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_EMAIL_NOT_VALID',
+                                         Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                                         Details: {
+                                                    EMail: request.body.EMail
+                                                  }
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 404, //Not found
+                         Code: 'ERROR_USER_NOT_FOUND',
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Mark: '81CBFCD7E4E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_NOT_FOUND',
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_EMAIL_CHANGE_CODE_ALREADY_USED',
+                       Message: await I18NManager.translate( strLanguage, 'The email change code %s already used', request.body.Code ),
+                       Mark: 'EBB44FAB84DB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_EMAIL_CHANGE_CODE_ALREADY_USED',
+                                   Message: await I18NManager.translate( strLanguage, 'The email change code %s already used', request.body.Code ),
+                                   Details: null,
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_EMAIL_CHANGE_CODE_EXPIRED',
+                     Message: await I18NManager.translate( strLanguage, 'The email change code %s is expired', request.body.Code ),
+                     Mark: 'B810BD062AF4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_EMAIL_CHANGE_CODE_EXPIRED',
+                                 Message: await I18NManager.translate( strLanguage, 'The email change code %s is expired', request.body.Code ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_EMAIL_CHANGE_CODE_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The email change code %s not found in database', request.body.Code ),
+                   Mark: '5241B773D358' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_EMAIL_CHANGE_CODE_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The email change code %s not found in database', request.body.Code ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -3592,9 +4399,9 @@ export default class UserServiceController {
 
   }
 
-  static async phoneChangeTokenSend( request: Request,
-                                     transaction: any,
-                                     logger: any ): Promise<any> {
+  static async phoneChangeCodeSend( request: Request,
+                                    transaction: any,
+                                    logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3620,7 +4427,358 @@ export default class UserServiceController {
 
       }
 
-      //
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "phone_number_change",
+                                                                                  userSessionStatus ? userSessionStatus.UserId : "",
+                                                                                  10,
+                                                                                  currentTransaction,
+                                                                                  logger );
+
+      if ( intCount < 20 ) {
+
+        const userInDB = await UserService.getByName( userSessionStatus.UserName,
+                                                      context.TimeZoneId,
+                                                      transaction,
+                                                      logger );
+
+        if ( userInDB != null &&
+             userInDB instanceof Error === false ) {
+
+          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                       Mark: '98366EF44736' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                       Mark: '563CBF3EE2A5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                       Mark: '6D46A46F3106' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                          currentTransaction,
+                                                          logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                       Mark: 'B722C2897726' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
+
+              const strWellFormatedPhoneNumberList = CommonUtilities.wellFormatedPhoneNumberList( request.body.Phone );
+
+              if ( CommonUtilities.isValidPhoneNumberList( strWellFormatedPhoneNumberList ) ) {
+
+                const strClearFormatedPhoneNumberList = CommonUtilities.clearFormatPhoneNumberList( strWellFormatedPhoneNumberList );
+
+                //ANCHOR getInfoFromSessionStatus
+                const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                              "UserName",
+                                                                              logger );
+
+                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+
+                const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
+
+                const actionToken = await ActionTokenService.createOrUpdate(
+                                                                             {
+                                                                               Kind: "phone_number_change",
+                                                                               Owner: userInDB.Id,
+                                                                               Token: strChangeCode,
+                                                                               Status: 1,
+                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                               ExpireAt: expireAt.format(),
+                                                                               ExtraData: `{ "NewPhoneNumber": "${strWellFormatedPhoneNumberList}" }`
+                                                                             },
+                                                                             false,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+                if ( actionToken &&
+                     actionToken instanceof Error === false ) {
+
+                  //Send immediately the sms with the change code
+                  if ( await NotificationManager.send(
+                                                       "sms",
+                                                       {
+                                                         to: strClearFormatedPhoneNumberList,
+                                                         //context: "AMERICA/NEW_YORK",
+                                                         foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                         //device_id: "*",
+                                                         body: {
+                                                                 kind: "self",
+                                                                 text: await I18NManager.translate( strLanguage, 'Your phone number change code is: %s', strChangeCode )
+                                                               }
+                                                       },
+                                                       logger
+                                                     ) ) {
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
+                               Message: await I18NManager.translate( strLanguage, 'Success to send phone number change code. Please check your phone' ),
+                               Mark: 'B6EFE4864DA7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: [],
+                               Count: 0,
+                               Data: [
+                                       {
+                                         Phone: CommonUtilities.maskPhoneList( request.body.Phone )
+                                       }
+                                     ]
+                             }
+
+                  }
+                  else {
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
+                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                               Mark: '3657E857AF1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: 'ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
+                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                                           Details: {
+                                                      Phone: CommonUtilities.maskPhoneList( request.body.Phone )
+                                                    }
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+
+                }
+                else {
+
+                  const error = actionToken as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: 'B035AEB41192' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+              else {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_PHONE_NUMBER_IS_INVALID',
+                           Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                           Mark: '01E51F2FB37F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_PHONE_NUMBER_IS_INVALID',
+                                       Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                                       Details: {
+                                                  EMail: request.body.Phone
+                                                }
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: 'ERROR_WRONG_PASSWORD',
+                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                         Mark: '920F14EFBDE7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_WRONG_PASSWORD',
+                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_USER_NOT_FOUND',
+                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                     Mark: '00FB818E026E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_FOUND',
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        const strMark = "49F9083D3F81" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_TOO_MANY_PHONE_NUMBER_CHANGE_REQUEST',
+                   Message: await I18NManager.translate( strLanguage, 'The user %s has too many phone number change requests', request.body.Name ),
+                   Mark: strMark,
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_TOO_MANY_PHONE_CHANGE_REQUEST',
+                               Message: await I18NManager.translate( strLanguage, 'The user %s has too many phone number change requests', request.body.Name ),
+                               Details: { Count: intCount, Comment: "In last 10 minutes" }
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+        debugMark( 'The user %s has too many phone change requests', request.body.Name );
+
+        if ( logger &&
+             typeof logger.warning === "function" ) {
+
+          logger.warning( 'The user %s has too many phone change requests', request.body.Name );
+
+        }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -3635,7 +4793,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.phoneChangeTokenSend.name;
+      sourcePosition.method = this.name + "." + this.phoneChangeCodeSend.name;
 
       const strMark = "C05ECD83072C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -3695,9 +4853,9 @@ export default class UserServiceController {
 
   }
 
-  static async phoneChange( request: Request,
-                            transaction: any,
-                            logger: any ): Promise<any> {
+  static async phoneNumberChange( request: Request,
+                                  transaction: any,
+                                  logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3723,7 +4881,417 @@ export default class UserServiceController {
 
       }
 
-      //
+      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
+                                                                   "phone_number_change",
+                                                                   context.TimeZoneId,
+                                                                   transaction,
+                                                                   logger );
+
+      if ( actionTokenInDB !== null &&
+           actionTokenInDB instanceof Error === false ) {
+
+        if ( actionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+
+          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+
+            let userInDB = await UserService.getById( actionTokenInDB.Owner,
+                                                      context.TimeZoneId,
+                                                      transaction,
+                                                      logger );
+
+            if ( userInDB != null &&
+                 userInDB instanceof Error === false ) {
+
+              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                           Mark: 'EAA7E9E5C6FA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                                   currentTransaction,
+                                                                   logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_GROUP_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                           Mark: 'E52573CD2052' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                               currentTransaction,
+                                                               logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_DISABLED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                           Mark: '8AB386DAE87B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_DISABLED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_USER_EXPIRED',
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                           Mark: '15CB6C1B117B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_USER_EXPIRED',
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else {
+
+                const jsonExtraData = CommonUtilities.parseJSON( actionTokenInDB.ExtraData, logger );
+
+                if ( jsonExtraData &&
+                     CommonUtilities.isValidPhoneNumberList( jsonExtraData.NewPhoneNumber ) ) {
+
+                  const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
+                                                                                "UserName",
+                                                                                logger );
+
+                  let personInDB = null;
+                  let personWithPhoneChanged = null;
+
+                  if ( !userInDB.UserPerson ) {
+
+                    jsonExtraData.OldPhoneNumber = ""; //Create empty field, phone number person assoicated
+
+                    personWithPhoneChanged = await PersonService.createOrUpdate(
+                                                                                 {
+                                                                                   Id: userInDB.Id,
+                                                                                   FirstName: " ",
+                                                                                   Phone: jsonExtraData.NewPhoneNumber,
+                                                                                   CreatedBy: strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+                                                                                   CreatedAt: null
+                                                                                 },
+                                                                                 false,
+                                                                                 currentTransaction,
+                                                                                 logger
+                                                                               );
+
+                    personInDB = personWithPhoneChanged;
+
+                    if ( personInDB &&
+                         personInDB instanceof Error === false ) {
+
+                      userInDB.PersonId = personInDB.Id;
+                      userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                      userInDB.UpdatedAt = null;
+
+                      userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger );
+
+                    }
+
+                  }
+                  else {
+
+                    personInDB = userInDB.UserPerson;
+
+                    jsonExtraData.OldPhoneNumber = personInDB.Phone; //Save the the current person phone number
+
+                    personInDB.Phone = jsonExtraData.NewPhoneNumber;
+                    personInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    personInDB.UpdatedAt = null;
+
+                    personWithPhoneChanged = await PersonService.createOrUpdate( ( personInDB as any ).dataValues,
+                                                                                 true,
+                                                                                 currentTransaction,
+                                                                                 logger );
+
+                  }
+
+                  if ( personWithPhoneChanged instanceof Error  ) {
+
+                    const error = personWithPhoneChanged as any;
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: '16C6BCD6839E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: error.logId,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+                  else if ( userInDB instanceof Error ) {
+
+                    const error = userInDB as any;
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'BE0B313EAA02' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             }
+
+                  }
+                  else {
+
+                    actionTokenInDB.Status = 0;
+                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    actionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old phone number and new phone number
+
+                    const warnings = [];
+
+                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
+                                                                                        true,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
+                    //ANCHOR update the token
+                    if ( actionTokenUpdated instanceof Error ) {
+
+                      const error = actionTokenUpdated as any;
+
+                      warnings.push(
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                    }
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_PHONE_NUMBER_CHANGE',
+                               Message: await I18NManager.translate( strLanguage, 'Success to change the user phone number.' ),
+                               Mark: '1DF00A420467' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 0,
+                               Data: []
+                             }
+
+                    await NotificationManager.send(
+                                                    "sms",
+                                                    {
+                                                      to: userInDB.UserPerson.Phone,
+                                                      //context: "AMERICA/NEW_YORK",
+                                                      foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                      //device_id: "*",
+                                                      body: {
+                                                              kind: "self",
+                                                              text: await I18NManager.translate( strLanguage, 'Phone number change success!' )
+                                                            }
+                                                    },
+                                                    logger
+                                                  );
+                  }
+
+                }
+                else {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_PHONE_NUMBER_NOT_VALID',
+                             Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                             Mark: '8AC35D3BD025' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_PHONE_NUMBER_NOT_VALID',
+                                         Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                                         Details: {
+                                                    Phone: request.body.Phone
+                                                  }
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 404, //Not found
+                         Code: 'ERROR_USER_NOT_FOUND',
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Mark: '17B6D60D5199' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_NOT_FOUND',
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED',
+                       Message: await I18NManager.translate( strLanguage, 'The phone number change code %s already used', request.body.Code ),
+                       Mark: '6CDB3A2649DA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED',
+                                   Message: await I18NManager.translate( strLanguage, 'The phone number change code %s already used', request.body.Code ),
+                                   Details: null,
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED',
+                     Message: await I18NManager.translate( strLanguage, 'The phone number change code %s is expired', request.body.Code ),
+                     Mark: '3B86B9F1AD0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED',
+                                 Message: await I18NManager.translate( strLanguage, 'The phone number change code %s is expired', request.body.Code ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The phone number change code %s not found in database', request.body.Code ),
+                   Mark: 'C0A61871B549' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The phone number change code %s not found in database', request.body.Code ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -3738,7 +5306,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.phoneChange.name;
+      sourcePosition.method = this.name + "." + this.phoneNumberChange.name;
 
       const strMark = "540DF2DAAA60" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -3798,9 +5366,9 @@ export default class UserServiceController {
 
   }
 
-  static async profile( request: Request,
-                        transaction: any,
-                        logger: any ): Promise<any> {
+  static async profileGet( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3826,6 +5394,138 @@ export default class UserServiceController {
 
       }
 
+      let strUserName = context.UserSessionStatus.UserName;
+
+      let strAutorization = context.Authorization;
+
+      let userSessionStatus = null;
+
+      let bProfileOfAnotherUser = false;
+
+      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ) {
+
+        if ( request.query.ShortToken ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByShortToken( request.query.ShortToken,
+                                                                                               currentTransaction,
+                                                                                               logger );
+
+          if ( userSessionStatus &&
+               userSessionStatus instanceof Error == false ) {
+
+            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.ShortToken;
+
+            strUserName = userSessionStatus.UserName ? userSessionStatus.UserName : null;
+
+          }
+          else {
+
+            strAutorization = request.query.ShortToken;
+
+          }
+
+        }
+        else if ( request.query.Token ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByToken( strAutorization,
+                                                                                          currentTransaction,
+                                                                                          logger );
+
+          if ( userSessionStatus &&
+               userSessionStatus instanceof Error == false ) {
+
+            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.Token;
+
+            strUserName = userSessionStatus.UserName ? userSessionStatus.UserName : null;
+
+          }
+          else {
+
+            strAutorization = request.query.Token;
+
+          }
+
+        }
+
+      }
+
+      if ( bProfileOfAnotherUser &&
+           userSessionStatus === null ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                   Mark: '6AD438512BFA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( bProfileOfAnotherUser &&
+                userSessionStatus instanceof Error ) {
+
+        const error = userSessionStatus;
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                   Mark: '20E77DDE1001' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        result = await SecurityServiceController.processSessionStatus( context,
+                                                                       {
+                                                                         checkFrontendId: false,
+                                                                         checkPassword: false,
+                                                                         useSoftCheck: true,
+                                                                         notProcessExpireOn: true,
+                                                                         useCustomResponse: true,
+                                                                         authorization: strAutorization,
+                                                                         code: "SUCESS_GET_SESSION_PROFILE",
+                                                                         message: "Sucess get the user session profile information",
+                                                                         mark: "1CB1DC7063D8",
+                                                                         useSecondaryUserToCreatedBy: false,
+                                                                         updateCreatedAt: request.query.CreatedAt === "1"
+                                                                       },
+                                                                       strUserName,
+                                                                       "",
+                                                                       context.UserSessionStatus.UserName,
+                                                                       currentTransaction,
+                                                                       logger );
+
+      }
+
+      /*
       await JobQueueManager.addJobToQueue( "SampleJob",
                                            { mydata: "my data" },
                                            null, //{ jobId: SystemUtilities.getUUIDv4(), attempts: 0, timeout: 99999999, removeOnComplete: true, removeOnFail: true, backoff: 0 }, //{ repeat: { cron: '* * * * *' } },
@@ -3843,6 +5543,7 @@ export default class UserServiceController {
                  Count: 0,
                  Data: []
                }
+               */
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -3857,7 +5558,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profile.name;
+      sourcePosition.method = this.name + "." + this.profileGet.name;
 
       const strMark = "DBA7E36C5D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -3917,9 +5618,9 @@ export default class UserServiceController {
 
   }
 
-  static async profileChange( request: Request,
-                              transaction: any,
-                              logger: any ): Promise<any> {
+  static async profileSet( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3960,7 +5661,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileChange.name;
+      sourcePosition.method = this.name + "." + this.profileSet.name;
 
       const strMark = "59582149A69D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

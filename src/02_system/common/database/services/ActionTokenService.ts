@@ -113,6 +113,7 @@ export default class ActionTokenService extends BaseService {
   }
 
   static async getByToken( strToken: string,
+                           strKind: string,
                            strTimeZoneId: string,
                            transaction: any,
                            logger: any ): Promise<ActionToken> {
@@ -137,7 +138,7 @@ export default class ActionTokenService extends BaseService {
 
       const options = {
 
-        where: { "Token": strToken },
+        where: { "Token": strToken, "Kind": strKind },
         transaction: currentTransaction,
 
       }
