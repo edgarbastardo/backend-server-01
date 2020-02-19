@@ -1,3 +1,8 @@
+import fs from 'fs'; //Load the filesystem module
+import path from 'path';
+import os from "os";
+import cluster from "cluster";
+
 import moment, { Moment } from "moment-timezone";
 import XXHash from 'xxhashjs';
 //import  from "moment-timezone";
@@ -6,10 +11,6 @@ import Hashes from 'jshashes';
 import readChunk from 'read-chunk';
 import fileType from 'file-type';
 //import { loggers } from "winston";
-import fs from 'fs'; //Load the filesystem module
-import path from 'path';
-import os from "os";
-import cluster from "cluster";
 
 import archiver, { ArchiverError } from 'archiver';
 
@@ -1301,12 +1302,16 @@ export default class SystemUtilities {
 
       if ( roleSet1.length > 0 ) {
 
+        //const regularExpresion = /#.*?#/gi;
+
         for ( const strRole of roleSet1 ) {
 
           if ( strRole.startsWith( "-#" ) === false ) {
 
-            if ( roleSetInBlackList.indexOf( strRole ) === -1 &&
-                 mergedRoleSet.indexOf( strRole ) === -1 ) {
+            const roleSplitted = strRole.match( /#.*?#/gi ) //regularExpresion.exec( strRole ); //strRole.split( /#.*?#/gi );
+
+            if ( roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
+                 mergedRoleSet.indexOf( roleSplitted[ 0 ] ) === -1 ) {
 
               mergedRoleSet.push( strRole );
 
@@ -1318,14 +1323,19 @@ export default class SystemUtilities {
 
       }
 
+      //#.*?# -> #Hola1#+#Hola2#
       if ( roleSet2.length > 0 ) {
+
+        //const regularExpresion = /#.*?#/gi;
 
         for ( const strRole of roleSet2 ) {
 
           if ( strRole.startsWith( "-#" ) === false ) {
 
-            if ( roleSetInBlackList.indexOf( strRole ) === -1 &&
-                 mergedRoleSet.indexOf( strRole ) === -1 ) {
+            const roleSplitted = strRole.match( /#.*?#/gi ) //regularExpresion.exec( strRole ); //strRole.split( /#.*?#/gi );
+
+            if ( roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
+                 mergedRoleSet.indexOf( roleSplitted[ 0 ] ) === -1 ) {
 
               mergedRoleSet.push( strRole );
 
@@ -1701,6 +1711,102 @@ export default class SystemUtilities {
         } );
 
         newRow[ model.name ] = newDataStruct;
+
+      } );
+
+      result.push( newRow );
+
+    });
+
+    return result;
+
+  }
+
+  static transformRowValuesToSingleRootNestedObject( rows: any[],
+                                                     models: any[],
+                                                     alias: string[],
+                                                     bIncludeUndefined: boolean = false ) {
+
+    let result: any[] = [];
+
+    rows.map( ( row ) => {
+
+      let newRow: any = {};
+
+      models.map( ( model: any, intIndex: number ) => {
+
+        let newDataStruct = {};
+
+        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+          if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
+
+            newDataStruct[ attribute ] = row[ alias[ intIndex ] + "_" + attribute ];
+
+          }
+
+        } );
+
+        if ( intIndex === 0 ) {
+
+          newRow = newDataStruct;
+
+        }
+        else {
+
+          newRow[ model.name ] = newDataStruct;
+
+        }
+
+      } );
+
+      result.push( newRow );
+
+    });
+
+    return result;
+
+  }
+
+  static transformRowValuesToNestedObject( rows: any[],
+                                           models: any[],
+                                           alias: string[],
+                                           bIncludeUndefined: boolean = false ) {
+
+    let result: any[] = [];
+
+    rows.map( ( row ) => {
+
+      let newRow: any = {};
+
+      let strRoot = "";
+
+      models.map( ( model: any, intIndex: number ) => {
+
+        let newDataStruct = {};
+
+        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+
+          if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
+
+            newDataStruct[ attribute ] = row[ alias[ intIndex ] + "_" + attribute ];
+
+          }
+
+        } );
+
+        if ( intIndex === 0 ) {
+
+          newRow[ model.name ] = newDataStruct;
+
+          strRoot = model.name;
+
+        }
+        else {
+
+          newRow[ strRoot ][ model.name ] = newDataStruct;
+
+        }
 
       } );
 
@@ -2166,6 +2272,16 @@ export default class SystemUtilities {
                           'The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX.'
                         );
 
+      Validator.register(
+                          'dateInFormat01',
+                          function( value: any, requirement, attribute ) {
+
+                            return CommonUtilities.isValidDateInFormat01( value );
+
+                          },
+                          'The :attribute is not in the format YYYY-MM-DD and valid date value.'
+                        );
+
       if ( registerCallback ) {
 
         registerCallback( Validator, logger );
@@ -2474,5 +2590,7 @@ export default class SystemUtilities {
     return intResult
 
   }
+
+
 
 }

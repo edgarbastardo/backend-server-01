@@ -443,7 +443,43 @@ export default class Always {
                                                              }
                                                            ),
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                    }
+                                    },
+                                    {
+                                      ConfigMetaDataId: "e87b5ce8-e488-4869-be72-a754314e5f75", //system.maps.geocode.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: JSON.stringify(
+                                                             {
+                                                               "service":"#google_maps#",
+                                                               "#google_maps#":{
+                                                                 "type":"google_maps",
+                                                                 "host":"https://maps.googleapis.com/maps/api/geocode/json",
+                                                                 "port":443,
+                                                                 "auth":{
+                                                                   "api_key":process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
+                                                                 }
+                                                               }
+                                                             }
+                                                           ),
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: "0d06e235-c282-4d8a-bac5-8d7b84010939", //system.maps.distance.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: JSON.stringify(
+                                                             {
+                                                               "service":"#google_maps#",
+                                                               "#google_maps#":{
+                                                                 "type":"google_maps",
+                                                                 "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                 "port":443,
+                                                                 "auth":{
+                                                                   "api_key":process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
+                                                                 }
+                                                               }
+                                                             }
+                                                           ),
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
                                   ]
 
       const loopConfigValueEntriesAsync = async () => {

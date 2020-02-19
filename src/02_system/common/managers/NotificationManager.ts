@@ -9,10 +9,10 @@ import SystemUtilities from "../SystemUtilities";
 import DBConnectionManager from "./DBConnectionManager";
 import ConfigValueDataService from "../database/services/ConfigValueDataService";
 
-import TransportSMTP from "../transports/TransportSMTP";
-import TransportSendGrid from "../transports/TransportSendGrid";
-import TransportSMSGateway from "../transports/TransportSMSGateway";
-import TransportOneSignal from "../transports/TransportOneSignal";
+import TransportSMTP from "../implementations/notifications/TransportSMTP";
+import TransportSendGrid from "../implementations/notifications/TransportSendGrid";
+import TransportSMSGateway from "../implementations/notifications/TransportSMSGateway";
+import TransportOneSignal from "../implementations/notifications/TransportOneSignal";
 
 const debug = require( 'debug' )( 'NotificationManager' );
 
@@ -167,7 +167,7 @@ export default class NotificationManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.send.name;
+      sourcePosition.method = this.name + "." + this.getConfigServiceType.name;
 
       const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

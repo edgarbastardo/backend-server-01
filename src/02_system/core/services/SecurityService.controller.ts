@@ -675,7 +675,7 @@ export default class SecurityServiceController {
                                  "AllowTagAccess",
                                  "DenyTagAccess",
                                  "Role",
-                                 "Tag",
+                                 //"Tag",
                                  //"PasswordSetAt",
                                  "ExpireAt",
                                  "ImageId"
@@ -700,10 +700,10 @@ export default class SecurityServiceController {
 
         let userPersonDataResponse = null;
 
-        if ( ( user as any ).dataValues.UserPerson &&
-             ( user as any ).dataValues.UserPerson.dataValues ) {
+        if ( ( user as any ).dataValues.Person &&
+             ( user as any ).dataValues.Person.dataValues ) {
 
-          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserPerson.dataValues,
+          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.Person.dataValues,
                                                                        fieldsToDelete,
                                                                        logger );
 
@@ -852,8 +852,10 @@ export default class SecurityServiceController {
 
         if ( processOptions.useSoftCheck === true ) {
 
+          const bIsPersistent =  strAuthorization.startsWith( "p:" );
+
           if ( bUserDisabled &&
-               strAuthorization.startsWith( "p:" ) === false ) {
+               bIsPersistent === false ) {
 
             detectedWarnings.warnings.push(
                                             {
@@ -868,7 +870,7 @@ export default class SecurityServiceController {
           }
 
           if ( bUserExpired &&
-               strAuthorization.startsWith( "p:" ) === false ) {
+               bIsPersistent === false ) {
 
             detectedWarnings.warnings.push(
                                             {
@@ -883,7 +885,7 @@ export default class SecurityServiceController {
           }
 
           if ( bUserGroupDisabled &&
-               strAuthorization.startsWith( "p:" ) === false  ) {
+               bIsPersistent === false  ) {
 
             detectedWarnings.warnings.push(
                                             {
@@ -898,7 +900,7 @@ export default class SecurityServiceController {
           }
 
           if ( bUserGroupExpired &&
-               strAuthorization.startsWith( "p:" ) === false  ) {
+               bIsPersistent === false  ) {
 
             detectedWarnings.warnings.push(
                                             {
@@ -1364,10 +1366,10 @@ export default class SecurityServiceController {
 
         let userPersonDataResponse = null;
 
-        if ( ( user as any ).dataValues.UserPerson &&
-             ( user as any ).dataValues.UserPerson.dataValues ) {
+        if ( ( user as any ).dataValues.Person &&
+             ( user as any ).dataValues.Person.dataValues ) {
 
-          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserPerson.dataValues,
+          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.Person.dataValues,
                                                                        fieldsToDelete,
                                                                        logger );
 

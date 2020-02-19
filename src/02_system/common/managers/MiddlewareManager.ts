@@ -619,7 +619,7 @@ export default class MiddlewareManager {
     if ( bIsAuthorized === false ) {
 
       const result = {
-                       StatusCode: 403, //Forbiden
+                       StatusCode: 403, //Forbidden
                        Code: 'ERROR_FORBIDEN_ACCESS',
                        Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
                        Mark: '1ED45DB6E425' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
@@ -810,7 +810,7 @@ export default class MiddlewareManager {
       if ( result === false ) {
 
         const extensions = {
-                             StatusCode: 403, //Forbiden
+                             StatusCode: 403, //Forbidden
                              Mark: '74EC582F0760' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: SystemUtilities.getUUIDv4()
                            };

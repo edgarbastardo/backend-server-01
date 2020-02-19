@@ -24,7 +24,8 @@ import {
   //requestBody,
   request,
   httpPut,
-  httpGet
+  httpGet,
+  httpDelete
 } from "inversify-express-utils";
 import {
   //injectable,
@@ -63,18 +64,20 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/signup/activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
                                   { Path: UserController._BASE_PATH + "/password/recover/code/send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
                                   { Path: UserController._BASE_PATH + "/password/recover", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the password recover code" },
-                                  { Path: UserController._BASE_PATH + "/password/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set new password to user using the current password" },
+                                  { Path: UserController._BASE_PATH + "/password/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#ChangeUserPasswordL01#,#ChangeUserPasswordL02#,#ChangeUserPasswordL03#", Roles: [ "Authenticated", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "ChangeUserPasswordL01", "ChangeUserPasswordL02", "ChangeUserPasswordL03" ], Description: "Set new password to user using the current password" },
                                   { Path: UserController._BASE_PATH + "/email/change/code/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change email code to the new email. Using the current user password" },
                                   { Path: UserController._BASE_PATH + "/email/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change email to the current user using the code" },
                                   { Path: UserController._BASE_PATH + "/phone/change/code/send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change phone code to the phone number. Using the current user password" },
                                   { Path: UserController._BASE_PATH + "/phone/change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the code" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#GetUserL01#,#GetUserL02#,#GetUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "GetUserL01", "GetUserL02", "GetUserL03" ], Description: "Get the information for one user" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#CreateUserL01#,#CreateUserL02#,#CreateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "CreateUserL01", "CreateUserL02", "CreateUserL03" ], Description: "Create new user information" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Update existent user information" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteUserL01#,#DeleteUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteUserL01", "DeleteUserL02", "DeleteUserL03" ], Description: "Delete the user information" },
+                                  { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Search for users information" },
+                                  { Path: UserController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Count search users information result" },
                                   { Path: UserController._BASE_PATH + "/role/routes/allowed", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
-                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#CreateUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "CreateUserL01" ], Description: "Create new user information" },
-                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#UpdateUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "UpdateUserL01" ], Description: "Update existent user information" },
-                                  { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#SearchUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "SearchUserL01" ], Description: "Search for users" },
-                                  { Path: UserController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#MasterL01#,#BManagerL01#,#SearchUserL01#", Roles: [ "Administrator", "MasterL01", "BManagerL01", "SearchUserL01" ], Description: "Count search users result" },
                                 ]
 
   _controllerLogger = null;
@@ -406,6 +409,102 @@ export default class UserController {
     const result = await UserServiceController.profileSet( request,
                                                               null,
                                                               this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async userGet( request: Request, response: Response ) {
+
+    const result = await UserServiceController.getUser( request,
+                                                        null,
+                                                        this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async userPost( request: Request, response: Response ) {
+
+    const result = await UserServiceController.createUser( request,
+                                                           null,
+                                                           this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async userPut( request: Request, response: Response ) {
+
+    const result = await UserServiceController.modifyUser( request,
+                                                           null,
+                                                           this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized,
+             )
+  async userDelete( request: Request, response: Response ) {
+
+    const result = await UserServiceController.deleteUser( request,
+                                                           null,
+                                                           this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/search",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async userSearch( request: Request, response: Response ) {
+
+    const result = await UserServiceController.searchUser( request,
+                                                           null,
+                                                           this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/search/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async userSearchCount( request: Request, response: Response ) {
+
+    const result = await UserServiceController.searchUserCount( request,
+                                                                null,
+                                                                this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 

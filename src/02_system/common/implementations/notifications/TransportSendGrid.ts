@@ -2,10 +2,10 @@ import cluster from 'cluster';
 
 import sendgridMail from '@sendgrid/mail';
 
-import CommonConstants from "../CommonConstants";
+import CommonConstants from "../../CommonConstants";
 
-import CommonUtilities from "../CommonUtilities";
-import SystemUtilities from "../SystemUtilities";
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
 
 import TransportEMail from "./TransportEMail";
 

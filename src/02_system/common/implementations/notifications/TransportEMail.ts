@@ -6,10 +6,10 @@ import pug from "pug";
 import juice from "juice";
 import htmlToText from "html-to-text";
 
-import CommonConstants from "../CommonConstants";
+import CommonConstants from "../../CommonConstants";
 
-import CommonUtilities from "../CommonUtilities";
-import SystemUtilities from "../SystemUtilities";
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
 
 const debug = require( 'debug' )( 'TransportEMail' );
 

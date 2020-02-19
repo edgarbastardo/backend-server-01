@@ -43,6 +43,11 @@ export default class SystemQueries {
         strResult = SqlString.format( `Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = ? And A.Owner = ? And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( ?, INTERVAL ? MINUTE ) )`, [ params.Kind, params.Owner, strNow, params.MinutesAgo ] );
 
       }
+      else if ( strName === "searchUser" ) {
+
+        strResult = `Select ${params.SelectFields} From User As A Inner Join UserGroup As B On A.GroupId = B.Id Left Outer Join Person As C On C.Id = A.PersonId Where `;
+
+      }
 
     }
 

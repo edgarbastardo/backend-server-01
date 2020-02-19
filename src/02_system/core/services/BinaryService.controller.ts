@@ -1263,7 +1263,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                                logger );
 
           result = {
-                     StatusCode: 400, //Bad request
+                     StatusCode: 413, //Request Entity Too Large
                      Code: 'ERROR_FILE_TOO_BIG',
                      Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
                      Mark: strMark,
@@ -2117,7 +2117,7 @@ export default class BinaryServiceController extends BaseService {
                     }
 
                     resultData = {
-                                   StatusCode: 403, //Forbiden
+                                   StatusCode: 403, //Forbidden
                                    Code: strCode,
                                    Message: strMessage,
                                    Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),

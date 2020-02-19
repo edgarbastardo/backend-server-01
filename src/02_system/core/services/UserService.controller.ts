@@ -1,13 +1,6 @@
 import cluster from 'cluster';
 
-import SystemConstants from "../../common/SystemContants";
-
-import CommonUtilities from "../../common/CommonUtilities";
-import SystemUtilities from "../../common/SystemUtilities";
-
-//import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
-//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import {
   //Router,
   Request,
@@ -15,6 +8,14 @@ import {
   //NextFunction
 } from 'express';
 import bcrypt from 'bcrypt';
+//import { OriginalSequelize } from "sequelize"; //Original sequelize
+//import uuidv4 from 'uuid/v4';
+//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
+import SystemConstants from "../../common/SystemContants";
+
+import CommonUtilities from "../../common/CommonUtilities";
+import SystemUtilities from "../../common/SystemUtilities";
 
 //import { Role } from "../models/Role";
 //import { User } from "../../common/database/models/User";
@@ -38,10 +39,26 @@ import CipherManager from "../../common/managers/CipherManager";
 import PersonService from "../../common/database/services/PersonService";
 import I18NManager from "../../common/managers/I18Manager";
 import ActionTokenService from "../../common/database/services/ActionTokenService";
-import JobQueueManager from "../../common/managers/JobQueueManager";
+//import JobQueueManager from "../../common/managers/JobQueueManager";
 import UserSessionStatusService from '../../common/database/services/UserSessionStatusService';
+//import GeoMapGoogle from "../../common/implementations/geomaps/GeoMapGoogle";
+import GeoMapManager from "../../common/managers/GeoMapManager";
+import { User } from '../../common/database/models/User';
+//import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
+import { Person } from '../../common/database/models/Person';
+import { UserGroup } from '../../common/database/models/UserGroup';
 
 const debug = require( 'debug' )( 'UserServiceController' );
+
+export interface ICheckUserRoles {
+
+  isAuthorizedAdmin: boolean,
+  isAuthorizedL01: boolean,
+  isAuthorizedL02: boolean,
+  isAuthorizedL03: boolean,
+  isNotAuthorized: boolean
+
+}
 
 export default class UserServiceController {
 
@@ -589,8 +606,8 @@ export default class UserServiceController {
                         Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
                         EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
                         Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                        FirstName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        LastName:  [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        LastName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
                       };
 
           const validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -598,7 +615,7 @@ export default class UserServiceController {
                                                                        null,
                                                                        logger );
 
-          if ( validator.passes() ) { //Validate reqeust.body field values
+          if ( validator.passes() ) { //ANCHOR Validate request.body field values
 
             const checkFieldValueResults = {};
 
@@ -1895,8 +1912,8 @@ export default class UserServiceController {
             if ( !strTransport ||
                  strTransport === "email" ) {
 
-              if ( !userInDB.UserPerson ||
-                   CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) === false ) {
+              if ( !userInDB.Person ||
+                   CommonUtilities.isValidEMailList( userInDB.Person.EMail ) === false ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -1922,8 +1939,8 @@ export default class UserServiceController {
             }
             else if ( strTransport === "sms" ) {
 
-              if ( !userInDB.UserPerson ||
-                  CommonUtilities.isValidPhoneNumberList( userInDB.UserPerson.Phone ) === false ) {
+              if ( !userInDB.Person ||
+                  CommonUtilities.isValidPhoneNumberList( userInDB.Person.Phone ) === false ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -1985,7 +2002,7 @@ export default class UserServiceController {
 
               if ( bFrontendIdIsAllowed ) {
 
-                //ANCHOR
+                //ANCHOR FroentIdIsAllowed
                 const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
                                                                               "UserName",
                                                                               logger );
@@ -2035,7 +2052,7 @@ export default class UserServiceController {
                                                         "email",
                                                         {
                                                           from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                          to: userInDB.UserPerson.EMail,
+                                                          to: userInDB.Person.EMail,
                                                           subject: await I18NManager.translate( strLanguage, "PASSWORD RECOVER CODE" ),
                                                           body: {
                                                                   kind: "template",
@@ -2065,10 +2082,10 @@ export default class UserServiceController {
                                 IsError: false,
                                 Errors: [],
                                 Warnings: [],
-                                Count: 0,
+                                Count: 1,
                                 Data: [
                                         {
-                                          EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
+                                          EMail: CommonUtilities.maskEMailList( userInDB.Person.EMail )
                                         }
                                       ]
                               }
@@ -2088,7 +2105,7 @@ export default class UserServiceController {
                                              Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                              Details: {
-                                                        EMail: CommonUtilities.maskEMailList( userInDB.UserPerson.EMail )
+                                                        EMail: CommonUtilities.maskEMailList( userInDB.Person.EMail )
                                                       }
                                            }
                                          ],
@@ -2105,7 +2122,7 @@ export default class UserServiceController {
                     if ( await NotificationManager.send(
                                                          "sms",
                                                          {
-                                                           to: userInDB.UserPerson.Phone,
+                                                           to: userInDB.Person.Phone,
                                                            //context: "AMERICA/NEW_YORK",
                                                            foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
                                                            //device_id: "*",
@@ -2126,10 +2143,10 @@ export default class UserServiceController {
                                  IsError: false,
                                  Errors: [],
                                  Warnings: [],
-                                 Count: 0,
+                                 Count: 1,
                                  Data: [
                                          {
-                                           Phone: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
+                                           Phone: CommonUtilities.maskPhoneList( userInDB.Person.Phone )
                                          }
                                        ]
                                }
@@ -2149,7 +2166,7 @@ export default class UserServiceController {
                                              Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
                                              Details: {
-                                                        EMail: CommonUtilities.maskPhoneList( userInDB.UserPerson.Phone )
+                                                        EMail: CommonUtilities.maskPhoneList( userInDB.Person.Phone )
                                                       }
                                            }
                                          ],
@@ -2246,7 +2263,7 @@ export default class UserServiceController {
         const strMark = "D1DC7AD9A293" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         result = {
-                   StatusCode: 400, //Bad request
+                   StatusCode: 429, //Too Many Requests
                    Code: 'ERROR_TOO_MANY_RECOVER_REQUEST',
                    Message: await I18NManager.translate( strLanguage, 'The user %s has too many password recovery requests', request.body.Name ),
                    Mark: strMark,
@@ -2565,8 +2582,8 @@ export default class UserServiceController {
                                Data: []
                              }
 
-                    if ( userInDB.UserPerson &&
-                         CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) ) {
+                    if ( userInDB.Person &&
+                         CommonUtilities.isValidEMailList( userInDB.Person.EMail ) ) {
 
                       const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                         logger );
@@ -2584,7 +2601,7 @@ export default class UserServiceController {
                                                       "email",
                                                       {
                                                         from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                        to: userInDB.UserPerson.EMail,
+                                                        to: userInDB.Person.EMail,
                                                         subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
                                                         body: {
                                                                 kind: "template",
@@ -2827,6 +2844,105 @@ export default class UserServiceController {
 
   }
 
+  //ANCHOR checkUserRoleLevel
+  static checkUserRoleLevel( userSessionStatus: any,
+                             userInDB: User,
+                             strActionRole: string,
+                             logger: any ): ICheckUserRoles {
+
+    let result: ICheckUserRoles = {
+                                    isAuthorizedAdmin: false,
+                                    isAuthorizedL03: false,
+                                    isAuthorizedL02: false,
+                                    isAuthorizedL01: false,
+                                    isNotAuthorized: false
+                                  };
+
+    try {
+
+      result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      if ( result.isAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#ChangeUserPasswordL03#" );
+
+        }
+
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.UserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Id:" +  userInDB.UserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#SId:" +  userInDB.UserGroup.ShortId + "#" ) ) : false;
+
+        if ( result.isAuthorizedL03 === false ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+          if ( !roleSubTag ||
+                roleSubTag.length === 0 ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
+
+          }
+
+          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.Name + "#" ) ||
+                                                              roleSubTag.includes( "#Id:" +  userInDB.Id + "#" ) ||
+                                                              roleSubTag.includes( "#SId:" +  userInDB.ShortId + "#" ) ) : false;
+
+          if ( result.isAuthorizedL02 === false ) {
+
+            result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                              userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
+
+            if ( result.isAuthorizedL01 &&
+                 userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+
+              //Uhathorized
+              result.isNotAuthorized = true;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkUserRoleLevel.name;
+
+      const strMark = "3F9FEF587ABA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async passwordChange( request: Request,
                                transaction: any,
                                logger: any ): Promise<any> {
@@ -2859,9 +2975,12 @@ export default class UserServiceController {
 
       if ( context.Authorization.startsWith( "p:" ) === false ) {
 
+        // ANCHOR password change
         let userSessionStatus = context.UserSessionStatus;
 
-        let bIsNotAuthorized = false;
+        //let bIsNotAuthorized = false;
+
+        let resultCheckUserRoles = null;
 
         let bUpdateSessionStatus = true;
 
@@ -2887,35 +3006,87 @@ export default class UserServiceController {
 
           }
 
-          const bIsAdministrator = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ): false;
-          let bIsMasterL01 = false;
+          resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                          userInDB,
+                                                          "ChangeUserPassword",
+                                                          logger );
 
-          if ( bIsAdministrator === false ) {
+          /*
+          //ANCHOR check roles password change
+          const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                              userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+          let bIsAuthorizedL01 = false;
+          let bIsAuthorizedL02 = false;
+          let bIsAuthorizedL03 = false;
 
-            bIsMasterL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                 userSessionStatus.Role.includes( "#" +  userInDB.UserGroup.Name + "#" ): false;
+          if ( bIsAuthorizedAdmin === false ) {
 
-            if ( bIsMasterL01 &&
-                 userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+            let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
 
-              //Uhathorized
-              bIsNotAuthorized = true;
+            if ( !roleSubTag ||
+                  roleSubTag.length === 0 ) {
+
+              roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL03#" );
+
+            }
+
+            bIsAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.UserGroup.Name + "#" ) ||
+                                                          roleSubTag.includes( "#Id:" +  userInDB.UserGroup.Id + "#" ) ||
+                                                          roleSubTag.includes( "#SId:" +  userInDB.UserGroup.ShortId + "#" ) ) : false;
+
+            if ( bIsAuthorizedL03 === false ) {
+
+              roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+              if ( !roleSubTag ||
+                    roleSubTag.length === 0 ) {
+
+                roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL02#" );
+
+              }
+
+              bIsAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Id:" +  userInDB.Id + "#" ) ||
+                                                            roleSubTag.includes( "#SId:" +  userInDB.ShortId + "#" ) ) : false;
+
+              if ( bIsAuthorizedL02 === false ) {
+
+                bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                            userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
+
+                if ( bIsAuthorizedL01 &&
+                     userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+
+                  //Uhathorized
+                  bIsNotAuthorized = true;
+
+                }
+
+              }
 
             }
 
           }
+          */
 
-          if ( userInDB.Id !== userSessionStatus.UserId ) {
+          //if ( userInDB.Id !== userSessionStatus.UserId ) {
 
-            if ( bIsAdministrator ||
-                bIsMasterL01 ) {
+          if ( resultCheckUserRoles.isAuthorizedAdmin ||
+               resultCheckUserRoles.isAuthorizedL03 ||
+               resultCheckUserRoles.isAuthorizedL02 ||
+               resultCheckUserRoles.isAuthorizedL01 ) {
 
-              bUpdateSessionStatus = false;
-              bCheckCurrentPassword = false;
-
-            }
+            bUpdateSessionStatus = false;
+            bCheckCurrentPassword = false;
 
           }
+          else {
+
+            resultCheckUserRoles.isNotAuthorized = true;
+
+          }
+
+          //}
 
         }
         else {
@@ -2935,10 +3106,10 @@ export default class UserServiceController {
 
         }
 
-        if ( bIsNotAuthorized ) {
+        if ( resultCheckUserRoles.IsNotAuthorized ) {
 
           result = {
-                     StatusCode: 401, //Unauthorized
+                     StatusCode: 403, //Forbidden
                      Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
                      Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', userInDB.Name ),
                      Mark: 'CD5990E0CBD1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
@@ -3095,10 +3266,14 @@ export default class UserServiceController {
 
                   if ( bUpdateSessionStatus ) {
 
+                    /*
                     userSessionStatus.Tag = userSessionStatus.Tag.replace( /#FORCE_CHANGE_PASSSWORD#(,)?/g, "" );
                     userSessionStatus.Tag = userSessionStatus.Tag.replace( /(,)?#FORCE_CHANGE_PASSSWORD#/g, "" );
                     userSessionStatus.Tag = userSessionStatus.Tag.replace( /#PASSSWORD_EXPIRED#(,)?/g, "" );
                     userSessionStatus.Tag = userSessionStatus.Tag.replace( /(,)?#PASSSWORD_EXPIRED#/g, "" );
+                    */
+                    userSessionStatus.Tag = CommonUtilities.removeTag( userSessionStatus.Tag, "#FORCE_CHANGE_PASSSWORD#" );
+                    userSessionStatus.Tag = CommonUtilities.removeTag( userSessionStatus.Tag, "#PASSSWORD_EXPIRED#" );
                     userSessionStatus.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
 
                     //ANCHOR update the session
@@ -3150,8 +3325,8 @@ export default class UserServiceController {
                              Data: []
                            }
 
-                  if ( userInDB.UserPerson &&
-                       CommonUtilities.isValidEMailList( userInDB.UserPerson.EMail ) ) {
+                  if ( userInDB.Person &&
+                       CommonUtilities.isValidEMailList( userInDB.Person.EMail ) ) {
 
                     const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                       logger );
@@ -3169,7 +3344,7 @@ export default class UserServiceController {
                                                     "email",
                                                     {
                                                       from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                      to: userInDB.UserPerson.EMail,
+                                                      to: userInDB.Person.EMail,
                                                       subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
                                                       body: {
                                                               kind: "template",
@@ -3434,9 +3609,31 @@ export default class UserServiceController {
         if ( userInDB != null &&
              userInDB instanceof Error === false ) {
 
-          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          if ( context.Authorization.startsWith( "p:" ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                       Mark: 'EF21E15D0ACA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                                currentTransaction,
+                                                                logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -3617,7 +3814,7 @@ export default class UserServiceController {
                                IsError: false,
                                Errors: [],
                                Warnings: [],
-                               Count: 0,
+                               Count: 1,
                                Data: [
                                        {
                                          EMail: CommonUtilities.maskEMailList( request.body.EMail )
@@ -3759,7 +3956,7 @@ export default class UserServiceController {
         const strMark = "DD514B770B97" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         result = {
-                   StatusCode: 400, //Bad request
+                   StatusCode: 429, //Too Many Requests
                    Code: 'ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST',
                    Message: await I18NManager.translate( strLanguage, 'The user %s has too many email change requests', request.body.Name ),
                    Mark: strMark,
@@ -3914,9 +4111,31 @@ export default class UserServiceController {
             if ( userInDB != null &&
                  userInDB instanceof Error === false ) {
 
-              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              if ( context.Authorization.startsWith( "p:" ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                           Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                           Mark: 'B4381A42D579' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         };
+
+              }
+              else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                                    currentTransaction,
+                                                                    logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -4024,7 +4243,7 @@ export default class UserServiceController {
                   let personInDB = null;
                   let personWithEMailChanged = null;
 
-                  if ( !userInDB.UserPerson ) {
+                  if ( !userInDB.Person ) {
 
                     jsonExtraData.OldEmail = ""; //Create empty field, no old person assoicated
 
@@ -4060,7 +4279,7 @@ export default class UserServiceController {
                   }
                   else {
 
-                    personInDB = userInDB.UserPerson;
+                    personInDB = userInDB.Person;
 
                     jsonExtraData.OldEmail = personInDB.EMail; //Save the the current person email
 
@@ -4446,9 +4665,31 @@ export default class UserServiceController {
         if ( userInDB != null &&
              userInDB instanceof Error === false ) {
 
-          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          if ( context.Authorization.startsWith( "p:" ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                       Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                                currentTransaction,
+                                                                logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -4548,11 +4789,11 @@ export default class UserServiceController {
 
             if ( await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
 
-              const strWellFormatedPhoneNumberList = CommonUtilities.wellFormatedPhoneNumberList( request.body.Phone );
+              const strWellFormattedPhoneNumberList = CommonUtilities.wellFormattedPhoneNumberList( request.body.Phone );
 
-              if ( CommonUtilities.isValidPhoneNumberList( strWellFormatedPhoneNumberList ) ) {
+              if ( CommonUtilities.isValidPhoneNumberList( strWellFormattedPhoneNumberList ) ) {
 
-                const strClearFormatedPhoneNumberList = CommonUtilities.clearFormatPhoneNumberList( strWellFormatedPhoneNumberList );
+                const strClearFormattedPhoneNumberList = CommonUtilities.clearFormatPhoneNumberList( strWellFormattedPhoneNumberList );
 
                 //ANCHOR getInfoFromSessionStatus
                 const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
@@ -4571,7 +4812,7 @@ export default class UserServiceController {
                                                                                Status: 1,
                                                                                CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                ExpireAt: expireAt.format(),
-                                                                               ExtraData: `{ "NewPhoneNumber": "${strWellFormatedPhoneNumberList}" }`
+                                                                               ExtraData: `{ "NewPhoneNumber": "${strWellFormattedPhoneNumberList}" }`
                                                                              },
                                                                              false,
                                                                              currentTransaction,
@@ -4585,7 +4826,7 @@ export default class UserServiceController {
                   if ( await NotificationManager.send(
                                                        "sms",
                                                        {
-                                                         to: strClearFormatedPhoneNumberList,
+                                                         to: strClearFormattedPhoneNumberList,
                                                          //context: "AMERICA/NEW_YORK",
                                                          foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
                                                          //device_id: "*",
@@ -4606,7 +4847,7 @@ export default class UserServiceController {
                                IsError: false,
                                Errors: [],
                                Warnings: [],
-                               Count: 0,
+                               Count: 1,
                                Data: [
                                        {
                                          Phone: CommonUtilities.maskPhoneList( request.body.Phone )
@@ -4748,7 +4989,7 @@ export default class UserServiceController {
         const strMark = "49F9083D3F81" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         result = {
-                   StatusCode: 400, //Bad request
+                   StatusCode: 429, //Too Many Requests
                    Code: 'ERROR_TOO_MANY_PHONE_NUMBER_CHANGE_REQUEST',
                    Message: await I18NManager.translate( strLanguage, 'The user %s has too many phone number change requests', request.body.Name ),
                    Mark: strMark,
@@ -4903,9 +5144,31 @@ export default class UserServiceController {
             if ( userInDB != null &&
                  userInDB instanceof Error === false ) {
 
-              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              if ( context.Authorization.startsWith( "p:" ) ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                           Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                           Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         };
+
+              }
+              else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                                    currentTransaction,
+                                                                    logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -5013,7 +5276,7 @@ export default class UserServiceController {
                   let personInDB = null;
                   let personWithPhoneChanged = null;
 
-                  if ( !userInDB.UserPerson ) {
+                  if ( !userInDB.Person ) {
 
                     jsonExtraData.OldPhoneNumber = ""; //Create empty field, phone number person assoicated
 
@@ -5049,7 +5312,7 @@ export default class UserServiceController {
                   }
                   else {
 
-                    personInDB = userInDB.UserPerson;
+                    personInDB = userInDB.Person;
 
                     jsonExtraData.OldPhoneNumber = personInDB.Phone; //Save the the current person phone number
 
@@ -5156,7 +5419,7 @@ export default class UserServiceController {
                     await NotificationManager.send(
                                                     "sms",
                                                     {
-                                                      to: userInDB.UserPerson.Phone,
+                                                      to: userInDB.Person.Phone,
                                                       //context: "AMERICA/NEW_YORK",
                                                       foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
                                                       //device_id: "*",
@@ -5402,27 +5665,28 @@ export default class UserServiceController {
 
       let bProfileOfAnotherUser = false;
 
-      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ) {
+      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
+           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
 
-        if ( request.query.ShortToken ) {
+        if ( request.query.shortToken ) {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByShortToken( request.query.ShortToken,
+          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
                                                                                                currentTransaction,
                                                                                                logger );
 
           if ( userSessionStatus &&
                userSessionStatus instanceof Error == false ) {
 
-            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.ShortToken;
+            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.shortToken;
 
             strUserName = userSessionStatus.UserName ? userSessionStatus.UserName : null;
 
           }
           else {
 
-            strAutorization = request.query.ShortToken;
+            strAutorization = request.query.shortToken;
 
           }
 
@@ -5515,7 +5779,7 @@ export default class UserServiceController {
                                                                          message: "Sucess get the user session profile information",
                                                                          mark: "1CB1DC7063D8",
                                                                          useSecondaryUserToCreatedBy: false,
-                                                                         updateCreatedAt: request.query.CreatedAt === "1"
+                                                                         updateCreatedAt: request.query.createdAt === "1"
                                                                        },
                                                                        strUserName,
                                                                        "",
@@ -5646,7 +5910,357 @@ export default class UserServiceController {
 
       }
 
-      //
+      let strUserName = context.UserSessionStatus.UserName;
+
+      //let strAutorization = context.Authorization;
+
+      let userInDB = await UserService.getByName( strUserName,
+                                                  context.TimeZoneId,
+                                                  transaction,
+                                                  logger );
+
+      if ( userInDB != null &&
+           userInDB instanceof Error === false ) {
+
+        if ( context.Authorization.startsWith( "p:" ) ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                     Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change your profile information' ),
+                     Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
+                                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change your profile information' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_GROUP_DISABLED',
+                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', userInDB.UserGroup.Name ),
+                     Mark: 'CA03218D26D4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_GROUP_DISABLED',
+                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', userInDB.UserGroup.Name ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_GROUP_EXPIRED',
+                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change your profile information', userInDB.UserGroup.Name ),
+                     Mark: '4F0F53813715' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_GROUP_EXPIRED',
+                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change you profile information', userInDB.UserGroup.Name ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( await UserService.checkDisabledByName( userInDB.Name,
+                                                         currentTransaction,
+                                                         logger ) ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_DISABLED',
+                     Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', userInDB.Name ),
+                     Mark: '8362FE646A8D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_DISABLED',
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', userInDB.Name ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( await UserService.checkExpiredByName( userInDB.Name,
+                                                        currentTransaction,
+                                                        logger ) ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_EXPIRED',
+                     Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', userInDB.Name ),
+                     Mark: 'D9E15CB1BA2A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_EXPIRED',
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', userInDB.Name ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else {
+
+          let personData = {} as any;
+
+          if ( userInDB.Person ) {
+
+            personData = ( userInDB.Person as any ).dataValues;
+
+            personData.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            personData.UpdatedAt = null;
+
+          }
+          else {
+
+            personData.CreatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            personData.CreatedAt = null;
+
+          }
+
+          let rules = {
+                        Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Gender: [ 'present', 'between:0,100' ],
+                        BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                        Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Avatar: [ 'present', 'min:36', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                      };
+
+          const validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                       rules,
+                                                                       null,
+                                                                       logger );
+
+          if ( validator.passes() ) { //Validate request.body field values
+
+            personData.Title = request.body.Title ? request.body.Title : personData.Title;
+            personData.FirstName = request.body.FirstName ? CommonUtilities.normalizeWhitespaces( request.body.FirstName ) : personData.FirstName;
+            personData.LastName = request.body.LastName ? CommonUtilities.normalizeWhitespaces( request.body.LastName ): personData.LastName;
+            personData.NickName = request.body.NickName ? request.body.NickName : personData.NickName;
+
+            if ( request.body.Abbreviation ) {
+
+              personData.Abbreviation = request.body.Abbreviation;
+
+            }
+            else if ( !personData.Abbreviation ) {
+
+              const fistNameAbbreviation = CommonUtilities.getFirstLetters( request.body.FirstName );
+              const lastNameAbbreviation = CommonUtilities.getFirstLetters( request.body.LastName );
+
+              personData.Abbreviation = fistNameAbbreviation.join( "" ) + lastNameAbbreviation.join( "" );
+
+            }
+
+            personData.Gender = request.body.Gender && parseInt( request.body.Gender ) >= 0 ? request.body.Gender : personData.Gender;
+            personData.BirthDate = request.body.BirthDate ? request.body.BirthDate : personData.BirthDate;
+            personData.Address = request.body.Address ? request.body.Address : personData.Address;
+
+            if ( personData.Address &&
+                 await GeoMapManager.getConfigServiceType( "geocode", logger ) !== "@__none__@" ) {
+
+              const geocodeResult = await GeoMapManager.geocodeServiceUsingAddress( [ personData.Address ],
+                                                                                    true,
+                                                                                    logger );
+
+              if ( !geocodeResult ||
+                   geocodeResult.length == 0 ||
+                   geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
+
+                personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+              }
+              else {
+
+                personData.Address = geocodeResult[ 0 ].formattedAddress;
+                personData.Tag = CommonUtilities.removeTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+              }
+
+              personData.Tag = personData.Tag ? personData.Tag: null;
+
+            }
+
+            const personInDB = await PersonService.createOrUpdate( personData,
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger );
+
+            if ( personInDB &&
+                 personInDB instanceof Error === false ) {
+
+              if ( request.body.Avatar !== undefined &&
+                   userInDB.Avatar !== request.body.Avatar ) {
+
+                userInDB.Avatar = request.body.Avatar ? request.body.Avatar : userInDB.Avatar;
+                userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                userInDB.UpdatedAt = null;
+
+                userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
+                                                             true,
+                                                             currentTransaction,
+                                                             logger );
+
+              }
+
+              const warnings = [];
+
+              if ( userInDB instanceof Error ) {
+
+                const error = userInDB as any;
+
+                warnings.push(
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error )
+                               }
+                             );
+
+              }
+
+              personData = (personInDB as any).dataValues;
+
+              delete personData.ImageId;
+              delete personData.Comment;
+              delete personData.ExtraData;
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: 'SUCCESS_PROFILE_INFORMATION_CHANGE',
+                         Message: await I18NManager.translate( strLanguage, 'Success to change the user profile information.' ),
+                         Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: warnings,
+                         Count: 1,
+                         Data: [
+                                 personData
+                               ]
+                       }
+
+            }
+            else {
+
+              const error = personInDB as any;
+
+              result = {
+                         StatusCode: 500, //Internal server error
+                         Code: 'ERROR_UNEXPECTED',
+                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                         Mark: 'FEFFF7F8CFDC',
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: error.name,
+                                     Message: error.message,
+                                     Details: await SystemUtilities.processErrorDetails( error ) //error
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       };
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                       Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                   Details: validator.errors.all()
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', strUserName ),
+                   Mark: 'C11A63D5568C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', strUserName ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -5664,6 +6278,1052 @@ export default class UserServiceController {
       sourcePosition.method = this.name + "." + this.profileSet.name;
 
       const strMark = "59582149A69D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getUser( request: Request,
+                        transaction: any,
+                        logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      //ANCHOR getUser
+      let userSessionStatus = context.UserSessionStatus;
+
+      //let bIsNotAuthorized = false;
+
+      let userInDB = null;
+
+      if ( request.query.id ) {
+
+        userInDB = await UserService.getById( request.query.id,
+                                              null,
+                                              currentTransaction,
+                                              logger );
+
+      }
+      if ( request.query.shortId ) {
+
+        userInDB = await UserService.getByShortId( request.query.shortId,
+                                                   null,
+                                                   currentTransaction,
+                                                   logger );
+
+      }
+      else {
+
+        userInDB = await UserService.getByName( request.query.name,
+                                                null,
+                                                currentTransaction,
+                                                logger );
+
+      }
+
+      const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                            userInDB,
+                                                            "GetUser",
+                                                            logger );
+
+      if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+           !resultCheckUserRoles.isAuthorizedL03 &&
+           !resultCheckUserRoles.isAuthorizedL02 &&
+           !resultCheckUserRoles.isAuthorizedL01 ) {
+
+        resultCheckUserRoles.isNotAuthorized = true;
+
+      }
+
+      if ( resultCheckUserRoles.isNotAuthorized ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
+                   Message: await I18NManager.translate( strLanguage, 'Not authorized to get the information' ),
+                   Mark: '49BC23FE5772' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
+                               Message: await I18NManager.translate( strLanguage, 'Not authorized to get the information' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( userInDB != null &&
+                userInDB instanceof Error === false ) {
+
+        let modelData = ( userInDB as any ).dataValues;
+
+        const tempModelData = await User.convertFieldValues(
+                                                             {
+                                                               Data: userInDB,
+                                                               FilterFields: 1, //Force to remove fields like password and value
+                                                               TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                               Include: null,
+                                                               Logger: logger,
+                                                               ExtraInfo: {
+                                                                            Request: request
+                                                                          }
+                                                             }
+                                                           );
+
+        if ( tempModelData ) {
+
+          modelData = tempModelData;
+
+        }
+
+        /*
+        if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+             modelData.Person ) {
+
+          delete modelData.Person.ImageId;
+
+        }
+        */
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_INFORMATION',
+                   Message: await I18NManager.translate( strLanguage, 'Success get the information.' ),
+                   Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           modelData
+                         ]
+                 }
+
+      }
+      else {
+
+        const error = userInDB;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: 'FCB0F3218AD0',
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      /*
+      //let userSessionStatus = context.UserSessionStatus;
+      //let strUserName = context.UserSessionStatus.UserName;
+
+      request.query.include = [ { "model": "Person" }, { "model": "UserGroup" } ];
+      delete request.query.attributes;
+
+      const resultData = await ModelToRestAPIServiceController.get( User,
+                                                                    request,
+                                                                    null,
+                                                                    logger );
+
+      result = resultData;
+      */
+
+      /*
+      if ( resultData.statusCode === 200 ) {
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_USER',
+                   Message: await I18NManager.translate( strLanguage, 'Success get the user.' ),
+                   Mark: '3E14265E7A10' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: null,
+                   Count: 0,
+                   Data: [
+                           userData
+                         ]
+                 }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'User not found in database' ),
+                   Mark: '454854885291' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The user not found in database' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      */
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "63E5C8D66751" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async createUser( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      let strUserName = context.UserSessionStatus.UserName;
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "F754B87531BC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async modifyUser( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      let strUserName = context.UserSessionStatus.UserName;
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "C1CB15FAF087" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async deleteUser( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      let strUserName = context.UserSessionStatus.UserName;
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "A68F177F4DBF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async searchUser( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL02 = false;
+      let strWhereL02 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = CommonUtilities.tranformTagListToWhere( roleSubTag, "B", "Or" );
+
+        }
+
+        //if ( bIsAuthorizedL03 === false ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+          if ( !roleSubTag ||
+                roleSubTag.length === 0 ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL02#" );
+
+          }
+
+          if ( roleSubTag &&
+              roleSubTag.length > 0 ) {
+
+            bIsAuthorizedL02 = true;
+
+            strWhereL02 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
+
+          }
+
+          //if ( bIsAuthorizedL02 === false ) {
+
+          bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                      userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
+
+          if ( bIsAuthorizedL01 ) {
+
+            strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
+
+          }
+
+          //}
+
+        //}
+
+      }
+
+      const strSelectField = SystemUtilities.createSelectAliasFromModels(
+                                                                          [
+                                                                            User,
+                                                                            UserGroup,
+                                                                            Person
+                                                                          ],
+                                                                          [
+                                                                            "A",
+                                                                            "B",
+                                                                            "C"
+                                                                          ]
+                                                                        );
+
+      let strSQL = DBConnectionManager.getStatement( "searchUser",
+                                                     {
+                                                       SelectFields: strSelectField,
+                                                     },
+                                                     logger );
+
+      strSQL = strSQL + "( " + request.query.where + " )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL02 &&
+             !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+
+        }
+        else {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL01 &&
+             !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+        }
+        else {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      let intLimit = 200;
+
+      const warnings = [];
+
+      if ( request.query.limit &&
+           isNaN( request.query.limit ) === false &&
+           parseInt( request.query.limit ) <= intLimit ) {
+
+        intLimit = parseInt( request.query.limit );
+
+      }
+      else {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
+                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
+                         Details: I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                       }
+                     );
+
+      }
+
+      //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
+
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+
+      //}
+
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows, [
+                                                                                                  User,
+                                                                                                  UserGroup,
+                                                                                                  Person
+                                                                                                ],
+                                                                                                [
+                                                                                                  "A",
+                                                                                                  "B",
+                                                                                                  "C"
+                                                                                                ] );
+
+      const convertedRows = [];
+
+      for ( const currentRow of transformedRows ) {
+
+        const tempModelData = await User.convertFieldValues(
+                                                             {
+                                                               Data: currentRow,
+                                                               FilterFields: 1, //Force to remove fields like password and value
+                                                               TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                               Include: null,
+                                                               Logger: logger,
+                                                               ExtraInfo: {
+                                                                            Request: request
+                                                                          }
+                                                             }
+                                                           );
+        if ( tempModelData ) {
+
+          convertedRows.push( tempModelData );
+
+        }
+        else {
+
+          convertedRows.push( currentRow );
+
+        }
+
+      }
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH',
+                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
+                 Mark: 'C89386280047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: convertedRows.length,
+                 Data: convertedRows
+               }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "52299BDE0903" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction != null &&
+           bApplyTansaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( ex ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async searchUserCount( request: Request,
+                                transaction: any,
+                                logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bApplyTansaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bApplyTansaction = true;
+
+      }
+
+      let strUserName = context.UserSessionStatus.UserName;
+
+      //
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bApplyTansaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.profileSet.name;
+
+      const strMark = "AF049675D770" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -129,8 +129,11 @@ export class User extends Model<User> {
   @BelongsTo( () => UserGroup, "GroupId" )
   UserGroup: UserGroup;
 
+  //@BelongsTo( () => Person, "PersonId" )
+  //UserPerson: Person;
+
   @BelongsTo( () => Person, "PersonId" )
-  UserPerson: Person;
+  Person: Person;
 
   @BeforeValidate
   static beforeValidateHook( instance: User, options: any ): any {
@@ -214,6 +217,56 @@ export class User extends Model<User> {
           }
 
         }
+
+      }
+
+      if ( result.ExtraData ) {
+
+        const extraData = CommonUtilities.parseJSON( result.ExtraData,
+                                                     params.logger );
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        result.ExtraData = extraData;
+
+      }
+
+      if ( result.Person &&
+           result.Person.ExtraData ) {
+
+        const extraData = CommonUtilities.parseJSON( result.Person.ExtraData,
+                                                     params.logger );
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        result.Person.ExtraData = extraData;
+
+      }
+
+      if ( result.UserGroup &&
+           result.UserGroup.ExtraData ) {
+
+        const extraData = CommonUtilities.parseJSON( result.UserGroup.ExtraData,
+                                                     params.logger );
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        result.UserGroup.ExtraData = extraData;
 
       }
 

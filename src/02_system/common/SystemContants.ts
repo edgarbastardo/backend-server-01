@@ -1189,6 +1189,90 @@ export default class SystemConstants {
                                                  ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_PUSH_Service_SCHEMA}" }`
                                                };
 
+  static readonly _CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_MAP_GEOCODE_Service = {
+                                                        Id: "e87b5ce8-e488-4869-be72-a754314e5f75",
+                                                        Scope: "system",
+                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                        Category: "Maps",
+                                                        Name: "system.maps.geocode.service",
+                                                        Default: JSON.stringify(
+                                                                                 {
+                                                                                   "service":"@__none__@",
+                                                                                   "#google_maps#":{
+                                                                                     "type":"google_maps",
+                                                                                     "host":"https://maps.googleapis.com/maps/api/geocode/json",
+                                                                                     "port":443,
+                                                                                     "auth":{
+                                                                                       "apiKey":"my_key"
+                                                                                     }
+                                                                                   }
+                                                                                 }
+                                                                               ),
+                                                        Label: "Configuration for the geocode map service",
+                                                        Description: "Configuration for the geocode map service",
+                                                        AllowTagAccessR: "#Administrator#",
+                                                        AllowTagAccessW: "#Administrator#",
+                                                        Example: JSON.stringify(
+                                                                                 {
+                                                                                   "service":"#google_maps#",
+                                                                                   "#google_maps#":{
+                                                                                     "type":"google_maps",
+                                                                                     "host":"https://maps.googleapis.com/maps/api/geocode/json",
+                                                                                     "port":443,
+                                                                                     "auth":{
+                                                                                       "apiKey":"my_key"
+                                                                                     }
+                                                                                   }
+                                                                                 }
+                                                                               ),
+                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                        ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA}" }`
+                                                      };
+
+  static readonly _CONFIG_ENTRY_MAP_DISTANCE_Service_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_MAP_DISTANCE_Service = {
+                                                         Id: "0d06e235-c282-4d8a-bac5-8d7b84010939",
+                                                         Scope: "system",
+                                                         Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                         Category: "Maps",
+                                                         Name: "system.map.distance.service",
+                                                         Default: JSON.stringify(
+                                                                                  {
+                                                                                    "service":"@__none__@",
+                                                                                    "#google_maps#":{
+                                                                                      "type":"google_maps",
+                                                                                      "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                                      "port":443,
+                                                                                      "auth":{
+                                                                                        "apiKey":"my_key"
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                ),
+                                                         Label: "Configuration for the geocode map service",
+                                                         Description: "Configuration for the geocode map service",
+                                                         AllowTagAccessR: "#Administrator#",
+                                                         AllowTagAccessW: "#Administrator#",
+                                                         Example: JSON.stringify(
+                                                                                  {
+                                                                                    "service":"#google_maps#",
+                                                                                    "#google_maps#":{
+                                                                                      "type":"google_maps",
+                                                                                      "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                                      "port":443,
+                                                                                      "auth":{
+                                                                                        "apiKey":"my_key"
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                ),
+                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                         ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA}" }`
+                                                       };
+
   static readonly _CONFIG_ENTRY_Frontend_Rules_SCHEMA = JSON.stringify(
                                                                         {
                                                                           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -1448,6 +1532,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_Push_Service,
                                                SystemConstants._CONFIG_ENTRY_Frontend_Rules,
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
+                                               SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
+                                               SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service,
                                              ];
 
 }

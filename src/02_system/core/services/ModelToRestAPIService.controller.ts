@@ -235,20 +235,20 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               let modelData = modelInDB.get();
 
-              if ( ( model as any).convertFieldValues ) { //The hook is defined?
+              if ( ( model as any ).convertFieldValues ) { //The hook is defined?
 
-                const tempModelData = await ( model as any).convertFieldValues(
-                                                                                {
-                                                                                  Data: modelData,
-                                                                                  FilterFields: 1, //Force to remove fields like password and value
-                                                                                  TimeZoneId: request.header( "timezoneid" ),
-                                                                                  Include: includeFnResult.Result,
-                                                                                  Logger: logger,
-                                                                                  ExtraInfo: {
-                                                                                              Request: request
-                                                                                            }
-                                                                                }
-                                                                              );
+                const tempModelData = await ( model as any ).convertFieldValues(
+                                                                                 {
+                                                                                   Data: modelData,
+                                                                                   FilterFields: 1, //Force to remove fields like password and value
+                                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                   Include: includeFnResult.Result,
+                                                                                   Logger: logger,
+                                                                                   ExtraInfo: {
+                                                                                                Request: request
+                                                                                              }
+                                                                                 }
+                                                                               );
 
                 if ( tempModelData ) {
 
@@ -499,7 +499,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         const warnings = [];
 
-        if ( request.query.limit && isNaN( request.query.limit ) === false && parseInt( request.query.limit ) <= intDefaultMaxRows ) {
+        if ( request.query.limit &&
+             isNaN( request.query.limit ) === false &&
+             parseInt( request.query.limit ) <= intDefaultMaxRows ) {
 
           intLimit = parseInt( request.query.limit );
 
@@ -568,7 +570,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         let dataFound = [];
 
-        if ( ( model as any).convertFieldValues ) { //The hook is defined?
+        if ( ( model as any ).convertFieldValues ) { //The hook is defined?
 
           for ( const modelInDB of modelInDBList ) {
 
@@ -576,18 +578,18 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               let modelData = modelInDB.get();
 
-              const tempModelData = await ( model as any).convertFieldValues(
-                                                                              {
-                                                                                Data: modelData,
-                                                                                FilterFields: 1, //Force to remove fields like password and value
-                                                                                TimeZoneId: request.header( "timezoneid" ),
-                                                                                Include: includeFnResult.Result,
-                                                                                Logger: logger,
-                                                                                ExtraInfo: {
-                                                                                             Request: request
-                                                                                           }
-                                                                              }
-                                                                            );
+              const tempModelData = await ( model as any ).convertFieldValues(
+                                                                               {
+                                                                                 Data: modelData,
+                                                                                 FilterFields: 1, //Force to remove fields like password and value
+                                                                                 TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                 Include: includeFnResult.Result,
+                                                                                 Logger: logger,
+                                                                                 ExtraInfo: {
+                                                                                              Request: request
+                                                                                            }
+                                                                               }
+                                                                             );
 
               if ( tempModelData ) {
 

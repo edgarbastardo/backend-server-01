@@ -2,6 +2,7 @@ import cluster from 'cluster';
 
 import { AccessKind, HTTPMethod } from "./CommonConstants";
 import path from 'path';
+import { results } from 'inversify-express-utils';
 
 const debug = require( 'debug' )( 'CommonUtilities' );
 
@@ -650,6 +651,7 @@ export default class CommonUtilities {
     return bResult;
 
   }
+
   static isInList( list1: string[],
                    list2: string[],
                    logger: any ): boolean {
@@ -950,7 +952,7 @@ export default class CommonUtilities {
 
     try {
 
-      let clearFormatedPhoneList = [];
+      let clearFormattedPhoneList = [];
 
       const phoneList = strPhoneList.split( "," );
 
@@ -962,7 +964,7 @@ export default class CommonUtilities {
 
           if ( strPhoneTrimed ) {
 
-            clearFormatedPhoneList.push( strPhoneTrimed.trim().replace( /\-/g, "" ) );
+            clearFormattedPhoneList.push( strPhoneTrimed.trim().replace( /\-/g, "" ) );
 
           }
 
@@ -970,7 +972,7 @@ export default class CommonUtilities {
 
       }
 
-      strResult = clearFormatedPhoneList.join( "," );
+      strResult = clearFormattedPhoneList.join( "," );
 
     }
     catch ( error ) {
@@ -1014,13 +1016,13 @@ export default class CommonUtilities {
 
   }
 
-  public static wellFormatedPhoneNumberList( strPhoneList: string ): string {
+  public static wellFormattedPhoneNumberList( strPhoneList: string ): string {
 
     let strResult = strPhoneList;
 
     try {
 
-      let wellFormatedPhoneList = [];
+      let wellFormattedPhoneList = [];
 
       const phoneList = strPhoneList.split( "," );
 
@@ -1028,11 +1030,11 @@ export default class CommonUtilities {
 
         if ( strPhone ) {
 
-          const strPhoneFormated = CommonUtilities.formatPhoneNumber( strPhone.trim() );
+          const strPhoneFormatted = CommonUtilities.formatPhoneNumber( strPhone.trim() );
 
-          if ( strPhoneFormated ) {
+          if ( strPhoneFormatted ) {
 
-            wellFormatedPhoneList.push( strPhoneFormated );
+            wellFormattedPhoneList.push( strPhoneFormatted );
 
           }
 
@@ -1040,7 +1042,7 @@ export default class CommonUtilities {
 
       }
 
-      strResult = wellFormatedPhoneList.join( "," );
+      strResult = wellFormattedPhoneList.join( "," );
 
     }
     catch ( error ) {
@@ -1235,4 +1237,224 @@ export default class CommonUtilities {
     return result;
 
   }
+
+  public static addTag( strCurrentTagList: string, strTag: string ): string {
+
+    let strResult = strCurrentTagList;
+
+    try {
+
+      if ( !strCurrentTagList ) {
+
+        strResult = strTag;
+
+      }
+      else if ( strCurrentTagList.includes( strTag ) === false ) {
+
+        strResult = strCurrentTagList + "," + strTag;
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  public static removeTag( strCurrentTagList: string, strTag: string ): string {
+
+    let strResult = strCurrentTagList;
+
+    try {
+
+      if ( strCurrentTagList && strCurrentTagList.includes( strTag ) ) {
+
+        const regExp1 = new RegExp( `${strTag}(,)?`, "g" );
+        const regExp2 = new RegExp( `(,)?${strTag}`, "g" );
+
+        strResult = strCurrentTagList.replace( regExp1, "" );
+        strResult = strResult.replace( regExp2, "" );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  public static getSubTagFromComposeTag( strTagList: string, strTag: string ): string[] {
+
+    let result = [];
+
+    try {
+
+      const tagList = strTagList.split( "," );
+
+      for ( const strCurrentTag of tagList ) {
+
+        if ( strCurrentTag.startsWith( strTag ) ) {
+
+          const subTagList = CommonUtilities.trimArray( strCurrentTag.split( "+" ) );
+
+          if ( subTagList ) {
+
+            result = subTagList;
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
+  public static tranformTagListToWhere( tagList: string[],
+                                        strPrefix: string,
+                                        strLogicOperator: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      for ( const strCurrentTag of tagList ) {
+
+        if ( strCurrentTag.startsWith( "#Id:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".Id = '" + strCurrentTag.replace( "#Id:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Id = '" + strCurrentTag.replace( "#Id:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+        else if ( strCurrentTag.startsWith( "#Name:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".Name = '" + strCurrentTag.replace( "#Name:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Name = '" + strCurrentTag.replace( "#Name:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+        else if ( strCurrentTag.startsWith( "#SId:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".ShortId = '" + strCurrentTag.replace( "#SId:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult  + strLogicOperator + " " + strPrefix + ".ShortId = '" + strCurrentTag.replace( "#SId:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+
+      }
+
+      if ( strResult ) {
+
+        strResult = "( " + strResult + " )";
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  public static isValidDateInFormat01( strDate: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const regExp = /^\d{4}-\d{2}-\d{2}$/;
+
+      if ( strDate.match( regExp ) ) {
+
+        const date = new Date( strDate );
+
+        const dateAsNum = date.getTime();
+
+        if ( dateAsNum && dateAsNum !== NaN ) {
+
+          bResult = date.toISOString().slice( 0,10 ) === strDate;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public static getFirstLetters( strExpresion: string ): string[] {
+
+    let result = [];
+
+    try {
+
+      const words = CommonUtilities.normalizeWhitespaces( strExpresion ).split( " " );
+
+      for ( const strWord of words ) {
+
+        result.push( strWord.charAt( 0 ) );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return result;
+
+  }
+
 }

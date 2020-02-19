@@ -1,10 +1,12 @@
-import request from 'request-promise-native';
+//import request from 'request-promise-native';
+import fetch from 'node-fetch';
+import { URLSearchParams } from 'url';
 import cluster from "cluster";
 
-import CommonConstants from "../CommonConstants";
+import CommonConstants from "../../CommonConstants";
 
-import CommonUtilities from "../CommonUtilities";
-import SystemUtilities from "../SystemUtilities";
+import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
 
 const debug = require( 'debug' )( 'TransportSMSGateway' );
 
@@ -22,6 +24,20 @@ export default class TransportSMSGateway {
 
       for ( const strTo of toList ) {
 
+        const params = new URLSearchParams();
+        params.append( "request.SecurityTokenId", transportOptions.auth.api_key ); //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
+        params.append( "request.DeviceId", messageOptions.device_id || transportOptions.deviceId );
+        params.append( "request.PhoneNumber", strTo ); //"3057769594",
+        params.append( "request.Message", messageOptions.body.text );  //"Test message",
+        params.append( "request.ForeignData", messageOptions.foreign_data );  //`{ "user": "myuser" }`,
+        params.append( "request.Context", messageOptions.context || transportOptions.context || "AMERICA/NEW_YORK" );
+
+        const options = {
+                          method: 'POST',
+                          body: params
+                        };
+
+        /*
         const options = {
                           method: 'POST',
                           uri: transportOptions.host,
@@ -34,17 +50,22 @@ export default class TransportSMSGateway {
                                   "request.Context": messageOptions.context || transportOptions.context || "AMERICA/NEW_YORK"
                                 },
                           headers: {
-                                    /* 'content-type': 'application/x-www-form-urlencoded' */ // Is set automatically
+                                    // 'content-type': 'application/x-www-form-urlencoded' // Is set automatically
                                    }
 
                         };
+        */
 
-        const strResult = await request( options );
+        const result = await fetch( transportOptions.host, options );
 
         if ( process.env.ENV === "dev" ) {
 
+          const json = await result.json();
+          //const body = result.body;
+
           let debugMark = debug.extend( '9D18E07D936A' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-          debugMark( strResult );
+          debugMark( json );
+          //debugMark( body );
 
         }
 
