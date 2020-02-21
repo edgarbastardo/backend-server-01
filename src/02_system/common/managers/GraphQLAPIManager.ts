@@ -12,7 +12,7 @@ import CommonConstants from '../CommonConstants';
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from "../SystemUtilities";
 
-import RouteService from '../database/services/RouteService';
+import SYSRouteService from '../database/services/SYSRouteService';
 
 const debug = require( 'debug' )( 'GraphQLAPIManager' );
 
@@ -120,7 +120,7 @@ export default class GraphQLAPIManager {
 
               await CommonUtilities.asyncForEach( Object.keys( obj.roles ) as any, async ( strResolverName: string, intIndex: number ) => {
 
-                await RouteService.createOrUpdateRouteAndRoles( obj.roles[ strResolverName ].AccessKind,
+                await SYSRouteService.createOrUpdateRouteAndRoles( obj.roles[ strResolverName ].AccessKind,
                                                                 2, //Post
                                                                 strResolverName, //Path
                                                                 obj.roles[ strResolverName ].AllowTagAccess,

@@ -1,6 +1,6 @@
 -- CREATE SCHEMA IF NOT EXISTS `Test02_DB` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `DBMigratedData` (
+CREATE TABLE IF NOT EXISTS `sysDBMigratedData` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `SystemId` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
   `FilePath` varchar(2048) COLLATE utf8_unicode_ci NOT NULL,
@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS `DBMigratedData` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `DBMigratedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
+  UNIQUE KEY `sysDBMigratedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `DBImportedData` (
+CREATE TABLE IF NOT EXISTS `sysDBImportedData` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `SystemId` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
   `FilePath` varchar(2048) COLLATE utf8_unicode_ci NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `DBImportedData` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `DBImportedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
+  UNIQUE KEY `sysDBImportedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `DBImportedData` (
           - username
 */
 
-CREATE TABLE IF NOT EXISTS `BinaryIndex` (
+CREATE TABLE IF NOT EXISTS `sysBinaryIndex` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.\n\nAlso is the name of file itself system operating file system',
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `AccessKind` tinyint(1) unsigned NOT NULL DEFAULT '2' COMMENT '1=Public, 2=Authenticated, 3=Tag',
@@ -78,19 +78,19 @@ CREATE TABLE IF NOT EXISTS `BinaryIndex` (
   `ProcessStartedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'When started to work',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `BinaryIndex_ShortId` (`ShortId`)
+  UNIQUE KEY `sysBinaryIndex_ShortId` (`ShortId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the index for saved binary (files) entities ( .JPG , .PNG , .PDF) on system operating file system.';
 
-CREATE TABLE IF NOT EXISTS `Person` (
+CREATE TABLE IF NOT EXISTS `sysPerson` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `ImageId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Reference the ID of binary in table BinaryIndex',
+  `ImageId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Reference the ID of binary in table sysBinaryIndex',
   `Title` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Mr, Ms, Dr',
   `FirstName` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
   `LastName` varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL,
   `NickName` varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Abbreviation` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Abbreviation of firstname and lastname',
-  `Gender` smallint(6) DEFAULT NULL COMMENT '0 = Famale\n1 = Male',
+  `Gender` smallint(6) DEFAULT NULL COMMENT '0 = Famale\n1 = Male,\100 = I prefer not say',
   `BirthDate` date DEFAULT NULL,
   `Phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Main phone of person',
   `EMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Main email of person',
@@ -103,14 +103,14 @@ CREATE TABLE IF NOT EXISTS `Person` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `Person_ShortId` (`ShortId`),
-  KEY `Person_Phone_idx` (`Phone`),
-  KEY `Person_EMail_idx` (`EMail`),
-  KEY `FK_Person_ImageId_From_BinaryIndex_Id_idx` (`ImageId`),
-  CONSTRAINT `FK_Person_ImageId_From_BinaryIndex_Id` FOREIGN KEY (`ImageId`) REFERENCES `BinaryIndex` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
+  UNIQUE KEY `sysPerson_ShortId` (`ShortId`),
+  KEY `sysPerson_Phone_idx` (`Phone`),
+  KEY `sysPerson_EMail_idx` (`EMail`),
+  KEY `FK_sysPerson_ImageId_From_sysBinaryIndex_Id_idx` (`ImageId`),
+  CONSTRAINT `FK_sysPerson_ImageId_From_sysBinaryIndex_Id` FOREIGN KEY (`ImageId`) REFERENCES `sysBinaryIndex` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store information Person';
 
-CREATE TABLE IF NOT EXISTS `UserGroup` (
+CREATE TABLE IF NOT EXISTS `sysUserGroup` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `Name` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of group. Must be unique will can apply a restriction (Unique).',
@@ -128,19 +128,19 @@ CREATE TABLE IF NOT EXISTS `UserGroup` (
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `UserGroup_ShortId` (`ShortId`),
-  UNIQUE KEY `UserGroup_Name_UNIQUE` (`Name`)
+  UNIQUE KEY `sysUserGroup_ShortId` (`ShortId`),
+  UNIQUE KEY `sysUserGroup_Name_UNIQUE` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all groups system users.';
 
-CREATE TABLE IF NOT EXISTS `User` (
+CREATE TABLE IF NOT EXISTS `sysUser` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `GroupId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of UserGroup table. The group to which the user belongs.',
-  `PersonId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign Key to the Id field of Person table. The person to which the user belongs.',
+  `GroupId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of sysUserGroup table. The group to which the user belongs.',
+  `PersonId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign Key to the Id field of sysPerson table. The person to which the user belongs.',
   `ForceChangePassword` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Force to change password the next login.\n\n1 = Force the change password the next login.\n0 = Not force the change password the next login.',
   `ChangePasswordEvery` smallint(6) NOT NULL DEFAULT 0 COMMENT 'Change password every N days.',
   `SessionsLimit` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = No limit session, >= 1 Only the number of sessions allowed',
-  `Avatar` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Reference the ID of binary in table BinaryIndex, Or URI from extrnal service avatar image',
+  `Avatar` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Reference the ID of binary in table sysBinaryIndex, Or URI from extrnal service avatar image',
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name (login). Must be unique will can apply a restriction (Unique).',
   `Password` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'User password.',
   `PasswordSetAt` varchar(30) NOT NULL COMMENT 'Last Date and time password set, default the same when created.',
@@ -156,15 +156,15 @@ CREATE TABLE IF NOT EXISTS `User` (
   `DisabledAt` varchar(30) DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `User_ShortId` (`ShortId`),
-  UNIQUE KEY `User_Name_UNIQUE` (`Name`),
-  KEY `FK_User_GroupId_From_UserGroup_Id_idx` (`GroupId`),
-  KEY `FK_User_PersonId_From_Person_Id_idx` (`PersonId`),
-  CONSTRAINT `FK_User_GroupId_From_UserGroup_Id` FOREIGN KEY (`GroupId`) REFERENCES `UserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_User_PersonId_From_Person_Id` FOREIGN KEY (`PersonId`) REFERENCES `Person` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
+  UNIQUE KEY `sysUser_ShortId` (`ShortId`),
+  UNIQUE KEY `sysUser_Name_UNIQUE` (`Name`),
+  KEY `FK_sysUser_GroupId_From_sysUserGroup_Id_idx` (`GroupId`),
+  KEY `FK_sysUser_PersonId_From_sysPerson_Id_idx` (`PersonId`),
+  CONSTRAINT `FK_sysUser_GroupId_From_sysUserGroup_Id` FOREIGN KEY (`GroupId`) REFERENCES `sysUserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_sysUser_PersonId_From_sysPerson_Id` FOREIGN KEY (`PersonId`) REFERENCES `sysPerson` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all Users.';
 
-CREATE TABLE IF NOT EXISTS `ActionToken` (
+CREATE TABLE IF NOT EXISTS `sysActionToken` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
   `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Kind of token example: recover_password, change_email, change_phone',
   `Owner` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Owner of token, generally user id',
@@ -178,11 +178,11 @@ CREATE TABLE IF NOT EXISTS `ActionToken` (
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this token',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  KEY `ActionToken_Token_idx` (`Owner`),
-  UNIQUE KEY `UNQ_ActionToken_Token_idx` (`Token`)
+  KEY `sysActionToken_Token_idx` (`Owner`),
+  UNIQUE KEY `UNQ_sysActionToken_Token_idx` (`Token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the action token created by diferent routes, like /password/recover/token/send, /email/change/token/send, /phone/change/token/send';
 
-CREATE TABLE IF NOT EXISTS `UserSignup` (
+CREATE TABLE IF NOT EXISTS `sysUserSignup` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `Kind` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Depend of type of user to activate',
   `FrontendId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frontend id code, to help to identify the frontend. Example: web-reactjs-???? or mobile-ionic5-driver-???',
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS `UserSignup` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user auto signup table information';
 
-CREATE TABLE IF NOT EXISTS `UserDevice` (
+CREATE TABLE IF NOT EXISTS `sysUserDevice` (
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of User table.',
   `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Registration token from extenal services like one signal push',
   `Device` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Generic device info',
@@ -215,14 +215,14 @@ CREATE TABLE IF NOT EXISTS `UserDevice` (
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`,`Token`),
   KEY `FK_SessionStatus_Token_idx` (`Token`),
-  CONSTRAINT `FK_UserDevice_UserId_User_Id` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_sysUserDevice_UserId_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the device register by the user.';
 
-CREATE TABLE IF NOT EXISTS `UserSessionStatus` (
-  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of User table.',
+CREATE TABLE IF NOT EXISTS `sysUserSessionStatus` (
+  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of sysUser table.',
   `Token` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Authentication token',
   `ShortToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Authentication short token. Generally used by support issues',
-  `UserGroupId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of UserGroup table.',
+  `UserGroupId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of sysUserGroup table.',
   `BinaryDataToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Binary token, used in get petition pass to url, in binary data',
   `SocketToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Web socket authentication token, pass on connect event to websocket server',
   `FrontendId` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frontend id code, to help to identify the frontend. Example: web-reactjs-???? or mobile-ionic5-driver-???',
@@ -241,17 +241,17 @@ CREATE TABLE IF NOT EXISTS `UserSessionStatus` (
   `LoggedOutAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the date and time of logout, to be different from NULL, it is assumed that the session which represents the row is no longer valid.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`,`Token`),
-  UNIQUE KEY `FK_SessionStatus_Token_idx` (`Token`),
-  UNIQUE KEY `FK_SessionStatus_ShortToken_idx` (`ShortToken`),
-  UNIQUE KEY `FK_SessionStatus_BinaryDataToken_idx` (`BinaryDataToken`),
-  UNIQUE KEY `FK_SessionStatus_SocketToken_idx` (`SocketToken`),
-  CONSTRAINT `FK_SessionStatus_UserId_User_Id` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_SessionStatus_UserGroupId_UserGroup_Id` FOREIGN KEY (`UserGroupId`) REFERENCES `UserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY `FK_sysUserSessionStatus_Token_idx` (`Token`),
+  UNIQUE KEY `FK_sysUserSessionStatus_ShortToken_idx` (`ShortToken`),
+  UNIQUE KEY `FK_sysUserSessionStatus_BinaryDataToken_idx` (`BinaryDataToken`),
+  UNIQUE KEY `FK_sysUserSessionStatus_SocketToken_idx` (`SocketToken`),
+  CONSTRAINT `FK_sysUserSessionStatus_UserId_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_sysUserSessionStatus_UserGroupId_sysUserGroup_Id` FOREIGN KEY (`UserGroupId`) REFERENCES `sysUserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user session if it alive or not.';
 
-CREATE TABLE IF NOT EXISTS `UserSessionPersistent` (
+CREATE TABLE IF NOT EXISTS `sysUserSessionPersistent` (
   `Id` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
-  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of User table. Partially identifies the restriction to which the user belongs.',
+  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of sysUser table. Partially identifies the restriction to which the user belongs.',
   `Token` varchar(175) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Clear or crypted authentication token. Must by start with p:',
   `BinaryDataToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Binary token, used in get petition pass to url, in binary data',
   `SocketToken` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Web socket authentication token, pass on connect event to websocket server',
@@ -266,12 +266,12 @@ CREATE TABLE IF NOT EXISTS `UserSessionPersistent` (
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Expiration date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  KEY `FK_SessionPersistent_UserId_idx` (`UserId`),
-  UNIQUE KEY `UNQ_SessionPersistent_Token_idx` (`Token`),
-  CONSTRAINT `FK_SessionPersistent_UserId_From_User_Id` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_sysUserSessionPersistent_UserId_idx` (`UserId`),
+  UNIQUE KEY `UNQ_sysUserSessionPersistent_Token_idx` (`Token`),
+  CONSTRAINT `FK_sysSessionPersistent_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the persistent user session for access with only session token and not with username/password';
 
-CREATE TABLE IF NOT EXISTS `Route` (
+CREATE TABLE IF NOT EXISTS `sysRoute` (
   `Id` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Id from path, generated with xxhash',
   `AccessKind` tinyint(3) unsigned DEFAULT NULL COMMENT '1=Public, 2=Authenticated, 3=Role',
   `RequestKind` tinyint(3) unsigned DEFAULT NULL COMMENT '0=None, 1=Get, 2=Post, 3=Put, 4=Delete',
@@ -289,7 +289,7 @@ CREATE TABLE IF NOT EXISTS `Route` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store all routes in the backend';
 
-CREATE TABLE IF NOT EXISTS `Role` (
+CREATE TABLE IF NOT EXISTS `sysRole` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `Name` varchar(120) COLLATE utf8_unicode_ci NOT NULL,
@@ -303,23 +303,23 @@ CREATE TABLE IF NOT EXISTS `Role` (
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `Role_ShortId` (`ShortId`),
-  UNIQUE KEY `Role_Name` (`Name`)
+  UNIQUE KEY `sysRole_ShortId` (`ShortId`),
+  UNIQUE KEY `sysRole_Name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store all role definition';
 
-CREATE TABLE IF NOT EXISTS `RoleHasRoute` (
+CREATE TABLE IF NOT EXISTS `sysRoleHasRoute` (
   `RoleId` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `RouteId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   PRIMARY KEY (`RoleId`,`RouteId`),
-  KEY `RoleHasRoute_RoleId` (`RoleId`),
-  KEY `RoleHasRoute_RouteId` (`RouteId`),
-  CONSTRAINT `RoleHasRoute_RoleId_From_Role_Id` FOREIGN KEY (`RoleId`) REFERENCES `Role` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `RoleHasRoute_RouteId_From_Route_Id` FOREIGN KEY (`RouteId`) REFERENCES `Route` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `sysRoleHasRoute_RoleId` (`RoleId`),
+  KEY `sysRoleHasRoute_RouteId` (`RouteId`),
+  CONSTRAINT `sysRoleHasRoute_RoleId_From_Role_Id` FOREIGN KEY (`RoleId`) REFERENCES `sysRole` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `sysRoleHasRoute_RouteId_From_Route_Id` FOREIGN KEY (`RouteId`) REFERENCES `sysRoute` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store relations between role and route';
 
--- CREATE TABLE IF NOT EXISTS `ApiKey` (
+-- CREATE TABLE IF NOT EXISTS `sysApiKey` (
 --   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'UUID',
 --   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
 --   `Application` varchar(175) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Store the system associated or use this key. Use * for any system\n\nExample:\n\nWebFrontend\nBackend\n',
@@ -345,10 +345,10 @@ CREATE TABLE IF NOT EXISTS `RoleHasRoute` (
 --   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
 --   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
 --   PRIMARY KEY (`Id`),
---   UNIQUE KEY `ApiKey_ShortId` (`ShortId`)
+--   UNIQUE KEY `sysApiKey_ShortId` (`ShortId`)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the api key for use with system.';
 
-CREATE TABLE IF NOT EXISTS `ConfigMetaData` (
+CREATE TABLE IF NOT EXISTS `sysConfigMetaData` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'UUID gen id',
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `Scope` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Apply to entity, apply to system, group, user.\n\nExample:\n\nsystem\ngroup\nuser\n*',
@@ -387,8 +387,8 @@ CREATE TABLE IF NOT EXISTS `ConfigMetaData` (
   -- `FrontendInfo` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Frotend information used by uid\n\nExample:\n\n{ "webzk" = { "width" : "100px", "lines" : "5", "mask" : "0000-00-00 00:00:00" }, "android"={ "width="20px", }, "ios"={ "width": "50px" } }\n\nwhere 0000-00-00 00:00:00 is preset for ui\n\n0000-00-00 00:00:00 Javascript/html textbox validation format / JQuery Mask plugin https://igorescobar.github.io/jQuery-Mask-Plugin/docs.html',
   -- `DenyRead` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of users id or users names separated by ; use * for all.\n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
   -- `DenyWrite` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of users id or users names separated by ; use * for all.\n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
-  -- `AllowRead` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table ConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
-  -- `AllowWrite` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table ConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
+  -- `AllowRead` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table sysConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
+  -- `AllowWrite` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'List of users id or users names separated by ; use * for all. Use @ for only field value in owner from table sysConfigValueData \n\nExample:\n\n874e97ee-81bb-463d-a651-1c2996706e63;manager@business.net;Business.Managers;System.Administrators',
   `Example` longtext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Example data',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Commentary configuration data input , usually created from ui.',
@@ -398,12 +398,12 @@ CREATE TABLE IF NOT EXISTS `ConfigMetaData` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `ConfigMetaData_ShortId` (`ShortId`),
-  UNIQUE KEY `ConfigMetaData_Name_UNIQUE` (`Name`)
+  UNIQUE KEY `sysConfigMetaData_ShortId` (`ShortId`),
+  UNIQUE KEY `sysConfigMetaData_Name_UNIQUE` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store information about config meta data.';
 
-CREATE TABLE IF NOT EXISTS `ConfigValueData` (
-  `ConfigMetaDataId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'foreign key to Id field on table ConfigMetaData. that indicates that the shares belong config. GUID.',
+CREATE TABLE IF NOT EXISTS `sysConfigValueData` (
+  `ConfigMetaDataId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'foreign key to Id field on table sysConfigMetaData. that indicates that the shares belong config. GUID.',
   `Owner` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Owner form config value entry\n\nExample:\n\nSystem.Administrators\n971406fe-2aa5-4cb0-82d8-4c90c090f6cc\n',
   `Value` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Value from config',
   `ValueLabel` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the meaning of a value\n\nExample:\nWhen Value = 0, ValueLabel = Deny\n\nWhen Value = 1, ValueLabel = Allow\n',
@@ -415,5 +415,5 @@ CREATE TABLE IF NOT EXISTS `ConfigValueData` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`ConfigMetaDataId`,`Owner`),
-  CONSTRAINT `FK_ConfigValueData_ConfigMetaDataId_From_ConfigMetaData_Id` FOREIGN KEY (`ConfigMetaDataId`) REFERENCES `ConfigMetaData` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_sysConfigVData_ConfigMetaDataId_From_sysConfigMData_Id` FOREIGN KEY (`ConfigMetaDataId`) REFERENCES `sysConfigMetaData` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

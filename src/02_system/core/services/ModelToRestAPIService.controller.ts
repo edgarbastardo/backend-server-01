@@ -512,7 +512,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                          {
                            Code: 'WARNING_DATA_LIMITED_TO_MAX',
                            Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                           Details: I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                           Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
                          }
                        );
 
@@ -901,7 +901,9 @@ export class ModelToRestAPIServiceController extends BaseService {
                  Errors: [],
                  Warnings: [],
                  Count: 1,
-                 Data: [ createdData ]
+                 Data: [
+                         createdData
+                       ]
                };
 
     }
@@ -1345,7 +1347,9 @@ export class ModelToRestAPIServiceController extends BaseService {
                      Errors: [],
                      Warnings: [],
                      Count: 1,
-                     Data: [ updatedData ]
+                     Data: [
+                             updatedData
+                           ]
                    };
 
         }
@@ -1828,7 +1832,11 @@ export class ModelToRestAPIServiceController extends BaseService {
             Errors: [],
             Warnings: [],
             Count: 1,
-            Data: []
+            Data: [
+                    {
+                      Count: 1
+                    }
+                  ]
           };
 
         }

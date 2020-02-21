@@ -12,17 +12,19 @@ import {
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
+import CommonConstants from "../../CommonConstants";
+
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import CommonConstants from "../../CommonConstants";
-
-const debug = require( 'debug' )( 'UserGroup' );
+const debug = require( 'debug' )( 'SYSUserGroup' );
 
 @Table( {
   timestamps: false,
+  tableName: "sysUserGroup",
+  modelName: "sysUserGroup"
 } )
-export class UserGroup extends Model<UserGroup> {
+export class SYSUserGroup extends Model<SYSUserGroup> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -80,7 +82,7 @@ export class UserGroup extends Model<UserGroup> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: UserGroup, options: any ): void {
+  static beforeValidateHook( instance: SYSUserGroup, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

@@ -1,8 +1,9 @@
 import cluster from 'cluster';
-import { User } from "../models/User";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
+
+import { SYSUser } from "../models/SYSUser";
 
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
@@ -42,7 +43,7 @@ export default abstract class BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -52,7 +53,7 @@ export default abstract class BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -129,13 +130,13 @@ export default abstract class BaseService {
                                                   strTimeZoneId,
                                                   logger );
 
-        SystemUtilities.transformModelToTimeZone( result.dataValues.UserGroup,
+        SystemUtilities.transformModelToTimeZone( result.dataValues.sysUserGroup,
                                                   strTimeZoneId,
                                                   logger );
 
-        if ( CommonUtilities.isNotNullOrEmpty( result.dataValues.Person ) ) {
+        if ( CommonUtilities.isNotNullOrEmpty( result.dataValues.sysPerson ) ) {
 
-          SystemUtilities.transformModelToTimeZone( result.dataValues.Person,
+          SystemUtilities.transformModelToTimeZone( result.dataValues.sysPerson,
                                                     strTimeZoneId,
                                                     logger );
 
@@ -146,7 +147,7 @@ export default abstract class BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 

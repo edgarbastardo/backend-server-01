@@ -3,31 +3,33 @@ import cluster from 'cluster';
 //import moment = require("moment-timezone");
 
 import CommonConstants from "../../CommonConstants";
+//import SystemConstants from "../../SystemContants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
 //import { UserSessionStatus } from "../models/UserSessionStatus";
-//import SystemConstants from "../../SystemContants";
+import { SYSUserSessionPersistent } from "../models/SYSUserSessionPersistent";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
-import { UserSessionPersistent } from "../models/UserSessionPersistent";
 
-const debug = require( 'debug' )( 'UserSessionPersistentService' );
+const debug = require( 'debug' )( 'SYSUserSessionPersistentService' );
 
-export default class UserSessionPersistentService extends BaseService {
+export default class SYSUserSessionPersistentService extends BaseService {
 
-  static readonly _ID = "UserSessionPersistentService";
+  static readonly _ID = "sysUserSessionPersistentService";
 
   static async getUserSessionPersistentByToken( strToken: string = "",
                                                 transaction: any,
-                                                logger: any ): Promise<UserSessionPersistent> {
+                                                logger: any ): Promise<SYSUserSessionPersistent> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -37,7 +39,7 @@ export default class UserSessionPersistentService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -48,11 +50,11 @@ export default class UserSessionPersistentService extends BaseService {
 
       }
 
-      result = await UserSessionPersistent.findOne( options );
+      result = await SYSUserSessionPersistent.findOne( options );
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -84,7 +86,7 @@ export default class UserSessionPersistentService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

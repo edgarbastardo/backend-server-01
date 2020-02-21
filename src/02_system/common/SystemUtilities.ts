@@ -23,17 +23,17 @@ import SystemConstants from "./SystemContants";
 
 import CommonUtilities from "./CommonUtilities";
 
-import PersonService from "./database/services/PersonService";
-import UserGroupService from "./database/services/UserGroupService";
-import UserService from "./database/services/UserService";
-import UserSessionStatusService from "./database/services/UserSessionStatusService";
-import UserSessionPersistentService from "./database/services/UserSessionPersistentService";
-import RoleService from "./database/services/RoleService";
+//import SYSPersonService from "./database/services/SYSPersonService";
+//import SYSUserGroupService from "./database/services/SYSUserGroupService";
+import SYSUserService from "./database/services/SYSUserService";
+import SYSUserSessionStatusService from "./database/services/SYSUserSessionStatusService";
+import SYSUserSessionPersistentService from "./database/services/SYSUserSessionPersistentService";
+import SYSRoleService from "./database/services/SYSRoleService";
 
 import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
-import { UserSessionStatus } from "./database/models/UserSessionStatus";
+import { SYSUserSessionStatus } from "./database/models/SYSUserSessionStatus";
 
 const debug = require( 'debug' )( 'SystemUtilities' );
 
@@ -484,22 +484,22 @@ export default class SystemUtilities {
   }
   */
 
-  static checkUserSessionStatusExpired( sessionStatus: any,
+  static checkUserSessionStatusExpired( userSessionStatus: any,
                                         logger: any ): any {
 
     let result = { Expired: false, Duration: null };
 
     try {
 
-      if ( sessionStatus.ExpireKind === 0 ) { //Expired time calculated from UpdatedAt
+      if ( userSessionStatus.ExpireKind === 0 ) { //Expired time calculated from UpdatedAt
 
-        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( sessionStatus.HardLimit );
+        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( userSessionStatus.HardLimit );
 
         if ( bLimitIsExpired ) {
 
           const duration = moment.duration(
                                             {
-                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" )
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.HardLimit, "seconds" )
                                             }
                                           );
 
@@ -509,25 +509,25 @@ export default class SystemUtilities {
         else {
 
           //Check UpdateAt field not more old to ExpireOn minutes
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.UpdatedAt, "seconds" ) } );
+          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.UpdatedAt, "seconds" ) } );
 
           result = {
-                     Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn || bLimitIsExpired,
+                     Expired: duration.asSeconds() / 60 >= userSessionStatus.ExpireOn || bLimitIsExpired,
                      Duration: duration
                    };
 
         }
 
       }
-      else if ( sessionStatus.ExpireKind === 1 ) { //Expired time calculated from CreatedAt
+      else if ( userSessionStatus.ExpireKind === 1 ) { //Expired time calculated from CreatedAt
 
-        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( sessionStatus.HardLimit );
+        const bLimitIsExpired = SystemUtilities.isDateAndTimeAfter( userSessionStatus.HardLimit );
 
         if ( bLimitIsExpired ) {
 
           const duration = moment.duration(
                                             {
-                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.HardLimit, "seconds" )
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.HardLimit, "seconds" )
                                             }
                                           );
 
@@ -542,33 +542,33 @@ export default class SystemUtilities {
           //Check CreatedAt field not more old to ExpireOn minutes
           const duration = moment.duration(
                                             {
-                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.CreatedAt, "seconds" )
+                                              seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.CreatedAt, "seconds" )
                                             }
                                           );
 
           result = {
-                     Expired: duration.asSeconds() / 60 >= sessionStatus.ExpireOn,
+                     Expired: duration.asSeconds() / 60 >= userSessionStatus.ExpireOn,
                      Duration: duration
                    };
 
         }
 
       }
-      else if ( sessionStatus.ExpireKind === 2 ) { //Fixed date and time to expire
+      else if ( userSessionStatus.ExpireKind === 2 ) { //Fixed date and time to expire
 
         const duration = moment.duration(
                                           {
-                                            seconds: SystemUtilities.getCurrentDateAndTime().diff( sessionStatus.ExpireOn, "seconds" )
+                                            seconds: SystemUtilities.getCurrentDateAndTime().diff( userSessionStatus.ExpireOn, "seconds" )
                                           }
                                         );
 
         result = { Expired: duration.asSeconds() > 0, Duration: duration };
 
       }
-      else if ( sessionStatus.ExpireKind === 3 &&  //Persistent session token
-                sessionStatus.ExpireOn ) {         //Expired time calculated unsing ExpireOn field
+      else if ( userSessionStatus.ExpireKind === 3 &&  //Persistent session token
+                userSessionStatus.ExpireOn ) {         //Expired time calculated unsing ExpireOn field
 
-        const expireOn = moment( sessionStatus.ExpireOn );
+        const expireOn = moment( userSessionStatus.ExpireOn );
 
         if ( expireOn.isValid() ) {
 
@@ -646,106 +646,110 @@ export default class SystemUtilities {
 
       }
 
-      let userRoles = "";
-      let groupRoles = "";
+      let strUserRole = "";
+      let strUserGroupRole = "";
 
-      if ( CommonUtilities.isNullOrEmpty( result ) ) { //Is not in cache or is not valid json struct
+      if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionPersistentByToken
-        let sessionPersistent = await UserSessionPersistentService.getUserSessionPersistentByToken( strToken,
-                                                                                                    null,
-                                                                                                    logger ); //Find in the database
+        let sysUserSessionPersistent = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
+                                                                                                              null,
+                                                                                                              logger ); //Find in the database
 
-        if ( CommonUtilities.isNotNullOrEmpty( sessionPersistent ) ) {
+        let sysUserSessionPersistentData = null;
 
-          sessionPersistent = ( sessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+        if ( sysUserSessionPersistent ) {
 
-          const UserInfo = await UserService.getById( sessionPersistent.UserId,
-                                                      null,
-                                                      null,
-                                                      logger );
+          sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
 
-          userRoles = ( UserInfo as any ).dataValues.Role;
-
-          const GroupInfo = await UserGroupService.getById( UserInfo.GroupId,
+          const sysUserInDB = await SYSUserService.getById( sysUserSessionPersistentData.UserId,
                                                             null,
                                                             null,
                                                             logger );
 
-          groupRoles = ( GroupInfo as any ).dataValues.Role;
+          strUserRole = sysUserInDB.Role;
 
-          if ( UserInfo.PersonId ) {
+          const sysUserGroupInDB = sysUserInDB.sysUserGroup;
+          // const sysGroupInDB = await SYSUserGroupService.getById( sysUserInDB.GroupId,
+          //                                                         null,
+          //                                                         null,
+          //                                                         logger );
 
-            const PersonInfo = await PersonService.getById( UserInfo.PersonId,
-                                                            null,
-                                                            null,
-                                                            logger );
+          strUserGroupRole = sysUserGroupInDB.Role;
 
-            sessionPersistent[ "PersonId" ] = PersonInfo.Id;
-            sessionPersistent[ "Title" ] = PersonInfo.Title;
-            sessionPersistent[ "FirstName" ] = PersonInfo.FirstName;
-            sessionPersistent[ "LastName" ] = PersonInfo.LastName;
-            sessionPersistent[ "EMail" ] = PersonInfo.EMail;
-            sessionPersistent[ "Phone" ] = PersonInfo.Phone;
+          if ( sysUserInDB.sysPerson ) {
+
+            const sysPerson = sysUserInDB.sysPerson;
+            // const sysPerson = await SYSPersonService.getById( sysUserInDB.PersonId,
+            //                                                   null,
+            //                                                   null,
+            //                                                   logger );
+
+            sysUserSessionPersistentData[ "PersonId" ] = sysPerson.Id;
+            sysUserSessionPersistentData[ "Title" ] = sysPerson.Title;
+            sysUserSessionPersistentData[ "FirstName" ] = sysPerson.FirstName;
+            sysUserSessionPersistentData[ "LastName" ] = sysPerson.LastName;
+            sysUserSessionPersistentData[ "EMail" ] = sysPerson.EMail;
+            sysUserSessionPersistentData[ "Phone" ] = sysPerson.Phone;
 
           }
           else {
 
-            sessionPersistent[ "PersonId" ] = "";
-            sessionPersistent[ "Title" ] = "";
-            sessionPersistent[ "FirstName" ] = "";
-            sessionPersistent[ "LastName" ] = "";
-            sessionPersistent[ "EMail" ] = "";
-            sessionPersistent[ "Phone" ] = "";
+            sysUserSessionPersistentData[ "PersonId" ] = "";
+            sysUserSessionPersistentData[ "Title" ] = "";
+            sysUserSessionPersistentData[ "FirstName" ] = "";
+            sysUserSessionPersistentData[ "LastName" ] = "";
+            sysUserSessionPersistentData[ "EMail" ] = "";
+            sysUserSessionPersistentData[ "Phone" ] = "";
 
           }
 
           //sessionPersistent[ "UserName" ] = UserInfo.Name;
-          sessionPersistent[ "UserTag" ] = UserInfo.Tag;
-          sessionPersistent[ "UserGroupId" ] = GroupInfo.Id;
-          sessionPersistent[ "UserGroupName" ] = GroupInfo.Name;
-          sessionPersistent[ "UserGroupTag" ] = GroupInfo.Tag;
+          sysUserSessionPersistentData[ "UserTag" ] = sysUserInDB.Tag;
+          sysUserSessionPersistentData[ "UserGroupId" ] = sysUserGroupInDB.Id;
+          sysUserSessionPersistentData[ "UserGroupName" ] = sysUserGroupInDB.Name;
+          sysUserSessionPersistentData[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
 
           bFromCache = false;
 
         }
 
-        if ( CommonUtilities.isNotNullOrEmpty( sessionPersistent ) &&
-             CommonUtilities.isNullOrEmpty( sessionPersistent.DisabledAt ) &&
-             SystemUtilities.checkUserSessionStatusExpired( sessionPersistent, logger ).Expired === false &&
+        if ( sysUserSessionPersistentData &&
+             !sysUserSessionPersistentData.DisabledAt &&
+             SystemUtilities.checkUserSessionStatusExpired( sysUserSessionPersistentData, logger ).Expired === false &&
              bUpdateAt ) {
 
-          result = UserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                         null,
-                                                                         logger );
+          result = SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                            null,
+                                                                            logger );
 
-          const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
-                                                              userRoles,
+          const strRolesMerged = SystemUtilities.mergeTokens( strUserGroupRole,
+                                                              strUserRole,
                                                               true,
                                                               logger );
 
-          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sessionPersistent.DisabledAt,
-                                                                          sessionPersistent.ExpireAt );
+          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sysUserSessionPersistentData.DisabledAt,
+                                                                          sysUserSessionPersistentData.ExpireAt );
 
-          if ( CommonUtilities.isNullOrEmpty( result ) ) {
+          if ( !result ) {
 
             //Insert new entry in the session status table
             result = {
-                       UserId: sessionPersistent.UserId,
-                       UserGroupId: sessionPersistent[ "UserGroupId" ],
+                       UserId: sysUserSessionPersistentData.UserId,
+                       UserGroupId: sysUserSessionPersistentData[ "UserGroupId" ],
                        Token: strToken,
-                       BinaryDataToken: sessionPersistent[ "BinaryDataToken" ],
-                       SocketToken: sessionPersistent[ "SocketToken" ],
+                       BinaryDataToken: sysUserSessionPersistentData[ "BinaryDataToken" ],
+                       SocketToken: sysUserSessionPersistentData[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
                        Role: strRolesMerged,
-                       UserName: sessionPersistent[ "User" ],
+                       UserName: sysUserSessionPersistentData[ "User" ],
                        ExpireKind: 3,
                        ExpireOn: expireAt,
                        HardLimit: null,
-                       Tag: sessionPersistent[ "Tag" ],
-                       CreatedBy: sessionPersistent[ "User" ],
-                       UpdatedBy: sessionPersistent[ "User" ],
+                       Tag: sysUserSessionPersistentData[ "Tag" ],
+                       CreatedBy: sysUserSessionPersistentData[ "User" ],
+                       UpdatedBy: sysUserSessionPersistentData[ "User" ],
                      };
 
           }
@@ -762,28 +766,28 @@ export default class SystemUtilities {
           }
 
           //Add additional info to memory cache struct
-          result[ "PersonId" ] = sessionPersistent[ "PersonId" ];
-          result[ "Title" ] = sessionPersistent[ "Title" ];
-          result[ "FirstName" ] = sessionPersistent[ "FirstName" ];
-          result[ "LastName" ] = sessionPersistent[ "LastName" ];
-          result[ "EMail" ] = sessionPersistent[ "EMail" ];
-          result[ "Phone" ] = sessionPersistent[ "Phone" ];
+          result[ "PersonId" ] = sysUserSessionPersistentData[ "PersonId" ];
+          result[ "Title" ] = sysUserSessionPersistentData[ "Title" ];
+          result[ "FirstName" ] = sysUserSessionPersistentData[ "FirstName" ];
+          result[ "LastName" ] = sysUserSessionPersistentData[ "LastName" ];
+          result[ "EMail" ] = sysUserSessionPersistentData[ "EMail" ];
+          result[ "Phone" ] = sysUserSessionPersistentData[ "Phone" ];
 
-          result[ "Group" ] = sessionPersistent[ "Group" ];
+          result[ "Group" ] = sysUserSessionPersistentData[ "Group" ];
 
         }
 
       }
 
-      if ( CommonUtilities.isNotNullOrEmpty( result ) &&
+      if ( result &&
            SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
         SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                          result,
                                                          bFromCache === false, //Set roles?
-                                                         groupRoles,
-                                                         userRoles,
+                                                         strUserGroupRole,
+                                                         strUserRole,
                                                          false,    //Force update?
                                                          1,        //Only 1 try
                                                          7 * 1000, //Second
@@ -794,7 +798,7 @@ export default class SystemUtilities {
 
     }
 
-    if ( CommonUtilities.isNotNullOrEmpty( result ) ) {
+    if ( result ) {
 
       result.FromCache = bFromCache;
 
@@ -830,48 +834,50 @@ export default class SystemUtilities {
 
       }
 
-      let userRoles = "";
-      let groupRoles = "";
+      let strUserRole = "";
+      let strUserGroupRole = "";
 
-      if ( CommonUtilities.isNullOrEmpty( result ) ) { //Is not in cache or is not valid json struct
+      if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionStatusByToken
-        result = await UserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                             null,
-                                                                             logger ); //Find in the database
+        result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                null,
+                                                                                logger ); //Find in the database
 
-        if ( CommonUtilities.isNotNullOrEmpty( result ) ) {
+        if ( result ) {
 
-          result = ( result as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          //result = ( result as any ).dataValues; //Get only the basic json struct object with field values from the orm model
 
           //Add additional info to memory cache struct
-          const UserInfo = await UserService.getById( result.UserId,
-                                                      null,
-                                                      null,
-                                                      logger );
-
-          userRoles = ( UserInfo as any ).dataValues.Role;
-
-          const GroupInfo = await UserGroupService.getById( UserInfo.GroupId,
+          const sysUserInDB = await SYSUserService.getById( result.UserId,
                                                             null,
                                                             null,
                                                             logger );
 
-          groupRoles = ( GroupInfo as any ).dataValues.Role;
+          strUserRole = sysUserInDB.Role;
 
-          if ( UserInfo.PersonId ) {
+          const sysUserGroupInDB = sysUserInDB.sysUserGroup;
+          // const sysUserGroupInDB = await SYSUserGroupService.getById( sysUserInDB.GroupId,
+          //                                                             null,
+          //                                                             null,
+          //                                                             logger );
 
-            const PersonInfo = await PersonService.getById( UserInfo.PersonId,
-                                                            null,
-                                                            null,
-                                                            logger );
+          strUserGroupRole = sysUserGroupInDB.Role;
 
-            result[ "PersonId" ] = PersonInfo.Id;
-            result[ "Title" ] = PersonInfo.Title;
-            result[ "FirstName" ] = PersonInfo.FirstName;
-            result[ "LastName" ] = PersonInfo.LastName;
-            result[ "EMail" ] = PersonInfo.EMail;
-            result[ "Phone" ] = PersonInfo.Phone;
+          if ( sysUserInDB.sysPerson ) {
+
+            const sysPerson = sysUserInDB.sysPerson;
+            // const PersonInfo = await SYSPersonService.getById( sysUserInDB.PersonId,
+            //                                                    null,
+            //                                                    null,
+            //                                                    logger );
+
+            result[ "PersonId" ] = sysPerson.Id;
+            result[ "Title" ] = sysPerson.Title;
+            result[ "FirstName" ] = sysPerson.FirstName;
+            result[ "LastName" ] = sysPerson.LastName;
+            result[ "EMail" ] = sysPerson.EMail;
+            result[ "Phone" ] = sysPerson.Phone;
 
           }
           else {
@@ -885,11 +891,11 @@ export default class SystemUtilities {
 
           }
 
-          result[ "UserTag" ] = UserInfo.Tag;
-          result[ "UserGroupId" ] = GroupInfo.Id;
-          result[ "UserGroupName" ] = GroupInfo.Name;
-          result[ "UserGroupTag" ] = GroupInfo.Tag;
-          result.UpdatedBy = UserInfo.Name;
+          result[ "UserTag" ] = sysUserInDB.Tag;
+          result[ "UserGroupId" ] = sysUserGroupInDB.Id;
+          result[ "UserGroupName" ] = sysUserGroupInDB.Name;
+          result[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
+          result.UpdatedBy = sysUserInDB.Name;
 
           bFromCache = false;
 
@@ -897,16 +903,16 @@ export default class SystemUtilities {
 
       }
 
-      if ( CommonUtilities.isNotNullOrEmpty( result ) &&
-           CommonUtilities.isNullOrEmpty( result.LoggedOutAt ) &&
+      if ( result &&
+           !result.LoggedOutAt &&
            SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
         SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                          result,
                                                          bFromCache === false, //Set roles?
-                                                         groupRoles,
-                                                         userRoles,
+                                                         strUserGroupRole,
+                                                         strUserRole,
                                                          false,    //Force update?
                                                          1,        //Only 1 try
                                                          7 * 1000, //Second
@@ -917,7 +923,7 @@ export default class SystemUtilities {
 
     }
 
-    if ( CommonUtilities.isNotNullOrEmpty( result ) ) {
+    if ( result ) {
 
       result.FromCache = bFromCache;
 
@@ -936,7 +942,7 @@ export default class SystemUtilities {
                                                 intTryLock: number,
                                                 intLockSeconds: number,
                                                 transaction: any,
-                                                logger: any ):Promise<UserSessionStatus> {
+                                                logger: any ):Promise<SYSUserSessionStatus> {
 
     let result = null;
 
@@ -1017,12 +1023,12 @@ export default class SystemUtilities {
 
           }
 
-          result = await UserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
-                                                                  strToken,
-                                                                  dataToWriteToDB,
-                                                                  true,
-                                                                  transaction,
-                                                                  logger ); //Refresh the UpdatedAt field in central db
+          result = await SYSUserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
+                                                                     strToken,
+                                                                     dataToWriteToDB,
+                                                                     true,
+                                                                     transaction,
+                                                                     logger ); //Refresh the UpdatedAt field in central db
 
         }
 
@@ -1130,7 +1136,7 @@ export default class SystemUtilities {
 
       if ( CommonUtilities.isNullOrEmpty( result ) ) { //Is not in cache or is not valid json struct
 
-        result = await RoleService.getRolesFromRouteId( strId,
+        result = await SYSRoleService.getRolesFromRouteId( strId,
                                                         null,
                                                         logger ); //Find in the database
 

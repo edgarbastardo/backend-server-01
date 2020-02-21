@@ -608,9 +608,9 @@ export default class MiddlewareManager {
     }
 
     const roles = await SystemUtilities.getRoleOfRoute( CommonUtilities.getRequestKindFromHTTPMethodString( request.method ), //Always post
-                                                        strPath,
-                                                        true,
-                                                        logger );
+                                                          strPath,
+                                                          true,
+                                                          logger );
 
     const bIsAuthorized = CommonUtilities.isInList( roles,
                                                     userSessionStatus.Role,

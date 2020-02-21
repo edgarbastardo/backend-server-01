@@ -10,8 +10,10 @@ export default class SystemConstants {
 
   static readonly _CREATED_BY_BACKEND_SYSTEM_NET = SystemConstants._USER_BACKEND_SYSTEM_NET_NAME;
   static readonly _UPDATED_BY_BACKEND_SYSTEM_NET = SystemConstants._USER_BACKEND_SYSTEM_NET_NAME;
+  static readonly _DISABLED_BY_BACKEND_SYSTEM_NET = SystemConstants._USER_BACKEND_SYSTEM_NET_NAME;
   static readonly _CREATED_BY_UNKNOWN_SYSTEM_NET = SystemConstants._USER_UNKNOWN_SYSTEM_NET_NAME;
   static readonly _UPDATED_BY_UNKNOWN_SYSTEM_NET = SystemConstants._USER_UNKNOWN_SYSTEM_NET_NAME;
+  static readonly _DISABLED_BY_UNKNOWN_SYSTEM_NET = SystemConstants._USER_UNKNOWN_SYSTEM_NET_NAME;
 
   static readonly _VALUE_ANY = "*";
 

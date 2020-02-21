@@ -7,16 +7,20 @@ import {
          BeforeValidate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
-import CommonUtilities from "../../CommonUtilities";
 //import moment from "moment-timezone";
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
   timestamps: false,
+  tableName: "sysConfigMetaData",
+  modelName: "sysConfigMetaData"
 } )
-export class ConfigMetaData extends Model<ConfigMetaData> {
+export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -118,7 +122,7 @@ export class ConfigMetaData extends Model<ConfigMetaData> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: ConfigMetaData, options: any ): void {
+  static beforeValidateHook( instance: SYSConfigMetaData, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 

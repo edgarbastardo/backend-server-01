@@ -6,7 +6,7 @@ import SystemConstants from "../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
-import { UserSessionPersistent } from "../../../02_system/common/database/models/UserSessionPersistent";
+import { SYSUserSessionPersistent } from "../../../02_system/common/database/models/SYSUserSessionPersistent";
 
 const debug = require( 'debug' )( '501_business_check_persistent_tokens_exists' );
 
@@ -77,11 +77,11 @@ export default class Always {
 
           }
 
-          const userSessionPersistent = await UserSessionPersistent.findOne( options );
+          const userSessionPersistent = await SYSUserSessionPersistent.findOne( options );
 
           if ( userSessionPersistent === null ) {
 
-            await UserSessionPersistent.create( userSessionPersistentToCreate );
+            await SYSUserSessionPersistent.create( userSessionPersistentToCreate );
 
           }
           else if ( !userSessionPersistent.Tag ||
@@ -89,7 +89,7 @@ export default class Always {
 
             userSessionPersistent.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-            await UserSessionPersistent.update( ( userSessionPersistent as any ).dataValues, options );
+            await SYSUserSessionPersistent.update( ( userSessionPersistent as any ).dataValues, options );
 
           }
 

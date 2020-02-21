@@ -1,3 +1,5 @@
+import os from 'os';
+
 import {
          Table,
          Model,
@@ -7,16 +9,23 @@ import {
          BeforeValidate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
-import os from 'os';
-import CommonUtilities from "../../CommonUtilities";
 //import moment from "moment-timezone";
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
   timestamps: false,
+  tableName: "sysDBMigratedData",
+  modelName: "sysDBMigratedData"
+  // validate: {
+  //   validateDefault( this: SYSDBMigratedData ): void {
+  //   }
+  // }
 } )
-export class DBImportedData extends Model<DBImportedData> {
+export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -72,7 +81,7 @@ export class DBImportedData extends Model<DBImportedData> {
   UpdatedAt: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: DBImportedData, options: any ): void {
+  static beforeValidateHook( instance: SYSDBMigratedData, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 

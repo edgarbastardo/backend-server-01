@@ -13,7 +13,7 @@ import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
 //import { User } from '../../../02_system/common/database/models/User';
-import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
+import { SYSUserGroup } from '../../../02_system/common/database/models/SYSUserGroup';
 
 const debug = require( 'debug' )( '502_check_business_groups_and_users_exists' );
 
@@ -50,7 +50,7 @@ export default class Always {
                                    Tag: "#Drivers#",
                                    Comment: "Created from backend startup. Group of users for testing.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                   DisabledBy: "0", //"1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
                                ]
 
@@ -66,11 +66,11 @@ export default class Always {
 
           }
 
-          const userGroupInDB = await UserGroup.findOne( options );
+          const userGroupInDB = await SYSUserGroup.findOne( options );
 
           if ( userGroupInDB === null ) {
 
-            await UserGroup.create( userGroupToCreate );
+            await SYSUserGroup.create( userGroupToCreate );
 
           }
           else if ( !userGroupInDB.Tag ||
@@ -80,7 +80,7 @@ export default class Always {
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
             //userGroup.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
-            await UserGroup.update( ( userGroupInDB as any ).dataValues, options );
+            await SYSUserGroup.update( ( userGroupInDB as any ).dataValues, options );
 
           }
 
@@ -104,7 +104,7 @@ export default class Always {
                               Tag: "#Odin#",
                               Comment: "Created from backend startup. Mobile App Drivers, Restaurants. System Odin.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
@@ -118,7 +118,7 @@ export default class Always {
                               Tag: "#Odin#",
                               Comment: "Created from backend startup. System Migration command line tool.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
@@ -132,7 +132,7 @@ export default class Always {
                               Tag: "#Odin#",
                               Comment: "Created from backend startup. System Migration command line tool.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                           ]
 

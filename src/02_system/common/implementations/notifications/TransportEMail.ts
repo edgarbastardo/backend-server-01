@@ -22,19 +22,19 @@ export default class TransportEMail {
 
     try {
 
-      let strFullFilePath = `${__dirname}/../../../03_business/common/others/templates/email/${body.language}/${body.file}`;
+      let strFullFilePath = `${__dirname}/../../../../03_business/common/others/templates/email/${body.language}/${body.file}`;
 
       if ( fs.existsSync( strFullFilePath ) === false ) {
 
-        strFullFilePath = `${__dirname}/../../../03_business/common/others/templates/email/en_US/${body.file}`;
+        strFullFilePath = `${__dirname}/../../../../03_business/common/others/templates/email/en_US/${body.file}`;
 
         if ( fs.existsSync( strFullFilePath ) === false ) {
 
-          strFullFilePath = `${__dirname}/../others/templates/email/${body.language}/${body.file}`;
+          strFullFilePath = `${__dirname}/../../others/templates/email/${body.language}/${body.file}`;
 
           if ( fs.existsSync( strFullFilePath ) === false ) {
 
-            strFullFilePath = `${__dirname}/../others/templates/email/en_US/${body.file}`;
+            strFullFilePath = `${__dirname}/../../others/templates/email/en_US/${body.file}`;
 
           }
 

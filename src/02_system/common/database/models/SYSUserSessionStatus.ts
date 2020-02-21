@@ -10,19 +10,24 @@ import {
          BelongsTo,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
-import CommonUtilities from "../../CommonUtilities";
 //import moment from "moment-timezone";
-import { User } from "./User";
-//import SystemUtilities from "../../SystemUtilities";
-import { UserGroup } from "./UserGroup";
-import SystemUtilities from "../../SystemUtilities";
+
+import { SYSUser } from "./SYSUser";
+import { SYSUserGroup } from "./SYSUserGroup";
+
 import SystemConstants from "../../SystemContants";
+
+//import CommonUtilities from "../../CommonUtilities";
+import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
   timestamps: false,
+  tableName: "sysUserSessionStatus",
+  modelName: "sysUserSessionStatus"
 } )
-export class UserSessionStatus extends Model<UserSessionStatus> {
+export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -105,14 +110,14 @@ export class UserSessionStatus extends Model<UserSessionStatus> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => User, "UserId" )
-  User: User;
+  @BelongsTo( () => SYSUser, "UserId" )
+  User: SYSUser;
 
-  @BelongsTo( () => UserGroup, "UserGroupId" )
-  UserGroup: UserGroup;
+  @BelongsTo( () => SYSUserGroup, "UserGroupId" )
+  UserGroup: SYSUserGroup;
 
   @BeforeValidate
-  static beforeValidateHook( instance: UserSessionStatus, options: any ): void {
+  static beforeValidateHook( instance: SYSUserSessionStatus, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

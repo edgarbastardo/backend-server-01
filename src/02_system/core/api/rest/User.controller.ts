@@ -13,7 +13,7 @@ import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import { ApolloError } from 'apollo-server-express';
-import RouteService from '../../../common/database/services/RouteService';
+import SYSRouteService from '../../../common/database/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -72,7 +72,7 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
                                   { Path: UserController._BASE_PATH + "/profile", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#GetUserL01#,#GetUserL02#,#GetUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "GetUserL01", "GetUserL02", "GetUserL03" ], Description: "Get the information for one user" },
-                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#CreateUserL01#,#CreateUserL02#,#CreateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "CreateUserL01", "CreateUserL02", "CreateUserL03" ], Description: "Create new user information" },
+                                  { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#CreateUserL01#,#CreateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "CreateUserL01", "CreateUserL03" ], Description: "Create new user information" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Update existent user information" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteUserL01#,#DeleteUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteUserL01", "DeleteUserL02", "DeleteUserL03" ], Description: "Delete the user information" },
                                   { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Search for users information" },
@@ -213,7 +213,7 @@ export default class UserController {
 
       for ( let routeInfo of UserController._ROUTE_INFO ) {
 
-        await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
+        await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                         routeInfo.RequestKind,
                                                         routeInfo.Path, //Path
                                                         routeInfo.AllowTagAccess,

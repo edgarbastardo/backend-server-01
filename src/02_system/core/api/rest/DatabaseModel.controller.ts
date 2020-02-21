@@ -9,7 +9,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 //import { Route } from '../../../common/database/models/Route';
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import RouteService from '../../../common/database/services/RouteService';
+import SYSRouteService from '../../../common/database/services/SYSRouteService';
 //import ModelServiceLoader from "../../../common/database/ModelServiceLoader";
 import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPIService.controller';
 //import dbConnection from "../../../common/managers/DBConnectionManager";
@@ -62,17 +62,21 @@ export default class DatabaseModelController {
 
       if ( DBConnectionManager.currentInstance.models !== null ) {
 
+        //const connection = DBConnectionManager.currentInstance;
+
         for ( let strModelName of Object.keys( DBConnectionManager.currentInstance.models ) ) {
+
+          const strTableMame = DBConnectionManager.currentInstance.models[ strModelName ].tableName;
 
           for ( let routeInfo of DatabaseModelController._ROUTE_INFO ) {
 
-            let strRealPath = routeInfo.Path.replace( ":name", strModelName );
+            let strRealPath = routeInfo.Path.replace( ":name", strTableMame );
             //strRealPath = strRealPath.replace( ":id", "" );
 
             const strAction = CommonUtilities.getActionStringFromRequestKind( routeInfo.RequestKind );
 
             //const strFullActionTag = strModelName + "_Full";
-            const strSpecificActionTag = strModelName + "_" + strAction;
+            const strSpecificActionTag = strTableMame + "_" + strAction;
 
             let strAllowTagAccess = routeInfo.AllowTagAccess + ",#" + strSpecificActionTag + "#";
 
@@ -81,30 +85,30 @@ export default class DatabaseModelController {
 
             if ( strAllowTagAccess.indexOf( "#@@Entity@@_Basic#" ) >= 0 ) {
 
-              strAllowTagAccess = strAllowTagAccess.replace( "#@@Entity@@_Basic#", "#" + strModelName + "_Basic#" );
+              strAllowTagAccess = strAllowTagAccess.replace( "#@@Entity@@_Basic#", "#" + strTableMame + "_Basic#" );
 
-              roles.push( strModelName + "_Basic" );
+              roles.push( strTableMame + "_Basic" );
 
             }
 
             if ( strAllowTagAccess.indexOf( "#@@Entity@@_Full#" ) >= 0 ) {
 
-              strAllowTagAccess = strAllowTagAccess.replace( "#@@Entity@@_Full#", "#" + strModelName + "_Full#" );
+              strAllowTagAccess = strAllowTagAccess.replace( "#@@Entity@@_Full#", "#" + strTableMame + "_Full#" );
 
-              roles.push( strModelName + "_Full" );
+              roles.push( strTableMame + "_Full" );
 
             }
 
             MiddlewareManager.registerRealPath( process.env.SERVER_ROOT_PATH + strRealPath );
 
-            await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                            routeInfo.RequestKind,
-                                                            strRealPath, //Path
-                                                            strAllowTagAccess,
-                                                            roles as any,
-                                                            routeInfo.Description,
-                                                            null,
-                                                            logger );
+            await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
+                                                               routeInfo.RequestKind,
+                                                               strRealPath, //Path
+                                                               strAllowTagAccess,
+                                                               roles as any,
+                                                               routeInfo.Description,
+                                                               null,
+                                                               logger );
 
           }
 

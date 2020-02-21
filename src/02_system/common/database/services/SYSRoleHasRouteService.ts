@@ -9,26 +9,28 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
+import { SYSRoleHasRoute } from "../models/SYSRoleHasRoute";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
-import { RoleHasRoute } from "../models/RoleHasRoute";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'RoleHasRouteService' );
+const debug = require( 'debug' )( 'SYSRoleHasRouteService' );
 
-export default class RoleHasRouteService extends BaseService {
+export default class SYSRoleHasRouteService extends BaseService {
 
-  static readonly _ID = "RoleHasRouteService";
+  static readonly _ID = "sysRoleHasRouteService";
 
   static async create( strRoleId: string,
                        strRouteId: string,
                        transaction: any,
-                       logger: any ): Promise<RoleHasRoute> {
+                       logger: any ): Promise<SYSRoleHasRoute> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -38,7 +40,7 @@ export default class RoleHasRouteService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -50,11 +52,11 @@ export default class RoleHasRouteService extends BaseService {
 
       }
 
-      let roleHasRoute = await RoleHasRoute.findOne( options );
+      let roleHasRoute = await SYSRoleHasRoute.findOne( options );
 
       if ( CommonUtilities.isNullOrEmpty( roleHasRoute ) ) {
 
-        roleHasRoute = await RoleHasRoute.create(
+        roleHasRoute = await SYSRoleHasRoute.create(
                                                   { RoleId: strRoleId,
                                                     RouteId: strRouteId,
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
@@ -66,7 +68,7 @@ export default class RoleHasRouteService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -100,7 +102,7 @@ export default class RoleHasRouteService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

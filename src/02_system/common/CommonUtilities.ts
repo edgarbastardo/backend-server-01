@@ -554,6 +554,44 @@ export default class CommonUtilities {
 
   }
 
+  static jsonToString( jsonToString: any, logger: any ): string {
+
+    let strResult = null;
+
+    try {
+
+      strResult = JSON.stringify( jsonToString );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.parseJSON.name;
+
+      const strMark = "5F6F9C6E5A03" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      //error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
   static parseArray( strListToParse: string = "", logger: any ): any {
 
     let result = []; //Safe empty array

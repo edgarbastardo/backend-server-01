@@ -1,34 +1,35 @@
 import cluster from 'cluster';
 
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
 
 import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from '../../SystemUtilities';
+import SystemUtilities from "../../SystemUtilities";
 
-import { User } from "../models/User";
-import { UserGroup } from "../models/UserGroup";
-import { Person } from "../models/Person";
+import { SYSActionToken } from "../models/SYSActionToken";
 
 import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'UserService' );
+const debug = require( 'debug' )( 'SYSActionTokenService' );
 
-export default class UserService extends BaseService {
+export default class SYSActionTokenService extends BaseService {
 
-  static readonly _ID = "UserService";
+  static readonly _ID = "sysActionTokenService";
 
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<User> {
+                        logger: any ): Promise<SYSActionToken> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -38,26 +39,18 @@ export default class UserService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
       const options = {
 
-        where: { Id: strId },
+        where: { "Id": strId },
         transaction: currentTransaction,
-        include: [
-                   {
-                     model: UserGroup,
-                   },
-                   {
-                     model: Person,
-                   }
-                 ]
 
       }
 
-      result = await User.findOne( options );
+      result = await SYSActionToken.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -69,7 +62,7 @@ export default class UserService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -80,9 +73,9 @@ export default class UserService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = UserService.name + "." + this.getById.name;
+      sourcePosition.method = this.name + "." + this.getById.name;
 
-      const strMark = "552640F5364C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "15BB80A06D61" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -101,7 +94,7 @@ export default class UserService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -115,24 +108,23 @@ export default class UserService extends BaseService {
 
       }
 
-      result = error;
-
     }
 
     return result;
 
   }
 
-  static async getByShortId( strShortId: string,
-                             strTimeZoneId: string,
-                             transaction: any,
-                             logger: any ): Promise<User> {
+  static async getByToken( strToken: string,
+                           strKind: string,
+                           strTimeZoneId: string,
+                           transaction: any,
+                           logger: any ): Promise<SYSActionToken> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -142,26 +134,18 @@ export default class UserService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
       const options = {
 
-        where: { ShortId: strShortId },
+        where: { "Token": strToken, "Kind": strKind },
         transaction: currentTransaction,
-        include: [
-                   {
-                     model: UserGroup,
-                   },
-                   {
-                     model: Person,
-                   }
-                 ]
 
       }
 
-      result = await User.findOne( options );
+      result = await SYSActionToken.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -173,7 +157,7 @@ export default class UserService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -184,9 +168,9 @@ export default class UserService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = UserService.name + "." + this.getByShortId.name;
+      sourcePosition.method = this.name + "." + this.getByToken.name;
 
-      const strMark = "6B21762E11A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "652467D1ABE6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -205,7 +189,7 @@ export default class UserService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -219,24 +203,23 @@ export default class UserService extends BaseService {
 
       }
 
-      result = error;
-
     }
 
     return result;
 
   }
 
-  static async getByName( strName: string,
-                          strTimeZoneId: string,
-                          transaction: any,
-                          logger: any ): Promise<User> {
+  static async getCountActionTokenOnLastMinutes( strKind: string,
+                                                 strOnwer: string,
+                                                 intMinutesAgo: number,
+                                                 transaction: any,
+                                                 logger: any ): Promise<number> {
 
-    let result = null;
+    let intResult = 0;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -246,38 +229,39 @@ export default class UserService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const options = {
+      const strSQL = DBConnectionManager.getStatement( "getCountActionTokenOnLastMinutes",
+                                                       {
+                                                         Kind: strKind, //"recover_password",
+                                                         Owner: strOnwer,
+                                                         //Now: ,
+                                                         MinutesAgo: intMinutesAgo, //10,
+                                                       },
+                                                       logger );
 
-        where: { Name: strName },
-        transaction: currentTransaction,
-        include: [
-                   {
-                     model: UserGroup,
-                   },
-                   {
-                     model: Person,
-                   }
-                 ]
 
-      }
+      //const intCount = await ActionToken.count();
 
-      result = await User.findOne( options );
+      const rows = await dbConnection.query( strSQL, //'2020-02-06 11:45:41' //"Select Count( A.Id ) As Count From ActionToken As A Where A.Kind = 'recover_password' And A.Owner = 'test01' And ( TIMESTAMP( A.CreatedAt ) >= DATE_SUB( now(), INTERVAL 60 MINUTE ) )", 
+                                             {
+                                               logging: console.log,
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction,
+                                             } );
 
-      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
 
-        SystemUtilities.transformModelToTimeZone( result,
-                                                  strTimeZoneId,
-                                                  logger );
+        intResult = rows[ 0 ].Count;
 
       }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -288,9 +272,9 @@ export default class UserService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = UserService.name + "." + this.getByName.name;
+      sourcePosition.method = this.name + "." + this.getCountActionTokenOnLastMinutes.name;
 
-      const strMark = "E8DDEF95875E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "234C0028238B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -309,112 +293,36 @@ export default class UserService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
           await currentTransaction.rollback();
 
         }
-        catch ( error1 ) {
+        catch ( ex ) {
 
 
         }
 
       }
 
-      result = error;
-
     }
 
-    return result;
-
-  }
-
-  static async checkExistsById( strId: string,
-                                transaction: any,
-                                logger: any ): Promise<boolean> {
-
-    return await this.getById( strId,
-                               null,
-                               transaction,
-                               logger ) !== null;
-
-  }
-
-  static async checkDisabledById( strId: string,
-                                  transaction: any,
-                                  logger: any ): Promise<boolean> {
-
-    const user = await this.getById( strId,
-                                     null,
-                                     transaction,
-                                     logger );
-
-    return user ? user.DisabledBy !== null || user.DisabledAt !== null : false;
-
-  }
-
-  static async checkExistsByName( strName: string,
-                                  transaction: any,
-                                  logger: any ): Promise<boolean> {
-
-    return await this.getByName( strName,
-                                 null,
-                                 transaction,
-                                 logger ) !== null;
-
-  }
-
-  static async checkDisabledByName( strName: string,
-                                    transaction: any,
-                                    logger: any ): Promise<boolean> {
-
-    const user = await this.getByName( strName,
-                                       null,
-                                       transaction,
-                                       logger );
-
-    return user ? user.DisabledBy !== null || user.DisabledAt !== null : false;
-
-  }
-
-  static async checkExpiredById( strId: string,
-                                 transaction: any,
-                                 logger: any ): Promise<boolean> {
-
-    const user = await this.getById( strId,
-                                     null,
-                                     transaction,
-                                     logger );
-
-    return user ? SystemUtilities.isDateAndTimeAfter( user.ExpireAt ) : false;
-
-  }
-
-  static async checkExpiredByName( strName: string,
-                                    transaction: any,
-                                    logger: any ): Promise<boolean> {
-
-    const user = await this.getByName( strName,
-                                       null,
-                                       transaction,
-                                       logger );
-
-    return user ? SystemUtilities.isDateAndTimeAfter( user.ExpireAt ) : false;
+    return intResult;
 
   }
 
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<User> {
+                               logger: any ): Promise<SYSActionToken> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -424,7 +332,7 @@ export default class UserService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -435,19 +343,19 @@ export default class UserService extends BaseService {
 
       }
 
-      result = await User.findOne( options );
+      result = await SYSActionToken.findOne( options );
 
       if ( result === null ) {
 
-        result = await User.create(
-                                    createOrUpdateData,
-                                    { transaction: currentTransaction }
-                                  );
+        result = await SYSActionToken.create(
+                                           createOrUpdateData,
+                                           { transaction: currentTransaction }
+                                         );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues =  createOrUpdateData; //( result as any ).dataValues;
+        const currentValues = createOrUpdateData; //( result as any ).dataValues;
 
         if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
 
@@ -455,13 +363,13 @@ export default class UserService extends BaseService {
 
         }
 
-        const updateResult = await User.update( currentValues,
-                                                options );
+        const updateResult = await SYSActionToken.update( currentValues,
+                                                       options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          result = await User.findOne( options );
+          result = await SYSActionToken.findOne( options );
 
         }
 
@@ -469,7 +377,7 @@ export default class UserService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -482,7 +390,7 @@ export default class UserService extends BaseService {
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "B6EAD2FBE1A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "0BC308EDEE2F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -501,7 +409,7 @@ export default class UserService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

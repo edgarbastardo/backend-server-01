@@ -16,8 +16,8 @@ import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
 
 //import config from "../database/00_config/config.json"
-import { DBMigratedData } from '../database/models/DBMigratedData';
-import { DBImportedData } from '../database/models/DBImportedData';
+import { SYSDBMigratedData } from '../database/models/SYSDBMigratedData';
+import { SYSDBImportedData } from '../database/models/SYSDBImportedData';
 
 const debug = require( 'debug' )( 'DBMigrationManagerORM' );
 
@@ -214,7 +214,7 @@ export class DBMigrationManagerORM {
     try {
 
       const dbMigrationContent = await this.getTableContent( dbConnection,
-                                                             "DBMigratedData",
+                                                             "sysDBMigratedData",
                                                              null ); //Force silent errors
 
       const strRootPath = __dirname; //require( 'app-root-path' );
@@ -297,7 +297,7 @@ export class DBMigrationManagerORM {
 
                 const strFullPathCheckSum = SystemUtilities.hashString( strMigrationsFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strMigrationsFolder + "/" + strFileName ).toString( 16 );
 
-                await DBMigratedData.create( {
+                await SYSDBMigratedData.create( {
                                                FilePath: strMigrationsFolder,
                                                FileName: strFileName,
                                                FullPathCheckSum: strFullPathCheckSum,
@@ -308,7 +308,7 @@ export class DBMigrationManagerORM {
                 /*
                 const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strMigrationsFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
-                const strSQL = `Insert Into DBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+                const strSQL = `Insert Into sysDBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
                 await dbConnection.execute( strSQL );
                 */
@@ -392,7 +392,7 @@ export class DBMigrationManagerORM {
     try {
 
       const dbImportedDataContent = await this.getTableContent( dbConnection,
-                                                                "DBImportedData",
+                                                                "sysDBImportedData",
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
@@ -407,9 +407,9 @@ export class DBMigrationManagerORM {
         await CommonUtilities.asyncForEach( dirs as any, async ( strFileName: string ) => {
 
           if ( this.getFileExecuted( dbImportedDataContent,
-                                       strImportDataFolder,
-                                       strFileName,
-                                       logger ) === null ) {
+                                     strImportDataFolder,
+                                     strFileName,
+                                     logger ) === null ) {
 
             let bEmptyContent = true;
             let bSuccess = false;
@@ -475,19 +475,21 @@ export class DBMigrationManagerORM {
 
                 const strFullPathCheckSum = strContentCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strImportDataFolder + "/" + strFileName ).toString( 16 );
 
-                await DBImportedData.create( {
-                                               FilePath: strImportDataFolder,
-                                               FileName: strFileName,
-                                               FullPathCheckSum: strFullPathCheckSum,
-                                               ContentCheckSum: strContentCheckSum,
-                                               Success: ( bSuccess ? 1 : 0 ),
-                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                             } );
+                await SYSDBImportedData.create(
+                                                {
+                                                  FilePath: strImportDataFolder,
+                                                  FileName: strFileName,
+                                                  FullPathCheckSum: strFullPathCheckSum,
+                                                  ContentCheckSum: strContentCheckSum,
+                                                  Success: ( bSuccess ? 1 : 0 ),
+                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                                }
+                                              );
 
                 /*
                 const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strImportDataFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
-                const strSQL = `Insert Into DBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+                const strSQL = `Insert Into sysDBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
                 await dbConnection.execute( strSQL );
                 */
@@ -571,7 +573,7 @@ export class DBMigrationManagerORM {
     try {
 
       const dbImportedDataContent = await this.getTableContent( dbConnection,
-                                                                "DBImportedData",
+                                                                "sysDBImportedData",
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
@@ -661,7 +663,7 @@ export class DBMigrationManagerORM {
 
               if ( importedDataRow === null ) {
 
-                await DBImportedData.create( {
+                await SYSDBImportedData.create( {
                                                FilePath: strImportDataFolder,
                                                FileName: strFileName,
                                                FullPathCheckSum: strFullPathCheckSum,
@@ -675,7 +677,7 @@ export class DBMigrationManagerORM {
 
                 importedDataRow.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-                await DBImportedData.update( importedDataRow, { where: { Id: importedDataRow.Id } } );
+                await SYSDBImportedData.update( importedDataRow, { where: { Id: importedDataRow.Id } } );
 
               }
 

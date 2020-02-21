@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -19,6 +20,7 @@ import {
          //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import bcrypt from 'bcrypt';
 
 import CommonConstants from "../../CommonConstants";
@@ -28,12 +30,14 @@ import SystemUtilities from "../../SystemUtilities";
 
 import CipherManager from "../../managers/CipherManager";
 
-const debug = require( 'debug' )( 'UserSignup' );
+const debug = require( 'debug' )( 'SYSUserSignup' );
 
 @Table( {
   timestamps: false,
+  tableName: "sysUserSignup",
+  modelName: "sysUserSignup"
 } )
-export class UserSignup extends Model<UserSignup> {
+export class SYSUserSignup extends Model<SYSUserSignup> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -121,7 +125,7 @@ export class UserSignup extends Model<UserSignup> {
   ExtraData: string;
 
   @BeforeValidate
-  static async beforeValidateHook( instance: UserSignup, options: any ): Promise<any> {
+  static async beforeValidateHook( instance: SYSUserSignup, options: any ): Promise<any> {
 
     //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "context:\n %O", options.context );

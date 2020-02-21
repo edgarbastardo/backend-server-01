@@ -34,7 +34,7 @@ export default class Dev000ServicesController extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     let strLanguage = "";
 
@@ -50,7 +50,7 @@ export default class Dev000ServicesController extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -58,7 +58,7 @@ export default class Dev000ServicesController extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 

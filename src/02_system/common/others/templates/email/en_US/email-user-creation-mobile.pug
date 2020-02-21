@@ -5,14 +5,13 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style
-        include ./email-user-activation-web.css
+        include ./email-user-creation-mobile.css
   body
-      h2 USER ACCOUNT ACTIVATION SUCCESS
+      h2 USER ACCOUNT CREATION SUCCESS
       p Hello!. This email is for your new user account #[strong #{user_name}]
       p Your account information is:
       h3 User: #[strong #{user_name}]
       h3 Password: #[strong #{user_password}]
-      p You can login #[a(href=`${web_app_url}`) #{web_app_url}]
       p If you not recognize this email please ignore and archive it.
       p #[strong #{company_name}]
       p #[strong #{company_address}]

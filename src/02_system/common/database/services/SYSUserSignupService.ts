@@ -6,26 +6,28 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
+import { SYSUserSignup } from "../models/SYSUserSignup";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
-import { UserSignup } from "../models/UserSignup";
 
-const debug = require( 'debug' )( 'UserSignupService' );
+const debug = require( 'debug' )( 'SYSUserSignupService' );
 
-export default class UserSignupService extends BaseService {
+export default class SYSUserSignupService extends BaseService {
 
-  static readonly _ID = "UserSignupService";
+  static readonly _ID = "sysUserSignupService";
 
   static async getByToken( strToken: string,
                            strTimeZoneId: string,
                            transaction: any,
-                           logger: any ): Promise<UserSignup> {
+                           logger: any ): Promise<SYSUserSignup> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -35,7 +37,7 @@ export default class UserSignupService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -46,7 +48,7 @@ export default class UserSignupService extends BaseService {
 
       }
 
-      result = await UserSignup.findOne( options );
+      result = await SYSUserSignup.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -58,7 +60,7 @@ export default class UserSignupService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -69,7 +71,7 @@ export default class UserSignupService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = UserSignupService.name + "." + this.getByToken.name;
+      sourcePosition.method = SYSUserSignupService.name + "." + this.getByToken.name;
 
       const strMark = "4709E07DF47B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -90,7 +92,7 @@ export default class UserSignupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -115,13 +117,13 @@ export default class UserSignupService extends BaseService {
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<UserSignup> {
+                               logger: any ): Promise<SYSUserSignup> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -131,7 +133,7 @@ export default class UserSignupService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -142,11 +144,11 @@ export default class UserSignupService extends BaseService {
 
       }
 
-      result = await UserSignup.findOne( options );
+      result = await SYSUserSignup.findOne( options );
 
       if ( result === null ) {
 
-        result = await UserSignup.create(
+        result = await SYSUserSignup.create(
                                           createOrUpdateData,
                                           { transaction: currentTransaction }
                                         );
@@ -162,14 +164,14 @@ export default class UserSignupService extends BaseService {
 
         }
 
-        const updateResult = await UserSignup.update( currentValues,
+        const updateResult = await SYSUserSignup.update( currentValues,
                                                       options );
 
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          result = await UserSignup.findOne( options );
+          result = await SYSUserSignup.findOne( options );
 
         }
 
@@ -177,7 +179,7 @@ export default class UserSignupService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -209,7 +211,7 @@ export default class UserSignupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

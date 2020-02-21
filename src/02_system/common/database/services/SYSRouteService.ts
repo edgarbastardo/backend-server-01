@@ -9,17 +9,19 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import DBConnectionManager from './../../managers/DBConnectionManager';
-import { Route } from "../models/Route";
-import RoleService from "./RoleService";
-import RoleHasRouteService from "./RoleHasRouteService";
+import { SYSRoute } from "../models/SYSRoute";
+
+import DBConnectionManager from '../../managers/DBConnectionManager';
+
 import BaseService from "./BaseService";
+import SYSRoleService from "./SYSRoleService";
+import SYSRoleHasRouteService from "./SYSRoleHasRouteService";
 
-const debug = require( 'debug' )( 'RouteService' );
+const debug = require( 'debug' )( 'SYSRouteService' );
 
-export default class RouteService extends BaseService {
+export default class SYSRouteService extends BaseService {
 
-  static readonly _ID = "RouteService";
+  static readonly _ID = "sysRouteService";
 
   static async createOrUpdate( intAccessKind: number,
                                intRequestKind: number,
@@ -28,13 +30,13 @@ export default class RouteService extends BaseService {
                                strDescription: string,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<Route> {
+                               logger: any ): Promise<SYSRoute> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -44,7 +46,7 @@ export default class RouteService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -61,13 +63,13 @@ export default class RouteService extends BaseService {
 
       }
 
-      let routeInDB = await Route.findOne( options );
+      let routeInDB = await SYSRoute.findOne( options );
 
       //debugMark( "1 =>", routeInDB );
 
       if ( CommonUtilities.isNullOrEmpty( routeInDB ) ) {
 
-        result = await Route.create(
+        result = await SYSRoute.create(
                                      {
                                        AccessKind: intAccessKind,
                                        RequestKind: intRequestKind,
@@ -90,13 +92,13 @@ export default class RouteService extends BaseService {
                                                                     false,
                                                                     logger );
 
-        const updateResult = await Route.update( currentValues,
+        const updateResult = await SYSRoute.update( currentValues,
                                                  options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          result = await Route.findOne( options );
+          result = await SYSRoute.findOne( options );
 
         }
 
@@ -104,7 +106,7 @@ export default class RouteService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -136,7 +138,7 @@ export default class RouteService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -165,13 +167,13 @@ export default class RouteService extends BaseService {
                                             roles: [],
                                             strDescription: string,
                                             transaction: any,
-                                            logger: any ): Promise<Route> {
+                                            logger: any ): Promise<SYSRoute> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -181,44 +183,44 @@ export default class RouteService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const route = await this.createOrUpdate( intAccessKind,
-                                               intRequestKind,
-                                               strPath,
-                                               strAllowTagAccess,
-                                               strDescription,
-                                               true,
-                                               currentTransaction,
-                                               logger );
+      const sysRoute = await this.createOrUpdate( intAccessKind,
+                                                  intRequestKind,
+                                                  strPath,
+                                                  strAllowTagAccess,
+                                                  strDescription,
+                                                  true,
+                                                  currentTransaction,
+                                                  logger );
 
       const loopAsync = async () => {
 
         await CommonUtilities.asyncForEach( roles, async ( strRoleName: string, intIndex: number ) => {
 
-          const role = await RoleService.createOrUpdate( strRoleName,
-                                                         "Auto created by backend at startup",
-                                                         false,
-                                                         currentTransaction,
-                                                         logger );
+          const sysRole = await SYSRoleService.createOrUpdate( strRoleName,
+                                                               "Auto created by backend at startup",
+                                                               false,
+                                                               currentTransaction,
+                                                               logger );
 
-          if ( role &&
-               ( role as any ).dataValues &&
-               route &&
-               ( route as any ).dataValues ) {
+          if ( sysRole &&
+               ( sysRole as any ).dataValues &&
+               sysRoute &&
+               ( sysRoute as any ).dataValues ) {
 
-            await RoleHasRouteService.create( ( role as any ).dataValues.Id,
-                                              ( route as any ).dataValues.Id,
-                                              currentTransaction,
-                                              logger );
+            await SYSRoleHasRouteService.create( ( sysRole as any ).dataValues.Id,
+                                                 ( sysRoute as any ).dataValues.Id,
+                                                 currentTransaction,
+                                                 logger );
 
           }
 
         });
 
-        result = route;
+        result = sysRoute;
 
       }
 
@@ -226,7 +228,7 @@ export default class RouteService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -258,7 +260,7 @@ export default class RouteService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

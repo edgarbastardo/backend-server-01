@@ -28,7 +28,7 @@ export default class Import {
 
       const strValues = "'" + strId + "','" + strShortId + "','Group01','#Administrator#','Group test created with migration','backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
-      const strSQL = `Insert Into \`UserGroup\`( Id, ShortId, Name, Role, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+      const strSQL = `Insert Into \`sysUserGroup\`( Id, ShortId, Name, Role, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
       //debug( strSQL );
 

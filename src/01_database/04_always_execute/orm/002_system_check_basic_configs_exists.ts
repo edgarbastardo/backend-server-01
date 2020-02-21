@@ -15,8 +15,8 @@ import SystemConstants from "../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
-import { ConfigMetaData } from "../../../02_system/common/database/models/ConfigMetaData";
-import { ConfigValueData } from '../../../02_system/common/database/models/ConfigValueData';
+import { SYSConfigMetaData } from "../../../02_system/common/database/models/SYSConfigMetaData";
+import { SYSConfigValueData } from '../../../02_system/common/database/models/SYSConfigValueData';
 
 const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
 
@@ -61,14 +61,14 @@ export default class Always {
 
           }
 
-          const configMetaDataInDB = await ConfigMetaData.findOne( options );
+          const configMetaDataInDB = await SYSConfigMetaData.findOne( options );
 
           try {
 
             if ( configMetaDataInDB === null ) {
 
               //const configMetaDataCreated =
-              await ConfigMetaData.create( configMetaDataToCreate );
+              await SYSConfigMetaData.create( configMetaDataToCreate );
 
               /*
               if ( configMetaDataCreated ) {
@@ -493,13 +493,13 @@ export default class Always {
 
           }
 
-          const configValueDataInDB = await ConfigValueData.findOne( options );
+          const configValueDataInDB = await SYSConfigValueData.findOne( options );
 
           try {
 
             if ( configValueDataInDB === null ) {
 
-              await ConfigValueData.create( configValueToCreate );
+              await SYSConfigValueData.create( configValueToCreate );
 
             }
             else if ( !configValueDataInDB.Tag ||
@@ -508,7 +508,7 @@ export default class Always {
               configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
               configValueDataInDB.Value = configValueToCreate.Value;
 
-              await ConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+              await SYSConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
 
             }
 

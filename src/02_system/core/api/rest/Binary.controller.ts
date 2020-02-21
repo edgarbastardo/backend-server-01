@@ -29,7 +29,7 @@ import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from "../../../common/SystemUtilities";
 
 //import SecurityService from '../../../common/database/services/SecurityService';
-import RouteService from '../../../common/database/services/RouteService';
+import SYSRouteService from '../../../common/database/services/SYSRouteService';
 import BinaryServiceController from "../../services/BinaryService.controller";
 import I18NManager from "../../../common/managers/I18Manager";
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
@@ -79,7 +79,7 @@ export default class BinaryController {
 
       for ( let routeInfo of BinaryController._ROUTE_INFO ) {
 
-        await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
+        await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                         routeInfo.RequestKind,
                                                         routeInfo.Path, //Path
                                                         routeInfo.AllowTagAccess,

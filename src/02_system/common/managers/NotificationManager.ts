@@ -7,7 +7,7 @@ import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
-import ConfigValueDataService from "../database/services/ConfigValueDataService";
+import SYSConfigValueDataService from "../database/services/SYSConfigValueDataService";
 
 import TransportSMTP from "../implementations/notifications/TransportSMTP";
 import TransportSendGrid from "../implementations/notifications/TransportSendGrid";
@@ -25,16 +25,16 @@ export default class NotificationManager {
 
     try {
 
-      const emailServiceConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_EMail_Service.Id,
-                                                                                       SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                       transaction,
-                                                                                       logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_EMail_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( emailServiceConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( emailServiceConfigValue.Value,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -56,9 +56,9 @@ export default class NotificationManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( emailServiceConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( emailServiceConfigValue.Default,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -215,16 +215,16 @@ export default class NotificationManager {
 
     try {
 
-      const smsServiceConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_SMS_Service.Id,
-                                                                                     SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                     transaction,
-                                                                                     logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_SMS_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( smsServiceConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( smsServiceConfigValue.Value,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -246,9 +246,9 @@ export default class NotificationManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( smsServiceConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( smsServiceConfigValue.Default,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -305,16 +305,16 @@ export default class NotificationManager {
 
     try {
 
-      const smsServiceConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Push_Service.Id,
-                                                                                     SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                     transaction,
-                                                                                     logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Push_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( smsServiceConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( smsServiceConfigValue.Value,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -336,9 +336,9 @@ export default class NotificationManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( smsServiceConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( smsServiceConfigValue.Default,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
 
         const strService = jsonConfigValue.service

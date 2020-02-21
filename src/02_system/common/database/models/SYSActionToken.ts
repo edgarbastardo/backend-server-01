@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -11,19 +13,19 @@ import {
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
-import cluster from 'cluster';
-
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-const debug = require( 'debug' )( 'ActionToken' );
+const debug = require( 'debug' )( 'SYSActionToken' );
 
 @Table( {
   timestamps: false,
+  tableName: "sysActionToken",
+  modelName: "sysActionToken"
 } )
-export class ActionToken extends Model<ActionToken> {
+export class SYSActionToken extends Model<SYSActionToken> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -69,7 +71,7 @@ export class ActionToken extends Model<ActionToken> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: ActionToken, options: any ): void {
+  static beforeValidateHook( instance: SYSActionToken, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

@@ -6,28 +6,30 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
-import DBConnectionManager from "../../managers/DBConnectionManager";
 //import { User } from "../models/User";
 //import { UserGroup } from "../models/UserGroup";
-import { Person } from "../models/Person";
+import { SYSPerson } from "../models/SYSPerson";
+
+import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'PersonService' );
+const debug = require( 'debug' )( 'SYSPersonService' );
 
-export default class PersonService extends BaseService {
+export default class SYSPersonService extends BaseService {
 
-  static readonly _ID = "PersonService";
+  static readonly _ID = "sysPersonService";
 
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<Person> {
+                        logger: any ): Promise<SYSPerson> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -37,7 +39,7 @@ export default class PersonService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -48,7 +50,7 @@ export default class PersonService extends BaseService {
 
       }
 
-      result = await Person.findOne( options );
+      result = await SYSPerson.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -60,7 +62,7 @@ export default class PersonService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -71,7 +73,7 @@ export default class PersonService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = PersonService.name + "." + this.getById.name;
+      sourcePosition.method = SYSPersonService.name + "." + this.getById.name;
 
       const strMark = "DC96C7888421" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -92,7 +94,7 @@ export default class PersonService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -116,13 +118,13 @@ export default class PersonService extends BaseService {
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<Person> {
+                               logger: any ): Promise<SYSPerson> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -132,7 +134,7 @@ export default class PersonService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -143,11 +145,11 @@ export default class PersonService extends BaseService {
 
       }
 
-      result = await Person.findOne( options );
+      result = await SYSPerson.findOne( options );
 
       if ( result === null ) {
 
-        result = await Person.create(
+        result = await SYSPerson.create(
                                       createOrUpdateData,
                                       { transaction: currentTransaction }
                                     );
@@ -163,13 +165,13 @@ export default class PersonService extends BaseService {
 
         }
 
-        result = await Person.update( currentValues,
+        result = await SYSPerson.update( currentValues,
                                       options );
 
         if ( result.length > 0 &&
              result[ 0 ] >= 1 ) {
 
-          result = await Person.findOne( options );
+          result = await SYSPerson.findOne( options );
 
         }
 
@@ -177,7 +179,7 @@ export default class PersonService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -209,7 +211,7 @@ export default class PersonService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -255,13 +257,13 @@ export default class PersonService extends BaseService {
                                                   params.TimeZoneId,
                                                   logger );
 
-        SystemUtilities.transformModelToTimeZone( instance.dataValues.UserGroup,
+        SystemUtilities.transformModelToTimeZone( instance.dataValues.sysUserGroup,
                                                   params.TimeZoneId,
                                                   logger );
 
-        if ( CommonUtilities.isNotNullOrEmpty( instance.dataValues.Person ) ) {
+        if ( CommonUtilities.isNotNullOrEmpty( instance.dataValues.sysPerson ) ) {
 
-          SystemUtilities.transformModelToTimeZone( instance.dataValues.Person,
+          SystemUtilities.transformModelToTimeZone( instance.dataValues.sysPerson,
                                                     params.TimeZoneId,
                                                     logger );
 

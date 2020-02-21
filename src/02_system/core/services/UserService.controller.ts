@@ -28,25 +28,25 @@ import SystemUtilities from "../../common/SystemUtilities";
 //import { UserSignup } from "../../common/database/models/UserSignup";
 //import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
 import DBConnectionManager from '../../common/managers/DBConnectionManager';
-import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
-import UserService from "../../common/database/services/UserService";
+import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
+import SYSUserService from "../../common/database/services/SYSUserService";
 import CommonConstants from "../../common/CommonConstants";
 import SecurityServiceController from "./SecurityService.controller";
-import UserGroupService from "../../common/database/services/UserGroupService";
+import SYSUserGroupService from "../../common/database/services/SYSUserGroupService";
 import NotificationManager from "../../common/managers/NotificationManager";
-import UserSignupService from "../../common/database/services/UserSignupService";
+import SYSUserSignupService from "../../common/database/services/SYSUserSignupService";
 import CipherManager from "../../common/managers/CipherManager";
-import PersonService from "../../common/database/services/PersonService";
+import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../common/managers/I18Manager";
-import ActionTokenService from "../../common/database/services/ActionTokenService";
+import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
 //import JobQueueManager from "../../common/managers/JobQueueManager";
-import UserSessionStatusService from '../../common/database/services/UserSessionStatusService';
+import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
 //import GeoMapGoogle from "../../common/implementations/geomaps/GeoMapGoogle";
 import GeoMapManager from "../../common/managers/GeoMapManager";
-import { User } from '../../common/database/models/User';
+import { SYSUser } from '../../common/database/models/SYSUser';
 //import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
-import { Person } from '../../common/database/models/Person';
-import { UserGroup } from '../../common/database/models/UserGroup';
+import { SYSPerson } from '../../common/database/models/SYSPerson';
+import { SYSUserGroup } from '../../common/database/models/SYSUserGroup';
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -72,10 +72,10 @@ export default class UserServiceController {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_UserSignupControl.Id,
-                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_UserSignupControl.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
@@ -242,10 +242,10 @@ export default class UserServiceController {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_Default_Information.Id,
-                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_Default_Information.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
@@ -308,10 +308,10 @@ export default class UserServiceController {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id,
-                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
@@ -389,10 +389,10 @@ export default class UserServiceController {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id,
-                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
@@ -566,7 +566,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -582,7 +584,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -652,9 +654,9 @@ export default class UserServiceController {
                                                                                                          logger );
               if ( checkPasswordStrengthResult.code === 1 ) {
 
-                const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
-                                                                                   currentTransaction,
-                                                                                   logger );
+                const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                                      currentTransaction,
+                                                                                      logger );
 
                 if ( signupProcessData.createGroup === false &&
                      bUserGroupExists === false ) {
@@ -703,9 +705,9 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
-                                                                      currentTransaction,
-                                                                      logger ) ) {
+                          await SYSUserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                         currentTransaction,
+                                                                         logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
@@ -728,9 +730,9 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
-                                                                     currentTransaction,
-                                                                     logger ) ) {
+                          await SYSUserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                                                                        currentTransaction,
+                                                                        logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
@@ -752,9 +754,9 @@ export default class UserServiceController {
                            }
 
                 }
-                else if ( await UserService.checkExistsByName( request.body.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+                else if ( await SYSUserService.checkExistsByName( request.body.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
@@ -788,30 +790,31 @@ export default class UserServiceController {
 
                   const expireAt = signupProcessData.expireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.expireAt ): null;
 
-                  const userSignup = await UserSignupService.createOrUpdate(
-                                                                             {
-                                                                               Id: strId,
-                                                                               Kind: request.body.Kind,
-                                                                               FrontendId: context.FrontendId,
-                                                                               Token: strToken,
-                                                                               Status: signupProcessData.status,
-                                                                               Name: request.body.Name,
-                                                                               FirstName: request.body.FirstName,
-                                                                               LastName: request.body.LastName,
-                                                                               EMail: request.body.EMail,
-                                                                               Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
-                                                                               Password: request.body.Password,
-                                                                               Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
-                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                               ExpireAt: expireAt ? expireAt.format(): null
-                                                                             },
-                                                                             false,
-                                                                             currentTransaction,
-                                                                             logger
-                                                                           );
+                  const sysUserSignup = await SYSUserSignupService.createOrUpdate(
+                                                                                   {
+                                                                                     Id: strId,
+                                                                                     Kind: request.body.Kind,
+                                                                                     FrontendId: context.FrontendId,
+                                                                                     Token: strToken,
+                                                                                     Status: signupProcessData.status,
+                                                                                     Name: request.body.Name,
+                                                                                     FirstName: request.body.FirstName,
+                                                                                     LastName: request.body.LastName,
+                                                                                     EMail: request.body.EMail,
+                                                                                     Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
+                                                                                     Password: request.body.Password,
+                                                                                     Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
+                                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                     CreatedAt: null,
+                                                                                     ExpireAt: expireAt ? expireAt.format(): null
+                                                                                   },
+                                                                                   false,
+                                                                                   currentTransaction,
+                                                                                   logger
+                                                                                 );
 
-                  if ( userSignup !== null &&
-                       userSignup instanceof Error === false ) {
+                  if ( sysUserSignup !== null &&
+                       sysUserSignup instanceof Error === false ) {
 
                     if ( signupProcessData.status === 1 ) { //Automatic send activation code to email address
 
@@ -871,6 +874,8 @@ export default class UserServiceController {
                                    Data: []
                                  }
 
+                        bApplyTransaction = true;
+
                       }
                       else {
 
@@ -913,12 +918,14 @@ export default class UserServiceController {
                                  Data: []
                                }
 
+                      bApplyTransaction = true;
+
                     }
 
                   }
-                  else if ( userSignup instanceof Error  ) {
+                  else if ( sysUserSignup instanceof Error  ) {
 
-                    const error = userSignup as any;
+                    const error = sysUserSignup as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -1065,9 +1072,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -1116,7 +1132,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -1144,7 +1160,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -1160,31 +1178,31 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const userSignup = await UserSignupService.getByToken( request.body.Activation,
-                                                             context.TimeZoneId,
-                                                             currentTransaction,
-                                                             logger );
+      let sysUserSignupInDB = await SYSUserSignupService.getByToken( request.body.Activation,
+                                                                  context.TimeZoneId,
+                                                                  currentTransaction,
+                                                                  logger );
 
-      if ( userSignup !== null &&
-           userSignup instanceof Error === false ) {
+      if ( sysUserSignupInDB !== null &&
+           sysUserSignupInDB instanceof Error === false ) {
 
-        if ( userSignup.Status >= 0 && userSignup.Status < 50 ) {
+        if ( sysUserSignupInDB.Status >= 0 && sysUserSignupInDB.Status < 50 ) {
 
-          if ( !userSignup.ExpireAt ||
-              SystemUtilities.isDateAndTimeBefore( userSignup.ExpireAt ) ) {
+          if ( !sysUserSignupInDB.ExpireAt ||
+              SystemUtilities.isDateAndTimeBefore( sysUserSignupInDB.ExpireAt ) ) {
 
             const bFrontendIdIsAllowed = await this.getFrontendIdIsAllowed( context.FrontendId,
-                                                                            userSignup.Kind,
+                                                                            sysUserSignupInDB.Kind,
                                                                             currentTransaction,
                                                                             logger ) >= 0;
 
             if ( bFrontendIdIsAllowed ) {
 
-              const signupProcessData = await this.getConfigSignupProcess( userSignup.Kind,
+              const signupProcessData = await this.getConfigSignupProcess( sysUserSignupInDB.Kind,
                                                                            currentTransaction,
                                                                            logger );
 
@@ -1193,9 +1211,9 @@ export default class UserServiceController {
                    signupProcessData.group.trim() !== "" &&
                    signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
-                const bUserGroupExists = await UserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
-                                                                                   currentTransaction,
-                                                                                   logger );
+                const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                                                                                      currentTransaction,
+                                                                                      logger );
 
                 if ( signupProcessData.createGroup === false &&
                      bUserGroupExists === false ) {
@@ -1203,14 +1221,14 @@ export default class UserServiceController {
                   result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, userSignup.Kind ),
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, sysUserSignupInDB.Kind ),
                              Mark: '0EA9AC54E217' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, userSignup.Kind ),
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -1226,14 +1244,14 @@ export default class UserServiceController {
                   result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, userSignup.Kind ),
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, sysUserSignupInDB.Kind ),
                              Mark: '832157FFA57C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, userSignup.Kind ),
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -1244,21 +1262,21 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
-                                                                      currentTransaction,
-                                                                      logger ) ) {
+                          await SYSUserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                                                                         currentTransaction,
+                                                                         logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_USER_GROUP_DISABLED',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
                              Mark: '74E11EE1CFE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_USER_GROUP_DISABLED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -1269,21 +1287,21 @@ export default class UserServiceController {
 
                 }
                 else if ( bUserGroupExists &&
-                          await UserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : userSignup.Name,
-                                                                     currentTransaction,
-                                                                     logger ) ) {
+                          await SYSUserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                                                                        currentTransaction,
+                                                                        logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_USER_GROUP_EXPIRED',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
                              Mark: '2E99F86FF13B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_USER_GROUP_EXPIRED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, userSignup.Kind ),
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -1293,21 +1311,21 @@ export default class UserServiceController {
                            }
 
                 }
-                else if ( await UserService.checkExistsByName( userSignup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+                else if ( await SYSUserService.checkExistsByName( sysUserSignupInDB.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                   result = {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                             Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', userSignup.Name ),
+                             Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', sysUserSignupInDB.Name ),
                              Mark: '46F913842BF5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
                                          Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                         Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', userSignup.Name ),
+                                         Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', sysUserSignupInDB.Name ),
                                          Details: null
                                        }
                                      ],
@@ -1324,113 +1342,124 @@ export default class UserServiceController {
                                                                                 "UserName",
                                                                                 logger );
 
-                  let userGroup = null;
-                  let person = null;
-                  let user = null;
+                  let sysUserGroup = null;
+                  let sysUser = null;
+                  let sysPerson = null;
 
                   if ( signupProcessData.createGroup ) {
 
                     const expireAt = signupProcessData.groupExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.groupExpireAt ): null;
 
-                    const strRole = signupProcessData.groupRole.replace( "@__FromName__@", userSignup.Name );
+                    const strRole = signupProcessData.groupRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                    const strTag = signupProcessData.groupTag.replace( "@__FromName__@", userSignup.Name );
+                    const strTag = signupProcessData.groupTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
                     //Create new group
-                    userGroup = await UserGroupService.createOrUpdate(
+                    sysUserGroup = await SYSUserGroupService.createOrUpdate(
+                                                                             {
+                                                                               Name: sysUserSignupInDB.Name,
+                                                                               Role: strRole ? strRole: null,
+                                                                               Tag: strTag ? strTag: null,
+                                                                               ExpireAt: expireAt ? expireAt.format(): null,
+                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                               Comment: sysUserSignupInDB.Comment
+                                                                             },
+                                                                             false,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+                  }
+                  else {
+
+                    sysUserGroup = await SYSUserGroupService.getByName( signupProcessData.group,
+                                                                        context.TimeZoneId,
+                                                                        currentTransaction,
+                                                                        logger );
+
+                  }
+
+                  if ( sysUserGroup &&
+                       sysUserGroup instanceof Error === false ) {
+
+                    sysPerson = await SYSPersonService.createOrUpdate(
                                                                        {
-                                                                         Name: userSignup.Name,
-                                                                         Role: strRole ? strRole: null,
-                                                                         Tag: strTag ? strTag: null,
-                                                                         ExpireAt: expireAt ? expireAt.format(): null,
+                                                                         FirstName: sysUserSignupInDB.FirstName,
+                                                                         LastName: sysUserSignupInDB.LastName,
+                                                                         Phone: sysUserSignupInDB.Phone ? sysUserSignupInDB.Phone : null,
+                                                                         EMail: sysUserSignupInDB.EMail,
+                                                                         Comment: sysUserSignupInDB.Comment ? sysUserSignupInDB.Comment : null,
                                                                          CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                         Comment: userSignup.Comment
                                                                        },
                                                                        false,
                                                                        currentTransaction,
                                                                        logger
                                                                      );
 
-                  }
-                  else {
+                    if ( sysPerson &&
+                         sysPerson instanceof Error === false ) {
 
-                    userGroup = await UserGroupService.getByName( signupProcessData.group,
-                                                                  context.TimeZoneId,
-                                                                  currentTransaction,
-                                                                  logger );
-
-                  }
-
-                  if ( userGroup &&
-                       userGroup instanceof Error === false ) {
-
-                    person = await PersonService.createOrUpdate(
-                                                                 {
-                                                                   FirstName: userSignup.FirstName,
-                                                                   LastName: userSignup.LastName,
-                                                                   Phone: userSignup.Phone ? userSignup.Phone : null,
-                                                                   EMail: userSignup.EMail,
-                                                                   Comment: userSignup.Comment ? userSignup.Comment : null,
-                                                                   CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                 },
-                                                                 false,
-                                                                 currentTransaction,
-                                                                 logger
-                                                               );
-
-                    if ( person &&
-                         person instanceof Error === false ) {
-
-                      const strPassword = await CipherManager.decrypt( userSignup.Password, logger );
+                      const strPassword = await CipherManager.decrypt( sysUserSignupInDB.Password, logger );
 
                       const expireAt = signupProcessData.userExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.userExpireAt ) : null;
 
-                      const strRole = signupProcessData.userRole.replace( "@__FromName__@", userSignup.Name );
+                      const strRole = signupProcessData.userRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                      const strTag = signupProcessData.userTag.replace( "@__FromName__@", userSignup.Name );
+                      const strTag = signupProcessData.userTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                      //Create new user
-                      user = await UserService.createOrUpdate(
-                                                               {
-                                                                 Id: person.Id,
-                                                                 PersonId: person.Id,
-                                                                 GroupId: userGroup.Id,
-                                                                 Name: userSignup.Name,
-                                                                 Password: strPassword,
-                                                                 Role: strRole ? strRole : null,
-                                                                 Tag: strTag ? strTag : null,
-                                                                 ExpireAt: expireAt ? expireAt.format(): null,
-                                                                 Comment: userSignup.Comment,
-                                                                 CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                               },
-                                                               false,
-                                                               currentTransaction,
-                                                               logger
-                                                             );
+                      //ANCHOR Create new user
+                      sysUser = await SYSUserService.createOrUpdate(
+                                                                     {
+                                                                       Id: sysPerson.Id,
+                                                                       PersonId: sysPerson.Id,
+                                                                       GroupId: sysUserGroup.Id,
+                                                                       Name: sysUserSignupInDB.Name,
+                                                                       Password: strPassword,
+                                                                       Role: strRole ? strRole : null,
+                                                                       Tag: strTag ? strTag : null,
+                                                                       ExpireAt: expireAt ? expireAt.format(): null,
+                                                                       Comment: sysUserSignupInDB.Comment,
+                                                                       CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                     },
+                                                                     false,
+                                                                     currentTransaction,
+                                                                     logger
+                                                                   );
 
-                      if ( user &&
-                           user instanceof Error === false ) {
+                      if ( sysUser &&
+                           sysUser instanceof Error === false ) {
 
-                        userSignup.Status = 50; //Activated
-                        userSignup.UpdatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+                        const warnings = [];
 
-                        await UserSignupService.createOrUpdate( ( userSignup as any ).dataValues,
-                                                                true,
-                                                                currentTransaction,
-                                                                logger );
+                        sysUserSignupInDB.Status = 50; //Activated
+                        sysUserSignupInDB.UpdatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
 
-                        result = {
-                                   StatusCode: 200, //Ok
-                                   Code: 'SUCCESS_USER_ACTIVATION',
-                                   Message: await I18NManager.translate( strLanguage, 'Success to made the user activation' ),
-                                   Mark: '1E74B6B63B07' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                   LogId: null,
-                                   IsError: false,
-                                   Errors: [],
-                                   Warnings: [],
-                                   Count: 0,
-                                   Data: []
-                                 }
+                        sysUserSignupInDB = await SYSUserSignupService.createOrUpdate( ( sysUserSignupInDB as any ).dataValues,
+                                                                                       true,
+                                                                                       currentTransaction,
+                                                                                       logger );
+
+                        if ( sysUserSignupInDB instanceof Error ) {
+
+                          const error = sysUserSignupInDB as any;
+
+                          warnings.push(
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error )
+                                         }
+                                       );
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_FAILED_UPDATE_SIGNUP_STATUS",
+                                           Message: await I18NManager.translate( strLanguage, "Failed to update the signup status." ),
+                                           Details: null
+                                         }
+                                       );
+
+                        }
 
                         //ANCHOR send email sucess
                         const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
@@ -1445,34 +1474,61 @@ export default class UserServiceController {
                                                                                 currentTransaction,
                                                                                 logger );
 
-                        await NotificationManager.send(
-                                                        "email",
-                                                        {
-                                                          from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                          to: userSignup.EMail,
-                                                          subject: await I18NManager.translate( strLanguage, "USER ACCOUNT ACTIVATION SUCCESS" ),
-                                                          body: {
-                                                                  kind: "template",
-                                                                  file: `email-user-activation-${strTemplateKind}.pug`,
-                                                                  language: context.Language,
-                                                                  variables: {
-                                                                               user_name: userSignup.Name,
-                                                                               user_password: CommonUtilities.maskPassword( strPassword ),
-                                                                               web_app_url: strWebAppURL,
-                                                                               ... configData
-                                                                             }
-                                                                  //kind: "embedded",
-                                                                  //text: "Hello",
-                                                                  //html: "<b>Hello</b>"
-                                                                }
-                                                        },
-                                                        logger
-                                                      );
+                        if ( await NotificationManager.send(
+                                                             "email",
+                                                             {
+                                                               from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                               to: sysUserSignupInDB.EMail,
+                                                               subject: await I18NManager.translate( strLanguage, "USER ACCOUNT ACTIVATION SUCCESS" ),
+                                                               body: {
+                                                                       kind: "template",
+                                                                       file: `email-user-activation-${strTemplateKind}.pug`,
+                                                                       language: context.Language,
+                                                                       variables: {
+                                                                                    user_name: sysUserSignupInDB.Name,
+                                                                                    user_password: CommonUtilities.maskPassword( strPassword ),
+                                                                                    web_app_url: strWebAppURL,
+                                                                                    ... configData
+                                                                                  }
+                                                                       //kind: "embedded",
+                                                                       //text: "Hello",
+                                                                       //html: "<b>Hello</b>"
+                                                                     }
+                                                             },
+                                                             logger
+                                                           ) === false ) {
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_CANNOT_SEND_EMAIL",
+                                           Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                           Details: {
+                                                      Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                    }
+                                         }
+                                       );
+
+                        }
+
+                        result = {
+                                   StatusCode: 200, //Ok
+                                   Code: 'SUCCESS_USER_ACTIVATION',
+                                   Message: await I18NManager.translate( strLanguage, 'Success to made the user activation' ),
+                                   Mark: '1E74B6B63B07' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   LogId: null,
+                                   IsError: false,
+                                   Errors: [],
+                                   Warnings: warnings,
+                                   Count: 0,
+                                   Data: []
+                                 }
+
+                        bApplyTransaction = true;
 
                       }
                       else {
 
-                        const error = user as any;
+                        const error = sysUser as any;
 
                         result = {
                                    StatusCode: 500, //Internal server error
@@ -1498,7 +1554,7 @@ export default class UserServiceController {
                     }
                     else {
 
-                      const error = person as any;
+                      const error = sysPerson as any;
 
                       result = {
                                  StatusCode: 500, //Internal server error
@@ -1522,9 +1578,9 @@ export default class UserServiceController {
                     }
 
                   }
-                  else if ( userGroup instanceof Error  ) {
+                  else if ( sysUserGroup instanceof Error  ) {
 
-                    const error = userGroup as any;
+                    const error = sysUserGroup as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -1555,14 +1611,14 @@ export default class UserServiceController {
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                           Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', userSignup.Kind ),
+                           Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', sysUserSignupInDB.Kind ),
                            Mark: 'C632418EF717' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', userSignup.Kind ),
+                                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', sysUserSignupInDB.Kind ),
                                        Details: null
                                      }
                                    ],
@@ -1611,7 +1667,7 @@ export default class UserServiceController {
                                  {
                                    Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
                                    Message: await I18NManager.translate( strLanguage, 'Activation code is expired' ),
-                                   Details: userSignup.ExpireAt
+                                   Details: sysUserSignupInDB.ExpireAt
                                  }
                                ],
                        Warnings: [],
@@ -1622,7 +1678,7 @@ export default class UserServiceController {
           }
 
         }
-        else if ( userSignup.Status === 50 ) {
+        else if ( sysUserSignupInDB.Status === 50 ) {
 
           result = {
                      StatusCode: 400, //Bad request
@@ -1693,9 +1749,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -1744,7 +1809,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -1772,7 +1837,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -1788,41 +1855,41 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "password_recover",
-                                                                                  request.body.Name,
-                                                                                  10,
-                                                                                  currentTransaction,
-                                                                                  logger );
+      const intCount = await SYSActionTokenService.getCountActionTokenOnLastMinutes( "password_recover",
+                                                                                     request.body.Name,
+                                                                                     10,
+                                                                                     currentTransaction,
+                                                                                     logger );
 
       if ( intCount < 20 ) {
 
-        const userInDB = await UserService.getByName( request.body.Name,
-                                                      context.TimeZoneId,
-                                                      transaction,
-                                                      logger );
+        const sysUserInDB = await SYSUserService.getByName( request.body.Name,
+                                                            context.TimeZoneId,
+                                                            transaction,
+                                                            logger );
 
-        if ( userInDB != null &&
-             userInDB instanceof Error === false ) {
+        if ( sysUserInDB != null &&
+             sysUserInDB instanceof Error === false ) {
 
-          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                        Mark: '39212A25A17D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -1832,21 +1899,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                        Mark: '2E99F86FF13B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -1856,21 +1923,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                        Mark: '231463F16B95' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -1880,21 +1947,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                          currentTransaction,
-                                                          logger ) ) {
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                        Mark: '55C127F50C3B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -1912,8 +1979,8 @@ export default class UserServiceController {
             if ( !strTransport ||
                  strTransport === "email" ) {
 
-              if ( !userInDB.Person ||
-                   CommonUtilities.isValidEMailList( userInDB.Person.EMail ) === false ) {
+              if ( !sysUserInDB.sysPerson ||
+                   CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) === false ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -1939,8 +2006,8 @@ export default class UserServiceController {
             }
             else if ( strTransport === "sms" ) {
 
-              if ( !userInDB.Person ||
-                  CommonUtilities.isValidPhoneNumberList( userInDB.Person.Phone ) === false ) {
+              if ( !sysUserInDB.sysPerson ||
+                   CommonUtilities.isValidPhoneNumberList( sysUserInDB.sysPerson.Phone ) === false ) {
 
                 result = {
                            StatusCode: 400, //Bad request
@@ -1991,12 +2058,12 @@ export default class UserServiceController {
 
               //Use the config of _CONFIG_ENTRY_Frontend_Rules.userLoginControl
               const bFrontendIdIsAllowed = await SecurityServiceController.getFrontendIdIsAllowed( context.FrontendId,
-                                                                                                   userInDB.UserGroup.Id,
-                                                                                                   userInDB.UserGroup.Name,
-                                                                                                   userInDB.UserGroup.Tag,
-                                                                                                   userInDB.Id,
-                                                                                                   userInDB.Name,
-                                                                                                   userInDB.Tag,
+                                                                                                   sysUserInDB.sysUserGroup.Id,
+                                                                                                   sysUserInDB.sysUserGroup.Name,
+                                                                                                   sysUserInDB.sysUserGroup.Tag,
+                                                                                                   sysUserInDB.Id,
+                                                                                                   sysUserInDB.Name,
+                                                                                                   sysUserInDB.Tag,
                                                                                                    currentTransaction,
                                                                                                    logger ) >= 0;
 
@@ -2011,22 +2078,23 @@ export default class UserServiceController {
 
                 const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
-                const actionToken = await ActionTokenService.createOrUpdate(
-                                                                             {
-                                                                               Kind: "password_recover",
-                                                                               Owner: userInDB.Name,
-                                                                               Token: strRecoverCode,
-                                                                               Status: 1,
-                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                               ExpireAt: expireAt.format(),
-                                                                             },
-                                                                             false,
-                                                                             currentTransaction,
-                                                                             logger
-                                                                           );
+                const sysActionToken = await SYSActionTokenService.createOrUpdate(
+                                                                                   {
+                                                                                     Kind: "password_recover",
+                                                                                     Owner: sysUserInDB.Id,
+                                                                                     Token: strRecoverCode,
+                                                                                     Status: 1,
+                                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                     ExpireAt: expireAt.format(),
+                                                                                     ExtraData: JSON.stringify( { UserName: sysUserInDB.Name } )
+                                                                                   },
+                                                                                   false,
+                                                                                   currentTransaction,
+                                                                                   logger
+                                                                                 );
 
-                if ( actionToken &&
-                     actionToken instanceof Error === false ) {
+                if ( sysActionToken &&
+                     sysActionToken instanceof Error === false ) {
 
                   if ( strTransport === "email" ) {
 
@@ -2052,7 +2120,7 @@ export default class UserServiceController {
                                                         "email",
                                                         {
                                                           from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                          to: userInDB.Person.EMail,
+                                                          to: sysUserInDB.sysPerson.EMail,
                                                           subject: await I18NManager.translate( strLanguage, "PASSWORD RECOVER CODE" ),
                                                           body: {
                                                                   kind: "template",
@@ -2074,21 +2142,23 @@ export default class UserServiceController {
                                                       ) ) {
 
                       result = {
-                                StatusCode: 200, //Ok
-                                Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL',
-                                Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
-                                Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                LogId: null,
-                                IsError: false,
-                                Errors: [],
-                                Warnings: [],
-                                Count: 1,
-                                Data: [
-                                        {
-                                          EMail: CommonUtilities.maskEMailList( userInDB.Person.EMail )
-                                        }
-                                      ]
-                              }
+                                 StatusCode: 200, //Ok
+                                 Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL',
+                                 Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
+                                 Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: null,
+                                 IsError: false,
+                                 Errors: [],
+                                 Warnings: [],
+                                 Count: 1,
+                                 Data: [
+                                         {
+                                           EMail: CommonUtilities.maskEMailList( sysUserInDB.sysPerson.EMail )
+                                         }
+                                       ]
+                               }
+
+                      bApplyTransaction = true;
 
                     }
                     else {
@@ -2105,7 +2175,7 @@ export default class UserServiceController {
                                              Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                              Details: {
-                                                        EMail: CommonUtilities.maskEMailList( userInDB.Person.EMail )
+                                                        EMail: CommonUtilities.maskEMailList( sysUserInDB.sysPerson.EMail )
                                                       }
                                            }
                                          ],
@@ -2122,7 +2192,7 @@ export default class UserServiceController {
                     if ( await NotificationManager.send(
                                                          "sms",
                                                          {
-                                                           to: userInDB.Person.Phone,
+                                                           to: sysUserInDB.sysPerson.Phone,
                                                            //context: "AMERICA/NEW_YORK",
                                                            foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
                                                            //device_id: "*",
@@ -2146,10 +2216,12 @@ export default class UserServiceController {
                                  Count: 1,
                                  Data: [
                                          {
-                                           Phone: CommonUtilities.maskPhoneList( userInDB.Person.Phone )
+                                           Phone: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone )
                                          }
                                        ]
                                }
+
+                      bApplyTransaction = true;
 
                     }
                     else {
@@ -2166,7 +2238,7 @@ export default class UserServiceController {
                                              Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
                                              Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
                                              Details: {
-                                                        EMail: CommonUtilities.maskPhoneList( userInDB.Person.Phone )
+                                                        EMail: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone )
                                                       }
                                            }
                                          ],
@@ -2182,7 +2254,7 @@ export default class UserServiceController {
                 }
                 else {
 
-                  const error = actionToken as any;
+                  const error = sysActionToken as any;
 
                   result = {
                              StatusCode: 500, //Internal server error
@@ -2297,9 +2369,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -2348,7 +2429,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -2376,7 +2457,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -2392,47 +2475,47 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
-                                                                   "password_recover",
-                                                                   context.TimeZoneId,
-                                                                   transaction,
-                                                                   logger );
+      const sysActionTokenInDB = await SYSActionTokenService.getByToken( request.body.Code,
+                                                                         "password_recover",
+                                                                         context.TimeZoneId,
+                                                                         transaction,
+                                                                         logger );
 
-      if ( actionTokenInDB !== null &&
-           actionTokenInDB instanceof Error === false ) {
+      if ( sysActionTokenInDB !== null &&
+           sysActionTokenInDB instanceof Error === false ) {
 
-        if ( actionTokenInDB.ExpireAt &&
-             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+        if ( sysActionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( sysActionTokenInDB.ExpireAt ) ) {
 
-          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+          if ( sysActionTokenInDB.Status === 1 ) { //Waiting for use
 
-            const userInDB = await UserService.getById( actionTokenInDB.Owner,
-                                                        context.TimeZoneId,
-                                                        transaction,
-                                                        logger );
+            const sysUserInDB = await SYSUserService.getById( sysActionTokenInDB.Owner,
+                                                              context.TimeZoneId,
+                                                              transaction,
+                                                              logger );
 
-            if ( userInDB != null &&
-                 userInDB instanceof Error === false ) {
+            if ( sysUserInDB != null &&
+                 sysUserInDB instanceof Error === false ) {
 
-              if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                            Mark: '63C9C6FBCB8F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -2442,21 +2525,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                                   currentTransaction,
-                                                                   logger ) ) {
+              else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                      currentTransaction,
+                                                                      logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                            Mark: '9471EA8763E3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -2466,21 +2549,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                            Mark: 'D013A4C4C1D6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -2490,21 +2573,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+              else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                                 currentTransaction,
+                                                                 logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                            Mark: '5EE4EEA9A907' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -2516,7 +2599,7 @@ export default class UserServiceController {
               }
               else {
 
-                const strTag = "#" + userInDB.Id + "#,#" + userInDB.Name + "#,#" + userInDB.UserGroup.Id + "#,#" + userInDB.UserGroup.Name + "#";
+                const strTag = "#" + sysUserInDB.Id + "#,#" + sysUserInDB.Name + "#,#" + sysUserInDB.sysUserGroup.Id + "#,#" + sysUserInDB.sysUserGroup.Name + "#";
 
                 //ANCHOR check password Strength
                 const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
@@ -2532,38 +2615,112 @@ export default class UserServiceController {
                                                                                 "UserName",
                                                                                 logger );
 
-                  userInDB.Password = request.body.Password;
-                  userInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
-                  userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                  sysUserInDB.Password = request.body.Password;
+                  sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
+                  sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-                  const userWithPasswordChanged = UserService.createOrUpdate( ( userInDB as any ).dataValues,
-                                                                              true,
-                                                                              currentTransaction,
-                                                                              logger );
+                  const sysUserWithPasswordChanged = SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
+                                                                                    true,
+                                                                                    currentTransaction,
+                                                                                    logger );
 
-                  if ( userWithPasswordChanged !== null &&
-                      userWithPasswordChanged instanceof Error === false ) {
+                  if ( sysUserWithPasswordChanged !== null &&
+                      sysUserWithPasswordChanged instanceof Error === false ) {
 
-                    actionTokenInDB.Status = 0;
-                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    sysActionTokenInDB.Status = 0;
+                    sysActionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
                     const warnings = [];
 
-                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
-                                                                                        true,
-                                                                                        currentTransaction,
-                                                                                        logger );
+                    const sysActionTokenUpdated = await SYSActionTokenService.createOrUpdate( ( sysActionTokenInDB as any ).dataValues,
+                                                                                              true,
+                                                                                              currentTransaction,
+                                                                                              logger );
 
                     //ANCHOR update the token
-                    if ( actionTokenUpdated instanceof Error ) {
+                    if ( sysActionTokenUpdated instanceof Error ) {
 
-                      const error = actionTokenUpdated as any;
+                      const error = sysActionTokenUpdated as any;
 
                       warnings.push(
                                      {
                                        Code: error.name,
                                        Message: error.message,
                                        Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_FAILED_UPDATE_TOKEN_STATUS",
+                                       Message: await I18NManager.translate( strLanguage, "Failed to update the token status." ),
+                                       Details: null
+                                     }
+                                   );
+
+                    }
+
+                    if ( sysUserInDB.sysPerson &&
+                         CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) ) {
+
+                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                        logger );
+
+                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                              currentTransaction,
+                                                                              logger ) ? "web" : "mobile";
+
+                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                              "url",
+                                                                              currentTransaction,
+                                                                              logger );
+
+                      if ( await NotificationManager.send(
+                                                           "email",
+                                                           {
+                                                             from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                             to: sysUserInDB.sysPerson.EMail,
+                                                             subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
+                                                             body: {
+                                                                     kind: "template",
+                                                                     file: `email-user-password-change-${strTemplateKind}.pug`,
+                                                                     language: context.Language,
+                                                                     variables: {
+                                                                                  user_name: sysUserInDB.Name,
+                                                                                  user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                  web_app_url: strWebAppURL,
+                                                                                  ... configData
+                                                                                }
+                                                                     //kind: "embedded",
+                                                                     //text: "Hello",
+                                                                     //html: "<b>Hello</b>"
+                                                                   }
+                                                           },
+                                                           logger
+                                                         ) === false ) {
+
+                        warnings.push(
+                                       {
+                                         Code: "WARNING_CANNOT_SEND_EMAIL",
+                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                         Details: {
+                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                  }
+                                       }
+                                     );
+
+                      }
+
+                    }
+                    else {
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_CANNOT_SEND_EMAIL",
+                                       Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                       Details: {
+                                                  Reason: await I18NManager.translate( strLanguage, "No valid email associated to the user" )
+                                                }
                                      }
                                    );
 
@@ -2582,51 +2739,12 @@ export default class UserServiceController {
                                Data: []
                              }
 
-                    if ( userInDB.Person &&
-                         CommonUtilities.isValidEMailList( userInDB.Person.EMail ) ) {
-
-                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                        logger );
-
-                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                              currentTransaction,
-                                                                              logger ) ? "web" : "mobile";
-
-                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                              "url",
-                                                                              currentTransaction,
-                                                                              logger );
-
-                      await NotificationManager.send(
-                                                      "email",
-                                                      {
-                                                        from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                        to: userInDB.Person.EMail,
-                                                        subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
-                                                        body: {
-                                                                kind: "template",
-                                                                file: `email-user-password-change-${strTemplateKind}.pug`,
-                                                                language: context.Language,
-                                                                variables: {
-                                                                             user_name: userInDB.Name,
-                                                                             user_password: CommonUtilities.maskPassword( request.body.Password ),
-                                                                             web_app_url: strWebAppURL,
-                                                                             ... configData
-                                                                           }
-                                                                //kind: "embedded",
-                                                                //text: "Hello",
-                                                                //html: "<b>Hello</b>"
-                                                              }
-                                                      },
-                                                      logger
-                                                    );
-
-                    }
+                    bApplyTransaction = true;
 
                   }
-                  else if ( userWithPasswordChanged instanceof Error  ) {
+                  else if ( sysUserWithPasswordChanged instanceof Error  ) {
 
-                    const error = userWithPasswordChanged as any;
+                    const error = sysUserWithPasswordChanged as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -2681,14 +2799,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 404, //Not found
                          Code: 'ERROR_USER_NOT_FOUND',
-                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                          Mark: '7DDC6B0761EE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_NOT_FOUND',
-                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                                      Details: null,
                                    }
                                  ],
@@ -2773,9 +2891,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -2824,7 +2951,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -2846,7 +2973,7 @@ export default class UserServiceController {
 
   //ANCHOR checkUserRoleLevel
   static checkUserRoleLevel( userSessionStatus: any,
-                             userInDB: User,
+                             sysUserInDB: SYSUser,
                              strActionRole: string,
                              logger: any ): ICheckUserRoles {
 
@@ -2874,9 +3001,9 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.UserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  userInDB.UserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  userInDB.UserGroup.ShortId + "#" ) ) : false;
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Id:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#SId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ) : false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -2889,17 +3016,17 @@ export default class UserServiceController {
 
           }
 
-          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.Name + "#" ) ||
-                                                              roleSubTag.includes( "#Id:" +  userInDB.Id + "#" ) ||
-                                                              roleSubTag.includes( "#SId:" +  userInDB.ShortId + "#" ) ) : false;
+          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserInDB.Name + "#" ) ||
+                                                              roleSubTag.includes( "#Id:" +  sysUserInDB.Id + "#" ) ||
+                                                              roleSubTag.includes( "#SId:" +  sysUserInDB.ShortId + "#" ) ) : false;
 
           if ( result.isAuthorizedL02 === false ) {
 
             result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                              userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
+                                                              userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
             if ( result.isAuthorizedL01 &&
-                 userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+                 userSessionStatus.UserGroupId !== sysUserInDB.sysUserGroup.Id ) {
 
               //Uhathorized
               result.isNotAuthorized = true;
@@ -2951,7 +3078,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let bCheckCurrentPassword = true;
 
@@ -2969,7 +3098,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -2984,30 +3113,30 @@ export default class UserServiceController {
 
         let bUpdateSessionStatus = true;
 
-        let userInDB = null;
+        let sysUserInDB = null;
 
         if ( request.body.User ||
              request.body.UserId ) {
 
           if ( request.body.UserId ) {
 
-            userInDB = await UserService.getById( request.body.UserId,
-                                                  null,
-                                                  currentTransaction,
-                                                  logger );
+            sysUserInDB = await SYSUserService.getById( request.body.UserId,
+                                                        null,
+                                                        currentTransaction,
+                                                        logger );
 
           }
           else {
 
-            userInDB = await UserService.getByName( request.body.User,
-                                                    null,
-                                                    currentTransaction,
-                                                    logger );
+            sysUserInDB = await SYSUserService.getByName( request.body.User,
+                                                          null,
+                                                          currentTransaction,
+                                                          logger );
 
           }
 
           resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
-                                                          userInDB,
+                                                          sysUserInDB,
                                                           "ChangeUserPassword",
                                                           logger );
 
@@ -3099,10 +3228,10 @@ export default class UserServiceController {
                                                                           currentTransaction,
                                                                           logger );
 
-          userInDB = await UserService.getById( userSessionStatus.UserId,
-                                                null,
-                                                currentTransaction,
-                                                logger );
+          sysUserInDB = await SYSUserService.getById( userSessionStatus.UserId,
+                                                      null,
+                                                      currentTransaction,
+                                                      logger );
 
         }
 
@@ -3111,14 +3240,14 @@ export default class UserServiceController {
           result = {
                      StatusCode: 403, //Forbidden
                      Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                     Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', userInDB.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', sysUserInDB.Name ),
                      Mark: 'CD5990E0CBD1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                                 Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', userInDB.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', sysUserInDB.Name ),
                                  Details: null,
                                }
                              ],
@@ -3128,24 +3257,24 @@ export default class UserServiceController {
                    }
 
         }
-        else if ( userInDB != null &&
-                  userInDB instanceof Error === false ) {
+        else if ( sysUserInDB != null &&
+                  sysUserInDB instanceof Error === false ) {
 
-          if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.UserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.UserGroup.Name ),
                        Mark: '34B74D7BDF33' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.UserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3155,21 +3284,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.UserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.UserGroup.Name ),
                        Mark: '933C3B47067B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.UserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3179,21 +3308,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                        Mark: '57D0268A40C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -3203,21 +3332,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                          currentTransaction,
-                                                          logger ) ) {
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                        Mark: 'C90533CFEFF0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -3232,12 +3361,12 @@ export default class UserServiceController {
             const strCurrentPassword = request.body.CurrentPassword;
 
             if ( bCheckCurrentPassword === false ||
-                 await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
+                 await bcrypt.compare( strCurrentPassword, sysUserInDB.Password ) ) {
 
               const strNewPassword = request.body.NewPassword;
 
               //ANCHOR check password Strength
-              const strTag = "#" + userInDB.Id + "#,#" + userInDB.Name + "#,#" + userInDB.UserGroup.Id + "#,#" + userInDB.UserGroup.Name + "#";
+              const strTag = "#" + sysUserInDB.Id + "#,#" + sysUserInDB.Name + "#,#" + sysUserInDB.UserGroup.Id + "#,#" + sysUserInDB.UserGroup.Name + "#";
 
               const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
                                                                                                                       currentTransaction,
@@ -3249,15 +3378,15 @@ export default class UserServiceController {
 
               if ( checkPasswordStrengthResult.code === 1 ) {
 
-                userInDB.Password = strNewPassword;
-                userInDB.ForceChangePassword = 0;
-                userInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
-                userInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                sysUserInDB.Password = strNewPassword;
+                sysUserInDB.ForceChangePassword = 0;
+                sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
+                sysUserInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-                const userWithPasswordChanged = await UserService.createOrUpdate( ( userInDB as any).dataValues,
-                                                                                  true,
-                                                                                  currentTransaction,
-                                                                                  logger );
+                const userWithPasswordChanged = await SYSUserService.createOrUpdate( ( sysUserInDB as any).dataValues,
+                                                                                     true,
+                                                                                     currentTransaction,
+                                                                                     logger );
 
                 if ( userWithPasswordChanged !== null &&
                      userWithPasswordChanged instanceof Error === false ) {
@@ -3302,8 +3431,8 @@ export default class UserServiceController {
 
                       warnings.push(
                                     {
-                                      Code: "WARNING_FAILED_UPDATE_USER_SESSION_STATUS",
-                                      Message: "Failed to update the user session status. You are required to close the session and start another",
+                                      Code: "WARNING_FAILED_UPDATE_USER_DATA_SESSION",
+                                      Message: await I18NManager.translate( strLanguage, "Failed to update the user session status. You are required to close the session and start another" ),
                                       Details: null
                                     }
                                   );
@@ -3325,8 +3454,10 @@ export default class UserServiceController {
                              Data: []
                            }
 
-                  if ( userInDB.Person &&
-                       CommonUtilities.isValidEMailList( userInDB.Person.EMail ) ) {
+                  bApplyTransaction = true;
+
+                  if ( sysUserInDB.SYSPerson &&
+                       CommonUtilities.isValidEMailList( sysUserInDB.SYSPerson.EMail ) ) {
 
                     const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                       logger );
@@ -3344,14 +3475,14 @@ export default class UserServiceController {
                                                     "email",
                                                     {
                                                       from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                      to: userInDB.Person.EMail,
+                                                      to: sysUserInDB.SYSPerson.EMail,
                                                       subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
                                                       body: {
                                                               kind: "template",
                                                               file: `email-user-password-change-${strTemplateKind}.pug`,
                                                               language: context.Language,
                                                               variables: {
-                                                                           user_name: userInDB.Name,
+                                                                           user_name: sysUserInDB.Name,
                                                                            user_password: CommonUtilities.maskPassword( request.body.Password ),
                                                                            web_app_url: strWebAppURL,
                                                                            ... configData
@@ -3492,9 +3623,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -3543,7 +3683,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -3571,7 +3711,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -3587,24 +3729,24 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
       const userSessionStatus = context.UserSessionStatus;
 
-      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "email_change",
-                                                                                  userSessionStatus ? userSessionStatus.UserId : "",
-                                                                                  10,
-                                                                                  currentTransaction,
-                                                                                  logger );
+      const intCount = await SYSActionTokenService.getCountActionTokenOnLastMinutes( "email_change",
+                                                                                     userSessionStatus ? userSessionStatus.UserId : "",
+                                                                                     10,
+                                                                                     currentTransaction,
+                                                                                     logger );
 
       if ( intCount < 20 ) {
 
-        const userInDB = await UserService.getByName( userSessionStatus.UserName,
-                                                      context.TimeZoneId,
-                                                      transaction,
-                                                      logger );
+        const userInDB = await SYSUserService.getByName( userSessionStatus.UserName,
+                                                         context.TimeZoneId,
+                                                         transaction,
+                                                         logger );
 
         if ( userInDB != null &&
              userInDB instanceof Error === false ) {
@@ -3631,21 +3773,21 @@ export default class UserServiceController {
                      };
 
           }
-          else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                                currentTransaction,
-                                                                logger ) ) {
+          else if ( await SYSUserGroupService.checkDisabledByName( userInDB.sysUserGroup.Name,
+                                                                   currentTransaction,
+                                                                   logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.sysUserGroup.Name ),
                        Mark: 'B308899A1A43' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3655,21 +3797,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+          else if ( await SYSUserGroupService.checkExpiredByName( userInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.sysUserGroup.Name ),
                        Mark: '0A4F7A24E7F9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3679,9 +3821,9 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          else if ( await SYSUserService.checkDisabledByName( userInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -3703,9 +3845,9 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                          currentTransaction,
-                                                          logger ) ) {
+          else if ( await SYSUserService.checkExpiredByName( userInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -3744,23 +3886,23 @@ export default class UserServiceController {
 
                 const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
-                const actionToken = await ActionTokenService.createOrUpdate(
-                                                                             {
-                                                                               Kind: "email_change",
-                                                                               Owner: userInDB.Id,
-                                                                               Token: strChangeCode,
-                                                                               Status: 1,
-                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                               ExpireAt: expireAt.format(),
-                                                                               ExtraData: `{ "NewEMail": "${request.body.EMail}" }`
-                                                                             },
-                                                                             false,
-                                                                             currentTransaction,
-                                                                             logger
-                                                                           );
+                const sysActionToken = await SYSActionTokenService.createOrUpdate(
+                                                                                   {
+                                                                                     Kind: "email_change",
+                                                                                     Owner: userInDB.Id,
+                                                                                     Token: strChangeCode,
+                                                                                     Status: 1,
+                                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                     ExpireAt: expireAt.format(),
+                                                                                     ExtraData: `{ "NewEMail": "${request.body.EMail}" }`
+                                                                                   },
+                                                                                   false,
+                                                                                   currentTransaction,
+                                                                                   logger
+                                                                                 );
 
-                if ( actionToken &&
-                    actionToken instanceof Error === false ) {
+                if ( sysActionToken &&
+                    sysActionToken instanceof Error === false ) {
 
                   const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                     logger );
@@ -3822,6 +3964,8 @@ export default class UserServiceController {
                                      ]
                              }
 
+                    bApplyTransaction = true;
+
                   }
                   else {
 
@@ -3851,7 +3995,7 @@ export default class UserServiceController {
                 }
                 else {
 
-                  const error = actionToken as any;
+                  const error = sysActionToken as any;
 
                   result = {
                              StatusCode: 500, //Internal server error
@@ -3990,9 +4134,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -4041,7 +4194,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -4069,7 +4222,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -4085,31 +4240,31 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
-                                                                   "email_change",
-                                                                   context.TimeZoneId,
-                                                                   transaction,
-                                                                   logger );
+      const sysActionTokenInDB = await SYSActionTokenService.getByToken( request.body.Code,
+                                                                         "email_change",
+                                                                         context.TimeZoneId,
+                                                                         transaction,
+                                                                         logger );
 
-      if ( actionTokenInDB !== null &&
-           actionTokenInDB instanceof Error === false ) {
+      if ( sysActionTokenInDB !== null &&
+           sysActionTokenInDB instanceof Error === false ) {
 
-        if ( actionTokenInDB.ExpireAt &&
-             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+        if ( sysActionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( sysActionTokenInDB.ExpireAt ) ) {
 
-          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+          if ( sysActionTokenInDB.Status === 1 ) { //Waiting for use
 
-            let userInDB = await UserService.getById( actionTokenInDB.Owner,
-                                                      context.TimeZoneId,
-                                                      transaction,
-                                                      logger );
+            let sysUserInDB = await SYSUserService.getById( sysActionTokenInDB.Owner,
+                                                            context.TimeZoneId,
+                                                            transaction,
+                                                            logger );
 
-            if ( userInDB != null &&
-                 userInDB instanceof Error === false ) {
+            if ( sysUserInDB != null &&
+                 sysUserInDB instanceof Error === false ) {
 
               if ( context.Authorization.startsWith( "p:" ) ) {
 
@@ -4133,21 +4288,21 @@ export default class UserServiceController {
                          };
 
               }
-              else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                                    currentTransaction,
-                                                                    logger ) ) {
+              else if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                                       currentTransaction,
+                                                                       logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
                            Mark: 'C29DB5D3E5B9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -4157,21 +4312,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                                   currentTransaction,
-                                                                   logger ) ) {
+              else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                      currentTransaction,
+                                                                      logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
                            Mark: '3C05036866E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -4181,21 +4336,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', sysUserInDB.Name ),
                            Mark: 'D70CB73D33AB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -4205,21 +4360,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+              else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                                 currentTransaction,
+                                                                 logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', sysUserInDB.Name ),
                            Mark: 'EE18C1A52A3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -4231,7 +4386,7 @@ export default class UserServiceController {
               }
               else {
 
-                const jsonExtraData = CommonUtilities.parseJSON( actionTokenInDB.ExtraData, logger );
+                const jsonExtraData = CommonUtilities.parseJSON( sysActionTokenInDB.ExtraData, logger );
 
                 if ( jsonExtraData &&
                      CommonUtilities.isValidEMailList( jsonExtraData.NewEMail ) ) {
@@ -4240,63 +4395,63 @@ export default class UserServiceController {
                                                                                 "UserName",
                                                                                 logger );
 
-                  let personInDB = null;
-                  let personWithEMailChanged = null;
+                  let sysPersonInDB = null;
+                  let sysPersonWithEMailChanged = null;
 
-                  if ( !userInDB.Person ) {
+                  if ( !sysUserInDB.sysPerson ) {
 
                     jsonExtraData.OldEmail = ""; //Create empty field, no old person assoicated
 
-                    personWithEMailChanged = await PersonService.createOrUpdate(
-                                                                                 {
-                                                                                   Id: userInDB.Id,
-                                                                                   FirstName: " ",
-                                                                                   EMail: jsonExtraData.NewEMail,
-                                                                                   CreatedBy: strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
-                                                                                   CreatedAt: null
-                                                                                 },
-                                                                                 false,
-                                                                                 currentTransaction,
-                                                                                 logger
-                                                                               );
+                    sysPersonWithEMailChanged = await SYSPersonService.createOrUpdate(
+                                                                                       {
+                                                                                         Id: sysUserInDB.Id,
+                                                                                         FirstName: " ",
+                                                                                         EMail: jsonExtraData.NewEMail,
+                                                                                         CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                         CreatedAt: null
+                                                                                       },
+                                                                                       false,
+                                                                                       currentTransaction,
+                                                                                       logger
+                                                                                     );
 
-                    personInDB = personWithEMailChanged;
+                    sysPersonInDB = sysPersonWithEMailChanged;
 
-                    if ( personInDB &&
-                         personInDB instanceof Error === false ) {
+                    if ( sysPersonInDB &&
+                         sysPersonInDB instanceof Error === false ) {
 
-                      userInDB.PersonId = personInDB.Id;
-                      userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                      userInDB.UpdatedAt = null;
+                      sysUserInDB.PersonId = sysPersonInDB.Id;
+                      sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                      sysUserInDB.UpdatedAt = null;
 
-                      userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
-                                                                   true,
-                                                                   currentTransaction,
-                                                                   logger );
+                      sysUserInDB = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
+                                                                         true,
+                                                                         currentTransaction,
+                                                                         logger );
 
                     }
 
                   }
                   else {
 
-                    personInDB = userInDB.Person;
+                    sysPersonInDB = sysUserInDB.sysPerson;
 
-                    jsonExtraData.OldEmail = personInDB.EMail; //Save the the current person email
+                    jsonExtraData.OldEmail = sysPersonInDB.EMail; //Save the the current person email
 
-                    personInDB.EMail = jsonExtraData.NewEMail;
-                    personInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                    personInDB.UpdatedAt = null;
+                    sysPersonInDB.EMail = jsonExtraData.NewEMail;
+                    sysPersonInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    sysPersonInDB.UpdatedAt = null;
 
-                    personWithEMailChanged = await PersonService.createOrUpdate( ( personInDB as any ).dataValues,
-                                                                                 true,
-                                                                                 currentTransaction,
-                                                                                 logger );
+                    sysPersonWithEMailChanged = await SYSPersonService.createOrUpdate( ( sysPersonInDB as any ).dataValues,
+                                                                                       true,
+                                                                                       currentTransaction,
+                                                                                       logger );
 
                   }
 
-                  if ( personWithEMailChanged instanceof Error  ) {
+                  if ( sysPersonWithEMailChanged instanceof Error  ) {
 
-                    const error = personWithEMailChanged as any;
+                    const error = sysPersonWithEMailChanged as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -4318,9 +4473,9 @@ export default class UserServiceController {
                              }
 
                   }
-                  else if ( userInDB instanceof Error ) {
+                  else if ( sysUserInDB instanceof Error ) {
 
-                    const error = userInDB as any;
+                    const error = sysUserInDB as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -4344,27 +4499,83 @@ export default class UserServiceController {
                   }
                   else {
 
-                    actionTokenInDB.Status = 0;
-                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                    actionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old email and new email
+                    sysActionTokenInDB.Status = 0;
+                    sysActionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    sysActionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old email and new email
 
                     const warnings = [];
 
-                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
-                                                                                        true,
-                                                                                        currentTransaction,
-                                                                                        logger );
+                    const sysActionTokenUpdated = await SYSActionTokenService.createOrUpdate( ( sysActionTokenInDB as any ).dataValues,
+                                                                                              true,
+                                                                                              currentTransaction,
+                                                                                              logger );
 
                     //ANCHOR update the token
-                    if ( actionTokenUpdated instanceof Error ) {
+                    if ( sysActionTokenUpdated instanceof Error ) {
 
-                      const error = actionTokenUpdated as any;
+                      const error = sysActionTokenUpdated as any;
 
                       warnings.push(
                                      {
                                        Code: error.name,
                                        Message: error.message,
                                        Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_FAILED_UPDATE_TOKEN_STATUS",
+                                       Message: await I18NManager.translate( strLanguage, "Failed to update the token status." ),
+                                       Details: null
+                                     }
+                                   );
+
+                    }
+
+                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                      logger );
+
+                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                            currentTransaction,
+                                                                            logger ) ? "web" : "mobile";
+
+                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                            "url",
+                                                                            currentTransaction,
+                                                                            logger );
+
+                    if ( await NotificationManager.send(
+                                                         "email",
+                                                         {
+                                                           from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                           to: jsonExtraData.NewEMail,
+                                                           subject: await I18NManager.translate( strLanguage, "USER EMAIL CHANGE SUCCESS" ),
+                                                           body: {
+                                                                   kind: "template",
+                                                                   file: `email-user-email-change-success-${strTemplateKind}.pug`,
+                                                                   language: context.Language,
+                                                                   variables: {
+                                                                                user_name: sysUserInDB.Name,
+                                                                                user_email: CommonUtilities.maskEMailList( jsonExtraData.NewEMail ),
+                                                                                web_app_url: strWebAppURL,
+                                                                                ... configData
+                                                                              }
+                                                                   //kind: "embedded",
+                                                                   //text: "Hello",
+                                                                   //html: "<b>Hello</b>"
+                                                                 }
+                                                         },
+                                                         logger
+                                                       ) === false ) {
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_CANNOT_SEND_EMAIL",
+                                       Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                       Details: {
+                                                  Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                }
                                      }
                                    );
 
@@ -4383,41 +4594,7 @@ export default class UserServiceController {
                                Data: []
                              }
 
-                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                      logger );
-
-                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                            currentTransaction,
-                                                                            logger ) ? "web" : "mobile";
-
-                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                            "url",
-                                                                            currentTransaction,
-                                                                            logger );
-
-                    await NotificationManager.send(
-                                                    "email",
-                                                    {
-                                                      from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                      to: jsonExtraData.NewEMail,
-                                                      subject: await I18NManager.translate( strLanguage, "USER EMAIL CHANGE SUCCESS" ),
-                                                      body: {
-                                                              kind: "template",
-                                                              file: `email-user-email-change-success-${strTemplateKind}.pug`,
-                                                              language: context.Language,
-                                                              variables: {
-                                                                           user_name: userInDB.Name,
-                                                                           user_email: CommonUtilities.maskPassword( jsonExtraData.NewEMail ),
-                                                                           web_app_url: strWebAppURL,
-                                                                           ... configData
-                                                                         }
-                                                              //kind: "embedded",
-                                                              //text: "Hello",
-                                                              //html: "<b>Hello</b>"
-                                                            }
-                                                    },
-                                                    logger
-                                                  );
+                    bApplyTransaction = true;
 
                   }
 
@@ -4455,14 +4632,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 404, //Not found
                          Code: 'ERROR_USER_NOT_FOUND',
-                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                          Mark: '81CBFCD7E4E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_NOT_FOUND',
-                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                                      Details: null,
                                    }
                                  ],
@@ -4547,9 +4724,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -4598,7 +4784,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -4626,7 +4812,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -4642,28 +4830,28 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
 
       const userSessionStatus = context.UserSessionStatus;
 
-      const intCount = await ActionTokenService.getCountActionTokenOnLastMinutes( "phone_number_change",
-                                                                                  userSessionStatus ? userSessionStatus.UserId : "",
-                                                                                  10,
-                                                                                  currentTransaction,
-                                                                                  logger );
+      const intCount = await SYSActionTokenService.getCountActionTokenOnLastMinutes( "phone_number_change",
+                                                                                     userSessionStatus ? userSessionStatus.UserId : "",
+                                                                                     10,
+                                                                                     currentTransaction,
+                                                                                     logger );
 
       if ( intCount < 20 ) {
 
-        const userInDB = await UserService.getByName( userSessionStatus.UserName,
-                                                      context.TimeZoneId,
-                                                      transaction,
-                                                      logger );
+        const sysUserInDB = await SYSUserService.getByName( userSessionStatus.UserName,
+                                                            context.TimeZoneId,
+                                                            transaction,
+                                                            logger );
 
-        if ( userInDB != null &&
-             userInDB instanceof Error === false ) {
+        if ( sysUserInDB != null &&
+             sysUserInDB instanceof Error === false ) {
 
           if ( context.Authorization.startsWith( "p:" ) ) {
 
@@ -4687,21 +4875,21 @@ export default class UserServiceController {
                      };
 
           }
-          else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                                currentTransaction,
-                                                                logger ) ) {
+          else if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                                   currentTransaction,
+                                                                   logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                        Mark: '98366EF44736' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -4711,21 +4899,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                        Mark: '563CBF3EE2A5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -4735,21 +4923,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                           currentTransaction,
-                                                           logger ) ) {
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
                        Mark: '6D46A46F3106' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -4759,21 +4947,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                          currentTransaction,
-                                                          logger ) ) {
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
                        Mark: 'B722C2897726' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -4787,7 +4975,7 @@ export default class UserServiceController {
 
             const strCurrentPassword = request.body.CurrentPassword;
 
-            if ( await bcrypt.compare( strCurrentPassword, userInDB.Password ) ) {
+            if ( await bcrypt.compare( strCurrentPassword, sysUserInDB.Password ) ) {
 
               const strWellFormattedPhoneNumberList = CommonUtilities.wellFormattedPhoneNumberList( request.body.Phone );
 
@@ -4804,23 +4992,23 @@ export default class UserServiceController {
 
                 const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
-                const actionToken = await ActionTokenService.createOrUpdate(
-                                                                             {
-                                                                               Kind: "phone_number_change",
-                                                                               Owner: userInDB.Id,
-                                                                               Token: strChangeCode,
-                                                                               Status: 1,
-                                                                               CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                               ExpireAt: expireAt.format(),
-                                                                               ExtraData: `{ "NewPhoneNumber": "${strWellFormattedPhoneNumberList}" }`
-                                                                             },
-                                                                             false,
-                                                                             currentTransaction,
-                                                                             logger
-                                                                           );
+                const sysActionToken = await SYSActionTokenService.createOrUpdate(
+                                                                                   {
+                                                                                     Kind: "phone_number_change",
+                                                                                     Owner: sysUserInDB.Id,
+                                                                                     Token: strChangeCode,
+                                                                                     Status: 1,
+                                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                     ExpireAt: expireAt.format(),
+                                                                                     ExtraData: `{ "NewPhoneNumber": "${strWellFormattedPhoneNumberList}" }`
+                                                                                   },
+                                                                                   false,
+                                                                                   currentTransaction,
+                                                                                   logger
+                                                                                 );
 
-                if ( actionToken &&
-                     actionToken instanceof Error === false ) {
+                if ( sysActionToken &&
+                     sysActionToken instanceof Error === false ) {
 
                   //Send immediately the sms with the change code
                   if ( await NotificationManager.send(
@@ -4855,6 +5043,8 @@ export default class UserServiceController {
                                      ]
                              }
 
+                    bApplyTransaction = true;
+
                   }
                   else {
 
@@ -4884,7 +5074,7 @@ export default class UserServiceController {
                 }
                 else {
 
-                  const error = actionToken as any;
+                  const error = sysActionToken as any;
 
                   result = {
                              StatusCode: 500, //Internal server error
@@ -5023,9 +5213,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -5074,7 +5273,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -5102,7 +5301,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -5118,31 +5319,31 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      const actionTokenInDB = await ActionTokenService.getByToken( request.body.Code,
-                                                                   "phone_number_change",
-                                                                   context.TimeZoneId,
-                                                                   transaction,
-                                                                   logger );
+      const sysActionTokenInDB = await SYSActionTokenService.getByToken( request.body.Code,
+                                                                         "phone_number_change",
+                                                                         context.TimeZoneId,
+                                                                         transaction,
+                                                                         logger );
 
-      if ( actionTokenInDB !== null &&
-           actionTokenInDB instanceof Error === false ) {
+      if ( sysActionTokenInDB !== null &&
+           sysActionTokenInDB instanceof Error === false ) {
 
-        if ( actionTokenInDB.ExpireAt &&
-             SystemUtilities.isDateAndTimeBefore( actionTokenInDB.ExpireAt ) ) {
+        if ( sysActionTokenInDB.ExpireAt &&
+             SystemUtilities.isDateAndTimeBefore( sysActionTokenInDB.ExpireAt ) ) {
 
-          if ( actionTokenInDB.Status === 1 ) { //Waiting for use
+          if ( sysActionTokenInDB.Status === 1 ) { //Waiting for use
 
-            let userInDB = await UserService.getById( actionTokenInDB.Owner,
-                                                      context.TimeZoneId,
-                                                      transaction,
-                                                      logger );
+            let sysUserInDB = await SYSUserService.getById( sysActionTokenInDB.Owner,
+                                                            context.TimeZoneId,
+                                                            transaction,
+                                                            logger );
 
-            if ( userInDB != null &&
-                 userInDB instanceof Error === false ) {
+            if ( sysUserInDB != null &&
+                 sysUserInDB instanceof Error === false ) {
 
               if ( context.Authorization.startsWith( "p:" ) ) {
 
@@ -5166,21 +5367,21 @@ export default class UserServiceController {
                          };
 
               }
-              else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                                    currentTransaction,
-                                                                    logger ) ) {
+              else if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                                       currentTransaction,
+                                                                       logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                            Mark: 'EAA7E9E5C6FA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -5190,21 +5391,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                                   currentTransaction,
-                                                                   logger ) ) {
+              else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                      currentTransaction,
+                                                                      logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                            Mark: 'E52573CD2052' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', userInDB.UserGroup.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -5214,21 +5415,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                               currentTransaction,
-                                                               logger ) ) {
+              else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
                            Mark: '8AB386DAE87B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -5238,21 +5439,21 @@ export default class UserServiceController {
                          }
 
               }
-              else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+              else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                                 currentTransaction,
+                                                                 logger ) ) {
 
                 result = {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_USER_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
                            Mark: '15CB6C1B117B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
                                        Code: 'ERROR_USER_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', userInDB.Name ),
+                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -5264,7 +5465,7 @@ export default class UserServiceController {
               }
               else {
 
-                const jsonExtraData = CommonUtilities.parseJSON( actionTokenInDB.ExtraData, logger );
+                const jsonExtraData = CommonUtilities.parseJSON( sysActionTokenInDB.ExtraData, logger );
 
                 if ( jsonExtraData &&
                      CommonUtilities.isValidPhoneNumberList( jsonExtraData.NewPhoneNumber ) ) {
@@ -5273,63 +5474,63 @@ export default class UserServiceController {
                                                                                 "UserName",
                                                                                 logger );
 
-                  let personInDB = null;
-                  let personWithPhoneChanged = null;
+                  let sysPersonInDB = null;
+                  let sysPersonWithPhoneChanged = null;
 
-                  if ( !userInDB.Person ) {
+                  if ( !sysUserInDB.sysPerson ) {
 
                     jsonExtraData.OldPhoneNumber = ""; //Create empty field, phone number person assoicated
 
-                    personWithPhoneChanged = await PersonService.createOrUpdate(
-                                                                                 {
-                                                                                   Id: userInDB.Id,
-                                                                                   FirstName: " ",
-                                                                                   Phone: jsonExtraData.NewPhoneNumber,
-                                                                                   CreatedBy: strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
-                                                                                   CreatedAt: null
-                                                                                 },
-                                                                                 false,
-                                                                                 currentTransaction,
-                                                                                 logger
-                                                                               );
+                    sysPersonWithPhoneChanged = await SYSPersonService.createOrUpdate(
+                                                                                       {
+                                                                                         Id: sysUserInDB.Id,
+                                                                                         FirstName: " ",
+                                                                                         Phone: jsonExtraData.NewPhoneNumber,
+                                                                                         CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                         CreatedAt: null
+                                                                                       },
+                                                                                       false,
+                                                                                       currentTransaction,
+                                                                                       logger
+                                                                                     );
 
-                    personInDB = personWithPhoneChanged;
+                    sysPersonInDB = sysPersonWithPhoneChanged;
 
-                    if ( personInDB &&
-                         personInDB instanceof Error === false ) {
+                    if ( sysPersonInDB &&
+                         sysPersonInDB instanceof Error === false ) {
 
-                      userInDB.PersonId = personInDB.Id;
-                      userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                      userInDB.UpdatedAt = null;
+                      sysUserInDB.PersonId = sysPersonInDB.Id;
+                      sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                      sysUserInDB.UpdatedAt = null;
 
-                      userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
-                                                                   true,
-                                                                   currentTransaction,
-                                                                   logger );
+                      sysUserInDB = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
+                                                                         true,
+                                                                         currentTransaction,
+                                                                         logger );
 
                     }
 
                   }
                   else {
 
-                    personInDB = userInDB.Person;
+                    sysPersonInDB = sysUserInDB.sysPerson;
 
-                    jsonExtraData.OldPhoneNumber = personInDB.Phone; //Save the the current person phone number
+                    jsonExtraData.OldPhoneNumber = sysPersonInDB.Phone; //Save the the current person phone number
 
-                    personInDB.Phone = jsonExtraData.NewPhoneNumber;
-                    personInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                    personInDB.UpdatedAt = null;
+                    sysPersonInDB.Phone = jsonExtraData.NewPhoneNumber;
+                    sysPersonInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    sysPersonInDB.UpdatedAt = null;
 
-                    personWithPhoneChanged = await PersonService.createOrUpdate( ( personInDB as any ).dataValues,
-                                                                                 true,
-                                                                                 currentTransaction,
-                                                                                 logger );
+                    sysPersonWithPhoneChanged = await SYSPersonService.createOrUpdate( ( sysPersonInDB as any ).dataValues,
+                                                                                       true,
+                                                                                       currentTransaction,
+                                                                                       logger );
 
                   }
 
-                  if ( personWithPhoneChanged instanceof Error  ) {
+                  if ( sysPersonWithPhoneChanged instanceof Error  ) {
 
-                    const error = personWithPhoneChanged as any;
+                    const error = sysPersonWithPhoneChanged as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -5351,9 +5552,9 @@ export default class UserServiceController {
                              }
 
                   }
-                  else if ( userInDB instanceof Error ) {
+                  else if ( sysUserInDB instanceof Error ) {
 
-                    const error = userInDB as any;
+                    const error = sysUserInDB as any;
 
                     result = {
                                StatusCode: 500, //Internal server error
@@ -5377,27 +5578,62 @@ export default class UserServiceController {
                   }
                   else {
 
-                    actionTokenInDB.Status = 0;
-                    actionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                    actionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old phone number and new phone number
+                    sysActionTokenInDB.Status = 0;
+                    sysActionTokenInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                    sysActionTokenInDB.ExtraData = JSON.stringify( jsonExtraData ); //Save the old phone number and new phone number
 
                     const warnings = [];
 
-                    const actionTokenUpdated = await ActionTokenService.createOrUpdate( ( actionTokenInDB as any ).dataValues,
-                                                                                        true,
-                                                                                        currentTransaction,
-                                                                                        logger );
+                    const sysActionTokenUpdated = await SYSActionTokenService.createOrUpdate( ( sysActionTokenInDB as any ).dataValues,
+                                                                                              true,
+                                                                                              currentTransaction,
+                                                                                              logger );
 
                     //ANCHOR update the token
-                    if ( actionTokenUpdated instanceof Error ) {
+                    if ( sysActionTokenUpdated instanceof Error ) {
 
-                      const error = actionTokenUpdated as any;
+                      const error = sysActionTokenUpdated as any;
 
                       warnings.push(
                                      {
                                        Code: error.name,
                                        Message: error.message,
                                        Details: await SystemUtilities.processErrorDetails( error )
+                                     }
+                                   );
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_FAILED_UPDATE_TOKEN_STATUS",
+                                       Message: await I18NManager.translate( strLanguage, "Failed to update the token status." ),
+                                       Details: null
+                                     }
+                                   );
+
+                    }
+
+                    if ( await NotificationManager.send(
+                                                         "sms",
+                                                         {
+                                                           to: sysUserInDB.sysPerson.Phone,
+                                                           //context: "AMERICA/NEW_YORK",
+                                                           foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                           //device_id: "*",
+                                                           body: {
+                                                                   kind: "self",
+                                                                   text: await I18NManager.translate( strLanguage, 'Phone number change success!' )
+                                                                 }
+                                                         },
+                                                         logger
+                                                       ) === false ) {
+
+                      warnings.push(
+                                     {
+                                       Code: "WARNING_CANNOT_SEND_SMS",
+                                       Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                       Details: {
+                                                  Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                }
                                      }
                                    );
 
@@ -5416,20 +5652,8 @@ export default class UserServiceController {
                                Data: []
                              }
 
-                    await NotificationManager.send(
-                                                    "sms",
-                                                    {
-                                                      to: userInDB.Person.Phone,
-                                                      //context: "AMERICA/NEW_YORK",
-                                                      foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
-                                                      //device_id: "*",
-                                                      body: {
-                                                              kind: "self",
-                                                              text: await I18NManager.translate( strLanguage, 'Phone number change success!' )
-                                                            }
-                                                    },
-                                                    logger
-                                                  );
+                    bApplyTransaction = true;
+
                   }
 
                 }
@@ -5466,14 +5690,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 404, //Not found
                          Code: 'ERROR_USER_NOT_FOUND',
-                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                          Mark: '17B6D60D5199' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_USER_NOT_FOUND',
-                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', actionTokenInDB.Owner ),
+                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
                                      Details: null,
                                    }
                                  ],
@@ -5558,9 +5782,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -5609,7 +5842,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -5637,7 +5870,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -5653,7 +5888,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -5672,9 +5907,9 @@ export default class UserServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
-                                                                                               currentTransaction,
-                                                                                               logger );
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
 
           if ( userSessionStatus &&
                userSessionStatus instanceof Error == false ) {
@@ -5695,9 +5930,9 @@ export default class UserServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await UserSessionStatusService.getUserSessionStatusByToken( strAutorization,
-                                                                                          currentTransaction,
-                                                                                          logger );
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( strAutorization,
+                                                                                             currentTransaction,
+                                                                                             logger );
 
           if ( userSessionStatus &&
                userSessionStatus instanceof Error == false ) {
@@ -5811,9 +6046,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -5862,7 +6106,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -5890,7 +6134,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -5906,7 +6152,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -5914,13 +6160,13 @@ export default class UserServiceController {
 
       //let strAutorization = context.Authorization;
 
-      let userInDB = await UserService.getByName( strUserName,
-                                                  context.TimeZoneId,
-                                                  transaction,
-                                                  logger );
+      let sysUserInDB = await SYSUserService.getByName( strUserName,
+                                                        context.TimeZoneId,
+                                                        transaction,
+                                                        logger );
 
-      if ( userInDB != null &&
-           userInDB instanceof Error === false ) {
+      if ( sysUserInDB != null &&
+           sysUserInDB instanceof Error === false ) {
 
         if ( context.Authorization.startsWith( "p:" ) ) {
 
@@ -5944,21 +6190,21 @@ export default class UserServiceController {
                    };
 
         }
-        else if ( await UserGroupService.checkDisabledByName( userInDB.UserGroup.Name,
-                                                              currentTransaction,
-                                                              logger ) ) {
+        else if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                                 currentTransaction,
+                                                                 logger ) ) {
 
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_USER_GROUP_DISABLED',
-                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', userInDB.UserGroup.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
                      Mark: 'CA03218D26D4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_USER_GROUP_DISABLED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', userInDB.UserGroup.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
                                  Details: null
                                }
                              ],
@@ -5968,21 +6214,21 @@ export default class UserServiceController {
                    }
 
         }
-        else if ( await UserGroupService.checkExpiredByName( userInDB.UserGroup.Name,
-                                                             currentTransaction,
-                                                             logger ) ) {
+        else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                currentTransaction,
+                                                                logger ) ) {
 
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_USER_GROUP_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change your profile information', userInDB.UserGroup.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
                      Mark: '4F0F53813715' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_USER_GROUP_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change you profile information', userInDB.UserGroup.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change you profile information', sysUserInDB.sysUserGroup.Name ),
                                  Details: null
                                }
                              ],
@@ -5992,21 +6238,21 @@ export default class UserServiceController {
                    }
 
         }
-        else if ( await UserService.checkDisabledByName( userInDB.Name,
-                                                         currentTransaction,
-                                                         logger ) ) {
+        else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                            currentTransaction,
+                                                            logger ) ) {
 
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_USER_DISABLED',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', userInDB.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', sysUserInDB.Name ),
                      Mark: '8362FE646A8D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_USER_DISABLED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', userInDB.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', sysUserInDB.Name ),
                                  Details: null
                                }
                              ],
@@ -6016,21 +6262,21 @@ export default class UserServiceController {
                    }
 
         }
-        else if ( await UserService.checkExpiredByName( userInDB.Name,
-                                                        currentTransaction,
-                                                        logger ) ) {
+        else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                           currentTransaction,
+                                                           logger ) ) {
 
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_USER_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', userInDB.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', sysUserInDB.Name ),
                      Mark: 'D9E15CB1BA2A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_USER_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', userInDB.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', sysUserInDB.Name ),
                                  Details: null
                                }
                              ],
@@ -6044,9 +6290,9 @@ export default class UserServiceController {
 
           let personData = {} as any;
 
-          if ( userInDB.Person ) {
+          if ( sysUserInDB.sysPerson ) {
 
-            personData = ( userInDB.Person as any ).dataValues;
+            personData = ( sysUserInDB.sysPerson as any ).dataValues;
 
             personData.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             personData.UpdatedAt = null;
@@ -6054,7 +6300,8 @@ export default class UserServiceController {
           }
           else {
 
-            personData.CreatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            personData.Id = sysUserInDB.Id;
+            personData.CreatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
             personData.CreatedAt = null;
 
           }
@@ -6126,45 +6373,69 @@ export default class UserServiceController {
 
             }
 
-            const personInDB = await PersonService.createOrUpdate( personData,
+            const sysPersonInDB = await SYSPersonService.createOrUpdate( personData,
+                                                                         true,
+                                                                         currentTransaction,
+                                                                         logger );
+
+            if ( sysPersonInDB &&
+                 sysPersonInDB instanceof Error === false ) {
+
+              const warnings = [];
+
+              if ( ( request.body.Avatar !== undefined &&
+                     sysUserInDB.Avatar !== request.body.Avatar ) ||
+                   sysUserInDB.PersonId !== sysPersonInDB.Id ) {
+
+                sysUserInDB.PersonId = sysPersonInDB.Id;
+
+                if ( request.body.Avatar === undefined ||
+                     request.body.Avatar !== "" ) {
+
+                  sysUserInDB.Avatar = request.body.Avatar && sysUserInDB.Avatar !== request.body.Avatar ? request.body.Avatar : sysUserInDB.Avatar;
+
+                }
+                else {
+
+                  sysUserInDB.Avatar = null;
+
+                }
+
+                sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                sysUserInDB.UpdatedAt = null;
+
+                sysUserInDB = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
                                                                    true,
                                                                    currentTransaction,
                                                                    logger );
 
-            if ( personInDB &&
-                 personInDB instanceof Error === false ) {
+                if ( sysUserInDB instanceof Error ) {
 
-              if ( request.body.Avatar !== undefined &&
-                   userInDB.Avatar !== request.body.Avatar ) {
+                  const error = sysUserInDB as any;
 
-                userInDB.Avatar = request.body.Avatar ? request.body.Avatar : userInDB.Avatar;
-                userInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-                userInDB.UpdatedAt = null;
+                  warnings.push(
+                                 {
+                                   Code: error.name,
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error )
+                                 }
+                               );
 
-                userInDB = await UserService.createOrUpdate( ( userInDB as any ).dataValues,
-                                                             true,
-                                                             currentTransaction,
-                                                             logger );
+                  warnings.push(
+                                 {
+                                   Code: 'WARNING_CANNOT_UPDATE_USER_DATA',
+                                   Message: 'Cannot update the user information.',
+                                   Details: {
+                                              Avatar: "Avatar field cannot updated"
+                                            }
+                                 }
+                               );
 
-              }
-
-              const warnings = [];
-
-              if ( userInDB instanceof Error ) {
-
-                const error = userInDB as any;
-
-                warnings.push(
-                               {
-                                 Code: error.name,
-                                 Message: error.message,
-                                 Details: await SystemUtilities.processErrorDetails( error )
-                               }
-                             );
+                }
 
               }
 
-              personData = (personInDB as any).dataValues;
+              personData = ( sysPersonInDB as any ).dataValues;
 
               delete personData.ImageId;
               delete personData.Comment;
@@ -6185,16 +6456,18 @@ export default class UserServiceController {
                                ]
                        }
 
+              bApplyTransaction = true;
+
             }
             else {
 
-              const error = personInDB as any;
+              const error = sysPersonInDB as any;
 
               result = {
                          StatusCode: 500, //Internal server error
                          Code: 'ERROR_UNEXPECTED',
                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                         Mark: 'FEFFF7F8CFDC',
+                         Mark: 'FEFFF7F8CFDC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -6218,7 +6491,7 @@ export default class UserServiceController {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
                        Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                       Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Mark: '35F2EDA66821' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -6234,7 +6507,6 @@ export default class UserServiceController {
                      }
 
           }
-
 
         }
 
@@ -6264,9 +6536,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -6315,7 +6596,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -6343,7 +6624,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -6359,7 +6642,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -6372,26 +6655,26 @@ export default class UserServiceController {
 
       if ( request.query.id ) {
 
-        userInDB = await UserService.getById( request.query.id,
-                                              null,
-                                              currentTransaction,
-                                              logger );
+        userInDB = await SYSUserService.getById( request.query.id,
+                                                 null,
+                                                 currentTransaction,
+                                                 logger );
 
       }
       if ( request.query.shortId ) {
 
-        userInDB = await UserService.getByShortId( request.query.shortId,
-                                                   null,
-                                                   currentTransaction,
-                                                   logger );
+        userInDB = await SYSUserService.getByShortId( request.query.shortId,
+                                                      null,
+                                                      currentTransaction,
+                                                      logger );
 
       }
       else {
 
-        userInDB = await UserService.getByName( request.query.name,
-                                                null,
-                                                currentTransaction,
-                                                logger );
+        userInDB = await SYSUserService.getByName( request.query.name,
+                                                   null,
+                                                   currentTransaction,
+                                                   logger );
 
       }
 
@@ -6436,18 +6719,18 @@ export default class UserServiceController {
 
         let modelData = ( userInDB as any ).dataValues;
 
-        const tempModelData = await User.convertFieldValues(
-                                                             {
-                                                               Data: userInDB,
-                                                               FilterFields: 1, //Force to remove fields like password and value
-                                                               TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                               Include: null,
-                                                               Logger: logger,
-                                                               ExtraInfo: {
-                                                                            Request: request
-                                                                          }
-                                                             }
-                                                           );
+        const tempModelData = await SYSUser.convertFieldValues(
+                                                                {
+                                                                  Data: userInDB,
+                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                  Include: null,
+                                                                  Logger: logger,
+                                                                  ExtraInfo: {
+                                                                               Request: request
+                                                                             }
+                                                                }
+                                                              );
 
         if ( tempModelData ) {
 
@@ -6479,6 +6762,8 @@ export default class UserServiceController {
                          ]
                  }
 
+        bApplyTransaction = true;
+
       }
       else {
 
@@ -6488,7 +6773,7 @@ export default class UserServiceController {
                    StatusCode: 500, //Internal server error
                    Code: 'ERROR_UNEXPECTED',
                    Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'FCB0F3218AD0',
+                   Mark: 'FCB0F3218AD0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -6565,9 +6850,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -6616,7 +6910,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -6636,6 +6930,131 @@ export default class UserServiceController {
 
   }
 
+  static checkUserGroupRoleLevel( userSessionStatus: any,
+                                  userGroup: { Id: string, ShortId: string, Name: string },
+                                  strActionRole: string,
+                                  logger: any ): ICheckUserRoles {
+
+    let result: ICheckUserRoles = {
+                                    isAuthorizedAdmin: false,
+                                    isAuthorizedL03: false,
+                                    isAuthorizedL02: false,
+                                    isAuthorizedL01: false,
+                                    isNotAuthorized: false
+                                  };
+
+    try {
+
+      result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      if ( result.isAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+
+        }
+
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Id:" +  userGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#SId:" +  userGroup.ShortId + "#" ) ) : false;
+
+        if ( result.isAuthorizedL03 === false ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+          if ( !roleSubTag ||
+                roleSubTag.length === 0 ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
+
+          }
+
+          if ( result.isAuthorizedL03 === false ) {
+
+            result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                              userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
+
+            if ( result.isAuthorizedL01 &&
+                 ( userSessionStatus.UserGroupName !== userGroup.Name &&
+                   userSessionStatus.UserGroupShortId !== userGroup.ShortId &&
+                   userSessionStatus.GroupId !== userGroup.Id ) ) {
+
+              //Uhathorized
+              result.isNotAuthorized = true;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkUserRoleLevel.name;
+
+      const strMark = "E1C0D723CB80" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getMessageGroup( strLanguage: string,
+                                by: {
+                                      Id: string,
+                                      SId: string,
+                                      Name: string
+                                    } ): Promise<string> {
+
+    let strResult = "";
+
+    if ( by.Name ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user group with name %s not exists', by.Name );
+
+    }
+    else if ( by.Id ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not exists', by.Id );
+
+    }
+    else if ( by.SId ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not exists', by.SId );
+
+    }
+
+    return strResult;
+
+  }
+
   static async createUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
@@ -6644,7 +7063,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -6660,19 +7081,688 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      let strUserName = context.UserSessionStatus.UserName;
+      // ANCHOR password change
+      let userSessionStatus = context.UserSessionStatus;
 
-      //
+      let resultCheckUserRoles = null;
+
+      let sysUserGroupInDB: SYSUserGroup = null;
+
+      let sysUserInDB: SYSUser = null;
+
+      let userRules = {
+                        Avatar: [ 'present', 'min:36', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
+                        UserGroup: [ 'present' ],
+                        CreateGroup: [ 'present', 'boolean' ],
+                        ExpireAt: [ 'present', 'date' ],
+                        Notify: [ 'present', 'min:3' ],
+                      };
+
+      const validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                   userRules,
+                                                                   null,
+                                                                   logger );
+
+      if ( validator.passes() ) { //Validate request.body field values
+
+        delete request.body.CreatedBy;
+        delete request.body.CreatedAt;
+        delete request.body.UpdatedBy;
+        delete request.body.UpdatedAt;
+
+        if ( request.body.DisabledBy !== "0" &&
+             request.body.DisabledBy !== "1" ) {
+
+          delete request.body.DisabledBy;
+
+        }
+
+        delete request.body.DisabledAt;
+
+        sysUserInDB = await SYSUserService.getByName( request.body.Name,
+                                                      null,
+                                                      currentTransaction,
+                                                      logger );
+
+        if ( !sysUserInDB ) {
+
+          const strUserName = context.UserSessionStatus.UserName;
+
+          let bIsAuthorizedCreateGroup = userSessionStatus.Role.includes( "#CreateUserGroupL01#" );
+
+          let bIsAllowedAddInDisabledGroup = userSessionStatus.Role.includes( "#AllowAddInDisabledGroupL01#" );
+
+          if ( !request.body.UserGroupId &&
+               !request.body.UserGroupSId &&
+               !request.body.UserGroup ) {
+
+            request.body.UserGroup = request.body.Name;
+
+          }
+
+          sysUserGroupInDB = await SYSUserGroupService.getBy( {
+                                                                Id: request.body.UserGroupId,
+                                                                ShortId: request.body.UserGroupSId,
+                                                                Name: request.body.UserGroup || request.body.Name
+                                                              },
+                                                              null,
+                                                              currentTransaction,
+                                                              logger );
+
+          resultCheckUserRoles = this.checkUserGroupRoleLevel( userSessionStatus,
+                                                               {
+                                                                 Id: request.body.UserGroupId,
+                                                                 ShortId: request.body.UserGroupSId,
+                                                                 Name: request.body.UserGroup
+                                                               },
+                                                               "createUser",
+                                                               logger );
+
+          if ( resultCheckUserRoles.IsAuthorizedAdmin ) {
+
+            bIsAuthorizedCreateGroup = request.body.CreateGroup === true;
+
+          }
+
+          if ( sysUserGroupInDB instanceof Error ) {
+
+            const error = sysUserGroupInDB;
+
+            result = {
+                       StatusCode: 500, //Internal server error
+                       Code: 'ERROR_UNEXPECTED',
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Mark: 'F82A2A732532' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: error.name,
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else if ( sysUserGroupInDB &&
+                    SYSUserGroupService.checkDisabled( sysUserGroupInDB ) &&
+                    bIsAllowedAddInDisabledGroup === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_DISABLED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                       Mark: 'A9FBA806248A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_DISABLED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( sysUserGroupInDB &&
+                    SYSUserGroupService.checkExpired( sysUserGroupInDB ) &&
+                    bIsAllowedAddInDisabledGroup === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_EXPIRED',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                       Mark: 'C70A2903EC1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_EXPIRED',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( sysUserGroupInDB &&
+                    request.body.CreateGroup ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                       Mark: '5C5B23E9219A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( !sysUserGroupInDB &&
+                    request.body.CreateGroup == false ) {
+
+            const strMessage = await this.getMessageGroup( strLanguage, {
+                                                                          Id: request.body.UserGroupId,
+                                                                          SId: request.body.UserGroupSId,
+                                                                          Name: request.body.UserGroup
+                                                                        } );
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                       Message: strMessage,
+                       Mark: 'C0171BD3B328' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                   Message: strMessage,
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( !sysUserGroupInDB &&
+                    request.body.CreateGroup &&
+                    bIsAuthorizedCreateGroup === false ) {
+
+            result = {
+                       StatusCode: 403, //Forbidden
+                       Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                       Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                       Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                                   Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( !sysUserGroupInDB &&
+                     request.body.CreateGroup &&
+                     bIsAuthorizedCreateGroup ) {
+
+            sysUserGroupInDB = await SYSUserGroupService.createOrUpdate(
+                                                                         {
+                                                                           Name: request.body.UserGroup,
+                                                                           Comment: request.body.Comment,
+                                                                           Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
+                                                                           Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
+                                                                           ExtraData: request.body.Business ? CommonUtilities.jsonToString( request.body.Business, logger ): null,
+                                                                           CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                           CreatedAt: null
+                                                                         },
+                                                                         false,
+                                                                         currentTransaction,
+                                                                         logger
+                                                                       );
+
+            if ( sysUserGroupInDB instanceof Error ) {
+
+              const error = sysUserGroupInDB;
+
+              result = {
+                         StatusCode: 500, //Internal server error
+                         Code: 'ERROR_UNEXPECTED',
+                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                         Mark: '8DBA87D7ABE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: error.name,
+                                     Message: error.message,
+                                     Details: await SystemUtilities.processErrorDetails( error ) //error
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       };
+
+            }
+
+          }
+
+          if ( !result ) {
+
+            let personData = {} as any;
+
+            //personData.CreatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+            personData.CreatedAt = null;
+
+            let rules = {
+                          Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          Gender: [ 'present', 'between:0,100' ],
+                          BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                        };
+
+            const validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                         rules,
+                                                                         null,
+                                                                         logger );
+
+            if ( validator.passes() ) { //Validate request.body field values
+
+              personData.Title = request.body.Title ? request.body.Title : personData.Title;
+              personData.FirstName = request.body.FirstName ? CommonUtilities.normalizeWhitespaces( request.body.FirstName ) : personData.FirstName;
+              personData.LastName = request.body.LastName ? CommonUtilities.normalizeWhitespaces( request.body.LastName ): personData.LastName;
+              personData.NickName = request.body.NickName ? request.body.NickName : personData.NickName;
+
+              if ( request.body.Abbreviation ) {
+
+                personData.Abbreviation = request.body.Abbreviation;
+
+              }
+              else if ( !personData.Abbreviation ) {
+
+                const fistNameAbbreviation = CommonUtilities.getFirstLetters( request.body.FirstName );
+                const lastNameAbbreviation = CommonUtilities.getFirstLetters( request.body.LastName );
+
+                personData.Abbreviation = fistNameAbbreviation.join( "" ) + lastNameAbbreviation.join( "" );
+
+              }
+
+              personData.Gender = request.body.Gender && parseInt( request.body.Gender ) >= 0 ? request.body.Gender : personData.Gender;
+              personData.BirthDate = request.body.BirthDate ? request.body.BirthDate : personData.BirthDate;
+              personData.EMail = request.body.EMail; // ? request.body.EMail : null;
+              personData.Phone = request.body.Phone ? request.body.Phone : null;
+              personData.Address = request.body.Address ? request.body.Address : personData.Address;
+
+              if ( personData.Address &&
+                   await GeoMapManager.getConfigServiceType( "geocode", logger ) !== "@__none__@" ) {
+
+                const geocodeResult = await GeoMapManager.geocodeServiceUsingAddress( [ personData.Address ],
+                                                                                      true,
+                                                                                      logger );
+
+                if ( !geocodeResult ||
+                     geocodeResult.length == 0 ||
+                     geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
+
+                  personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+                }
+                else {
+
+                  personData.Address = geocodeResult[ 0 ].formattedAddress;
+                  personData.Tag = CommonUtilities.removeTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+                }
+
+                personData.Tag = personData.Tag ? personData.Tag: null;
+
+              }
+
+              const sysPersonInDB = await SYSPersonService.createOrUpdate( personData,
+                                                                           true,
+                                                                           currentTransaction,
+                                                                           logger );
+
+              if ( sysPersonInDB &&
+                   sysPersonInDB instanceof Error === false ) {
+
+                //ANCHOR Create new user
+                sysUserInDB = await SYSUserService.createOrUpdate(
+                                                                   {
+                                                                     Id: sysPersonInDB.Id,
+                                                                     PersonId: sysPersonInDB.Id,
+                                                                     GroupId: sysUserGroupInDB.Id,
+                                                                     Name: request.body.Name,
+                                                                     Password: request.body.Password,
+                                                                     Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
+                                                                     Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
+                                                                     ExtraData: request.body.Business ? CommonUtilities.jsonToString( request.body.Business, logger ): null,
+                                                                     ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
+                                                                     Comment: request.body.Comment,
+                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                     CreatedAt: null,
+                                                                     DisabledBy: request.body.DisabledBy === "1"? "1@" + strUserName: null
+                                                                   },
+                                                                   false,
+                                                                   currentTransaction,
+                                                                   logger
+                                                                 );
+
+                if ( sysUserInDB &&
+                     sysUserInDB instanceof Error === false ) {
+
+                  const warnings = [];
+
+                  if ( request.body.Notify ) {
+
+                    const transportList = request.body.Notify.split( "," );
+
+                    if ( transportList.includes( "email" ) ) {
+
+                      //ANCHOR send email sucess
+                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                        logger );
+
+                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                              currentTransaction,
+                                                                              logger ) ? "web" : "mobile";
+
+                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                              "url",
+                                                                              currentTransaction,
+                                                                              logger );
+
+                      if ( await NotificationManager.send(
+                                                           "email",
+                                                           {
+                                                             from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                             to: request.body.EMail,
+                                                             subject: await I18NManager.translate( strLanguage, "USER ACCOUNT CREATION SUCCESS" ),
+                                                             body: {
+                                                                     kind: "template",
+                                                                     file: `email-user-creation-${strTemplateKind}.pug`,
+                                                                     language: context.Language,
+                                                                     variables: {
+                                                                                  user_name: request.body.Name,
+                                                                                  user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                  web_app_url: strWebAppURL,
+                                                                                  ... configData
+                                                                                }
+                                                                     //kind: "embedded",
+                                                                     //text: "Hello",
+                                                                     //html: "<b>Hello</b>"
+                                                                   }
+                                                           },
+                                                           logger
+                                                         ) === false ) {
+
+                        warnings.push(
+                                       {
+                                         Code: "WARNING_CANNOT_SEND_EMAIL",
+                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                         Details: {
+                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                  }
+                                       }
+                                     );
+
+                      }
+
+                    }
+
+                    if ( transportList.includes( "sms" ) ) {
+
+                      if ( request.body.Phone ) {
+
+                        if ( await NotificationManager.send(
+                                                             "sms",
+                                                             {
+                                                               to: sysUserInDB.sysPerson.Phone,
+                                                               //context: "AMERICA/NEW_YORK",
+                                                               foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                               //device_id: "*",
+                                                               body: {
+                                                                       kind: "self",
+                                                                       text: await I18NManager.translate( strLanguage, 'User account creation success.\n%s\n%s', request.body.Name, request.body.Password )
+                                                                     }
+                                                             },
+                                                             logger
+                                                           ) === false ) {
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_CANNOT_SEND_SMS",
+                                           Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                           Details: {
+                                                      Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                    }
+                                         }
+                                       );
+
+                        }
+
+                      }
+                      else {
+
+                        warnings.push(
+                                       {
+                                         Code: "WARNING_CANNOT_SEND_SMS",
+                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                         Details: {
+                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                  }
+                                       }
+                                     );
+
+                      }
+
+                    }
+
+                  }
+
+                  result = {
+                             StatusCode: 200, //Ok
+                             Code: 'SUCCESS_CREATE_USER',
+                             Message: await I18NManager.translate( strLanguage, 'Success user creation.' ),
+                             Mark: 'B9779ACDB9EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: false,
+                             Errors: [],
+                             Warnings: warnings,
+                             Count: 1,
+                             Data: [
+                                     sysUserInDB
+                                   ]
+                           }
+
+                  bApplyTransaction = true;
+
+                }
+                else {
+
+                  const error = sysUserInDB as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: 'C4B8A26D4B57' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           };
+
+                }
+
+              }
+              else {
+
+                const error = sysPersonInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: 'ERROR_UNEXPECTED',
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Mark: '8E230246A1AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         };
+
+              }
+
+            }
+            else {
+
+              result = {
+                        StatusCode: 400, //Bad request
+                        Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                        Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                        Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        LogId: null,
+                        IsError: true,
+                        Errors: [
+                                  {
+                                    Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                                    Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                    Details: validator.errors.all()
+                                  }
+                                ],
+                        Warnings: [],
+                        Count: 0,
+                        Data: []
+                      }
+
+            }
+
+          }
+
+        }
+        else if ( sysUserInDB instanceof Error ) {
+
+          const error = sysUserInDB as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: '726AB9ABEFE9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                     Mark: '61B8AA67F498' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                                 Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                 Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                   Mark: '78706654C68B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Details: validator.errors.all()
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -6721,7 +7811,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -6749,7 +7839,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -6765,7 +7857,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -6775,9 +7867,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -6826,7 +7927,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -6854,7 +7955,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -6870,7 +7973,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -6880,9 +7983,18 @@ export default class UserServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -6931,7 +8043,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -6959,7 +8071,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -6975,7 +8089,7 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -6998,7 +8112,7 @@ export default class UserServiceController {
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL03#" );
 
         }
 
@@ -7011,48 +8125,40 @@ export default class UserServiceController {
 
         }
 
-        //if ( bIsAuthorizedL03 === false ) {
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
 
-          if ( !roleSubTag ||
-                roleSubTag.length === 0 ) {
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL02#" );
 
-            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#ChangeUserPasswordL02#" );
+        }
 
-          }
+        if ( roleSubTag &&
+            roleSubTag.length > 0 ) {
 
-          if ( roleSubTag &&
-              roleSubTag.length > 0 ) {
+          bIsAuthorizedL02 = true;
 
-            bIsAuthorizedL02 = true;
+          strWhereL02 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
 
-            strWhereL02 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
+        }
 
-          }
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchUserL01#" ): false;
 
-          //if ( bIsAuthorizedL02 === false ) {
+        if ( bIsAuthorizedL01 ) {
 
-          bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                      userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
+          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
 
-          if ( bIsAuthorizedL01 ) {
-
-            strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
-
-          }
-
-          //}
-
-        //}
+        }
 
       }
 
       const strSelectField = SystemUtilities.createSelectAliasFromModels(
                                                                           [
-                                                                            User,
-                                                                            UserGroup,
-                                                                            Person
+                                                                            SYSUser,
+                                                                            SYSUserGroup,
+                                                                            SYSPerson
                                                                           ],
                                                                           [
                                                                             "A",
@@ -7067,7 +8173,7 @@ export default class UserServiceController {
                                                      },
                                                      logger );
 
-      strSQL = strSQL + "( " + request.query.where + " )";
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
 
       if ( !bIsAuthorizedAdmin ) {
 
@@ -7081,29 +8187,35 @@ export default class UserServiceController {
 
         }
 
-        if ( bIsAuthorizedL02 &&
-             !strBeforeParenthesis ) {
+        if ( bIsAuthorizedL02 ) {
 
-          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+          if ( !strBeforeParenthesis ) {
 
-        }
-        else {
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
 
-          strSQL = strSQL + strBeforeParenthesis + strWhereL02;
-          strBeforeParenthesis = "";
+          }
+          else {
 
-        }
+            strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+            strBeforeParenthesis = "";
 
-        if ( bIsAuthorizedL01 &&
-             !strBeforeParenthesis ) {
-
-          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+          }
 
         }
-        else {
 
-          strSQL = strSQL + strBeforeParenthesis + strWhereL01;
-          strBeforeParenthesis = "";
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
 
         }
 
@@ -7114,6 +8226,8 @@ export default class UserServiceController {
         }
 
       }
+
+      strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
 
       let intLimit = 200;
 
@@ -7132,7 +8246,21 @@ export default class UserServiceController {
                        {
                          Code: 'WARNING_DATA_LIMITED_TO_MAX',
                          Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                         Details: I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                       }
+                     );
+
+      }
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
                        }
                      );
 
@@ -7151,9 +8279,9 @@ export default class UserServiceController {
                                                      } );
 
       const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows, [
-                                                                                                  User,
-                                                                                                  UserGroup,
-                                                                                                  Person
+                                                                                                  SYSUser,
+                                                                                                  SYSUserGroup,
+                                                                                                  SYSPerson
                                                                                                 ],
                                                                                                 [
                                                                                                   "A",
@@ -7165,7 +8293,7 @@ export default class UserServiceController {
 
       for ( const currentRow of transformedRows ) {
 
-        const tempModelData = await User.convertFieldValues(
+        const tempModelData = await SYSUser.convertFieldValues(
                                                              {
                                                                Data: currentRow,
                                                                FilterFields: 1, //Force to remove fields like password and value
@@ -7203,11 +8331,22 @@ export default class UserServiceController {
                  Data: convertedRows
                }
 
+      bApplyTransaction = true;
+
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -7256,7 +8395,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -7284,7 +8423,9 @@ export default class UserServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -7300,19 +8441,180 @@ export default class UserServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      let strUserName = context.UserSessionStatus.UserName;
+      const userSessionStatus = context.UserSessionStatus;
 
-      //
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL02 = false;
+      let strWhereL02 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = CommonUtilities.tranformTagListToWhere( roleSubTag, "B", "Or" );
+
+        }
+
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL02#" );
+
+        }
+
+        if ( roleSubTag &&
+            roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL02 = true;
+
+          strWhereL02 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
+
+        }
+
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchUserL01#" ): false;
+
+        if ( bIsAuthorizedL01 ) {
+
+          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
+
+        }
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "searchCountUser",
+                                                     {
+                                                       //SelectFields: strSelectField,
+                                                     },
+                                                     logger );
+
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL02 &&
+             !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+
+        }
+        else {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL01 &&
+             !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+        }
+        else {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      const warnings = [];
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not counted due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
+                       }
+                     );
+
+      }
+
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH_COUNT',
+                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
+                 Mark: 'C89386280047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: 1,
+                 Data: [
+                         {
+                           Count: rows.length > 0 ? rows[ 0 ].Count: 0
+                         }
+                       ]
+               }
+
+      bApplyTransaction = true;
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -7361,7 +8663,7 @@ export default class UserServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

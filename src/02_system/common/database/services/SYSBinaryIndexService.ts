@@ -8,28 +8,30 @@ import CommonConstants from "../../CommonConstants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
+import { SYSBinaryIndex } from "../models/SYSBinaryIndex";
+
 //import ConfigValueDataService from "./ConfigValueDataService";
 import DBConnectionManager from "../../managers/DBConnectionManager";
-import { BinaryIndex } from "../models/BinaryIndex";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'BinaryIndexService' );
+const debug = require( 'debug' )( 'SYSBinaryIndexService' );
 
-export default class BinaryIndexService extends BaseService {
+export default class SYSBinaryIndexService extends BaseService {
 
-  static readonly _ID = "BinaryIndexService";
+  static readonly _ID = "sysBinaryIndexService";
 
   static async createOrUpdate( strId: string,
                                data: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<any> {
+                               logger: any ): Promise<SYSBinaryIndex> {
 
-    let result = { data: null, error: null };
+    let result = null; //{ data: null, error: null };
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -39,7 +41,7 @@ export default class BinaryIndexService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -50,25 +52,25 @@ export default class BinaryIndexService extends BaseService {
 
       }
 
-      let binaryIndexInDB = await BinaryIndex.findOne( options );
+      let sysBinaryIndexInDB = await SYSBinaryIndex.findOne( options );
 
-      if ( CommonUtilities.isNullOrEmpty( binaryIndexInDB ) ) {
+      if ( CommonUtilities.isNullOrEmpty( sysBinaryIndexInDB ) ) {
 
-        binaryIndexInDB = await BinaryIndex.create(
-                                                    data,
-                                                    { transaction: currentTransaction }
-                                                  );
+        sysBinaryIndexInDB = await SYSBinaryIndex.create(
+                                                          data,
+                                                          { transaction: currentTransaction }
+                                                        );
 
       }
       else if ( bUpdate ) {
 
-        const updateResult = await BinaryIndex.update( data,
-                                                       options );
+        const updateResult = await SYSBinaryIndex.update( data,
+                                                          options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          binaryIndexInDB = await BinaryIndex.findOne( options );
+          sysBinaryIndexInDB = await SYSBinaryIndex.findOne( options );
 
         }
 
@@ -76,13 +78,14 @@ export default class BinaryIndexService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
       }
 
-      result.data = binaryIndexInDB;
+      //result.data = sysBinaryIndexInDB;
+      result = sysBinaryIndexInDB;
 
     }
     catch ( error ) {
@@ -110,7 +113,7 @@ export default class BinaryIndexService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -124,7 +127,8 @@ export default class BinaryIndexService extends BaseService {
 
       }
 
-      result.error = error;
+      //result.error = error;
+      result = error;
 
     }
 

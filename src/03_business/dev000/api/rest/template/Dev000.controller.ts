@@ -24,7 +24,7 @@ import CommonConstants from '../../../../../02_system/common/CommonConstants';
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
-import RouteService from '../../../../../02_system/common/database/services/RouteService';
+import SYSRouteService from '../../../../../02_system/common/database/services/SYSRouteService';
 import I18NManager from '../../../../../02_system/common/managers/I18Manager';
 import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 
@@ -65,7 +65,7 @@ export default class Dev000Controller {
 
       for ( let routeInfo of Dev000Controller._ROUTE_INFO ) {
 
-        await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
+        await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                         routeInfo.RequestKind,
                                                         routeInfo.Path, //Path
                                                         routeInfo.AllowTagAccess,

@@ -10,27 +10,29 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import DBConnectionManager from './../../managers/DBConnectionManager';
-import { Role } from "../models/Role";
+import { SYSRole } from "../models/SYSRole";
+
+import DBConnectionManager from '../../managers/DBConnectionManager';
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'RoleService' );
+const debug = require( 'debug' )( 'SYSRoleService' );
 
-export default class RoleService extends BaseService {
+export default class SYSRoleService extends BaseService {
 
-  static readonly _ID = "RoleService";
+  static readonly _ID = "sysRoleService";
 
   static async createOrUpdate( strName: string,
                                strComment: string,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<Role> {
+                               logger: any ): Promise<SYSRole> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -40,7 +42,7 @@ export default class RoleService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -57,13 +59,13 @@ export default class RoleService extends BaseService {
 
       }
 
-      let roleInDB = await Role.findOne( options );
+      let roleInDB = await SYSRole.findOne( options );
 
       //debugMark( "1 => %O", role );
 
       if ( CommonUtilities.isNullOrEmpty( roleInDB ) ) {
 
-        result = await Role.create(
+        result = await SYSRole.create(
                                     {
                                       Name: strName,
                                       Comment: strComment,
@@ -82,13 +84,13 @@ export default class RoleService extends BaseService {
 
         //debugMark( "2 => %O", role );
 
-        const updateResult = await Role.update( currentValues,
+        const updateResult = await SYSRole.update( currentValues,
                                                 options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          result = await Role.findOne( options );
+          result = await SYSRole.findOne( options );
 
         }
 
@@ -96,7 +98,7 @@ export default class RoleService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -128,7 +130,7 @@ export default class RoleService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -158,7 +160,7 @@ export default class RoleService extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -168,7 +170,7 @@ export default class RoleService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -235,7 +237,7 @@ export default class RoleService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
          await currentTransaction.commit();
 

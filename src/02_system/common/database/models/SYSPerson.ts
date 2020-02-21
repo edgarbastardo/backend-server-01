@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -7,21 +9,23 @@ import {
          BeforeValidate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
-import cluster from 'cluster';
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-const debug = require( 'debug' )( 'Person' );
+const debug = require( 'debug' )( 'SYSPerson' );
 
 @Table( {
   timestamps: false,
+  tableName: "sysPerson",
+  modelName: "sysPerson"
 } )
-export class Person extends Model<Person> {
+export class SYSPerson extends Model<SYSPerson> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -91,7 +95,7 @@ export class Person extends Model<Person> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: Person, options: any ): void {
+  static beforeValidateHook( instance: SYSPerson, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

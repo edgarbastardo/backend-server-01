@@ -26,7 +26,7 @@ import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from "../../../common/SystemUtilities";
 
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
-import RouteService from '../../../common/database/services/RouteService';
+import SYSRouteService from '../../../common/database/services/SYSRouteService';
 import SecurityServiceController from '../../services/SecurityService.controller';
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 
@@ -76,7 +76,7 @@ export default class AuthenticationController {
 
       for ( let routeInfo of AuthenticationController._ROUTE_INFO ) {
 
-        await RouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
+        await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                         routeInfo.RequestKind,
                                                         routeInfo.Path, //Path
                                                         routeInfo.AllowTagAccess,

@@ -16,11 +16,14 @@ import SystemConstants from "../../common/SystemContants";
 import CommonUtilities from "../../common/CommonUtilities";
 import SystemUtilities from "../../common/SystemUtilities";
 
-import { BinaryIndex } from "../../common/database/models/BinaryIndex";
+import { SYSBinaryIndex } from "../../common/database/models/SYSBinaryIndex";
+
 import BaseService from "../../common/database/services/BaseService";
-import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
+
+import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
+import SYSBinaryIndexService from "../../common/database/services/SYSBinaryIndexService";
+
 import DBConnectionManager from "../../common/managers/DBConnectionManager";
-import BinaryIndexService from "../../common/database/services/BinaryIndexService";
 import CacheManager from "../../common/managers/CacheManager";
 import I18NManager from '../../common/managers/I18Manager';
 import MiddlewareManager from '../../common/managers/MiddlewareManager';
@@ -38,10 +41,10 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize.Id,
-                                                                          SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize.Owner,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize.Id,
+                                                                             SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize.Owner,
+                                                                             transaction,
+                                                                             logger );
 
       if ( configData.Value && isNaN( configData.Value ) === false ) {
 
@@ -97,10 +100,10 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_BinaryDataBasePath.Id,
-                                                                          SystemConstants._CONFIG_ENTRY_BinaryDataBasePath.Owner,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_BinaryDataBasePath.Id,
+                                                                             SystemConstants._CONFIG_ENTRY_BinaryDataBasePath.Owner,
+                                                                             transaction,
+                                                                             logger );
 
       if ( configData.Value ) {
 
@@ -149,12 +152,12 @@ export default class BinaryServiceController extends BaseService {
                                                    transaction: any,
                                                    logger: any ): Promise<any> {
 
-    return await ConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
-                                                                               SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
-                                                                               SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
-                                                                               strCategory,
-                                                                               transaction,
-                                                                               logger );
+    return await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
+                                                                                  SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
+                                                                                  SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
+                                                                                  strCategory,
+                                                                                  transaction,
+                                                                                  logger );
 
   }
 
@@ -163,12 +166,12 @@ export default class BinaryServiceController extends BaseService {
                                                    transaction: any,
                                                    logger: any ): Promise<any> {
 
-    return await ConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
-                                                                               SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
-                                                                               SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
-                                                                               strCategory,
-                                                                               transaction,
-                                                                               logger );
+    return await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
+                                                                                  SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
+                                                                                  SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
+                                                                                  strCategory,
+                                                                                  transaction,
+                                                                                  logger );
 
   }
 
@@ -182,12 +185,12 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      let configData = await ConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
-                                                                                   strCategory,
-                                                                                   transaction,
-                                                                                   logger );
+      let configData = await SYSConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
+                                                                                      strCategory,
+                                                                                      transaction,
+                                                                                      logger );
 
       if ( CommonUtilities.isNotNullOrEmpty( configData ) ) {
 
@@ -260,12 +263,12 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      let configData = await ConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Id,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Owner,
-                                                                                   strCategory,
-                                                                                   transaction,
-                                                                                   logger );
+      let configData = await SYSConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Id,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Owner,
+                                                                                      strCategory,
+                                                                                      transaction,
+                                                                                      logger );
 
       if ( CommonUtilities.isNotNullOrEmpty( configData ) ) {
 
@@ -341,14 +344,14 @@ export default class BinaryServiceController extends BaseService {
 
     let result = { result: 1, allowed: "*", denied: "" }; //Default allow all
 
-    const checkData = await ConfigValueDataService.checkAllowed( userSessionStatus,
-                                                                 SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
-                                                                 SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
-                                                                 strCategory,
-                                                                 "",
-                                                                 transaction,
-                                                                 true,
-                                                                 logger );
+    const checkData = await SYSConfigValueDataService.checkAllowed( userSessionStatus,
+                                                                    SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
+                                                                    SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
+                                                                    strCategory,
+                                                                    "",
+                                                                    transaction,
+                                                                    true,
+                                                                    logger );
 
     if ( checkData &&
          checkData.value !== undefined &&
@@ -371,14 +374,14 @@ export default class BinaryServiceController extends BaseService {
 
     let result = { result: 1, allowed: "*", denied: "" }; //Default allow all
 
-    const checkData = await ConfigValueDataService.checkAllowed( userSessionStatus,
-                                                                 SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
-                                                                 SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
-                                                                 strMimeType,
-                                                                 strCategory,
-                                                                 transaction,
-                                                                 true,
-                                                                 logger );
+    const checkData = await SYSConfigValueDataService.checkAllowed( userSessionStatus,
+                                                                    SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
+                                                                    SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
+                                                                    strMimeType,
+                                                                    strCategory,
+                                                                    transaction,
+                                                                    true,
+                                                                    logger );
 
     if ( checkData &&
          checkData.value !== undefined &&
@@ -402,12 +405,12 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      let configData = await ConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Id,
-                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Owner,
-                                                                                   strCategory,
-                                                                                   transaction,
-                                                                                   logger );
+      let configData = await SYSConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Id,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Owner,
+                                                                                      strCategory,
+                                                                                      transaction,
+                                                                                      logger );
 
       if ( CommonUtilities.isNotNullOrEmpty( configData ) ) {
 
@@ -837,7 +840,7 @@ export default class BinaryServiceController extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     let strLanguage = "";
 
@@ -859,7 +862,7 @@ export default class BinaryServiceController extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -1066,13 +1069,14 @@ export default class BinaryServiceController extends BaseService {
 
                     debugMark( "Writing info to database" );
 
-                    const dbOperationResult = await BinaryIndexService.createOrUpdate( strId,
+                    const sysBinaryIndex = await SYSBinaryIndexService.createOrUpdate( strId,
                                                                                        binaryIndexData,
                                                                                        true,
                                                                                        transaction,
                                                                                        logger );
 
-                    if ( dbOperationResult.error === null ) {
+                    if ( sysBinaryIndex &&
+                         sysBinaryIndex instanceof Error === false ) {
 
                       debugMark( "Sucess" );
 
@@ -1096,6 +1100,8 @@ export default class BinaryServiceController extends BaseService {
                     }
                     else {
 
+                      const error = sysBinaryIndex as any;
+
                       debugMark( "Failed" );
 
                       result = {
@@ -1103,13 +1109,13 @@ export default class BinaryServiceController extends BaseService {
                                  Code: 'ERROR_UNEXPECTED',
                                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                                  Mark: strMark,
-                                 LogId: dbOperationResult.error.LogId,
+                                 LogId: error.LogId,
                                  IsError: true,
                                  Errors: [
                                            {
-                                             Code: dbOperationResult.error.name,
-                                             Message: dbOperationResult.error.message,
-                                             Details:  await SystemUtilities.processErrorDetails( dbOperationResult.error ) //dbOperationResult.error
+                                             Code: error.name,
+                                             Message: error.message,
+                                             Details:  await SystemUtilities.processErrorDetails( error ) //dbOperationResult.error
                                            }
                                          ],
                                  Warnings: [],
@@ -1312,7 +1318,7 @@ export default class BinaryServiceController extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -1376,7 +1382,7 @@ export default class BinaryServiceController extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     let strLanguage = "";
 
@@ -1392,7 +1398,7 @@ export default class BinaryServiceController extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -1450,7 +1456,7 @@ export default class BinaryServiceController extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -1514,7 +1520,7 @@ export default class BinaryServiceController extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     let strLanguage = "";
 
@@ -1530,7 +1536,7 @@ export default class BinaryServiceController extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -1619,7 +1625,7 @@ export default class BinaryServiceController extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -1891,7 +1897,7 @@ export default class BinaryServiceController extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     let strLanguage = "";
 
@@ -1907,7 +1913,7 @@ export default class BinaryServiceController extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -1941,7 +1947,7 @@ export default class BinaryServiceController extends BaseService {
 
         }
 
-        const binaryIndexInDB = await BinaryIndex.findOne( options );
+        const binaryIndexInDB = await SYSBinaryIndex.findOne( options );
 
         if ( binaryIndexInDB ) {
 
@@ -2300,7 +2306,7 @@ export default class BinaryServiceController extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 

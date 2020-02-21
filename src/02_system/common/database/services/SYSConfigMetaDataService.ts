@@ -5,16 +5,18 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
+import { SYSConfigMetaData } from "../models/SYSConfigMetaData";
+import { SYSUserGroup } from "../models/SYSUserGroup";
+
 import BaseService from "./BaseService";
-import { ConfigMetaData } from "../models/ConfigMetaData";
-import { UserGroup } from "../models/UserGroup";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
-const debug = require( 'debug' )( 'ConfigMetaDataService' );
+const debug = require( 'debug' )( 'SYSConfigMetaDataService' );
 
-export default class ConfigMetaDataService extends BaseService {
+export default class SYSConfigMetaDataService extends BaseService {
 
-  static readonly _ID = "ConfigMetaDataService";
+  static readonly _ID = "sysConfigMetaDataService";
 
   /*
   static async createOrUpdate( configMetaDataToCreate: any,
@@ -26,7 +28,7 @@ export default class ConfigMetaDataService extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -36,7 +38,7 @@ export default class ConfigMetaDataService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -82,7 +84,7 @@ export default class ConfigMetaDataService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -114,7 +116,7 @@ export default class ConfigMetaDataService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

@@ -13,8 +13,8 @@ import SystemConstants from "../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
-import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
-import { User } from '../../../02_system/common/database/models/User';
+import { SYSUserGroup } from '../../../02_system/common/database/models/SYSUserGroup';
+import { SYSUser } from '../../../02_system/common/database/models/SYSUser';
 
 const debug = require( 'debug' )( '001_system_check_groups_and_users_exists' );
 
@@ -56,12 +56,12 @@ export default class Always {
 
           }
 
-          const userGroupInDB = await UserGroup.findOne( options );
+          const userGroupInDB = await SYSUserGroup.findOne( options );
 
           if ( userGroupInDB === null ) {
 
             //const userGroupCreated =
-            await UserGroup.create( userGroupToCreate );
+            await SYSUserGroup.create( userGroupToCreate );
 
             /*
             if ( userGroupCreated ) {
@@ -93,14 +93,14 @@ export default class Always {
 
           }
 
-          const userInDB = await User.findOne( options );
+          const userInDB = await SYSUser.findOne( options );
 
           if ( userInDB === null ) {
 
             //userToCreate.Password = await bcrypt.hash( userToCreate.Password, 10 );
 
             //const userCreated =
-            await User.create( userToCreate );
+            await SYSUser.create( userToCreate );
 
             /*
             if ( userCreated ) {
@@ -122,7 +122,7 @@ export default class Always {
             userInDB.DisabledBy = userToCreate.DisabledBy;
 
             //const userUpdated =
-            await User.update( ( userInDB as any).dataValues,
+            await SYSUser.update( ( userInDB as any).dataValues,
                                options );
 
             /*

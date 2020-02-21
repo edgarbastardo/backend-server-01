@@ -767,7 +767,7 @@ export class DBMigrationManagerMYSQL {
     try {
 
       const dbMigrationContent = await this.getTableContent( dbConnection,
-                                                             "DBMigratedData",
+                                                             "sysDBMigratedData",
                                                              logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
@@ -864,7 +864,7 @@ export class DBMigrationManagerMYSQL {
 
                 const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strMigrationsFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
-                const strSQL = `Insert Into DBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+                const strSQL = `Insert Into sysDBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
                 await dbConnection.execute( strSQL );
 
@@ -952,7 +952,7 @@ export class DBMigrationManagerMYSQL {
     try {
 
       const dbImportedDataContent = await this.getTableContent( dbConnection,
-                                                                "DBImportedData",
+                                                                "sysDBImportedData",
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
@@ -1049,7 +1049,7 @@ export class DBMigrationManagerMYSQL {
 
                 const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strImportDataFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
-                const strSQL = `Insert Into DBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+                const strSQL = `Insert Into sysDBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
                 await dbConnection.execute( strSQL );
 

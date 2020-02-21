@@ -11,16 +11,17 @@ import SystemConstants from "../../common/SystemContants";
 import SystemUtilities from "../../common/SystemUtilities";
 import CommonUtilities from "../../common/CommonUtilities";
 
-//import { Role } from "../models/Role";
-//import { UserSessionStatus } from "../models/UserSessionStatus";
+//import { SYSRole } from "../models/Role";
+//import { SYSUserSessionStatus } from "../models/UserSessionStatus";
+//import { SYSUser } from "../../common/database/models/SYSUser";
+//import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
+//import { SYSPerson } from "../../common/database/models/SYSPerson";
+import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
+import SYSUserSessionStatusService from "../../common/database/services/SYSUserSessionStatusService";
+import SYSUserService from "../../common/database/services/SYSUserService";
+
 import DBConnectionManager from '../../common/managers/DBConnectionManager';
-import { User } from "../../common/database/models/User";
-import { UserGroup } from "../../common/database/models/UserGroup";
-import { Person } from "../../common/database/models/Person";
-import ConfigValueDataService from "../../common/database/services/ConfigValueDataService";
-import UserSessionStatusService from "../../common/database/services/UserSessionStatusService";
 import CacheManager from "../../common/managers/CacheManager";
-import UserService from "../../common/database/services/UserService";
 import I18NManager from "../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
@@ -57,15 +58,15 @@ export default class SecurityServiceController {
 
     try {
 
-      const expireTimeConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id,
-                                                                                     SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                     transaction,
-                                                                                     logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( expireTimeConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( expireTimeConfigValue.Value, logger );
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value, logger );
 
         if ( jsonConfigValue[ "#" + strOperatorId + "#" ] ) {
 
@@ -106,9 +107,9 @@ export default class SecurityServiceController {
       }
 
       if ( bSet === false &&
-           CommonUtilities.isNotNullOrEmpty( expireTimeConfigValue.Default ) ) {
+           CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( expireTimeConfigValue.Default, logger );
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default, logger );
 
         if ( jsonConfigValue[ "@__default__@" ] ) {
 
@@ -158,10 +159,10 @@ export default class SecurityServiceController {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
-                                                                          SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                          transaction,
-                                                                          logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, //SystemConstants._CONFIG_ENTRY_LoginAccessControl.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
       let bSet = false;
 
       if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
@@ -356,11 +357,11 @@ export default class SecurityServiceController {
 
     try {
 
-      result = await ConfigValueDataService.getConfigValueDataFromTags( strTags,
-                                                                        SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters.Id,
-                                                                        SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                        transaction,
-                                                                        logger );
+      result = await SYSConfigValueDataService.getConfigValueDataFromTags( strTags,
+                                                                           SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters.Id,
+                                                                           SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                           transaction,
+                                                                           logger );
 
     }
     catch ( error ) {
@@ -585,7 +586,7 @@ export default class SecurityServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -595,20 +596,20 @@ export default class SecurityServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      let user = await UserService.getByName( strUserName,
-                                              null,
-                                              currentTransaction,
-                                              logger ); // await User.findOne( options );
+      let sysUserInDB = await SYSUserService.getByName( strUserName,
+                                                        null,
+                                                        currentTransaction,
+                                                        logger ); // await User.findOne( options );
 
-      const bUserFound = user && user instanceof Error === false;
-      const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.DisabledAt );
-      const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
-      const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
-      const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
+      const bUserFound = sysUserInDB && sysUserInDB instanceof Error === false;
+      const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( sysUserInDB.DisabledAt );
+      const bUserExpired = SystemUtilities.isDateAndTimeAfter( sysUserInDB.ExpireAt );
+      const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( sysUserInDB.sysUserGroup.DisabledAt );
+      const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( sysUserInDB.sysUserGroup.ExpireAt );
 
       let bFrontendIdIsAllowed = processOptions.checkFrontendId === false;
 
@@ -616,12 +617,12 @@ export default class SecurityServiceController {
            processOptions.checkFrontendId === false ) {
 
         bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( context.FrontendId,
-                                                                                user.UserGroup.Id,
-                                                                                user.UserGroup.Name,
-                                                                                user.UserGroup.Tag,
-                                                                                user.Id,
-                                                                                user.Name,
-                                                                                user.Tag,
+                                                                                sysUserInDB.sysUserGroup.Id,
+                                                                                sysUserInDB.sysUserGroup.Name,
+                                                                                sysUserInDB.sysUserGroup.Tag,
+                                                                                sysUserInDB.Id,
+                                                                                sysUserInDB.Name,
+                                                                                sysUserInDB.Tag,
                                                                                 transaction,
                                                                                 logger ) >= 0;
 
@@ -639,7 +640,7 @@ export default class SecurityServiceController {
            bUserExpired === false &&
            bUserGroupDisabled === false &&
            bUserGroupExpired === false &&
-           await bcrypt.compare( strPassword, user.Password ) ) {
+           await bcrypt.compare( strPassword, sysUserInDB.Password ) ) {
 
         bUserPasswordIsValid = true;
 
@@ -681,18 +682,17 @@ export default class SecurityServiceController {
                                  "ImageId"
                                ];
 
-        let groupRoles = "";
-        let groupTags = "";
+        let strGroupRoles = "";
+        let strGroupTags = "";
 
         let userGroupDataResponse = null;
 
-        if ( ( user as any ).dataValues.UserGroup &&
-             ( user as any ).dataValues.UserGroup.dataValues ) {
+        if ( sysUserInDB.sysUserGroup ) {
 
-          groupRoles = ( user as any ).dataValues.UserGroup.dataValues.Role;
-          groupTags = ( user as any ).dataValues.UserGroup.dataValues.Tag;
+          strGroupRoles = sysUserInDB.sysUserGroup.Role;
+          strGroupTags = sysUserInDB.sysUserGroup.Tag;
 
-          userGroupDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserGroup.dataValues,
+          userGroupDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB.sysUserGroup as any ).dataValues,
                                                                       fieldsToDelete,
                                                                       logger );
 
@@ -700,21 +700,20 @@ export default class SecurityServiceController {
 
         let userPersonDataResponse = null;
 
-        if ( ( user as any ).dataValues.Person &&
-             ( user as any ).dataValues.Person.dataValues ) {
+        if ( sysUserInDB.sysPerson ) {
 
-          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.Person.dataValues,
+          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB.sysPerson as any ).dataValues,
                                                                        fieldsToDelete,
                                                                        logger );
 
         }
 
-        const userRoles = ( user as any ).dataValues.Role; //Save the role field value
-        const userTags = ( user as any ).dataValues.Tag; //Save the role field value
+        const userRoles = ( sysUserInDB as any ).dataValues.Role; //Save the role field value
+        const userTags = ( sysUserInDB as any ).dataValues.Tag; //Save the role field value
 
-        const createdAt = ( user as any ).dataValues.CreatedAt; //Save the CreatedAt field value
+        const createdAt = ( sysUserInDB as any ).dataValues.CreatedAt; //Save the CreatedAt field value
 
-        const userDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues,
+        const userDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB as any ).dataValues,
                                                                      fieldsToDelete,
                                                                      logger );
         userDataResponse.CreatedAt = createdAt; //Restore the field to main object struct
@@ -729,17 +728,17 @@ export default class SecurityServiceController {
                processOptions.checkOldSession ) &&
              userDataResponse.SessionsAllowed > 0 ) {
 
-          await UserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
-                                                                    userDataResponse.SessionsAllowed - 1,
-                                                                    currentTransaction,
-                                                                    logger );
+          await SYSUserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
+                                                                       userDataResponse.SessionsAllowed - 1,
+                                                                       currentTransaction,
+                                                                       logger );
 
         }
 
-        const lastLoginAt = await UserSessionStatusService.getLastUserLogin( userDataResponse.Id,
-                                                                             strAuthorization,
-                                                                             currentTransaction,
-                                                                             logger );
+        const lastLoginAt = await SYSUserSessionStatusService.getLastUserLogin( userDataResponse.Id,
+                                                                                strAuthorization,
+                                                                                currentTransaction,
+                                                                                logger );
 
         /*
         if ( lastLoggedAt ) {
@@ -757,18 +756,18 @@ export default class SecurityServiceController {
         }
         */
 
-        const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( user.UserGroup.Id,
-                                                                                              user.UserGroup.Name,
-                                                                                              user.Id,
-                                                                                              user.Name,
+        const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( sysUserInDB.sysUserGroup.Id,
+                                                                                              sysUserInDB.sysUserGroup.Name,
+                                                                                              sysUserInDB.Id,
+                                                                                              sysUserInDB.Name,
                                                                                               transaction,
                                                                                               logger );
 
         configData.hardLimit = null; //Limit by default is null not hard limit for to session
 
         //Select more close data time to current date time
-        const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( user.ExpireAt,
-                                                                        user.UserGroup.ExpireAt );
+        const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sysUserInDB.ExpireAt,
+                                                                        sysUserInDB.sysUserGroup.ExpireAt );
 
         if ( expireAt !== null ) {
 
@@ -804,7 +803,7 @@ export default class SecurityServiceController {
 
         }
 
-        const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
+        const strRolesMerged = SystemUtilities.mergeTokens( strGroupRoles,
                                                             userRoles,
                                                             true,
                                                             logger );
@@ -917,13 +916,13 @@ export default class SecurityServiceController {
         }
 
         const userSessionStatusData = {
-                                        UserId: user.Id,
-                                        UserGroupId: user.GroupId,
+                                        UserId: sysUserInDB.Id,
+                                        UserGroupId: sysUserInDB.GroupId,
                                         Token: strAuthorization,
                                         FrontendId: context.FrontendId,
                                         SourceIPAddress: context.SourceIPAddress,
                                         Role: strRolesMerged + strBasicRoles,
-                                        UserName: user.Name,
+                                        UserName: sysUserInDB.Name,
                                         ExpireKind: configData.kind,
                                         ExpireOn: configData.on,
                                         HardLimit: configData.hardLimit,
@@ -934,12 +933,12 @@ export default class SecurityServiceController {
                                         UpdatedAt: null
                                       };
 
-        const userSessionStatus = await UserSessionStatusService.createOrUpdate( user.Id, //UserId
-                                                                                 strAuthorization, //Token created
-                                                                                 userSessionStatusData, //The data
-                                                                                 true, //Force Only create
-                                                                                 currentTransaction, //Continue the current transaction
-                                                                                 logger );
+        const userSessionStatus = await SYSUserSessionStatusService.createOrUpdate( sysUserInDB.Id, //UserId
+                                                                                    strAuthorization, //Token created
+                                                                                    userSessionStatusData, //The data
+                                                                                    true, //Force Only create
+                                                                                    currentTransaction, //Continue the current transaction
+                                                                                    logger );
 
         if ( userPersonDataResponse !== null ) {
 
@@ -964,7 +963,8 @@ export default class SecurityServiceController {
 
         userSessionStatusData[ "UserTag" ] = userTags;
         //userSessionStatusData[ "User" ] = user.Name;
-        userSessionStatusData[ "UserGroupTag" ] = groupTags;
+        userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
+        userSessionStatusData[ "UserGroupShortId" ] = userGroupDataResponse.ShortId;
         userSessionStatusData[ "UserGroupName" ] = userGroupDataResponse.Name;
         userSessionStatusData[ "CreatedAt" ] = userSessionStatus.CreatedAt;
         userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
@@ -994,7 +994,7 @@ export default class SecurityServiceController {
                        Data: [
                                {
                                  Authorization: strAuthorization,
-                                 SupportToken: userSessionStatus.ShortToken,
+                                 ShortToken: userSessionStatus.ShortToken,
                                  Role: strRolesMerged + strBasicRoles,
                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
                                  User: userDataResponse,
@@ -1170,7 +1170,7 @@ export default class SecurityServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -1221,7 +1221,7 @@ export default class SecurityServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -1252,7 +1252,7 @@ export default class SecurityServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -1262,7 +1262,7 @@ export default class SecurityServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -1274,466 +1274,9 @@ export default class SecurityServiceController {
                                                                      currentTransaction,
                                                                      logger );
 
-      /*
-      const options = {
-
-        where: { Name: strUserName },
-        transaction: currentTransaction,
-        include: [
-                  {
-                    model: UserGroup,
-                  },
-                  {
-                    model: Person,
-                  }
-                 ]
-        //context: { TimeZoneId: "America/Los_Angeles" }
-
-      }
-
-      let user = await User.findOne( options );
-
-      const bUserFound = CommonUtilities.isNotNullOrEmpty( user );
-      const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.DisabledAt );
-      const bUserExpired = SystemUtilities.isDateAndTimeAfter( user.ExpireAt );
-      const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( user.UserGroup.DisabledAt );
-      const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( user.UserGroup.ExpireAt );
-      const bFrontendIdIsAllowed = bUserFound && await this.getFrontendIdIsAllowed( context.FrontendId,
-                                                                                    user.UserGroup.Id,
-                                                                                    user.UserGroup.Name,
-                                                                                    user.UserGroup.Tag,
-                                                                                    user.Id,
-                                                                                    user.Name,
-                                                                                    user.Tag,
-                                                                                    transaction,
-                                                                                    logger ) >= 0;
-      let bUserPasswordIsValid = false;
-
-      if ( bUserFound &&
-           bUserDisabled === false &&
-           bUserExpired === false &&
-           bUserGroupDisabled === false &&
-           bUserGroupExpired === false &&
-           await bcrypt.compare( strPassword, user.Password ) ) {
-
-        bUserPasswordIsValid = true;
-
-      }
-
-      if ( bUserFound &&
-           bFrontendIdIsAllowed &&
-           bUserDisabled === false &&
-           bUserExpired === false &&
-           bUserGroupDisabled === false &&
-           bUserGroupExpired === false &&
-           bUserPasswordIsValid ) {
-
-        const fieldsToDelete = [
-                                 "Comment",
-                                 "CreatedBy",
-                                 "CreatedAt",
-                                 "UpdatedBy",
-                                 "UpdatedAt",
-                                 "DisabledBy",
-                                 "DisabledAt",
-                                 "Password",
-                                 "ExtraData",
-                                 "UserGroup",
-                                 "UserPerson",
-                                 "AllowTagAccess",
-                                 "DenyTagAccess",
-                                 "Role",
-                                 "Tag",
-                                 "ExpireAt",
-                               ];
-
-        let groupRoles = "";
-        let groupTags = "";
-
-        let userGroupDataResponse = null;
-
-        if ( ( user as any ).dataValues.UserGroup &&
-             ( user as any ).dataValues.UserGroup.dataValues ) {
-
-          groupRoles = ( user as any ).dataValues.UserGroup.dataValues.Role;
-          groupTags = ( user as any ).dataValues.UserGroup.dataValues.Tag;
-
-          userGroupDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.UserGroup.dataValues,
-                                                                      fieldsToDelete,
-                                                                      logger );
-
-        }
-
-        let userPersonDataResponse = null;
-
-        if ( ( user as any ).dataValues.Person &&
-             ( user as any ).dataValues.Person.dataValues ) {
-
-          userPersonDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues.Person.dataValues,
-                                                                       fieldsToDelete,
-                                                                       logger );
-
-        }
-
-        const userRoles = ( user as any ).dataValues.Role; //Save the role field value
-        const userTags = ( user as any ).dataValues.Tag; //Save the role field value
-
-        const createdAt = ( user as any ).dataValues.CreatedAt; //Save the CreatedAt field value
-
-        const userDataResponse = CommonUtilities.deleteObjectFields( ( user as any ).dataValues,
-                                                                     fieldsToDelete,
-                                                                     logger );
-        userDataResponse.CreatedAt = createdAt; //Restore the field to main object struct
-
-        SystemUtilities.transformObjectToTimeZone( userDataResponse,
-                                                   context.TimeZoneId,
-                                                   logger ); //Convert to local timezoneId
-
-        const strAuthorizationToken = SystemUtilities.getUUIDv4();
-
-        delete options[ "where" ];
-        delete options[ "include" ];
-
-        if ( userDataResponse.SessionsAllowed > 0 ) {
-
-          await UserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
-                                                                    userDataResponse.SessionsAllowed - 1,
-                                                                    currentTransaction,
-                                                                    logger );
-
-        }
-
-        const lastLoggedAt = await UserSessionStatusService.getLastUserLogin( userDataResponse.Id,
-                                                                              currentTransaction,
-                                                                              logger );
-
-        if ( lastLoggedAt ) {
-
-          userDataResponse.LastLoggerAt = SystemUtilities.transformToTimeZone( lastLoggedAt,
-                                                                               context.TimeZoneId,
-                                                                               undefined,
-                                                                               logger );
-
-        }
-        else {
-
-          userDataResponse.LastLoggerAt = null; //Never
-
-        }
-
-        const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( user.UserGroup.Id,
-                                                                                              user.UserGroup.Name,
-                                                                                              user.Id,
-                                                                                              user.Name,
-                                                                                              transaction,
-                                                                                              logger );
-
-        configData.hardLimit = null; //Limit by default is null not hard limit for to session
-
-        //Select more close data time to current date time
-        const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( user.ExpireAt,
-                                                                        user.UserGroup.ExpireAt );
-
-        if ( expireAt !== null ) {
-
-          if ( configData.kind === 0 ||   //Calculated from UpdatedAt
-               configData.kind === 1 ) {  //Calculated from CreatedAt
-
-            const expireOn = SystemUtilities.getCurrentDateAndTimeIncMinutes( configData.on );
-
-            if ( expireOn.isAfter( expireAt ) ) {
-
-              configData.kind = 2;     //Overwrite and use the value of 2
-              configData.on = expireAt; //Use now this fixed date time
-
-            }
-
-            configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
-
-          }
-          else if ( configData.kind === 2 ) { //Fixed expire Date and Time
-
-            const expireOn = SystemUtilities.getCurrentDateAndTimeFrom( configData.on )
-
-            if ( expireOn.isAfter( expireAt ) ) {
-
-              configData.kind = 2;
-              configData.on = expireAt;    //Overwrite and use now the value defined in ExpireAt and not in the config
-              configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
-
-            }
-
-          }
-
-        }
-
-        const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
-                                                            userRoles,
-                                                            true,
-                                                            logger );
-
-        let strBasicRoles = "";
-
-        if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
-
-          if ( strRolesMerged.length > 0 ) {
-
-            strBasicRoles = ",#Authenticated#";
-
-          }
-          else {
-
-            strBasicRoles = "#Authenticated#";
-
-          }
-
-        }
-
-        if ( strRolesMerged.includes( "#Public#" ) === false ) {
-
-          if ( strBasicRoles.length > 0 ) {
-
-            strBasicRoles = strBasicRoles + ",#Public#";
-
-          }
-          else if ( strRolesMerged.length > 0 ) {
-
-            strBasicRoles = ",#Public#";
-
-          }
-          else {
-
-            strBasicRoles = "#Public#";
-
-          }
-
-        }
-
-        const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
-                                                                      userDataResponse,
-                                                                      logger );
-
-        const userSessionStatusData = {
-                                        UserId: user.Id,
-                                        UserGroupId: user.GroupId,
-                                        Token: strAuthorizationToken,
-                                        FrontendId: context.FrontendId,
-                                        SourceIPAddress: context.SourceIPAddress,
-                                        Role: strRolesMerged + strBasicRoles,
-                                        UserName: user.Name,
-                                        ExpireKind: configData.kind,
-                                        ExpireOn: configData.on,
-                                        HardLimit: configData.hardLimit,
-                                        Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
-                                        CreatedBy: strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                        UpdatedBy: strUserName //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
-                                      };
-
-        const userSessionStatus = await UserSessionStatusService.createOrUpdate( user.Id, //UserId
-                                                                                 strAuthorizationToken, //Token created
-                                                                                 userSessionStatusData, //The data
-                                                                                 false, //Force Only create
-                                                                                 currentTransaction, //Continue the current transaction
-                                                                                 logger );
-
-        if ( userPersonDataResponse !== null ) {
-
-          userSessionStatusData[ "PersonId" ] = userPersonDataResponse.PersonId;
-          userSessionStatusData[ "Title" ] = userPersonDataResponse.Title;
-          userSessionStatusData[ "FirstName" ] = userPersonDataResponse.FirstName;
-          userSessionStatusData[ "LastName" ] = userPersonDataResponse.LastName;
-          userSessionStatusData[ "EMail" ] = userPersonDataResponse.EMail;
-          userSessionStatusData[ "Phone" ] = userPersonDataResponse.Phone;
-
-        }
-        else {
-
-          userSessionStatusData[ "PersonId" ] = "";
-          userSessionStatusData[ "Title" ] = "";
-          userSessionStatusData[ "FirstName" ] = "";
-          userSessionStatusData[ "LastName" ] = "";
-          userSessionStatusData[ "EMail" ] = "";
-          userSessionStatusData[ "Phone" ] = "";
-
-        }
-
-        userSessionStatusData[ "UserTag" ] = userTags;
-        //userSessionStatusData[ "User" ] = user.Name;
-        userSessionStatusData[ "UserGroupTag" ] = groupTags;
-        userSessionStatusData[ "UserGroupName" ] = userGroupDataResponse.Name;
-        userSessionStatusData[ "CreatedAt" ] = userSessionStatus.CreatedAt;
-        userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
-        userSessionStatusData[ "LoggedOutBy" ] = null;
-        userSessionStatusData[ "LoggedOutAt" ] = null;
-
-        await CacheManager.setDataWithTTL( strAuthorizationToken,
-                                           JSON.stringify( userSessionStatusData ),
-                                           300, //5 minutes in seconds
-                                           logger );
-
-        if ( userSessionStatus !== null ) {
-
-          result = {
-                     StatusCode: 200, //Ok
-                     Code: 'SUCCESS_LOGIN',
-                     Message: await I18NManager.translate( context.Language, 'Sucess login' ),
-                     Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: false,
-                     Errors: [],
-                     Warnings: detectedWarnings.warnings,
-                     Count: 1,
-                     Data: [
-                             {
-                               Authorization: strAuthorizationToken,
-                               SupportToken: userSessionStatus.ShortToken,
-                               User: userDataResponse,
-                               Group: userGroupDataResponse,
-                               Person: userPersonDataResponse
-                             }
-                           ]
-                   };
-
-        }
-
-      }
-      else if ( bUserDisabled ) {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_DISABLED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
-                   Mark: 'C2344BE0E051' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_DISABLED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else if ( bUserExpired ) {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_EXPIRED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
-                   Mark: '5E65F3A6BB84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_EXPIRED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else if ( bUserGroupDisabled ) {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_GROUP_DISABLED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
-                   Mark: 'C0631A69B6F6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else if ( bUserGroupExpired ) {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
-                   Mark: 'B621392319E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else if ( bFrontendIdIsAllowed === false ) {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                   Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
-                   Mark: 'D8E7BA64792D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                               Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else {
-
-        result = {
-                   StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_LOGIN_FAILED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
-                   Mark: '22E89FB65D2B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_LOGIN_FAILED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      */
-
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -1784,7 +1327,7 @@ export default class SecurityServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -1813,7 +1356,7 @@ export default class SecurityServiceController {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
 
     try {
@@ -1824,22 +1367,22 @@ export default class SecurityServiceController {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
-      let userSessionStatus = await UserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                          currentTransaction,
-                                                                                          logger ); //Find in the database
+      let userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                             currentTransaction,
+                                                                                             logger ); //Find in the database
 
       if ( CommonUtilities.isNotNullOrEmpty( userSessionStatus ) ) {
 
         if ( strToken.startsWith( "p:" ) === false ) {
 
-          const UserInfo = await UserService.getById( userSessionStatus.UserId,
-                                                      null,
-                                                      null,
-                                                      logger );
+          const UserInfo = await SYSUserService.getById( userSessionStatus.UserId,
+                                                         null,
+                                                         null,
+                                                         logger );
 
           userSessionStatus.LoggedOutBy = UserInfo.Name;
           userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
@@ -1861,22 +1404,22 @@ export default class SecurityServiceController {
               await CacheManager.deleteData( strToken,
                                              logger ); //Delete the token in the central cache
 
-              await UserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
-                                                            strToken,
-                                                            {
-                                                              UserId: userSessionStatus.UserId,
-                                                              Token: strToken,
-                                                              LoggedOutBy: UserInfo.Name,
-                                                              UpdatedBy: UserInfo.Name,
-                                                              LoggedOutAt: SystemUtilities.getCurrentDateAndTime().format(),
-                                                              UpdatedAt: SystemUtilities.getCurrentDateAndTime().format()
-                                                            },
-                                                            true,
-                                                            null,
-                                                            logger ); //Refresh the LoggedOutBy, LoggedOutAt, UpdatedAt field in central db
+              await SYSUserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
+                                                                strToken,
+                                                                {
+                                                                  UserId: userSessionStatus.UserId,
+                                                                  Token: strToken,
+                                                                  LoggedOutBy: UserInfo.Name,
+                                                                  UpdatedBy: UserInfo.Name,
+                                                                  UpdatedAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                  LoggedOutAt: SystemUtilities.getCurrentDateAndTime().format()
+                                                                },
+                                                                true,
+                                                                null,
+                                                                logger ); //Refresh the LoggedOutBy, LoggedOutAt, UpdatedAt field in central db
 
               await CacheManager.unlockResource( lockedResource,
-                                                logger );
+                                                 logger );
 
               result = {
                          StatusCode: 200, //Ok
@@ -1989,7 +1532,7 @@ export default class SecurityServiceController {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -2040,7 +1583,7 @@ export default class SecurityServiceController {
                };
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

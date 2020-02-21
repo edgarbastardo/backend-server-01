@@ -20,22 +20,25 @@ import {
          //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 import bcrypt from 'bcrypt';
+
+import { SYSUserGroup } from "./SYSUserGroup";
+import { SYSPerson } from "./SYSPerson";
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import { UserGroup } from "./UserGroup";
-import { Person } from "./Person";
-
-const debug = require( 'debug' )( 'User' );
+const debug = require( 'debug' )( 'SYSUser' );
 
 @Table( {
   timestamps: false,
+  tableName: "sysUser",
+  modelName: "sysUser"
 } )
-export class User extends Model<User> {
+export class SYSUser extends Model<SYSUser> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -57,12 +60,12 @@ export class User extends Model<User> {
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => UserGroup )
+  @ForeignKey( () => SYSUserGroup )
   GroupId: string;
 
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  @ForeignKey( () => Person )
+  @ForeignKey( () => SYSPerson )
   PersonId: string;
 
   @Column( { type: DataType.TINYINT, allowNull: false } )
@@ -126,17 +129,17 @@ export class User extends Model<User> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => UserGroup, "GroupId" )
-  UserGroup: UserGroup;
+  @BelongsTo( () => SYSUserGroup, "GroupId" )
+  sysUserGroup: SYSUserGroup;
 
   //@BelongsTo( () => Person, "PersonId" )
   //UserPerson: Person;
 
-  @BelongsTo( () => Person, "PersonId" )
-  Person: Person;
+  @BelongsTo( () => SYSPerson, "PersonId" )
+  sysPerson: SYSPerson;
 
   @BeforeValidate
-  static beforeValidateHook( instance: User, options: any ): any {
+  static beforeValidateHook( instance: SYSUser, options: any ): any {
 
     //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
     //debugMark( "context:\n %O", options.context );
@@ -236,10 +239,10 @@ export class User extends Model<User> {
 
       }
 
-      if ( result.Person &&
-           result.Person.ExtraData ) {
+      if ( result.sysPerson &&
+           result.sysPerson.ExtraData ) {
 
-        const extraData = CommonUtilities.parseJSON( result.Person.ExtraData,
+        const extraData = CommonUtilities.parseJSON( result.sysPerson.ExtraData,
                                                      params.logger );
 
         if ( extraData &&
@@ -249,14 +252,14 @@ export class User extends Model<User> {
 
         }
 
-        result.Person.ExtraData = extraData;
+        result.SYSPerson.ExtraData = extraData;
 
       }
 
-      if ( result.UserGroup &&
-           result.UserGroup.ExtraData ) {
+      if ( result.sysUserGroup &&
+           result.sysUserGroup.ExtraData ) {
 
-        const extraData = CommonUtilities.parseJSON( result.UserGroup.ExtraData,
+        const extraData = CommonUtilities.parseJSON( result.sysUserGroup.ExtraData,
                                                      params.logger );
 
         if ( extraData &&
@@ -266,7 +269,7 @@ export class User extends Model<User> {
 
         }
 
-        result.UserGroup.ExtraData = extraData;
+        result.SYSUserGroup.ExtraData = extraData;
 
       }
 

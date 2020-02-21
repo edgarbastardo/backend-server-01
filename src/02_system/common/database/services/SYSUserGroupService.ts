@@ -6,26 +6,68 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import { UserGroup } from "../models/UserGroup";
+import { SYSUserGroup } from "../models/SYSUserGroup";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'UserGroupService' );
+const debug = require( 'debug' )( 'SYSUserGroupService' );
 
-export default class UserGroupService extends BaseService {
+export default class SYSUserGroupService extends BaseService {
 
-  static readonly _ID = "UserGroupService";
+  static readonly _ID = "sysUserGroupService";
+
+  static async getBy( by: { Id: string, ShortId: string, Name: string },
+                      strTimeZoneId: string,
+                      transaction: any,
+                      logger: any ): Promise<SYSUserGroup> {
+
+    let result: SYSUserGroup = null;
+
+    if ( by.Name ) {
+
+      result = await this.getByName( by.Name,
+                                     strTimeZoneId,
+                                     transaction,
+                                     logger );
+
+    }
+
+    if ( result === null &&
+         by.Id ) {
+
+      result = await this.getById( by.Id,
+                                   strTimeZoneId,
+                                   transaction,
+                                   logger );
+
+    }
+
+    if ( result === null &&
+         by.ShortId ) {
+
+      result = await this.getByShortId( by.ShortId,
+                                        strTimeZoneId,
+                                        transaction,
+                                        logger );
+
+    }
+
+    return result;
+
+  }
 
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<UserGroup> {
+                        logger: any ): Promise<SYSUserGroup> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -35,7 +77,7 @@ export default class UserGroupService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -46,7 +88,7 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await SYSUserGroup.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -58,7 +100,7 @@ export default class UserGroupService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -90,7 +132,101 @@ export default class UserGroupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getByShortId( strShortId: string,
+                             strTimeZoneId: string,
+                             transaction: any,
+                             logger: any ): Promise<SYSUserGroup> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "ShortId": strShortId },
+        transaction: currentTransaction,
+
+      }
+
+      result = await SYSUserGroup.findOne( options );
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getById.name;
+
+      const strMark = "55D9FD1115C6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bIsLocalTransaction ) {
 
         try {
 
@@ -113,13 +249,13 @@ export default class UserGroupService extends BaseService {
   static async getByName( strName: string,
                           strTimeZoneId: string,
                           transaction: any,
-                          logger: any ): Promise<UserGroup> {
+                          logger: any ): Promise<SYSUserGroup> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -129,7 +265,7 @@ export default class UserGroupService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -140,7 +276,7 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await SYSUserGroup.findOne( options );
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -152,7 +288,7 @@ export default class UserGroupService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -184,7 +320,7 @@ export default class UserGroupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -278,16 +414,37 @@ export default class UserGroupService extends BaseService {
 
   }
 
+  static async checkDisabled( userGroup: SYSUserGroup ): Promise<boolean> {
+
+    return userGroup ? userGroup.DisabledBy !== null ||
+                       userGroup.DisabledAt !== null : false;
+
+  }
+
+  static async checkExpired( userGroup: SYSUserGroup ): Promise<boolean> {
+
+    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+
+  }
+
+  static async checkDisabledOrExpired( userGroup: SYSUserGroup ): Promise<boolean> {
+
+    return userGroup ? userGroup.DisabledBy !== null ||
+                       userGroup.DisabledAt !== null ||
+                       SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+
+  }
+
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<UserGroup> {
+                               logger: any ): Promise<SYSUserGroup> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -297,7 +454,7 @@ export default class UserGroupService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -308,11 +465,11 @@ export default class UserGroupService extends BaseService {
 
       }
 
-      result = await UserGroup.findOne( options );
+      result = await SYSUserGroup.findOne( options );
 
       if ( result === null ) {
 
-        result = await UserGroup.create(
+        result = await SYSUserGroup.create(
                                          createOrUpdateData,
                                          { transaction: currentTransaction }
                                        );
@@ -328,13 +485,13 @@ export default class UserGroupService extends BaseService {
 
         }
 
-        const updateResult = await UserGroup.update( currentValues,
+        const updateResult = await SYSUserGroup.update( currentValues,
                                                      options );
 
         if ( updateResult.length > 0 &&
           updateResult[ 0 ] >= 1 ) {
 
-          result = await UserGroup.findOne( options );
+          result = await SYSUserGroup.findOne( options );
 
         }
 
@@ -342,7 +499,7 @@ export default class UserGroupService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -374,7 +531,7 @@ export default class UserGroupService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 

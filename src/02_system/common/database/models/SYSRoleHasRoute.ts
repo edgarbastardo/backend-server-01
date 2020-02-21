@@ -8,25 +8,29 @@ import {
          BeforeValidate,
          //AfterFind
        } from "sequelize-typescript";
-import { Role } from "./Role";
-import { Route } from "./Route";
+
+import { SYSRole } from "./SYSRole";
+import { SYSRoute } from "./SYSRoute";
+
+//import moment = require("moment-timezone");
+
 import CommonUtilities from "../../CommonUtilities";
-import moment = require("moment-timezone");
 import SystemUtilities from "../../SystemUtilities";
-//import SystemUtilities from "../../common/SystemUtilities";
 
 @Table( {
-  timestamps: false
+  timestamps: false,
+  tableName: "sysRoleHasRoute",
+  modelName: "sysRoleHasRoute"
 } )
-export class RoleHasRoute extends Model<RoleHasRoute> {
+export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
 
-  @ForeignKey( () => Role )
+  @ForeignKey( () => SYSRole )
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
   RoleId: string;
 
   //@BelongsTo(() => Parent, { foreignKey: { allowNull: false }, onDelete: 'CASCADE'})
-  @ForeignKey( () => Route )
+  @ForeignKey( () => SYSRoute )
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
   RouteId: string;
@@ -38,7 +42,7 @@ export class RoleHasRoute extends Model<RoleHasRoute> {
   CreatedAt: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: RoleHasRoute, options: any ): void {
+  static beforeValidateHook( instance: SYSRoleHasRoute, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
 

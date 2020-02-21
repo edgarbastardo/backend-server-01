@@ -7,6 +7,7 @@ import {
          BeforeValidate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
 //import moment from "moment-timezone";
@@ -16,13 +17,16 @@ import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
   timestamps: false,
+  tableName: "sysConfigValueData",
+  modelName: "sysConfigValueData"
 } )
-export class UserSessionPersistent extends Model<UserSessionPersistent> {
+export class SYSConfigValueData extends Model<SYSConfigValueData> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
 
       if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
@@ -31,25 +35,30 @@ export class UserSessionPersistent extends Model<UserSessionPersistent> {
 
       }
 
+      if ( CommonUtilities.isNullOrEmpty( values.ShortId ) ) {
+
+        this.ShortId = SystemUtilities.hashString( this.id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
+
+      }
+
     }
+    */
 
   }
 
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
-  Id: string;
+  ConfigMetaDataId: string;
 
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  UserId: string;
+  @PrimaryKey
+  @Column( { type: DataType.STRING( 40 ) } )
+  Owner: string;
 
-  @Column( { type: DataType.STRING( 175 ), allowNull: false, unique: true } )
-  Token: string;
+  @Column( { type: DataType.TEXT } )
+  Value: string;
 
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  BinaryDataToken: string;
-
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  SocketToken: string;
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
+  ValueLabel: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
@@ -57,10 +66,10 @@ export class UserSessionPersistent extends Model<UserSessionPersistent> {
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 30 ) } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
@@ -69,26 +78,25 @@ export class UserSessionPersistent extends Model<UserSessionPersistent> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  DisabledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  ExpireAt: string;
-
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: UserSessionPersistent, options: any ): void {
+  static beforeValidateHook( instance: SYSConfigValueData, options: any ): void {
 
+    /*
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 
       instance.Id = SystemUtilities.getUUIDv4();
 
     }
+
+    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ) {
+
+      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
+
+    }
+    */
 
     if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
 

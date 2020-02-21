@@ -8,20 +8,24 @@ import {
          BeforeValidate,
          //AfterFind,
        } from "sequelize-typescript";
-import { RoleHasRoute } from "./RoleHasRoute";
-import { Route } from "./Route";
 import { BuildOptions } from "sequelize/types";
+
+import { SYSRoleHasRoute } from "./SYSRoleHasRoute";
+import { SYSRoute } from "./SYSRoute";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
-import CommonUtilities from "../../CommonUtilities";
 //import moment from "moment-timezone";
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
-//import SystemUtilities from "../../common/SystemUtilities";
 
 @Table( {
   timestamps: false,
+  tableName: "sysRole",
+  modelName: "sysRole"
 } )
-export class Role extends Model<Role> {
+export class SYSRole extends Model<SYSRole> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -83,11 +87,11 @@ export class Role extends Model<Role> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
-  @BelongsToMany( () => Route, () => RoleHasRoute )
-  routes?: Route[];
+  @BelongsToMany( () => SYSRoute, () => SYSRoleHasRoute )
+  routes?: SYSRoute[];
 
   @BeforeValidate
-  static beforeValidateHook( instance: Role, options: any ): void {
+  static beforeValidateHook( instance: SYSRole, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 

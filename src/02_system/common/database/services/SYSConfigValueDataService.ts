@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import CommonConstants from "../../CommonConstants";
@@ -7,15 +8,17 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
-import DBConnectionManager from "../../managers/DBConnectionManager";
-import BaseService from "./BaseService";
 //import { UserGroup } from "../models/UserGroup";
 
-const debug = require( 'debug' )( 'ConfigValueDataService' );
+import DBConnectionManager from "../../managers/DBConnectionManager";
 
-export default class ConfigValueDataService extends BaseService {
+import BaseService from "./BaseService";
 
-  static readonly _ID = "ConfigValueDataService";
+const debug = require( 'debug' )( 'SYSConfigValueDataService' );
+
+export default class SYSConfigValueDataService extends BaseService {
+
+  static readonly _ID = "sysConfigValueDataService";
 
   static async getConfigValueData( strConfigMetaDataId: string,
                                    strOnwer: string,
@@ -26,7 +29,7 @@ export default class ConfigValueDataService extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -36,7 +39,7 @@ export default class ConfigValueDataService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -65,7 +68,7 @@ export default class ConfigValueDataService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -97,7 +100,7 @@ export default class ConfigValueDataService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -185,10 +188,10 @@ export default class ConfigValueDataService extends BaseService {
 
     let result = null;
 
-    const configData = await ConfigValueDataService.getConfigValueData( strConfigId,
-                                                                        strConfigOwner,
-                                                                        transaction,
-                                                                        logger );
+    const configData = await SYSConfigValueDataService.getConfigValueData( strConfigId,
+                                                                           strConfigOwner,
+                                                                           transaction,
+                                                                           logger );
 
     try {
 
@@ -225,10 +228,10 @@ export default class ConfigValueDataService extends BaseService {
         }
         else {
 
-          let searchConfigData = ConfigValueDataService.searchInTags( jsonConfig,
-                                                                      userSessionStatus.UserTag,
-                                                                      strPostfix,
-                                                                      logger );
+          let searchConfigData = SYSConfigValueDataService.searchInTags( jsonConfig,
+                                                                         userSessionStatus.UserTag,
+                                                                         strPostfix,
+                                                                         logger );
 
           if ( searchConfigData === null ) {
 
@@ -254,10 +257,10 @@ export default class ConfigValueDataService extends BaseService {
             }
             else {
 
-              searchConfigData = ConfigValueDataService.searchInTags( jsonConfig,
-                                                                      userSessionStatus.UserGroupTag,
-                                                                      strPostfix,
-                                                                      logger );
+              searchConfigData = SYSConfigValueDataService.searchInTags( jsonConfig,
+                                                                         userSessionStatus.UserGroupTag,
+                                                                         strPostfix,
+                                                                         logger );
 
               if ( searchConfigData === null ) {
 
@@ -342,10 +345,10 @@ export default class ConfigValueDataService extends BaseService {
 
     let result = null;
 
-    const configData = await ConfigValueDataService.getConfigValueData( strConfigId,
-                                                                        strConfigOwner,
-                                                                        transaction,
-                                                                        logger );
+    const configData = await SYSConfigValueDataService.getConfigValueData( strConfigId,
+                                                                           strConfigOwner,
+                                                                           transaction,
+                                                                           logger );
 
     try {
 
@@ -360,10 +363,10 @@ export default class ConfigValueDataService extends BaseService {
 
       if ( jsonConfig ) {
 
-        let searchConfigData = ConfigValueDataService.searchInTags( jsonConfig,
-                                                                    strTags,
-                                                                    "",
-                                                                    logger );
+        let searchConfigData = SYSConfigValueDataService.searchInTags( jsonConfig,
+                                                                       strTags,
+                                                                       "",
+                                                                       logger );
 
 
         jsonConfig = searchConfigData;
@@ -588,12 +591,12 @@ export default class ConfigValueDataService extends BaseService {
 
     let result = { allowed: "*", denied: null }; //Default allow all
 
-    const configData = await ConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
-                                                                                   strConfigId,
-                                                                                   strConfigOwner,
-                                                                                   strPostfix,
-                                                                                   transaction,
-                                                                                   logger );
+    const configData = await SYSConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
+                                                                                      strConfigId,
+                                                                                      strConfigOwner,
+                                                                                      strPostfix,
+                                                                                      transaction,
+                                                                                      logger );
 
     if ( configData &&
          configData.allowed !== undefined &&
@@ -620,12 +623,12 @@ export default class ConfigValueDataService extends BaseService {
 
     try {
 
-      const configData = await ConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
-                                                                                             strConfigId,
-                                                                                             strConfigOwner,
-                                                                                             strPostfix,
-                                                                                             transaction,
-                                                                                             logger );
+      const configData = await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
+                                                                                                strConfigId,
+                                                                                                strConfigOwner,
+                                                                                                strPostfix,
+                                                                                                transaction,
+                                                                                                logger );
 
       result.denied = configData.denied;
       result.allowed = configData.allowed;

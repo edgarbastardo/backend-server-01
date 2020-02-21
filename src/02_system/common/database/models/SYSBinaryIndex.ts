@@ -7,16 +7,20 @@ import {
          BeforeValidate,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
-import CommonUtilities from "../../CommonUtilities";
 //import moment from "moment-timezone";
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
-  timestamps: false
+  timestamps: false,
+  tableName: "sysBinaryIndex",
+  modelName: "sysBinaryIndex"
 } )
-export class BinaryIndex extends Model<BinaryIndex> {
+export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -133,7 +137,7 @@ export class BinaryIndex extends Model<BinaryIndex> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: BinaryIndex, options: any ): void {
+  static beforeValidateHook( instance: SYSBinaryIndex, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 

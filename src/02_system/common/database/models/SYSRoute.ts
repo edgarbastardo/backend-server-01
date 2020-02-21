@@ -13,21 +13,25 @@ import {
          //BeforeSave,
          BeforeValidate,
        } from "sequelize-typescript";
+import { BuildOptions } from "sequelize/types";
 //import { Sequelize as OriginSequelize, Utils } from "sequelize";
-import { RoleHasRoute } from "./RoleHasRoute";
-import { Role } from "./Role";
+
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
-import CommonUtilities from "../../CommonUtilities";
-import { BuildOptions } from "sequelize/types";
 //import moment from 'moment-timezone';
+
+import { SYSRoleHasRoute } from "./SYSRoleHasRoute";
+import { SYSRole } from "./SYSRole";
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
-import moment = require("moment-timezone");
 
 @Table( {
-  timestamps: false
+  timestamps: false,
+  tableName: "sysRoute",
+  modelName: "sysRoute"
 } )
-export class Route extends Model<Route> {
+export class SYSRoute extends Model<SYSRoute> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -89,11 +93,11 @@ export class Route extends Model<Route> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
-  @BelongsToMany( () => Role, () => RoleHasRoute )
-  Roles: Role[];
+  @BelongsToMany( () => SYSRole, () => SYSRoleHasRoute )
+  Roles: SYSRole[];
 
   @BeforeValidate
-  static beforeValidateHook( instance: Route, options: any ): void {
+  static beforeValidateHook( instance: SYSRoute, options: any ): void {
 
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) &&
          CommonUtilities.isNotNullOrEmpty( instance.RequestKind ) &&

@@ -7,7 +7,7 @@ import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
-import ConfigValueDataService from "../database/services/ConfigValueDataService";
+import SYSConfigValueDataService from "../database/services/SYSConfigValueDataService";
 import GeoMapGoogle from '../implementations/geomaps/GeoMapGoogle';
 
 const debug = require( 'debug' )( 'GeoMapManager' );
@@ -21,16 +21,16 @@ export default class GeoMapManager {
 
     try {
 
-      const mapGeocodeServiceConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service.Id,
-                                                                                            SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                            transaction,
-                                                                                            logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( mapGeocodeServiceConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( mapGeocodeServiceConfigValue.Value,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -52,9 +52,9 @@ export default class GeoMapManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( mapGeocodeServiceConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( mapGeocodeServiceConfigValue.Default,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -112,16 +112,16 @@ export default class GeoMapManager {
 
     try {
 
-      const mapDistanceServiceConfigValue = await ConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service.Id,
-                                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                                                             transaction,
-                                                                                             logger );
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
 
       let bSet = false;
 
-      if ( CommonUtilities.isNotNullOrEmpty( mapDistanceServiceConfigValue.Value ) ) {
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( mapDistanceServiceConfigValue.Value,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                            logger );
 
         const strService = jsonConfigValue.service
@@ -143,9 +143,9 @@ export default class GeoMapManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( mapDistanceServiceConfigValue.Default ) ) {
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
-        const jsonConfigValue = CommonUtilities.parseJSON( mapDistanceServiceConfigValue.Default,
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
 
         const strService = jsonConfigValue.service

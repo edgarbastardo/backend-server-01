@@ -12,8 +12,8 @@ import SystemConstants from "../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
-import { User } from '../../../02_system/common/database/models/User';
-import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
+import { SYSUser } from '../../../02_system/common/database/models/SYSUser';
+import { SYSUserGroup } from '../../../02_system/common/database/models/SYSUserGroup';
 
 const debug = require( 'debug' )( '003_system_check_foreign_systems_groups_and_users_exists' );
 
@@ -44,7 +44,7 @@ export default class Always {
                                    Tag: "#Foreign_Systems#",
                                    Comment: "Created from backend startup. Group of users associated to persistent sessions tokens and foreign systems.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                   DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
                                ]
 
@@ -60,11 +60,11 @@ export default class Always {
 
           }
 
-          const userGroupInDB = await UserGroup.findOne( options );
+          const userGroupInDB = await SYSUserGroup.findOne( options );
 
           if ( userGroupInDB === null ) {
 
-            await UserGroup.create( userGroupToCreate );
+            await SYSUserGroup.create( userGroupToCreate );
 
           }
           else if ( !userGroupInDB.Tag ||
@@ -73,7 +73,7 @@ export default class Always {
             userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
 
-            await UserGroup.update( ( userGroupInDB as any ).dataValues, options );
+            await SYSUserGroup.update( ( userGroupInDB as any ).dataValues, options );
 
           }
 
@@ -96,7 +96,7 @@ export default class Always {
                               Tag: "#Foreign_Systems#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
@@ -110,7 +110,7 @@ export default class Always {
                               Tag: "#Foreign_Systems#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
@@ -124,7 +124,7 @@ export default class Always {
                               Tag: "#Foreign_Systems#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "e4f82a85-c800-47bc-bc3a-f6a427f3da02",
@@ -138,7 +138,7 @@ export default class Always {
                               Tag: "#Foreign_Systems#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
                               Id: "4607413a-3dca-4a8a-9f2b-2fee3617a990",
@@ -152,7 +152,7 @@ export default class Always {
                               Tag: "#Foreign_Systems#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                           ]
 
@@ -166,11 +166,11 @@ export default class Always {
 
           }
 
-          const userInDB = await User.findOne( options );
+          const userInDB = await SYSUser.findOne( options );
 
           if ( userInDB === null ) {
 
-            await User.create( userToCreate );
+            await SYSUser.create( userToCreate );
 
           }
           else if ( !userInDB.Tag ||
@@ -181,7 +181,7 @@ export default class Always {
             userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userInDB.DisabledBy = userToCreate.DisabledBy;
 
-            await User.update( ( userInDB as any ).dataValues,
+            await SYSUser.update( ( userInDB as any ).dataValues,
                                options );
 
           }

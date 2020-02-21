@@ -8,25 +8,27 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from '../../SystemUtilities';
 
-import { UserSessionStatus } from "../models/UserSessionStatus";
+import { SYSUserSessionStatus } from "../models/SYSUserSessionStatus";
+
 import DBConnectionManager from "../../managers/DBConnectionManager";
+
 import BaseService from "./BaseService";
 
-const debug = require( 'debug' )( 'UserSessionStatus' );
+const debug = require( 'debug' )( 'SYSUserSessionStatus' );
 
-export default class UserSessionStatusService extends BaseService {
+export default class SYSUserSessionStatusService extends BaseService {
 
-  static readonly _ID = "UserSessionStatusService";
+  static readonly _ID = "sysUserSessionStatusService";
 
   static async getUserSessionStatusByToken( strToken: string = "",
                                             transaction: any,
-                                            logger: any ): Promise<UserSessionStatus> {
+                                            logger: any ): Promise<SYSUserSessionStatus> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -36,7 +38,7 @@ export default class UserSessionStatusService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -47,11 +49,11 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      result = await UserSessionStatus.findOne( options );
+      result = await SYSUserSessionStatus.findOne( options );
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -83,7 +85,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -105,13 +107,13 @@ export default class UserSessionStatusService extends BaseService {
 
   static async getUserSessionStatusByShortToken( strShortToken: string = "",
                                                  transaction: any,
-                                                 logger: any ): Promise<UserSessionStatus> {
+                                                 logger: any ): Promise<SYSUserSessionStatus> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -121,7 +123,7 @@ export default class UserSessionStatusService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -132,11 +134,11 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      result = await UserSessionStatus.findOne( options );
+      result = await SYSUserSessionStatus.findOne( options );
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -168,7 +170,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -197,7 +199,7 @@ export default class UserSessionStatusService extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -207,7 +209,7 @@ export default class UserSessionStatusService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -222,7 +224,7 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      const rows = await UserSessionStatus.findAll( options as any );
+      const rows = await SYSUserSessionStatus.findAll( options as any );
 
       let intCurrentSession = 0;
 
@@ -237,7 +239,7 @@ export default class UserSessionStatusService extends BaseService {
 
           ( options as any).where = { UserId: strUserId, Token: currentValues.Token };
 
-          await UserSessionStatus.update( currentValues,
+          await SYSUserSessionStatus.update( currentValues,
                                           options );
 
         }
@@ -248,7 +250,7 @@ export default class UserSessionStatusService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -282,7 +284,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -311,7 +313,7 @@ export default class UserSessionStatusService extends BaseService {
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -321,7 +323,7 @@ export default class UserSessionStatusService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -343,7 +345,7 @@ export default class UserSessionStatusService extends BaseService {
 
       }
 
-      const rows = await UserSessionStatus.findAll( options as any );
+      const rows = await SYSUserSessionStatus.findAll( options as any );
 
       if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
 
@@ -353,7 +355,7 @@ export default class UserSessionStatusService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -385,7 +387,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
@@ -410,13 +412,13 @@ export default class UserSessionStatusService extends BaseService {
                                data: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<UserSessionStatus> {
+                               logger: any ): Promise<SYSUserSessionStatus> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
-    let bApplyTansaction = false;
+    let bIsLocalTransaction = false;
 
     try {
 
@@ -426,7 +428,7 @@ export default class UserSessionStatusService extends BaseService {
 
         currentTransaction = await dbConnection.transaction();
 
-        bApplyTansaction = true;
+        bIsLocalTransaction = true;
 
       }
 
@@ -447,13 +449,13 @@ export default class UserSessionStatusService extends BaseService {
 
       if ( bUpdate ) {
 
-        userSessionStatusInDB = await UserSessionStatus.findOne( options );
+        userSessionStatusInDB = await SYSUserSessionStatus.findOne( options );
 
       }
 
       if ( CommonUtilities.isNullOrEmpty( userSessionStatusInDB ) ) {
 
-        userSessionStatusInDB = await UserSessionStatus.create(
+        userSessionStatusInDB = await SYSUserSessionStatus.create(
                                                                 data,
                                                                 { transaction: currentTransaction }
                                                               );
@@ -479,13 +481,13 @@ export default class UserSessionStatusService extends BaseService {
 
         }
 
-        const updateResult = await UserSessionStatus.update( data,
+        const updateResult = await SYSUserSessionStatus.update( data,
                                                              options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
 
-          result = await UserSessionStatus.findOne( options );
+          result = await SYSUserSessionStatus.findOne( options );
 
         }
 
@@ -493,7 +495,7 @@ export default class UserSessionStatusService extends BaseService {
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         await currentTransaction.commit();
 
@@ -527,7 +529,7 @@ export default class UserSessionStatusService extends BaseService {
       }
 
       if ( currentTransaction != null &&
-           bApplyTansaction ) {
+           bIsLocalTransaction ) {
 
         try {
 
