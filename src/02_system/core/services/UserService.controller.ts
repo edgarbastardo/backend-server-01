@@ -7167,6 +7167,8 @@ export default class UserServiceController {
 
             bIsAuthorizedCreateGroup = request.body.CreateGroup === true;
 
+            bIsAllowedAddInDisabledGroup = true;
+
           }
 
           if ( sysUserGroupInDB instanceof Error ) {

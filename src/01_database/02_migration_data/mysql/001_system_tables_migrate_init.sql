@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `sysDBMigratedData` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysDBMigratedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
+  UNIQUE KEY `UNQ_sysDBMigratedData_FullPathCheckSum_idx` (`FullPathCheckSum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `sysDBImportedData` (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `sysDBImportedData` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysDBImportedData_FullPathCheckSum_UNIQUE` (`FullPathCheckSum`)
+  UNIQUE KEY `UNQ_sysDBImportedData_FullPathCheckSum_idx` (`FullPathCheckSum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `sysBinaryIndex` (
   `ProcessStartedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'When started to work',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysBinaryIndex_ShortId` (`ShortId`)
+  UNIQUE KEY `UNQ_sysBinaryIndex_ShortId_idx` (`ShortId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the index for saved binary (files) entities ( .JPG , .PNG , .PDF) on system operating file system.';
 
 CREATE TABLE IF NOT EXISTS `sysPerson` (
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `sysPerson` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysPerson_ShortId` (`ShortId`),
+  UNIQUE KEY `UNQ_sysPerson_ShortId_idx` (`ShortId`),
   KEY `sysPerson_Phone_idx` (`Phone`),
   KEY `sysPerson_EMail_idx` (`EMail`),
   KEY `FK_sysPerson_ImageId_From_sysBinaryIndex_Id_idx` (`ImageId`),
@@ -128,8 +128,8 @@ CREATE TABLE IF NOT EXISTS `sysUserGroup` (
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysUserGroup_ShortId` (`ShortId`),
-  UNIQUE KEY `sysUserGroup_Name_UNIQUE` (`Name`)
+  UNIQUE KEY `UNQ_sysUserGroup_ShortId_idx` (`ShortId`),
+  UNIQUE KEY `UNQ_sysUserGroup_Name_UNIQUE_idx` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all groups system users.';
 
 CREATE TABLE IF NOT EXISTS `sysUser` (
@@ -156,8 +156,8 @@ CREATE TABLE IF NOT EXISTS `sysUser` (
   `DisabledAt` varchar(30) DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysUser_ShortId` (`ShortId`),
-  UNIQUE KEY `sysUser_Name_UNIQUE` (`Name`),
+  UNIQUE KEY `UNQ_sysUser_ShortId_idx` (`ShortId`),
+  UNIQUE KEY `UNQ_sysUser_Name_UNIQUE_idx` (`Name`),
   KEY `FK_sysUser_GroupId_From_sysUserGroup_Id_idx` (`GroupId`),
   KEY `FK_sysUser_PersonId_From_sysPerson_Id_idx` (`PersonId`),
   CONSTRAINT `FK_sysUser_GroupId_From_sysUserGroup_Id` FOREIGN KEY (`GroupId`) REFERENCES `sysUserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -241,10 +241,10 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionStatus` (
   `LoggedOutAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the date and time of logout, to be different from NULL, it is assumed that the session which represents the row is no longer valid.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`,`Token`),
-  UNIQUE KEY `FK_sysUserSessionStatus_Token_idx` (`Token`),
-  UNIQUE KEY `FK_sysUserSessionStatus_ShortToken_idx` (`ShortToken`),
-  UNIQUE KEY `FK_sysUserSessionStatus_BinaryDataToken_idx` (`BinaryDataToken`),
-  UNIQUE KEY `FK_sysUserSessionStatus_SocketToken_idx` (`SocketToken`),
+  UNIQUE KEY `UNQ_sysUserSessionStatus_Token_idx` (`Token`),
+  UNIQUE KEY `UNQ_sysUserSessionStatus_ShortToken_idx` (`ShortToken`),
+  UNIQUE KEY `UNQ_sysUserSessionStatus_BinaryDataToken_idx` (`BinaryDataToken`),
+  UNIQUE KEY `UNQ_sysUserSessionStatus_SocketToken_idx` (`SocketToken`),
   CONSTRAINT `FK_sysUserSessionStatus_UserId_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_sysUserSessionStatus_UserGroupId_sysUserGroup_Id` FOREIGN KEY (`UserGroupId`) REFERENCES `sysUserGroup` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user session if it alive or not.';
@@ -303,8 +303,8 @@ CREATE TABLE IF NOT EXISTS `sysRole` (
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` text COLLATE utf8_unicode_ci COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysRole_ShortId` (`ShortId`),
-  UNIQUE KEY `sysRole_Name` (`Name`)
+  UNIQUE KEY `UNQ_sysRole_ShortId_idx` (`ShortId`),
+  UNIQUE KEY `UNQ_sysRole_Name_idx` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store all role definition';
 
 CREATE TABLE IF NOT EXISTS `sysRoleHasRoute` (
@@ -315,8 +315,8 @@ CREATE TABLE IF NOT EXISTS `sysRoleHasRoute` (
   PRIMARY KEY (`RoleId`,`RouteId`),
   KEY `sysRoleHasRoute_RoleId` (`RoleId`),
   KEY `sysRoleHasRoute_RouteId` (`RouteId`),
-  CONSTRAINT `sysRoleHasRoute_RoleId_From_Role_Id` FOREIGN KEY (`RoleId`) REFERENCES `sysRole` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `sysRoleHasRoute_RouteId_From_Route_Id` FOREIGN KEY (`RouteId`) REFERENCES `sysRoute` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `sysRoleHasRoute_RoleId_From_sysRole_Id` FOREIGN KEY (`RoleId`) REFERENCES `sysRole` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `sysRoleHasRoute_RouteId_From_sysRoute_Id` FOREIGN KEY (`RouteId`) REFERENCES `sysRoute` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store relations between role and route';
 
 -- CREATE TABLE IF NOT EXISTS `sysApiKey` (
@@ -345,7 +345,7 @@ CREATE TABLE IF NOT EXISTS `sysRoleHasRoute` (
 --   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
 --   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
 --   PRIMARY KEY (`Id`),
---   UNIQUE KEY `sysApiKey_ShortId` (`ShortId`)
+--   UNIQUE KEY `UNQ_sysApiKey_ShortId_idx` (`ShortId`)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the api key for use with system.';
 
 CREATE TABLE IF NOT EXISTS `sysConfigMetaData` (
@@ -398,8 +398,8 @@ CREATE TABLE IF NOT EXISTS `sysConfigMetaData` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
-  UNIQUE KEY `sysConfigMetaData_ShortId` (`ShortId`),
-  UNIQUE KEY `sysConfigMetaData_Name_UNIQUE` (`Name`)
+  UNIQUE KEY `UNQ_sysConfigMetaData_ShortId_idx` (`ShortId`),
+  UNIQUE KEY `UNQ_sysConfigMetaData_Name_idx` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store information about config meta data.';
 
 CREATE TABLE IF NOT EXISTS `sysConfigValueData` (
