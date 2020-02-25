@@ -1,6 +1,7 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
 import fs from 'fs'; //Load the filesystem module
+import os from 'os'; //Load the os module
 
 const assert = require('assert').strict;
 //import cluster from "cluster";
@@ -293,6 +294,7 @@ function saveInput( strFileName: string, inputs: any ) {
 
     const strPath = SystemUtilities.baseRootPath +
                     "/test/standalone/result/" +
+                    os.hostname + "/" +
                     SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
                     "/";
 

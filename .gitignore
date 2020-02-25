@@ -8,3 +8,4 @@ install_distribution/
 .deploy.json
 .env.log
 .env.secrets
+test/standalone/result/dsistemas01/
