@@ -25,17 +25,7 @@ export default class SYSUserGroupService extends BaseService {
 
     let result: SYSUserGroup = null;
 
-    if ( by.Name ) {
-
-      result = await this.getByName( by.Name,
-                                     strTimeZoneId,
-                                     transaction,
-                                     logger );
-
-    }
-
-    if ( result === null &&
-         by.Id ) {
+    if ( by.Id ) {
 
       result = await this.getById( by.Id,
                                    strTimeZoneId,
@@ -51,6 +41,16 @@ export default class SYSUserGroupService extends BaseService {
                                         strTimeZoneId,
                                         transaction,
                                         logger );
+
+    }
+
+    if ( result === null &&
+         by.Name ) {
+
+      result = await this.getByName( by.Name,
+                                     strTimeZoneId,
+                                     transaction,
+                                     logger );
 
     }
 

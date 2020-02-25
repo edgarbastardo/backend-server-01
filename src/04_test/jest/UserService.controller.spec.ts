@@ -1,7 +1,7 @@
 import Validator from 'validatorjs';
-import SystemUtilities from "../../common/SystemUtilities";
+import SystemUtilities from "../../02_system/common/SystemUtilities";
 
-const debug = require( 'debug' )( 'UserService.constroller.test' );
+//const debug = require( 'debug' )( 'UserService.constroller.test' );
 
 function customRegister( validator: any, logger: any ) {
 

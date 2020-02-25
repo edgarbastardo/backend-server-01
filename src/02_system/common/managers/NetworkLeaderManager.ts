@@ -1,6 +1,7 @@
-import Discover from '@dashersw/node-discover';
-import os from "os";
+//import os from "os";
 import cluster from "cluster";
+
+import Discover from '@dashersw/node-discover';
 //import uuidv4 from 'uuid/v4';
 
 import CommonConstants from "../CommonConstants";
@@ -8,9 +9,9 @@ import CommonConstants from "../CommonConstants";
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-const debug = require( 'debug' )( 'ClusterNetworkManager' );
+const debug = require( 'debug' )( 'NetworkLeaderManager' );
 
-export default class ClusterNetworkManager {
+export default class NetworkLeaderManager {
 
   static currentInstance: any = null;
 
@@ -20,9 +21,9 @@ export default class ClusterNetworkManager {
 
     try {
 
-      await new Promise<any>( function( resolve, reject ) {
+      let debugMark = debug.extend( "AA21700D550C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-        let debugMark = debug.extend( "AA21700D550C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      await new Promise<any>( function( resolve, reject ) {
 
         result = new Discover();
 
@@ -132,6 +133,115 @@ export default class ClusterNetworkManager {
         });
 
       });
+
+      if ( result ) {
+
+        await new Promise<any>( function( resolve, reject ) {
+
+          let bResolvePending = true;
+
+          let bSuccessJoinNetworkLeader = false;
+
+          bSuccessJoinNetworkLeader = result.join( "networkLeader", function ( data: any ) {
+
+            const dateTime = SystemUtilities.getCurrentDateAndTime();
+
+            debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Channel networkLeader received command %s", data.command );
+
+            if ( data.command === "getCurrentInfo" ) {
+
+              if ( SystemUtilities.isNetworkLeader ) {
+
+                debugMark( "Sending network leader current info %O", SystemUtilities.info );
+
+                result.send( "networkLeader", {
+                                                command: "currentInfo",
+                                                info: SystemUtilities.info
+                                              } );
+
+              }
+
+            }
+            else if ( data.command === "currentInfo" &&
+                      data.info ) {
+
+              debugMark( "Network leader info received %O", data.info );
+              debugMark( "Current info %O", SystemUtilities.info );
+
+              if ( SystemUtilities.isDateAndTimeBeforeAt( data.info.release, SystemUtilities.info.release ) ) {
+
+                result.promote();
+
+                //Wait for 5 seconds to promoted
+                setTimeout(
+                            () => {
+                                    bResolvePending ? resolve(): null;
+                                    bResolvePending = false;
+                                  },
+                            5000
+                          );
+
+              }
+              else {
+
+                bResolvePending ? resolve() : null;
+                bResolvePending = false;
+
+              }
+
+            }
+            else {
+
+              bResolvePending ? resolve() : null;
+              bResolvePending = false;
+
+            }
+
+          });
+
+          const dateTime = SystemUtilities.getCurrentDateAndTime();
+
+          if ( bSuccessJoinNetworkLeader ) {
+
+            debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Success to join to networkLeader channel." );
+
+            if ( SystemUtilities.isNetworkLeader === false ) {
+
+              result.send( "networkLeader", { command: "getCurrentInfo" } );
+
+              //Wait for 7 seconds to promoted
+              setTimeout(
+                          () => {
+                                  bResolvePending ? resolve(): null;
+                                  bResolvePending = false;
+                                },
+                          7000
+                        );
+
+            }
+            else {
+
+              bResolvePending ? resolve(): null;
+              bResolvePending = false;
+
+            }
+
+          }
+          else {
+
+            debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Failed to join to networkLeader channel." );
+
+            bResolvePending ? resolve(): null;
+            bResolvePending = false;
+
+          }
+
+        });
+
+      };
 
     }
     catch ( error ) {

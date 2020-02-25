@@ -726,7 +726,7 @@ export default class SecurityServiceController {
 
         if ( ( !processOptions.checkOldSession ||
                processOptions.checkOldSession ) &&
-             userDataResponse.SessionsAllowed > 0 ) {
+               userDataResponse.SessionsAllowed > 0 ) {
 
           await SYSUserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
                                                                        userDataResponse.SessionsAllowed - 1,
@@ -978,6 +978,9 @@ export default class SecurityServiceController {
 
         if ( userSessionStatus !== null ) {
 
+          userDataResponse.sysUserGroup = userGroupDataResponse;
+          userDataResponse.sysPerson = userPersonDataResponse;
+
           if ( !processOptions.useCustomResponse ||
                processOptions.useCustomResponse === false ) {
 
@@ -997,9 +1000,9 @@ export default class SecurityServiceController {
                                  ShortToken: userSessionStatus.ShortToken,
                                  Role: strRolesMerged + strBasicRoles,
                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
-                                 User: userDataResponse,
-                                 Group: userGroupDataResponse,
-                                 Person: userPersonDataResponse
+                                 sysUser: userDataResponse,
+                                 //sysUserGroup: userGroupDataResponse,
+                                 //sysPerson: userPersonDataResponse
                                }
                              ]
                      };
@@ -1023,9 +1026,9 @@ export default class SecurityServiceController {
                                  SupportToken: userSessionStatus.ShortToken,
                                  Role: strRolesMerged + strBasicRoles,
                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
-                                 User: userDataResponse,
-                                 Group: userGroupDataResponse,
-                                 Person: userPersonDataResponse
+                                 sysUser: userDataResponse,
+                                 //Group: userGroupDataResponse,
+                                 //Person: userPersonDataResponse
                                }
                              ]
                      };

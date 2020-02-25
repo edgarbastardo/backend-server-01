@@ -454,7 +454,7 @@ export default class UserController {
           )
   async userPut( request: Request, response: Response ) {
 
-    const result = await UserServiceController.modifyUser( request,
+    const result = await UserServiceController.updateUser( request,
                                                            null,
                                                            this._controllerLogger );
 

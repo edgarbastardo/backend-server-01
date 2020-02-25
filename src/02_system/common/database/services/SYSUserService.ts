@@ -20,6 +20,46 @@ export default class SYSUserService extends BaseService {
 
   static readonly _ID = "sysUserService";
 
+  static async getBy( by: { Id: string, ShortId: string, Name: string },
+                      strTimeZoneId: string,
+                      transaction: any,
+                      logger: any ): Promise<SYSUser> {
+
+    let result: SYSUser = null;
+
+    if ( by.Id ) {
+
+      result = await this.getById( by.Id,
+                                   strTimeZoneId,
+                                   transaction,
+                                   logger );
+
+    }
+
+    if ( result === null &&
+         by.ShortId ) {
+
+      result = await this.getByShortId( by.ShortId,
+                                        strTimeZoneId,
+                                        transaction,
+                                        logger );
+
+    }
+
+    if ( result === null &&
+         by.Name ) {
+
+      result = await this.getByName( by.Name,
+                                     strTimeZoneId,
+                                     transaction,
+                                     logger );
+
+    }
+
+    return result;
+
+  }
+
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
@@ -433,6 +473,14 @@ export default class SYSUserService extends BaseService {
 
         where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
         transaction: currentTransaction,
+        include: [
+                   {
+                     model: SYSUserGroup,
+                   },
+                   {
+                     model: SYSPerson,
+                   }
+                 ]
 
       }
 
@@ -457,7 +505,7 @@ export default class SYSUserService extends BaseService {
         }
 
         const updateResult = await SYSUser.update( currentValues,
-                                                options );
+                                                   options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {

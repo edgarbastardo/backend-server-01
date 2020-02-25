@@ -235,29 +235,65 @@ export class SYSUser extends Model<SYSUser> {
 
         }
 
-        result.ExtraData = extraData;
+        if ( !params.KeepGroupExtraData ||
+             params.KeepGroupExtraData === 0 ) {
 
-      }
+          result.Business = extraData;
 
-      if ( result.sysPerson &&
-           result.sysPerson.ExtraData ) {
+          delete result.ExtraData;
 
-        const extraData = CommonUtilities.parseJSON( result.sysPerson.ExtraData,
-                                                     params.logger );
+        }
+        else {
 
-        if ( extraData &&
-             extraData.Private ) {
-
-          delete extraData.Private;
+          result.ExtraData = extraData;
 
         }
 
-        result.SYSPerson.ExtraData = extraData;
+      }
+
+      if ( result.sysPerson ) {
+
+        if ( !result.sysPerson.Id ) {
+
+          result.sysPerson = null;
+
+        }
+        else if ( result.sysPerson.ExtraData ) {
+
+          result.sysPerson = result.sysPerson.dataValues ? result.sysPerson.dataValues: result.sysPerson;
+
+          const extraData = CommonUtilities.parseJSON( result.sysPerson.ExtraData,
+                                                       params.logger );
+
+          if ( extraData &&
+              extraData.Private ) {
+
+            delete extraData.Private;
+
+          }
+
+          if ( !params.KeepPersonExtraData ||
+                params.KeepPersonExtraData === 0 ) {
+
+            result.SYSPerson.Business = extraData;
+
+            delete result.SYSPerson.ExtraData;
+
+          }
+          else {
+
+            result.SYSPerson.ExtraData = extraData;
+
+          }
+
+        }
 
       }
 
       if ( result.sysUserGroup &&
            result.sysUserGroup.ExtraData ) {
+
+        result.sysUserGroup = result.sysUserGroup.dataValues ? result.sysUserGroup.dataValues: result.sysUserGroup;
 
         const extraData = CommonUtilities.parseJSON( result.sysUserGroup.ExtraData,
                                                      params.logger );
@@ -269,7 +305,20 @@ export class SYSUser extends Model<SYSUser> {
 
         }
 
-        result.SYSUserGroup.ExtraData = extraData;
+        if ( !params.KeepGroupExtraData ||
+             params.KeepGroupExtraData === 0 ) {
+
+          result.sysUserGroup.Business = extraData;
+          //result.Business = extraData;
+
+          delete result.sysUserGroup.ExtraData;
+
+        }
+        else {
+
+          result.sysUserGroup.ExtraData = extraData;
+
+        }
 
       }
 

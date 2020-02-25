@@ -1,5 +1,6 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
+import fs from 'fs'; //Load the filesystem module
 import cluster from 'cluster';
 //import os from 'os';
 
@@ -20,7 +21,7 @@ import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
 import ModelServiceManager from "./02_system/common/managers/ModelServiceManager";
-import ClusterNetworkManager from "./02_system/common/managers/ClusterNetworkManager";
+import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
 //import NotificationManager from "./02_system/common/managers/NotificationManager";
@@ -207,12 +208,23 @@ function jobProcessWorkerExit( jobProcessWorker: any,
 
 }
 
-async function main() {
+export default async function main() {
 
   SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 
   SystemUtilities.baseRunPath = __dirname;
   SystemUtilities.baseRootPath = appRoot.path;
+
+  if ( fs.existsSync( appRoot.path + "/info.json" ) ) {
+
+    SystemUtilities.info = require( appRoot.path + "/info.json" );
+
+  }
+  else {
+
+    SystemUtilities.info.release = `No info.json file found in the folder ${appRoot.path}`;
+
+  }
 
   let debugMark = null;
 
@@ -253,7 +265,7 @@ async function main() {
     if ( cluster.isMaster ) { //Only the master process lock
 
       //Register in the net cluster manager
-      ClusterNetworkManager.currentInstance = await ClusterNetworkManager.create( LoggerManager.mainLoggerInstance );
+      NetworkLeaderManager.currentInstance = await NetworkLeaderManager.create( LoggerManager.mainLoggerInstance );
 
       if ( process.env.ENV === "prod" ||
            process.env.ENV === "test" ) {

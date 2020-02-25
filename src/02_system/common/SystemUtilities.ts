@@ -44,6 +44,9 @@ export default class SystemUtilities {
   static baseRootPath: string = null;
   static isNetworkLeader: boolean = false;
   static isNetworkLeaderAt: Moment = null;
+  static info = {
+                  release: null
+                } //Fill with the info.json in the root of project
 
   static getCurrentDateAndTime(): any {
 
@@ -164,6 +167,24 @@ export default class SystemUtilities {
 
   }
 
+  static isDateAndTimeBeforeAt( strAt: string, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      bResult = strDateTime ? moment( strAt ).tz( CommonUtilities.getCurrentTimeZoneId() ).isBefore( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
   static isDateAndTimeAfter( strDateTime: string ): boolean {
 
     let bResult = false;
@@ -171,6 +192,24 @@ export default class SystemUtilities {
     try {
 
       bResult = strDateTime ? moment().tz( CommonUtilities.getCurrentTimeZoneId() ).isAfter( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
+  static isDateAndTimeAfterAt( strAt: string, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      bResult = strDateTime ? moment( strAt ).tz( CommonUtilities.getCurrentTimeZoneId() ).isAfter( strDateTime ) : false;
 
     }
     catch ( error ) {

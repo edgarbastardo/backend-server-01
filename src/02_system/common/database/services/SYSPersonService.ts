@@ -150,9 +150,9 @@ export default class SYSPersonService extends BaseService {
       if ( result === null ) {
 
         result = await SYSPerson.create(
-                                      createOrUpdateData,
-                                      { transaction: currentTransaction }
-                                    );
+                                         createOrUpdateData,
+                                         { transaction: currentTransaction }
+                                       );
 
       }
       else if ( bUpdate ) {
@@ -166,7 +166,7 @@ export default class SYSPersonService extends BaseService {
         }
 
         result = await SYSPerson.update( currentValues,
-                                      options );
+                                         options );
 
         if ( result.length > 0 &&
              result[ 0 ] >= 1 ) {

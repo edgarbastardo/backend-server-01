@@ -54,6 +54,17 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Program Test 01 REST API",
+      "program": "${workspaceFolder}/src/04_test/standalone/test01_rest_api.ts",
+      "outputCapture": "std",
+      "preLaunchTask": "build-test01-rest-api",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Program Deploy",
       "program": "${workspaceFolder}/src/copy_install_backend.ts",
       "outputCapture": "std",

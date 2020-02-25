@@ -24,7 +24,7 @@ import SystemUtilities from "./02_system/common/SystemUtilities";
 
 //import DeployTarget from "./deploy_target.json";
 
-import CommonUtilities from './02_system/common/CommonUtilities';
+import CommonUtilities from "./02_system/common/CommonUtilities";
 import CommonConstants from './02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( 'copy_install_backend' );
@@ -63,6 +63,43 @@ let strCurrentDate = SystemUtilities.getCurrentDateAndTime().format( "YYYY-MM-DD
 strCurrentDate = strCurrentDate.replace( ":", "-" );
 strCurrentDate = strCurrentDate.replace( "#TT#", "Z" );
 
+async function updateInfoFile( strFileInfoPath: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    let info = null;
+
+    if ( fs.existsSync( strFileInfoPath ) ) {
+
+      info = require( strFileInfoPath );
+
+    }
+    else {
+
+      info = { release: "" };
+
+    }
+
+    info.release = SystemUtilities.getCurrentDateAndTime().format();
+
+    const strJSONInfoData = JSON.stringify( info, null, 2 );
+
+    fs.writeFileSync( strFileInfoPath, strJSONInfoData );
+
+    bResult = true;
+
+  }
+  catch ( error ) {
+
+
+  }
+
+  return bResult;
+
+}
+
 async function createInstallBundle( strProject: string ): Promise<{ path: string, name: string }> {
 
   let result = { path: null, name: null };
@@ -82,6 +119,9 @@ async function createInstallBundle( strProject: string ): Promise<{ path: string
     fs.copyFileSync( appRoot.path + "/db_config.json", appRoot.path + installDistributionRelativePath + "/db_config.json" );
     fs.copyFileSync( appRoot.path + "/package.json", appRoot.path + installDistributionRelativePath + "/package.json" );
     fs.copyFileSync( appRoot.path + "/README.md", appRoot.path + installDistributionRelativePath + "/README.md" );
+    fs.copyFileSync( appRoot.path + "/info.json", appRoot.path + installDistributionRelativePath + "/info.json" );
+
+    await updateInfoFile( appRoot.path + installDistributionRelativePath + "/info.json" );
 
     //fs.unlinkSync( appRoot.path + installDistributionRelativePath + "/build/deploy_target.json" );
     //fs.unlinkSync( appRoot.path + installDistributionRelativePath + "/build/deploy_target_template.json" );
@@ -570,7 +610,7 @@ async function askForPassword( strUser: string ): Promise<string> {
 
 }
 
-async function main() {
+export default async function main() {
 
   try {
 

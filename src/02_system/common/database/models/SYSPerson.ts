@@ -136,6 +136,34 @@ export class SYSPerson extends Model<SYSPerson> {
 
       }
 
+      if ( result.ExtraData ) {
+
+        const extraData = CommonUtilities.parseJSON( result.ExtraData,
+                                                     params.logger );
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        if ( !params.KeepPersonExtraData ||
+             params.KeepPersonExtraData === 0 ) {
+
+          result.Business = extraData;
+
+          delete result.ExtraData;
+
+        }
+        else {
+
+          result.ExtraData = extraData;
+
+        }
+
+      }
+
     }
     catch ( error ) {
 

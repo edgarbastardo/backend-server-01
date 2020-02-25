@@ -1,5 +1,5 @@
-import NotificationManager from "./NotificationManager";
-import DBConnectionManager from "./DBConnectionManager";
+import NotificationManager from "../../02_system/common/managers/NotificationManager";
+import DBConnectionManager from "../../02_system/common/managers/DBConnectionManager";
 
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 

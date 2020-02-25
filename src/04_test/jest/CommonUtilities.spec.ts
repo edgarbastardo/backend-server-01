@@ -1,6 +1,6 @@
-import SystemUtilities from "./SystemUtilities";
+import SystemUtilities from "../../02_system/common/SystemUtilities";
 import appRoot from 'app-root-path';
-import CommonUtilities from "./CommonUtilities";
+import CommonUtilities from "../../02_system/common/CommonUtilities";
 
 require( 'dotenv' );
 

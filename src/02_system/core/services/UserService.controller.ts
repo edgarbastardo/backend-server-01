@@ -43,10 +43,10 @@ import SYSActionTokenService from "../../common/database/services/SYSActionToken
 import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
 //import GeoMapGoogle from "../../common/implementations/geomaps/GeoMapGoogle";
 import GeoMapManager from "../../common/managers/GeoMapManager";
-import { SYSUser } from '../../common/database/models/SYSUser';
+import { SYSUser } from "../../common/database/models/SYSUser";
 //import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
 import { SYSPerson } from '../../common/database/models/SYSPerson';
-import { SYSUserGroup } from '../../common/database/models/SYSUserGroup';
+import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -3002,6 +3002,7 @@ export default class UserServiceController {
         }
 
         result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Name:*#" ) ||
                                                             roleSubTag.includes( "#Id:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
                                                             roleSubTag.includes( "#SId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ) : false;
 
@@ -3184,7 +3185,7 @@ export default class UserServiceController {
                                                             userSessionStatus.Role.includes( "#ChangeUserPasswordL01#" ): false;
 
                 if ( bIsAuthorizedL01 &&
-                     userSessionStatus.UserGroupId !== userInDB.UserGroup.Id ) {
+                     userSessionStatus.UserGroupId !== userInDB.sysUserGroup.Id ) {
 
                   //Uhathorized
                   bIsNotAuthorized = true;
@@ -6651,11 +6652,11 @@ export default class UserServiceController {
 
       //let bIsNotAuthorized = false;
 
-      let userInDB = null;
+      let sysUserInDB = null;
 
       if ( request.query.id ) {
 
-        userInDB = await SYSUserService.getById( request.query.id,
+        sysUserInDB = await SYSUserService.getById( request.query.id,
                                                  null,
                                                  currentTransaction,
                                                  logger );
@@ -6663,7 +6664,7 @@ export default class UserServiceController {
       }
       if ( request.query.shortId ) {
 
-        userInDB = await SYSUserService.getByShortId( request.query.shortId,
+        sysUserInDB = await SYSUserService.getByShortId( request.query.shortId,
                                                       null,
                                                       currentTransaction,
                                                       logger );
@@ -6671,7 +6672,7 @@ export default class UserServiceController {
       }
       else {
 
-        userInDB = await SYSUserService.getByName( request.query.name,
+        sysUserInDB = await SYSUserService.getByName( request.query.name,
                                                    null,
                                                    currentTransaction,
                                                    logger );
@@ -6679,7 +6680,7 @@ export default class UserServiceController {
       }
 
       const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
-                                                            userInDB,
+                                                            sysUserInDB,
                                                             "GetUser",
                                                             logger );
 
@@ -6714,14 +6715,14 @@ export default class UserServiceController {
                  }
 
       }
-      else if ( userInDB != null &&
-                userInDB instanceof Error === false ) {
+      else if ( sysUserInDB != null &&
+                sysUserInDB instanceof Error === false ) {
 
-        let modelData = ( userInDB as any ).dataValues;
+        let modelData = ( sysUserInDB as any ).dataValues;
 
         const tempModelData = await SYSUser.convertFieldValues(
                                                                 {
-                                                                  Data: userInDB,
+                                                                  Data: modelData,
                                                                   FilterFields: 1, //Force to remove fields like password and value
                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                   Include: null,
@@ -6767,7 +6768,7 @@ export default class UserServiceController {
       }
       else {
 
-        const error = userInDB;
+        const error = sysUserInDB;
 
         result = {
                    StatusCode: 500, //Internal server error
@@ -6931,7 +6932,7 @@ export default class UserServiceController {
   }
 
   static checkUserGroupRoleLevel( userSessionStatus: any,
-                                  userGroup: { Id: string, ShortId: string, Name: string },
+                                  sysUserGroup: { Id: string, ShortId: string, Name: string },
                                   strActionRole: string,
                                   logger: any ): ICheckUserRoles {
 
@@ -6959,9 +6960,10 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  userGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  userGroup.ShortId + "#" ) ) : false;
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#Name:*#" ) ||
+                                                            roleSubTag.includes( "#Id:" +  sysUserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#SId:" +  sysUserGroup.ShortId + "#" ) ) : false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -6980,9 +6982,9 @@ export default class UserServiceController {
                                                               userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
             if ( result.isAuthorizedL01 &&
-                 ( userSessionStatus.UserGroupName !== userGroup.Name &&
-                   userSessionStatus.UserGroupShortId !== userGroup.ShortId &&
-                   userSessionStatus.GroupId !== userGroup.Id ) ) {
+                 ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
+                   userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
+                   userSessionStatus.GroupId !== sysUserGroup.Id ) ) {
 
               //Uhathorized
               result.isNotAuthorized = true;
@@ -7029,7 +7031,7 @@ export default class UserServiceController {
   static async getMessageGroup( strLanguage: string,
                                 by: {
                                       Id: string,
-                                      SId: string,
+                                      ShortId: string,
                                       Name: string
                                     } ): Promise<string> {
 
@@ -7045,9 +7047,9 @@ export default class UserServiceController {
       strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not exists', by.Id );
 
     }
-    else if ( by.SId ) {
+    else if ( by.ShortId ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not exists', by.SId );
+      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not exists', by.ShortId );
 
     }
 
@@ -7085,7 +7087,6 @@ export default class UserServiceController {
 
       }
 
-      // ANCHOR password change
       let userSessionStatus = context.UserSessionStatus;
 
       let resultCheckUserRoles = null;
@@ -7095,12 +7096,23 @@ export default class UserServiceController {
       let sysUserInDB: SYSUser = null;
 
       let userRules = {
-                        Avatar: [ 'present', 'min:36', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Avatar: [ 'present', 'string', 'min:36' ],
                         Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                        UserGroup: [ 'present' ],
-                        CreateGroup: [ 'present', 'boolean' ],
+                        //UserGroupId: [ 'present', 'string', 'min:36' ],
+                        //UserGroupSId: [ 'present', 'string', 'min:8' ],
+                        //UserGroup: [ 'present', 'string', 'min:3' ],
+                        //CreateGroup: [ 'present', 'boolean' ],
                         ExpireAt: [ 'present', 'date' ],
                         Notify: [ 'present', 'min:3' ],
+                        sysUserGroup: {
+                                        Create: [ 'required', 'boolean' ],
+                                        Id: [ 'present', 'string', 'min:36' ],
+                                        Name: [ 'present', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
+                                        Role: [ 'present', 'string' ],
+                                        Tag: [ 'present', 'string' ],
+                                      },
+                        sysPerson: [ 'present' ],
+                        Business: [ 'present' ],
                       };
 
       const validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -7114,6 +7126,7 @@ export default class UserServiceController {
         delete request.body.CreatedAt;
         delete request.body.UpdatedBy;
         delete request.body.UpdatedAt;
+        delete request.body.ExtraData;
 
         if ( request.body.DisabledBy !== "0" &&
              request.body.DisabledBy !== "1" ) {
@@ -7123,6 +7136,15 @@ export default class UserServiceController {
         }
 
         delete request.body.DisabledAt;
+        delete request.body.ExtraData;
+
+        delete request.body.sysUserGroup.CreatedBy;
+        delete request.body.sysUserGroup.CreatedAt;
+        delete request.body.sysUserGroup.UpdatedBy;
+        delete request.body.sysUserGroup.UpdatedAt;
+        delete request.body.sysUserGroup.DisableBy;
+        delete request.body.sysUserGroup.DisableAt;
+        delete request.body.sysUserGroup.ExtraData;
 
         sysUserInDB = await SYSUserService.getByName( request.body.Name,
                                                       null,
@@ -7131,214 +7153,91 @@ export default class UserServiceController {
 
         if ( !sysUserInDB ) {
 
-          const strUserName = context.UserSessionStatus.UserName;
+          const strPassword = request.body.Password;
 
-          let bIsAuthorizedCreateGroup = userSessionStatus.Role.includes( "#CreateUserGroupL01#" );
+          //ANCHOR check password Strength (createUser)
+          const strTag = "#" + request.body.Name + "#,#" + request.body.sysUserGroup.Name + "#,#" + request.body.sysUserGroup.Id + "#,#" + request.body.sysUserGroup.ShortId + "#";
 
-          let bIsAllowedAddInDisabledGroup = userSessionStatus.Role.includes( "#AllowAddInDisabledGroupL01#" );
+          const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
+                                                                                                                  currentTransaction,
+                                                                                                                  logger );
 
-          if ( !request.body.UserGroupId &&
-               !request.body.UserGroupSId &&
-               !request.body.UserGroup ) {
+          const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
+                                                                                                     strPassword,
+                                                                                                     logger );
 
-            request.body.UserGroup = request.body.Name;
+          if ( checkPasswordStrengthResult.code === 1 ) {
 
-          }
+            const strUserName = context.UserSessionStatus.UserName;
 
-          sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.body.UserGroupId,
-                                                                ShortId: request.body.UserGroupSId,
-                                                                Name: request.body.UserGroup || request.body.Name
-                                                              },
-                                                              null,
-                                                              currentTransaction,
-                                                              logger );
+            let bIsAuthorizedCreateGroup = userSessionStatus.Role.includes( "#CreateUserGroupL01#" );
 
-          resultCheckUserRoles = this.checkUserGroupRoleLevel( userSessionStatus,
-                                                               {
-                                                                 Id: request.body.UserGroupId,
-                                                                 ShortId: request.body.UserGroupSId,
-                                                                 Name: request.body.UserGroup
-                                                               },
-                                                               "createUser",
-                                                               logger );
+            let bIsAllowedAddInDisabledGroup = userSessionStatus.Role.includes( "#AllowAddInDisabledGroupL01#" );
 
-          if ( resultCheckUserRoles.IsAuthorizedAdmin ) {
+            if ( !request.body.sysUserGroup.Id &&
+                 !request.body.sysUserGroup.ShortId &&
+                 !request.body.sysUserGroup.Name ) {
 
-            bIsAuthorizedCreateGroup = request.body.CreateGroup === true;
+              request.body.sysUserGroup.Name = request.body.Name;
 
-            bIsAllowedAddInDisabledGroup = true;
+            }
 
-          }
+            //ANCHOR checkUserGroupRoleLevel
+            resultCheckUserRoles = this.checkUserGroupRoleLevel( userSessionStatus,
+                                                                 {
+                                                                   Id: request.body.sysUserGroup.Id,
+                                                                   ShortId: request.body.sysUserGroup.ShortId,
+                                                                   Name: request.body.sysUserGroup.Name
+                                                                 },
+                                                                 "createUser",
+                                                                 logger );
 
-          if ( sysUserGroupInDB instanceof Error ) {
+            if ( resultCheckUserRoles.isAuthorizedAdmin ) {
 
-            const error = sysUserGroupInDB;
+              bIsAuthorizedCreateGroup = request.body.sysUserGroup.Create === true;
 
-            result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: 'F82A2A732532' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
+              bIsAllowedAddInDisabledGroup = true;
 
-          }
-          else if ( sysUserGroupInDB &&
-                    SYSUserGroupService.checkDisabled( sysUserGroupInDB ) &&
-                    bIsAllowedAddInDisabledGroup === false ) {
+            }
+            else if ( !resultCheckUserRoles.isAuthorizedL03 &&
+                      !resultCheckUserRoles.isAuthorizedL01 ) {
 
-            result = {
-                       StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
-                       Mark: 'A9FBA806248A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
-                                   Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
+              resultCheckUserRoles.isNotAuthorized = true;
 
-          }
-          else if ( sysUserGroupInDB &&
-                    SYSUserGroupService.checkExpired( sysUserGroupInDB ) &&
-                    bIsAllowedAddInDisabledGroup === false ) {
+            }
 
-            result = {
-                       StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
-                       Mark: 'C70A2903EC1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
-                                   Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
+            sysUserGroupInDB = await SYSUserGroupService.getBy( {
+                                                                  Id: request.body.sysUserGroup.Id,
+                                                                  ShortId: request.body.sysUserGroup.ShortId,
+                                                                  Name: request.body.sysUserGroup.Name || request.body.Name
+                                                                },
+                                                                null,
+                                                                currentTransaction,
+                                                                logger );
 
-          }
-          else if ( sysUserGroupInDB &&
-                    request.body.CreateGroup ) {
+            if ( resultCheckUserRoles.isNotAuthorized ) {
 
-            result = {
-                       StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
-                       Mark: '5C5B23E9219A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
-                                   Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_CREATE_USER',
+                         Message: await I18NManager.translate( strLanguage, 'Not authorized to create the user' ),
+                         Mark: 'EDF5D29CE61C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_CREATE_USER',
+                                     Message: await I18NManager.translate( strLanguage, 'Not authorized to create the user' ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-          }
-          else if ( !sysUserGroupInDB &&
-                    request.body.CreateGroup == false ) {
-
-            const strMessage = await this.getMessageGroup( strLanguage, {
-                                                                          Id: request.body.UserGroupId,
-                                                                          SId: request.body.UserGroupSId,
-                                                                          Name: request.body.UserGroup
-                                                                        } );
-
-            result = {
-                       StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                       Message: strMessage,
-                       Mark: 'C0171BD3B328' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                   Message: strMessage,
-                                   Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
-
-          }
-          else if ( !sysUserGroupInDB &&
-                    request.body.CreateGroup &&
-                    bIsAuthorizedCreateGroup === false ) {
-
-            result = {
-                       StatusCode: 403, //Forbidden
-                       Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                       Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
-                       Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                                   Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
-                                   Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
-
-          }
-          else if ( !sysUserGroupInDB &&
-                     request.body.CreateGroup &&
-                     bIsAuthorizedCreateGroup ) {
-
-            sysUserGroupInDB = await SYSUserGroupService.createOrUpdate(
-                                                                         {
-                                                                           Name: request.body.UserGroup,
-                                                                           Comment: request.body.Comment,
-                                                                           Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
-                                                                           Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
-                                                                           ExtraData: request.body.Business ? CommonUtilities.jsonToString( request.body.Business, logger ): null,
-                                                                           CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                           CreatedAt: null
-                                                                         },
-                                                                         false,
-                                                                         currentTransaction,
-                                                                         logger
-                                                                       );
-
-            if ( sysUserGroupInDB instanceof Error ) {
+            }
+            else if ( sysUserGroupInDB instanceof Error ) {
 
               const error = sysUserGroupInDB;
 
@@ -7346,7 +7245,7 @@ export default class UserServiceController {
                          StatusCode: 500, //Internal server error
                          Code: 'ERROR_UNEXPECTED',
                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                         Mark: '8DBA87D7ABE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Mark: 'F82A2A732532' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -7362,196 +7261,411 @@ export default class UserServiceController {
                        };
 
             }
+            else if ( sysUserGroupInDB &&
+                      SYSUserGroupService.checkDisabled( sysUserGroupInDB ) &&
+                      bIsAllowedAddInDisabledGroup === false ) {
 
-          }
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_DISABLED',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                         Mark: 'A9FBA806248A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_DISABLED',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-          if ( !result ) {
+            }
+            else if ( sysUserGroupInDB &&
+                      SYSUserGroupService.checkExpired( sysUserGroupInDB ) &&
+                      bIsAllowedAddInDisabledGroup === false ) {
 
-            let personData = {} as any;
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_EXPIRED',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                         Mark: 'C70A2903EC1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_EXPIRED',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-            //personData.CreatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
-            personData.CreatedAt = null;
+            }
+            else if ( sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create ) {
 
-            let rules = {
-                          Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          Gender: [ 'present', 'between:0,100' ],
-                          BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                          Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                          Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                        };
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                         Mark: '5C5B23E9219A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-            const validator = SystemUtilities.createCustomValidatorSync( request.body,
-                                                                         rules,
-                                                                         null,
-                                                                         logger );
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create == false ) {
 
-            if ( validator.passes() ) { //Validate request.body field values
+              const strMessage = await this.getMessageGroup( strLanguage, {
+                                                                            Id: request.body.sysUserGroup.Id,
+                                                                            ShortId: request.body.sysUserGroup.ShortId,
+                                                                            Name: request.body.sysUserGroup.Name
+                                                                          } );
 
-              personData.Title = request.body.Title ? request.body.Title : personData.Title;
-              personData.FirstName = request.body.FirstName ? CommonUtilities.normalizeWhitespaces( request.body.FirstName ) : personData.FirstName;
-              personData.LastName = request.body.LastName ? CommonUtilities.normalizeWhitespaces( request.body.LastName ): personData.LastName;
-              personData.NickName = request.body.NickName ? request.body.NickName : personData.NickName;
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                         Message: strMessage,
+                         Mark: 'C0171BD3B328' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                     Message: strMessage,
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-              if ( request.body.Abbreviation ) {
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup === true &&
+                      !request.body.sysUserGroup.Id &&
+                      !request.body.sysUserGroup.ShortId &&
+                      !request.body.sysUserGroup.Name ) {
 
-                personData.Abbreviation = request.body.Abbreviation;
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                         Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
+                         Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-              }
-              else if ( !personData.Abbreviation ) {
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup === false ) {
 
-                const fistNameAbbreviation = CommonUtilities.getFirstLetters( request.body.FirstName );
-                const lastNameAbbreviation = CommonUtilities.getFirstLetters( request.body.LastName );
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                         Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                         Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                                     Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
 
-                personData.Abbreviation = fistNameAbbreviation.join( "" ) + lastNameAbbreviation.join( "" );
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup ) {
 
-              }
-
-              personData.Gender = request.body.Gender && parseInt( request.body.Gender ) >= 0 ? request.body.Gender : personData.Gender;
-              personData.BirthDate = request.body.BirthDate ? request.body.BirthDate : personData.BirthDate;
-              personData.EMail = request.body.EMail; // ? request.body.EMail : null;
-              personData.Phone = request.body.Phone ? request.body.Phone : null;
-              personData.Address = request.body.Address ? request.body.Address : personData.Address;
-
-              if ( personData.Address &&
-                   await GeoMapManager.getConfigServiceType( "geocode", logger ) !== "@__none__@" ) {
-
-                const geocodeResult = await GeoMapManager.geocodeServiceUsingAddress( [ personData.Address ],
-                                                                                      true,
-                                                                                      logger );
-
-                if ( !geocodeResult ||
-                     geocodeResult.length == 0 ||
-                     geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
-
-                  personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
-
-                }
-                else {
-
-                  personData.Address = geocodeResult[ 0 ].formattedAddress;
-                  personData.Tag = CommonUtilities.removeTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
-
-                }
-
-                personData.Tag = personData.Tag ? personData.Tag: null;
-
-              }
-
-              const sysPersonInDB = await SYSPersonService.createOrUpdate( personData,
-                                                                           true,
+              sysUserGroupInDB = await SYSUserGroupService.createOrUpdate(
+                                                                           {
+                                                                             Name: request.body.sysUserGroup.Name,
+                                                                             Comment: request.body.Comment,
+                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.UserGroupRole ? request.body.UserGroupRole: null,
+                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.UserGroupTag ? request.body.UserGroupTag: null,
+                                                                             ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
+                                                                             CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                             CreatedAt: null
+                                                                           },
+                                                                           false,
                                                                            currentTransaction,
+                                                                           logger
+                                                                         );
+
+              if ( sysUserGroupInDB instanceof Error ) {
+
+                const error = sysUserGroupInDB;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: 'ERROR_UNEXPECTED',
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Mark: '8DBA87D7ABE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         };
+
+              }
+
+            }
+
+            if ( !result ) {
+
+              let personData = {} as any;
+
+              personData.CreatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+              personData.CreatedAt = null;
+
+              let rules = {
+                            Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            Gender: [ 'present', 'between:0,100' ],
+                            BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          };
+
+              const validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
+                                                                           rules,
+                                                                           null,
                                                                            logger );
 
-              if ( sysPersonInDB &&
-                   sysPersonInDB instanceof Error === false ) {
+              if ( validator.passes() ) { //Validate request.body field values
 
-                //ANCHOR Create new user
-                sysUserInDB = await SYSUserService.createOrUpdate(
-                                                                   {
-                                                                     Id: sysPersonInDB.Id,
-                                                                     PersonId: sysPersonInDB.Id,
-                                                                     GroupId: sysUserGroupInDB.Id,
-                                                                     Name: request.body.Name,
-                                                                     Password: request.body.Password,
-                                                                     Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
-                                                                     Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
-                                                                     ExtraData: request.body.Business ? CommonUtilities.jsonToString( request.body.Business, logger ): null,
-                                                                     ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
-                                                                     Comment: request.body.Comment,
-                                                                     CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                     CreatedAt: null,
-                                                                     DisabledBy: request.body.DisabledBy === "1"? "1@" + strUserName: null
-                                                                   },
-                                                                   false,
-                                                                   currentTransaction,
-                                                                   logger
-                                                                 );
+                delete request.body.sysPerson.CreatedBy;
+                delete request.body.sysPerson.CreatedAt;
+                delete request.body.sysPerson.UpdatedBy;
+                delete request.body.sysPerson.UpdatedAt;
+                delete request.body.sysPerson.ExtraData;
 
-                if ( sysUserInDB &&
-                     sysUserInDB instanceof Error === false ) {
+                personData.Title = request.body.sysPerson.Title ? request.body.sysPerson.Title : personData.Title;
+                personData.FirstName = request.body.sysPerson.FirstName ? CommonUtilities.normalizeWhitespaces( request.body.sysPerson.FirstName ) : personData.FirstName;
+                personData.LastName = request.body.sysPerson.LastName ? CommonUtilities.normalizeWhitespaces( request.body.sysPerson.LastName ): personData.LastName;
+                personData.NickName = request.body.sysPerson.NickName ? request.body.sysPerson.NickName : personData.NickName;
 
-                  const warnings = [];
+                if ( request.body.Abbreviation ) {
 
-                  if ( request.body.Notify ) {
+                  personData.Abbreviation = request.body.sysPerson.Abbreviation;
 
-                    const transportList = request.body.Notify.split( "," );
+                }
+                else if ( !personData.Abbreviation ) {
 
-                    if ( transportList.includes( "email" ) ) {
+                  const fistNameAbbreviation = CommonUtilities.getFirstLetters( request.body.sysPerson.FirstName );
+                  const lastNameAbbreviation = CommonUtilities.getFirstLetters( request.body.sysPerson.LastName );
 
-                      //ANCHOR send email sucess
-                      const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                  personData.Abbreviation = fistNameAbbreviation.join( "" ) + lastNameAbbreviation.join( "" );
+
+                }
+
+                personData.Gender = request.body.sysPerson.Gender && parseInt( request.body.sysPerson.Gender ) >= 0 ? request.body.sysPerson.Gender : personData.Gender;
+                personData.BirthDate = request.body.sysPerson.BirthDate ? request.body.sysPerson.BirthDate : personData.BirthDate;
+                personData.EMail = request.body.sysPerson.EMail; // ? request.body.sysPerson.EMail : null;
+                personData.Phone = request.body.sysPerson.Phone ? request.body.sysPerson.Phone : null;
+                personData.Address = request.body.sysPerson.Address ? request.body.sysPerson.Address : personData.Address;
+
+                if ( personData.Address &&
+                    await GeoMapManager.getConfigServiceType( "geocode", logger ) !== "@__none__@" ) {
+
+                  const geocodeResult = await GeoMapManager.geocodeServiceUsingAddress( [ personData.Address ],
+                                                                                        true,
                                                                                         logger );
 
-                      const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                              currentTransaction,
-                                                                              logger ) ? "web" : "mobile";
+                  if ( !geocodeResult ||
+                       geocodeResult.length == 0 ||
+                       geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
 
-                      const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                              "url",
-                                                                              currentTransaction,
-                                                                              logger );
+                    personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
 
-                      if ( await NotificationManager.send(
-                                                           "email",
-                                                           {
-                                                             from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                             to: request.body.EMail,
-                                                             subject: await I18NManager.translate( strLanguage, "USER ACCOUNT CREATION SUCCESS" ),
-                                                             body: {
-                                                                     kind: "template",
-                                                                     file: `email-user-creation-${strTemplateKind}.pug`,
-                                                                     language: context.Language,
-                                                                     variables: {
-                                                                                  user_name: request.body.Name,
-                                                                                  user_password: CommonUtilities.maskPassword( request.body.Password ),
-                                                                                  web_app_url: strWebAppURL,
-                                                                                  ... configData
-                                                                                }
-                                                                     //kind: "embedded",
-                                                                     //text: "Hello",
-                                                                     //html: "<b>Hello</b>"
-                                                                   }
-                                                           },
-                                                           logger
-                                                         ) === false ) {
+                  }
+                  else {
 
-                        warnings.push(
-                                       {
-                                         Code: "WARNING_CANNOT_SEND_EMAIL",
-                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
-                                         Details: {
-                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
-                                                  }
-                                       }
-                                     );
+                    personData.Address = geocodeResult[ 0 ].formattedAddress;
+                    personData.Tag = CommonUtilities.removeTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
 
-                      }
+                  }
 
-                    }
+                  personData.Tag = personData.Tag ? personData.Tag: null;
 
-                    if ( transportList.includes( "sms" ) ) {
+                }
 
-                      if ( request.body.Phone ) {
+                const sysPersonInDB = await SYSPersonService.createOrUpdate( personData,
+                                                                             true,
+                                                                             currentTransaction,
+                                                                             logger );
+
+                if ( sysPersonInDB &&
+                     sysPersonInDB instanceof Error === false ) {
+
+                  //ANCHOR create new user
+                  sysUserInDB = await SYSUserService.createOrUpdate(
+                                                                     {
+                                                                       Id: sysPersonInDB.Id,
+                                                                       PersonId: sysPersonInDB.Id,
+                                                                       GroupId: sysUserGroupInDB.Id,
+                                                                       Name: request.body.Name,
+                                                                       Password: request.body.Password,
+                                                                       Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
+                                                                       Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: null,
+                                                                       ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
+                                                                       ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
+                                                                       Comment: request.body.Comment,
+                                                                       CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                       CreatedAt: null,
+                                                                       DisabledBy: request.body.DisabledBy === "1"? "1@" + strUserName: null
+                                                                     },
+                                                                     false,
+                                                                     currentTransaction,
+                                                                     logger
+                                                                   );
+
+                  if ( sysUserInDB &&
+                       sysUserInDB instanceof Error === false ) {
+
+                    const warnings = [];
+
+                    if ( request.body.Notify ) {
+
+                      const transportList = request.body.Notify.split( "," );
+
+                      if ( transportList.includes( "email" ) ) {
+
+                        //ANCHOR send email sucess
+                        const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                          logger );
+
+                        const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                                currentTransaction,
+                                                                                logger ) ? "web" : "mobile";
+
+                        const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                                "url",
+                                                                                currentTransaction,
+                                                                                logger );
 
                         if ( await NotificationManager.send(
-                                                             "sms",
+                                                             "email",
                                                              {
-                                                               to: sysUserInDB.sysPerson.Phone,
-                                                               //context: "AMERICA/NEW_YORK",
-                                                               foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
-                                                               //device_id: "*",
+                                                               from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                               to: personData.EMail,
+                                                               subject: await I18NManager.translate( strLanguage, "USER ACCOUNT CREATION SUCCESS" ),
                                                                body: {
-                                                                       kind: "self",
-                                                                       text: await I18NManager.translate( strLanguage, 'User account creation success.\n%s\n%s', request.body.Name, request.body.Password )
+                                                                       kind: "template",
+                                                                       file: `email-user-creation-${strTemplateKind}.pug`,
+                                                                       language: context.Language,
+                                                                       variables: {
+                                                                                    user_name: request.body.Name,
+                                                                                    user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                    web_app_url: strWebAppURL,
+                                                                                    ... configData
+                                                                                  }
+                                                                       //kind: "embedded",
+                                                                       //text: "Hello",
+                                                                       //html: "<b>Hello</b>"
                                                                      }
                                                              },
                                                              logger
                                                            ) === false ) {
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_CANNOT_SEND_EMAIL",
+                                           Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                           Details: {
+                                                      Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                    }
+                                         }
+                                       );
+
+                        }
+
+                      }
+
+                      if ( transportList.includes( "sms" ) ) {
+
+                        if ( personData.Phone ) {
+
+                          if ( await NotificationManager.send(
+                                                               "sms",
+                                                               {
+                                                                 to: personData.Phone,
+                                                                 //context: "AMERICA/NEW_YORK",
+                                                                 foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                                 //device_id: "*",
+                                                                 body: {
+                                                                         kind: "self",
+                                                                         text: await I18NManager.translate( strLanguage, 'User account creation success.\n%s\n%s', request.body.Name, request.body.Password )
+                                                                       }
+                                                               },
+                                                               logger
+                                                             ) === false ) {
+
+                            warnings.push(
+                                           {
+                                             Code: "WARNING_CANNOT_SEND_SMS",
+                                             Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                             Details: {
+                                                        Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                      }
+                                           }
+                                         );
+
+                          }
+
+                        }
+                        else {
 
                           warnings.push(
                                          {
@@ -7566,51 +7680,89 @@ export default class UserServiceController {
                         }
 
                       }
-                      else {
-
-                        warnings.push(
-                                       {
-                                         Code: "WARNING_CANNOT_SEND_SMS",
-                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
-                                         Details: {
-                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
-                                                  }
-                                       }
-                                     );
-
-                      }
 
                     }
 
+                    sysUserInDB = await SYSUserService.getById( sysUserInDB.Id,
+                                                                null,
+                                                                currentTransaction,
+                                                                logger );
+
+                    let modelData = ( sysUserInDB as any ).dataValues;
+
+                    const tempModelData = await SYSUser.convertFieldValues(
+                                                                            {
+                                                                              Data: modelData,
+                                                                              FilterFields: 1, //Force to remove fields like password and value
+                                                                              TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                              Include: null,
+                                                                              Logger: logger,
+                                                                              ExtraInfo: {
+                                                                                           Request: request
+                                                                                         }
+                                                                            }
+                                                                          );
+
+                    if ( tempModelData ) {
+
+                      modelData = tempModelData;
+
+                    }
+
+                    //ANCHOR success user create
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_USER_CREATE',
+                               Message: await I18NManager.translate( strLanguage, 'Success user creation.' ),
+                               Mark: 'B9779ACDB9EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 1,
+                               Data: [
+                                       modelData
+                                     ]
+                             }
+
+                    bApplyTransaction = true;
+
                   }
+                  else {
 
-                  result = {
-                             StatusCode: 200, //Ok
-                             Code: 'SUCCESS_CREATE_USER',
-                             Message: await I18NManager.translate( strLanguage, 'Success user creation.' ),
-                             Mark: 'B9779ACDB9EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                             LogId: null,
-                             IsError: false,
-                             Errors: [],
-                             Warnings: warnings,
-                             Count: 1,
-                             Data: [
-                                     sysUserInDB
-                                   ]
-                           }
+                    const error = sysUserInDB as any;
 
-                  bApplyTransaction = true;
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'C4B8A26D4B57' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             };
+
+                  }
 
                 }
                 else {
 
-                  const error = sysUserInDB as any;
+                  const error = sysPersonInDB as any;
 
                   result = {
                              StatusCode: 500, //Internal server error
                              Code: 'ERROR_UNEXPECTED',
                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: 'C4B8A26D4B57' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: '8E230246A1AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -7630,52 +7782,51 @@ export default class UserServiceController {
               }
               else {
 
-                const error = sysPersonInDB as any;
-
                 result = {
-                           StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                           Mark: '8E230246A1AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside of sysPerson' ),
+                           Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: error.name,
-                                       Message: error.message,
-                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside of sysPerson' ),
+                                       Details: validator.errors.all()
                                      }
                                    ],
                            Warnings: [],
                            Count: 0,
                            Data: []
-                         };
+                         }
 
               }
 
             }
-            else {
 
-              result = {
-                        StatusCode: 400, //Bad request
-                        Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                        Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                        Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                        LogId: null,
-                        IsError: true,
-                        Errors: [
-                                  {
-                                    Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                    Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                                    Details: validator.errors.all()
-                                  }
-                                ],
-                        Warnings: [],
-                        Count: 0,
-                        Data: []
-                      }
+          }
+          else {
 
-            }
+            //ANCHOR password not valid (createUser)
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_PASSWORD_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
+                       Mark: 'F9F02C3E2859' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: checkPasswordStrengthResult.code,
+                                   Message: checkPasswordStrengthResult.message,
+                                   Details: passwordStrengthParameters
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
 
           }
 
@@ -7773,7 +7924,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.createUser.name;
 
       const strMark = "F754B87531BC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -7833,7 +7984,7 @@ export default class UserServiceController {
 
   }
 
-  static async modifyUser( request: Request,
+  static async updateUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
 
@@ -7863,9 +8014,861 @@ export default class UserServiceController {
 
       }
 
-      let strUserName = context.UserSessionStatus.UserName;
+      let userSessionStatus = context.UserSessionStatus;
 
-      //
+      let resultCheckUserRoles = null;
+
+      let sysUserGroupInDB: SYSUserGroup = null;
+
+      let sysUserInDB: SYSUser = null;
+
+      let userRules = {
+                        Avatar: [ 'present', 'string', 'min:36' ],
+                        Id: [ 'required', 'string', 'min:36' ],
+                        ShortId: [ 'present', 'string', 'min:8' ],
+                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
+                        ExpireAt: [ 'present', 'date' ],
+                        Notify: [ 'present', 'min:3' ],
+                        sysUserGroup: {
+                          Create: [ 'required', 'boolean' ],
+                          Id: [ 'present', 'string', 'min:36' ],
+                          ShortId: [ 'present', 'string', 'min:8' ],
+                          Name: [ 'present', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
+                          Role: [ 'present', 'string' ],
+                          Tag: [ 'present', 'string' ],
+                        },
+                        sysPerson: [ 'present' ],
+                        Business: [ 'present' ],
+                      };
+
+      const validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                   userRules,
+                                                                   null,
+                                                                   logger );
+
+      if ( validator.passes() ) { //Validate request.body field values
+
+        delete request.body.CreatedBy;
+        delete request.body.CreatedAt;
+        delete request.body.UpdatedBy;
+        delete request.body.UpdatedAt;
+
+        if ( request.body.DisabledBy !== "0" &&
+             request.body.DisabledBy !== "1" ) {
+
+          delete request.body.DisabledBy;
+
+        }
+
+        delete request.body.DisabledAt;
+        delete request.body.ExtraData;
+
+        delete request.body.sysUserGroup.CreatedBy;
+        delete request.body.sysUserGroup.CreatedAt;
+        delete request.body.sysUserGroup.UpdatedBy;
+        delete request.body.sysUserGroup.UpdatedAt;
+        delete request.body.sysUserGroup.DisableBy;
+        delete request.body.sysUserGroup.DisableAt;
+        delete request.body.sysUserGroup.ExtraData;
+
+        sysUserInDB = await SYSUserService.getBy( {
+                                                    Id: request.body.Id,
+                                                    ShortId: request.body.ShortId,
+                                                    Name: request.body.Name
+                                                  },
+                                                  null,
+                                                  currentTransaction,
+                                                  logger );
+
+        if ( sysUserInDB &&
+             sysUserInDB.Id !== userSessionStatus.UserId ) {
+
+          let passwordStrengthParameters = null;
+          let checkPasswordStrengthResult = null;
+
+          if ( request.body.Password ) {
+
+            const strPassword = request.body.Password;
+
+            //ANCHOR check password Strength (modifyUser)
+            const strTag = "#" + request.body.Name + "#,#" + request.body.Id + "#,#" + request.body.sysUserGroup.Name + "#,#" + request.body.sysUserGroup.Id + "#,#" + request.body.sysUserGroup.ShortId + "#";
+
+            passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
+                                                                                                              currentTransaction,
+                                                                                                              logger );
+
+            checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
+                                                                                                 strPassword,
+                                                                                                 logger );
+
+          }
+
+          if ( !request.body.Password ||
+               checkPasswordStrengthResult.code === 1 ) {
+
+            const strUserName = context.UserSessionStatus.UserName;
+
+            let bIsAuthorizedCreateGroup = userSessionStatus.Role.includes( "#CreateUserGroupL01#" );
+
+            let bIsAllowedAddInDisabledGroup = userSessionStatus.Role.includes( "#AllowAddInDisabledGroupL01#" );
+
+            if ( !request.body.sysUserGroup.Id &&
+                 !request.body.sysUserGroup.ShortId &&
+                 !request.body.sysUserGroup.Name ) {
+
+              request.body.stsUserGroup.Name = request.body.Name;
+
+            }
+
+            sysUserGroupInDB = await SYSUserGroupService.getBy( {
+                                                                  Id: request.body.sysUserGroup.Id,
+                                                                  ShortId: request.body.sysUserGroup.ShortId,
+                                                                  Name: request.body.sysUserGroup.Name || request.body.Name
+                                                                },
+                                                                null,
+                                                                currentTransaction,
+                                                                logger );
+
+             //ANCHOR checkUserRoleLevel
+            resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                            sysUserInDB,
+                                                            "updateUser",
+                                                            logger );
+
+            if ( resultCheckUserRoles.isAuthorizedAdmin ) {
+
+              bIsAuthorizedCreateGroup = request.body.sysUserGroup.Create === true;
+
+              bIsAllowedAddInDisabledGroup = true;
+
+            }
+            else if ( !resultCheckUserRoles.isAuthorizedL03 &&
+                      !resultCheckUserRoles.isAuthorizedL02 &&
+                      !resultCheckUserRoles.isAuthorizedL01 ) {
+
+              resultCheckUserRoles.isNotAuthorized = true;
+
+            }
+
+            if ( resultCheckUserRoles.isNotAuthorized ) {
+
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_MODIFY_USER',
+                         Message: await I18NManager.translate( strLanguage, 'Not authorized to modify the user' ),
+                         Mark: '649C2E456688' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_MODIFY_USER',
+                                     Message: await I18NManager.translate( strLanguage, 'Not authorized to modify the user' ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( sysUserGroupInDB instanceof Error ) {
+
+              const error = sysUserGroupInDB;
+
+              result = {
+                         StatusCode: 500, //Internal server error
+                         Code: 'ERROR_UNEXPECTED',
+                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                         Mark: '4BCF34A0662D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: error.name,
+                                     Message: error.message,
+                                     Details: await SystemUtilities.processErrorDetails( error ) //error
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       };
+
+            }
+            else if ( sysUserGroupInDB &&
+                      SYSUserGroupService.checkDisabled( sysUserGroupInDB ) &&
+                      bIsAllowedAddInDisabledGroup === false ) {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_DISABLED',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                         Mark: '4FC2BC4D3209' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_DISABLED',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( sysUserGroupInDB &&
+                      SYSUserGroupService.checkExpired( sysUserGroupInDB ) &&
+                      bIsAllowedAddInDisabledGroup === false ) {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_EXPIRED',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                         Mark: '9951957659E5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_EXPIRED',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create ) {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                         Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                         Mark: 'C02BDD5D7F85' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create == false ) {
+
+              const strMessage = await this.getMessageGroup( strLanguage, {
+                                                                            Id: request.body.sysUserGroup.Id,
+                                                                            ShortId: request.body.sysUserGroup.ShortId,
+                                                                            Name: request.body.sysUserGroup.Name
+                                                                          } );
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                         Message: strMessage,
+                         Mark: '140885E9DB9B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                     Message: strMessage,
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup === true &&
+                      !request.body.sysUserGroup.Id &&
+                      !request.body.sysUserGroup.ShortId &&
+                      !request.body.sysUserGroup.Name ) {
+
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                         Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
+                         Mark: '754CE1444A44' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                                     Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup === false ) {
+
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                         Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                         Mark: 'BC1E68690F49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
+                                     Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( !sysUserGroupInDB &&
+                      request.body.sysUserGroup.Create &&
+                      bIsAuthorizedCreateGroup ) {
+
+              sysUserGroupInDB = await SYSUserGroupService.createOrUpdate(
+                                                                           {
+                                                                             Name: request.body.sysUserGroup.Name,
+                                                                             Comment: request.body.Comment,
+                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
+                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
+                                                                             ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
+                                                                             CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                             CreatedAt: null
+                                                                           },
+                                                                           false,
+                                                                           currentTransaction,
+                                                                           logger
+                                                                         );
+
+              if ( sysUserGroupInDB instanceof Error ) {
+
+                const error = sysUserGroupInDB;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: 'ERROR_UNEXPECTED',
+                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Mark: '3ADACE44BB5B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         };
+
+              }
+
+            }
+
+            if ( !result ) {
+
+              let personData = sysUserInDB.sysPerson ? ( sysUserInDB.sysPerson as any ).dataValues: {} as any;
+
+              personData.UpdatedBy = strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+              personData.UpdatedAt = null;
+
+              let rules = {
+                            Id: [ 'required', 'string', 'min:36' ],
+                            Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            Gender: [ 'present', 'between:0,100' ],
+                            BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                            EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          };
+
+              const validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
+                                                                           rules,
+                                                                           null,
+                                                                           logger );
+
+              if ( validator.passes() ) { //Validate request.body field values
+
+                delete request.body.sysPerson.CreatedBy;
+                delete request.body.sysPerson.CreatedAt;
+                delete request.body.sysPerson.UpdatedBy;
+                delete request.body.sysPerson.UpdatedAt;
+                delete request.body.sysPerson.ExtraData;
+
+                personData.Id = request.body.sysPerson.Id ? request.body.sysPerson.Id : personData.Id;
+                personData.Title = request.body.sysPerson.Title ? request.body.sysPerson.Title : personData.Title;
+                personData.FirstName = request.body.sysPerson.FirstName ? CommonUtilities.normalizeWhitespaces( request.body.sysPerson.FirstName ) : personData.FirstName;
+                personData.LastName = request.body.sysPerson.LastName ? CommonUtilities.normalizeWhitespaces( request.body.sysPerson.LastName ): personData.LastName;
+                personData.NickName = request.body.sysPerson.NickName ? request.body.sysPerson.NickName : personData.NickName;
+
+                if ( request.body.Abbreviation ) {
+
+                  personData.Abbreviation = request.body.sysPerson.Abbreviation;
+
+                }
+                else if ( !personData.Abbreviation ) {
+
+                  const fistNameAbbreviation = CommonUtilities.getFirstLetters( request.body.sysPerson.FirstName );
+                  const lastNameAbbreviation = CommonUtilities.getFirstLetters( request.body.sysPerson.LastName );
+
+                  personData.Abbreviation = fistNameAbbreviation.join( "" ) + lastNameAbbreviation.join( "" );
+
+                }
+
+                personData.Gender = request.body.sysPerson.Gender && parseInt( request.body.sysPerson.Gender ) >= 0 ? request.body.sysPerson.Gender : personData.Gender;
+                personData.BirthDate = request.body.sysPerson.BirthDate ? request.body.sysPerson.BirthDate: personData.BirthDate;
+                personData.EMail = request.body.sysPerson.EMail ? request.body.sysPerson.EMail: personData.EMail; // ? request.body.sysPerson.EMail : null;
+                personData.Phone = request.body.sysPerson.Phone ? request.body.sysPerson.Phone: personData.Phone;
+                personData.Address = request.body.sysPerson.Address ? request.body.sysPerson.Address: personData.Address;
+
+                if ( personData.Address &&
+                     await GeoMapManager.getConfigServiceType( "geocode", logger ) !== "@__none__@" ) {
+
+                  const geocodeResult = await GeoMapManager.geocodeServiceUsingAddress( [ personData.Address ],
+                                                                                        true,
+                                                                                        logger );
+
+                  if ( !geocodeResult ||
+                       geocodeResult.length == 0 ||
+                       ( geocodeResult[ 0 ].formattedAddressParts &&
+                         geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
+
+                    personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+                  }
+                  else {
+
+                    personData.Address = geocodeResult[ 0 ].formattedAddress;
+                    personData.Tag = CommonUtilities.removeTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
+
+                  }
+
+                  personData.Tag = personData.Tag ? personData.Tag: null;
+
+                }
+
+                const sysPersonInDB = await SYSPersonService.createOrUpdate( personData,
+                                                                             true,
+                                                                             currentTransaction,
+                                                                             logger );
+
+                if ( sysPersonInDB &&
+                     sysPersonInDB instanceof Error === false ) {
+
+                  //ANCHOR modify user
+                  sysUserInDB.GroupId = sysUserGroupInDB.Id;
+                  sysUserInDB.Name = request.body.Name ? request.body.Name: sysUserInDB.Name;
+                  sysUserInDB.Password = request.body.Password !== undefined ? request.body.Password: sysUserInDB.Password;
+                  sysUserInDB.Role = resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
+                  sysUserInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserInDB.Tag;
+
+                  if ( request.body.Business ) {
+
+                    const extraData = CommonUtilities.parseJSON( sysUserInDB.ExtraData, logger );
+
+                    if ( extraData ) {
+
+                      extraData.Business = { ...request.body.Business };
+
+                      sysUserInDB.ExtraData = CommonUtilities.jsonToString( extraData, logger );
+
+                    }
+
+                  }
+
+                  sysUserInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null;
+                  sysUserInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserInDB.Comment;
+                  sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+                  sysUserInDB.UpdatedAt = null;
+                  sysUserInDB.DisabledBy = request.body.DisabledBy === "1"? "1@" + strUserName: null;
+
+                  sysUserInDB = await SYSUserService.createOrUpdate(
+                                                                     ( sysUserInDB as any ).dataValues,
+                                                                     true,
+                                                                     currentTransaction,
+                                                                     logger
+                                                                   );
+
+                  if ( sysUserInDB &&
+                       sysUserInDB instanceof Error === false ) {
+
+                    const warnings = [];
+
+                    if ( request.body.Notify ) {
+
+                      const transportList = request.body.Notify.split( "," );
+
+                      if ( transportList.includes( "email" ) ) {
+
+                        //ANCHOR send email sucess
+                        const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                          logger );
+
+                        const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
+                                                                                currentTransaction,
+                                                                                logger ) ? "web" : "mobile";
+
+                        const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
+                                                                                "url",
+                                                                                currentTransaction,
+                                                                                logger );
+
+                        if ( await NotificationManager.send(
+                                                             "email",
+                                                             {
+                                                               from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                               to: personData.EMail,
+                                                               subject: await I18NManager.translate( strLanguage, "USER ACCOUNT MODIFICATION SUCCESS" ),
+                                                               body: {
+                                                                       kind: "template",
+                                                                       file: `email-user-modification-${strTemplateKind}.pug`,
+                                                                       language: context.Language,
+                                                                       variables: {
+                                                                                    user_name: request.body.Name,
+                                                                                    user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                    web_app_url: strWebAppURL,
+                                                                                    ... configData
+                                                                                  }
+                                                                       //kind: "embedded",
+                                                                       //text: "Hello",
+                                                                       //html: "<b>Hello</b>"
+                                                                     }
+                                                             },
+                                                             logger
+                                                           ) === false ) {
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_CANNOT_SEND_EMAIL",
+                                           Message: await I18NManager.translate( strLanguage, "Cannot send the notification email to the user" ),
+                                           Details: {
+                                                      Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                    }
+                                         }
+                                       );
+
+                        }
+
+                      }
+
+                      if ( transportList.includes( "sms" ) ) {
+
+                        if ( personData.Phone ) {
+
+                          if ( await NotificationManager.send(
+                                                               "sms",
+                                                               {
+                                                                 to: personData.Phone,
+                                                                 //context: "AMERICA/NEW_YORK",
+                                                                 foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                                 //device_id: "*",
+                                                                 body: {
+                                                                         kind: "self",
+                                                                         text: await I18NManager.translate( strLanguage, 'User account modification success.\n%s\n%s', request.body.Name, request.body.Password )
+                                                                       }
+                                                               },
+                                                               logger
+                                                             ) === false ) {
+
+                            warnings.push(
+                                           {
+                                             Code: "WARNING_CANNOT_SEND_SMS",
+                                             Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                             Details: {
+                                                        Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                      }
+                                           }
+                                         );
+
+                          }
+
+                        }
+                        else {
+
+                          warnings.push(
+                                         {
+                                           Code: "WARNING_CANNOT_SEND_SMS",
+                                           Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                           Details: {
+                                                      Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                    }
+                                         }
+                                       );
+
+                        }
+
+                      }
+
+                    }
+
+                    let modelData = ( sysUserInDB as any ).dataValues;
+
+                    const tempModelData = await SYSUser.convertFieldValues(
+                                                                            {
+                                                                              Data: modelData,
+                                                                              FilterFields: 1, //Force to remove fields like password and value
+                                                                              TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                              Include: null,
+                                                                              Logger: logger,
+                                                                              ExtraInfo: {
+                                                                                           Request: request
+                                                                                         }
+                                                                            }
+                                                                          );
+
+                    if ( tempModelData ) {
+
+                      modelData = tempModelData;
+
+                    }
+
+                    //ANCHOR success user update
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: 'SUCCESS_USER_UDPATE',
+                               Message: await I18NManager.translate( strLanguage, 'Success user update.' ),
+                               Mark: '34F3D558BD74' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 1,
+                               Data: [
+                                       modelData
+                                     ]
+                             }
+
+                    bApplyTransaction = true;
+
+                  }
+                  else {
+
+                    const error = sysUserInDB as any;
+
+                    result = {
+                               StatusCode: 500, //Internal server error
+                               Code: 'ERROR_UNEXPECTED',
+                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                               Mark: 'CFEA59FE0AA3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: error.name,
+                                           Message: error.message,
+                                           Details: await SystemUtilities.processErrorDetails( error ) //error
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             };
+
+                  }
+
+                }
+                else {
+
+                  const error = sysPersonInDB as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: 'ERROR_UNEXPECTED',
+                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                             Mark: 'D80E1396B8C9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           };
+
+                }
+
+              }
+              else {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside or sysPerson' ),
+                           Mark: '28D2B22DC85C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside or sysPerson' ),
+                                       Details: validator.errors.all()
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+
+            }
+
+          }
+          else {
+
+            //ANCHOR password not valid (modifyUser)
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_PASSWORD_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
+                       Mark: '6FBA9E138C03' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: checkPasswordStrengthResult.code,
+                                   Message: checkPasswordStrengthResult.message,
+                                   Details: passwordStrengthParameters
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else if ( sysUserInDB instanceof Error ) {
+
+          const error = sysUserInDB as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else if ( sysUserInDB &&
+                  sysUserInDB.Id !== userSessionStatus.UserId ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_NOT_VALID',
+                     Message: await I18NManager.translate( strLanguage, 'The user to modify cannot be yourself.' ),
+                     Mark: '823DBA64229F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_VALID',
+                                 Message: await I18NManager.translate( strLanguage, 'The user to modify cannot be yourself.' ),
+                                 Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_NAME_NOT_EXISTS',
+                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                     Mark: '4CE574F8D33C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NAME_NOT_EXISTS',
+                                 Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                 Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                   Mark: '39F4B9428B50' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
+                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Details: validator.errors.all()
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&
@@ -7889,7 +8892,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.updateUser.name;
 
       const strMark = "C1CB15FAF087" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -8296,17 +9299,17 @@ export default class UserServiceController {
       for ( const currentRow of transformedRows ) {
 
         const tempModelData = await SYSUser.convertFieldValues(
-                                                             {
-                                                               Data: currentRow,
-                                                               FilterFields: 1, //Force to remove fields like password and value
-                                                               TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                               Include: null,
-                                                               Logger: logger,
-                                                               ExtraInfo: {
-                                                                            Request: request
-                                                                          }
-                                                             }
-                                                           );
+                                                                {
+                                                                  Data: currentRow,
+                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                  Include: null,
+                                                                  Logger: logger,
+                                                                  ExtraInfo: {
+                                                                                Request: request
+                                                                              }
+                                                                }
+                                                              );
         if ( tempModelData ) {
 
           convertedRows.push( tempModelData );

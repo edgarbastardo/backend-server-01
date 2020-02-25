@@ -27,17 +27,21 @@ export default class GeoMapGoogle {
                           method: 'GET',
                         };
 
-        const geocodeResult = await fetch( serviceOptions.host + "?language=en&address=" + strAddress + "&key=" + serviceOptions.auth.api_key,
+        const strURL = serviceOptions.host + "?language=en&address=" + encodeURI( strAddress ) + "&key=" + serviceOptions.auth.api_key;
+
+        const geocodeResult = await fetch( strURL,
                                            options );
+
+        const jsonResult = await geocodeResult.json();
 
         if ( bParseGeocodeResponse ) {
 
-          result.push( ( await GeoMapGoogle.parseGeocodeResponse( [ await geocodeResult.json() ], logger ) )[ 0 ] );
+          result.push( ( await GeoMapGoogle.parseGeocodeResponse( [ jsonResult ], logger ) )[ 0 ] );
 
         }
         else {
 
-          result.push( await geocodeResult.json() );
+          result.push( jsonResult );
 
         }
 

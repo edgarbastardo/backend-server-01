@@ -1,5 +1,5 @@
 import appRoot from 'app-root-path';
-import CipherManager from "./CipherManager";
+import CipherManager from "../../02_system/common/managers/CipherManager";
 
 require( 'dotenv' );
 
