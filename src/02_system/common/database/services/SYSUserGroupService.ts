@@ -355,12 +355,12 @@ export default class SYSUserGroupService extends BaseService {
                                   transaction: any,
                                   logger: any ): Promise<boolean> {
 
-    const userGroup = await this.getById( strId,
-                                          null,
-                                          transaction,
-                                          logger );
+    const sysUserGroup = await this.getById( strId,
+                                             null,
+                                             transaction,
+                                             logger );
 
-    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+    return sysUserGroup ? sysUserGroup.DisabledBy !== null || sysUserGroup.DisabledAt !== null : false;
 
   }
 
@@ -379,12 +379,12 @@ export default class SYSUserGroupService extends BaseService {
                                     transaction: any,
                                     logger: any ): Promise<boolean> {
 
-    const userGroup = await this.getByName( strName,
-                                            null,
-                                            transaction,
-                                            logger );
+    const sysUserGroup = await this.getByName( strName,
+                                               null,
+                                               transaction,
+                                               logger );
 
-    return userGroup ? userGroup.DisabledBy !== null || userGroup.DisabledAt !== null : false;
+    return sysUserGroup ? sysUserGroup.DisabledBy !== null || sysUserGroup.DisabledAt !== null : false;
 
   }
 
@@ -392,46 +392,48 @@ export default class SYSUserGroupService extends BaseService {
                                  transaction: any,
                                  logger: any ): Promise<boolean> {
 
-    const userGroup = await this.getById( strId,
-                                          null,
-                                          transaction,
-                                          logger );
+    const sysUserGroup = await this.getById( strId,
+                                             null,
+                                             transaction,
+                                             logger );
 
-    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+    return sysUserGroup ? SystemUtilities.isDateAndTimeAfter( sysUserGroup.ExpireAt ) : false;
 
   }
 
   static async checkExpiredByName( strName: string,
-                                    transaction: any,
-                                    logger: any ): Promise<boolean> {
+                                   transaction: any,
+                                   logger: any ): Promise<boolean> {
 
-    const userGroup = await this.getByName( strName,
-                                            null,
-                                            transaction,
-                                            logger );
+    const sysUserGroup = await this.getByName( strName,
+                                               null,
+                                               transaction,
+                                               logger );
 
-    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
-
-  }
-
-  static async checkDisabled( userGroup: SYSUserGroup ): Promise<boolean> {
-
-    return userGroup ? userGroup.DisabledBy !== null ||
-                       userGroup.DisabledAt !== null : false;
+    return sysUserGroup ? SystemUtilities.isDateAndTimeAfter( sysUserGroup.ExpireAt ) : false;
 
   }
 
-  static async checkExpired( userGroup: SYSUserGroup ): Promise<boolean> {
+  static checkDisabled( sysUserGroup: SYSUserGroup ): boolean {
 
-    return userGroup ? SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+    return sysUserGroup &&
+           ( sysUserGroup.DisabledBy ||
+             sysUserGroup.DisabledAt ) ? true: false;
 
   }
 
-  static async checkDisabledOrExpired( userGroup: SYSUserGroup ): Promise<boolean> {
+  static checkExpired( sysUserGroup: SYSUserGroup ): boolean {
 
-    return userGroup ? userGroup.DisabledBy !== null ||
-                       userGroup.DisabledAt !== null ||
-                       SystemUtilities.isDateAndTimeAfter( userGroup.ExpireAt ) : false;
+    return sysUserGroup ? SystemUtilities.isDateAndTimeAfter( sysUserGroup.ExpireAt ) : false;
+
+  }
+
+  static checkDisabledOrExpired( sysUserGroup: SYSUserGroup ): boolean {
+
+    return sysUserGroup &&
+           ( sysUserGroup.DisabledBy ||
+             sysUserGroup.DisabledAt ||
+           SystemUtilities.isDateAndTimeAfter( sysUserGroup.ExpireAt ) ) ? true: false;
 
   }
 
@@ -550,6 +552,181 @@ export default class SYSUserGroupService extends BaseService {
     }
 
     return result;
+
+  }
+
+  static async deleteByModel( sysUserGroup: SYSUserGroup,
+                              transaction: any,
+                              logger: any ): Promise<Error|boolean> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        transaction: currentTransaction,
+
+      }
+
+      await sysUserGroup.destroy( options );
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+      result = true;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteByModel.name;
+
+      const strMark = "E119216006E0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async countUsers( strId: string,
+                           transaction: any,
+                           logger: any ): Promise<number> {
+
+    let intResult = 0;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "GroupId": strId ? strId : "" },
+        transaction: currentTransaction,
+
+      }
+
+      intResult = await SYSUserGroup.count( options );
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteByModel.name;
+
+      const strMark = "E119216006E0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      intResult = error;
+
+    }
+
+    return intResult;
 
   }
 

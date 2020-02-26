@@ -12,6 +12,9 @@ html(lang="en")
       p Your account information is:
       h3 User: #[strong #{user_name}]
       h3 Password: #[strong #{user_password}]
+      h3 EMail: #[strong #{user_email}]
+      if user_phone
+      h3 Phone: #[strong #{user_phone}]
       p You can login #[a(href=`${web_app_url}`) #{web_app_url}]
       p If you not recognize this email please ignore and archive it.
       p #[strong #{company_name}]

@@ -5,12 +5,13 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style
-        include ./email-user-creation-mobile.css
+        include ./email-user-modification-mobile.css
   body
-      h2 USER ACCOUNT CREATION SUCCESS
-      p Hello!. This email is for your new user account #[strong #{user_name}]
+      h2 USER ACCOUNT MODIFICATION SUCCESS
+      p Hello!. This email is for your information change for the user account #[strong #{user_name}]
       p Your account information is:
       h3 User: #[strong #{user_name}]
+      if user_password
       h3 Password: #[strong #{user_password}]
       h3 EMail: #[strong #{user_email}]
       if user_phone

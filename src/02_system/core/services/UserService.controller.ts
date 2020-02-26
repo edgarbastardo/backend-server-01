@@ -662,16 +662,16 @@ export default class UserServiceController {
                      bUserGroupExists === false ) {
 
                   result = {
-                             StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
+                             StatusCode: 404, //Not found
+                             Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, request.body.Kind ),
                              Mark: '49EEF768004F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, request.body.Kind ),
+                                         Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, request.body.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -1219,16 +1219,16 @@ export default class UserServiceController {
                      bUserGroupExists === false ) {
 
                   result = {
-                             StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, sysUserSignupInDB.Kind ),
+                             StatusCode: 404, //Not found
+                             Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                             Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, sysUserSignupInDB.Kind ),
                              Mark: '0EA9AC54E217' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not exists', signupProcessData.group, sysUserSignupInDB.Kind ),
+                                         Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                                         Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -3241,14 +3241,14 @@ export default class UserServiceController {
           result = {
                      StatusCode: 403, //Forbidden
                      Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                     Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', sysUserInDB.Name ),
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to change the password to the user %s', sysUserInDB.Name ),
                      Mark: 'CD5990E0CBD1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                                 Message: await I18NManager.translate( strLanguage, 'Not authorized to change the password to the user %s', sysUserInDB.Name ),
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to change the password to the user %s', sysUserInDB.Name ),
                                  Details: null,
                                }
                              ],
@@ -6652,6 +6652,7 @@ export default class UserServiceController {
 
       //let bIsNotAuthorized = false;
 
+      /*
       let sysUserInDB = null;
 
       if ( request.query.id ) {
@@ -6678,6 +6679,16 @@ export default class UserServiceController {
                                                    logger );
 
       }
+      */
+
+     let sysUserInDB = await SYSUserService.getBy( {
+                                                     Id: request.query.id,
+                                                     ShortId: request.query.shortId,
+                                                     Name: request.query.name
+                                                   },
+                                                   null,
+                                                   currentTransaction,
+                                                   logger );
 
       const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
                                                             sysUserInDB,
@@ -6698,14 +6709,14 @@ export default class UserServiceController {
         result = {
                    StatusCode: 403, //Forbidden
                    Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
-                   Message: await I18NManager.translate( strLanguage, 'Not authorized to get the information' ),
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the information' ),
                    Mark: '49BC23FE5772' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
-                               Message: await I18NManager.translate( strLanguage, 'Not authorized to get the information' ),
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the information' ),
                                Details: null,
                              }
                            ],
@@ -6714,7 +6725,7 @@ export default class UserServiceController {
                    Data: []
                  }
 
-      }
+      } //ANCHOR getUser
       else if ( sysUserInDB != null &&
                 sysUserInDB instanceof Error === false ) {
 
@@ -6768,7 +6779,7 @@ export default class UserServiceController {
       }
       else {
 
-        const error = sysUserInDB;
+        const error = sysUserInDB as any;
 
         result = {
                    StatusCode: 500, //Internal server error
@@ -6871,7 +6882,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.getUser.name;
 
       const strMark = "63E5C8D66751" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -6967,29 +6978,16 @@ export default class UserServiceController {
 
         if ( result.isAuthorizedL03 === false ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+          result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                            userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
-          if ( !roleSubTag ||
-                roleSubTag.length === 0 ) {
+          if ( result.isAuthorizedL01 &&
+                ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
+                  userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
+                  userSessionStatus.GroupId !== sysUserGroup.Id ) ) {
 
-            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
-
-          }
-
-          if ( result.isAuthorizedL03 === false ) {
-
-            result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                              userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
-
-            if ( result.isAuthorizedL01 &&
-                 ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
-                   userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
-                   userSessionStatus.GroupId !== sysUserGroup.Id ) ) {
-
-              //Uhathorized
-              result.isNotAuthorized = true;
-
-            }
+            //Uhathorized
+            result.isNotAuthorized = true;
 
           }
 
@@ -7002,7 +7000,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.checkUserRoleLevel.name;
+      sourcePosition.method = this.name + "." + this.checkUserGroupRoleLevel.name;
 
       const strMark = "E1C0D723CB80" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -7028,12 +7026,12 @@ export default class UserServiceController {
 
   }
 
-  static async getMessageGroup( strLanguage: string,
-                                by: {
-                                      Id: string,
-                                      ShortId: string,
-                                      Name: string
-                                    } ): Promise<string> {
+  static async getMessageUserGroup( strLanguage: string,
+                                    by: {
+                                          Id: string,
+                                          ShortId: string,
+                                          Name: string
+                                        } ): Promise<string> {
 
     let strResult = "";
 
@@ -7050,6 +7048,35 @@ export default class UserServiceController {
     else if ( by.ShortId ) {
 
       strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not exists', by.ShortId );
+
+    }
+
+    return strResult;
+
+  }
+
+  static async getMessageUser( strLanguage: string,
+                               by: {
+                                     Id: string,
+                                     ShortId: string,
+                                     Name: string
+                                   } ): Promise<string> {
+
+    let strResult = "";
+
+    if ( by.Name ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user with name %s not exists', by.Name );
+
+    }
+    else if ( by.Id ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user with id %s not exists', by.Id );
+
+    }
+    else if ( by.ShortId ) {
+
+      strResult = await I18NManager.translate( strLanguage, 'The user with short id %s not exists', by.ShortId );
 
     }
 
@@ -7220,14 +7247,14 @@ export default class UserServiceController {
               result = {
                          StatusCode: 403, //Forbidden
                          Code: 'ERROR_CANNOT_CREATE_USER',
-                         Message: await I18NManager.translate( strLanguage, 'Not authorized to create the user' ),
+                         Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user' ),
                          Mark: 'EDF5D29CE61C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_CANNOT_CREATE_USER',
-                                     Message: await I18NManager.translate( strLanguage, 'Not authorized to create the user' ),
+                                     Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user' ),
                                      Details: null,
                                    }
                                  ],
@@ -7335,22 +7362,22 @@ export default class UserServiceController {
             else if ( !sysUserGroupInDB &&
                       request.body.sysUserGroup.Create == false ) {
 
-              const strMessage = await this.getMessageGroup( strLanguage, {
-                                                                            Id: request.body.sysUserGroup.Id,
-                                                                            ShortId: request.body.sysUserGroup.ShortId,
-                                                                            Name: request.body.sysUserGroup.Name
-                                                                          } );
+              const strMessage = await this.getMessageUserGroup( strLanguage, {
+                                                                                Id: request.body.sysUserGroup.Id,
+                                                                                ShortId: request.body.sysUserGroup.ShortId,
+                                                                                Name: request.body.sysUserGroup.Name
+                                                                              } );
 
               result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                         StatusCode: 404, //Not found
+                         Code: 'ERROR_USER_GROUP_NOT_FOUND',
                          Message: strMessage,
                          Mark: 'C0171BD3B328' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                     Code: 'ERROR_USER_GROUP_NOT_FOUND',
                                      Message: strMessage,
                                      Details: null
                                    }
@@ -7607,7 +7634,9 @@ export default class UserServiceController {
                                                                        language: context.Language,
                                                                        variables: {
                                                                                     user_name: request.body.Name,
-                                                                                    user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                    user_email: request.body.EMail,
+                                                                                    user_phone: request.body.Phone,
+                                                                                    user_password: request.body.Password,
                                                                                     web_app_url: strWebAppURL,
                                                                                     ... configData
                                                                                   }
@@ -7713,7 +7742,7 @@ export default class UserServiceController {
                     result = {
                                StatusCode: 200, //Ok
                                Code: 'SUCCESS_USER_CREATE',
-                               Message: await I18NManager.translate( strLanguage, 'Success user creation.' ),
+                               Message: await I18NManager.translate( strLanguage, 'Success user create.' ),
                                Mark: 'B9779ACDB9EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
@@ -8080,7 +8109,7 @@ export default class UserServiceController {
                                                   currentTransaction,
                                                   logger );
 
-        if ( sysUserInDB &&
+        if ( sysUserInDB instanceof Error === false &&
              sysUserInDB.Id !== userSessionStatus.UserId ) {
 
           let passwordStrengthParameters = null;
@@ -8090,7 +8119,7 @@ export default class UserServiceController {
 
             const strPassword = request.body.Password;
 
-            //ANCHOR check password Strength (modifyUser)
+            //ANCHOR check password Strength (updateUser)
             const strTag = "#" + request.body.Name + "#,#" + request.body.Id + "#,#" + request.body.sysUserGroup.Name + "#,#" + request.body.sysUserGroup.Id + "#,#" + request.body.sysUserGroup.ShortId + "#";
 
             passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
@@ -8154,15 +8183,15 @@ export default class UserServiceController {
 
               result = {
                          StatusCode: 403, //Forbidden
-                         Code: 'ERROR_CANNOT_MODIFY_USER',
-                         Message: await I18NManager.translate( strLanguage, 'Not authorized to modify the user' ),
+                         Code: 'ERROR_CANNOT_UDPATE_USER',
+                         Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user' ),
                          Mark: '649C2E456688' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_CANNOT_MODIFY_USER',
-                                     Message: await I18NManager.translate( strLanguage, 'Not authorized to modify the user' ),
+                                     Code: 'ERROR_CANNOT_UPDATE_USER',
+                                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user' ),
                                      Details: null,
                                    }
                                  ],
@@ -8270,22 +8299,22 @@ export default class UserServiceController {
             else if ( !sysUserGroupInDB &&
                       request.body.sysUserGroup.Create == false ) {
 
-              const strMessage = await this.getMessageGroup( strLanguage, {
-                                                                            Id: request.body.sysUserGroup.Id,
-                                                                            ShortId: request.body.sysUserGroup.ShortId,
-                                                                            Name: request.body.sysUserGroup.Name
-                                                                          } );
+              const strMessage = await this.getMessageUserGroup( strLanguage, {
+                                                                                Id: request.body.sysUserGroup.Id,
+                                                                                ShortId: request.body.sysUserGroup.ShortId,
+                                                                                Name: request.body.sysUserGroup.Name
+                                                                              } );
 
               result = {
-                         StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                         StatusCode: 404, //Not found
+                         Code: 'ERROR_USER_GROUP_NOT_FOUND',
                          Message: strMessage,
                          Mark: '140885E9DB9B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_NOT_EXISTS',
+                                     Code: 'ERROR_USER_GROUP_NOT_FOUND',
                                      Message: strMessage,
                                      Details: null
                                    }
@@ -8487,10 +8516,10 @@ export default class UserServiceController {
                 if ( sysPersonInDB &&
                      sysPersonInDB instanceof Error === false ) {
 
-                  //ANCHOR modify user
+                  //ANCHOR update user
                   sysUserInDB.GroupId = sysUserGroupInDB.Id;
                   sysUserInDB.Name = request.body.Name ? request.body.Name: sysUserInDB.Name;
-                  sysUserInDB.Password = request.body.Password !== undefined ? request.body.Password: sysUserInDB.Password;
+                  sysUserInDB.Password = request.body.Password ? request.body.Password: sysUserInDB.Password;
                   sysUserInDB.Role = resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
                   sysUserInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserInDB.Tag;
 
@@ -8557,7 +8586,9 @@ export default class UserServiceController {
                                                                        language: context.Language,
                                                                        variables: {
                                                                                     user_name: request.body.Name,
-                                                                                    user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                                    user_password: request.body.Password ? request.body.Password: null,
+                                                                                    user_email: request.body.EMail,
+                                                                                    user_phone: request.body.Phone ? request.body.Phone: null,
                                                                                     web_app_url: strWebAppURL,
                                                                                     ... configData
                                                                                   }
@@ -8753,7 +8784,7 @@ export default class UserServiceController {
           }
           else {
 
-            //ANCHOR password not valid (modifyUser)
+            //ANCHOR password not valid (updateUser)
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_PASSWORD_NOT_VALID',
@@ -8801,20 +8832,20 @@ export default class UserServiceController {
 
         }
         else if ( sysUserInDB &&
-                  sysUserInDB.Id !== userSessionStatus.UserId ) {
+                  sysUserInDB.Id === userSessionStatus.UserId ) {
 
           result = {
                      StatusCode: 400, //Bad request
                      Code: 'ERROR_USER_NOT_VALID',
-                     Message: await I18NManager.translate( strLanguage, 'The user to modify cannot be yourself.' ),
+                     Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
                      Mark: '823DBA64229F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_USER_NOT_VALID',
-                                 Message: await I18NManager.translate( strLanguage, 'The user to modify cannot be yourself.' ),
-                                 Details: validator.errors.all()
+                                 Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
+                                 Details: null
                                }
                              ],
                      Warnings: [],
@@ -8825,18 +8856,24 @@ export default class UserServiceController {
         }
         else {
 
+          const strMessage = await this.getMessageUser( strLanguage, {
+                                                                       Id: request.body.Id,
+                                                                       ShortId: request.body.ShortId,
+                                                                       Name: request.body.Name
+                                                                     } );
+
           result = {
-                     StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_NAME_NOT_EXISTS',
-                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_USER_NOT_FOUND',
+                     Message: strMessage,
                      Mark: '4CE574F8D33C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_NAME_NOT_EXISTS',
-                                 Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
-                                 Details: validator.errors.all()
+                                 Code: 'ERROR_USER_NOT_FOUND',
+                                 Message: strMessage,
+                                 Details: null
                                }
                              ],
                      Warnings: [],
@@ -8952,6 +8989,7 @@ export default class UserServiceController {
 
   }
 
+  //ANCHOR deleteUser
   static async deleteUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
@@ -8982,9 +9020,217 @@ export default class UserServiceController {
 
       }
 
-      let strUserName = context.UserSessionStatus.UserName;
+      const userSessionStatus = context.UserSessionStatus;
 
-      //
+      //let strUserName = context.UserSessionStatus.UserName;
+
+      let sysUserInDB = await SYSUserService.getBy( {
+                                                      Id: request.body.Id,
+                                                      ShortId: request.body.ShortId,
+                                                      Name: request.body.Name
+                                                    },
+                                                    null,
+                                                    currentTransaction,
+                                                    logger );
+
+      const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                            sysUserInDB,
+                                                            "deleteUser",
+                                                            logger );
+
+      if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+           !resultCheckUserRoles.isAuthorizedL03 &&
+           !resultCheckUserRoles.isAuthorizedL02 &&
+           !resultCheckUserRoles.isAuthorizedL01 ) {
+
+        resultCheckUserRoles.isNotAuthorized = true;
+
+      }
+
+      if ( resultCheckUserRoles.isNotAuthorized ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_CANNOT_DELETE_THE_INFORMATION',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the information' ),
+                   Mark: 'BA7F0A12AD3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CANNOT_DELETE_THE_INFORMATION',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the information' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( sysUserInDB != null &&
+                sysUserInDB instanceof Error === false ) {
+
+        const strPersonId = sysUserInDB.sysPerson ? sysUserInDB.sysPerson.Id: null;
+
+        if ( strPersonId &&
+             await SYSUserService.countUsersWithPerson( strPersonId,
+                                                        currentTransaction,
+                                                        logger ) === 1 ) {
+
+          await SYSPersonService.deleteByModel( sysUserInDB.sysPerson,
+                                                currentTransaction,
+                                                logger );
+
+        }
+
+        const deleteResult = await SYSUserService.deleteByModel( sysUserInDB,
+                                                                 currentTransaction,
+                                                                 logger );
+
+        if ( deleteResult instanceof Error ) {
+
+          const error = deleteResult as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: 'CC964294E67E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+
+        }
+        else if ( deleteResult === true ) {
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_USER_DELETE',
+                     Message: await I18NManager.translate( strLanguage, 'Success user %s deleted.', sysUserInDB.Name ),
+                     Mark: 'BEF1D6D336E2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+          bApplyTransaction = true;
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 500, //Ok
+                     Code: 'ERROR_USER_DELETE',
+                     Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
+                     Mark: '34335D14522F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
+                                 Message: 'Method delete return false',
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else if ( sysUserInDB instanceof Error ) {
+
+        const error = sysUserInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysUserInDB &&
+                sysUserInDB.Id === userSessionStatus.UserId ) {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_USER_NOT_VALID',
+                   Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
+                   Mark: '3576DA16A5CA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_VALID',
+                               Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        const strMessage = await this.getMessageUser( strLanguage, {
+                                                                     Id: request.body.Id,
+                                                                     ShortId: request.body.ShortId,
+                                                                     Name: request.body.Name
+                                                                   } );
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_NOT_FOUND',
+                   Message: strMessage,
+                   Mark: '58A44EA21984' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_FOUND',
+                               Message: strMessage,
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&

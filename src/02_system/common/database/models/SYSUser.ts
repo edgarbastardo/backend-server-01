@@ -238,7 +238,24 @@ export class SYSUser extends Model<SYSUser> {
         if ( !params.KeepGroupExtraData ||
              params.KeepGroupExtraData === 0 ) {
 
-          result.Business = extraData;
+          if ( extraData.Business ) {
+
+            result.Business = extraData.Business;
+
+            delete extraData.Business;
+
+            if ( extraData ) {
+
+              result.Business = { ...result.Business, ...extraData };
+
+            }
+
+          }
+          else {
+
+            result.Business = extraData;
+
+          }
 
           delete result.ExtraData;
 
@@ -275,14 +292,31 @@ export class SYSUser extends Model<SYSUser> {
           if ( !params.KeepPersonExtraData ||
                 params.KeepPersonExtraData === 0 ) {
 
-            result.SYSPerson.Business = extraData;
+            if ( extraData.Business ) {
 
-            delete result.SYSPerson.ExtraData;
+              result.sysPerson.Business = extraData.Business;
+
+              delete extraData.Business;
+
+              if ( extraData ) {
+
+                result.sysPerson.Business = { ...result.sysPerson.Business, ...extraData };
+
+              }
+
+            }
+            else {
+
+              result.sysPerson.Business = extraData;
+
+            }
+
+            delete result.sysPerson.ExtraData;
 
           }
           else {
 
-            result.SYSPerson.ExtraData = extraData;
+            result.sysPerson.ExtraData = extraData;
 
           }
 
@@ -308,8 +342,24 @@ export class SYSUser extends Model<SYSUser> {
         if ( !params.KeepGroupExtraData ||
              params.KeepGroupExtraData === 0 ) {
 
-          result.sysUserGroup.Business = extraData;
-          //result.Business = extraData;
+          if ( extraData.Business ) {
+
+            result.sysUserGroup.Business = extraData.Business;
+
+            delete extraData.Business;
+
+            if ( extraData ) {
+
+              result.sysUserGroup.Business = { ...result.sysUserGroup.Business, ...extraData };
+
+            }
+
+          }
+          else {
+
+            result.sysUserGroup.Business = extraData;
+
+          }
 
           delete result.sysUserGroup.ExtraData;
 
