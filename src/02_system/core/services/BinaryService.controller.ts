@@ -1078,13 +1078,13 @@ export default class BinaryServiceController extends BaseService {
                     if ( sysBinaryIndex &&
                          sysBinaryIndex instanceof Error === false ) {
 
-                      debugMark( "Sucess" );
+                      debugMark( "Success" );
 
                       delete binaryIndexData.ExtraData;
 
                       result = {
                                  StatusCode: 200, //Ok
-                                 Code: 'SUCESS_BINARY_DATA_UPLOAD',
+                                 Code: 'SUCCESS_BINARY_DATA_UPLOAD',
                                  Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
                                  Mark: strMark,
                                  LogId: null,
@@ -1439,7 +1439,7 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                   StatusCode: 200, //Ok
-                  Code: 'SUCESS_AUTH_TOKEN_CREATED',
+                  Code: 'SUCCESS_AUTH_TOKEN_CREATED',
                   Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success created.' ),
                   Mark: '73057DAD2CAF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                   LogId: null,
@@ -1565,7 +1565,7 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCESS_AUTH_TOKEN_DELETED',
+                     Code: 'SUCCESS_AUTH_TOKEN_DELETED',
                      Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success deleted.' ),
                      Mark: '473D6FEA3F86' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,

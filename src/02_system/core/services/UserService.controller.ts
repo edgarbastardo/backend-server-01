@@ -1461,7 +1461,7 @@ export default class UserServiceController {
 
                         }
 
-                        //ANCHOR send email sucess
+                        //ANCHOR send email success
                         const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                           logger );
 
@@ -6011,8 +6011,8 @@ export default class UserServiceController {
                                                                          notProcessExpireOn: true,
                                                                          useCustomResponse: true,
                                                                          authorization: strAutorization,
-                                                                         code: "SUCESS_GET_SESSION_PROFILE",
-                                                                         message: "Sucess get the user session profile information",
+                                                                         code: "SUCCESS_GET_SESSION_PROFILE",
+                                                                         message: "Success get the user session profile information",
                                                                          mark: "1CB1DC7063D8",
                                                                          useSecondaryUserToCreatedBy: false,
                                                                          updateCreatedAt: request.query.createdAt === "1"
@@ -7397,14 +7397,14 @@ export default class UserServiceController {
 
               result = {
                          StatusCode: 403, //Forbidden
-                         Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                         Code: 'ERROR_USER_GROUP_INVALID',
                          Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
                          Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                                     Code: 'ERROR_USER_GROUP_INVALID',
                                      Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
                                      Details: null
                                    }
@@ -7609,7 +7609,7 @@ export default class UserServiceController {
 
                       if ( transportList.includes( "email" ) ) {
 
-                        //ANCHOR send email sucess
+                        //ANCHOR send email success
                         const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                           logger );
 
@@ -8109,8 +8109,107 @@ export default class UserServiceController {
                                                   currentTransaction,
                                                   logger );
 
-        if ( sysUserInDB instanceof Error === false &&
-             sysUserInDB.Id !== userSessionStatus.UserId ) {
+        if ( !sysUserInDB ) {
+
+          const strMessage = await this.getMessageUser( strLanguage, {
+                                                                       Id: request.body.Id,
+                                                                       ShortId: request.body.ShortId,
+                                                                       Name: request.body.Name
+                                                                     } );
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_USER_NOT_FOUND',
+                     Message: strMessage,
+                     Mark: '4CE574F8D33C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_FOUND',
+                                 Message: strMessage,
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( sysUserInDB instanceof Error ) {
+
+          const error = sysUserInDB as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else if ( sysUserInDB.Id === userSessionStatus.UserId ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_NOT_VALID',
+                     Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
+                     Mark: '823DBA64229F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NOT_VALID',
+                                 Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( await SYSUserService.getNameIsFree( request.body.Id,
+                                                      request.body.Name,
+                                                      null,
+                                                      currentTransaction,
+                                                      logger ) === null ) {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                     Mark: 'F14ADFA7FE9D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
+                                 Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                 Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else {
 
           let passwordStrengthParameters = null;
           let checkPasswordStrengthResult = null;
@@ -8333,15 +8432,15 @@ export default class UserServiceController {
                       !request.body.sysUserGroup.Name ) {
 
               result = {
-                         StatusCode: 403, //Forbidden
-                         Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                         StatusCode: 400, //Bas request
+                         Code: 'ERROR_USER_GROUP_INVALID',
                          Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
                          Mark: '754CE1444A44' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_CANNOT_USER_GROUP_INVALID',
+                                     Code: 'ERROR_USER_GROUP_INVALID',
                                      Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
                                      Details: null
                                    }
@@ -8561,7 +8660,7 @@ export default class UserServiceController {
 
                       if ( transportList.includes( "email" ) ) {
 
-                        //ANCHOR send email sucess
+                        //ANCHOR send email success
                         const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                           logger );
 
@@ -8805,81 +8904,6 @@ export default class UserServiceController {
                      }
 
           }
-
-        }
-        else if ( sysUserInDB instanceof Error ) {
-
-          const error = sysUserInDB as any;
-
-          result = {
-                     StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: true,
-                     Errors: [
-                               {
-                                 Code: error.name,
-                                 Message: error.message,
-                                 Details: await SystemUtilities.processErrorDetails( error ) //error
-                               }
-                             ],
-                     Warnings: [],
-                     Count: 0,
-                     Data: []
-                   };
-
-        }
-        else if ( sysUserInDB &&
-                  sysUserInDB.Id === userSessionStatus.UserId ) {
-
-          result = {
-                     StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_NOT_VALID',
-                     Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
-                     Mark: '823DBA64229F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: true,
-                     Errors: [
-                               {
-                                 Code: 'ERROR_USER_NOT_VALID',
-                                 Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
-                                 Details: null
-                               }
-                             ],
-                     Warnings: [],
-                     Count: 0,
-                     Data: []
-                   }
-
-        }
-        else {
-
-          const strMessage = await this.getMessageUser( strLanguage, {
-                                                                       Id: request.body.Id,
-                                                                       ShortId: request.body.ShortId,
-                                                                       Name: request.body.Name
-                                                                     } );
-
-          result = {
-                     StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_NOT_FOUND',
-                     Message: strMessage,
-                     Mark: '4CE574F8D33C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: true,
-                     Errors: [
-                               {
-                                 Code: 'ERROR_USER_NOT_FOUND',
-                                 Message: strMessage,
-                                 Details: null
-                               }
-                             ],
-                     Warnings: [],
-                     Count: 0,
-                     Data: []
-                   }
 
         }
 

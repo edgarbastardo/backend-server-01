@@ -58,6 +58,8 @@
       "program": "${workspaceFolder}/src/04_test/standalone/test01_rest_api.ts",
       "outputCapture": "std",
       "preLaunchTask": "build-test01-rest-api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
       "outFiles": [
         "${workspaceFolder}/build/**/*.js"
       ]

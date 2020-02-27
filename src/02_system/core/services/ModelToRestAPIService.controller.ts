@@ -274,7 +274,7 @@ export class ModelToRestAPIServiceController extends BaseService {
             result = {
                        StatusCode: 200, //Ok
                        Code: 'SUCCESS_GET',
-                       Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
+                       Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
                        Mark: '17BC08C03272' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
@@ -622,7 +622,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         result = {
                    StatusCode: 200, //Ok
                    Code: 'SUCCESS_SEARCH',
-                   Message: await I18NManager.translate( strLanguage, 'Sucess search the information' ),
+                   Message: await I18NManager.translate( strLanguage, 'Success search the information' ),
                    Mark: '545F8DE9950F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
@@ -776,7 +776,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_SEARCH_COUNT',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess count the information' ),
+                     Message: await I18NManager.translate( strLanguage, 'Success count the information' ),
                      Mark: 'D0C4F28783EA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -894,7 +894,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       result = {
                  StatusCode: 201, //Accepted
                  Code: 'SUCCESS_CREATE',
-                 Message: await I18NManager.translate( strLanguage, 'Sucess created the information' ),
+                 Message: await I18NManager.translate( strLanguage, 'Success created the information' ),
                  Mark: '275AF508CF64' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
@@ -1096,7 +1096,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_CREATE_BULK';
-            strMessage = await I18NManager.translate( strLanguage, 'Sucess created ALL information' );
+            strMessage = await I18NManager.translate( strLanguage, 'Success created ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
@@ -1340,7 +1340,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_UPDATE',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess updated the information' ),
+                     Message: await I18NManager.translate( strLanguage, 'Success updated the information' ),
                      Mark: 'CC6466005703' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -1610,7 +1610,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_UPDATE_BULK';
-            strMessage = await I18NManager.translate( strLanguage, 'Sucess updated ALL information' );
+            strMessage = await I18NManager.translate( strLanguage, 'Success updated ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
@@ -1825,7 +1825,7 @@ export class ModelToRestAPIServiceController extends BaseService {
           result = {
             StatusCode: 200, //Ok
             Code: 'SUCCESS_DELETE',
-            Message: await I18NManager.translate( strLanguage, 'Sucess delete the information' ),
+            Message: await I18NManager.translate( strLanguage, 'Success delete the information' ),
             Mark: '1F6F499BCA5D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
             LogId: null,
             IsError: false,
@@ -2065,7 +2065,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             intStatusCode = 200
             strCode = 'SUCCESS_DELETE_BULK';
-            strMessage = await I18NManager.translate( strLanguage, 'Sucess deleted the ALL information' );
+            strMessage = await I18NManager.translate( strLanguage, 'Success deleted the ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {

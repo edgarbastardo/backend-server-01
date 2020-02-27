@@ -987,7 +987,7 @@ export default class SecurityServiceController {
             result = {
                        StatusCode: 200, //Ok
                        Code: 'SUCCESS_LOGIN',
-                       Message: await I18NManager.translate( context.Language, 'Sucess login' ),
+                       Message: await I18NManager.translate( context.Language, 'Success login' ),
                        Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
@@ -1427,7 +1427,7 @@ export default class SecurityServiceController {
               result = {
                          StatusCode: 200, //Ok
                          Code: 'SUCCESS_LOGOUT',
-                         Message: await I18NManager.translate( strLanguage, 'Sucess logout' ),
+                         Message: await I18NManager.translate( strLanguage, 'Success logout' ),
                          Mark: '86B853E96517' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,

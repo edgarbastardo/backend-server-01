@@ -7,6 +7,7 @@ import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 import { SYSUserGroup } from "../models/SYSUserGroup";
+import { SYSUser } from '../models/SYSUser';
 
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
@@ -672,7 +673,7 @@ export default class SYSUserGroupService extends BaseService {
 
       }
 
-      intResult = await SYSUserGroup.count( options );
+      intResult = await SYSUser.count( options );
 
       if ( currentTransaction != null &&
            currentTransaction.finished !== "rollback" &&

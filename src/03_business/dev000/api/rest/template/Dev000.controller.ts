@@ -119,7 +119,7 @@ export default class Dev000Controller {
     const result = {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_DEV000_EXAMPLE',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
+                     Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
                      Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,

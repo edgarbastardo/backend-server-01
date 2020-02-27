@@ -372,6 +372,114 @@ export default class SYSUserService extends BaseService {
 
   }
 
+  static async getNameIsFree( strId: string,
+                              strName: string,
+                              strTimeZoneId: string,
+                              transaction: any,
+                              logger: any ): Promise<SYSUser> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction == null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const Sequelize = require( 'sequelize' );
+      const notEqual = Sequelize.Op.ne;
+
+      const options = {
+
+        where: { Id: { notEqual: strId }, Name: strName },
+        transaction: currentTransaction,
+        include: [
+                   {
+                     model: SYSUserGroup,
+                   },
+                   {
+                     model: SYSPerson,
+                   }
+                 ]
+
+      }
+
+      result = await SYSUser.findOne( options );
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction != null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = SYSUserService.name + "." + this.getByName.name;
+
+      const strMark = "E8DDEF95875E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction != null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
   static async checkExistsById( strId: string,
                                 transaction: any,
                                 logger: any ): Promise<boolean> {

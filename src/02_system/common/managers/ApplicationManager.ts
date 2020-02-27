@@ -79,7 +79,12 @@ export default class ApplicationManager {
       const coreRestAPIRoutes = await new RestAPIManager().getRoutes( { Container: container },
                                                                       logger );
 
-      app.use( coreRestAPIRoutes );
+      if ( coreRestAPIRoutes &&
+           coreRestAPIRoutes.length > 0 ) {
+
+        app.use( coreRestAPIRoutes );
+
+      }
 
       const schema = await new GraphQLAPIManager().getSchema( logger );
 
