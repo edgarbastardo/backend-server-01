@@ -466,10 +466,10 @@ export default class UserGroupServiceController {
 
         let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Name:*#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  sysUserGroup.ShortId + "#" ) ) : false;
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#GName:*#" ) ||
+                                                            roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ) : false;
 
       }
 

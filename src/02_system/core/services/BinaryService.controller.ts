@@ -884,9 +884,9 @@ export default class BinaryServiceController extends BaseService {
             strCategory = CommonUtilities.unaccent( strCategory );
 
             const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
-                                                                              strCategory,
-                                                                              transaction,
-                                                                              logger );
+                                                                                        strCategory,
+                                                                                        transaction,
+                                                                                        logger );
 
             if ( allowedCategory.value === 1 ) {
 
@@ -899,17 +899,17 @@ export default class BinaryServiceController extends BaseService {
                                                                         logger );
 
                   const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
-                                                                                    fileDetectedType.mime,
-                                                                                    strCategory,
-                                                                                    transaction,
-                                                                                    logger );
+                                                                                              fileDetectedType.mime,
+                                                                                              strCategory,
+                                                                                              transaction,
+                                                                                              logger );
 
                   if ( allowedMimeType.value === 1 ) {
 
                     const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
-                                                                                   strCategory,
-                                                                                   transaction,
-                                                                                   logger );
+                                                                                             strCategory,
+                                                                                             transaction,
+                                                                                             logger );
 
                     let strId = request.body.Id;
 
@@ -967,7 +967,7 @@ export default class BinaryServiceController extends BaseService {
                     let strFullPath = "";
                     let expireAt = null;
                     const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
-                                                                                         logger );
+                                                                                                   logger );
 
                     if ( request.body.StorageKind === "0" ) { //Persistent
 
@@ -1058,8 +1058,8 @@ export default class BinaryServiceController extends BaseService {
                                               System: CommonUtilities.isNotNullOrEmpty( context.FrontendId ) ? context.FrontendId: null,
                                               Context: CommonUtilities.isNotNullOrEmpty( request.body.Context ) ? request.body.Context: null,
                                               Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
-                                              DenyTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.DenyTagAccess ) ? request.body.DenyTagAccess: null,
-                                              AllowTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.AllowTagAccess ) ? request.body.AllowTagAccess: null,
+                                              //DenyTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.DenyTagAccess ) ? request.body.DenyTagAccess: null,
+                                              //AllowTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.AllowTagAccess ) ? request.body.AllowTagAccess: null,
                                               ShareCode: CommonUtilities.isNotNullOrEmpty( request.body.ShareCode ) ? request.body.ShareCode: null,
                                               Owner: strDefaultOwners,
                                               ProcessNeeded: processData && processData.value ? processData.value : 0,
@@ -1417,13 +1417,13 @@ export default class BinaryServiceController extends BaseService {
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                userSessionStatus,
-                                                               false, //Set roles?
-                                                               null,
-                                                               null,
-                                                               true,    //Force update?
+                                                               false,    //Set roles?
+                                                               null,     //User group roles
+                                                               null,     //User roles
+                                                               true,     //Force update?
                                                                2,        //Only 1 try
                                                                4 * 1000, //Second
-                                                               transaction,
+                                                               currentTransaction,
                                                                logger );
 
         await CacheManager.setData( strBinaryDataToken,
@@ -1552,16 +1552,16 @@ export default class BinaryServiceController extends BaseService {
           userSessionStatus.BinaryDataToken = null;
 
           //Update the cache and database
-          SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
-                                                           userSessionStatus,
-                                                           false, //Set roles?
-                                                           null,
-                                                           null,
-                                                           true,    //Force update?
-                                                           2,        //Only 1 try
-                                                           4 * 1000, //Second
-                                                           transaction,
-                                                           logger );
+          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
+                                                                 userSessionStatus,
+                                                                 false,    //Set roles?
+                                                                 null,     //User group roles
+                                                                 null,     //User roles
+                                                                 true,     //Force update?
+                                                                 2,        //Only 1 try
+                                                                 4 * 1000, //Second
+                                                                 currentTransaction,
+                                                                 logger );
 
           result = {
                      StatusCode: 200, //Ok
@@ -1932,7 +1932,7 @@ export default class BinaryServiceController extends BaseService {
         }
 
         const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
-                                                                             logger );
+                                                                                       logger );
 
         let strFullPath = "";
 
@@ -2005,14 +2005,12 @@ export default class BinaryServiceController extends BaseService {
 
               if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
-                let userSessionStatus = null;
-
-                userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
-                                                                                context,
-                                                                                true,
-                                                                                false,
-                                                                                null,
-                                                                                logger );
+                let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                                    context,
+                                                                                    true,
+                                                                                    false,
+                                                                                    null,
+                                                                                    logger );
 
                 if ( userSessionStatus ) {
 
@@ -2032,7 +2030,11 @@ export default class BinaryServiceController extends BaseService {
               if ( resultData &&
                    resultData.StatusCode == 200 ) { //Ok the authorization token is valid
 
-                if ( binaryIndexInDB.AccessKind == 2 ) { //Authenticated
+                const userSessionStatus = context.UserSessionStatus;
+
+                if ( binaryIndexInDB.AccessKind == 2 ||
+                     userSessionStatus.Role.includes( "#Administrator#" ) ||
+                     userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
 
                   result = {
                              StatusCode: 200, //Ok
@@ -2047,17 +2049,18 @@ export default class BinaryServiceController extends BaseService {
 
                   //Check access using Owner or DenyAccessTag AllowAccessTag
                   let bIsOwner = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.Owner,
-                                                                                context.UserSessionStatus.Role,
-                                                                                context.UserSessionStatus.UserId,
-                                                                                context.UserSessionStatus.UserName,
-                                                                                context.UserSessionStatus.UserTag,
-                                                                                context.UserSessionStatus.UserGroupId,
-                                                                                context.UserSessionStatus.UserGroupName,
-                                                                                context.UserSessionStatus.UserGroupTag,
-                                                                                context.UserSessionStatus.Tag,
-                                                                                false,
-                                                                                logger );
+                                                                                          userSessionStatus.Role,
+                                                                                          userSessionStatus.UserId,
+                                                                                          userSessionStatus.UserName,
+                                                                                          userSessionStatus.UserTag,
+                                                                                          userSessionStatus.UserGroupId,
+                                                                                          userSessionStatus.UserGroupName,
+                                                                                          userSessionStatus.UserGroupTag,
+                                                                                          userSessionStatus.Tag,
+                                                                                          false,
+                                                                                          logger );
 
+                  /*
                   let bDenyTagAccess = false;
                   let bAllowTagAccess = false;
 
@@ -2092,8 +2095,9 @@ export default class BinaryServiceController extends BaseService {
                     }
 
                   }
+                  */
 
-                  if ( bIsOwner || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
+                  if ( bIsOwner ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
 
                     result = {
                                StatusCode: 200, //Ok
@@ -2109,6 +2113,10 @@ export default class BinaryServiceController extends BaseService {
                     let strCode = "";
                     let strMessage = "";
 
+                    strCode = "ERROR_NOT_ALLOWED_ACCESS";
+                    strMessage = "Not allowed access to binary data";
+
+                    /*
                     if ( bDenyTagAccess ) {
 
                       strCode = "ERROR_FORBIDEN_ACCESS_DENIED";
@@ -2121,6 +2129,7 @@ export default class BinaryServiceController extends BaseService {
                       strMessage = "No explicit allow access to binary data in AllowTagAccess field";
 
                     }
+                    */
 
                     resultData = {
                                    StatusCode: 403, //Forbidden
@@ -2136,13 +2145,13 @@ export default class BinaryServiceController extends BaseService {
                                                Details: null,
                                              }
                                            ],
-                                    Warnings: [],
-                                    Count: 0,
-                                    Data: []
+                                   Warnings: [],
+                                   Count: 0,
+                                   Data: []
                                  };
 
                     response.setHeader( "X-Body-Response",
-                                    JSON.stringify( resultData ) );
+                                        JSON.stringify( resultData ) );
 
                     //ANCHOR binary data download Fobidden
                     result = {
@@ -2161,7 +2170,7 @@ export default class BinaryServiceController extends BaseService {
               else {
 
                 response.setHeader( "X-Body-Response",
-                                JSON.stringify( resultData ) );
+                                    JSON.stringify( resultData ) );
 
                 //ANCHOR binary data download Unauthorized
                 result = {
@@ -2179,15 +2188,15 @@ export default class BinaryServiceController extends BaseService {
 
               const resultHeaders = {
                                       StatusCode: 400, //Bad request
-                                      Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                      Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
+                                      Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                      Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
                                       Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       LogId: null,
                                       IsError: true,
                                       Errors: [
                                                 {
-                                                  Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                                  Message: await I18NManager.translate( strLanguage, `The id parameter cannot be empty.` ),
+                                                  Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                                  Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
                                                   Details: null,
                                                 }
                                               ],
@@ -2196,7 +2205,8 @@ export default class BinaryServiceController extends BaseService {
                                       Data: []
                                     };
 
-              response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+              response.setHeader( "X-Body-Response",
+                                  JSON.stringify( resultHeaders ) );
 
               result = {
                          StatusCode: 400, //Bad request
@@ -2226,7 +2236,8 @@ export default class BinaryServiceController extends BaseService {
                                     Data: []
                                   };
 
-            response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+            response.setHeader( "X-Body-Response",
+                                JSON.stringify( resultHeaders ) );
 
             //ANCHOR binary data download FILE NOT FOUND
             result = {
@@ -2261,7 +2272,8 @@ export default class BinaryServiceController extends BaseService {
                                   Data: []
                                 };
 
-          response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+          response.setHeader( "X-Body-Response",
+                              JSON.stringify( resultHeaders ) );
 
           //ANCHOR binary data download DB NOT FOUND
           result = {
@@ -2296,7 +2308,8 @@ export default class BinaryServiceController extends BaseService {
                                 Data: []
                               };
 
-        response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+        response.setHeader( "X-Body-Response",
+                            JSON.stringify( resultHeaders ) );
 
         result = {
                    StatusCode: 400, //Bad request

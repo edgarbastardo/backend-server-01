@@ -3001,10 +3001,10 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Name:*#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ) : false;
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#GName:*#" ) ||
+                                                            roleSubTag.includes( "#GId:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#GSId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ) : false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -3017,9 +3017,9 @@ export default class UserServiceController {
 
           }
 
-          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserInDB.Name + "#" ) ||
-                                                              roleSubTag.includes( "#Id:" +  sysUserInDB.Id + "#" ) ||
-                                                              roleSubTag.includes( "#SId:" +  sysUserInDB.ShortId + "#" ) ) : false;
+          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
+                                                              roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
+                                                              roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ) : false;
 
           if ( result.isAuthorizedL02 === false ) {
 
@@ -3160,9 +3160,9 @@ export default class UserServiceController {
 
             }
 
-            bIsAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.UserGroup.Name + "#" ) ||
-                                                          roleSubTag.includes( "#Id:" +  userInDB.UserGroup.Id + "#" ) ||
-                                                          roleSubTag.includes( "#SId:" +  userInDB.UserGroup.ShortId + "#" ) ) : false;
+            bIsAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  userInDB.UserGroup.Name + "#" ) ||
+                                                          roleSubTag.includes( "#GId:" +  userInDB.UserGroup.Id + "#" ) ||
+                                                          roleSubTag.includes( "#GSId:" +  userInDB.UserGroup.ShortId + "#" ) ) : false;
 
             if ( bIsAuthorizedL03 === false ) {
 
@@ -3175,9 +3175,9 @@ export default class UserServiceController {
 
               }
 
-              bIsAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  userInDB.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  userInDB.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  userInDB.ShortId + "#" ) ) : false;
+              bIsAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  userInDB.Name + "#" ) ||
+                                                            roleSubTag.includes( "#UId:" +  userInDB.Id + "#" ) ||
+                                                            roleSubTag.includes( "#USId:" +  userInDB.ShortId + "#" ) ) : false;
 
               if ( bIsAuthorizedL02 === false ) {
 
@@ -3236,7 +3236,8 @@ export default class UserServiceController {
 
         }
 
-        if ( resultCheckUserRoles.IsNotAuthorized ) {
+        if ( resultCheckUserRoles &&
+             resultCheckUserRoles.isNotAuthorized ) {
 
           result = {
                      StatusCode: 403, //Forbidden
@@ -3261,21 +3262,21 @@ export default class UserServiceController {
         else if ( sysUserInDB != null &&
                   sysUserInDB instanceof Error === false ) {
 
-          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.UserGroup.Name,
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
                                                               currentTransaction,
                                                               logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                        Mark: '34B74D7BDF33' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3285,21 +3286,21 @@ export default class UserServiceController {
                      }
 
           }
-          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.UserGroup.Name,
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
                                                                   currentTransaction,
                                                                   logger ) ) {
 
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.UserGroup.Name ),
+                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                        Mark: '933C3B47067B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.UserGroup.Name ),
+                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -3357,6 +3358,28 @@ export default class UserServiceController {
                      }
 
           }
+          else if ( await bcrypt.compare( request.body.NewPassword, sysUserInDB.Password ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The new password is invalid', sysUserInDB.Name ),
+                       Mark: '7E91B5B3AED1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
+                                   Message: await I18NManager.translate( strLanguage, 'The new password is invalid', sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
           else {
 
             const strCurrentPassword = request.body.CurrentPassword;
@@ -3367,7 +3390,7 @@ export default class UserServiceController {
               const strNewPassword = request.body.NewPassword;
 
               //ANCHOR check password Strength
-              const strTag = "#" + sysUserInDB.Id + "#,#" + sysUserInDB.Name + "#,#" + sysUserInDB.UserGroup.Id + "#,#" + sysUserInDB.UserGroup.Name + "#";
+              const strTag = "#" + sysUserInDB.Id + "#,#" + sysUserInDB.Name + "#,#" + sysUserInDB.sysUserGroup.Id + "#,#" + sysUserInDB.sysUserGroup.Name + "#";
 
               const passwordStrengthParameters = await SecurityServiceController.getConfigPasswordStrengthParameters( strTag,
                                                                                                                       currentTransaction,
@@ -3409,13 +3432,13 @@ export default class UserServiceController {
                     //ANCHOR update the session
                     const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
                                                                                                             userSessionStatus,
-                                                                                                            false, //Set roles?
-                                                                                                            null,
-                                                                                                            null,
+                                                                                                            false,    //Set roles?
+                                                                                                            null,     //User group roles
+                                                                                                            null,     //User roles
                                                                                                             true,     //Force update?
                                                                                                             3,        //3 tries
                                                                                                             3 * 1000, //Second
-                                                                                                            transaction,
+                                                                                                            currentTransaction,
                                                                                                             logger );
 
                     if ( userSessionStatusUpdated instanceof Error ) {
@@ -6971,10 +6994,10 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#Name:" +  sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#Name:*#" ) ||
-                                                            roleSubTag.includes( "#Id:" +  sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#SId:" +  sysUserGroup.ShortId + "#" ) ) : false;
+        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
+                                                            roleSubTag.includes( "#GName:*#" ) ||
+                                                            roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
+                                                            roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ) : false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -7131,6 +7154,9 @@ export default class UserServiceController {
                         //CreateGroup: [ 'present', 'boolean' ],
                         ExpireAt: [ 'present', 'date' ],
                         Notify: [ 'present', 'min:3' ],
+                        ForceChangePassword: [ 'present', 'boolean' ],
+                        ChangePasswordEvery: [ 'present', 'integer', 'min:0' ],
+                        SessionsLimit: [ 'present', 'integer', 'min:0' ],
                         sysUserGroup: {
                                         Create: [ 'required', 'boolean' ],
                                         Id: [ 'present', 'string', 'min:36' ],
@@ -7447,8 +7473,8 @@ export default class UserServiceController {
                                                                            {
                                                                              Name: request.body.sysUserGroup.Name,
                                                                              Comment: request.body.Comment,
-                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.UserGroupRole ? request.body.UserGroupRole: null,
-                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.UserGroupTag ? request.body.UserGroupTag: null,
+                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.sysUserGroup.Role ? request.body.sysUserGroup.Role: null,
+                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.sysUserGroup.Tag ? request.body.sysUserGroup.Tag: null,
                                                                              ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
                                                                              CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                              CreatedAt: null
@@ -7586,6 +7612,9 @@ export default class UserServiceController {
                                                                        Password: request.body.Password,
                                                                        Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
                                                                        Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: null,
+                                                                       ForceChangePassword: request.body.ForceChangePassword,
+                                                                       ChangePasswordEvery: request.body.ChangePasswordEvery,
+                                                                       SessionsLimit: request.body.SessionsLimit,
                                                                        ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
                                                                        ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
                                                                        Comment: request.body.Comment,
@@ -8058,6 +8087,9 @@ export default class UserServiceController {
                         Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
                         ExpireAt: [ 'present', 'date' ],
                         Notify: [ 'present', 'min:3' ],
+                        ForceChangePassword: [ 'present', 'boolean' ],
+                        ChangePasswordEvery: [ 'present', 'integer', 'min:0' ],
+                        SessionsLimit: [ 'present', 'integer', 'min:0' ],
                         sysUserGroup: {
                           Create: [ 'required', 'boolean' ],
                           Id: [ 'present', 'string', 'min:36' ],
@@ -8187,7 +8219,7 @@ export default class UserServiceController {
                                                       request.body.Name,
                                                       null,
                                                       currentTransaction,
-                                                      logger ) === null ) {
+                                                      logger ) !== null ) {
 
           result = {
                      StatusCode: 400, //Bad request
@@ -8483,8 +8515,8 @@ export default class UserServiceController {
                                                                            {
                                                                              Name: request.body.sysUserGroup.Name,
                                                                              Comment: request.body.Comment,
-                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ? request.body.Role: null,
-                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
+                                                                             Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.sysUserGroup.Role ? request.body.sysUserGroup.Role: null,
+                                                                             Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.sysUserGroup.Tag ? request.body.sysUserGroup.Tag: null,
                                                                              ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
                                                                              CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                              CreatedAt: null
@@ -8618,6 +8650,9 @@ export default class UserServiceController {
                   //ANCHOR update user
                   sysUserInDB.GroupId = sysUserGroupInDB.Id;
                   sysUserInDB.Name = request.body.Name ? request.body.Name: sysUserInDB.Name;
+                  sysUserInDB.ForceChangePassword = request.body.ForceChangePassword;
+                  sysUserInDB.ChangePasswordEvery = request.body.ChangePasswordEvery;
+                  sysUserInDB.SessionsLimit = request.body.SessionsLimit;
                   sysUserInDB.Password = request.body.Password ? request.body.Password: sysUserInDB.Password;
                   sysUserInDB.Role = resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
                   sysUserInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserInDB.Tag;
@@ -8787,7 +8822,7 @@ export default class UserServiceController {
                     //ANCHOR success user update
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_USER_UDPATE',
+                               Code: 'SUCCESS_USER_UPDATE',
                                Message: await I18NManager.translate( strLanguage, 'Success user update.' ),
                                Mark: '34F3D558BD74' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
@@ -9423,7 +9458,7 @@ export default class UserServiceController {
 
         if ( bIsAuthorizedL01 ) {
 
-          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
+          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroupId + "' )";
 
         }
 
@@ -9775,7 +9810,7 @@ export default class UserServiceController {
 
         if ( bIsAuthorizedL01 ) {
 
-          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroup.Id + "' )";
+          strWhereL01 = " ( B.Id = '" + userSessionStatus.UserGroupId + "' )";
 
         }
 
@@ -9801,29 +9836,35 @@ export default class UserServiceController {
 
         }
 
-        if ( bIsAuthorizedL02 &&
-             !strBeforeParenthesis ) {
+        if ( bIsAuthorizedL02 ) {
 
-          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+          if ( !strBeforeParenthesis ) {
 
-        }
-        else {
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
 
-          strSQL = strSQL + strBeforeParenthesis + strWhereL02;
-          strBeforeParenthesis = "";
+          }
+          else {
 
-        }
+            strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+            strBeforeParenthesis = "";
 
-        if ( bIsAuthorizedL01 &&
-             !strBeforeParenthesis ) {
-
-          strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+          }
 
         }
-        else {
 
-          strSQL = strSQL + strBeforeParenthesis + strWhereL01;
-          strBeforeParenthesis = "";
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
 
         }
 

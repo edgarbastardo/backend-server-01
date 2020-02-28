@@ -17,9 +17,9 @@ export default class SystemConstants {
 
   static readonly _VALUE_ANY = "*";
 
-  static readonly _LOCK_RESOURCE_START = "lock:689d7b6b-f184";
-  static readonly _LOCK_RESOURCE_UPDATE_SESSION_STATUS = "sessionStatus:8f0468c6-b0f2";
-  static readonly _LOCK_RESOURCE_UPDATE_ROLES_OF_ROUTE = "rolesOfRoute:17def5ee-83e8";
+  static readonly _LOCK_RESOURCE_START = "startLock:689d7b6b";
+  static readonly _LOCK_RESOURCE_UPDATE_SESSION_STATUS = "sessionStatus:8f0468c6:";
+  static readonly _LOCK_RESOURCE_UPDATE_ROLES_OF_ROUTE = "rolesOfRoute:17def5ee:";
 
   //Group System Administrators
   static readonly _GROUP_SYSTEM_ADMINISTRATORS = {

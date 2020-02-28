@@ -232,15 +232,33 @@ export default class SYSUserSessionStatusService extends BaseService {
 
         if ( intCurrentSession >= intMaxSessionsAllowed ) {
 
+          /*
           const currentValues = ( row as any ).dataValues;
 
           currentValues.LoggedOutBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
           currentValues.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
 
-          ( options as any).where = { UserId: strUserId, Token: currentValues.Token };
+          ( options as any ).where = { UserId: strUserId, Token: currentValues.Token };
 
           await SYSUserSessionStatus.update( currentValues,
-                                          options );
+                                             options );
+
+          */
+         const userSessionStatus = ( row as any ).dataValues;
+
+         userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
+         userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
+
+         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
+                                                                userSessionStatus,
+                                                                false,    //Set roles?
+                                                                null,     //User group Roles
+                                                                null,     //User Roles
+                                                                true,     //Force update?
+                                                                1,        //Only 1 try
+                                                                7 * 1000, //Second
+                                                                currentTransaction,
+                                                                logger );
 
         }
 

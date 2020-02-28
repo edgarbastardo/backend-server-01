@@ -1375,44 +1375,86 @@ export default class CommonUtilities {
 
       for ( const strCurrentTag of tagList ) {
 
-        if ( strCurrentTag.startsWith( "#Id:" ) ) {
+        if ( strCurrentTag.startsWith( "#GId:" ) ) {
 
           if ( !strResult ) {
 
-            strResult = strPrefix + ".Id = '" + strCurrentTag.replace( "#Id:", "" ).replace( "#", "'" );
+            strResult = strPrefix + ".Id = '" + strCurrentTag.replace( "#GId:", "" ).replace( "#", "'" );
 
           }
           else {
 
-            strResult = strResult + strLogicOperator + " " + strPrefix + ".Id = '" + strCurrentTag.replace( "#Id:", "" ).replace( "#", "'" );
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Id = '" + strCurrentTag.replace( "#GId:", "" ).replace( "#", "'" );
 
           }
 
         }
-        else if ( strCurrentTag.startsWith( "#Name:" ) ) {
+        else if ( strCurrentTag.startsWith( "#UId:" ) ) {
 
           if ( !strResult ) {
 
-            strResult = strPrefix + ".Name = '" + strCurrentTag.replace( "#Name:", "" ).replace( "#", "'" );
+            strResult = strPrefix + ".Id = '" + strCurrentTag.replace( "#UId:", "" ).replace( "#", "'" );
 
           }
           else {
 
-            strResult = strResult + strLogicOperator + " " + strPrefix + ".Name = '" + strCurrentTag.replace( "#Name:", "" ).replace( "#", "'" );
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Id = '" + strCurrentTag.replace( "#UId:", "" ).replace( "#", "'" );
 
           }
 
         }
-        else if ( strCurrentTag.startsWith( "#SId:" ) ) {
+        else if ( strCurrentTag.startsWith( "#GName:" ) ) {
 
           if ( !strResult ) {
 
-            strResult = strPrefix + ".ShortId = '" + strCurrentTag.replace( "#SId:", "" ).replace( "#", "'" );
+            strResult = strPrefix + ".Name = '" + strCurrentTag.replace( "#GName:", "" ).replace( "#", "'" );
 
           }
           else {
 
-            strResult = strResult  + strLogicOperator + " " + strPrefix + ".ShortId = '" + strCurrentTag.replace( "#SId:", "" ).replace( "#", "'" );
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Name = '" + strCurrentTag.replace( "#GName:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+        else if ( strCurrentTag.startsWith( "#UName:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".Name = '" + strCurrentTag.replace( "#UName:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult + strLogicOperator + " " + strPrefix + ".Name = '" + strCurrentTag.replace( "#UName:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+        else if ( strCurrentTag.startsWith( "#GSId:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".ShortId = '" + strCurrentTag.replace( "#GSId:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult  + strLogicOperator + " " + strPrefix + ".ShortId = '" + strCurrentTag.replace( "#GSId:", "" ).replace( "#", "'" );
+
+          }
+
+        }
+        else if ( strCurrentTag.startsWith( "#USId:" ) ) {
+
+          if ( !strResult ) {
+
+            strResult = strPrefix + ".ShortId = '" + strCurrentTag.replace( "#USId:", "" ).replace( "#", "'" );
+
+          }
+          else {
+
+            strResult = strResult  + strLogicOperator + " " + strPrefix + ".ShortId = '" + strCurrentTag.replace( "#USId:", "" ).replace( "#", "'" );
 
           }
 

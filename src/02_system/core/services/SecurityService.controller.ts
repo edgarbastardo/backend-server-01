@@ -23,6 +23,7 @@ import SYSUserService from "../../common/database/services/SYSUserService";
 import DBConnectionManager from '../../common/managers/DBConnectionManager';
 import CacheManager from "../../common/managers/CacheManager";
 import I18NManager from "../../common/managers/I18Manager";
+import { SYSUser } from '../../common/database/models/SYSUser';
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 
@@ -670,9 +671,9 @@ export default class SecurityServiceController {
                                  "DisabledBy",
                                  "DisabledAt",
                                  "Password",
-                                 "ExtraData",
-                                 "UserGroup",
-                                 "UserPerson",
+                                 //"ExtraData",
+                                 //"sysUserGroup",
+                                 //"sysUserPerson",
                                  "AllowTagAccess",
                                  "DenyTagAccess",
                                  "Role",
@@ -713,23 +714,41 @@ export default class SecurityServiceController {
 
         const createdAt = ( sysUserInDB as any ).dataValues.CreatedAt; //Save the CreatedAt field value
 
-        const userDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB as any ).dataValues,
-                                                                     fieldsToDelete,
-                                                                     logger );
+        let userDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB as any ).dataValues,
+                                                                   fieldsToDelete,
+                                                                   logger );
+
+        userDataResponse.sysUserGroup = userGroupDataResponse;
+        userDataResponse.sysPerson = userPersonDataResponse;
+
         userDataResponse.CreatedAt = createdAt; //Restore the field to main object struct
 
+        userDataResponse = await SYSUser.convertFieldValues(
+                                                             {
+                                                               Data: userDataResponse,
+                                                               FilterFields: 1, //Force to remove fields like password and value
+                                                               TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                               Include: null,
+                                                               Logger: logger,
+                                                               ExtraInfo: {
+                                                                             Request: null
+                                                                           }
+                                                             }
+                                                           );
+        /*
         SystemUtilities.transformObjectToTimeZone( userDataResponse,
                                                    context.TimeZoneId,
                                                    logger ); //Convert to local timezoneId
+                                                   */
 
         const strAuthorization = !processOptions.authorization ? SystemUtilities.getUUIDv4() : processOptions.authorization;
 
         if ( ( !processOptions.checkOldSession ||
-               processOptions.checkOldSession ) &&
-               userDataResponse.SessionsAllowed > 0 ) {
+               processOptions.checkOldSession === 1 ) &&
+               userDataResponse.SessionsLimit > 0 ) {
 
           await SYSUserSessionStatusService.invalidateOldUserSessions( userDataResponse.Id,
-                                                                       userDataResponse.SessionsAllowed - 1,
+                                                                       userDataResponse.SessionsLimit - 1,
                                                                        currentTransaction,
                                                                        logger );
 
@@ -978,8 +997,8 @@ export default class SecurityServiceController {
 
         if ( userSessionStatus !== null ) {
 
-          userDataResponse.sysUserGroup = userGroupDataResponse;
-          userDataResponse.sysPerson = userPersonDataResponse;
+          //userDataResponse.sysUserGroup = userGroupDataResponse;
+          //userDataResponse.sysPerson = userPersonDataResponse;
 
           if ( !processOptions.useCustomResponse ||
                processOptions.useCustomResponse === false ) {
@@ -1361,7 +1380,6 @@ export default class SecurityServiceController {
 
     let bIsLocalTransaction = false;
 
-
     try {
 
       const dbConnection = DBConnectionManager.currentInstance;
@@ -1382,21 +1400,75 @@ export default class SecurityServiceController {
 
         if ( strToken.startsWith( "p:" ) === false ) {
 
+          /*
           const UserInfo = await SYSUserService.getById( userSessionStatus.UserId,
                                                          null,
                                                          null,
                                                          logger );
+                                                         */
 
-          userSessionStatus.LoggedOutBy = UserInfo.Name;
+          userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
           userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
 
+          userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
+                                                                                     ( userSessionStatus as any ).dataValues,
+                                                                                     false,    //Set roles?
+                                                                                     null,     //User group roles
+                                                                                     null,     //User roles
+                                                                                     true,     //Force update?
+                                                                                     1,        //Only 1 try
+                                                                                     7 * 1000, //Second
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+          if ( userSessionStatus instanceof Error ) {
+
+            const error = userSessionStatus as any;
+
+            result = {
+                       StatusCode: 500, //Internal server error
+                       Code: 'ERROR_UNEXPECTED',
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Mark: "8D6DF9F3623E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: error.LogId,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_LOGOUT_FAILED',
+                                   Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: 'SUCCESS_LOGOUT',
+                       Message: await I18NManager.translate( strLanguage, 'Success logout' ),
+                       Mark: '86B853E96517' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          /*
           let lockedResource = null;
 
           try {
 
             //We need write the shared resource and going to block temporally the write access
             lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
-                                                              SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS,
+                                                              SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
                                                               7 * 1000, //7 seconds
                                                               1, //Only one try
                                                               undefined, //Default 5000 milliseconds
@@ -1484,6 +1556,7 @@ export default class SecurityServiceController {
                     };
 
           }
+          */
 
         }
         else {

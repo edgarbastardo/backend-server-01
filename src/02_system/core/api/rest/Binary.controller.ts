@@ -54,15 +54,14 @@ export default class BinaryController {
   static readonly _BASE_PATH = "/system/binary";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Binary_Basic#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Basic", "Binary_Full", "Administrator" ], Description: "Create a new auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Binary_Basic#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Basic", "Binary_Full", "Administrator" ], Description: "Delete a auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Binary_Search#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Search", "Binary_Full", "Administrator" ], Description: "Search by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Binary_Search#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Search", "Binary_Full", "Administrator" ], Description: "Search count by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#ResourceAuthL01#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "ResourceAuthL01" ], Description: "Create a new auth token for access to binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#ResourceAuthL01#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "ResourceAuthL01" ], Description: "Search by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchResourceL01#,#SearchResourceL02#,#SearchResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchResourceL01", "SearchResourceL02", "SearchResourceL03" ], Description: "Search count by meta of binary data" },
                                   { Path: BinaryController._BASE_PATH, AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data from backend server" },
                                   { Path: BinaryController._BASE_PATH + "/detail", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data detail from backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Binary_Upload#,#Binary_Basic#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Basic", "Binary_Full", "Administrator" ], Description: "Upload binary data to backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Binary_Modify#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Full", "Administrator" ], Description: "Modify information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Binary_Delete#,#Binary_Full#,#Administrator#", Roles: [ "Binary_Full", "Administrator" ], Description: "Delete binary data to backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadResourceL01#,#UploadResourceL02#,#UploadResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadResourceL01", "UploadResourceL02", "UploadResourceL03" ], Description: "Upload binary data to the backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateResourceL01#,#UpdateResourceL02#,#UpdateResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateResourceL01", "UpdateResourceL02", "UpdateResourceL03" ], Description: "Update the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteResourceL01#,#DeleteResourceL02#,#DeleteResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteResourceL01", "DeleteResourceL02", "DeleteResourceL03" ], Description: "Delete the information metadata of binary data from backend server" },
                                 ]
 
   _controllerLogger = null;
@@ -80,13 +79,13 @@ export default class BinaryController {
       for ( let routeInfo of BinaryController._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                        routeInfo.RequestKind,
-                                                        routeInfo.Path, //Path
-                                                        routeInfo.AllowTagAccess,
-                                                        routeInfo.Roles as any,
-                                                        routeInfo.Description,
-                                                        null,
-                                                        logger );
+                                                           routeInfo.RequestKind,
+                                                           routeInfo.Path, //Path
+                                                           routeInfo.AllowTagAccess,
+                                                           routeInfo.Roles as any,
+                                                           routeInfo.Description,
+                                                           null,
+                                                           logger );
 
       }
 
@@ -506,8 +505,8 @@ export default class BinaryController {
       strLanguage = context.Language;
 
       const result = await BinaryServiceController.processBinaryDataUpload( request,
-                                                                  null,
-                                                                  context.Logger );
+                                                                            null,
+                                                                            context.Logger );
 
       response.status( result.StatusCode ).send( result );
 

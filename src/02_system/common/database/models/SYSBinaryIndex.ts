@@ -97,11 +97,11 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  DenyTagAccess: string;
+  //@Column( { type: DataType.STRING( 2048 ), allowNull: true } )
+  //DenyTagAccess: string;
 
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  AllowTagAccess: string;
+  //@Column( { type: DataType.STRING( 2048 ), allowNull: true } )
+  //AllowTagAccess: string;
 
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   ShareCode: string;

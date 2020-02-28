@@ -822,16 +822,16 @@ export default class SystemUtilities {
            SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
-        SystemUtilities.createOrUpdateUserSessionStatus( strToken,
-                                                         result,
-                                                         bFromCache === false, //Set roles?
-                                                         strUserGroupRole,
-                                                         strUserRole,
-                                                         false,    //Force update?
-                                                         1,        //Only 1 try
-                                                         7 * 1000, //Second
-                                                         transaction,
-                                                         logger );
+        await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
+                                                               result,
+                                                               bFromCache === false, //Set roles?
+                                                               strUserGroupRole,     //User group roles
+                                                               strUserRole,          //User roles
+                                                               false,                //Force update?
+                                                               1,                    //Only 1 try
+                                                               7 * 1000,             //Second
+                                                               transaction,
+                                                               logger );
 
       }
 
@@ -947,16 +947,16 @@ export default class SystemUtilities {
            SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
-        SystemUtilities.createOrUpdateUserSessionStatus( strToken,
-                                                         result,
-                                                         bFromCache === false, //Set roles?
-                                                         strUserGroupRole,
-                                                         strUserRole,
-                                                         false,    //Force update?
-                                                         1,        //Only 1 try
-                                                         7 * 1000, //Second
-                                                         transaction,
-                                                         logger );
+        await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
+                                                               result,
+                                                               bFromCache === false, //Set roles?
+                                                               strUserGroupRole,     //User group roles
+                                                               strUserRole,          //User roles
+                                                               false,                //Force update?
+                                                               1,                    //Only 1 try
+                                                               7 * 1000,             //Second
+                                                               transaction,
+                                                               logger );
 
       }
 
@@ -1018,7 +1018,7 @@ export default class SystemUtilities {
 
         //We need write the shared resource and going to block temporally the write access
         lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
-                                                          SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS,
+                                                          SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
                                                           intLockSeconds, //7 * 1000, //7 seconds
                                                           intTryLock, //1, //Only one try
                                                           undefined, //Default 5000 milliseconds
@@ -1096,13 +1096,15 @@ export default class SystemUtilities {
 
         }
 
+        result = error;
+
       }
 
       //Release the write access for another process. VERY IMPORTANT!!!
       if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) {
 
         await CacheManager.unlockResource( lockedResource,
-                                          logger );
+                                           logger );
 
       }
 
@@ -1191,7 +1193,7 @@ export default class SystemUtilities {
 
             //We need write the shared resource and going to block temporally the write access
             lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
-                                                              SystemConstants._LOCK_RESOURCE_UPDATE_ROLES_OF_ROUTE,
+                                                              SystemConstants._LOCK_RESOURCE_UPDATE_ROLES_OF_ROUTE + strId + "@roles",
                                                               3 * 1000, //3 seconds
                                                               1, //Only one try
                                                               3000, //2 Seconds

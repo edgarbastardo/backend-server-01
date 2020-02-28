@@ -267,6 +267,13 @@ export class SYSUser extends Model<SYSUser> {
         }
 
       }
+      else {
+
+        delete result.ExtraData;
+
+        result.Business = {};
+
+      }
 
       if ( result.sysPerson ) {
 
@@ -321,52 +328,84 @@ export class SYSUser extends Model<SYSUser> {
           }
 
         }
+        else {
 
-      }
+          if ( !params.KeepPersonExtraData ||
+               params.KeepPersonExtraData === 0 ) {
 
-      if ( result.sysUserGroup &&
-           result.sysUserGroup.ExtraData ) {
+            delete result.sysPerson.ExtraData;
 
-        result.sysUserGroup = result.sysUserGroup.dataValues ? result.sysUserGroup.dataValues: result.sysUserGroup;
+            result.sysPerson.Business = {};
 
-        const extraData = CommonUtilities.parseJSON( result.sysUserGroup.ExtraData,
-                                                     params.logger );
-
-        if ( extraData &&
-             extraData.Private ) {
-
-          delete extraData.Private;
+          }
 
         }
 
-        if ( !params.KeepGroupExtraData ||
-             params.KeepGroupExtraData === 0 ) {
+      }
 
-          if ( extraData.Business ) {
+      if ( result.sysUserGroup ) {
 
-            result.sysUserGroup.Business = extraData.Business;
+        if ( !result.sysUserGroup.Id ) {
 
-            delete extraData.Business;
+          result.sysUserGroup = null;
 
-            if ( extraData ) {
+        }
+        else if ( result.sysUserGroup.ExtraData ) {
 
-              result.sysUserGroup.Business = { ...result.sysUserGroup.Business, ...extraData };
+          result.sysUserGroup = result.sysUserGroup.dataValues ? result.sysUserGroup.dataValues: result.sysUserGroup;
+
+          const extraData = CommonUtilities.parseJSON( result.sysUserGroup.ExtraData,
+                                                      params.logger );
+
+          if ( extraData &&
+              extraData.Private ) {
+
+            delete extraData.Private;
+
+          }
+
+          if ( !params.KeepGroupExtraData ||
+              params.KeepGroupExtraData === 0 ) {
+
+            if ( extraData.Business ) {
+
+              result.sysUserGroup.Business = extraData.Business;
+
+              delete extraData.Business;
+
+              if ( extraData ) {
+
+                result.sysUserGroup.Business = { ...result.sysUserGroup.Business, ...extraData };
+
+              }
 
             }
+            else {
+
+              result.sysUserGroup.Business = extraData;
+
+            }
+
+            delete result.sysUserGroup.ExtraData;
 
           }
           else {
 
-            result.sysUserGroup.Business = extraData;
+            result.sysUserGroup.ExtraData = extraData;
 
           }
-
-          delete result.sysUserGroup.ExtraData;
 
         }
         else {
 
-          result.sysUserGroup.ExtraData = extraData;
+          if ( !params.KeepPersonExtraData ||
+               params.KeepPersonExtraData === 0 ) {
+
+            delete result.sysUserGroup.ExtraData;
+
+            result.sysUserGroup.Business = {};
+
+          }
 
         }
 

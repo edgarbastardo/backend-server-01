@@ -18,6 +18,8 @@ import chalk from 'chalk';
 import SystemUtilities from "../../02_system/common/SystemUtilities";
 import CommonConstants from '../../02_system/common/CommonConstants';
 import { SYSPerson } from "../../02_system/common/database/models/SYSPerson";
+import { SYSUserGroup } from "../../02_system/common/database/models/SYSUserGroup";
+import { roles } from "../../02_system/core/api/graphql/template/Group.permission";
 
 const debug = require( 'debug' )( 'test01_test_api' );
 
@@ -39,13 +41,21 @@ const headers_admin01_at_system_net = {
                                         "Language": "en_US"
                                       }
 
-const headers_user01_at_TestL01 = {
-                                    "Authorization": "",
-                                    "Content-Type": "application/json",
-                                    "FrontendId": "ccc1",
-                                    "TimeZoneId": "America/Los_Angeles",
-                                    "Language": "en_US"
-                                  }
+const headers_user01_at_TestL01_Session1 = {
+                                             "Authorization": "",
+                                             "Content-Type": "application/json",
+                                             "FrontendId": "ccc1",
+                                             "TimeZoneId": "America/Los_Angeles",
+                                             "Language": "en_US"
+                                           }
+
+const headers_user01_at_TestL01_Session2 = {
+                                             "Authorization": "",
+                                             "Content-Type": "application/json",
+                                             "FrontendId": "ccc1",
+                                             "TimeZoneId": "America/Los_Angeles",
+                                             "Language": "en_US"
+                                           }
 
 const headers_user02_at_TestL01 = {
                                     "Authorization": "",
@@ -63,12 +73,23 @@ const headers_user01_at_TestL02 = {
                                     "Language": "en_US"
                                   }
 
+const headers_user02_at_TestL02 = {
+                                    "Authorization": "",
+                                    "Content-Type": "application/json",
+                                    "FrontendId": "ccc1",
+                                    "TimeZoneId": "America/Los_Angeles",
+                                    "Language": "en_US"
+                                  }
+
 //Test request failed
 const userRequestFull = {
                           "Avatar": null,
                           "Id": null,
                           "Name": "",
                           "Password": "",
+                          "ForceChangePassword": false,
+                          "ChangePasswordEvery": 0,
+                          "SessionsLimit": 0,
                           "Comment": null,
                           "Role": null,
                           "Tag": null,
@@ -108,6 +129,8 @@ let user02_at_TestL01_data = {} as any;
 
 let user01_at_TestL02_data = {} as any;
 let user02_at_TestL02_data = {} as any;
+
+let user98_at_TestL98_data = {} as any;
 
 async function call_login( headers: any,
                            strUser: string,
@@ -161,6 +184,48 @@ async function call_login( headers: any,
 
 }
 
+async function call_token_check( headers: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'POST',
+                      headers: headers,
+                      body: null, //JSON.stringify( body ),
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/security/authentication/token/check";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+     result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
 
 async function call_profile( headers: any ): Promise<any> {
 
@@ -238,6 +303,249 @@ async function call_logout( headers: any ): Promise<any> {
                                   };
 
      result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_search( headers: any,
+                            params: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      headers: headers,
+                      body: null,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/user/search";
+
+    let strQueryParams = "";
+
+    if ( params.where ) {
+
+      strQueryParams = "?where=" + params.where;
+
+    }
+
+    if ( params.orderBy ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
+
+      }
+      else {
+
+        strRequestPath = "?orderBy=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.offset ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&offset=" + params.offset;
+
+      }
+      else {
+
+        strRequestPath = "?offset=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.limit ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&limit=" + params.limit;
+
+      }
+      else {
+
+        strRequestPath = "?limit=" + params.limit;
+
+      }
+
+    }
+
+    const callResult = await fetch( strRequestPath + strQueryParams,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+     //( options as any ).body = body;
+
+     result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_search_count( headers: any,
+                                  params: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      headers: headers,
+                      body: null,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/user/search/count";
+
+    let strQueryParams = "";
+
+    if ( params.where ) {
+
+      strQueryParams = "?where=" + params.where;
+
+    }
+
+    if ( params.orderBy ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
+
+      }
+      else {
+
+        strRequestPath = "?orderBy=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.offset ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&offset=" + params.offset;
+
+      }
+      else {
+
+        strRequestPath = "?offset=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.limit ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&limit=" + params.limit;
+
+      }
+      else {
+
+        strRequestPath = "?limit=" + params.limit;
+
+      }
+
+    }
+
+    const callResult = await fetch( strRequestPath + strQueryParams,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+     //( options as any ).body = body;
+
+     result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_change_password( headers: any, body: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'PUT',
+                      body: JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/user/password/change";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = body;
+
+    result.input = options;
 
   }
   catch ( error ) {
@@ -500,7 +808,8 @@ function saveResult( strFileName: string, result: any ) {
 export async function test_login( headers: any,
                                   userData: any,
                                   strCode: string,
-                                  strFileName: string ): Promise<boolean> {
+                                  strFileName: string,
+                                  bIsFail: boolean ): Promise<boolean> {
 
   let bResult = false;
 
@@ -517,9 +826,51 @@ export async function test_login( headers: any,
     if ( result &&
          result.output.body.Code === strCode ) { //"SUCCESS_LOGIN"
 
-      const strAuthorization = result.output.body.Data[ 0 ].Authorization;
+      if ( bIsFail === false ) {
 
-      headers.Authorization = strAuthorization;
+        const strAuthorization = result.output.body.Data[ 0 ].Authorization;
+
+        headers.Authorization = strAuthorization;
+
+        bResult = true;
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_token( headers: any,
+                                  strCode: string,
+                                  strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_token_check( headers );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) { //"SUCCESS_LOGIN"
 
       bResult = true;
 
@@ -568,10 +919,45 @@ export async function test_logout( headers: any,
 
 }
 
+export async function test_change_password( headers: any,
+                                            userData: any,
+                                            strCode: string,
+                                            strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_change_password( headers,
+                                               userData );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
 export async function test_profile_at_less_one_role( headers: any,
                                                      rolesToTest: string[] | string[],
                                                      strCode: string,
-                                                     strFileName: string ): Promise<boolean> {
+                                                     strFileName: string,
+                                                     bIsFail: boolean ): Promise<boolean> {
 
   let bResult = false;
 
@@ -586,30 +972,39 @@ export async function test_profile_at_less_one_role( headers: any,
     if ( result &&
          result.output.body.Code === strCode ) { //"SUCCESS_GET_SESSION_PROFILE"
 
-      const currentRoles = result.output.body.Data[ 0 ].Role.split( "," );
+      if ( bIsFail === false ) {
 
-      for ( let intRoleToTestIndex = 0; intRoleToTestIndex < rolesToTest.length; intRoleToTestIndex++ ) {
+        const currentRoles = result.output.body.Data[ 0 ].Role.split( "," );
 
-        const strRoleToTest = rolesToTest[ intRoleToTestIndex ];
+        for ( let intRoleToTestIndex = 0; intRoleToTestIndex < rolesToTest.length; intRoleToTestIndex++ ) {
 
-        for ( let intCurrentRoleIndex = 0; intCurrentRoleIndex < currentRoles.length; intCurrentRoleIndex++ ) {
+          const strRoleToTest = rolesToTest[ intRoleToTestIndex ];
 
-          const strCurrentRole = currentRoles[ intCurrentRoleIndex ];
+          for ( let intCurrentRoleIndex = 0; intCurrentRoleIndex < currentRoles.length; intCurrentRoleIndex++ ) {
 
-          if ( strCurrentRole.startsWith( strRoleToTest ) ) {
+            const strCurrentRole = currentRoles[ intCurrentRoleIndex ];
 
-            bResult = true;
+            if ( strCurrentRole.startsWith( strRoleToTest ) ) {
+
+              bResult = true;
+              break;
+
+            }
+
+          }
+
+          if ( bResult ) {
+
             break;
 
           }
 
         }
 
-        if ( bResult ) {
+      }
+      else {
 
-          break;
-
-        }
+        bResult = true;
 
       }
 
@@ -671,6 +1066,116 @@ export async function test_profile_all_roles( headers: any,
       }
 
       bResult = resultOfTest.length === rolesToTest.length;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_search( headers: any,
+                                   params: any,
+                                   strCode: string,
+                                   strFileName: string,
+                                   intConditionType: number,
+                                   intCount: number ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_search( headers,
+                                      params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( intConditionType === 0 ) {       //<=
+
+        bResult = result.output.body.Count <= intCount;
+
+      }
+      else if ( intConditionType === 1 ) {  //>=
+
+        bResult = result.output.body.Count >= intCount;
+
+      }
+      else if ( intConditionType === 2 ) {  //===
+
+        bResult = result.output.body.Count === intCount;
+
+      }
+      else if ( intConditionType === 3 ) {  //!==
+
+        bResult = result.output.body.Count !== intCount;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_search_count( headers: any,
+                                         params: any,
+                                         strCode: string,
+                                         strFileName: string,
+                                         intConditionType: number,
+                                         intCount: number ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_search_count( headers,
+                                            params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( intConditionType === 0 ) {       //<=
+
+        bResult = result.output.body.Data[ 0 ].Count <= intCount;
+
+      }
+      else if ( intConditionType === 1 ) {  //>=
+
+        bResult = result.output.body.Data[ 0 ].Count >= intCount;
+
+      }
+      else if ( intConditionType === 2 ) {  //===
+
+        bResult = result.output.body.Data[ 0 ].Count === intCount;
+
+      }
+      else if ( intConditionType === 3 ) {  //!==
+
+        bResult = result.output.body.Data[ 0 ].Count !== intCount;
+
+      }
 
     }
 
@@ -817,6 +1322,96 @@ export async function test_createUser_user01_at_TestL01( headers: any,
 
 }
 
+export async function test_createUser_user98_at_TestL98( headers: any,
+                                                         strCode: string,
+                                                         strFileName: string,
+                                                         bIsFail: boolean,
+                                                         bCreateUserGroup: boolean,
+                                                         bMustBeEmptyRoleAndTag: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const userRequest = { ... userRequestFull }; //Copy original information
+
+    userRequest.Name = "user98@TestL98";
+    userRequest.Password = "12345678";
+    userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
+    userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Business.Role = "#Role01#,#Role02#";
+    userRequest.Business.Tag = "#Tag01#,#Tag02#";
+
+    const result = await call_createUser( headers, userRequest ); //This request must be success
+
+    saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
+    result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+    saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+
+    if ( result &&
+         result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+
+      if ( bIsFail === false ) {
+
+        user98_at_TestL98_data = result.output.body.Data[ 0 ];
+
+        if ( bMustBeEmptyRoleAndTag ) {
+
+          if ( !user98_at_TestL98_data.Role &&
+              !user98_at_TestL98_data.Tag &&
+              !user98_at_TestL98_data.sysUserGroup.Role &&
+              !user98_at_TestL98_data.sysUserGroup.Tag &&
+              user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+              user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+              user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+
+            user98_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+        else {
+
+          if ( user98_at_TestL98_data.Role === "#MasterL01#" &&
+              user98_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
+              user98_at_TestL98_data.sysUserGroup.Role === "#MasterL01#" &&
+              user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
+              user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+              user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+              user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+
+            user98_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
 export async function test_createUser_user01_at_TestL01_success( headers: any ): Promise<boolean> {
 
   let bResult = false;
@@ -828,8 +1423,11 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
     userRequest.Name = "user01@TestL01";
     userRequest.Password = "12345678";
     userRequest.Role = "#MasterL01#";
+    userRequest.Tag = "#Tag11#,#Tag12#";
     userRequest.sysUserGroup.Create = true;    //Ask to create
     userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
+    userRequest.sysUserGroup.Role = "";
+    userRequest.sysUserGroup.Tag = "";
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
@@ -843,8 +1441,19 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
       user01_at_TestL01_data = result.output.body.Data[ 0 ];
-      user01_at_TestL01_data.Password = userRequest.Password;
-      bResult = true;
+
+      if ( user01_at_TestL01_data.Role === "#MasterL01#" &&
+           user01_at_TestL01_data.Tag === "#Tag11#,#Tag12#" &&
+           !user01_at_TestL01_data.sysUserGroup.Role &&
+           !user01_at_TestL01_data.sysUserGroup.Tag &&
+           user01_at_TestL01_data.Business.Role === "#Role01#,#Role02#" &&
+           user01_at_TestL01_data.Business.Tag === "#Tag01#,#Tag02#" &&
+           user01_at_TestL01_data.sysUserGroup.Name === "TestL01" ) {
+
+        user01_at_TestL01_data.Password = userRequest.Password;
+        bResult = true;
+
+      }
 
     }
 
@@ -870,7 +1479,7 @@ export async function test_createUser_user01_at_TestL02_success( headers: any ):
     userRequest.Id = null;
     userRequest.Name = "user01@TestL02";
     userRequest.Password = "12345678";
-    userRequest.Role = "#MasterL03#+#Name:TestL01#+#Name:TestL02#";
+    userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#";
     userRequest.sysUserGroup.Create = false;         //Ask to create
     userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
     userRequest.Business.Role = "#Role10#,#Role11#";
@@ -913,11 +1522,12 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
     userRequest.Id = null;
     userRequest.Name = "user02@TestL02";
     userRequest.Password = "12345678";
-    userRequest.Role = "#MasterL03#+#Name:TestL01#+#Name:TestL02#"; //<---- This roles must be ignored
+    userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#"; //<---- This roles must be ignored
+    userRequest.Role = "#Tag#"; //<---- This roles must be ignored
     userRequest.sysUserGroup.Create = false;         //Ask to create
     userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
-    userRequest.Business.Role = "#Role20#,#Role21#";
-    userRequest.Business.Tag = "#Tag20#,#Tag21#";
+    userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
+    userRequest.Business.Tag = "#Tag20#,#Tag21#"; //<---- This roles must be ignored
 
     const result = await call_createUser( headers, userRequest ); //This request must be success
 
@@ -929,8 +1539,18 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
       user02_at_TestL02_data = result.output.body.Data[ 0 ];
-      user02_at_TestL02_data.Password = userRequest.Password;
-      bResult = true;
+
+      if ( user02_at_TestL02_data.Name === "user02@TestL02" &&
+           user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
+           !user02_at_TestL02_data.Role &&
+           !user02_at_TestL02_data.Tag &&
+           !user02_at_TestL02_data.sysUserGroup.Role &&
+           !user02_at_TestL02_data.sysUserGroup.Tag ) {
+
+        user02_at_TestL02_data.Password = userRequest.Password;
+        bResult = true;
+
+      }
 
     }
 
@@ -958,9 +1578,9 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
     userRequest.Id = userData.Id;
     userRequest.ShortId = "";
     userRequest.ExpireAt = "";
-    userRequest.Name = "user02@TestL02";
+    userRequest.Name = "user99@TestL01";
     userRequest.Password = "123456789";
-    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL01#"; //<-- This role is ignored
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
     userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
@@ -971,9 +1591,9 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
     userRequest.sysUserGroup.Create = false;
     userRequest.sysUserGroup.Id = "";
     userRequest.sysUserGroup.ShortId = "";
-    userRequest.sysUserGroup.Name = "TestL02";    //This group already exists
-    userRequest.sysUserGroup.Role = "";
-    userRequest.sysUserGroup.Tag = "";
+    userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag is ignored
     userRequest.Business = userData.Business;
 
     let result = await call_updateUser( headers, userRequest ); //This request must be success
@@ -986,8 +1606,141 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
       user02_at_TestL02_data = result.output.body.Data[ 0 ];
-      user02_at_TestL02_data.Password = userRequest.Password;
+
+      if ( user02_at_TestL02_data.Name === "user99@TestL01" &&
+           user02_at_TestL02_data.sysUserGroup.Name === "TestL01" &&
+           !user02_at_TestL02_data.Role &&
+           !user02_at_TestL02_data.Tag &&
+           !user02_at_TestL02_data.sysUserGroup.Role &&
+           !user02_at_TestL02_data.sysUserGroup.Tag ) {
+
+          user02_at_TestL02_data.Password = userRequest.Password;
+          bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_updateUser_user02_at_TestL02_fail( headers: any, userData: any ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const userRequest = { ... userRequestFull } as any; //Copy original information
+
+    userRequest.Notify = "";
+    userRequest.Avatar = "";
+    userRequest.Id = userData.Id;
+    userRequest.ShortId = "";
+    userRequest.ExpireAt = "";
+    userRequest.Name = "user01@TestL01";
+    userRequest.Password = "123456789";
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.Comment = "Update success";
+    userRequest.sysPerson = userData.sysPerson;
+    userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName.replace( " 1", "" );
+    userRequest.sysPerson.LastName = userRequest.sysPerson.LastName.replace( " 2", "" );
+    userRequest.sysPerson.Address = "1625 s walnut street, wa 98233, suite 102";
+    userRequest.sysUserGroup = {} as any;
+    userRequest.sysUserGroup.Create = false;
+    userRequest.sysUserGroup.Id = "";
+    userRequest.sysUserGroup.ShortId = "";
+    userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.sysUserGroup.Tag = "#Tag11#";  //<-- This tag is ignored
+    userRequest.Business = userData.Business;
+
+    let result = await call_updateUser( headers, userRequest ); //This request must be success
+
+    saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
+    result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" };
+    saveResult( "test_updateUser_user02_at_TestL02_fail", result.output );
+
+    if ( result &&
+         result.output.body.Code === "ERROR_USER_NAME_ALREADY_EXISTS" ) {
+
       bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_updateUser_user99_at_TestL01_success( headers: any, userData: any ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const userRequest = { ... userRequestFull } as any; //Copy original information
+
+    userRequest.Notify = "";
+    userRequest.Avatar = "";
+    userRequest.Id = userData.Id;
+    userRequest.ShortId = "";
+    userRequest.ExpireAt = "";
+    userRequest.Name = "user02@TestL02";
+    userRequest.Password = "123456789";
+    userRequest.ForceChangePassword = 1;
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.Comment = "Update success";
+    userRequest.sysPerson = userData.sysPerson;
+    userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName.replace( " 1", "" );
+    userRequest.sysPerson.LastName = userRequest.sysPerson.LastName.replace( " 2", "" );
+    userRequest.sysPerson.Address = "1625 s walnut street, wa 98233, suite 102";
+    userRequest.sysUserGroup = {} as any;
+    userRequest.sysUserGroup.Create = false;
+    userRequest.sysUserGroup.Id = "";
+    userRequest.sysUserGroup.ShortId = "";
+    userRequest.sysUserGroup.Name = "TestL02";    //This group already exists
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.Business = userData.Business;
+
+    let result = await call_updateUser( headers, userRequest ); //This request must be success
+
+    saveInput( "test_updateUser_user99_at_TestL01_success", result.input );
+    result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+    saveResult( "test_updateUser_user99_at_TestL01_success", result.output );
+
+    if ( result &&
+         result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+
+      user02_at_TestL02_data = result.output.body.Data[ 0 ];
+
+      if ( user02_at_TestL02_data.Name === "user02@TestL02" &&
+           user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
+           !user02_at_TestL02_data.Role &&
+           !user02_at_TestL02_data.Tag &&
+           !user02_at_TestL02_data.sysUserGroup.Role &&
+           !user02_at_TestL02_data.sysUserGroup.Tag ) {
+
+        user02_at_TestL02_data.Password = userRequest.Password;
+        bResult = true;
+
+      }
 
     }
 
@@ -1013,8 +1766,11 @@ export async function test_createUser_user01_at_TestL01_again_fail( headers: any
     userRequest.Name = "user01@TestL01";
     userRequest.Password = "12345678";
     userRequest.Role = "#MasterL01#";
+    userRequest.Tag = "#Tag11#,#Tag12#";
     userRequest.sysUserGroup.Create = false;    //Ask to create
     userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
+    userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
+    userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
@@ -1053,8 +1809,11 @@ export async function test_createUser_user_group_TestL01_again_fail( headers: an
     userRequest.Name = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, null );
     userRequest.Password = "12345678";
     userRequest.Role = "#MasterL01#";
+    userRequest.Tag = "#Tag11#,#Tag12#";
     userRequest.sysUserGroup.Create = true;    //Ask to create
     userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
+    userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
+    userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
@@ -1098,7 +1857,6 @@ export async function test_updateUser_user01_at_TestL01_success( headers: any, u
     userRequest.ExpireAt = "";
     userRequest.Name = "user99@TestL02";
     userRequest.Password = "123456789";
-    userRequest.Role = null,
     userRequest.Comment = "Update user success. The group is new 1";
     userRequest.sysPerson = userData.sysPerson; //Copy old person data
     userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName + " 1";
@@ -1116,15 +1874,21 @@ export async function test_updateUser_user01_at_TestL01_success( headers: any, u
     let result = await call_updateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user01_at_TestL01_success", result.input );
-    result.output.expected = { Code: "SUCCESS_USER_UDPATE" };
+    result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
     saveResult( "test_updateUser_user01_at_TestL01_success", result.output );
 
     if ( result &&
-         result.output.body.Code === "SUCCESS_USER_UDPATE" ) {
+         result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
       user01_at_TestL01_data = result.output.body.Data[ 0 ];
-      user01_at_TestL01_data.Password = userRequest.Password;
-      bResult = true;
+
+      if ( user01_at_TestL01_data.Name === "user99@TestL02" &&
+           user01_at_TestL01_data.sysUserGroup.Name === "TestL02" ) {
+
+        user01_at_TestL01_data.Password = userRequest.Password;
+        bResult = true;
+
+      }
 
     }
 
@@ -1264,10 +2028,11 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
     userRequest.Id = userData.Id;
     userRequest.ShortId = "";
     userRequest.ExpireAt = "";
-    userRequest.Name = "user02@TestL01";
+    userRequest.Name = "user01@TestL01";
     userRequest.Password = "123456789";
     userRequest.Role = "#MasterL01#";
     userRequest.Tag = "#Tag01#";
+    userRequest.SessionsLimit = 1;
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
     userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName.replace( " 1", "" );
@@ -1285,15 +2050,22 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
     let result = await call_updateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user99_at_TestL02_success", result.input );
-    result.output.expected = { Code: "SUCCESS_USER_UDPATE" };
+    result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
     saveResult( "test_updateUser_user99_at_TestL02_success", result.output );
 
     if ( result &&
-         result.output.body.Code === "SUCCESS_USER_UDPATE" ) {
+         result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
       user01_at_TestL01_data = result.output.body.Data[ 0 ];
-      user01_at_TestL01_data[ "Password" ] = userRequest.Password; //Save the current password to make login later
-      bResult = true;
+
+      if ( user01_at_TestL01_data.Name === "user01@TestL01" &&
+           user01_at_TestL01_data.sysUserGroup.Name === "TestL01" &&
+           user01_at_TestL01_data.Role === "#MasterL01#"  ) {
+
+        user01_at_TestL01_data[ "Password" ] = userRequest.Password; //Save the current password to make login later
+        bResult = true;
+
+      }
 
     }
 
@@ -1357,9 +2129,12 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
 
     userRequest.Name = "user02@TestL01";
     userRequest.Password = "12345678";
-    userRequest.Role = "#MasterL01#"; //<-- This role is ignored
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
     userRequest.sysUserGroup.Create = false;
     userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+    userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
     userRequest.Business.Role = "#Role03#,#Role04#";
     userRequest.Business.Tag = "#Tag03#,#Tag04#";
 
@@ -1373,8 +2148,18 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
       user02_at_TestL01_data = result.output.body.Data[ 0 ];
-      user02_at_TestL01_data.Password = userRequest.Password;
-      bResult = true;
+
+      if ( !user02_at_TestL01_data.Role &&
+           !user02_at_TestL01_data.Tag  &&
+           !user02_at_TestL01_data.sysUserGroup.Role &&
+           !user02_at_TestL01_data.sysUserGroup.Tag &&
+           userRequest.Business.Role === "#Role03#,#Role04#" &&
+           userRequest.Business.Tag === "#Tag03#,#Tag04#" ) {
+
+        user02_at_TestL01_data.Password = userRequest.Password;
+        bResult = true;
+
+      }
 
     }
 
@@ -1405,7 +2190,7 @@ export async function test_updateUser_user02_at_TestL01_success( headers: any, u
     userRequest.ExpireAt = "";
     userRequest.Name = "user02@TestL01";
     userRequest.Password = "123456789";
-    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL01#"; //<-- This role is ignored
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
     userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
@@ -1510,7 +2295,18 @@ async function test_set01() {
 
   try {
 
-    console.log( chalk.blue( "******************** admin01@system.net ********************" ) );
+    console.log( chalk.blue( ">******************** admin01@system.net ********************<" ) );
+
+    myAssert( await test_login( headers_admin01_at_system_net,
+                                {
+                                  Name: strUser_admin01_at_system_net,
+                                  Password: strPassword_admin01_at_system_net + "1" //Force to fail the login
+                                },
+                                "ERROR_LOGIN_FAILED",
+                                "test_login_admin01@system_net_fail",
+                                true ),
+              '185E24354C2F: Login with user admin01@system.net is OK with the fail',
+              '185E24354C2F: Login with user admin01@system.net is FAILED' );
 
     myAssert( await test_login( headers_admin01_at_system_net,
                                 {
@@ -1518,7 +2314,8 @@ async function test_set01() {
                                   Password: strPassword_admin01_at_system_net
                                 },
                                 "SUCCESS_LOGIN",
-                                "test_login_admin01@system_net_success" ),
+                                "test_login_admin01@system_net_success",
+                                false ),
               'EF56F748EC63: Login with user admin01@system.net is OK',
               'EF56F748EC63: Login with user admin01@system.net is FAILED' );
 
@@ -1528,8 +2325,80 @@ async function test_set01() {
                                        { Name: "noexists@systems.net" },
                                        "ERROR_USER_NOT_FOUND",
                                        "test_deleteUser_noexists@systems.net_fail" ),
-                'C98802C4C4F0: Delete of the user bmanager@system.net is OK with the fail',
-                'C98802C4C4F0: Delete of the user bmanager@system.net is FAILED' );
+                '53CCEE8DDB93: Delete of the user noexists@systems.net is OK with the fail',
+                '53CCEE8DDB93: Delete of the user noexists@systems.net is FAILED' );
+
+      //Fail to create the user user98@TestL98 because the user group user98_at_TestL98 not exists and Create = false in the section sysUserGroup
+      myAssert( await test_createUser_user98_at_TestL98( headers_admin01_at_system_net,
+                                                         "ERROR_USER_GROUP_NOT_FOUND",
+                                                         "test_createUser_user98_at_TestL98_fail",
+                                                         true,
+                                                         false, //<--- Not auto create the group and the group no exists
+                                                         false ),
+                'B7A8462E0A10: Creation of the user user98@TestL98 is OK with the fail',
+                'B7A8462E0A10: Creation of the user user98@TestL98 is FAILED' );
+
+      //*** Create user user98@TestL98 ***
+      //*** Create user group user98@TestL98 ***
+      myAssert( await test_createUser_user98_at_TestL98( headers_admin01_at_system_net,
+                                                         "SUCCESS_USER_CREATE",
+                                                         "test_createUser_user98_at_TestL98_success",
+                                                         false,
+                                                         true, //<--- Auto create the group user98@TestL98
+                                                         false ),
+                '8CF2731F0EC9: Creation of the user user98@TestL98 is OK',
+                '8CF2731F0EC9: Creation of the user user98@TestL98 is FAILED' );
+
+      myAssert( await test_deleteUser( headers_admin01_at_system_net,
+                                       { Name: "user98@TestL98" },
+                                       "SUCCESS_USER_DELETE",
+                                       "test_deleteUser_user98@TestL98_success" ),
+                'C98802C4C4F0: Delete of the user user98@TestL98 is OK',
+                'C98802C4C4F0: Delete of the user user98@TestL98 is FAILED' );
+
+      //Fail because the field Create = true in the section sysUserGroup
+      myAssert( await test_createUser_user98_at_TestL98( headers_admin01_at_system_net,
+                                                         "ERROR_USER_GROUP_ALREADY_EXISTS",
+                                                         "test_createUser_user98_at_TestL98_fail",
+                                                         true,
+                                                         true, //<--- Fail to try to create the group again
+                                                         false ),
+                'C69088FEAC85: Creation of the user user98@TestL98 is OK with the fail',
+                'C69088FEAC85: Creation of the user user98@TestL98 is FAILED' );
+
+      //Success because the field Create = false in the section sysUserGroup
+      myAssert( await test_createUser_user98_at_TestL98( headers_admin01_at_system_net,
+                                                         "SUCCESS_USER_CREATE",
+                                                         "test_createUser_user98_at_TestL98_success",
+                                                         false,
+                                                         false, //<--- NOT try to create the group
+                                                         false ),
+                '0E21DC94A0AE: Creation of the user user98@TestL98 is OK with the fail',
+                '0E21DC94A0AE: Creation of the user user98@TestL98 is FAILED' );
+
+      //Fail because the group is not empty, contains the user user98@TestL98
+      myAssert( await test_deleteUserGroup( headers_admin01_at_system_net,
+                                            { Name: "user98@TestL98" },
+                                            "ERROR_USER_GROUP_IS_NOT_USER_EMPTY",
+                                            "test_deleteUserGroup_user98@TestL98_fail" ),
+                '84BC2BB9654B: Delete of the user group user98@TestL98 is OK with the fail',
+                '84BC2BB9654B: Delete of the user group user98@TestL98 is FAILED' );
+
+      //Delete the user user98@TestL98 the next test not fail
+      myAssert( await test_deleteUser( headers_admin01_at_system_net,
+                                       { Name: "user98@TestL98" },
+                                       "SUCCESS_USER_DELETE",
+                                       "test_deleteUser_user98@TestL98_success" ),
+                '4BEA7143A94E: Delete of the user user98@TestL98 is OK',
+                '4BEA7143A94E: Delete of the user user98@TestL98 is FAILED' );
+
+      //Success because the group is now empty
+      myAssert( await test_deleteUserGroup( headers_admin01_at_system_net,
+                                            { Name: "user98@TestL98" },
+                                            "SUCCESS_USER_GROUP_DELETE",
+                                            "test_deleteUserGroup_user98@TestL98_success" ),
+                'A878B5F98A65: Delete of the user group user98@TestL98 is OK',
+                'A878B5F98A65: Delete of the user group user98@TestL98 is FAILED' );
 
       //Fail because try create the user user01@TestL01 and the user group TestL01, the field create of section sysGroup is false.
       myAssert( await test_createUser_user01_at_TestL01( headers_admin01_at_system_net,
@@ -1554,6 +2423,7 @@ async function test_set01() {
 
       //Change the name of the user from user01@TestL01 -> user99@TestL02
       //*** Create the user group TestL02 ****
+      //Change the user group name from TestL01 => TestL02
       myAssert( await test_updateUser_user01_at_TestL01_success( headers_admin01_at_system_net, user01_at_TestL01_data ),
                 '7A15DFC05C45: Update of the user user01@TestL01 is OK',
                 '7A15DFC05C45: Update of the user user01@TestL01 is FAILED' );
@@ -1565,66 +2435,163 @@ async function test_set01() {
                 'F51C021137D4: Update of the user user99@TestL02 is FAILED' );
 
       //Change the name of the user from user99@TestL02 -> user01@TestL01
-      //Change the user group to TestL01, the field create of section sysGroup is false.
+      //Change the user group from TestL02 => TestL01, the field create of section sysGroup is false.
+      //Restricted the number of session to one sysUser.SessionsLimit = 1
       myAssert( await test_updateUser_user99_at_TestL02_success( headers_admin01_at_system_net, user01_at_TestL01_data ),
                 '84945A9B59D0: Update of the user user02@TestL02 is OK',
                 '84945A9B59D0: Update of the user user02@TestL02 is FAILED' );
 
+      myAssert( await test_search( headers_admin01_at_system_net,
+                {  },
+                "SUCCESS_SEARCH",
+                "test_search_admin01@system.net_success",
+                1,
+                5 ),
+               'FA89A381FFA5: Search of the user admin01@system.net is OK',
+               'FA89A381FFA5: Search of the user admin01@system.net is FAILED' );
+
+      myAssert( await test_search_count( headers_admin01_at_system_net,
+                {  },
+                "SUCCESS_SEARCH_COUNT",
+                "test_search_admin01@system.net_success",
+                1,
+                5 ),
+               '95F1AB5D6C89: Search count of the user admin01@system.net is OK',
+               '95F1AB5D6C89: Search count of the user admin01@system.net is FAILED' );
+
       try {
 
-        console.log( chalk.blue( "******************** user01@TestL01 ********************" ) );
+        console.log( chalk.blue( ">******************** user01@TestL01 ********************<" ) );
 
-        myAssert( await test_login( headers_user01_at_TestL01,
+        headers_user01_at_TestL01_Session1.Authorization = "12345";
+
+        //Fail because the user user01@TestL01 no valid session
+        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
+                                         { Id: user02_at_TestL01_data.Id },
+                                         "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                                         "test_deleteUser_user02_at_TestL01_fail" ),
+                  '54259F9D648F: Delete of the user user01@TestL01 is OK with the fail',
+                  '54259F9D648F: Delete of the user user01@TestL01 is FAILED' );
+
+        //Open first session
+        myAssert( await test_login( headers_user01_at_TestL01_Session2,
                                     {
                                       Name: user01_at_TestL01_data.Name,
                                       Password: user01_at_TestL01_data.Password
                                     },
                                     "SUCCESS_LOGIN",
-                                    "test_login_user01@TestL01_success" ),
+                                    "test_login_user01@TestL01_success",
+                                    false ),
                   '2F5DF2F9A47A: Login with user user01@TestL01 is OK',
                   '2F5DF2F9A47A: Login with user user01@TestL01 is FAILED' );
 
-        myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL01,
+        //This session is now valid
+        myAssert( await test_token( headers_user01_at_TestL01_Session2,
+                                    "SUCCESS_TOKEN_IS_VALID",
+                                    "test_token_user01@TestL01_success" ),
+                  '3A5192B612AD: Token check with user user01@TestL01 is OK',
+                  '3A5192B612AD: Token check user user01@TestL01 is FAILED' );
+
+        //Open a second session, and invalidate the first session, sysUser.SessionsLimit = 1
+        myAssert( await test_login( headers_user01_at_TestL01_Session1,
+                                    {
+                                      Name: user01_at_TestL01_data.Name,
+                                      Password: user01_at_TestL01_data.Password
+                                    },
+                                    "SUCCESS_LOGIN",
+                                    "test_login_user01@TestL01_success",
+                                    false ),
+                  '3336E84BAEF2: Login with user user01@TestL01 is OK',
+                  '3336E84BAEF2: Login with user user01@TestL01 is FAILED' );
+
+        //Fail because this user has user session limit = 1, sysUser.SessionsLimit = 1
+        myAssert( await test_token( headers_user01_at_TestL01_Session2,
+                                    "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                                    "test_token_user01@TestL01_fail" ),
+                  'AC4E098E2E7B: Token check with user user01@TestL01 is OK with the fail',
+                  'AC4E098E2E7B: Token check user user01@TestL01 is FAILED' );
+
+        myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL01_Session1,
                                                        [ "#MasterL01#" ],
                                                        "SUCCESS_GET_SESSION_PROFILE",
-                                                       "test_profile_role_success" ),
+                                                       "test_profile_role_user01@TestL01_success",
+                                                       false ),
                   'CDA84E5562F3: The user user01@TestL01 is OK have the role #MasterL01#',
                   'CDA84E5562F3: The user user01@TestL01 NOT have the role #MasterL01# FAILED' );
 
-        myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL01,
-                                                       [ "#Administrator#", "#BManagerL01#" ],
+        myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL01_Session1,
+                                                       [ "#Administrator#", "#BManagerL99#" ],
                                                        "SUCCESS_GET_SESSION_PROFILE",
-                                                       "test_profile_role_fail" ) === false,
-                  '0DB4C6D59098: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL01#',
-                  '0DB4C6D59098: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL01# FAILED' );
+                                                       "test_profile_role_fail",
+                                                       false ) === false,
+                  '0DB4C6D59098: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99#',
+                  '0DB4C6D59098: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# FAILED' );
+
+        //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new group
+        myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
+                                                           "ERROR_CANNOT_CREATE_USER",
+                                                           "test_createUser_user98_at_TestL98_fail",
+                                                           true,
+                                                           false, //<--- Not auto create the group and the group no exists
+                                                           false ),
+                  'CA07E27A0CC3: Creation of the user user98@TestL98 is OK with the fail',
+                  'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
+
+        //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new group
+        myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
+                                                           "ERROR_CANNOT_CREATE_USER",
+                                                           "test_createUser_user98_at_TestL98_fail",
+                                                           true,
+                                                           true, //<--- Auto create the group and the group no exists
+                                                           false ),
+                  'CA07E27A0CC3: Creation of the user user98@TestL98 is OK with the fail',
+                  'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
 
         //Fail because the user01@TestL01 already exists
-        myAssert( await test_createUser_user01_at_TestL01( headers_user01_at_TestL01,
+        myAssert( await test_createUser_user01_at_TestL01( headers_user01_at_TestL01_Session1,
                                                            "ERROR_USER_NAME_ALREADY_EXISTS",
                                                            "test_createUser_user01@TestL01_fail" ),
                   '3C6BCE671AEB: Creation of the user user01@TestL01 is OK with the fail',
                   '3C6BCE671AEB: Creation of the user user01@TestL01 is FAILED' );
 
         //Fail because the user01@TestL01 is trying update himself
-        myAssert( await test_updateUser_user01_at_TestL01_fail( headers_user01_at_TestL01,
+        myAssert( await test_updateUser_user01_at_TestL01_fail( headers_user01_at_TestL01_Session1,
                                                                 user01_at_TestL01_data ),
                   'CF7DFB54EDE0: Update of the user user01@TestL01 is OK with the fail',
                   'CF7DFB54EDE0: Update of the user user01@TestL01 is FAILED' );
 
         //Fail because TestL02 is not in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #MasterL01#
-        myAssert( await test_createUser_user02_at_TestL02_fail( headers_user01_at_TestL01 ),
+        myAssert( await test_createUser_user02_at_TestL02_fail( headers_user01_at_TestL01_Session1 ),
                   '675C61D31DDF: Creation of the user user02@TestL02 is OK with the fail',
                   '675C61D31DDF: Creation of the user user02@TestL02 is FAILED' );
 
         //Success because TestL01 is in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #MasterL01#
         //*** Create user user02@TestL01 ***
-        myAssert( await test_createUser_user02_at_TestL01_success( headers_user01_at_TestL01 ),
+        myAssert( await test_createUser_user02_at_TestL01_success( headers_user01_at_TestL01_Session1 ),
                   '95543470C81F: Creation of the user user02@TestL01 is OK',
                   '95543470C81F: Creation of the user user02@TestL01 is FAILED' );
 
+        myAssert( await test_search( headers_user01_at_TestL01_Session1,
+                  {  },
+                  "SUCCESS_SEARCH",
+                  "test_search_user01@TestL01_success",
+                  2,   //Condition ===
+                  2 ), //Count
+                 'F720C51DE6FA: Search of the user user01@TestL01 is OK',
+                 'F720C51DE6FA: Search of the user user01@TestL01 is FAILED' );
+
+        myAssert( await test_search_count( headers_user01_at_TestL01_Session1,
+                  {  },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_user01@TestL01_success",
+                  2,   //Condition ===
+                  2 ), //Count
+                 'F77C16FE2082: Search count of the user user01@TestL01 is OK',
+                 'F77C16FE2082: Search count of the user user01@TestL01 is FAILED' );
+
         try {
 
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          console.log( chalk.blue( ">******************** user02@TestL01 ********************<" ) );
 
           myAssert( await test_login( headers_user02_at_TestL01,
                                       {
@@ -1632,16 +2599,18 @@ async function test_set01() {
                                         Password: user02_at_TestL01_data.Password
                                       },
                                       "SUCCESS_LOGIN",
-                                      "test_login_user02@TestL01_success" ),
+                                      "test_login_user02@TestL01_success",
+                                      false ),
                     '81A6B96C4E24: Login with user user02@TestL01 OK',
                     '81A6B96C4E24: Login with user user02@TestL01 FAILED' );
 
           myAssert( await test_profile_at_less_one_role( headers_user02_at_TestL01,
-                                                         [ "#MasterL01#", "#Administrator#", "#BManagerL01#" ],
+                                                         [ "#MasterL01#", "#Administrator#", "#BManagerL99#" ],
                                                          "SUCCESS_GET_SESSION_PROFILE",
-                                                         "test_profile_role_fail" ) === false,
-                    'A9464CC0DE81: The user user02@TestL01 is OK not have the roles #MasterL01# or #Administrator# or #BManagerL01#',
-                    'A9464CC0DE81: The user user02@TestL01 have the roles #MasterL01# and/or #Administrator# and/or #BManagerL01# FAILED' );
+                                                         "test_profile_role_user02@TestL01_fail",
+                                                         false ) === false,
+                    'A9464CC0DE81: The user user02@TestL01 is OK not have the roles #MasterL01# or #Administrator# or #BManagerL99#',
+                    'A9464CC0DE81: The user user02@TestL01 have the roles #MasterL01# and/or #Administrator# and/or #BManagerL99# FAILED' );
 
           //Fail because user03@TestL01 not have role to made this request
           myAssert( await test_createUser_user03_at_TestL01_fail( headers_user02_at_TestL01 ),
@@ -1662,7 +2631,7 @@ async function test_set01() {
                     '9D731B62D922: Logout with user user02@TestL01 is OK',
                     '9D731B62D922: Logout with user user02@TestL01 is FAILED' );
 
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
         catch ( error ) {
@@ -1670,13 +2639,13 @@ async function test_set01() {
           console.log( "user02@TestL02" );
           console.log( error );
 
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
 
         //Success because the user user02@TestL01 is in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
         //*** Delete user user02@TestL01 ***
-        myAssert( await test_deleteUser( headers_user01_at_TestL01,
+        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
                                          { Id: user02_at_TestL01_data.Id },
                                          "SUCCESS_USER_DELETE",
                                          "test_deleteUser_user02_at_TestL01_success" ),
@@ -1684,27 +2653,35 @@ async function test_set01() {
                   '1AD5AD5583DD: Delete of the user user02@TestL01 is FAILED' );
 
         //Fail because the user bmanager02@system.net is not in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
-        myAssert( await test_deleteUser( headers_user01_at_TestL01,
+        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
                                          { Name: "bmanager02@system.net" },
                                          "ERROR_CANNOT_DELETE_THE_INFORMATION",
                                          "test_deleteUser_bmanager02@system.net_fail" ),
                   '8E8766DECAD0: Delete of the user bmanager02@system.net is OK with the fail',
                   '8E8766DECAD0: Delete of the user bmanager02@system.net is FAILED' );
 
-        myAssert( await test_logout( headers_user01_at_TestL01,
+        myAssert( await test_logout( headers_user01_at_TestL01_Session1,
                                      "SUCCESS_LOGOUT",
                                      "test_logout_user01@TestL01_success" ),
                   '5FA1C53C9F1D: Logout with user user01@TestL01 is OK',
                   '5FA1C53C9F1D: Logout with user user01@TestL01 is FAILED' );
 
-        console.log( chalk.blue( "******************** user01@TestL01 ********************" ) );
+        //Fail because the user user01@TestL01 no valid session
+        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
+                                         { Id: user02_at_TestL01_data.Id },
+                                         "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                                         "test_deleteUser_user02_at_TestL01_fail" ),
+                  '1AF9D40E118A: Delete of the user user01@TestL01 is OK with the fail',
+                  '1AF9D40E118A: Delete of the user user01@TestL01 is FAILED' );
+
+        console.log( chalk.blue( "<******************** user01@TestL01 ********************>" ) );
 
       }
       catch ( error ) {
 
         console.log( "user01@TestL01" );
         console.log( error );
-        console.log( chalk.blue( "******************** user01@TestL01 ********************" ) );
+        console.log( chalk.blue( "<******************** user01@TestL01 ********************>" ) );
 
       }
 
@@ -1715,7 +2692,7 @@ async function test_set01() {
 
       try {
 
-        console.log( chalk.blue( "******************** user01@TestL02 ********************" ) );
+        console.log( chalk.blue( ">******************** user01@TestL02 ********************<" ) );
 
         myAssert( await test_login( headers_user01_at_TestL02,
                                     {
@@ -1723,81 +2700,269 @@ async function test_set01() {
                                       Password: user01_at_TestL02_data.Password
                                     },
                                     "SUCCESS_LOGIN",
-                                    "test_login_user01@TestL02_success" ),
+                                    "test_login_user01@TestL02_success",
+                                    false ),
                   '130FE0374778: Login with user user01@TestL02 OK',
                   '130FE0374778: Login with user user01@TestL02 FAILED' );
 
         myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL02,
                                                        [ "#MasterL03#" ],
                                                        "SUCCESS_GET_SESSION_PROFILE",
-                                                       "test_profile_role_success" ),
+                                                       "test_profile_role_user01@TestL02_success",
+                                                       false ),
                   'DDC02D014233: The user user01@TestL02 is OK have the role #MasterL03#',
                   'DDC02D014233: The user user01@TestL02 NOT have the role #MasterL03# FAILED' );
 
         myAssert( await test_profile_at_less_one_role( headers_user01_at_TestL02,
-                                                       [ "#Administrator#", "#BManagerL01#", "#MasterL01#" ],
+                                                       [ "#Administrator#", "#BManagerL99#", "#MasterL01#" ],
                                                        "SUCCESS_GET_SESSION_PROFILE",
-                                                       "test_profile_role_fail" ) === false,
-                  'AD3CC7F54477: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL01# or #MasterL01#',
-                  'AD3CC7F54477: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL01# and/or #MasterL01# FAILED' );
+                                                       "test_profile_role_user01@TestL02_fail",
+                                                       false ) === false,
+                  'AD3CC7F54477: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01#',
+                  'AD3CC7F54477: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# FAILED' );
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         //*** Create the user user02@TestL02 ***
         myAssert( await test_createUser_user02_at_TestL02_success( headers_user01_at_TestL02 ),
                   '595AA97F14E3: Creation of the user user02@TestL02 is OK',
                   '595AA97F14E3: Creation of the user user02@TestL02 is FAILED' );
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Change the user name from user02@TestL02 => user99@TestL01
+        //Change the user group name from TestL02 => TestL01
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         myAssert( await test_updateUser_user02_at_TestL02_success( headers_user01_at_TestL02, user02_at_TestL02_data ), //The user is another group
-                  '5CE1E61F0840: Creation of the user user02@TestL02 is OK',
-                  '5CE1E61F0840: Creation of the user user02@TestL02 is FAILED' );
+                  '5CE1E61F0840: Update of the user user02@TestL02 is OK',
+                  '5CE1E61F0840: Update of the user user02@TestL02 is FAILED' );
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Change the user name from user99@TestL01 => user02@TestL02
+        //Change the user group name from TestL01 => TestL02
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+        //Set the field sysUser.ForceChangePassword = 1
+        myAssert( await test_updateUser_user99_at_TestL01_success( headers_user01_at_TestL02, user02_at_TestL02_data ), //The user is another group
+                  'F59085E6DF03: Update of the user user99@TestL01 is OK',
+                  'F59085E6DF03: Update of the user user99@TestL01 is FAILED' );
+
+        //Try to change the user name from user02@TestL01 => user01@TestL01
+        //Try to change the user group name from TestL02 => TestL01
+        //Fail because user01@TestL01 already exists
+        myAssert( await test_updateUser_user02_at_TestL02_fail( headers_user01_at_TestL02, user02_at_TestL02_data ), //The user is another group
+                  'F15260F5B6AD: Update of the user user02@TestL02 is OK with the fail',
+                  'F15260F5B6AD: Update of the user user02@TestL02 is FAILED' );
+
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         //*** Create the user user02@TestL01 ***
         myAssert( await test_createUser_user02_at_TestL01_success( headers_user01_at_TestL02 ),
                   'F717131C21AA: Creation of the user user02@TestL01 is OK',
                   'F717131C21AA: Creation of the user user02@TestL01 is FAILED' );
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         myAssert( await test_updateUser_user02_at_TestL01_success( headers_user01_at_TestL02, user02_at_TestL01_data ), //The user is another group
                   '79736CBA890B: Creation of the user user02@TestL01 is OK',
                   '79736CBA890B: Creation of the user user02@TestL01 is FAILED' );
 
+        myAssert( await test_search( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH",
+                  "test_search_user01@TestL01_success",
+                  2,   //Condition ===
+                  4 ), //Count
+                 'AD0B5775D644: Search of the user user01@TestL02 is OK',
+                 'AD0B5775D644: Search of the user user01@TestL02 is FAILED' );
+
+        myAssert( await test_search_count( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_user01@TestL01_success",
+                  2,   //Condition ===
+                  4 ), //Count
+                 'C095D0EA6182: Search count of the user user01@TestL02 is OK',
+                 'C095D0EA6182: Search count of the user user01@TestL02 is FAILED' );
+
+        //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
+        myAssert( await test_search( headers_user01_at_TestL02,
+                  { where: "A.Name = 'admin01@system.net'" },
+                  "SUCCESS_SEARCH",
+                  "test_search_admin01@system.net_success",
+                  2,   //Condition ===
+                  0 ), //Count
+                 '0C4F58078409: Search of the user user01@TestL02 is OK',
+                 '0C4F58078409: Search of the user user01@TestL02 is FAILED' );
+
+        //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
+        myAssert( await test_search_count( headers_user01_at_TestL02,
+                  { where: "A.Name = 'admin01@system.net'" },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_admin01@system.net_success",
+                  2,   //Condition ===
+                  0 ), //Count
+                 '89A4483AD09F: Search count of the user user01@TestL02 is OK',
+                 'A972F4A5400E: Search count of the user user01@TestL02 is FAILED' );
+
+        myAssert( await test_search( headers_user01_at_TestL02,
+                  { where: "A.Name = 'user02@TestL02'" },
+                  "SUCCESS_SEARCH",
+                  "test_search_user02@TestL02_success",
+                  2,   //Condition ===
+                  1 ), //Count
+                 '0C4F58078409: Search of the user user02@TestL02 is OK',
+                 '0C4F58078409: Search of the user user02@TestL02 is FAILED' );
+
+        myAssert( await test_search_count( headers_user01_at_TestL02,
+                  { where: "A.Name = 'user02@TestL02'" },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_user02@TestL02_success",
+                  2,   //Condition ===
+                  1 ), //Count
+                 '89A4483AD09F: Search count of the user user02@TestL02 is OK',
+                 '89A4483AD09F: Search count of the user user02@TestL02 is FAILED' );
+
+        myAssert( await test_search( headers_user01_at_TestL02,
+                  { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
+                  "SUCCESS_SEARCH",
+                  "test_search_user02@TestL02_success",
+                  2,   //Condition ===
+                  2 ), //Count
+                 '6F000511292F: Search of the user user02@TestL02 is OK',
+                 '6F000511292F: Search of the user user02@TestL02 is FAILED' );
+
+        myAssert( await test_search_count( headers_user01_at_TestL02,
+                  { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_user02@TestL02_success",
+                  2,   //Condition ===
+                  2 ), //Count
+                 '656BB66AC356: Search count of the user user02@TestL02 is OK',
+                 '656BB66AC356: Search count of the user user02@TestL02 is FAILED' );
+
         try {
 
-          console.log( chalk.blue( "******************** user02@TestL02 ********************" ) );
+          console.log( chalk.blue( ">******************** user02@TestL02 ********************<" ) );
 
-          //
+          myAssert( await test_login( headers_user02_at_TestL02,
+                                      {
+                                        Name: user02_at_TestL02_data.Name,
+                                        Password: user02_at_TestL02_data.Password
+                                      },
+                                      "SUCCESS_LOGIN",
+                                      "test_login_user02@TestL02_success",
+                                      false ),
+                    'ECE77F4DB472: Login with user user02@TestL02 OK',
+                    'ECE77F4DB472: Login with user user02@TestL02 FAILED' );
 
-          console.log( chalk.blue( "******************** user02@TestL02 ********************" ) );
+          //Fail because need change the password before sysUser.ForceChangePassword = 1
+          myAssert( await test_profile_at_less_one_role( headers_user02_at_TestL02,
+                                                         [ "#Administrator#", "#BManagerL99#", "#MasterL01#", "#MasterL02#", "#MasterL03#" ],
+                                                         "ERROR_USER_CHANGE_PASSWORD_REQUIRED",
+                                                         "test_profile_role_user02@TestL02_fail",
+                                                         true ),
+                    'DEF3E36E35C4: The user user02@TestL02 is OK with fail',
+                    'DEF3E36E35C4: The user user02@TestL02 is FAILED' );
+
+          //Fail because the NewPassword and OldPassword are the same
+          myAssert( await test_change_password( headers_user02_at_TestL02,
+                                                { CurrentPassword: user02_at_TestL02_data.Password, NewPassword: user02_at_TestL02_data.Password },
+                                                "ERROR_NEW_PASSWORD_NOT_VALID",
+                                                "test_change_password_user02@TestL02_fail" ),
+                    'EC2D59F2121A: The user user02@TestL02 is OK with the fail',
+                    'EC2D59F2121A: The user user02@TestL02 is FAILED' );
+
+          //Fail because the NewPassword is too short
+          myAssert( await test_change_password( headers_user02_at_TestL02,
+                                                { CurrentPassword: user02_at_TestL02_data.Password, NewPassword: "123456" },
+                                                "ERROR_NEW_PASSWORD_NOT_VALID",
+                                                "test_change_password_user02@TestL02_fail" ),
+                    'F2D7309DE7EB: The user user02@TestL02 is OK with the fail',
+                    'F2D7309DE7EB: The user user02@TestL02 is FAILED' );
+
+          //Fail because the OldPassword is wrong
+          myAssert( await test_change_password( headers_user02_at_TestL02,
+                                                { CurrentPassword: user02_at_TestL02_data.Password + "1", NewPassword: user02_at_TestL02_data.Password },
+                                                "ERROR_NEW_PASSWORD_NOT_VALID",
+                                                "test_change_password_user02@TestL02_fail" ),
+                    'EC2D59F2121A: The user user02@TestL02 is OK with the fail',
+                    'EC2D59F2121A: The user user02@TestL02 is FAILED' );
+
+          myAssert( await test_change_password( headers_user02_at_TestL02,
+                                                { CurrentPassword: user02_at_TestL02_data.Password, NewPassword: user02_at_TestL02_data.Password + "0" },
+                                                "SUCCESS_PASSWORD_CHANGE",
+                                                "test_change_password_user02@TestL02_success" ),
+                    'D3533E1D951B: The user user02@TestL02 is OK',
+                    'D3533E1D951B: The user user02@TestL02 is FAILED' );
+
+          user02_at_TestL02_data.Password = user02_at_TestL02_data.Password + "0"; //Update with the new password
+
+          myAssert( await test_profile_at_less_one_role( headers_user02_at_TestL02,
+                                                         [ "#Administrator#", "#BManagerL99#", "#MasterL01#", "#MasterL02#", "#MasterL03#" ],
+                                                         "SUCCESS_GET_SESSION_PROFILE",
+                                                         "test_profile_role_user02@TestL02_fail",
+                                                         false ) === false,
+                    'DEF3E36E35C4: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
+                    'DEF3E36E35C4: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
+
+          myAssert( await test_logout( headers_user02_at_TestL02,
+                                       "SUCCESS_LOGOUT",
+                                       "test_logout_user02@TestL02_success" ),
+                    '56FE7F65DC57: Logout with user user02@TestL02 is OK',
+                    '56FE7F65DC57: Logout with user user02@TestL02 is FAILED' );
+
+          myAssert( await test_logout( headers_user02_at_TestL02,
+                                       "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                                       "test_logout_user02@TestL02_fail" ),
+                    '56FE7F65DC57: Logout with user user02@TestL02 is OK with the fail',
+                    '56FE7F65DC57: Logout with user user02@TestL02 is FAILED' );
+
+          console.log( chalk.blue( "<******************** user02@TestL02 ********************>" ) );
 
         }
         catch ( error ) {
 
           console.log( "user01@TestL01" );
           console.log( error );
-          console.log( chalk.blue( "******************** user02@TestL02 ********************" ) );
+          console.log( chalk.blue( "<******************** user02@TestL02 ********************>" ) );
 
         }
 
         try {
 
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          console.log( chalk.blue( ">******************** user02@TestL01 ********************<" ) );
 
-          //
+          myAssert( await test_login( headers_user02_at_TestL01,
+                                      {
+                                        Name: user02_at_TestL01_data.Name,
+                                        Password: user02_at_TestL01_data.Password
+                                      },
+                                      "SUCCESS_LOGIN",
+                                      "test_login_user02@TestL01_success",
+                                      false ),
+                    '9505C68A979F: Login with user user02@TestL01 OK',
+                    '9505C68A979F: Login with user user02@TestL01 FAILED' );
 
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          myAssert( await test_profile_at_less_one_role( headers_user02_at_TestL01,
+                                                         [ "#Administrator#", "#BManagerL99#", "#MasterL01#", "#MasterL02#", "#MasterL03#" ],
+                                                         "SUCCESS_GET_SESSION_PROFILE",
+                                                         "test_profile_role_user02@TestL01_fail",
+                                                         false ) === false,
+                    'BE0D27084964: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
+                    'BE0D27084964: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
+
+          myAssert( await test_logout( headers_user02_at_TestL01,
+                                       "SUCCESS_LOGOUT",
+                                       "test_logout_user02@TestL01_success" ),
+                    'A82203930794: Logout with user user02@TestL01 is OK',
+                    'A82203930794: Logout with user user02@TestL01 is FAILED' );
+
+          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
         catch ( error ) {
 
           console.log( "user01@TestL01" );
           console.log( error );
-          console.log( chalk.blue( "******************** user02@TestL01 ********************" ) );
+          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         myAssert( await test_deleteUser( headers_user01_at_TestL02,
                                         { Id: user02_at_TestL02_data.Id },
                                         "SUCCESS_USER_DELETE",
@@ -1805,7 +2970,7 @@ async function test_set01() {
                   'B266409B2D82: Delete of the user user02@TestL02 is OK',
                   'B266409B2D82: Delete of the user user02@TestL02 is FAILED' );
 
-        //Success because user01@TestL02 has the Role => #MasterL03#+#Name:TestL01#+#Name:TestL02#
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         myAssert( await test_deleteUser( headers_user01_at_TestL02,
                                         { Id: user02_at_TestL01_data.Id },
                                         "SUCCESS_USER_DELETE",
@@ -1819,14 +2984,14 @@ async function test_set01() {
                   '56FE7F65DC57: Logout with user user01@TestL02 is OK',
                   '56FE7F65DC57: Logout with user user01@TestL02 is FAILED' );
 
-        console.log( chalk.blue( "******************** user01@TestL02 ********************" ) );
+        console.log( chalk.blue( "<******************** user01@TestL02 ********************>" ) );
 
       }
       catch ( error ) {
 
         console.log( "user01@TestL02" );
         console.log( error );
-        console.log( chalk.blue( "******************** user01@TestL02 ********************" ) );
+        console.log( chalk.blue( "<******************** user01@TestL02 ********************>" ) );
 
       }
 
@@ -1886,14 +3051,14 @@ async function test_set01() {
               '0E7222800B26: Logout with user admin01@system.net is OK',
               '0E7222800B26: Logout with user admin01@system.net is FAILED' );
 
-    console.log( chalk.blue( "******************** admin01@system.net ********************" ) );
+    console.log( chalk.blue( "<******************** admin01@system.net ********************>" ) );
 
   }
   catch ( error ) {
 
     console.log( error );
 
-    console.log( chalk.blue( "******************** admin01@system.net ********************" ) );
+    console.log( chalk.blue( "<******************** admin01@system.net ********************>" ) );
 
   }
 

@@ -396,12 +396,12 @@ export default class SYSUserService extends BaseService {
 
       }
 
-      const Sequelize = require( 'sequelize' );
-      const notEqual = Sequelize.Op.ne;
+      //const Sequelize = require( 'sequelize' );
+      //const notEqual = Sequelize.Op.ne;
 
       const options = {
 
-        where: { Id: { notEqual: strId }, Name: strName },
+        where: { Id: { $ne: strId }, Name: strName },
         transaction: currentTransaction,
         include: [
                    {
