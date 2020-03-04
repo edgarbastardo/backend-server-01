@@ -1,8 +1,7 @@
 import cluster from 'cluster';
+import path from 'path';
 
 import { AccessKind, HTTPMethod } from "./CommonConstants";
-import path from 'path';
-import { results } from 'inversify-express-utils';
 
 const debug = require( 'debug' )( 'CommonUtilities' );
 
@@ -276,7 +275,7 @@ export default class CommonUtilities {
       }
 
     }
-    catch ( ex ) {
+    catch ( error ) {
 
       //let debugMark = debug.extend( 'BDA1708B1AAE' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       //debugMark( "Invalid!!" );

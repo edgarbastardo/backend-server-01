@@ -28,7 +28,7 @@ export default class Import {
     try {
 
       /*
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -72,7 +72,7 @@ export default class Import {
 
       debugMark( usersCreated );
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -107,7 +107,7 @@ export default class Import {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

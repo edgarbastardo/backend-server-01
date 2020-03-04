@@ -593,7 +593,7 @@ export default class SecurityServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1190,7 +1190,7 @@ export default class SecurityServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1242,7 +1242,7 @@ export default class SecurityServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1250,7 +1250,7 @@ export default class SecurityServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -1280,7 +1280,7 @@ export default class SecurityServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1296,7 +1296,7 @@ export default class SecurityServiceController {
                                                                      currentTransaction,
                                                                      logger );
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1348,7 +1348,7 @@ export default class SecurityServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1356,7 +1356,7 @@ export default class SecurityServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -1384,7 +1384,7 @@ export default class SecurityServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1606,7 +1606,7 @@ export default class SecurityServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1658,7 +1658,7 @@ export default class SecurityServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1666,7 +1666,7 @@ export default class SecurityServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

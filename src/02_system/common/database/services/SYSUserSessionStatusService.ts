@@ -34,7 +34,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -51,7 +51,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       result = await SYSUserSessionStatus.findOne( options );
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -84,7 +84,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -92,7 +92,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -119,7 +119,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -136,7 +136,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       result = await SYSUserSessionStatus.findOne( options );
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -169,7 +169,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -177,7 +177,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -205,7 +205,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -266,7 +266,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -301,7 +301,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -309,7 +309,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -337,7 +337,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -371,7 +371,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -404,7 +404,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -412,7 +412,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -442,7 +442,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -511,7 +511,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -546,7 +546,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -554,7 +554,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

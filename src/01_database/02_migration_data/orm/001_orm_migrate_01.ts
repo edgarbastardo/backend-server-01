@@ -26,7 +26,7 @@ export default class Migrate {
     try {
 
       /*
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -67,7 +67,7 @@ export default class Migrate {
 
       debug( "%O", usersCreated );
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -102,7 +102,7 @@ export default class Migrate {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

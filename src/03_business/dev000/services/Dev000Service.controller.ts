@@ -23,7 +23,7 @@ const debug = require( 'debug' )( 'Dev000ServicesController' );
 
 export default class Dev000ServicesController extends BaseService {
 
-    //Common business services
+  //Common business services
 
   static async processDev000Example( request: Request,
                                      response: Response,
@@ -36,6 +36,8 @@ export default class Dev000ServicesController extends BaseService {
 
     let bIsLocalTransaction = false;
 
+    let bApplyTransaction = false;
+
     let strLanguage = "";
 
     try {
@@ -46,7 +48,7 @@ export default class Dev000ServicesController extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -54,13 +56,44 @@ export default class Dev000ServicesController extends BaseService {
 
       }
 
-      //
+      //Custom logic code is here
 
-      if ( currentTransaction != null &&
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_DEV000_EXAMPLE',
+                 Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
+                 Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: [],
+                 Count: 1,
+                 Data: [
+                         {
+                           Example: "Dev000"
+                         }
+                       ]
+               };
+
+      //Custom logic code is here
+
+      //If everything is ok, turn on the flag and apply the transaction
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -89,24 +122,39 @@ export default class Dev000ServicesController extends BaseService {
 
       }
 
-      const result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       LogId: error.LogId,
-                       Mark: 'A141D683118A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 LogId: error.LogId,
+                 Mark: 'A141D683118A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
 
     }
 

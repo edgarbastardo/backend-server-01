@@ -86,7 +86,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -99,7 +99,7 @@ export default class UserGroupServiceController {
 
       //
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -160,7 +160,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -168,7 +168,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -232,7 +232,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -245,7 +245,7 @@ export default class UserGroupServiceController {
 
       //
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -306,7 +306,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -314,7 +314,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -349,7 +349,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -362,7 +362,7 @@ export default class UserGroupServiceController {
 
       //
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -423,7 +423,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -431,7 +431,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -526,7 +526,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -538,9 +538,9 @@ export default class UserGroupServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       let sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.body.Id,
-                                                                ShortId: request.body.ShortId,
-                                                                Name: request.body.Name
+                                                                Id: request.query.id,
+                                                                ShortId: request.query.shortId,
+                                                                Name: request.query.name
                                                               },
                                                               null,
                                                               currentTransaction,
@@ -734,7 +734,7 @@ export default class UserGroupServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -795,7 +795,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -803,7 +803,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -838,7 +838,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -851,7 +851,7 @@ export default class UserGroupServiceController {
 
       //
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -912,7 +912,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -920,7 +920,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -955,7 +955,7 @@ export default class UserGroupServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -968,7 +968,7 @@ export default class UserGroupServiceController {
 
       //
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1029,7 +1029,7 @@ export default class UserGroupServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1037,7 +1037,7 @@ export default class UserGroupServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

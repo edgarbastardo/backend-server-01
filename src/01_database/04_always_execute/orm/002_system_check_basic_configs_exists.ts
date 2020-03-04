@@ -41,7 +41,7 @@ export default class Always {
 
     try {
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -270,12 +270,12 @@ export default class Always {
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      ConfigMetaDataId: "aaa72b7d-9724-441d-bc28-4ae8b3e15b1c", //system.user.signup.Process
+                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id, //system.user.signup.Process
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: JSON.stringify(
                                                              {
                                                                "@__default__@":{
-                                                                 "expireAt":60,
+                                                                 "expireAt":60, //Token signup valid time in minutes
                                                                  "group":"@__error__@",
                                                                  "createGroup":false,
                                                                  "groupRole":"",
@@ -287,43 +287,71 @@ export default class Always {
                                                                  "passwordParameterTag":""
                                                                },
                                                                "#Driver#":{
-                                                                 "expireAt":60,
+                                                                 "expireAt":60, //Token signup valid time in minutes
                                                                  "group":"Drivers",
                                                                  "createGroup":false,
                                                                  "groupRole":"",
                                                                  "groupTag":"",
                                                                  "groupExpireAt":-1,
                                                                  "status":1,
-                                                                 "userRole":"#Driver#",
+                                                                 "userRole":"#Driver#,#UploadBinary,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
                                                                  "userTag":"",
                                                                  "userExpireAt":-1,
                                                                  "passwordParameterTag":""
                                                                },
                                                                "#FinalCustomer01#":{
-                                                                 "expireAt":60,
+                                                                 "expireAt":60,  //Token signup valid time in minutes
                                                                  "group":"Final_Customers",
                                                                  "createGroup":false,
                                                                  "groupRole":"",
                                                                  "groupTag":"",
                                                                  "groupExpireAt":-1,
                                                                  "status":1,
-                                                                 "userRole":"#FinalCustomer#,#FinalCustomer01#",
+                                                                 "userRole":"#FinalCustomer#,#FinalCustomer01#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
                                                                  "userTag":"",
                                                                  "userExpireAt":-1,
                                                                  "passwordParameterTag":""
                                                                },
                                                                "#Establishment#":{
-                                                                 "expireAt":60,
+                                                                 "expireAt":60,  //Token signup valid time in minutes
                                                                  "group":"@__FromName__@",
                                                                  "createGroup":true,
                                                                  "groupRole":"#@__FromName__@#,#Establishment#",
                                                                  "groupTag":"",
                                                                  "groupExpireAt":-1,
                                                                  "status":1,
-                                                                 "userRole":"#MasterL01#",
+                                                                 "userRole":"#MasterL01#",  //No need the #UploadBinary#,#DeleteBinary#,#UpdateBinary# because #MasterL01# allow that
                                                                  "userTag":"",
                                                                  "userExpireAt":-1,
                                                                  "passwordParameterTag":"#Establishments#"
+                                                               }
+                                                             }
+                                                           ),
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign.Id, //system.user.autorole.Assign
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: JSON.stringify(
+                                                             {
+                                                               "create": {
+                                                                 "@__default__@":{
+                                                                   "@__default__@": ""
+                                                                 },
+                                                                 "#MasterL01#": {
+                                                                   "@__default__@": "#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                 },
+                                                                 "#MasterL02#": {
+                                                                   "@__default__@": "#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                 },
+                                                                 "#MasterL03#": {
+                                                                   "@__default__@": "#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                 },
+                                                               },
+                                                               "update": {
+                                                                 "@__default__@":{
+                                                                   "@__default__@": ""
+                                                                 },
                                                                }
                                                              }
                                                            ),
@@ -545,7 +573,7 @@ export default class Always {
 
       await loopConfigValueEntriesAsync();
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -579,7 +607,7 @@ export default class Always {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

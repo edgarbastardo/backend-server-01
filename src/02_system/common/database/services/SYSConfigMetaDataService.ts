@@ -34,7 +34,7 @@ export default class SYSConfigMetaDataService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -82,7 +82,7 @@ export default class SYSConfigMetaDataService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -115,7 +115,7 @@ export default class SYSConfigMetaDataService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -123,7 +123,7 @@ export default class SYSConfigMetaDataService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

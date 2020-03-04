@@ -118,7 +118,7 @@ export default class NotificationManager {
     //ANCHOR getConfigServiceType
     try {
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await DBConnectionManager.currentInstance.transaction();
 
@@ -156,7 +156,7 @@ export default class NotificationManager {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -188,7 +188,7 @@ export default class NotificationManager {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 
@@ -497,7 +497,7 @@ export default class NotificationManager {
     try {
 
       //ANCHOR  send
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await DBConnectionManager.currentInstance.transaction();
 
@@ -592,7 +592,7 @@ export default class NotificationManager {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -624,7 +624,7 @@ export default class NotificationManager {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

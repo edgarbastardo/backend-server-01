@@ -35,7 +35,7 @@ export default class SYSUserSessionPersistentService extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -52,7 +52,7 @@ export default class SYSUserSessionPersistentService extends BaseService {
 
       result = await SYSUserSessionPersistent.findOne( options );
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -85,7 +85,7 @@ export default class SYSUserSessionPersistentService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -93,7 +93,7 @@ export default class SYSUserSessionPersistentService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

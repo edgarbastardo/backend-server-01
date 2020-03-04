@@ -211,7 +211,9 @@ export class SYSUser extends Model<SYSUser> {
             if ( modelIncluded.model &&
                  result[ modelIncluded.model.name ] ) {
 
-              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues,
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
+                                                                                              result[ modelIncluded.model.name ].dataValues:
+                                                                                              result[ modelIncluded.model.name ],
                                                                                               strTimeZoneId,
                                                                                               params.Logger );
 

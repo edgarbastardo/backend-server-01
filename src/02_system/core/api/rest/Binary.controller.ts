@@ -16,7 +16,8 @@ import {
   //requestBody,
   //request,
   httpDelete,
-  httpGet
+  httpGet,
+  httpPut
 } from "inversify-express-utils";
 import {
   //injectable,
@@ -33,6 +34,7 @@ import SYSRouteService from '../../../common/database/services/SYSRouteService';
 import BinaryServiceController from "../../services/BinaryService.controller";
 import I18NManager from "../../../common/managers/I18Manager";
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import { json } from 'sequelize/types';
 
 const debug = require( 'debug' )( 'Binary.controller' );
 
@@ -54,14 +56,15 @@ export default class BinaryController {
   static readonly _BASE_PATH = "/system/binary";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#ResourceAuthL01#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "ResourceAuthL01" ], Description: "Create a new auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#ResourceAuthL01#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "ResourceAuthL01" ], Description: "Search by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchResourceL01#,#SearchResourceL02#,#SearchResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchResourceL01", "SearchResourceL02", "SearchResourceL03" ], Description: "Search count by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH + "/detail", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data detail from backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadResourceL01#,#UploadResourceL02#,#UploadResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadResourceL01", "UploadResourceL02", "UploadResourceL03" ], Description: "Upload binary data to the backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateResourceL01#,#UpdateResourceL02#,#UpdateResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateResourceL01", "UpdateResourceL02", "UpdateResourceL03" ], Description: "Update the information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteResourceL01#,#DeleteResourceL02#,#DeleteResourceL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteResourceL01", "DeleteResourceL02", "DeleteResourceL03" ], Description: "Delete the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create a new auth token for access to binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete the auth token for access to binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search count by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03#", Roles: [ "Public", "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03" ], Description: "Get binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/details", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03#", Roles: [ "Public", "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03" ], Description: "Get binary meta data details from backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadBinary#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadBinary" ], Description: "Upload binary data to the backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Update the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data from backend server" },
                                 ]
 
   _controllerLogger = null;
@@ -126,7 +129,8 @@ export default class BinaryController {
 
       result = Router();
 
-      result.get( process.env.SERVER_ROOT_PATH + BinaryController._ROUTE_INFO[ 4 ].Path + "/:id?/:auth?/:thumbnail?",
+      //Download the binary data
+      result.get( process.env.SERVER_ROOT_PATH + BinaryController._ROUTE_INFO[ 4 ].Path, // + "/:id?/:auth?/:thumbnail?",
                   [
                     MiddlewareManager.middlewareSetContext,
                   ], //Midddlewares
@@ -140,31 +144,23 @@ export default class BinaryController {
 
           strLanguage = context.Language;
 
-          const result = await BinaryServiceController.processBinaryDataDownload( request,
-                                                                                  response,
-                                                                                  null,
-                                                                                  context.Logger );
-
-          /*
-          if ( result.statusCode === 200 ||  //Ok
-              result.statusCode === 401 ||  //Unauthorized
-              result.statusCode === 403 ||  //Forbidden
-              result.statusCode === 404 ) { //Not found
-          */
+          const result = await BinaryServiceController.getBinaryData( request,
+                                                                      response,
+                                                                      null,
+                                                                      context.Logger );
 
           if ( result.File ) {
 
             const options = {
                               headers: {
-                                        'Content-Disposition': `filename="${result.Name}"`, //attachment; 
-                                        'Content-Type': result.Mime,
-                                        'Content-Length': result.Size,
-                                      }
+                                         'Content-Disposition': `filename="${result.Name}"`, //attachment;
+                                         'Content-Type': result.Mime,
+                                         'Content-Length': result.Size,
+                                         'X-Body-Response': JSON.stringify( result[ "X-Body-Response" ] )
+                                       }
                             }
             response.status( result.StatusCode ).sendFile( result.File,
                                                            options );
-            //response.status( result.StatusCode ).download( result.File,
-            //                                               result.Name );
 
           }
           else {
@@ -262,64 +258,17 @@ export default class BinaryController {
              "/auth",
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
-             MiddlewareManager.middlewareCheckIsAuthorized
+             //MiddlewareManager.middlewareCheckIsAuthorized
            )
-  async createAuth( request: Request, response: Response ) {
+  async createBinaryDataAuthorization( request: Request, response: Response ) {
 
-    let strLanguage = "";
+    const context = ( request as any ).context;
 
-    try {
+    const result = await BinaryServiceController.createBinaryDataAuthorization( request,
+                                                                                null,
+                                                                                context.Logger );
 
-      const context = ( request as any ).context;
-
-      strLanguage = context.Language;
-
-      const result = await BinaryServiceController.createBinaryDataAuthorization( request,
-                                                                        null,
-                                                                        context.Logger );
-
-      response.status( result.StatusCode ).send( result );
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = BinaryController.name + "." + this.deleteAuth.name;
-
-      const strMark = "0E1FDD49C065" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      const result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: strMark,
-                       LogId: error.LogId,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
-
-      response.status( result.StatusCode ).send( result );
-
-    }
+    response.status( result.StatusCode ).send( result );
 
   }
 
@@ -327,64 +276,17 @@ export default class BinaryController {
                "/auth",
                MiddlewareManager.middlewareSetContext,
                MiddlewareManager.middlewareCheckIsAuthenticated,
-               MiddlewareManager.middlewareCheckIsAuthorized
+               //MiddlewareManager.middlewareCheckIsAuthorized
              )
-  async deleteAuth( request: Request, response: Response ) {
+  async deleteBinaryDataAuthorization( request: Request, response: Response ) {
 
-    let strLanguage = "";
+    const context = ( request as any ).context;
 
-    try {
+    const result = await BinaryServiceController.deleteBinaryDataAuthorization( request,
+                                                                                null,
+                                                                                context.Logger );
 
-      const context = ( request as any ).context;
-
-      strLanguage = context.Language;
-
-      const result = await BinaryServiceController.deleteBinaryDataAuthorization( request,
-                                                                        null,
-                                                                        context.Logger );
-
-      response.status( result.StatusCode ).send( result );
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = BinaryController.name + "." + this.deleteAuth.name;
-
-      const strMark = "E61AAB21A831" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      const result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: strMark,
-                       LogId: error.LogId,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
-
-      response.status( result.StatusCode ).send( result );
-
-    }
+    response.status( result.StatusCode ).send( result );
 
   }
 
@@ -394,17 +296,15 @@ export default class BinaryController {
              MiddlewareManager.middlewareCheckIsAuthenticated,
              MiddlewareManager.middlewareCheckIsAuthorized
            )
-  async search( request: Request, response: Response ) {
+  async searchBinaryData( request: Request, response: Response ) {
 
-    /*
     const context = ( request as any ).context;
 
-    const result = await SecurityService.tokenCheck( context.Authorization,
-                                                     null,
-                                                     context.Logger );
+    const result = await BinaryServiceController.searchBinaryData( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
-    */
 
   }
 
@@ -414,142 +314,85 @@ export default class BinaryController {
              MiddlewareManager.middlewareCheckIsAuthenticated,
              MiddlewareManager.middlewareCheckIsAuthorized
            )
-  async searchCount( request: Request, response: Response ) {
+  async searchCountBinaryData( request: Request, response: Response ) {
 
-    /*
     const context = ( request as any ).context;
 
-    const result = await SecurityService.tokenCheck( context.Authorization,
-                                                     null,
-                                                     context.Logger );
+    const result = await BinaryServiceController.searchCountBinaryData( request,
+                                                                        null,
+                                                                        this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
-    */
 
   }
 
-  /*
   @httpGet(
-             "/:id?/:auth?/:thumbnail?",
-             //SystemUtilities.middlewareSetContext
+             "/details",
+             MiddlewareManager.middlewareSetContext
            )
-  getBinaryData( request: Request, response: Response, next: Function ) {
+  async detailsBinaryData( request: Request, response: Response ) {
 
-    / *
     const context = ( request as any ).context;
 
-    const result = await BinaryService.processBinaryDataDownload( request,
-                                                                  response,
-                                                                  null,
-                                                                  context.Logger );
+    const result = await BinaryServiceController.getBinaryDataDetails( request,
+                                                                       null,
+                                                                       this._controllerLogger || context.Logger );
 
-    / *
-    if ( result.statusCode === 200 ||  //Ok
-         result.statusCode === 401 ||  //Unauthorized
-         result.statusCode === 403 ||  //Forbidden
-         result.statusCode === 404 ) { //Not found
-          * /
-    if ( result.File ) {
-
-      response.sendFile( result.File );
-
-    }
-    else {
-
-      response.status( result.StatusCode ).end();
-
-    }
-    */
-
-    /*
-    var options = {
-      root: "/home/dsistemas/Escritorio/Node_JS/2019-11-06/backend-server-01/binary_data/default/",
-      dotfiles: 'deny',
-      headers: {
-        'x-timestamp': Date.now(),
-        'x-sent': true
-      }
-    }
-
-    const fileName = "404.png"
-    response.sendFile(fileName, options, function (err) {
-      if (err) {
-        next(err)
-      } else {
-        let debugMark = debug.extend( 'A4F269DA1563' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-        debugMark( 'Sent: %s', fileName );
-      }
-    })
-    * /
-
-    response.download( "/home/dsistemas/Escritorio/Node_JS/2019-11-06/backend-server-01/binary_data/default/404.png" );
-    //response.sendFile(  );
+    response.status( result.StatusCode ).send( result );
 
   }
-  */
 
   @httpPost(
-             "/",
+             "",
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
              MiddlewareManager.middlewareCheckIsAuthorized
            )
   async uploadBinaryData( request: Request, response: Response ) {
 
-    let strLanguage = "";
+    const context = ( request as any ).context;
 
-    try {
+    const result = await BinaryServiceController.uploadBinaryData( request,
+                                                                   null,
+                                                                   context.Logger );
 
-      const context = ( request as any ).context;
+    response.status( result.StatusCode ).send( result );
 
-      strLanguage = context.Language;
+  }
 
-      const result = await BinaryServiceController.processBinaryDataUpload( request,
-                                                                            null,
-                                                                            context.Logger );
+  @httpPut(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized
+          )
+  async updateBinaryData( request: Request, response: Response ) {
 
-      response.status( result.StatusCode ).send( result );
+    const context = ( request as any ).context;
 
-    }
-    catch ( error ) {
+    const result = await BinaryServiceController.updateBinaryData( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.Logger );
 
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+    response.status( result.StatusCode ).send( result );
 
-      sourcePosition.method = BinaryController.name + "." + this.createAuth.name;
+  }
 
-      const strMark = "A773B579AA28" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+  @httpDelete(
+               "",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized
+             )
+  async deleteBinaryData( request: Request, response: Response ) {
 
-      const debugMark = debug.extend( strMark );
+    const context = ( request as any ).context;
 
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
+    const result = await BinaryServiceController.deleteBinaryData( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.Logger );
 
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      const result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: strMark,
-                       LogId: error.LogId,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
-
-      response.status( result.StatusCode ).send( result );
-
-    }
+    response.status( result.StatusCode ).send( result );
 
   }
 

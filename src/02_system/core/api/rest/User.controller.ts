@@ -259,9 +259,11 @@ export default class UserController {
            )
   async signup( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.signup( request,
                                                        null,
-                                                       this._controllerLogger );
+                                                       this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -273,9 +275,11 @@ export default class UserController {
            )
   async signupActivate( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.signupActivate( request,
                                                                null,
-                                                               this._controllerLogger );
+                                                               this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -287,9 +291,11 @@ export default class UserController {
            )
   async passwordRecoverCodeSend( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.passwordRecoverCodeSend( request,
                                                                         null,
-                                                                        this._controllerLogger );
+                                                                        this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -301,9 +307,11 @@ export default class UserController {
            )
   async passwordRecover( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.passwordRecover( request,
                                                                 null,
-                                                                this._controllerLogger );
+                                                                this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -316,9 +324,11 @@ export default class UserController {
           )
   async passwordChange( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.passwordChange( request,
                                                                null,
-                                                               this._controllerLogger );
+                                                               this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -329,11 +339,13 @@ export default class UserController {
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
            )
-  async emailChangeTokenSend( request: Request, response: Response ) {
+  async emailChangeCodeSend( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.emailChangeCodeSend( request,
                                                                     null,
-                                                                    this._controllerLogger );
+                                                                    this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -346,9 +358,11 @@ export default class UserController {
           )
   async emailChange( request: Request, response: Response ) {
 
+    const context = ( request as any ).context;
+
     const result = await UserServiceController.emailChange( request,
                                                             null,
-                                                            this._controllerLogger );
+                                                            this._controllerLogger || context.logger);
 
     response.status( result.StatusCode ).send( result );
 
@@ -359,11 +373,13 @@ export default class UserController {
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated,
            )
-  async phoneChangeTokenSend( request: Request, response: Response ) {
+  async phoneChangeCodeSend( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.phoneChangeCodeSend( request,
-                                                                     null,
-                                                                     this._controllerLogger );
+                                                                    null,
+                                                                    this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -374,11 +390,13 @@ export default class UserController {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
           )
-  async phoneChange( request: Request, response: Response ) {
+  async phoneNumberChange( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.phoneNumberChange( request,
-                                                            null,
-                                                            this._controllerLogger );
+                                                                  null,
+                                                                  this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -389,11 +407,13 @@ export default class UserController {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
           )
-  async profile( request: Request, response: Response ) {
+  async profileGet( request: Request, response: Response ) {
 
-    const result = await UserServiceController.profileGet( request,
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.getProfile( request,
                                                            null,
-                                                           this._controllerLogger );
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -404,11 +424,13 @@ export default class UserController {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
           )
-  async profileChange( request: Request, response: Response ) {
+  async profileSet( request: Request, response: Response ) {
 
-    const result = await UserServiceController.profileSet( request,
-                                                              null,
-                                                              this._controllerLogger );
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.setProfile( request,
+                                                           null,
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -420,11 +442,13 @@ export default class UserController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userGet( request: Request, response: Response ) {
+  async getUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.getUser( request,
                                                         null,
-                                                        this._controllerLogger );
+                                                        this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -436,11 +460,13 @@ export default class UserController {
              MiddlewareManager.middlewareCheckIsAuthenticated,
              MiddlewareManager.middlewareCheckIsAuthorized,
            )
-  async userPost( request: Request, response: Response ) {
+  async createUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.createUser( request,
                                                            null,
-                                                           this._controllerLogger );
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -452,11 +478,13 @@ export default class UserController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userPut( request: Request, response: Response ) {
+  async updateUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.updateUser( request,
                                                            null,
-                                                           this._controllerLogger );
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -468,11 +496,13 @@ export default class UserController {
                MiddlewareManager.middlewareCheckIsAuthenticated,
                MiddlewareManager.middlewareCheckIsAuthorized,
              )
-  async userDelete( request: Request, response: Response ) {
+  async deleteUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.deleteUser( request,
                                                            null,
-                                                           this._controllerLogger );
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -484,11 +514,13 @@ export default class UserController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userSearch( request: Request, response: Response ) {
+  async searchUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
 
     const result = await UserServiceController.searchUser( request,
                                                            null,
-                                                           this._controllerLogger );
+                                                           this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -500,11 +532,13 @@ export default class UserController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userSearchCount( request: Request, response: Response ) {
+  async searchCountUser( request: Request, response: Response ) {
 
-    const result = await UserServiceController.searchUserCount( request,
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.searchCountUser( request,
                                                                 null,
-                                                                this._controllerLogger );
+                                                                this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 

@@ -40,7 +40,7 @@ export default class SYSRouteService extends BaseService {
 
     try {
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         const dbConnection = DBConnectionManager.currentInstance;
 
@@ -104,7 +104,7 @@ export default class SYSRouteService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -137,7 +137,7 @@ export default class SYSRouteService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -145,7 +145,7 @@ export default class SYSRouteService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -177,7 +177,7 @@ export default class SYSRouteService extends BaseService {
 
     try {
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         const dbConnection = DBConnectionManager.currentInstance;
 
@@ -226,7 +226,7 @@ export default class SYSRouteService extends BaseService {
 
       await loopAsync();
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -259,7 +259,7 @@ export default class SYSRouteService extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -267,7 +267,7 @@ export default class SYSRouteService extends BaseService {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

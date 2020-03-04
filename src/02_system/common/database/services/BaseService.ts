@@ -49,7 +49,7 @@ export default abstract class BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -145,7 +145,7 @@ export default abstract class BaseService {
       }
       * /
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -178,7 +178,7 @@ export default abstract class BaseService {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

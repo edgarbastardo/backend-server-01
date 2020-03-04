@@ -2,6 +2,8 @@ import cluster from 'cluster';
 import path from 'path';
 import fs from 'fs'; //Load the filesystem module
 
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 //import Jimp from 'jimp';
 import glob from "glob";
 
@@ -11,22 +13,25 @@ import {
 } from 'express';
 
 import CommonConstants from "../../common/CommonConstants";
-import SystemConstants from "../../common/SystemContants";
+import SystemConstants, { ICheckUserRoles } from "../../common/SystemContants";
 
 import CommonUtilities from "../../common/CommonUtilities";
 import SystemUtilities from "../../common/SystemUtilities";
 
-import { SYSBinaryIndex } from "../../common/database/models/SYSBinaryIndex";
-
-import BaseService from "../../common/database/services/BaseService";
-
-import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
-import SYSBinaryIndexService from "../../common/database/services/SYSBinaryIndexService";
-
 import DBConnectionManager from "../../common/managers/DBConnectionManager";
+import MiddlewareManager from '../../common/managers/MiddlewareManager';
 import CacheManager from "../../common/managers/CacheManager";
 import I18NManager from '../../common/managers/I18Manager';
-import MiddlewareManager from '../../common/managers/MiddlewareManager';
+
+import BaseService from "../../common/database/services/BaseService";
+import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
+import SYSBinaryIndexService from "../../common/database/services/SYSBinaryIndexService";
+import SYSUserService from '../../common/database/services/SYSUserService';
+import SYSUserGroupService from '../../common/database/services/SYSUserGroupService';
+
+import { SYSUserGroup } from '../../common/database/models/SYSUserGroup';
+import { SYSUser } from '../../common/database/models/SYSUser';
+import { SYSBinaryIndex } from '../../common/database/models/SYSBinaryIndex';
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
 
@@ -121,7 +126,7 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getConfigBinaryDataMaximumSize.name;
+      sourcePosition.method = this.name + "." + this.getConfigBinaryDataBasePath.name;
 
       const strMark = "488ECC417710" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -226,7 +231,7 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDefaultOwners.name;
+      sourcePosition.method = this.name + "." + this.getConfigBinaryDataThumbnail.name;
 
       const strMark = "41EB37D707B7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -309,7 +314,7 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDefaultOwners.name;
+      sourcePosition.method = this.name + "." + this.getConfigBinaryDataProcess.name;
 
       const strMark = "3F18533ED8B4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -414,27 +419,59 @@ export default class BinaryServiceController extends BaseService {
 
       if ( CommonUtilities.isNotNullOrEmpty( configData ) ) {
 
-        if ( configData.indexOf( "#@@UserGroupIdUploader@@#" ) !== -1 ) {
+        if ( configData.indexOf( "#@@UserGroupId@@#" ) !== -1 ) {
 
-          configData = configData.replace( new RegExp( "#@@UserGroupIdUploader@@#", "gi" ), "#" + userSessionStatus.UserGroupId + "#" );
+          configData = configData.replace( new RegExp( "#@@UserGroupId@@#", "gi" ), "#GId:" + userSessionStatus.UserGroupId + "#" );
+
+        }
+        else {
+
+          configData = configData + ( configData ? ",#GId:" + userSessionStatus.UserGroupId + "#": "#GId:" + userSessionStatus.UserGroupId + "#" );
 
         }
 
-        if ( configData.indexOf( "#@@UserGroupNameUploader@@#" ) !== -1 ) {
+        if ( configData.indexOf( "#@@UserGroupShortId@@#" ) !== -1 ) {
 
-          configData = configData.replace( new RegExp( "#@@UserGroupNameUploader@@#", "gi" ), "#" + userSessionStatus.UserGroupName + "#" );
-
-        }
-
-        if ( configData.indexOf( "#@@UserIdUploader@@#" ) !== -1 ) {
-
-          configData = configData.replace( new RegExp( "#@@UserIdUploader@@#", "gi" ), "#" + userSessionStatus.UserId + "#" );
+          configData = configData.replace( new RegExp( "#@@UserGroupShortId@@#", "gi" ), "#GSId:" + userSessionStatus.UserGroupShortId + "#" );
 
         }
 
-        if ( configData.indexOf( "#@@UserNameUploader@@#" ) !== -1 ) {
+        if ( configData.indexOf( "#@@UserGroupName@@#" ) !== -1 ) {
 
-          configData = configData.replace( new RegExp( "#@@UserNameUploader@@#", "gi" ), "#" + userSessionStatus.UserName + "#" );
+          configData = configData.replace( new RegExp( "#@@UserGroupName@@#", "gi" ), "#GName:" + userSessionStatus.UserGroupName + "#" );
+
+        }
+        else {
+
+          configData = configData + ",#GName:" + userSessionStatus.UserGroupName + "#";
+
+        }
+
+        if ( configData.indexOf( "#@@UserId@@#" ) !== -1 ) {
+
+          configData = configData.replace( new RegExp( "#@@UserId@@#", "gi" ), "#UId:" + userSessionStatus.UserId + "#" );
+
+        }
+        else {
+
+          configData = configData + ",#UId:" + userSessionStatus.UserId + "#";
+
+        }
+
+        if ( configData.indexOf( "#@@UserShortId@@#" ) !== -1 ) {
+
+          configData = configData.replace( new RegExp( "#@@UserShortId@@#", "gi" ), "#USId:" + userSessionStatus.UserShortId + "#" );
+
+        }
+
+        if ( configData.indexOf( "#@@UserName@@#" ) !== -1 ) {
+
+          configData = configData.replace( new RegExp( "#@@UserName@@#", "gi" ), "#UName:" + userSessionStatus.UserName + "#" );
+
+        }
+        else {
+
+          configData = configData + ",#UName:" + userSessionStatus.UserName + "#";
 
         }
 
@@ -628,7 +665,10 @@ export default class BinaryServiceController extends BaseService {
                                      side: "width",
                                      factor: thumbnailFactor[ intIndex ],
                                      size: fileStats[ "size" ],
-                                     file: strFileName + ".thumbnail." + thumbnailFactor[ intIndex ]
+                                     file: strFileName + ".thumbnail." + thumbnailFactor[ intIndex ],
+                                     hash: "md5://" + await SystemUtilities.getFileHash( strThumbnailFile,
+                                                                                         undefined,
+                                                                                         logger )
                                    }
                                  );
 
@@ -658,7 +698,10 @@ export default class BinaryServiceController extends BaseService {
                                      side: "height",
                                      factor: thumbnailFactor[ intIndex ],
                                      size: fileStats[ "size" ],
-                                     file: strFileName + ".thumbnail." + thumbnailFactor[ intIndex ]
+                                     file: strFileName + ".thumbnail." + thumbnailFactor[ intIndex ],
+                                     hash: "md5://" + await SystemUtilities.getFileHash( strThumbnailFile,
+                                                                                         undefined,
+                                                                                         logger )
                                    }
                                  );
 
@@ -832,9 +875,2522 @@ export default class BinaryServiceController extends BaseService {
   }
   */
 
-  static async processBinaryDataUpload( request: Request,
-                                        transaction: any,
-                                        logger: any ):Promise<any> {
+
+  static async selectThumbnail( strBasePath: string,
+                                strFullPath: string,
+                                strFileThumbnailName: string,
+                                strFileName: string,
+                                strFileExtension: string,
+                                strMimeType: string,
+                                lngFileSize: number,
+                                strThumbnail: string,
+                                logger: any ):Promise<any> {
+
+    let result = {
+                   File: "",
+                   FileName: "",
+                   MimeType: "",
+                   FileSize: 0,
+                   Hash: ""
+                 };
+
+    try {
+
+      if ( fs.existsSync( path.join( strFullPath,
+                                     strFileThumbnailName + "." + strThumbnail ) ) ) {
+
+        result.File = path.join( strFullPath,
+                                 strFileThumbnailName + "." + strThumbnail );
+        result.FileName = strFileName;
+        result.MimeType = strMimeType;
+        result.FileSize = lngFileSize;
+        result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
+                                                                    undefined,
+                                                                    logger );
+
+      }
+      else {
+
+        let thumbnailList = glob.sync( strFileThumbnailName + ".*",
+                                       {
+                                         cwd: strFullPath,
+                                         nodir: true
+                                       } );
+
+        if ( thumbnailList &&
+             thumbnailList.length > 0 ) {
+
+          result.File = path.join( strFullPath,
+                                   thumbnailList[ 0 ] ); //The first thumbnail found in the list of possible options
+          result.FileName = strFileName;
+
+          const fileStats = fs.statSync( result.File );
+
+          result.MimeType = strMimeType;
+          result.FileSize = fileStats.size;
+          result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
+                                                                      undefined,
+                                                                      logger );
+
+        }
+        else if ( fs.existsSync( path.join( strBasePath,
+                                            "@default@/images/mime_types/",
+                                            strFileExtension + ".png" ) ) ) { //Use predefined thumbnail files
+
+          result.File = path.join( strBasePath,
+                                   "@default@/images/mime_types/",
+                                   strFileExtension + ".png" ); //pdf.png, docx.png
+          result.FileName = strFileExtension + ".png";
+
+          const fileStats = fs.statSync( result.File );
+
+          result.MimeType = "image/png";
+          result.FileSize = fileStats.size;
+          result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
+                                                                      undefined,
+                                                                      logger );
+
+        }
+        else {
+
+          result.File = path.join( strBasePath,
+                                   "@default@/images/mime_types/default.png" );
+          result.FileName = "default.png";
+
+          const fileStats = fs.statSync( result.File );
+
+          result.MimeType = strMimeType;
+          result.FileSize = fileStats.size;
+          result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
+                                                                      undefined,
+                                                                      logger );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.selectThumbnail.name;
+
+      const strMark = "003B5338EC0B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async checkIsOwner( strOwners: string,
+                             strUserId: string,
+                             strUserName: string,
+                             strGroupId: string,
+                             strGroupName: string,
+                             //strSessionTag: string,
+                             logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      if ( strOwners.includes( "#UId:" + strUserId + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( strOwners.includes( "#UName:" + strUserName + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( strOwners.includes( "#GId:" + strGroupId + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( strOwners.includes( "#GName:" + strGroupName + "#" ) ) {
+
+        bResult = true;
+
+      }
+      /*
+      else {
+
+        const sessionTag = strSessionTag.split( "," );
+
+        for ( let intIndex = 0; intIndex < sessionTag.length; intIndex++ ) {
+
+          if ( strOwners.includes( sessionTag[ intIndex ] ) ) {
+
+            bResult = true;
+            break;
+
+          }
+
+        }
+
+      }
+      */
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkIsOwner.name;
+
+      const strMark = "EA2FCDFC5049" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  //ANCHOR checkUserRoleLevel
+  static checkUserRoleLevel( userSessionStatus: any,
+                             sysUserInDB: SYSUser,
+                             strActionRole: string,
+                             logger: any ): ICheckUserRoles {
+
+    let result: ICheckUserRoles = {
+                                    isAuthorizedAdmin: false,
+                                    isAuthorizedL03: false,
+                                    isAuthorizedL02: false,
+                                    isAuthorizedL01: false,
+                                    isNotAuthorized: false
+                                  };
+
+    try {
+
+      result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      if ( result.isAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+        if ( !roleSubTag ||
+             roleSubTag.length === 0 &&
+             strActionRole ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
+
+        }
+
+        result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
+                                                            roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
+                                                            roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ) : false;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkUserRoleLevel.name;
+
+      const strMark = "C75647D48A4D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  //ANCHOR checkUserGroupRoleLevel
+  static checkUserGroupRoleLevel( userSessionStatus: any,
+                                  sysUserGroupInDB: SYSUserGroup,
+                                  strActionRole: string,
+                                  logger: any ): ICheckUserRoles {
+
+    let result: ICheckUserRoles = {
+                                    isAuthorizedAdmin: false,
+                                    isAuthorizedL03: false,
+                                    isAuthorizedL02: false,
+                                    isAuthorizedL01: false,
+                                    isNotAuthorized: false
+                                  };
+
+    try {
+
+      let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+      if ( !roleSubTag ||
+           roleSubTag.length === 0 &&
+           strActionRole ) {
+
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" );
+
+      }
+
+      result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroupInDB.Name + "#" ) ||
+                                                          roleSubTag.includes( "#GName:*#" ) ||
+                                                          roleSubTag.includes( "#GId:" +  sysUserGroupInDB.Id + "#" ) ||
+                                                          roleSubTag.includes( "#GSId:" +  sysUserGroupInDB.ShortId + "#" ) ) : false;
+
+      if ( result.isAuthorizedL03 === false ) {
+
+        result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                          userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
+
+        if ( result.isAuthorizedL01 &&
+             userSessionStatus.UserGroupId !== sysUserGroupInDB.Id ) {
+
+          result.isAuthorizedL01 = false;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkUserGroupRoleLevel.name;
+
+      const strMark = "F20C3245AC58" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static getUserOwner( strOwner: string, logger: any ): any[] {
+
+    let result = [];
+
+    try {
+
+      const ownerList = strOwner.split( "," );
+
+      for ( let intOwner = 0; intOwner < ownerList.length; intOwner++ ) {
+
+        if ( ownerList[ intOwner ].startsWith( "#UId:" ) ) {
+
+          result.push( { Id: ownerList[ intOwner ], ShortId: null, Name: null } );
+
+        }
+        else if ( ownerList[ intOwner ].startsWith( "#USId:" ) ) {
+
+          result.push( { Id: null, ShortId: ownerList[ intOwner ], Name: null } );
+
+        }
+        else if ( ownerList[ intOwner ].startsWith( "#UName:" ) ) {
+
+          result.push( { Id: null, ShortId: null, Name: ownerList[ intOwner ] } );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserOwner.name;
+
+      const strMark = "4F1CD17DEFE6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static getUserGroupOwner( strOwner: string, logger: any ): any[] {
+
+    let result = [];
+
+    try {
+
+      const ownerList = strOwner.split( "," );
+
+      for ( let intOwner = 0; intOwner < ownerList.length; intOwner++ ) {
+
+        if ( ownerList[ intOwner ].startsWith( "#GId:" ) ) {
+
+          result.push( { Id: ownerList[ intOwner ], ShortId: null, Name: null } );
+
+        }
+        else if ( ownerList[ intOwner ].startsWith( "#GSId:" ) ) {
+
+          result.push( { Id: null, ShortId: ownerList[ intOwner ], Name: null } );
+
+        }
+        else if ( ownerList[ intOwner ].startsWith( "#GName:" ) ) {
+
+          result.push( { Id: null, ShortId: null, Name: ownerList[ intOwner ] } );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserGroupOwner.name;
+
+      const strMark = "4F1CD17DEFE6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  /*
+  static async checkTagIsAllowedToAccess( strTagToCheck: string,
+                                          strRole: string,
+                                          strUserId: string,
+                                          strUserName: string,
+                                          strUserTag: string,
+                                          strGroupId: string,
+                                          strGroupName: string,
+                                          strGroupTag: string,
+                                          strSessionTag: string,
+                                          bAllowAny: boolean,
+                                          logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      let tagList = strTagToCheck.split( "," );
+      let roleList = strRole.split( "," );
+      let userTagList = strUserTag ? strUserTag.split( "," ): [];
+      let groupTagList = strGroupTag ? strGroupTag.split( "," ): [];
+      let sessionTagList = strSessionTag ? strSessionTag.split( "," ): [];
+
+      if ( bAllowAny &&
+           strTagToCheck === SystemConstants._VALUE_ANY ) {
+
+        bResult = true;
+
+      }
+      else if ( CommonUtilities.isInList( tagList,
+                                          roleList,
+                                          logger ) ) {
+
+        bResult = true;
+
+      }
+      else if ( tagList.includes( "#UId:" + strUserId + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( tagList.includes( "#UName:" + strUserName + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( CommonUtilities.isInList( tagList,
+                                          userTagList,
+                                          logger ) ) {
+
+        bResult = true;
+
+      }
+      else if ( tagList.includes( "#GId:" + strGroupId + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( tagList.includes( "#GName:" + strGroupName + "#" ) ) {
+
+        bResult = true;
+
+      }
+      else if ( CommonUtilities.isInList( tagList,
+                                          groupTagList,
+                                          logger ) ) {
+
+        bResult = true;
+
+      }
+      else if ( CommonUtilities.isInList( tagList,
+                                          sessionTagList,
+                                          logger ) ) {
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkTagIsAllowedToAccess.name;
+
+      const strMark = "09301995CE61" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+  */
+
+  static async createBinaryDataAuthorization( request: Request,
+                                              transaction: any,
+                                              logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      let strBinaryDataToken = null;
+
+      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ) {
+
+        const strId = SystemUtilities.getUUIDv4();
+
+        strBinaryDataToken = SystemUtilities.hashString( strId, 1, logger ); //xx hash
+
+        userSessionStatus.BinaryDataToken = strBinaryDataToken;
+
+        //Update the cache and database
+        await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
+                                                               userSessionStatus,
+                                                               false,    //Set roles?
+                                                               null,     //User group roles
+                                                               null,     //User roles
+                                                               true,     //Force update?
+                                                               2,        //Only 1 try
+                                                               4 * 1000, //Second
+                                                               currentTransaction,
+                                                               logger );
+
+        await CacheManager.setData( strBinaryDataToken,
+                                    userSessionStatus.Token,
+                                    logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
+
+      }
+      else {
+
+        await CacheManager.setData( strBinaryDataToken,
+                                    userSessionStatus.Token,
+                                    logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
+
+        strBinaryDataToken = userSessionStatus.BinaryDataToken;
+
+      }
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_AUTH_TOKEN_CREATED',
+                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success created.' ),
+                 Mark: '73057DAD2CAF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: [],
+                 Count: 1,
+                 Data: [
+                         {
+                           Auth: strBinaryDataToken,
+                         }
+                       ]
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.createBinaryDataAuthorization.name;
+
+      const strMark = "05A79B4A16B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async deleteBinaryDataAuthorization( request: Request,
+                                              transaction: any,
+                                              logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      if ( userSessionStatus.Token.startsWith( "p:" ) === false ) {
+
+        if ( userSessionStatus.BinaryDataToken ) {
+
+          await CacheManager.deleteData( userSessionStatus.BinaryDataToken,
+                                         logger ); //Remove from cache
+
+          userSessionStatus.BinaryDataToken = null;
+
+          //Update the cache and database
+          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
+                                                                 userSessionStatus,
+                                                                 false,    //Set roles?
+                                                                 null,     //User group roles
+                                                                 null,     //User roles
+                                                                 true,     //Force update?
+                                                                 2,        //Only 1 try
+                                                                 4 * 1000, //Second
+                                                                 currentTransaction,
+                                                                 logger );
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_AUTH_TOKEN_DELETED',
+                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success deleted.' ),
+                     Mark: '473D6FEA3F86' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+          bApplyTransaction = true;
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
+                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                     Mark: '3B11E61CDD49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
+                                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
+                   Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
+                   Mark: '88EE1E318404' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
+                               Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteBinaryDataAuthorization.name;
+
+      const strMark = "1FD534D0F6D8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  public static tranformTagListToWhere( tagList: string[] ): string {
+
+    let strResult = "";
+
+    try {
+
+      for ( const strCurrentTag of tagList ) {
+
+        if ( strResult ) {
+
+          strResult = strResult + " Or A.Owner Like '%" + strCurrentTag + "%'";
+
+        }
+        else {
+
+          strResult = "A.Owner Like '%" + strCurrentTag + "%'";
+
+        }
+
+      }
+
+      if ( strResult ) {
+
+        strResult = "( " + strResult + " )";
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  static async searchBinaryData( request: Request,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL02 = false;
+      let strWhereL02 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+      let strWhere = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = this.tranformTagListToWhere( roleSubTag );
+
+        }
+
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL02#" );
+
+        }
+
+        if ( roleSubTag &&
+            roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL02 = true;
+
+          strWhereL02 = this.tranformTagListToWhere( roleSubTag );
+
+        }
+
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchBinaryL01#" ): false;
+
+        if ( bIsAuthorizedL01 ) {
+
+          strWhereL01 = " ( A.Owner Like '%GId:" + userSessionStatus.UserGroupId + "%' Or A.Owner Like '%GName:" + userSessionStatus.UserGroupName + "%' Or A.Owner Like '%UId:" + userSessionStatus.UserId + "%' Or A.Owner Like '%UName:" + userSessionStatus.UserName + "%' )";
+
+        }
+        else {
+
+          strWhere = " ( A.Owner Like '%UId:" + userSessionStatus.UserId + "%' Or A.Owner Like '%UName:" + userSessionStatus.UserName + "%' )";
+
+        }
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "searchBinaryData",
+                                                     {
+                                                       //
+                                                     },
+                                                     logger );
+
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL02 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+        else {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhere;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhere;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
+
+      let intLimit = 200;
+
+      const warnings = [];
+
+      if ( request.query.limit &&
+           isNaN( request.query.limit ) === false &&
+           parseInt( request.query.limit ) <= intLimit ) {
+
+        intLimit = parseInt( request.query.limit );
+
+      }
+      else {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
+                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
+                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                       }
+                     );
+
+      }
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
+                       }
+                     );
+
+      }
+
+      //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
+
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+
+      //}
+
+      //ANCHOR dbConnection.query
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      const convertedRows = [];
+
+      for ( const currentRow of rows ) {
+
+        const tempModelData = await SYSUser.convertFieldValues(
+                                                                {
+                                                                  Data: currentRow,
+                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                  Include: null,
+                                                                  Logger: logger,
+                                                                  ExtraInfo: {
+                                                                                Request: request
+                                                                              }
+                                                                }
+                                                              );
+        if ( tempModelData ) {
+
+          convertedRows.push( tempModelData );
+
+        }
+        else {
+
+          convertedRows.push( currentRow );
+
+        }
+
+      }
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH',
+                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
+                 Mark: '29B492BF56BC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: convertedRows.length,
+                 Data: convertedRows
+               }
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.searchBinaryData.name;
+
+      const strMark = "7B39F7E451EC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async searchCountBinaryData( request: Request,
+                                      transaction: any,
+                                      logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL02 = false;
+      let strWhereL02 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+      let strWhere = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = this.tranformTagListToWhere( roleSubTag );
+
+        }
+
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL02#" );
+
+        }
+
+        if ( roleSubTag &&
+            roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL02 = true;
+
+          strWhereL02 = this.tranformTagListToWhere( roleSubTag );
+
+        }
+
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchBinaryL01#" ): false;
+
+        if ( bIsAuthorizedL01 ) {
+
+          strWhereL01 = " ( A.Owner Like '%GId:" + userSessionStatus.UserGroupId + "%' Or A.Owner Like '%GName:" + userSessionStatus.UserGroupName + "%' Or A.Owner Like '%UId:" + userSessionStatus.UserId + "%' Or A.Owner Like '%UName:" + userSessionStatus.UserName + "%' )";
+
+        }
+        else {
+
+          strWhere = " ( A.Owner Like '%UId:" + userSessionStatus.UserId + "%' Or A.Owner Like '%UName:" + userSessionStatus.UserName + "%' )";
+
+        }
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "searchCountBinaryData",
+                                                     {
+                                                       //
+                                                     },
+                                                     logger );
+
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL02 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL02;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL02;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+        else {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhere;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhere;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      const warnings = [];
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
+                       }
+                     );
+
+      }
+
+      //ANCHOR dbConnection.query
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH_COUNT',
+                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
+                 Mark: '29B492BF56BC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: 1,
+                 Data: [
+                         {
+                           Count: rows.length > 0 ? rows[ 0 ].Count: 0
+                         }
+                       ]
+               }
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.searchCountBinaryData.name;
+
+      const strMark = "2DEB4C0A7B47" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getBinaryData( request: Request,
+                              response: Response,
+                              transaction: any,
+                              logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //const userSessionStatus = context.UserSessionStatus;
+      const strId = request.query.id;
+      const strAuth = request.query.auth;
+      const strThumbnail = request.query.thumbnail;
+
+      if ( CommonUtilities.isNotNullOrEmpty( strId ) ) {
+
+        /*
+        const options = {
+
+          where: { "Id": strId },
+          transaction: currentTransaction,
+
+        }
+        */
+
+        const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( currentTransaction,
+                                                                                       logger );
+
+        let strFullPath = "";
+
+        if ( strBasePath.startsWith( "full://" ) ) {
+
+          strFullPath = strBasePath.replace( "full://", "" );
+
+        }
+        else {
+
+          strFullPath = path.join( SystemUtilities.baseRootPath, strBasePath );
+
+        }
+
+        //const binaryIndexInDB = await SYSBinaryIndex.findOne( options );
+        const binaryIndexInDB = await SYSBinaryIndexService.getById( strId,
+                                                                     null,
+                                                                     currentTransaction,
+                                                                     logger );
+
+        if ( binaryIndexInDB ) {
+
+          let binaryData = {
+                             File: "",
+                             FileName: "",
+                             MimeType: "",
+                             FileSize: 0,
+                             Hash: ""
+                           };
+
+          if ( !strThumbnail ||
+               strThumbnail === "0" ) {
+
+            binaryData.File = path.join( strFullPath,
+                                         binaryIndexInDB.FilePath,
+                                         strId + "." + binaryIndexInDB.FileExtension + ".data" );
+            binaryData.FileName = binaryIndexInDB.FileName;
+            binaryData.FileSize = binaryIndexInDB.FileSize;
+            binaryData.MimeType = binaryIndexInDB.MimeType;
+            binaryData.Hash = binaryIndexInDB.Hash;
+
+          }
+          else {
+
+            binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
+                                                                        path.join( strFullPath, binaryIndexInDB.FilePath ),
+                                                                        strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
+                                                                        binaryIndexInDB.FileName,
+                                                                        binaryIndexInDB.FileExtension,
+                                                                        binaryIndexInDB.MimeType,
+                                                                        binaryIndexInDB.FileSize,
+                                                                        strThumbnail,
+                                                                        logger );
+
+          }
+
+          if ( fs.existsSync( binaryData.File ) ) {
+
+            if ( binaryIndexInDB.AccessKind == 1 ||        //Public
+                 binaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
+
+              result = {
+                         StatusCode: 200, //Ok
+                         File: binaryData.File,
+                         Name: binaryData.FileName,
+                         Mime: binaryData.MimeType,
+                         Size: binaryData.FileSize,
+                         "X-Body-Response": {
+                                              Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                              Name: binaryData.FileName,
+                                              Mime: binaryData.MimeType,
+                                              Size: binaryData.FileSize,
+                                              Hash: binaryData.Hash,
+                                            }
+                       }
+
+              bApplyTransaction = true;
+
+            }
+            else if ( CommonUtilities.isNotNullOrEmpty( strAuth ) ) { //Authenticated
+
+              let strAuthorization = null;
+
+              strAuthorization = await CacheManager.getData( strAuth,
+                                                             logger ); //get from cache the real authorization token
+
+              if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
+
+                let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                                    context,
+                                                                                    true,
+                                                                                    false,
+                                                                                    null,
+                                                                                    logger );
+
+                if ( userSessionStatus ) {
+
+                  context.UserSessionStatus = userSessionStatus;
+
+                }
+
+              }
+
+              ( request as any ).returnResult = 1; //Force to return the result
+
+              //Check for valid session token
+              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request,
+                                                                                       null, //Not write response back
+                                                                                       null );
+
+              if ( resultData &&
+                   resultData.StatusCode == 200 ) { //Ok the authorization token is valid
+
+                const userSessionStatus = context.UserSessionStatus;
+
+                if ( binaryIndexInDB.AccessKind == 2 ||
+                     userSessionStatus.Role.includes( "#Administrator#" ) ||
+                     userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
+
+                  result = {
+                             StatusCode: 200, //Ok
+                             File: binaryData.File,
+                             Name: binaryData.FileName,
+                             Mime: binaryData.MimeType,
+                             Size: binaryData.FileSize,
+                             "X-Body-Response": {
+                                                  Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                  Name: binaryData.FileName,
+                                                  Mime: binaryData.MimeType,
+                                                  Size: binaryData.FileSize,
+                                                  Hash: binaryData.Hash,
+                                                }
+                           }
+
+                  bApplyTransaction = true;
+
+                }
+                else { //Tag
+
+                  //ANCHOR Check is owner of BinaryData
+                  const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                               binaryIndexInDB.Owner,
+                                                                               userSessionStatus.UserId,
+                                                                               userSessionStatus.UserName,
+                                                                               userSessionStatus.UserGroupId,
+                                                                               userSessionStatus.UserGroupName,
+                                                                               logger
+                                                                             );
+
+                  let checkUserRoles: ICheckUserRoles = {
+                                                          isAuthorizedAdmin: false,
+                                                          isAuthorizedL03: false,
+                                                          isAuthorizedL02: false,
+                                                          isAuthorizedL01: false,
+                                                          isNotAuthorized: false
+                                                        };
+
+                  let ownerList = null;
+
+                  if ( bIsOwner === false ) {
+
+                    ownerList = BinaryServiceController.getUserOwner( binaryIndexInDB.Owner, logger );
+
+                    for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                      const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                                      null,
+                                                                      currentTransaction,
+                                                                      logger );
+
+                      checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                                   sysUserInDB,
+                                                                                   "GetBinary",
+                                                                                   logger );
+
+                      if ( checkUserRoles.isAuthorizedAdmin ||
+                           checkUserRoles.isAuthorizedL02 ) {
+
+                        break;
+
+                      }
+
+                    }
+
+                    if ( checkUserRoles.isAuthorizedAdmin === false &&
+                         checkUserRoles.isAuthorizedL02 === false ) {
+
+                      ownerList = BinaryServiceController.getUserGroupOwner( binaryIndexInDB.Owner, logger );
+
+                      for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                        const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                                  null,
+                                                                                  currentTransaction,
+                                                                                  logger );
+
+                        checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                          sysUserGroupInDB,
+                                                                                          "GetBinary",
+                                                                                          logger );
+
+                        if ( checkUserRoles.isAuthorizedL01 ||
+                             checkUserRoles.isAuthorizedL03 ) {
+
+                          break;
+
+                        }
+
+                      }
+
+                    }
+
+                  }
+
+                  if ( bIsOwner ||
+                       checkUserRoles.isAuthorizedAdmin ||
+                       checkUserRoles.isAuthorizedL03 ||
+                       checkUserRoles.isAuthorizedL02 ||
+                       checkUserRoles.isAuthorizedL01 ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               File: binaryData.File,
+                               Name: binaryData.FileName,
+                               Mime: binaryData.MimeType,
+                               Size: binaryData.FileSize,
+                               "X-Body-Response": {
+                                                    Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                    Name: binaryData.FileName,
+                                                    Mime: binaryData.MimeType,
+                                                    Size: binaryData.FileSize,
+                                                    Hash: binaryData.Hash,
+                                                  }
+                             }
+
+                    bApplyTransaction = true;
+
+                  }
+                  else {
+
+                    resultData = {
+                                   StatusCode: 403, //Forbidden
+                                   Code: "ERROR_ACCESS_NOT_ALLOWED",
+                                   Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
+                                   Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   LogId: null,
+                                   IsError: true,
+                                   Errors: [
+                                             {
+                                               Code: "ERROR_ACCESS_NOT_ALLOWED",
+                                               Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
+                                               Details: null,
+                                             }
+                                           ],
+                                   Warnings: [],
+                                   Count: 0,
+                                   Data: []
+                                 };
+
+                    //response.setHeader( "X-Body-Response",
+                    //                    JSON.stringify( resultData ) );
+
+                    //ANCHOR binary data download Fobidden
+                    result = {
+                               StatusCode: resultData.StatusCode, //Forbidden
+                               File: path.join( strFullPath, "/@default@/images/http_codes/403.png" ),
+                               Name: "403.png",
+                               Mime: "image/png",
+                               Size: 13129,
+                               "X-Body-Response": resultData
+                              }
+
+                  }
+
+                }
+
+              }
+              else {
+
+                //response.setHeader( "X-Body-Response",
+                //                    JSON.stringify( resultData ) );
+
+                //ANCHOR binary data download Unauthorized
+                result = {
+                           StatusCode: resultData.StatusCode, //Unauthorized
+                           File: path.join( strFullPath, "/@default@/images/http_codes/401.png" ),
+                           Name: "401.png",
+                           Mime: "image/png",
+                           Size: 14591,
+                           "X-Body-Response": resultData
+                         }
+
+              }
+
+            }
+            else {
+
+              const resultHeaders = {
+                                      StatusCode: 400, //Bad request
+                                      Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                      Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
+                                      Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      LogId: null,
+                                      IsError: true,
+                                      Errors: [
+                                                {
+                                                  Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                                  Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
+                                                  Details: null,
+                                                }
+                                              ],
+                                      Warnings: [],
+                                      Count: 0,
+                                      Data: []
+                                    };
+
+              //response.setHeader( "X-Body-Response",
+              //                    JSON.stringify( resultHeaders ) );
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         "X-Body-Response": resultHeaders
+                       }
+
+            }
+
+          }
+          else {
+
+            const resultHeaders = {
+                                    StatusCode: 404, //Not found
+                                    Code: 'ERROR_FILE_NOT_FOUND',
+                                    Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                    Mark: '1109E2A671E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    LogId: null,
+                                    IsError: true,
+                                    Errors: [
+                                              {
+                                                Code: 'ERROR_FILE_NOT_FOUND',
+                                                Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                                Details: null,
+                                              }
+                                            ],
+                                    Warnings: [],
+                                    Count: 0,
+                                    Data: []
+                                  };
+
+            //response.setHeader( "X-Body-Response",
+            //                    JSON.stringify( resultHeaders ) );
+
+            //ANCHOR binary data download FILE NOT FOUND
+            result = {
+                       StatusCode: 404, //Not found
+                       File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
+                       Name: "404.png",
+                       Mime: "image/png",
+                       Size: 13218,
+                       "X-Body-Response": resultHeaders
+                     }
+
+          }
+
+        }
+        else {
+
+          const resultHeaders = {
+                                  StatusCode: 404, //Not found
+                                  Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                                  Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                                  Mark: 'E4650CE42D99' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  LogId: null,
+                                  IsError: true,
+                                  Errors: [
+                                            {
+                                              Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                                              Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                                              Details: null,
+                                            }
+                                          ],
+                                  Warnings: [],
+                                  Count: 0,
+                                  Data: []
+                                };
+
+          //response.setHeader( "X-Body-Response",
+          //                    JSON.stringify( resultHeaders ) );
+
+          //ANCHOR binary data download DB NOT FOUND
+          result = {
+                     StatusCode: 404, //Not found
+                     File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
+                     Name: "404.png",
+                     Mime: "image/png",
+                     Size: 13218,
+                     "X-Body-Response": resultHeaders
+                   }
+
+        }
+
+      }
+      else {
+
+        const resultHeaders = {
+                                StatusCode: 400, //Bad request
+                                Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
+                                Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
+                                Mark: '67F2D64A113E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                LogId: null,
+                                IsError: true,
+                                Errors: [
+                                          {
+                                            Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
+                                            Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
+                                            Details: null,
+                                          }
+                                        ],
+                                Warnings: [],
+                                Count: 0,
+                                Data: []
+                              };
+
+        //response.setHeader( "X-Body-Response",
+        //                    JSON.stringify( resultHeaders ) );
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   "X-Body-Response": resultHeaders
+                 }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getBinaryData.name;
+
+      const strMark = "1AB14A900E5E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      const resultHeaders = {
+                              StatusCode: 500, //Internal server error
+                              Code: 'ERROR_UNEXPECTED',
+                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                              Mark: strMark,
+                              LogId: error.LogId,
+                              IsError: true,
+                              Errors: [
+                                        {
+                                          Code: error.name,
+                                          Message: error.message,
+                                          Details: await SystemUtilities.processErrorDetails( error ) //error
+                                        }
+                                      ],
+                              Warnings: [],
+                              Count: 0,
+                              Data: []
+                            };
+
+      response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
+
+      result = {
+                 StatusCode: 500, //Internal server error
+               };
+
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+
+    }
+
+    return result;
+
+  }
+
+  static async getBinaryDataDetails( request: Request,
+                                     transaction: any,
+                                     logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+                                                                      null,
+                                                                      currentTransaction,
+                                                                      logger );
+
+      if ( sysBinaryIndexInDB instanceof Error ) {
+
+        const error = sysBinaryIndexInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: 'AEEC8C097CD6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysBinaryIndexInDB ) {
+
+        //ANCHOR Check is owner of BinaryData
+        const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                     sysBinaryIndexInDB.Owner,
+                                                                     userSessionStatus.UserId,
+                                                                     userSessionStatus.UserName,
+                                                                     userSessionStatus.UserGroupId,
+                                                                     userSessionStatus.UserGroupName,
+                                                                     logger
+                                                                   );
+
+        let checkUserRoles: ICheckUserRoles = {
+                                                isAuthorizedAdmin: false,
+                                                isAuthorizedL03: false,
+                                                isAuthorizedL02: false,
+                                                isAuthorizedL01: false,
+                                                isNotAuthorized: false
+                                              };
+
+        let ownerList = null;
+
+        if ( bIsOwner === false ) {
+
+          ownerList = BinaryServiceController.getUserOwner( sysBinaryIndexInDB.Owner, logger );
+
+          for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+            const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                            null,
+                                                            currentTransaction,
+                                                            logger );
+
+            checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                         sysUserInDB,
+                                                                         "GetBinary",
+                                                                         logger );
+
+            if ( checkUserRoles.isAuthorizedAdmin ||
+                 checkUserRoles.isAuthorizedL02 ) {
+
+              break;
+
+            }
+
+          }
+
+          if ( checkUserRoles.isAuthorizedAdmin === false &&
+               checkUserRoles.isAuthorizedL02 === false ) {
+
+            ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
+
+            for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+              const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger );
+
+              checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                sysUserGroupInDB,
+                                                                                "GetBinary",
+                                                                                logger );
+
+              if ( checkUserRoles.isAuthorizedL01 ||
+                   checkUserRoles.isAuthorizedL03 ) {
+
+                break;
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if ( bIsOwner ||
+             checkUserRoles.isAuthorizedAdmin ||
+             checkUserRoles.isAuthorizedL03 ||
+             checkUserRoles.isAuthorizedL02 ||
+             checkUserRoles.isAuthorizedL01 ) {
+
+          let modelData = ( sysBinaryIndexInDB as any ).dataValues;
+
+          const tempModelData = await SYSBinaryIndex.convertFieldValues(
+                                                                         {
+                                                                           Data: modelData,
+                                                                           FilterFields: 1, //Force to remove fields like password and value
+                                                                           TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                           Include: null,
+                                                                           Logger: logger,
+                                                                           ExtraInfo: {
+                                                                                        Request: request
+                                                                                      }
+                                                                         }
+                                                                       );
+
+          if ( tempModelData ) {
+
+            modelData = tempModelData;
+
+          }
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_GET_INFORMATION',
+                     Message: await I18NManager.translate( strLanguage, 'Success binary data details from the id %s', sysBinaryIndexInDB.Id ),
+                     Mark: 'F5509D216548' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 0,
+                     Data: [
+                             modelData
+                           ]
+                   }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: "ERROR_CANNOT_GET_THE_INFORMATION",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to get the information" ),
+                     Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_CANNOT_GET_THE_INFORMATION",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to get the information" ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                   Mark: '344684A4B26F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getBinaryDataDetails.name;
+
+      const strMark = "8786D9821FCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async uploadBinaryData( request: Request,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
 
     let result = null;
 
@@ -854,11 +3410,11 @@ export default class BinaryServiceController extends BaseService {
 
       let debugMark = debug.extend( strMark + "@" + ( cluster.isWorker ? cluster.worker.id : "0" ) );
       debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "processBinaryDataUpload" );
+      debugMark( "uploadBinaryData" );
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -868,7 +3424,6 @@ export default class BinaryServiceController extends BaseService {
 
       if ( request.files &&
            Object.keys( request.files ).length > 0 ) {
-
 
         let uploadedFile = null;
 
@@ -1077,6 +3632,12 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( sysBinaryIndex &&
                          sysBinaryIndex instanceof Error === false ) {
+
+                      const metaData = ( sysBinaryIndex as any ).dataValues;
+
+                      metaData.ExtraData = extraData; //JSON.parse( metaData.ExtraData );
+
+                      fs.writeFileSync( strFullPath + strId + "." + fileDetectedType.ext + ".meta.json", JSON.stringify( metaData, null, 2 ) );
 
                       debugMark( "Success" );
 
@@ -1316,7 +3877,7 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1329,7 +3890,7 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.processBinaryDataUpload.name;
+      sourcePosition.method = this.name + "." + this.uploadBinaryData.name;
 
       const strMark = "763DC880AD6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -1368,21 +3929,38 @@ export default class BinaryServiceController extends BaseService {
                  Data: []
                };
 
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
     }
 
     return result;
 
   }
 
-  static async createBinaryDataAuthorization( request: Request,
-                                              transaction: any,
-                                              logger: any ):Promise<any> {
+  static async updateBinaryData( request: Request,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
 
     let result = null;
 
     let currentTransaction = transaction;
 
     let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
 
     let strLanguage = "";
 
@@ -1394,7 +3972,7 @@ export default class BinaryServiceController extends BaseService {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1404,61 +3982,24 @@ export default class BinaryServiceController extends BaseService {
 
       const userSessionStatus = context.UserSessionStatus;
 
-      let strBinaryDataToken = null;
+      //
 
-      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ) {
+      bApplyTransaction = true;
 
-        const strId = SystemUtilities.getUUIDv4();
-
-        strBinaryDataToken = SystemUtilities.hashString( strId, 1, logger ); //xx hash
-
-        userSessionStatus.BinaryDataToken = strBinaryDataToken;
-
-        //Update the cache and database
-        await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
-                                                               userSessionStatus,
-                                                               false,    //Set roles?
-                                                               null,     //User group roles
-                                                               null,     //User roles
-                                                               true,     //Force update?
-                                                               2,        //Only 1 try
-                                                               4 * 1000, //Second
-                                                               currentTransaction,
-                                                               logger );
-
-        await CacheManager.setData( strBinaryDataToken,
-                                    userSessionStatus.Token,
-                                    logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
-
-      }
-      else {
-
-        strBinaryDataToken = userSessionStatus.BinaryDataToken;
-
-      }
-
-      result = {
-                  StatusCode: 200, //Ok
-                  Code: 'SUCCESS_AUTH_TOKEN_CREATED',
-                  Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success created.' ),
-                  Mark: '73057DAD2CAF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                  LogId: null,
-                  IsError: false,
-                  Errors: [],
-                  Warnings: [],
-                  Count: 1,
-                  Data: [
-                          {
-                            Auth: strBinaryDataToken,
-                          }
-                        ]
-                };
-
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -1467,9 +4008,9 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.processBinaryDataUpload.name;
+      sourcePosition.method = this.name + "." + this.updateBinaryData.name;
 
-      const strMark = "05A79B4A16B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "60373DE8CB8E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1506,15 +4047,30 @@ export default class BinaryServiceController extends BaseService {
                  Data: []
                };
 
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
     }
 
     return result;
 
   }
 
-  static async deleteBinaryDataAuthorization( request: Request,
-                                              transaction: any,
-                                              logger: any ):Promise<any> {
+  static async deleteBinaryData( request: Request,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
 
     let result = null;
 
@@ -1522,17 +4078,21 @@ export default class BinaryServiceController extends BaseService {
 
     let bIsLocalTransaction = false;
 
+    let bApplyTransaction = false;
+
     let strLanguage = "";
 
     try {
 
       const context = ( request as any ).context;
 
+      let userSessionStatus = context.UserSessionStatus;
+
       strLanguage = context.Language;
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1540,56 +4100,230 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const userSessionStatus = context.UserSessionStatus;
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+                                                                      null,
+                                                                      currentTransaction,
+                                                                      logger );
 
-      if ( userSessionStatus.Token.startsWith( "p:" ) === false ) {
+      if ( sysBinaryIndexInDB instanceof Error ) {
 
-        if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ) {
+        const error = sysBinaryIndexInDB as any;
 
-          await CacheManager.deleteData( userSessionStatus.BinaryDataToken,
-                                         logger ); //Remove from cache
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '8516092C5844' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
 
-          userSessionStatus.BinaryDataToken = null;
+      }
+      else if ( sysBinaryIndexInDB ) {
 
-          //Update the cache and database
-          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
-                                                                 userSessionStatus,
-                                                                 false,    //Set roles?
-                                                                 null,     //User group roles
-                                                                 null,     //User roles
-                                                                 true,     //Force update?
-                                                                 2,        //Only 1 try
-                                                                 4 * 1000, //Second
-                                                                 currentTransaction,
-                                                                 logger );
+        //ANCHOR Check is owner of BinaryData
+        const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                     sysBinaryIndexInDB.Owner,
+                                                                     userSessionStatus.UserId,
+                                                                     userSessionStatus.UserName,
+                                                                     userSessionStatus.UserGroupId,
+                                                                     userSessionStatus.UserGroupName,
+                                                                     logger
+                                                                   );
 
-          result = {
-                     StatusCode: 200, //Ok
-                     Code: 'SUCCESS_AUTH_TOKEN_DELETED',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success deleted.' ),
-                     Mark: '473D6FEA3F86' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: false,
-                     Errors: [],
-                     Warnings: [],
-                     Count: 0,
-                     Data: []
-                   };
+        let checkUserRoles: ICheckUserRoles = {
+                                                isAuthorizedAdmin: false,
+                                                isAuthorizedL03: false,
+                                                isAuthorizedL02: false,
+                                                isAuthorizedL01: false,
+                                                isNotAuthorized: false
+                                              };
+
+        let ownerList = null;
+
+        if ( bIsOwner === false ) {
+
+          ownerList = BinaryServiceController.getUserOwner( sysBinaryIndexInDB.Owner, logger );
+
+          for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+            const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                            null,
+                                                            currentTransaction,
+                                                            logger );
+
+            checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                         sysUserInDB,
+                                                                         "DeleteBinary",
+                                                                         logger );
+
+            if ( checkUserRoles.isAuthorizedAdmin ||
+                 checkUserRoles.isAuthorizedL02 ) {
+
+              break;
+
+            }
+
+          }
+
+          if ( checkUserRoles.isAuthorizedAdmin === false &&
+               checkUserRoles.isAuthorizedL02 === false ) {
+
+            ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
+
+            for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+              const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger );
+
+              checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                sysUserGroupInDB,
+                                                                                "DeleteBinary",
+                                                                                logger );
+
+              if ( checkUserRoles.isAuthorizedL01 ||
+                   checkUserRoles.isAuthorizedL03 ) {
+
+                break;
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if ( bIsOwner ||
+             checkUserRoles.isAuthorizedAdmin ||
+             checkUserRoles.isAuthorizedL03 ||
+             checkUserRoles.isAuthorizedL02 ||
+             checkUserRoles.isAuthorizedL01 ) {
+
+          if ( userSessionStatus.Role &&
+               ( userSessionStatus.Role.includes( "#Administrator#" ) ||
+                 userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                 userSessionStatus.Role.includes( "#DeleteBinaryFile#" ) ) ) {
+
+            const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( currentTransaction,
+                                                                                           logger );
+
+            let strFullPath = "";
+
+            if ( strBasePath.startsWith( "full://" ) ) {
+
+              strFullPath = strBasePath.replace( "full://", "" );
+
+            }
+            else {
+
+              strFullPath = path.join( SystemUtilities.baseRootPath,
+                                       strBasePath );
+
+            }
+
+            await SystemUtilities.deleteFilesPrefixBy( strFullPath + sysBinaryIndexInDB.FilePath,
+                                                       sysBinaryIndexInDB.Id,
+                                                       logger );
+
+          }
+
+          const deleteResult = await SYSBinaryIndexService.deleteByModel( sysBinaryIndexInDB,
+                                                                          currentTransaction,
+                                                                          logger );
+
+          if ( deleteResult instanceof Error ) {
+
+            const error = deleteResult as any;
+
+            result = {
+                       StatusCode: 500, //Internal server error
+                       Code: 'ERROR_UNEXPECTED',
+                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Mark: '429D44B24E88' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: error.name,
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else if ( deleteResult === true ) {
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: 'SUCCESS_BINARY_DATA_DELETE',
+                       Message: await I18NManager.translate( strLanguage, 'Success binary data with id %s deleted.', sysBinaryIndexInDB.Id ),
+                       Mark: 'BDA125C61987' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+            bApplyTransaction = true;
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 500, //Ok
+                       Code: 'ERROR_BINARY_DATA_DELETE',
+                       Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
+                       Mark: '6E317472B7E2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
+                                   Message: 'Method delete return false',
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
 
         }
         else {
 
           result = {
-                     StatusCode: 404, //Not found
-                     Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
-                     Mark: '3B11E61CDD49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     StatusCode: 403, //Forbidden
+                     Code: "ERROR_CANNOT_DELETE_THE_INFORMATION",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to delete the information" ),
+                     Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                                 Code: "ERROR_CANNOT_DELETE_THE_INFORMATION",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to delete the information" ),
+                                 Details: null,
                                }
                              ],
                      Warnings: [],
@@ -1603,31 +4337,40 @@ export default class BinaryServiceController extends BaseService {
       else {
 
         result = {
-                   StatusCode: 400, //Bad request
-                   Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                   Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
-                   Mark: '88EE1E318404' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                   Mark: '6AE6292D2DCD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                               Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
-                               Details: null
+                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Details: null,
                              }
                            ],
                    Warnings: [],
                    Count: 0,
                    Data: []
-                };
+                 };
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -1636,9 +4379,9 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.processBinaryDataUpload.name;
+      sourcePosition.method = this.name + "." + this.deleteBinaryData.name;
 
-      const strMark = "1FD534D0F6D8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "AB5BE4A80EF8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1675,705 +4418,20 @@ export default class BinaryServiceController extends BaseService {
                  Data: []
                };
 
-    }
-
-    return result;
-
-  }
-
-  static async selectThumbnail( strBasePath: string,
-                                strFullPath: string,
-                                strFileThumbnailName: string,
-                                strFileName: string,
-                                strFileExtension: string,
-                                strMimeType: string,
-                                lngFileSize: number,
-                                strThumbnail: string,
-                                logger: any ):Promise<any> {
-
-    let result = {
-                   File: "",
-                   FileName: "",
-                   MimeType: "",
-                   FileSize: 0
-                 };
-
-    try {
-
-      if ( fs.existsSync( path.join( strFullPath, strFileThumbnailName + "." + strThumbnail ) ) ) {
-
-        result.File = path.join( strFullPath, strFileThumbnailName + "." + strThumbnail );
-        result.FileName = strFileName;
-        result.MimeType = strMimeType;
-        result.FileSize = lngFileSize;
-
-      }
-      else {
-
-        let thumbnailList = glob.sync( strFileThumbnailName + ".*", { cwd: strFullPath, nodir: true } );
-
-        if ( thumbnailList &&
-             thumbnailList.length > 0 ) {
-
-          result.File = path.join( strFullPath, thumbnailList[ 0 ] ); //The first thumbnail found in the list of possible options
-          result.FileName = strFileName;
-
-          const fileStats = fs.statSync( result.File );
-
-          result.MimeType = strMimeType;
-          result.FileSize = fileStats.size;
-
-        }
-        else if ( fs.existsSync( path.join( strBasePath, "@default@/images/mime_types/", strFileExtension + ".png" ) ) ) { //Use predefined thumbnail files
-
-          result.File = path.join( strBasePath, "@default@/images/mime_types/", strFileExtension + ".png" ); //pdf.png, docx.png
-          result.FileName = strFileExtension + ".png";
-
-          const fileStats = fs.statSync( result.File );
-
-          result.MimeType = "image/png";
-          result.FileSize = fileStats.size;
-
-        }
-        else {
-
-          result.File = path.join( strBasePath, "@default@/images/mime_types/default.png" );
-          result.FileName = "default.png";
-
-          const fileStats = fs.statSync( result.File );
-
-          result.MimeType = strMimeType;
-          result.FileSize = fileStats.size;
-
-        }
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.processBinaryDataUpload.name;
-
-      const strMark = "003B5338EC0B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-    }
-
-    return result;
-
-  }
-
-  static async checkTagIsAllowedToAccess( strTagToCheck: string,
-                                          strRole: string,
-                                          strUserId: string,
-                                          strUserName: string,
-                                          strUserTag: string,
-                                          strGroupId: string,
-                                          strGroupName: string,
-                                          strGroupTag: string,
-                                          strSessionTag: string,
-                                          bAllowAny: boolean,
-                                          logger: any ): Promise<boolean> {
-
-    let bResult = false;
-
-    try {
-
-      let tagList = strTagToCheck.split( "," );
-      let roleList = strRole.split( "," );
-      let userTagList = strUserTag ? strUserTag.split( "," ): [];
-      let groupTagList = strGroupTag ? strGroupTag.split( "," ): [];
-      let sessionTagList = strSessionTag ? strSessionTag.split( "," ): [];
-
-      if ( bAllowAny &&
-           strTagToCheck === SystemConstants._VALUE_ANY ) {
-
-        bResult = true;
-
-      }
-      else if ( CommonUtilities.isInList( tagList,
-                                          roleList,
-                                          logger ) ) {
-
-        bResult = true;
-
-      }
-      else if ( tagList.includes( "#" + strUserId + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( tagList.includes( "#" + strUserName + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( CommonUtilities.isInList( tagList,
-                                          userTagList,
-                                          logger ) ) {
-
-        bResult = true;
-
-      }
-      else if ( tagList.includes( "#" + strGroupId + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( tagList.includes( "#" + strGroupName + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( CommonUtilities.isInList( tagList,
-                                          groupTagList,
-                                          logger ) ) {
-
-        bResult = true;
-
-      }
-      else if ( CommonUtilities.isInList( tagList,
-                                          sessionTagList,
-                                          logger ) ) {
-
-        bResult = true;
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.checkTagIsAllowedToAccess.name;
-
-      const strMark = "09301995CE61" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-    }
-
-    return bResult;
-
-  }
-
-  static async processBinaryDataDownload( request: Request,
-                                          response: Response,
-                                          transaction: any,
-                                          logger: any ):Promise<any> {
-
-    let result = null;
-
-    let currentTransaction = transaction;
-
-    let bIsLocalTransaction = false;
-
-    let strLanguage = "";
-
-    try {
-
-      const context = ( request as any ).context;
-
-      strLanguage = context.Language;
-
-      const dbConnection = DBConnectionManager.currentInstance;
-
-      if ( currentTransaction == null ) {
-
-        currentTransaction = await dbConnection.transaction();
-
-        bIsLocalTransaction = true;
-
-      }
-
-      //const userSessionStatus = context.UserSessionStatus;
-      const strId = request.params.id;
-      const strAuth = request.params.auth;
-      const strThumbnail = request.params.thumbnail;
-
-      if ( CommonUtilities.isNotNullOrEmpty( strId ) ) {
-
-        const options = {
-
-          where: { "Id": strId },
-          transaction: currentTransaction,
-
-        }
-
-        const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
-                                                                                       logger );
-
-        let strFullPath = "";
-
-        if ( strBasePath.startsWith( "full://" ) ) {
-
-          strFullPath = strBasePath.replace( "full://", "" );
-
-        }
-        else {
-
-          strFullPath = path.join( SystemUtilities.baseRootPath, strBasePath );
-
-        }
-
-        const binaryIndexInDB = await SYSBinaryIndex.findOne( options );
-
-        if ( binaryIndexInDB ) {
-
-          let binaryData = {
-                             File: "",
-                             FileName: "",
-                             MimeType: "",
-                             FileSize: 0
-                           };
-
-          if ( !strThumbnail ) {
-
-            binaryData.File = path.join( strFullPath,
-                                         binaryIndexInDB.FilePath,
-                                         strId + "." + binaryIndexInDB.FileExtension + ".data" );
-            binaryData.FileName = binaryIndexInDB.FileName;
-            binaryData.FileSize = binaryIndexInDB.FileSize;
-            binaryData.MimeType = binaryIndexInDB.MimeType;
-
-          }
-          else {
-
-            binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
-                                                                        path.join( strFullPath, binaryIndexInDB.FilePath ),
-                                                                        strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
-                                                                        binaryIndexInDB.FileName,
-                                                                        binaryIndexInDB.FileExtension,
-                                                                        binaryIndexInDB.MimeType,
-                                                                        binaryIndexInDB.FileSize,
-                                                                        strThumbnail,
-                                                                        logger );
-
-          }
-
-          if ( fs.existsSync( binaryData.File ) ) {
-
-            if ( binaryIndexInDB.AccessKind == 1 ||        //Public
-                 binaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
-
-              result = {
-                         StatusCode: 200, //Ok
-                         File: binaryData.File,
-                         Name: binaryData.FileName,
-                         Mime: binaryData.MimeType,
-                         Size: binaryData.FileSize,
-                       }
-
-            }
-            else if ( CommonUtilities.isNotNullOrEmpty( strAuth ) ) { //Authenticated Or Tag
-
-              let strAuthorization = null;
-
-              strAuthorization = await CacheManager.getData( strAuth,
-                                                             logger ); //get from cache the real authorization token
-
-              if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
-
-                let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
-                                                                                    context,
-                                                                                    true,
-                                                                                    false,
-                                                                                    null,
-                                                                                    logger );
-
-                if ( userSessionStatus ) {
-
-                  context.UserSessionStatus = userSessionStatus;
-
-                }
-
-              }
-
-              ( request as any ).returnResult = 1; //Force to return the result
-
-              //Check for valid session token
-              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request,
-                                                                                       null, //Not write response back
-                                                                                       null );
-
-              if ( resultData &&
-                   resultData.StatusCode == 200 ) { //Ok the authorization token is valid
-
-                const userSessionStatus = context.UserSessionStatus;
-
-                if ( binaryIndexInDB.AccessKind == 2 ||
-                     userSessionStatus.Role.includes( "#Administrator#" ) ||
-                     userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
-
-                  result = {
-                             StatusCode: 200, //Ok
-                             File: binaryData.File,
-                             Name: binaryData.FileName,
-                             Mime: binaryData.MimeType,
-                             Size: binaryData.FileSize,
-                           }
-
-                }
-                else { //Tag
-
-                  //Check access using Owner or DenyAccessTag AllowAccessTag
-                  let bIsOwner = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.Owner,
-                                                                                          userSessionStatus.Role,
-                                                                                          userSessionStatus.UserId,
-                                                                                          userSessionStatus.UserName,
-                                                                                          userSessionStatus.UserTag,
-                                                                                          userSessionStatus.UserGroupId,
-                                                                                          userSessionStatus.UserGroupName,
-                                                                                          userSessionStatus.UserGroupTag,
-                                                                                          userSessionStatus.Tag,
-                                                                                          false,
-                                                                                          logger );
-
-                  /*
-                  let bDenyTagAccess = false;
-                  let bAllowTagAccess = false;
-
-                  if ( bIsOwner === false ) {
-
-                    bDenyTagAccess = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.DenyTagAccess,
-                                                                                    context.UserSessionStatus.Role,
-                                                                                    context.UserSessionStatus.UserId,
-                                                                                    context.UserSessionStatus.UserName,
-                                                                                    context.UserSessionStatus.UserTag,
-                                                                                    context.UserSessionStatus.UserGroupId,
-                                                                                    context.UserSessionStatus.UserGroupName,
-                                                                                    context.UserSessionStatus.UserGroupTag,
-                                                                                    context.UserSessionStatus.Tag,
-                                                                                    true,
-                                                                                    logger );
-
-                    if ( bDenyTagAccess === false ) {
-
-                      bAllowTagAccess = await BinaryServiceController.checkTagIsAllowedToAccess( binaryIndexInDB.AllowTagAccess,
-                                                                                       context.UserSessionStatus.Role,
-                                                                                       context.UserSessionStatus.UserId,
-                                                                                       context.UserSessionStatus.UserName,
-                                                                                       context.UserSessionStatus.UserTag,
-                                                                                       context.UserSessionStatus.UserGroupId,
-                                                                                       context.UserSessionStatus.UserGroupName,
-                                                                                       context.UserSessionStatus.UserGroupTag,
-                                                                                       context.UserSessionStatus.Tag,
-                                                                                       true,
-                                                                                       logger );
-
-                    }
-
-                  }
-                  */
-
-                  if ( bIsOwner ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
-
-                    result = {
-                               StatusCode: 200, //Ok
-                               File: binaryData.File,
-                               Name: binaryData.FileName,
-                               Mime: binaryData.MimeType,
-                               Size: binaryData.FileSize,
-                             }
-
-                  }
-                  else {
-
-                    let strCode = "";
-                    let strMessage = "";
-
-                    strCode = "ERROR_NOT_ALLOWED_ACCESS";
-                    strMessage = "Not allowed access to binary data";
-
-                    /*
-                    if ( bDenyTagAccess ) {
-
-                      strCode = "ERROR_FORBIDEN_ACCESS_DENIED";
-                      strMessage = "Explicit deny access to binary data in DenyTagAccess field";
-
-                    }
-                    else {
-
-                      strCode = "ERROR_FORBIDEN_ACCESS_NOT_ALLOWED";
-                      strMessage = "No explicit allow access to binary data in AllowTagAccess field";
-
-                    }
-                    */
-
-                    resultData = {
-                                   StatusCode: 403, //Forbidden
-                                   Code: strCode,
-                                   Message: strMessage,
-                                   Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                   LogId: null,
-                                   IsError: true,
-                                   Errors: [
-                                             {
-                                               Code: strCode,
-                                               Message: strMessage,
-                                               Details: null,
-                                             }
-                                           ],
-                                   Warnings: [],
-                                   Count: 0,
-                                   Data: []
-                                 };
-
-                    response.setHeader( "X-Body-Response",
-                                        JSON.stringify( resultData ) );
-
-                    //ANCHOR binary data download Fobidden
-                    result = {
-                               StatusCode: resultData.StatusCode, //Forbidden
-                               File: path.join( strFullPath, "/@default@/images/http_codes/403.png" ),
-                               Name: "403.png",
-                               Mime: "image/png",
-                               Size: 13129,
-                             }
-
-                  }
-
-                }
-
-              }
-              else {
-
-                response.setHeader( "X-Body-Response",
-                                    JSON.stringify( resultData ) );
-
-                //ANCHOR binary data download Unauthorized
-                result = {
-                           StatusCode: resultData.StatusCode, //Unauthorized
-                           File: path.join( strFullPath, "/@default@/images/http_codes/401.png" ),
-                           Name: "401.png",
-                           Mime: "image/png",
-                           Size: 14591,
-                         }
-
-              }
-
-            }
-            else {
-
-              const resultHeaders = {
-                                      StatusCode: 400, //Bad request
-                                      Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
-                                      Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
-                                      Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      LogId: null,
-                                      IsError: true,
-                                      Errors: [
-                                                {
-                                                  Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
-                                                  Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
-                                                  Details: null,
-                                                }
-                                              ],
-                                      Warnings: [],
-                                      Count: 0,
-                                      Data: []
-                                    };
-
-              response.setHeader( "X-Body-Response",
-                                  JSON.stringify( resultHeaders ) );
-
-              result = {
-                         StatusCode: 400, //Bad request
-                       }
-
-            }
-
-          }
-          else {
-
-            const resultHeaders = {
-                                    StatusCode: 404, //Not found
-                                    Code: 'ERROR_FILE_NOT_FOUND',
-                                    Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
-                                    Mark: '1109E2A671E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                    LogId: null,
-                                    IsError: true,
-                                    Errors: [
-                                              {
-                                                Code: 'ERROR_FILE_NOT_FOUND',
-                                                Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
-                                                Details: null,
-                                              }
-                                            ],
-                                    Warnings: [],
-                                    Count: 0,
-                                    Data: []
-                                  };
-
-            response.setHeader( "X-Body-Response",
-                                JSON.stringify( resultHeaders ) );
-
-            //ANCHOR binary data download FILE NOT FOUND
-            result = {
-                       StatusCode: 404, //Not found
-                       File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
-                       Name: "404.png",
-                       Mime: "image/png",
-                       Size: 13218,
-                     }
-
-          }
-
-        }
-        else {
-
-          const resultHeaders = {
-                                  StatusCode: 404, //Not found
-                                  Code: 'ERROR_DB_NOT_FOUND',
-                                  Message: await I18NManager.translate( strLanguage, 'The binary data db not found.' ),
-                                  Mark: 'E4650CE42D99' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                  LogId: null,
-                                  IsError: true,
-                                  Errors: [
-                                            {
-                                              Code: 'ERROR_DB_NOT_FOUND',
-                                              Message: await I18NManager.translate( strLanguage, 'The binary data db not found.' ),
-                                              Details: null,
-                                            }
-                                          ],
-                                  Warnings: [],
-                                  Count: 0,
-                                  Data: []
-                                };
-
-          response.setHeader( "X-Body-Response",
-                              JSON.stringify( resultHeaders ) );
-
-          //ANCHOR binary data download DB NOT FOUND
-          result = {
-                     StatusCode: 404, //Not found
-                     File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
-                     Name: "404.png",
-                     Mime: "image/png",
-                     Size: 13218,
-                   }
-
-        }
-
-      }
-      else {
-
-        const resultHeaders = {
-                                StatusCode: 400, //Bad request
-                                Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
-                                Mark: '67F2D64A113E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                LogId: null,
-                                IsError: true,
-                                Errors: [
-                                          {
-                                            Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                            Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
-                                            Details: null,
-                                          }
-                                        ],
-                                Warnings: [],
-                                Count: 0,
-                                Data: []
-                              };
-
-        response.setHeader( "X-Body-Response",
-                            JSON.stringify( resultHeaders ) );
-
-        result = {
-                   StatusCode: 400, //Bad request
-                 }
-
-      }
-
-      if ( currentTransaction != null &&
-           currentTransaction.finished !== "rollback" &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
 
       }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.processBinaryDataUpload.name;
-
-      const strMark = "1AB14A900E5E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-      const resultHeaders = {
-                              StatusCode: 500, //Internal server error
-                              Code: 'ERROR_UNEXPECTED',
-                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                              Mark: strMark,
-                              LogId: error.LogId,
-                              IsError: true,
-                              Errors: [
-                                        {
-                                          Code: error.name,
-                                          Message: error.message,
-                                          Details: await SystemUtilities.processErrorDetails( error ) //error
-                                        }
-                                      ],
-                              Warnings: [],
-                              Count: 0,
-                              Data: []
-                            };
-
-      response.setHeader( "X-Body-Response", JSON.stringify( resultHeaders ) );
-
-      result = {
-                 StatusCode: 500, //Internal server error
-               };
 
     }
 

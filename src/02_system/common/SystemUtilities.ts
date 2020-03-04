@@ -1,13 +1,18 @@
+import crypto from "crypto";
 import fs from 'fs'; //Load the filesystem module
 import path from 'path';
 import os from "os";
 import cluster from "cluster";
 
+import glob from "glob";
+
 import moment, { Moment } from "moment-timezone";
 import XXHash from 'xxhashjs';
 //import  from "moment-timezone";
 import uuidv4 from 'uuid/v4';
-import Hashes from 'jshashes';
+//import Hashes from 'jshashes';
+import crc from 'node-crc';
+import { CRC32Stream } from 'crc32-stream';
 import readChunk from 'read-chunk';
 import fileType from 'file-type';
 //import { loggers } from "winston";
@@ -398,7 +403,7 @@ export default class SystemUtilities {
       }
       else if ( intAlgorimts == 2 ) {
 
-        strResult = Hashes.CRC32( strToHash ).toString( 16 );
+        strResult = crc.crc32( Buffer.from( strToHash, 'utf8' ) ).toString( 'hex' ); //Hashes.CRC32( strToHash ).toString( 16 );
 
       }
       else {
@@ -2638,6 +2643,162 @@ export default class SystemUtilities {
 
   }
 
+  static async getFileHash( strFilename: string,
+                            strAlgorithm: string = "md5",
+                            logger: any ): Promise<string> {
 
+    let strResult = "";
+
+    try {
+
+      strResult = await new Promise<string>( ( resolve, reject ) => {
+
+        // Algorithm depends on availability of OpenSSL on platform
+        // Another algorithms: 'sha1', 'md5', 'sha256', 'sha512' ...
+        let checkSum = strAlgorithm !== "crc32" ? crypto.createHash( strAlgorithm ): new CRC32Stream();
+
+        try {
+
+          let readStream = fs.createReadStream( strFilename )
+
+          if ( strAlgorithm !== "crc32" ) {
+
+            readStream.on( 'data', function ( data: any ) {
+
+              checkSum.update( data )
+
+            } );
+
+          }
+          else {
+
+            readStream.pipe( checkSum );
+
+          }
+
+          // making digest
+          readStream.on( 'end', function () {
+
+            const strHash = checkSum.digest( 'hex' );
+
+            if ( strAlgorithm === "crc32" ) {
+
+              checkSum.end();
+
+            }
+
+            return resolve( strHash );
+
+          } );
+
+        }
+        catch ( error ) {
+
+          return reject( "" );
+
+        }
+
+      } );
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getFileHash.name;
+
+      const strMark = "FCC11802D957" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+  static async deleteFilesPrefixBy( strFullPath: string,
+                                    strPrefix: string,
+                                    logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      let fileList = glob.sync( strPrefix + ".*",
+                                {
+                                  cwd: strFullPath,
+                                  nodir: true
+                                } );
+
+      if ( fileList &&
+           fileList.length > 0 ) {
+
+        for ( let intIndex = 0; intIndex < fileList.length; intIndex++ ) {
+
+          try {
+
+            fs.unlinkSync( path.join( strFullPath, fileList[ intIndex ] ) );
+
+          }
+          catch ( error ) {
+
+            //
+
+          }
+
+        }
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteFilesPrefixBy.name;
+
+      const strMark = "0EFD62556CFB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
 
 }

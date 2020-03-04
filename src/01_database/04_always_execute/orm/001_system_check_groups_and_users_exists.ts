@@ -37,7 +37,7 @@ export default class Always {
 
     try {
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -141,7 +141,7 @@ export default class Always {
 
       await loopUsersAsync();
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
@@ -175,7 +175,7 @@ export default class Always {
 
       }
 
-      if ( currentTransaction != null ) {
+      if ( currentTransaction !== null ) {
 
         try {
 

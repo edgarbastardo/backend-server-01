@@ -54,7 +54,7 @@ export default class ApplicationManager {
                            CommonUtilities.isNotNullOrEmpty( logger.stream ) ? logger.stream : null; // LoggerManager.mainLoggerIntance.stream;
 
       const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( null,
-                                                                                           logger );
+                                                                                                     logger );
       // The request handler must be the first middleware on the app
       //app.use( sentry.Handlers.requestHandler() );
       app.use( express.json() );

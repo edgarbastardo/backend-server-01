@@ -3,7 +3,7 @@ import cluster from 'cluster';
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import {
   //Router,
-  Request,
+  Request, json,
   //Response,
   //NextFunction
 } from 'express';
@@ -12,7 +12,7 @@ import bcrypt from 'bcrypt';
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import SystemConstants from "../../common/SystemContants";
+import SystemConstants, { ICheckUserRoles } from "../../common/SystemContants";
 
 import CommonUtilities from "../../common/CommonUtilities";
 import SystemUtilities from "../../common/SystemUtilities";
@@ -49,16 +49,6 @@ import { SYSPerson } from '../../common/database/models/SYSPerson';
 import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
 
 const debug = require( 'debug' )( 'UserServiceController' );
-
-export interface ICheckUserRoles {
-
-  isAuthorizedAdmin: boolean,
-  isAuthorizedL01: boolean,
-  isAuthorizedL02: boolean,
-  isAuthorizedL03: boolean,
-  isNotAuthorized: boolean
-
-}
 
 export default class UserServiceController {
 
@@ -580,7 +570,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1070,7 +1060,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1131,7 +1121,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1139,7 +1129,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -1174,7 +1164,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -1747,7 +1737,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -1808,7 +1798,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -1816,7 +1806,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -1851,7 +1841,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -2367,7 +2357,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -2428,7 +2418,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -2436,7 +2426,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -2471,7 +2461,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -2889,7 +2879,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -2950,7 +2940,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -2958,7 +2948,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -3095,7 +3085,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -3645,7 +3635,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -3706,7 +3696,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -3714,7 +3704,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -3749,7 +3739,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -4156,7 +4146,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -4217,7 +4207,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -4225,7 +4215,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -4260,7 +4250,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -4746,7 +4736,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -4807,7 +4797,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -4815,7 +4805,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -4850,7 +4840,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -5235,7 +5225,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -5296,7 +5286,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -5304,7 +5294,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -5339,7 +5329,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -5804,7 +5794,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -5865,7 +5855,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -5873,7 +5863,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -5886,7 +5876,7 @@ export default class UserServiceController {
 
   }
 
-  static async profileGet( request: Request,
+  static async getProfile( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
 
@@ -5908,7 +5898,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -6068,7 +6058,7 @@ export default class UserServiceController {
                }
                */
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -6090,7 +6080,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileGet.name;
+      sourcePosition.method = this.name + "." + this.getProfile.name;
 
       const strMark = "DBA7E36C5D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -6129,7 +6119,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -6137,7 +6127,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -6150,7 +6140,7 @@ export default class UserServiceController {
 
   }
 
-  static async profileSet( request: Request,
+  static async setProfile( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
 
@@ -6172,7 +6162,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -6380,8 +6370,9 @@ export default class UserServiceController {
                                                                                     logger );
 
               if ( !geocodeResult ||
-                   geocodeResult.length == 0 ||
-                   geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
+                    geocodeResult.length == 0 ||
+                    ( geocodeResult[ 0 ].formattedAddressParts &&
+                      geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
 
                 personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
 
@@ -6558,7 +6549,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -6580,7 +6571,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.setProfile.name;
 
       const strMark = "59582149A69D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -6619,7 +6610,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -6627,7 +6618,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -6662,7 +6653,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -6883,7 +6874,7 @@ export default class UserServiceController {
       }
       */
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -6944,7 +6935,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -6952,7 +6943,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -7107,6 +7098,186 @@ export default class UserServiceController {
 
   }
 
+  static getConfigAutoAssignRoleSection( strOperation: string,
+                                         strRole: string,
+                                         strUserGroupName: string,
+                                         jsonConfigValue: any ): string {
+
+    let strResult = "";
+
+    try {
+
+      if ( jsonConfigValue ) {
+
+        if ( jsonConfigValue[ strOperation ] ) {
+
+          jsonConfigValue = jsonConfigValue[ strOperation ];
+
+          if ( jsonConfigValue ) {
+
+            const subTag = strRole.split( "+" );
+
+            if ( jsonConfigValue[ subTag[ 0 ] ] ) {
+
+              jsonConfigValue = jsonConfigValue[ subTag[ 0 ] ];
+
+              if ( jsonConfigValue ) {
+
+                if ( jsonConfigValue[ strUserGroupName ] ) {
+
+                  strResult = jsonConfigValue[ strUserGroupName ];
+
+                }
+                else if ( jsonConfigValue[ "@__default__@" ] ) {
+
+                  strResult = jsonConfigValue[ "@__default__@" ];
+
+                }
+
+              }
+
+            }
+            else if ( jsonConfigValue[ "@__default__@" ] ) {
+
+              jsonConfigValue = jsonConfigValue[ "@__default__@" ];
+
+              if ( jsonConfigValue ) {
+
+                if ( jsonConfigValue[ strUserGroupName ] ) {
+
+                  strResult = jsonConfigValue[ strUserGroupName ];
+
+                }
+                else if ( jsonConfigValue[ "@__default__@" ] ) {
+
+                  strResult = jsonConfigValue[ "@__default__@" ];
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+  static async getConfigAutoAssignRole( strOperation: string,
+                                        strRoles: string,
+                                        strUserGroupName: string,
+                                        transaction: any,
+                                        logger: any ): Promise<string> {
+
+    let strResult = null;
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign.Id,
+                                                                             SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign.Owner,
+                                                                             transaction,
+                                                                             logger );
+
+      const roleList = strRoles.split( "," );
+
+      let jsonConfigValue = null;
+      let jsonConfigDefaultValue = null;
+
+      if ( configData.Value ) {
+
+        jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
+                                                     logger );
+
+      }
+
+      if ( configData.Default ) {
+
+        jsonConfigDefaultValue = CommonUtilities.parseJSON( configData.Default,
+                                                            logger );
+
+      }
+
+      for ( let intCurrentRole = 0; intCurrentRole < roleList.length; intCurrentRole++ ) {
+
+        const strRole = roleList[ intCurrentRole ];
+
+        let strRoleToAutoAssign = this.getConfigAutoAssignRoleSection( strOperation,
+                                                                       strRole,
+                                                                       strUserGroupName,
+                                                                       jsonConfigValue );
+
+        if ( !strRoleToAutoAssign ) {
+
+          strRoleToAutoAssign = this.getConfigAutoAssignRoleSection( strOperation,
+                                                                     strRole,
+                                                                     strUserGroupName,
+                                                                     jsonConfigDefaultValue );
+
+        }
+
+        if ( strRoleToAutoAssign ) {
+
+          if ( !strResult ) {
+
+            strResult = strRoleToAutoAssign;
+
+          }
+          else {
+
+            strResult = strResult + "," + strRoleToAutoAssign;
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigAutoAssignRole.name;
+
+      const strMark = "6C7D124BE728" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    strResult = CommonUtilities.removeTag( strResult, "#Administrator#" );
+    strResult = CommonUtilities.removeTag( strResult, "#BManagerL99#" );
+
+    return strResult;
+
+  }
+
   static async createUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
@@ -7129,7 +7300,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -7242,7 +7413,7 @@ export default class UserServiceController {
                                                                    ShortId: request.body.sysUserGroup.ShortId,
                                                                    Name: request.body.sysUserGroup.Name
                                                                  },
-                                                                 "createUser",
+                                                                 "CreateUser",
                                                                  logger );
 
             if ( resultCheckUserRoles.isAuthorizedAdmin ) {
@@ -7578,7 +7749,8 @@ export default class UserServiceController {
 
                   if ( !geocodeResult ||
                        geocodeResult.length == 0 ||
-                       geocodeResult[ 0 ].formattedAddressParts.length < 4 ) {
+                       ( geocodeResult[ 0 ].formattedAddressParts &&
+                         geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
 
                     personData.Tag = CommonUtilities.addTag( personData.Tag, "#ADDRESS_NOT_FOUND#" );
 
@@ -7602,6 +7774,21 @@ export default class UserServiceController {
                 if ( sysPersonInDB &&
                      sysPersonInDB instanceof Error === false ) {
 
+                  let strRoleToApply = await this.getConfigAutoAssignRole( "create",
+                                                                           userSessionStatus.Role,
+                                                                           sysUserGroupInDB.Name,
+                                                                           currentTransaction,
+                                                                           logger );
+
+                  if ( resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ) {
+
+                    strRoleToApply = SystemUtilities.mergeTokens( request.body.Role,
+                                                                  strRoleToApply,
+                                                                  true,
+                                                                  logger );
+
+                  }
+
                   //ANCHOR create new user
                   sysUserInDB = await SYSUserService.createOrUpdate(
                                                                      {
@@ -7610,7 +7797,7 @@ export default class UserServiceController {
                                                                        GroupId: sysUserGroupInDB.Id,
                                                                        Name: request.body.Name,
                                                                        Password: request.body.Password,
-                                                                       Role: resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
+                                                                       Role: strRoleToApply ? strRoleToApply : null, //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
                                                                        Tag: resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: null,
                                                                        ForceChangePassword: request.body.ForceChangePassword,
                                                                        ChangePasswordEvery: request.body.ChangePasswordEvery,
@@ -7960,7 +8147,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -8021,7 +8208,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -8029,7 +8216,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -8064,7 +8251,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -8289,10 +8476,10 @@ export default class UserServiceController {
                                                                 currentTransaction,
                                                                 logger );
 
-             //ANCHOR checkUserRoleLevel
+            //ANCHOR checkUserRoleLevel
             resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
                                                             sysUserInDB,
-                                                            "updateUser",
+                                                            "UpdateUser",
                                                             logger );
 
             if ( resultCheckUserRoles.isAuthorizedAdmin ) {
@@ -8647,6 +8834,30 @@ export default class UserServiceController {
                 if ( sysPersonInDB &&
                      sysPersonInDB instanceof Error === false ) {
 
+                  let strRoleToApply = await this.getConfigAutoAssignRole( "update",
+                                                                           userSessionStatus.Role,
+                                                                           sysUserGroupInDB.Name,
+                                                                           currentTransaction,
+                                                                           logger );
+
+                  if ( resultCheckUserRoles.isAuthorizedAdmin &&
+                       request.body.Role !== undefined ) {
+
+                    strRoleToApply = SystemUtilities.mergeTokens( request.body.Role,
+                                                                  strRoleToApply,
+                                                                  true,
+                                                                  logger );
+
+                  }
+                  else if ( sysUserInDB.Role ) {
+
+                    strRoleToApply = SystemUtilities.mergeTokens( sysUserInDB.Role,
+                                                                  strRoleToApply,
+                                                                  true,
+                                                                  logger );
+
+                  }
+
                   //ANCHOR update user
                   sysUserInDB.GroupId = sysUserGroupInDB.Id;
                   sysUserInDB.Name = request.body.Name ? request.body.Name: sysUserInDB.Name;
@@ -8654,7 +8865,7 @@ export default class UserServiceController {
                   sysUserInDB.ChangePasswordEvery = request.body.ChangePasswordEvery;
                   sysUserInDB.SessionsLimit = request.body.SessionsLimit;
                   sysUserInDB.Password = request.body.Password ? request.body.Password: sysUserInDB.Password;
-                  sysUserInDB.Role = resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
+                  sysUserInDB.Role = strRoleToApply ? strRoleToApply: null, //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
                   sysUserInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserInDB.Tag;
 
                   if ( request.body.Business ) {
@@ -8918,7 +9129,7 @@ export default class UserServiceController {
           }
           else {
 
-            //ANCHOR password not valid (updateUser)
+            //ANCHOR password not valid (UpdateUser)
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_PASSWORD_NOT_VALID',
@@ -8966,7 +9177,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -9027,7 +9238,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -9035,7 +9246,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -9071,7 +9282,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -9084,9 +9295,9 @@ export default class UserServiceController {
       //let strUserName = context.UserSessionStatus.UserName;
 
       let sysUserInDB = await SYSUserService.getBy( {
-                                                      Id: request.body.Id,
-                                                      ShortId: request.body.ShortId,
-                                                      Name: request.body.Name
+                                                      Id: request.query.id,
+                                                      ShortId: request.query.shortId,
+                                                      Name: request.query.name
                                                     },
                                                     null,
                                                     currentTransaction,
@@ -9094,7 +9305,7 @@ export default class UserServiceController {
 
       const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
                                                             sysUserInDB,
-                                                            "deleteUser",
+                                                            "DeleteUser",
                                                             logger );
 
       if ( !resultCheckUserRoles.isAuthorizedAdmin &&
@@ -9170,7 +9381,6 @@ export default class UserServiceController {
                      Count: 0,
                      Data: []
                    };
-
 
         }
         else if ( deleteResult === true ) {
@@ -9291,7 +9501,7 @@ export default class UserServiceController {
 
       }
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -9313,7 +9523,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.setProfile.name;
 
       const strMark = "A68F177F4DBF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -9352,7 +9562,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -9360,7 +9570,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -9395,7 +9605,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -9582,6 +9792,7 @@ export default class UserServiceController {
 
       //}
 
+      //ANCHOR dbConnection.query
       const rows = await dbConnection.query( strSQL, {
                                                        raw: true,
                                                        type: QueryTypes.SELECT,
@@ -9643,7 +9854,7 @@ export default class UserServiceController {
 
       bApplyTransaction = true;
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -9665,7 +9876,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.setProfile.name;
 
       const strMark = "52299BDE0903" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -9704,7 +9915,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -9712,7 +9923,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }
@@ -9725,7 +9936,7 @@ export default class UserServiceController {
 
   }
 
-  static async searchUserCount( request: Request,
+  static async searchCountUser( request: Request,
                                 transaction: any,
                                 logger: any ): Promise<any> {
 
@@ -9747,7 +9958,7 @@ export default class UserServiceController {
 
       const dbConnection = DBConnectionManager.currentInstance;
 
-      if ( currentTransaction == null ) {
+      if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
 
@@ -9917,7 +10128,7 @@ export default class UserServiceController {
 
       bApplyTransaction = true;
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
@@ -9939,7 +10150,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.profileSet.name;
+      sourcePosition.method = this.name + "." + this.setProfile.name;
 
       const strMark = "AF049675D770" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -9978,7 +10189,7 @@ export default class UserServiceController {
                  Data: []
                };
 
-      if ( currentTransaction != null &&
+      if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
         try {
@@ -9986,7 +10197,7 @@ export default class UserServiceController {
           await currentTransaction.rollback();
 
         }
-        catch ( ex ) {
+        catch ( error ) {
 
 
         }

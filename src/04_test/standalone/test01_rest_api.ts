@@ -2,26 +2,23 @@ require( 'dotenv' ).config(); //Read the .env file, in the root folder of projec
 
 import fs from 'fs'; //Load the filesystem module
 import os from 'os'; //Load the os module
+//import cluster from "cluster";
 
 const assert = require('assert').strict;
-//import cluster from "cluster";
 import appRoot from 'app-root-path';
 
 import fetch from 'node-fetch';
+import FormData from 'form-data';
 
 import logSymbols from 'log-symbols';
 import chalk from 'chalk';
 
-//import CommonConstants from "../../02_system/common/CommonConstants";
-
-//import CommonUtilities from '../../02_system/common/CommonUtilities';
-import SystemUtilities from "../../02_system/common/SystemUtilities";
 import CommonConstants from '../../02_system/common/CommonConstants';
-import { SYSPerson } from "../../02_system/common/database/models/SYSPerson";
-import { SYSUserGroup } from "../../02_system/common/database/models/SYSUserGroup";
-import { roles } from "../../02_system/core/api/graphql/template/Group.permission";
+import CommonUtilities from '../../02_system/common/CommonUtilities';
 
-const debug = require( 'debug' )( 'test01_test_api' );
+import SystemUtilities from "../../02_system/common/SystemUtilities";
+
+//const debug = require( 'debug' )( 'test01_test_api' );
 
 const strUser_admin01_at_system_net = "admin01@system.net";
 const strPassword_admin01_at_system_net = "admin1.123456.";
@@ -38,7 +35,8 @@ const headers_admin01_at_system_net = {
                                         "Content-Type": "application/json",
                                         "FrontendId": "ccc1",
                                         "TimeZoneId": "America/Los_Angeles",
-                                        "Language": "en_US"
+                                        "Language": "en_US",
+                                        "BinaryDataToken": ""
                                       }
 
 const headers_user01_at_TestL01_Session1 = {
@@ -46,23 +44,26 @@ const headers_user01_at_TestL01_Session1 = {
                                              "Content-Type": "application/json",
                                              "FrontendId": "ccc1",
                                              "TimeZoneId": "America/Los_Angeles",
-                                             "Language": "en_US"
-                                           }
+                                             "Language": "en_US",
+                                             "BinaryDataToken": ""
+                                            }
 
 const headers_user01_at_TestL01_Session2 = {
                                              "Authorization": "",
                                              "Content-Type": "application/json",
                                              "FrontendId": "ccc1",
                                              "TimeZoneId": "America/Los_Angeles",
-                                             "Language": "en_US"
-                                           }
+                                             "Language": "en_US",
+                                             "BinaryDataToken": ""
+                                            }
 
 const headers_user02_at_TestL01 = {
                                     "Authorization": "",
                                     "Content-Type": "application/json",
                                     "FrontendId": "ccc1",
                                     "TimeZoneId": "America/Los_Angeles",
-                                    "Language": "en_US"
+                                    "Language": "en_US",
+                                    "BinaryDataToken": ""
                                   }
 
 const headers_user01_at_TestL02 = {
@@ -70,7 +71,8 @@ const headers_user01_at_TestL02 = {
                                     "Content-Type": "application/json",
                                     "FrontendId": "ccc1",
                                     "TimeZoneId": "America/Los_Angeles",
-                                    "Language": "en_US"
+                                    "Language": "en_US",
+                                    "BinaryDataToken": ""
                                   }
 
 const headers_user02_at_TestL02 = {
@@ -78,7 +80,8 @@ const headers_user02_at_TestL02 = {
                                     "Content-Type": "application/json",
                                     "FrontendId": "ccc1",
                                     "TimeZoneId": "America/Los_Angeles",
-                                    "Language": "en_US"
+                                    "Language": "en_US",
+                                    "BinaryDataToken": ""
                                   }
 
 //Test request failed
@@ -124,6 +127,19 @@ const userRequestFull = {
                           }
                         }
 
+const binaryRequestFull = {
+                            "File": null,
+                            "AccessKind": 0,
+                            "StorageKind": 0,
+                            "Category": null,
+                            "ExpireAt": null,
+                            "Label": null,
+                            "Tag": null,
+                            "Context": null,
+                            "Comment": null,
+                            "ShareCode": null
+                          }
+
 let user01_at_TestL01_data = {} as any;
 let user02_at_TestL01_data = {} as any;
 
@@ -131,6 +147,8 @@ let user01_at_TestL02_data = {} as any;
 let user02_at_TestL02_data = {} as any;
 
 let user98_at_TestL98_data = {} as any;
+
+let upload_binary_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
 
 async function call_login( headers: any,
                            strUser: string,
@@ -184,7 +202,7 @@ async function call_login( headers: any,
 
 }
 
-async function call_token_check( headers: any ): Promise<any> {
+async function call_tokenCheck( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -315,8 +333,8 @@ async function call_logout( headers: any ): Promise<any> {
 
 }
 
-async function call_search( headers: any,
-                            params: any ): Promise<any> {
+async function call_userSearch( headers: any,
+                                params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -414,8 +432,8 @@ async function call_search( headers: any,
 
 }
 
-async function call_search_count( headers: any,
-                                  params: any ): Promise<any> {
+async function call_userSearchCount( headers: any,
+                                     params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -648,7 +666,7 @@ async function call_updateUser( headers: any, body: any ): Promise<any> {
 
 }
 
-async function call_deleteUser( headers: any, body: any ): Promise<any> {
+async function call_deleteUser( headers: any, query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -656,13 +674,13 @@ async function call_deleteUser( headers: any, body: any ): Promise<any> {
 
     const options = {
                       method: 'DELETE',
-                      body: JSON.stringify( body ),
+                      body: null, //JSON.stringify( body ),
                       headers: headers,
                     };
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user";
+    strRequestPath = strRequestPath + "/system/user?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -677,6 +695,335 @@ async function call_deleteUser( headers: any, body: any ): Promise<any> {
                                    statusText: null,
                                    body: { Code: "" }
                                   };
+
+    ( options as any ).body = query;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_deleteUserGroup( headers: any, query: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'DELETE',
+                      body: null, //JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/usergroup?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = query;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_createAuth( headers: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'POST',
+                      body: null, //JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary/auth";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_deleteAuth( headers: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'DELETE',
+                      body: null, //JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary/auth";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_binarySearch( headers: any,
+                                  params: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      headers: headers,
+                      body: null,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary/search";
+
+    let strQueryParams = "";
+
+    if ( params.where ) {
+
+      strQueryParams = "?where=" + params.where;
+
+    }
+
+    if ( params.orderBy ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
+
+      }
+      else {
+
+        strRequestPath = "?orderBy=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.offset ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&offset=" + params.offset;
+
+      }
+      else {
+
+        strRequestPath = "?offset=" + params.orderBy;
+
+      }
+
+    }
+
+    if ( params.limit ) {
+
+      if ( strQueryParams ) {
+
+        strRequestPath = strQueryParams + "&limit=" + params.limit;
+
+      }
+      else {
+
+        strRequestPath = "?limit=" + params.limit;
+
+      }
+
+    }
+
+    const callResult = await fetch( strRequestPath + strQueryParams,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+     //( options as any ).body = body;
+
+     result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_binarySearchCount( headers: any,
+                                       params: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      headers: headers,
+                      body: null,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary/search/count";
+
+    let strQueryParams = "";
+
+    if ( params.where ) {
+
+      strQueryParams = "?where=" + params.where;
+
+    }
+
+    const callResult = await fetch( strRequestPath + strQueryParams,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+     //( options as any ).body = body;
+
+     result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+async function call_uploadBinaryData( headers: any,
+                                      body: FormData ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'POST',
+                      body: body, //JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                 }:
+                                 {
+                                  status: null,
+                                  statusText: null,
+                                  body: { Code: "" }
+                                 };
 
     ( options as any ).body = body;
 
@@ -693,7 +1040,69 @@ async function call_deleteUser( headers: any, body: any ): Promise<any> {
 
 }
 
-async function call_deleteUserGroup( headers: any, body: any ): Promise<any> {
+async function call_downloadBinaryData( headers: any, query: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      body: null,
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary?id=" + query.Id + "&auth=" + headers.BinaryDataToken + "&thumbnail=" + query.Thumbnail;
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    const strXBodyResponse = callResult.headers.get( "x-body-response" ) as any; //callResult.headers.raw()
+
+    const jsonXBodyResponse = CommonUtilities.parseJSON( strXBodyResponse, null );
+
+    const strPath = query.SavePath + '/' + jsonXBodyResponse.Name;
+
+    fs.mkdirSync( query.SavePath, { recursive: true }  );
+
+    const destinationFileStream = fs.createWriteStream( strPath );
+
+    await new Promise( ( resolve: any, reject: any ) => {
+
+      callResult.body.pipe( destinationFileStream ).on( 'close', () => { resolve( true ) } ); //Wait for the stream finish to write to file system
+
+    } );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: jsonXBodyResponse
+                                 }:
+                                 {
+                                  status: null,
+                                  statusText: null,
+                                  body: { Code: "" }
+                                 };
+
+    //( options as any ).body = jsonXBodyResponse; //callResult.headers[ "X-Body-Response" ];
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_deleteBinaryData( headers: any,
+                                      query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -701,13 +1110,13 @@ async function call_deleteUserGroup( headers: any, body: any ): Promise<any> {
 
     const options = {
                       method: 'DELETE',
-                      body: JSON.stringify( body ),
+                      body: null, //query, //JSON.stringify( body ),
                       headers: headers,
                     };
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/usergroup";
+    strRequestPath = strRequestPath + "/system/binary?id=" + query.Id;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -716,14 +1125,58 @@ async function call_deleteUserGroup( headers: any, body: any ): Promise<any> {
                                    status: callResult.status,
                                    statusText: callResult.statusText,
                                    body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
+                                 }:
+                                 {
+                                  status: null,
+                                  statusText: null,
+                                  body: { Code: "" }
+                                 };
 
-    ( options as any ).body = body;
+    ( options as any ).body = query;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+async function call_getBinaryDataDetails( headers: any,
+                                          query: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'GET',
+                      body: null,
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/binary/details?id=" + query.Id;
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                 }:
+                                 {
+                                  status: null,
+                                  statusText: null,
+                                  body: { Code: "" }
+                                 };
 
     result.input = options;
 
@@ -750,6 +1203,11 @@ function formatSequence( intSequence: number ): string {
   else if ( intSequence < 100 ) {
 
     strResult = "0" + intSequence;
+
+  }
+  else {
+
+    strResult = intSequence.toString();
 
   }
 
@@ -863,7 +1321,7 @@ export async function test_token( headers: any,
 
   try {
 
-    const result = await call_token_check( headers );
+    const result = await call_tokenCheck( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1080,19 +1538,19 @@ export async function test_profile_all_roles( headers: any,
 
 }
 
-export async function test_search( headers: any,
-                                   params: any,
-                                   strCode: string,
-                                   strFileName: string,
-                                   intConditionType: number,
-                                   intCount: number ): Promise<boolean> {
+export async function test_userSearch( headers: any,
+                                       params: any,
+                                       strCode: string,
+                                       strFileName: string,
+                                       intConditionType: number,
+                                       intCount: number ): Promise<boolean> {
 
   let bResult = false;
 
   try {
 
-    const result = await call_search( headers,
-                                      params );
+    const result = await call_userSearch( headers,
+                                          params );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1135,19 +1593,19 @@ export async function test_search( headers: any,
 
 }
 
-export async function test_search_count( headers: any,
-                                         params: any,
-                                         strCode: string,
-                                         strFileName: string,
-                                         intConditionType: number,
-                                         intCount: number ): Promise<boolean> {
+export async function test_userSearchCount( headers: any,
+                                            params: any,
+                                            strCode: string,
+                                            strFileName: string,
+                                            intConditionType: number,
+                                            intCount: number ): Promise<boolean> {
 
   let bResult = false;
 
   try {
 
-    const result = await call_search_count( headers,
-                                            params );
+    const result = await call_userSearchCount( headers,
+                                               params );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1282,6 +1740,617 @@ export async function test_deleteUserGroup( headers: any,
 
 }
 
+export async function test_createAuth( headers: any,
+                                       strCode: string,
+                                       strFileName: string,
+                                       bIsFail: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_createAuth( headers );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( bIsFail === false ) {
+
+        const strAuth = result.output.body.Data[ 0 ].Auth;
+
+        headers.BinaryDataToken = strAuth;
+
+        bResult = true;
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_deleteAuth( headers: any,
+                                       strCode: string,
+                                       strFileName: string,
+                                       bIsFail: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_deleteAuth( headers );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( bIsFail === false ) {
+
+        headers.BinaryDataToken = null;
+
+        bResult = true;
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_uploadImageTiger( headers: any,
+                                             strCode: string,
+                                             strFileName: string,
+                                             strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    //const binaryRequest = { ... binaryRequestFull }; //Copy original information
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/input/data/images/tiger.jpg";
+
+    const strFileCheckSum = await SystemUtilities.getFileHash( strPath, "md5", null );
+
+    const binaryRequest = new FormData();
+
+    binaryRequest.append( "File", fs.createReadStream( strPath ) );
+    binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
+    binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
+    binaryRequest.append( "Category", "Test" );
+    binaryRequest.append( "Label", "Tiger File" );
+    binaryRequest.append( "Tag", "#Tiger#,#Image#,#Test#" );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tiger" } ) );
+    binaryRequest.append( "Comment", "A tiger image..." );
+
+    let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
+
+    delete headersMultipart[ "Content-Type" ];
+
+    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
+      upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum = "md5://" + strFileCheckSum;
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+
+export async function test_uploadImageTower( headers: any,
+                                             strCode: string,
+                                             strFileName: string,
+                                             strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    //const binaryRequest = { ... binaryRequestFull }; //Copy original information
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/input/data/images/tower.jpg";
+
+    const strFileCheckSum = await SystemUtilities.getFileHash( strPath, "md5", null );
+
+    const binaryRequest = new FormData();
+
+    binaryRequest.append( "File", fs.createReadStream( strPath ) );
+    binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
+    binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
+    binaryRequest.append( "Category", "Test" );
+    binaryRequest.append( "Label", "Tower File" );
+    binaryRequest.append( "Tag", "#Tower#,#Image#,#Test#" );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tower" } ) );
+    binaryRequest.append( "Comment", "A tower image..." );
+
+    let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
+
+    delete headersMultipart[ "Content-Type" ];
+
+    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
+      upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum = "md5://" + strFileCheckSum;
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_uploadImageRoad( headers: any,
+                                            strCode: string,
+                                            strFileName: string,
+                                            strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    //const binaryRequest = { ... binaryRequestFull }; //Copy original information
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/input/data/images/road.jpg";
+
+    const binaryRequest = new FormData();
+
+    binaryRequest.append( "File", fs.createReadStream( strPath ) );
+    binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
+    binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
+    binaryRequest.append( "Category", "Test" );
+    binaryRequest.append( "Label", "Road File" );
+    binaryRequest.append( "Tag", "#Road#,#Image#,#Test#" );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Road" } ) );
+    binaryRequest.append( "Comment", "A road image..." );
+
+    let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
+
+    delete headersMultipart[ "Content-Type" ];
+
+    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_uploadImageCastle( headers: any,
+                                              strCode: string,
+                                              strFileName: string,
+                                              strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    //const binaryRequest = { ... binaryRequestFull }; //Copy original information
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/input/data/images/castle.jpg";
+
+    const binaryRequest = new FormData();
+
+    binaryRequest.append( "File", fs.createReadStream( strPath ) );
+    binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
+    binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
+    binaryRequest.append( "Category", "Test" );
+    binaryRequest.append( "Label", "Castle File" );
+    binaryRequest.append( "Tag", "#Castle#,#Image#,#Test#" );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Castle" } ) );
+    binaryRequest.append( "Comment", "A castle image..." );
+
+    let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
+
+    delete headersMultipart[ "Content-Type" ];
+
+    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_downloadImageThumbnail( headers: any,
+                                                   strCode: string,
+                                                   strFileName: string,
+                                                   strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/standalone/result/" +
+                    os.hostname + "/" +
+                    SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
+                    "/data/" + strUploadBinaryDataKey + "_thumbnail";
+
+    const result = await call_downloadBinaryData( headers,
+                                                  {
+                                                    Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                    Thumbnail: 1,
+                                                    SavePath: strPath
+                                                  } ); //This request must be success
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_downloadImage( headers: any,
+                                          strCode: string,
+                                          strFileName: string,
+                                          strUploadBinaryDataKey: string,
+                                          strCheckSum: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const strPath = SystemUtilities.baseRootPath +
+                    "/test/standalone/result/" +
+                    os.hostname + "/" +
+                    SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
+                    "/data/" + strUploadBinaryDataKey + "_full";
+
+    const result = await call_downloadBinaryData( headers,
+                                                  {
+                                                    Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                    Thumbnail: 0,
+                                                    SavePath: strPath
+                                                  } ); //This request must be success
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( strCheckSum ) {
+
+        const checkSum = strCheckSum.split( "://" );
+
+        const strCalculatedCheckSum = await SystemUtilities.getFileHash( strPath + "/" + result.output.body.Name, checkSum[ 0 ], null );
+
+        if ( strCalculatedCheckSum === checkSum[ 1 ] ) {
+
+          bResult = true;
+
+        }
+
+      }
+      else if ( upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum ) {
+
+        const checkSum = upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum.split( "://" );
+
+        const strCalculatedCheckSum = await SystemUtilities.getFileHash( strPath + "/" + result.output.body.Name, checkSum[ 0 ], null );
+
+        if ( strCalculatedCheckSum === checkSum[ 1 ] ) {
+
+          bResult = true;
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_deleteImage( headers: any,
+                                        strCode: string,
+                                        strFileName: string,
+                                        strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_deleteBinaryData( headers,
+                                                {
+                                                  Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                } ); //This request must be success
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_getImageDetails( headers: any,
+                                            strCode: string,
+                                            strFileName: string,
+                                            strUploadBinaryDataKey: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_getBinaryDataDetails( headers,
+                                                    {
+                                                      Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                    } ); //This request must be success
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_binarySearch( headers: any,
+                                         params: any,
+                                         strCode: string,
+                                         strFileName: string,
+                                         intConditionType: number,
+                                         intCount: number ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_binarySearch( headers,
+                                            params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( intConditionType === 0 ) {       //<=
+
+        bResult = result.output.body.Count <= intCount;
+
+      }
+      else if ( intConditionType === 1 ) {  //>=
+
+        bResult = result.output.body.Count >= intCount;
+
+      }
+      else if ( intConditionType === 2 ) {  //===
+
+        bResult = result.output.body.Count === intCount;
+
+      }
+      else if ( intConditionType === 3 ) {  //!==
+
+        bResult = result.output.body.Count !== intCount;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_binarySearchCount( headers: any,
+                                              params: any,
+                                              strCode: string,
+                                              strFileName: string,
+                                              intConditionType: number,
+                                              intCount: number ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await call_binarySearchCount( headers,
+                                                 params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( intConditionType === 0 ) {       //<=
+
+        bResult = result.output.body.Data[ 0 ].Count <= intCount;
+
+      }
+      else if ( intConditionType === 1 ) {  //>=
+
+        bResult = result.output.body.Data[ 0 ].Count >= intCount;
+
+      }
+      else if ( intConditionType === 2 ) {  //===
+
+        bResult = result.output.body.Data[ 0 ].Count === intCount;
+
+      }
+      else if ( intConditionType === 3 ) {  //!==
+
+        bResult = result.output.body.Data[ 0 ].Count !== intCount;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
 export async function test_createUser_user01_at_TestL01( headers: any,
                                                          strCode: string,
                                                          strFileName: string ): Promise<boolean> {
@@ -1319,6 +2388,21 @@ export async function test_createUser_user01_at_TestL01( headers: any,
   }
 
   return bResult;
+
+}
+
+export function checkTokens( strCurrentTokens: string,
+                             strTokensToCheck: string ): boolean {
+
+  //let bResult = false;
+
+  return CommonUtilities.isInMultiSimpleList( strCurrentTokens,
+                                              ",",
+                                              strTokensToCheck,
+                                              false,
+                                              null );
+
+  //return bResult;
 
 }
 
@@ -1361,13 +2445,15 @@ export async function test_createUser_user98_at_TestL98( headers: any,
 
         if ( bMustBeEmptyRoleAndTag ) {
 
-          if ( !user98_at_TestL98_data.Role &&
-              !user98_at_TestL98_data.Tag &&
-              !user98_at_TestL98_data.sysUserGroup.Role &&
-              !user98_at_TestL98_data.sysUserGroup.Tag &&
-              user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-              user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
-              user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+          if ( //!user98_at_TestL98_data.Role &&
+               checkTokens( user98_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+               !user98_at_TestL98_data.Tag &&
+               //!user98_at_TestL98_data.sysUserGroup.Role &&
+               checkTokens( user98_at_TestL98_data.SYSUserGroup.Role, "#MasterL01#" ) === false &&
+               !user98_at_TestL98_data.sysUserGroup.Tag &&
+               user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
 
             user98_at_TestL98_data.Password = userRequest.Password;
             bResult = true;
@@ -1377,13 +2463,15 @@ export async function test_createUser_user98_at_TestL98( headers: any,
         }
         else {
 
-          if ( user98_at_TestL98_data.Role === "#MasterL01#" &&
-              user98_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
-              user98_at_TestL98_data.sysUserGroup.Role === "#MasterL01#" &&
-              user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
-              user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-              user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
-              user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+          if ( //user98_at_TestL98_data.Role === "#MasterL01#" &&
+               checkTokens( user98_at_TestL98_data.Role, "#MasterL01#" ) &&
+               user98_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
+               //user98_at_TestL98_data.sysUserGroup.Role === "#MasterL01#" &&
+               checkTokens( user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+               user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
+               user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
 
             user98_at_TestL98_data.Password = userRequest.Password;
             bResult = true;
@@ -1422,12 +2510,12 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
 
     userRequest.Name = "user01@TestL01";
     userRequest.Password = "12345678";
-    userRequest.Role = "#MasterL01#";
-    userRequest.Tag = "#Tag11#,#Tag12#";
+    userRequest.Role = "#MasterL01#"; //This roles must be NOT ignored
+    userRequest.Tag = "#Tag11#,#Tag12#"; //This tags must be NOT ignored
     userRequest.sysUserGroup.Create = true;    //Ask to create
     userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
-    userRequest.sysUserGroup.Role = "";
-    userRequest.sysUserGroup.Tag = "";
+    userRequest.sysUserGroup.Role = "";  //This roles must be NOT ignored
+    userRequest.sysUserGroup.Tag = ""; //This tags must be NOT ignored
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
@@ -1442,9 +2530,11 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
 
       user01_at_TestL01_data = result.output.body.Data[ 0 ];
 
-      if ( user01_at_TestL01_data.Role === "#MasterL01#" &&
+      if ( //user01_at_TestL01_data.Role === "#MasterL01#" &&
+           checkTokens( user01_at_TestL01_data.Role, "#MasterL01#" ) &&
            user01_at_TestL01_data.Tag === "#Tag11#,#Tag12#" &&
-           !user01_at_TestL01_data.sysUserGroup.Role &&
+           //!user01_at_TestL01_data.sysUserGroup.Role &&
+           checkTokens( user01_at_TestL01_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
            !user01_at_TestL01_data.sysUserGroup.Tag &&
            user01_at_TestL01_data.Business.Role === "#Role01#,#Role02#" &&
            user01_at_TestL01_data.Business.Tag === "#Tag01#,#Tag02#" &&
@@ -1523,9 +2613,11 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
     userRequest.Name = "user02@TestL02";
     userRequest.Password = "12345678";
     userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#"; //<---- This roles must be ignored
-    userRequest.Role = "#Tag#"; //<---- This roles must be ignored
+    userRequest.Tag = "#Tag01#"; //<---- This tag must be ignored
     userRequest.sysUserGroup.Create = false;         //Ask to create
     userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
+    userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#"; //<---- This roles must be ignored
+    userRequest.sysUserGroup.Tag = "#Tag02#"; //<---- This tag must be ignored
     userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
     userRequest.Business.Tag = "#Tag20#,#Tag21#"; //<---- This roles must be ignored
 
@@ -1542,9 +2634,11 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
 
       if ( user02_at_TestL02_data.Name === "user02@TestL02" &&
            user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
-           !user02_at_TestL02_data.Role &&
+           //!user02_at_TestL02_data.Role &&
+           checkTokens( user02_at_TestL02_data.Role, "#MasterL03#+#GName:TestL01#+#GName:TestL02#" ) === false &&
            !user02_at_TestL02_data.Tag &&
-           !user02_at_TestL02_data.sysUserGroup.Role &&
+           //!user02_at_TestL02_data.sysUserGroup.Role &&
+           checkTokens( user02_at_TestL02_data.sysUserGroup.Role, "#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL02_data.sysUserGroup.Tag ) {
 
         user02_at_TestL02_data.Password = userRequest.Password;
@@ -1580,8 +2674,8 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
     userRequest.ExpireAt = "";
     userRequest.Name = "user99@TestL01";
     userRequest.Password = "123456789";
-    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
-    userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+    userRequest.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
     userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName.replace( " 1", "" );
@@ -1592,8 +2686,8 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
     userRequest.sysUserGroup.Id = "";
     userRequest.sysUserGroup.ShortId = "";
     userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
-    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Business = userData.Business;
 
     let result = await call_updateUser( headers, userRequest ); //This request must be success
@@ -1609,9 +2703,11 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
 
       if ( user02_at_TestL02_data.Name === "user99@TestL01" &&
            user02_at_TestL02_data.sysUserGroup.Name === "TestL01" &&
-           !user02_at_TestL02_data.Role &&
+           //!user02_at_TestL02_data.Role &&
+           checkTokens( user02_at_TestL02_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL02_data.Tag &&
-           !user02_at_TestL02_data.sysUserGroup.Role &&
+           //!user02_at_TestL02_data.sysUserGroup.Role &&
+           checkTokens( user02_at_TestL02_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL02_data.sysUserGroup.Tag ) {
 
           user02_at_TestL02_data.Password = userRequest.Password;
@@ -1703,8 +2799,8 @@ export async function test_updateUser_user99_at_TestL01_success( headers: any, u
     userRequest.Name = "user02@TestL02";
     userRequest.Password = "123456789";
     userRequest.ForceChangePassword = 1;
-    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
-    userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+    userRequest.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
     userRequest.sysPerson.FirstName = userRequest.sysPerson.FirstName.replace( " 1", "" );
@@ -1715,8 +2811,8 @@ export async function test_updateUser_user99_at_TestL01_success( headers: any, u
     userRequest.sysUserGroup.Id = "";
     userRequest.sysUserGroup.ShortId = "";
     userRequest.sysUserGroup.Name = "TestL02";    //This group already exists
-    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
-    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag is ignored
+    userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+    userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Business = userData.Business;
 
     let result = await call_updateUser( headers, userRequest ); //This request must be success
@@ -1732,9 +2828,11 @@ export async function test_updateUser_user99_at_TestL01_success( headers: any, u
 
       if ( user02_at_TestL02_data.Name === "user02@TestL02" &&
            user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
-           !user02_at_TestL02_data.Role &&
+           //!user02_at_TestL02_data.Role &&
+           checkTokens( user02_at_TestL02_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL02_data.Tag &&
-           !user02_at_TestL02_data.sysUserGroup.Role &&
+           //!user02_at_TestL02_data.sysUserGroup.Role &&
+           checkTokens( user02_at_TestL02_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL02_data.sysUserGroup.Tag ) {
 
         user02_at_TestL02_data.Password = userRequest.Password;
@@ -2030,8 +3128,8 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
     userRequest.ExpireAt = "";
     userRequest.Name = "user01@TestL01";
     userRequest.Password = "123456789";
-    userRequest.Role = "#MasterL01#";
-    userRequest.Tag = "#Tag01#";
+    userRequest.Role = "#MasterL01#"; //This role must be NOT ignored
+    userRequest.Tag = "#Tag01#"; //This tag must be NOT ignored
     userRequest.SessionsLimit = 1;
     userRequest.Comment = "Update success";
     userRequest.sysPerson = userData.sysPerson;
@@ -2043,8 +3141,8 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
     userRequest.sysUserGroup.Id = "";
     userRequest.sysUserGroup.ShortId = "";
     userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-    userRequest.sysUserGroup.Role = "";
-    userRequest.sysUserGroup.Tag = "";
+    userRequest.sysUserGroup.Role = ""; //This role must be NOT ignored
+    userRequest.sysUserGroup.Tag = ""; //This tag must be NOT ignored
     userRequest.Business = userData.Business;
 
     let result = await call_updateUser( headers, userRequest ); //This request must be success
@@ -2060,7 +3158,10 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
 
       if ( user01_at_TestL01_data.Name === "user01@TestL01" &&
            user01_at_TestL01_data.sysUserGroup.Name === "TestL01" &&
-           user01_at_TestL01_data.Role === "#MasterL01#"  ) {
+           checkTokens( user01_at_TestL01_data.Role, "#MasterL01#" ) &&
+           //!user01_at_TestL01_data.Role &&
+           !user01_at_TestL01_data.sysUserGroup.Role &&
+           !user01_at_TestL01_data.sysUserGroup.Tag ) {
 
         user01_at_TestL01_data[ "Password" ] = userRequest.Password; //Save the current password to make login later
         bResult = true;
@@ -2149,9 +3250,11 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
 
       user02_at_TestL01_data = result.output.body.Data[ 0 ];
 
-      if ( !user02_at_TestL01_data.Role &&
-           !user02_at_TestL01_data.Tag  &&
-           !user02_at_TestL01_data.sysUserGroup.Role &&
+      if ( //!user02_at_TestL01_data.Role &&
+           checkTokens( user02_at_TestL01_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+           !user02_at_TestL01_data.Tag &&
+           //!user02_at_TestL01_data.sysUserGroup.Role &&
+           checkTokens( user02_at_TestL01_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
            !user02_at_TestL01_data.sysUserGroup.Tag &&
            userRequest.Business.Role === "#Role03#,#Role04#" &&
            userRequest.Business.Tag === "#Tag03#,#Tag04#" ) {
@@ -2173,7 +3276,6 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
   return bResult;
 
 }
-
 
 export async function test_updateUser_user02_at_TestL01_success( headers: any, userData: any ): Promise<boolean> {
 
@@ -2321,6 +3423,42 @@ async function test_set01() {
 
     try {
 
+      myAssert( await test_uploadImageTiger( headers_admin01_at_system_net,
+                                               "SUCCESS_BINARY_DATA_UPLOAD",
+                                               "test_uploadImageTiger_admin01@system.net_success",
+                                               "admin01@system.net_tiger" ),
+                "5143BE7B1AE1: upload image tiger is OK",
+                "5143BE7B1AE1: upload image tiger is FAILED" );
+
+      myAssert( await test_createAuth( headers_admin01_at_system_net,
+                                       "SUCCESS_AUTH_TOKEN_CREATED",
+                                       "test_createAuth_admin01@system.net_success",
+                                       false ),
+                "79991E80365A: create auth admin01@system.net is OK",
+                "79991E80365A: create auth admin01@system.net is FAILED" );
+
+      myAssert( await test_downloadImageThumbnail( headers_admin01_at_system_net,
+                                                     "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                     "test_downloadImageTigerThumbnail_admin01@system.net_success",
+                                                     "admin01@system.net_tiger" ),
+                "D8C8CF834EE9: download image thumbnail tiger admin01@system.net is OK",
+                "D8C8CF834EE9: download image thumbnail tiger admin01@system.net is FAILED" );
+
+      myAssert( await test_downloadImage( headers_admin01_at_system_net,
+                                           "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                           "test_downloadImageTiger_admin01@system.net_success",
+                                           "admin01@system.net_tiger",
+                                           null ),
+                "4E99438DE0A9: download image tiger admin01@system.net is OK",
+                "4E99438DE0A9: download image tiger admin01@system.net is FAILED" );
+
+      myAssert( await test_getImageDetails( headers_admin01_at_system_net,
+                                              "SUCCESS_GET_INFORMATION",
+                                              "test_getImageDetailsTiger_admin01@system.net_success",
+                                              "admin01@system.net_tiger" ),
+                "4D93C17B6B3C: get image details tiger admin01@system.net is OK",
+                "4D93C17B6B3C: get image details tiger admin01@system.net is FAILED" );
+
       myAssert( await test_deleteUser( headers_admin01_at_system_net,
                                        { Name: "noexists@systems.net" },
                                        "ERROR_USER_NOT_FOUND",
@@ -2441,7 +3579,7 @@ async function test_set01() {
                 '84945A9B59D0: Update of the user user02@TestL02 is OK',
                 '84945A9B59D0: Update of the user user02@TestL02 is FAILED' );
 
-      myAssert( await test_search( headers_admin01_at_system_net,
+      myAssert( await test_userSearch( headers_admin01_at_system_net,
                 {  },
                 "SUCCESS_SEARCH",
                 "test_search_admin01@system.net_success",
@@ -2450,7 +3588,7 @@ async function test_set01() {
                'FA89A381FFA5: Search of the user admin01@system.net is OK',
                'FA89A381FFA5: Search of the user admin01@system.net is FAILED' );
 
-      myAssert( await test_search_count( headers_admin01_at_system_net,
+      myAssert( await test_userSearchCount( headers_admin01_at_system_net,
                 {  },
                 "SUCCESS_SEARCH_COUNT",
                 "test_search_admin01@system.net_success",
@@ -2463,7 +3601,7 @@ async function test_set01() {
 
         console.log( chalk.blue( ">******************** user01@TestL01 ********************<" ) );
 
-        headers_user01_at_TestL01_Session1.Authorization = "12345";
+        headers_user01_at_TestL01_Session1.Authorization = "12345"; //Create invalid authentication token
 
         //Fail because the user user01@TestL01 no valid session
         myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
@@ -2527,6 +3665,42 @@ async function test_set01() {
                   '0DB4C6D59098: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99#',
                   '0DB4C6D59098: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# FAILED' );
 
+        myAssert( await test_uploadImageTower( headers_user01_at_TestL01_Session1,
+                                                 "SUCCESS_BINARY_DATA_UPLOAD",
+                                                 "test_uploadImageTower_user01@TestL01_success",
+                                                 "user01@TestL01_tower" ),
+                  "DCF30CA926BB: upload image tower user01@TestL01 is OK",
+                  "DCF30CA926BB: upload image tower user01@TestL01 is FAILED" );
+
+        myAssert( await test_createAuth( headers_user01_at_TestL01_Session1,
+                                         "SUCCESS_AUTH_TOKEN_CREATED",
+                                         "test_createAuth_user01@TestL01_success",
+                                         false ),
+                  "6F30C8E983E3: create auth user01@TestL01 is OK",
+                  "6F30C8E983E3: create auth user01@TestL01 is FAILED" );
+
+        myAssert( await test_downloadImageThumbnail( headers_user01_at_TestL01_Session1,
+                                                       "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                       "test_downloadImageTowerThumbnail_user01@TestL01_success",
+                                                       "user01@TestL01_tower" ),
+                  "DF6BC73BB52F: download image thumbnail tower user01@TestL01 is OK",
+                  "DF6BC73BB52F: download image thumbnail tower user01@TestL01 is FAILED" );
+
+        myAssert( await test_downloadImage( headers_user01_at_TestL01_Session1,
+                                             "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                             "test_downloadImageTower_user01@TestL01_success",
+                                             "user01@TestL01_tower",
+                                             null ),
+                  "326E879A24CF: download image tower user01@TestL01 is OK",
+                  "326E879A24CF: download image tower user01@TestL01 is FAILED" );
+
+        myAssert( await test_getImageDetails( headers_user01_at_TestL01_Session1,
+                                                "SUCCESS_GET_INFORMATION",
+                                                "test_getImageDetailsTower_user01@TestL01_success",
+                                                "user01@TestL01_tower" ),
+                  "EA9A3CA6AF6C: get image details tower user01@TestL01 is OK",
+                  "EA9A3CA6AF6C: get image details tower user01@TestL01 is FAILED" );
+
         //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new group
         myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
                                                            "ERROR_CANNOT_CREATE_USER",
@@ -2571,7 +3745,7 @@ async function test_set01() {
                   '95543470C81F: Creation of the user user02@TestL01 is OK',
                   '95543470C81F: Creation of the user user02@TestL01 is FAILED' );
 
-        myAssert( await test_search( headers_user01_at_TestL01_Session1,
+        myAssert( await test_userSearch( headers_user01_at_TestL01_Session1,
                   {  },
                   "SUCCESS_SEARCH",
                   "test_search_user01@TestL01_success",
@@ -2580,7 +3754,7 @@ async function test_set01() {
                  'F720C51DE6FA: Search of the user user01@TestL01 is OK',
                  'F720C51DE6FA: Search of the user user01@TestL01 is FAILED' );
 
-        myAssert( await test_search_count( headers_user01_at_TestL01_Session1,
+        myAssert( await test_userSearchCount( headers_user01_at_TestL01_Session1,
                   {  },
                   "SUCCESS_SEARCH_COUNT",
                   "test_search_user01@TestL01_success",
@@ -2612,6 +3786,85 @@ async function test_set01() {
                     'A9464CC0DE81: The user user02@TestL01 is OK not have the roles #MasterL01# or #Administrator# or #BManagerL99#',
                     'A9464CC0DE81: The user user02@TestL01 have the roles #MasterL01# and/or #Administrator# and/or #BManagerL99# FAILED' );
 
+          myAssert( await test_uploadImageRoad( headers_user02_at_TestL01,
+                                                "SUCCESS_BINARY_DATA_UPLOAD",
+                                                "test_uploadImageRoad_user02@TestL01_success",
+                                                "user02@TestL01_road" ),
+                    "DCF30CA926BB: upload image road user02@TestL01 is OK",
+                    "DCF30CA926BB: upload image road user02@TestL01 is FAILED" );
+
+          myAssert( await test_createAuth( headers_user02_at_TestL01,
+                                           "SUCCESS_AUTH_TOKEN_CREATED",
+                                           "test_createAuth_user02@TestL01_success",
+                                           false ),
+                    "6F30C8E983E3: create auth user02@TestL01 is OK",
+                    "6F30C8E983E3: create auth user02@TestL01 is FAILED" );
+
+          myAssert( await test_downloadImageThumbnail( headers_user02_at_TestL01,
+                                                       "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                       "test_downloadImageRoadThumbnail_user02@TestL01_success",
+                                                       "user02@TestL01_road" ),
+                    "237980EFB1D6: download image thumbnail road user02@TestL01 is OK",
+                    "237980EFB1D6: download image thumbnail road user02@TestL01 is FAILED" );
+
+          myAssert( await test_downloadImage( headers_user02_at_TestL01,
+                                              "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                              "test_downloadImageRoad_user02@TestL01_success",
+                                              "user02@TestL01_road",
+                                              null ),
+                    "326E879A24CF: download image road user02@TestL01 is OK",
+                    "326E879A24CF: download image road user02@TestL01 is FAILED" );
+
+          myAssert( await test_getImageDetails( headers_user02_at_TestL01,
+                                                "SUCCESS_GET_INFORMATION",
+                                                "test_getImageDetailsRoad_user02@TestL01_success",
+                                                "user02@TestL01_road" ),
+                    "EA9A3CA6AF6C: get image details road user02@TestL01 is OK",
+                    "EA9A3CA6AF6C: get image details road user02@TestL01 is FAILED" );
+
+          myAssert( await test_binarySearch( headers_user02_at_TestL01,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user02@TestL01_success",
+                    2,
+                    1 ),
+                    '6CAE1B5074FE: Search of the binary data user02@TestL01 is OK',
+                    '6CAE1B5074FE: Search of the binary data user02@TestL01 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user02_at_TestL01,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user02@TestL01_success",
+                    2,
+                    1 ),
+                    'BA12C15C021E: Search count of the binary data user02@TestL01 is OK',
+                    'BA12C15C021E: Search count of the binary data user02@TestL01 is FAILED' );
+
+          myAssert( await test_binarySearch( headers_user01_at_TestL01_Session1,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user01@TestL01_success",
+                    2,
+                    2 ),
+                    '30CC59357B73: Search of the user user01@TestL01 is OK',
+                    '30CC59357B73: Search of the user user01@TestL01 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user01_at_TestL01_Session1,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user01@TestL01_success",
+                    2,
+                    2 ),
+                    '447DC61A3301: Search count of the binary data user01@TestL01 is OK',
+                    '447DC61A3301: Search count of the binary data user01@TestL01 is FAILED' );
+
+          myAssert( await test_deleteImage( headers_user02_at_TestL01,
+                                            "SUCCESS_BINARY_DATA_DELETE",
+                                            "test_deleteImageRoad_user02@TestL01_success",
+                                            "user02@TestL01_road" ),
+                    "2940D61E1827: delete image road user02@TestL01 is OK",
+                    "2940D61E1827: delete image road user02@TestL01 is FAILED" );
+
           //Fail because user03@TestL01 not have role to made this request
           myAssert( await test_createUser_user03_at_TestL01_fail( headers_user02_at_TestL01 ),
                     'EFCA2421E693: Creation of the user user03@TestL01 is OK with the fail',
@@ -2642,6 +3895,13 @@ async function test_set01() {
           console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
+
+        myAssert( await test_deleteImage( headers_user01_at_TestL01_Session1,
+                                          "SUCCESS_BINARY_DATA_DELETE",
+                                          "test_deleteImageTower_admin01@system.net_success",
+                                          "user01@TestL01_tower" ),
+                  "7D2AB0B58075: delete image tower admin01@system.net is OK",
+                  "7D2AB0B58075: delete image tower admin01@system.net is FAILED" );
 
         //Success because the user user02@TestL01 is in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
         //*** Delete user user02@TestL01 ***
@@ -2760,7 +4020,7 @@ async function test_set01() {
                   '79736CBA890B: Creation of the user user02@TestL01 is OK',
                   '79736CBA890B: Creation of the user user02@TestL01 is FAILED' );
 
-        myAssert( await test_search( headers_user01_at_TestL02,
+        myAssert( await test_userSearch( headers_user01_at_TestL02,
                   {  },
                   "SUCCESS_SEARCH",
                   "test_search_user01@TestL01_success",
@@ -2769,7 +4029,7 @@ async function test_set01() {
                  'AD0B5775D644: Search of the user user01@TestL02 is OK',
                  'AD0B5775D644: Search of the user user01@TestL02 is FAILED' );
 
-        myAssert( await test_search_count( headers_user01_at_TestL02,
+        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
                   {  },
                   "SUCCESS_SEARCH_COUNT",
                   "test_search_user01@TestL01_success",
@@ -2779,7 +4039,7 @@ async function test_set01() {
                  'C095D0EA6182: Search count of the user user01@TestL02 is FAILED' );
 
         //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
-        myAssert( await test_search( headers_user01_at_TestL02,
+        myAssert( await test_userSearch( headers_user01_at_TestL02,
                   { where: "A.Name = 'admin01@system.net'" },
                   "SUCCESS_SEARCH",
                   "test_search_admin01@system.net_success",
@@ -2789,7 +4049,7 @@ async function test_set01() {
                  '0C4F58078409: Search of the user user01@TestL02 is FAILED' );
 
         //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
-        myAssert( await test_search_count( headers_user01_at_TestL02,
+        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
                   { where: "A.Name = 'admin01@system.net'" },
                   "SUCCESS_SEARCH_COUNT",
                   "test_search_admin01@system.net_success",
@@ -2798,7 +4058,7 @@ async function test_set01() {
                  '89A4483AD09F: Search count of the user user01@TestL02 is OK',
                  'A972F4A5400E: Search count of the user user01@TestL02 is FAILED' );
 
-        myAssert( await test_search( headers_user01_at_TestL02,
+        myAssert( await test_userSearch( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02'" },
                   "SUCCESS_SEARCH",
                   "test_search_user02@TestL02_success",
@@ -2807,7 +4067,7 @@ async function test_set01() {
                  '0C4F58078409: Search of the user user02@TestL02 is OK',
                  '0C4F58078409: Search of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_search_count( headers_user01_at_TestL02,
+        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02'" },
                   "SUCCESS_SEARCH_COUNT",
                   "test_search_user02@TestL02_success",
@@ -2816,7 +4076,7 @@ async function test_set01() {
                  '89A4483AD09F: Search count of the user user02@TestL02 is OK',
                  '89A4483AD09F: Search count of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_search( headers_user01_at_TestL02,
+        myAssert( await test_userSearch( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
                   "SUCCESS_SEARCH",
                   "test_search_user02@TestL02_success",
@@ -2825,7 +4085,7 @@ async function test_set01() {
                  '6F000511292F: Search of the user user02@TestL02 is OK',
                  '6F000511292F: Search of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_search_count( headers_user01_at_TestL02,
+        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
                   "SUCCESS_SEARCH_COUNT",
                   "test_search_user02@TestL02_success",
@@ -2833,6 +4093,60 @@ async function test_set01() {
                   2 ), //Count
                  '656BB66AC356: Search count of the user user02@TestL02 is OK',
                  '656BB66AC356: Search count of the user user02@TestL02 is FAILED' );
+
+        myAssert( await test_uploadImageRoad( headers_user01_at_TestL02,
+                                              "SUCCESS_BINARY_DATA_UPLOAD",
+                                              "test_uploadImageRoad_user01@TestL02_success",
+                                              "user01@TestL02_road" ),
+                  "C23E1CE5725E: upload image road user01@TestL02 is OK",
+                  "C23E1CE5725E: upload image road user01@TestL02 is FAILED" );
+
+        myAssert( await test_createAuth( headers_user01_at_TestL02,
+                                         "SUCCESS_AUTH_TOKEN_CREATED",
+                                         "test_createAuth_user01@TestL02_success",
+                                         false ),
+                  "C539A2B57526: create auth user01@TestL02 is OK",
+                  "C539A2B57526: create auth user01@TestL02 is FAILED" );
+
+        myAssert( await test_downloadImageThumbnail( headers_user01_at_TestL02,
+                                                     "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                     "test_downloadImageRoadThumbnail_user01@TestL02_success",
+                                                     "user01@TestL02_road" ),
+                  "EDD23DB9B25D: download image thumbnail road user01@TestL02 is OK",
+                  "EDD23DB9B25D: download image thumbnail road user01@TestL02 is FAILED" );
+
+        myAssert( await test_downloadImage( headers_user01_at_TestL02,
+                                            "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                            "test_downloadImageRoad_user01@TestL02_success",
+                                            "user01@TestL02_road",
+                                            null ),
+                  "0B1CD13DAD0B: download image road user01@TestL02 is OK",
+                  "0B1CD13DAD0B: download image road user01@TestL02 is FAILED" );
+
+        myAssert( await test_getImageDetails( headers_user01_at_TestL02,
+                                              "SUCCESS_GET_INFORMATION",
+                                              "test_getImageDetailsRoad_user01@TestL02_success",
+                                              "user01@TestL02_road" ),
+                  "EA9A3CA6AF6C: get image details road user01@TestL02 is OK",
+                  "EA9A3CA6AF6C: get image details road user01@TestL02 is FAILED" );
+
+        myAssert( await test_binarySearch( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH",
+                  "test_search_user01@TestL02_success",
+                  2,
+                  1 ),
+                  '7C542CAC93F9: Search of the binary data user01@TestL02 is OK',
+                  '7C542CAC93F9: Search of the binary data user01@TestL02 is FAILED' );
+
+        myAssert( await test_binarySearchCount( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_searchCount_user01@TestL02_success",
+                  2,
+                  1 ),
+                  '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is OK',
+                  '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is FAILED' );
 
         try {
 
@@ -2899,6 +4213,78 @@ async function test_set01() {
                     'DEF3E36E35C4: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
                     'DEF3E36E35C4: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
 
+          myAssert( await test_uploadImageRoad( headers_user02_at_TestL02,
+                                                "SUCCESS_BINARY_DATA_UPLOAD",
+                                                "test_uploadImageRoad_user02@TestL02_success",
+                                                "user02@TestL02_road" ),
+                    "09436E9FE7B4: upload image road user02@TestL02 is OK",
+                    "09436E9FE7B4: upload image road user02@TestL02 is FAILED" );
+
+          myAssert( await test_createAuth( headers_user02_at_TestL02,
+                                           "SUCCESS_AUTH_TOKEN_CREATED",
+                                           "test_createAuth_user02@TestL02_success",
+                                           false ),
+                    "68A9AE102E89: create auth user02@TestL02 is OK",
+                    "68A9AE102E89: create auth user02@TestL02 is FAILED" );
+
+          myAssert( await test_downloadImageThumbnail( headers_user02_at_TestL02,
+                                                       "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                       "test_downloadImageRoadThumbnail_user02@TestL02_success",
+                                                       "user02@TestL02_road" ),
+                    "29EA767C6CF1: download image thumbnail road user02@TestL02 is OK",
+                    "29EA767C6CF1: download image thumbnail road user02@TestL02 is FAILED" );
+
+          myAssert( await test_downloadImage( headers_user02_at_TestL02,
+                                              "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                              "test_downloadImageRoad_user02@TestL02_success",
+                                              "user02@TestL02_road",
+                                              null ),
+                    "D4F7EE1786AE: download image road user02@TestL02 is OK",
+                    "D4F7EE1786AE: download image road user02@TestL02 is FAILED" );
+
+          myAssert( await test_getImageDetails( headers_user02_at_TestL02,
+                                                "SUCCESS_GET_INFORMATION",
+                                                "test_getImageDetailsRoad_user02@TestL02_success",
+                                                "user02@TestL02_road" ),
+                    "D121F8FC1A6E: get image details road user02@TestL02 is OK",
+                    "D121F8FC1A6E: get image details road user02@TestL02 is FAILED" );
+
+          myAssert( await test_binarySearch( headers_user02_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user02@TestL02_success",
+                    2,
+                    1 ),
+                    'BA8DDFDEC334: Search of the binary data user02@TestL02 is OK',
+                    'BA8DDFDEC334: Search of the binary data user02@TestL02 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user02_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user02@TestL01_success",
+                    2,
+                    1 ),
+                    'E21BF5EF740F: Search count of the binary data user02@TestL02 is OK',
+                    'E21BF5EF740F: Search count of the binary data user02@TestL02 is FAILED' );
+
+          myAssert( await test_binarySearch( headers_user01_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user01@TestL02_success",
+                    2,
+                    2 ),
+                    'BA8DDFDEC334: Search of the binary data user01@TestL02 is OK',
+                    'BA8DDFDEC334: Search of the binary data user01@TestL02 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user01_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user01@TestL02_success",
+                    2,
+                    2 ),
+                    'C107CF6AA8EB: Search count of the binary data user01@TestL02 is OK',
+                    'C107CF6AA8EB: Search count of the binary data user01@TestL02 is FAILED' );
+
           myAssert( await test_logout( headers_user02_at_TestL02,
                                        "SUCCESS_LOGOUT",
                                        "test_logout_user02@TestL02_success" ),
@@ -2945,6 +4331,85 @@ async function test_set01() {
                     'BE0D27084964: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
                     'BE0D27084964: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
 
+          myAssert( await test_uploadImageCastle( headers_user02_at_TestL01,
+                                                  "SUCCESS_BINARY_DATA_UPLOAD",
+                                                  "test_uploadImageCastle_user02@TestL01_success",
+                                                  "user02@TestL01_castle" ),
+                    "6355B124499E: upload image castle user02@TestL01 is OK",
+                    "6355B124499E: upload image castle user02@TestL01 is FAILED" );
+
+          myAssert( await test_createAuth( headers_user02_at_TestL01,
+                                           "SUCCESS_AUTH_TOKEN_CREATED",
+                                           "test_createAuth_user02@TestL01_success",
+                                           false ),
+                    "68A9AE102E89: create auth user02@TestL01 is OK",
+                    "68A9AE102E89: create auth user02@TestL01 is FAILED" );
+
+          myAssert( await test_downloadImageThumbnail( headers_user02_at_TestL01,
+                                                       "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                       "test_downloadImageCastleThumbnail_user02@TestL01_success",
+                                                       "user02@TestL01_castle" ),
+                    "8C71B4C27928: download image thumbnail castle user02@TestL01 is OK",
+                    "8C71B4C27928: download image thumbnail castle user02@TestL01 is FAILED" );
+
+          myAssert( await test_downloadImage( headers_user02_at_TestL01,
+                                              "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                              "test_downloadImageCastle_user02@TestL01_success",
+                                              "user02@TestL01_castle",
+                                              null ),
+                    "15FC200672CD: download image castle user02@TestL01 is OK",
+                    "15FC200672CD: download image castle user02@TestL01 is FAILED" );
+
+          myAssert( await test_getImageDetails( headers_user02_at_TestL01,
+                                                "SUCCESS_GET_INFORMATION",
+                                                "test_getImageDetailsCatle_user02@TestL01_success",
+                                                "user02@TestL01_castle" ),
+                    "C4D63A79B8C6: get image details castle user02@TestL01 is OK",
+                    "C4D63A79B8C6: get image details castle user02@TestL01 is FAILED" );
+
+          myAssert( await test_binarySearch( headers_user02_at_TestL01,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user02@TestL01_success",
+                    2,
+                    1 ),
+                    '42D17A37758A: Search of the binary data user02@TestL01 is OK',
+                    '42D17A37758A: Search of the binary data user02@TestL01 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user02_at_TestL01,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user02@TestL01_success",
+                    2,
+                    1 ),
+                    '7A542D403847: Search count of the binary data user02@TestL01 is OK',
+                    '7A542D403847: Search count of the binary data user02@TestL01 is FAILED' );
+
+          myAssert( await test_binarySearch( headers_user01_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH",
+                    "test_search_user01@TestL02_success",
+                    2,
+                    3 ),
+                    'FA694F2DF9DB: Search of the binary data user01@TestL02 is OK',
+                    'FA694F2DF9DB: Search of the binary data user01@TestL02 is FAILED' );
+
+          myAssert( await test_binarySearchCount( headers_user01_at_TestL02,
+                    {  },
+                    "SUCCESS_SEARCH_COUNT",
+                    "test_searchCount_user01@TestL02_success",
+                    2,
+                    3 ),
+                    '3C577FAE6D3C: Search count of the binary data user01@TestL02 is OK',
+                    '3C577FAE6D3C: Search count of the binary data user01@TestL02 is FAILED' );
+
+          myAssert( await test_deleteImage( headers_user02_at_TestL01,
+                                            "SUCCESS_BINARY_DATA_DELETE",
+                                            "test_deleteImageCastle_user02@TestL01_success",
+                                            "user02@TestL01_castle" ),
+                    "61FD3EFB09E7: delete image castle user02@TestL01 is OK",
+                    "61FD3EFB09E7: delete image castle user02@TestL01 is FAILED" );
+
           myAssert( await test_logout( headers_user02_at_TestL01,
                                        "SUCCESS_LOGOUT",
                                        "test_logout_user02@TestL01_success" ),
@@ -2961,6 +4426,20 @@ async function test_set01() {
           console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
 
         }
+
+        myAssert( await test_deleteImage( headers_user01_at_TestL02,
+                                          "SUCCESS_BINARY_DATA_DELETE",
+                                          "test_deleteImageRoad_user01@TestL02_success",
+                                          "user02@TestL02_road" ),
+                  "DC8835AA08C0: delete image road user01@TestL02 is OK",
+                  "DC8835AA08C0: delete image road user01@TestL02 is FAILED" );
+
+        myAssert( await test_deleteImage( headers_user01_at_TestL02,
+                                          "SUCCESS_BINARY_DATA_DELETE",
+                                          "test_deleteImageRoad_user01@TestL02_success",
+                                          "user01@TestL02_road" ),
+                  "D02C1566D62C: delete image road user01@TestL02 is OK",
+                  "D02C1566D62C: delete image road user01@TestL02 is FAILED" );
 
         //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
         myAssert( await test_deleteUser( headers_user01_at_TestL02,
@@ -2994,6 +4473,13 @@ async function test_set01() {
         console.log( chalk.blue( "<******************** user01@TestL02 ********************>" ) );
 
       }
+
+      myAssert( await test_deleteImage( headers_admin01_at_system_net,
+                                        "SUCCESS_BINARY_DATA_DELETE",
+                                        "test_deleteImageTiger_admin01@system.net_success",
+                                        "admin01@system.net_tiger" ),
+                "B916F1ECD54E: delete image tiger admin01@system.net is OK",
+                "B916F1ECD54E: delete image tiger admin01@system.net is FAILED" );
 
       myAssert( await test_deleteUserGroup( headers_admin01_at_system_net,
                                             { Name: "TestL01" },
