@@ -149,9 +149,9 @@ export default class SYSUserSignupService extends BaseService {
       if ( result === null ) {
 
         result = await SYSUserSignup.create(
-                                          createOrUpdateData,
-                                          { transaction: currentTransaction }
-                                        );
+                                             createOrUpdateData,
+                                             { transaction: currentTransaction }
+                                           );
 
       }
       else if ( bUpdate ) {
@@ -165,7 +165,7 @@ export default class SYSUserSignupService extends BaseService {
         }
 
         const updateResult = await SYSUserSignup.update( currentValues,
-                                                      options );
+                                                         options );
 
 
         if ( updateResult.length > 0 &&

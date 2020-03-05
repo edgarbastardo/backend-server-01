@@ -608,7 +608,7 @@ export default class SecurityServiceController {
 
       const bUserFound = sysUserInDB && sysUserInDB instanceof Error === false;
       const bUserDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( sysUserInDB.DisabledAt );
-      const bUserExpired = SystemUtilities.isDateAndTimeAfter( sysUserInDB.ExpireAt );
+      const bUserExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( sysUserInDB.ExpireAt );
       const bUserGroupDisabled = bUserFound && CommonUtilities.isNotNullOrEmpty( sysUserInDB.sysUserGroup.DisabledAt );
       const bUserGroupExpired = bUserFound && SystemUtilities.isDateAndTimeAfter( sysUserInDB.sysUserGroup.ExpireAt );
 
@@ -1408,6 +1408,7 @@ export default class SecurityServiceController {
                                                          */
 
           //Delete from cache the other tokens
+          await CacheManager.deleteData( userSessionStatus.Token, logger );
           userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
           userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
 

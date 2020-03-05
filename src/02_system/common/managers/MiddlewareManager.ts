@@ -607,7 +607,7 @@ export default class MiddlewareManager {
 
     }
 
-    const roles = await SystemUtilities.getRoleOfRoute( CommonUtilities.getRequestKindFromHTTPMethodString( request.method ), //Always post
+    const roles = await SystemUtilities.getRoleOfRoute( CommonUtilities.getRequestKindFromString( request.method ), //Always post
                                                         strPath,
                                                         true,
                                                         logger );

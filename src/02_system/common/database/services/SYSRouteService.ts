@@ -103,6 +103,11 @@ export default class SYSRouteService extends BaseService {
         }
 
       }
+      else {
+
+        result = routeInDB;
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

@@ -147,10 +147,10 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
                                                             strTimeZoneId,
                                                             params.Logger );
 
-        result.PasswordSetAt = SystemUtilities.transformToTimeZone( result.PassswordSetAt,
-                                                                    strTimeZoneId,
-                                                                    undefined,
-                                                                    params.logger );
+        result.ExpireAt = SystemUtilities.transformToTimeZone( result.ExpireAt,
+                                                               strTimeZoneId,
+                                                               undefined,
+                                                               params.logger );
 
         if ( Array.isArray( params.Include ) ) {
 
@@ -222,142 +222,6 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
         delete result.ExtraData;
 
         result.Business = {};
-
-      }
-
-      if ( result.sysPerson ) {
-
-        if ( !result.sysPerson.Id ) {
-
-          result.sysPerson = null;
-
-        }
-        else if ( result.sysPerson.ExtraData ) {
-
-          result.sysPerson = result.sysPerson.dataValues ? result.sysPerson.dataValues: result.sysPerson;
-
-          const extraData = CommonUtilities.parseJSON( result.sysPerson.ExtraData,
-                                                       params.logger );
-
-          if ( extraData &&
-              extraData.Private ) {
-
-            delete extraData.Private;
-
-          }
-
-          if ( !params.KeepPersonExtraData ||
-                params.KeepPersonExtraData === 0 ) {
-
-            if ( extraData.Business ) {
-
-              result.sysPerson.Business = extraData.Business;
-
-              delete extraData.Business;
-
-              if ( extraData ) {
-
-                result.sysPerson.Business = { ...result.sysPerson.Business, ...extraData };
-
-              }
-
-            }
-            else {
-
-              result.sysPerson.Business = extraData;
-
-            }
-
-            delete result.sysPerson.ExtraData;
-
-          }
-          else {
-
-            result.sysPerson.ExtraData = extraData;
-
-          }
-
-        }
-        else {
-
-          if ( !params.KeepPersonExtraData ||
-               params.KeepPersonExtraData === 0 ) {
-
-            delete result.sysPerson.ExtraData;
-
-            result.sysPerson.Business = {};
-
-          }
-
-        }
-
-      }
-
-      if ( result.sysUserGroup ) {
-
-        if ( !result.sysUserGroup.Id ) {
-
-          result.sysUserGroup = null;
-
-        }
-        else if ( result.sysUserGroup.ExtraData ) {
-
-          result.sysUserGroup = result.sysUserGroup.dataValues ? result.sysUserGroup.dataValues: result.sysUserGroup;
-
-          const extraData = CommonUtilities.parseJSON( result.sysUserGroup.ExtraData,
-                                                      params.logger );
-
-          if ( extraData &&
-              extraData.Private ) {
-
-            delete extraData.Private;
-
-          }
-
-          if ( !params.KeepGroupExtraData ||
-              params.KeepGroupExtraData === 0 ) {
-
-            if ( extraData.Business ) {
-
-              result.sysUserGroup.Business = extraData.Business;
-
-              delete extraData.Business;
-
-              if ( extraData ) {
-
-                result.sysUserGroup.Business = { ...result.sysUserGroup.Business, ...extraData };
-
-              }
-
-            }
-            else {
-
-              result.sysUserGroup.Business = extraData;
-
-            }
-
-            delete result.sysUserGroup.ExtraData;
-
-          }
-          else {
-
-            result.sysUserGroup.ExtraData = extraData;
-
-          }
-
-        }
-        else {
-
-          if ( !params.KeepPersonExtraData ||
-               params.KeepPersonExtraData === 0 ) {
-
-            delete result.sysUserGroup.ExtraData;
-
-            result.sysUserGroup.Business = {};
-
-          }
-
-        }
 
       }
 

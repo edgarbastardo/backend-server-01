@@ -73,7 +73,7 @@ export default class DatabaseModelController {
             let strRealPath = routeInfo.Path.replace( ":name", strTableMame );
             //strRealPath = strRealPath.replace( ":id", "" );
 
-            const strAction = CommonUtilities.getActionStringFromRequestKind( routeInfo.RequestKind );
+            const strAction = CommonUtilities.getActionFromNumber( routeInfo.RequestKind );
 
             //const strFullActionTag = strModelName + "_Full";
             const strSpecificActionTag = strTableMame + "_" + strAction;

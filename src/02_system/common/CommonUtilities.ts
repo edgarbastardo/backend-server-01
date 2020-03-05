@@ -68,12 +68,12 @@ export default class CommonUtilities {
     }
     else if ( strAccessKind === "authenticated" ) {
 
-      result = AccessKind.Public;
+      result = AccessKind.Authenticated;
 
     }
     else if ( strAccessKind === "role" ) {
 
-      result = AccessKind.Public;
+      result = AccessKind.Role;
 
     }
 
@@ -81,7 +81,7 @@ export default class CommonUtilities {
 
   }
 
-  static getAccessKind( intAccessKind: number ): String {
+  static getAccessKindFromNumber( intAccessKind: number ): String {
 
     let strResult: string;
 
@@ -102,6 +102,126 @@ export default class CommonUtilities {
     }
 
     return strResult;
+
+  }
+
+  static getRequestKindFromString( strHTTPMethod: string ): number {
+
+    let result: number;
+
+    strHTTPMethod = strHTTPMethod.toLocaleLowerCase();
+
+    if ( strHTTPMethod === "get" ) {
+
+      result = 1;
+
+    }
+    else if ( strHTTPMethod === "post" ) {
+
+      result = 2;
+
+    }
+    else if ( strHTTPMethod === "put" ) {
+
+      result = 3;
+
+    }
+    else if ( strHTTPMethod === "delete" ) {
+
+      result = 4;
+
+    }
+
+    return result;
+
+  }
+
+  static getRequestKindFromNumber( intRequestKind: number ): string {
+
+    let strResult: string;
+
+    if ( intRequestKind === 1 ) {
+
+      strResult = "Get";
+
+    }
+    else if ( intRequestKind === 2 ) {
+
+      strResult = "Post";
+
+    }
+    else if ( intRequestKind === 3 ) {
+
+      strResult = "Put";
+
+    }
+    else if ( intRequestKind === 4 ) {
+
+      strResult = "Delete";
+
+    }
+
+    return strResult;
+
+  }
+
+  static getActionFromNumber( intAction: number ): string {
+
+    let strResult: string;
+
+    if ( intAction === 1 ) {
+
+      strResult = "Get";
+
+    }
+    else if ( intAction === 2 ) {
+
+      strResult = "Create";
+
+    }
+    else if ( intAction === 3 ) {
+
+      strResult = "Update";
+
+    }
+    else if ( intAction === 4 ) {
+
+      strResult = "Delete";
+
+    }
+
+    return strResult;
+
+  }
+
+  static getActionFromString( strAction: string ): number {
+
+    let intResult: number;
+
+    strAction = strAction.toLocaleLowerCase();
+
+    if ( strAction === "Get" ) {
+
+      intResult = 1;
+
+    }
+    else if ( strAction === "Create" ) {
+
+      intResult = 2;
+
+    }
+    else if ( strAction === "Update" ) {
+
+      intResult = 3;
+
+    }
+    else if ( strAction === "Delete" ) {
+
+      intResult = 4;
+
+    }
+
+    return intResult;
 
   }
 
@@ -133,94 +253,6 @@ export default class CommonUtilities {
     }
 
     return result;
-
-  }
-  static getRequestKindFromHTTPMethodString( strHTTPMethod: string ): number {
-
-    let result: number;
-
-    strHTTPMethod = strHTTPMethod.toLocaleLowerCase();
-
-    if ( strHTTPMethod === "get" ) {
-
-      result = 1;
-
-    }
-    else if ( strHTTPMethod === "post" ) {
-
-      result = 2;
-
-    }
-    else if ( strHTTPMethod === "put" ) {
-
-      result = 3;
-
-    }
-    else if ( strHTTPMethod === "delete" ) {
-
-      result = 4;
-
-    }
-
-    return result;
-
-  }
-
-  static getHTTPMethodStringFromRequestKind( intRequestKind: number ): string {
-
-    let strResult: string;
-
-    if ( intRequestKind === 1 ) {
-
-      strResult = "Get";
-
-    }
-    else if ( intRequestKind === 2 ) {
-
-      strResult = "Post";
-
-    }
-    else if ( intRequestKind === 3 ) {
-
-      strResult = "Put";
-
-    }
-    else if ( intRequestKind === 4 ) {
-
-      strResult = "Delete";
-
-    }
-
-    return strResult;
-
-  }
-
-  static getActionStringFromRequestKind( intRequestKind: number ): string {
-
-    let strResult: string;
-
-    if ( intRequestKind === 1 ) {
-
-      strResult = "Get";
-
-    }
-    else if ( intRequestKind === 2 ) {
-
-      strResult = "Create";
-
-    }
-    else if ( intRequestKind === 3 ) {
-
-      strResult = "Update";
-
-    }
-    else if ( intRequestKind === 4 ) {
-
-      strResult = "Delete";
-
-    }
-
-    return strResult;
 
   }
 
@@ -1148,8 +1180,51 @@ export default class CommonUtilities {
 
   public static normalizeWhitespaces( strValue: string ): string {
 
-    // Replace all whitespace blocks with single spaces.
-    return strValue != null ? strValue.trim().replace( / +/g, " " ) : "";
+    let strResult = "";
+
+    try {
+
+      // Replace all whitespace blocks with single spaces.
+      strResult = strValue != null ? strValue.trim().replace( / +/g, " " ) : "";
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
+  public static formatTitle( strValue: string ): string {
+
+    let result = [];
+
+    try {
+
+      let strValueNormalized = this.normalizeWhitespaces( strValue );
+
+      const wordList = strValueNormalized.toLowerCase().split( " " );
+
+      for ( let intWordIndex = 0; intWordIndex < wordList.length; intWordIndex++ ) {
+
+        let strWord = wordList[ intWordIndex ][ 0 ].toUpperCase() + wordList[ intWordIndex ].slice( 1 );
+
+        result.push( strWord );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return result.join( " " );
+
+    //return strValue != null ? strValue.trim().replace( / +/g, " " ) : "";
 
   }
 

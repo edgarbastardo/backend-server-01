@@ -45,19 +45,19 @@ export default class SYSConfigValueDataService extends BaseService {
 
       }
 
-      const strSQL = DBConnectionManager.getStatement( "getConfigValueData",
-                                                       {
-                                                         ConfigMetaDataId: strConfigMetaDataId,
-                                                         Owner: strOnwer
-                                                       },
-                                                       logger );
+      let strSQL = DBConnectionManager.getStatement( "getConfigValueData",
+                                                     {
+                                                       ConfigMetaDataId: strConfigMetaDataId,
+                                                       Owner: strOnwer
+                                                     },
+                                                     logger );
 
-      const rows = await dbConnection.query( strSQL,
-                                             {
-                                               raw: true,
-                                               type: QueryTypes.SELECT,
-                                               transaction: currentTransaction
-                                             } );
+      let rows = await dbConnection.query( strSQL,
+                                           {
+                                             raw: true,
+                                             type: QueryTypes.SELECT,
+                                             transaction: currentTransaction
+                                           } );
 
       if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
 
@@ -65,6 +65,31 @@ export default class SYSConfigValueDataService extends BaseService {
                    Value: rows[ 0 ].Value ? rows[ 0 ].Value : null,
                    Default: rows[ 0 ].Default ? rows[ 0 ].Default : null
                  };
+
+      }
+      else {
+
+        strSQL = DBConnectionManager.getStatement( "getConfigDefaultValueData",
+                                                    {
+                                                      ConfigMetaDataId: strConfigMetaDataId,
+                                                    },
+                                                    logger );
+
+        rows = await dbConnection.query( strSQL,
+                                         {
+                                           raw: true,
+                                           type: QueryTypes.SELECT,
+                                           transaction: currentTransaction
+                                         } );
+
+        if ( CommonUtilities.isNotNullOrEmpty( rows ) ) {
+
+          result = {
+                     Value: null,
+                     Default: rows[ 0 ].Default ? rows[ 0 ].Default : null
+                   };
+
+        }
 
       }
 

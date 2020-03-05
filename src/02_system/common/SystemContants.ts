@@ -1429,81 +1429,86 @@ export default class SystemConstants {
 
     static readonly _CONFIG_ENTRY_Frontend_Rules_EXAMPLE = JSON.stringify(
                                                                            {
-                                                                              "#mobile-ionic4-sales-???#": {
-                                                                                "userLoginControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "#Final_Customers_01#,#Administrator#"
-                                                                                },
-                                                                                "userSignupControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "#finalCustomer#"
-                                                                                },
-                                                                                "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
-                                                                                "url": "http://mycompany.com/myapp/url/",
-                                                                                "route": {
-                                                                                  "exclude": [
-                                                                                    "/my/service/",
-                                                                                    "/my/service2/"
-                                                                                  ],
-                                                                                  "include": []
-                                                                                }
-                                                                              },
-                                                                              "#web-reactjs-establisment-???#": {
-                                                                                "userLoginControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "#Establishment#,#Administrator#"
-                                                                                },
-                                                                                "userSignupControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "#establishment#"
-                                                                                },
-                                                                                "tag": "#web#,#web_desktop#",
-                                                                                "url": "http://mycompany.com/myapp/url/",
-                                                                                "route": {
-                                                                                  "exclude": [
-                                                                                    "/my/service/",
-                                                                                    "/my/service2/"
-                                                                                  ],
-                                                                                  "include": []
-                                                                                }
-                                                                              },
-                                                                              "#web-reactjs-delivery-???#": {
-                                                                                "userLoginControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "#Dispachers#,#Administrator#"
-                                                                                },
-                                                                                "userSignupControl": {
-                                                                                  "denied": "*",
-                                                                                  "allowed": ""
-                                                                                },
-                                                                                "tag": "#web#,#web_desktop#",
-                                                                                "url": "http://mycompany.com/myapp/url/",
-                                                                                "route": {
-                                                                                  "exclude": [
-                                                                                    "/my/service/",
-                                                                                    "/my/service2/"
-                                                                                  ],
-                                                                                  "include": []
-                                                                                }
-                                                                              },
-                                                                              "@__default__@": {
-                                                                                "userLoginControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "*"
-                                                                                },
-                                                                                "userSignupControl": {
-                                                                                  "denied": "",
-                                                                                  "allowed": "*"
-                                                                                },
-                                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
-                                                                                "url": "http://mycompany.com/myapp/url/",
-                                                                                "route": {
-                                                                                  "exclude": [
-                                                                                    "*"
-                                                                                  ],
-                                                                                  "include": []
-                                                                                }
-                                                                              }
+                                                                             "#mobile-ionic5-sales-???#": {
+                                                                               "userLoginControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "#Final_Customers_01#,#Administrator#"
+                                                                               },
+                                                                               "userSignupControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "#finalCustomer#"
+                                                                               },
+                                                                               "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
+                                                                               "url": "http://mycompany.com/myapp/url/",
+                                                                               "route": {
+                                                                                 "exclude": [
+                                                                                   "GET:/my/service",
+                                                                                   "POST:/my/service2"
+                                                                                 ],
+                                                                                 "include": []
+                                                                               }
+                                                                             },
+                                                                             "#web-reactjs-establisment-???#": {
+                                                                               "userLoginControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "#Establishment#,#Administrator#"
+                                                                               },
+                                                                               "userSignupControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "#establishment#"
+                                                                               },
+                                                                               "tag": "#web#,#web_desktop#",
+                                                                               "url": "http://mycompany.com/myapp/url/",
+                                                                               "route": {
+                                                                                 "exclude": [
+                                                                                   "GET:/my/service",
+                                                                                   "POST:/my/service2"
+                                                                                 ],
+                                                                                 "include": [
+                                                                                   "Public:PUBLIC:GET:/my/other/service",
+                                                                                   "Authenticated:AUTHENTICATED:POST:/my/other/duper/service"
+                                                                                 ]
+                                                                               }
+                                                                             },
+                                                                             "#web-reactjs-delivery-???#": {
+                                                                               "userLoginControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "#Dispachers#,#Administrator#"
+                                                                               },
+                                                                               "userSignupControl": {
+                                                                                 "denied": "*",
+                                                                                 "allowed": ""
+                                                                               },
+                                                                               "tag": "#web#,#web_desktop#",
+                                                                               "url": "http://mycompany.com/myapp/url/",
+                                                                               "route": {
+                                                                                 "exclude": [
+                                                                                   "GET:/my/service",
+                                                                                   "POST:/my/service2"
+                                                                                 ],
+                                                                                 "include": [
+                                                                                   "MyRole:ROLE:POST:/my/other/super/service"
+                                                                                 ]
+                                                                               }
+                                                                             },
+                                                                             "@__default__@": {
+                                                                               "userLoginControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "*"
+                                                                               },
+                                                                               "userSignupControl": {
+                                                                                 "denied": "",
+                                                                                 "allowed": "*"
+                                                                               },
+                                                                               "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                               "url": "http://mycompany.com/myapp/url/",
+                                                                               "route": {
+                                                                                 "exclude": [
+                                                                                   "*"
+                                                                                 ],
+                                                                                 "include": []
+                                                                               }
+                                                                             }
                                                                            }
                                                                          );
 
@@ -1531,8 +1536,11 @@ export default class SystemConstants {
                                                                                 "tag":"#web#,#mobile#,#phone#,#tablet#",
                                                                                 "url":"http://mycompany.com/myapp/url/",
                                                                                 "route":{
-                                                                                  "exclude":[ "*" ],
-                                                                                  "include":[]
+                                                                                  "exclude":[
+                                                                                  ],
+                                                                                  "include":[
+                                                                                    "*"
+                                                                                  ]
                                                                                 }
                                                                               }
                                                                             }

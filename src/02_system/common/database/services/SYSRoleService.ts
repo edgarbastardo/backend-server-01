@@ -66,13 +66,13 @@ export default class SYSRoleService extends BaseService {
       if ( CommonUtilities.isNullOrEmpty( roleInDB ) ) {
 
         result = await SYSRole.create(
-                                    {
-                                      Name: strName,
-                                      Comment: strComment,
-                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                    },
-                                    { transaction: currentTransaction }
-                                  );
+                                       {
+                                         Name: strName,
+                                         Comment: strComment,
+                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                       },
+                                       { transaction: currentTransaction }
+                                     );
 
       }
       else if ( bUpdate &&
@@ -85,7 +85,7 @@ export default class SYSRoleService extends BaseService {
         //debugMark( "2 => %O", role );
 
         const updateResult = await SYSRole.update( currentValues,
-                                                options );
+                                                   options );
 
         if ( updateResult.length > 0 &&
              updateResult[ 0 ] >= 1 ) {
@@ -93,6 +93,11 @@ export default class SYSRoleService extends BaseService {
           result = await SYSRole.findOne( options );
 
         }
+
+      }
+      else {
+
+        result = roleInDB;
 
       }
 

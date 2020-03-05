@@ -75,6 +75,11 @@ export default class SYSBinaryIndexService extends BaseService {
         }
 
       }
+      else {
+
+        result = sysBinaryIndexInDB;
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

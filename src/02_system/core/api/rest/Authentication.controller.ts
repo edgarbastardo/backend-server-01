@@ -77,13 +77,13 @@ export default class AuthenticationController {
       for ( let routeInfo of AuthenticationController._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                        routeInfo.RequestKind,
-                                                        routeInfo.Path, //Path
-                                                        routeInfo.AllowTagAccess,
-                                                        routeInfo.Roles as any,
-                                                        routeInfo.Description,
-                                                        null,
-                                                        logger );
+                                                           routeInfo.RequestKind,
+                                                           routeInfo.Path, //Path
+                                                           routeInfo.AllowTagAccess,
+                                                           routeInfo.Roles as any,
+                                                           routeInfo.Description,
+                                                           null,
+                                                           logger );
 
       }
 

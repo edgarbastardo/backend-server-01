@@ -488,9 +488,13 @@ export default class Always {
                                                                  "url":"http://mycompany.com/myapp/url/",
                                                                  "route":{
                                                                    "exclude":[
-                                                                     "*"
+                                                                     //"POST:/system/user/signup",
+                                                                     "POST:login"
                                                                    ],
                                                                    "include":[
+                                                                     "Test:ROLE:POST:/my/test/service",
+                                                                     "Test:ROLE:POST:graphQLTestService",
+                                                                     "Public:ROLE:GET:/my/other/public/service"
                                                                    ]
                                                                  }
                                                                }

@@ -21,6 +21,11 @@ export default class SystemQueries {
         strResult = SqlString.format( `Select A.Default, B.Value From sysConfigMetaData As A Left Outer Join sysConfigValueData As B On B.ConfigMetaDataId = A.Id Where ( A.Id = ? And ( B.Owner Is Null Or B.Owner = ? ) )`, [ params.ConfigMetaDataId, params.Owner ] );
 
       }
+      else if ( strName === "getConfigDefaultValueData" ) {
+
+        strResult = SqlString.format( `Select A.Default From sysConfigMetaData As A Where ( A.Id = ? )`, [ params.ConfigMetaDataId ] );
+
+      }
       else if ( strName === "getOldUserSessionStatus" ) {
 
         strResult = SqlString.format( `Select * From sysUserSessionStatus As A Where ( A.UserId = ? ) And A.LoggedOutAt Is Null Order By A.UpdatedAt Asc`, params.UserId );
@@ -61,6 +66,11 @@ export default class SystemQueries {
       else if ( strName === "searchCountBinaryData" ) {
 
         strResult = `Select Count( A.Id ) As Count FROM sysBinaryIndex As A Where `;
+
+      }
+      else if ( strName === "getRoutesOfRole" ) {
+
+        strResult = SqlString.format( `SELECT B.Name, C.Path, C.AccessKind, C.RequestKind FROM sysRoleHasRoute As A Inner Join sysRole As B On A.RoleId = B.Id Inner Join sysRoute As C On C.Id = A.RouteId Where ( B.Name = ? ) Order By C.RequestKind, C.Path;`, params.Role );
 
       }
 

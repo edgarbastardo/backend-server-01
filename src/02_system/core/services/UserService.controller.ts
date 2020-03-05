@@ -47,6 +47,7 @@ import { SYSUser } from "../../common/database/models/SYSUser";
 //import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
 import { SYSPerson } from '../../common/database/models/SYSPerson';
 import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
+import SYSRoleHasRouteService from '../../common/database/services/SYSRoleHasRouteService';
 
 const debug = require( 'debug' )( 'UserServiceController' );
 
@@ -10724,22 +10725,129 @@ export default class UserServiceController {
 
       }
 
-      const userSessionStatus = context.UserSessionStatus;
+      let userSessionStatus = context.UserSessionStatus;
 
-      result = {
-                 StatusCode: 200, //Ok
-                 Code: 'SUCCESS_GET_ROUTES',
-                 Message: await I18NManager.translate( strLanguage, 'Success get routes' ),
-                 Mark: '1DD6E83147C6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                 LogId: null,
-                 IsError: false,
-                 Errors: [],
-                 Warnings: [],
-                 Count: 0,
-                 Data: []
-               }
+      let bProfileOfAnotherUser = false;
 
-      bApplyTransaction = true;
+      let strAuthorization = context.Authorization;
+
+      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
+           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+
+        if ( request.query.shortToken ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
+
+          strAuthorization = request.query.shortToken;
+
+        }
+        else if ( request.query.token ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+          strAuthorization = request.query.token;
+
+        }
+
+      }
+
+      if ( bProfileOfAnotherUser &&
+           userSessionStatus === null ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( bProfileOfAnotherUser &&
+                userSessionStatus instanceof Error ) {
+
+        const error = userSessionStatus;
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        let routes = await SYSRoleHasRouteService.listRoutesOfRoles( userSessionStatus.Role,
+                                                                     context.FrontendId,
+                                                                     request.query.format,
+                                                                     currentTransaction,
+                                                                     logger );
+
+        let intCount = 0;
+
+        if ( routes ) {
+
+          if ( request.query.format === "1" ) {
+
+            intCount = routes.length;
+
+          }
+          else {
+
+            intCount = Object.keys( routes ).length;
+
+          }
+
+        }
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_ROUTES',
+                   Message: await I18NManager.translate( strLanguage, 'Success get routes' ),
+                   Mark: '29DB5C3384E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: intCount,
+                   Data: routes
+                 }
+
+        bApplyTransaction = true;
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

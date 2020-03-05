@@ -2097,18 +2097,18 @@ export default class BinaryServiceController extends BaseService {
 
       for ( const currentRow of rows ) {
 
-        const tempModelData = await SYSUser.convertFieldValues(
-                                                                {
-                                                                  Data: currentRow,
-                                                                  FilterFields: 1, //Force to remove fields like password and value
-                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                  Include: null,
-                                                                  Logger: logger,
-                                                                  ExtraInfo: {
-                                                                                Request: request
-                                                                              }
-                                                                }
-                                                              );
+        const tempModelData = await SYSBinaryIndex.convertFieldValues(
+                                                                       {
+                                                                         Data: currentRow,
+                                                                         FilterFields: 1, //Force to remove fields like password and value
+                                                                         TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                         Include: null,
+                                                                         Logger: logger,
+                                                                         ExtraInfo: {
+                                                                                      Request: request
+                                                                                    }
+                                                                       }
+                                                                     );
         if ( tempModelData ) {
 
           convertedRows.push( tempModelData );
@@ -4005,18 +4005,11 @@ export default class BinaryServiceController extends BaseService {
 
       if ( strBasePath.startsWith( "full://" ) ) {
 
-        //strFullOldPath = path.join( strBasePath.replace( "full://", "" ),
-        //                            strOldRelativePath );
-
         strFullNewPath = path.join( strBasePath.replace( "full://", "" ),
                                     strNewRelativePath );
 
       }
       else {
-
-        //strFullOldPath = path.join( SystemUtilities.baseRootPath,
-        //                            strBasePath,
-        //                            strOldRelativePath );
 
         strFullNewPath = path.join( SystemUtilities.baseRootPath,
                                     strBasePath,
@@ -4362,6 +4355,22 @@ export default class BinaryServiceController extends BaseService {
                       else {
 
                         let modelData = ( sysBinaryIndexInDB as any ).dataValues;
+
+                        if ( strBasePath.startsWith( "full://" ) ) {
+
+                          strFullPath = path.join( strBasePath.replace( "full://", "" ),
+                                                   modelData.FilePath );
+
+                        }
+                        else {
+
+                          strFullPath = path.join( SystemUtilities.baseRootPath,
+                                                   strBasePath,
+                                                   modelData.FilePath );
+
+                        }
+
+                        fs.writeFileSync( strFullPath + sysBinaryIndexInDB.Id + "." + fileDetectedType.ext + ".meta.json", JSON.stringify( modelData, null, 2 ) );
 
                         const tempModelData = await SYSUser.convertFieldValues(
                                                                                 {
