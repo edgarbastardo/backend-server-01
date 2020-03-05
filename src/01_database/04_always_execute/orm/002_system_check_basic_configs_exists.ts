@@ -129,7 +129,7 @@ export default class Always {
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      ConfigMetaDataId: "c0ea3ece-277c-4490-b2c1-a06f54382520", //system.binary.data.AllowedCategory
+                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id, //"c0ea3ece-277c-4490-b2c1-a06f54382520", //system.binary.data.AllowedCategory
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: JSON.stringify(
                                                              {
@@ -137,14 +137,16 @@ export default class Always {
                                                                  "denied":"",
                                                                  "allowed":"*"
                                                                },
-                                                               "#Documents_Allow_01#":{
+                                                               "#DocumentAllowL01#":{
                                                                  "denied":"",
-                                                                 "allowed":"#documents#"
+                                                                 "allowed":"#document#"
                                                                },
+                                                               /*
                                                                "#admin01@system.net#":{
                                                                  "denied":"",
                                                                  "allowed":"#test#,#other#"
                                                                },
+                                                               */
                                                                "@__default__@":{
                                                                  "denied":"",
                                                                  "allowed":"*"
@@ -154,7 +156,7 @@ export default class Always {
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      ConfigMetaDataId: "e2f57878-e408-4754-ac13-d7186ed451ba", //system.binary.data.AllowedMimeType
+                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id, //"e2f57878-e408-4754-ac13-d7186ed451ba", //system.binary.data.AllowedMimeType
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: JSON.stringify(
                                                              {
@@ -162,7 +164,7 @@ export default class Always {
                                                                  "denied":"#image/png#,#image/jpeg#",
                                                                  "allowed":"*"
                                                                },
-                                                               "#System_Administrators#":{
+                                                               "#System_Administrators#.test2":{
                                                                  "denied":"*",
                                                                  "allowed":""
                                                                },
@@ -170,9 +172,33 @@ export default class Always {
                                                                  "denied":"",
                                                                  "allowed":"#application/pdf#"
                                                                },
-                                                               "#admin01@system.net#.test":{
+                                                               "#admin01@system.net#.test1":{
                                                                  "denied":"#application/json#",
                                                                  "allowed":"#image/png#,#image/jpeg#"
+                                                               },
+                                                               "#testgif#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/gif#"
+                                                               },
+                                                               "#testjpeg#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/jpeg#"
+                                                               },
+                                                               "#testpng#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/png#"
+                                                               },
+                                                               "#test#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/png#,#image/jpeg#"
+                                                               },
+                                                               "#ticket#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/png#,#image/jpeg#,#image/gif#"
+                                                               },
+                                                               "#document#":{
+                                                                "denied":"",
+                                                                "allowed":"#application/pdf#,#application/docx#,#application/xlsx#"
                                                                },
                                                                "@__default__@":{
                                                                  "denied":"",

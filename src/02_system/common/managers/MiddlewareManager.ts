@@ -107,7 +107,7 @@ export default class MiddlewareManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.callToMiddlewareInterceptors.name;
+      sourcePosition.method = MiddlewareManager.name + "." + MiddlewareManager.callToMiddlewareInterceptors.name;
 
       const strMark = "BEC076D0844A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -180,7 +180,7 @@ export default class MiddlewareManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.bypassMiddlewareInterceptorsCallByRoute.name;
+      sourcePosition.method = MiddlewareManager.name + "." + MiddlewareManager.bypassMiddlewareInterceptorsCallByRoute.name;
 
       const strMark = "BEC076D0844A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -273,7 +273,7 @@ export default class MiddlewareManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.middlewareSetContext.name;
+      sourcePosition.method = MiddlewareManager.name + "." + MiddlewareManager.middlewareSetContext.name;
 
       const strMark = "A7BA900D7B56" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

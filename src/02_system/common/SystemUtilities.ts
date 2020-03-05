@@ -874,6 +874,14 @@ export default class SystemUtilities {
         result = CommonUtilities.parseJSON( strJSONUserSessionStatus,
                                             logger ); //Try to parse and transform to json object
 
+        if ( result &&
+             !result.UserGroupName ) {
+
+          let debugMark = debug.extend( 'AA5A6DE536DF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+        }
+
         bFromCache = true;
 
       }
@@ -1032,6 +1040,12 @@ export default class SystemUtilities {
         if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ||
              bForceUpdate ) { //Stay sure we had the resource locked or forced to updated is true
 
+          if ( !userSessionStatus.UserGroupName ) {
+
+            let debugMark = debug.extend( 'E9008B789BF0' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+            debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+          }
           await CacheManager.setDataWithTTL( strToken,
                                              JSON.stringify( userSessionStatus ),
                                              300, //5 minutes in seconds
@@ -2733,11 +2747,11 @@ export default class SystemUtilities {
 
   }
 
-  static async deleteFilesPrefixBy( strFullPath: string,
-                                    strPrefix: string,
-                                    logger: any ): Promise<boolean> {
+  static async deleteFilesPrefixedBy( strFullPath: string,
+                                      strPrefix: string,
+                                      logger: any ): Promise<Error|boolean> {
 
-    let bResult = false;
+    let result = false;
 
     try {
 
@@ -2765,7 +2779,7 @@ export default class SystemUtilities {
 
         }
 
-        bResult = true;
+        result = true;
 
       }
 
@@ -2774,7 +2788,7 @@ export default class SystemUtilities {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.deleteFilesPrefixBy.name;
+      sourcePosition.method = this.name + "." + this.deleteFilesPrefixedBy.name;
 
       const strMark = "0EFD62556CFB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -2795,9 +2809,86 @@ export default class SystemUtilities {
 
       }
 
+      result = error;
+
     }
 
-    return bResult;
+    return result;
+
+  }
+
+
+  static async moveFilesPrefixedBy( strFullOldPath: string,
+                                    strFullNewPath: string,
+                                    strPrefix: string,
+                                    logger: any ): Promise<Error|boolean> {
+
+    let result = false;
+
+    try {
+
+      let fileList = glob.sync( strPrefix + ".*",
+                                {
+                                  cwd: strFullOldPath,
+                                  nodir: true
+                                } );
+
+      if ( fileList &&
+           fileList.length > 0 ) {
+
+        fs.mkdirSync( strFullNewPath, { recursive: true } );
+
+        for ( let intIndex = 0; intIndex < fileList.length; intIndex++ ) {
+
+          try {
+
+            fs.renameSync( path.join( strFullOldPath, fileList[ intIndex ] ),
+                           path.join( strFullNewPath, fileList[ intIndex ] ) );
+
+          }
+          catch ( error ) {
+
+            //
+
+          }
+
+        }
+
+        result = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.moveFilesPrefixedBy.name;
+
+      const strMark = "63CB0E245A23" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof LoggerManager.mainLoggerInstance === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
 
   }
 

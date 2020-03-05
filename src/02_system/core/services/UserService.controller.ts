@@ -6370,7 +6370,7 @@ export default class UserServiceController {
                                                                                     logger );
 
               if ( !geocodeResult ||
-                    geocodeResult.length == 0 ||
+                    geocodeResult.length === 0 ||
                     ( geocodeResult[ 0 ].formattedAddressParts &&
                       geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
 
@@ -7402,7 +7402,18 @@ export default class UserServiceController {
                  !request.body.sysUserGroup.ShortId &&
                  !request.body.sysUserGroup.Name ) {
 
-              request.body.sysUserGroup.Name = request.body.Name;
+              if ( userSessionStatus.Role &&
+                   userSessionStatus.Role.includes( "#MasterL01#" ) &&
+                   request.body.sysUserGroup.Create === false ) {
+
+                request.body.sysUserGroup.Name = userSessionStatus.UserGroupName; //Create the user in the same group
+
+              }
+              else {
+
+                request.body.sysUserGroup.Name = request.body.Name;
+
+              }
 
             }
 
@@ -7748,7 +7759,7 @@ export default class UserServiceController {
                                                                                         logger );
 
                   if ( !geocodeResult ||
-                       geocodeResult.length == 0 ||
+                       geocodeResult.length === 0 ||
                        ( geocodeResult[ 0 ].formattedAddressParts &&
                          geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
 
@@ -8808,7 +8819,7 @@ export default class UserServiceController {
                                                                                         logger );
 
                   if ( !geocodeResult ||
-                       geocodeResult.length == 0 ||
+                       geocodeResult.length === 0 ||
                        ( geocodeResult[ 0 ].formattedAddressParts &&
                          geocodeResult[ 0 ].formattedAddressParts.length < 4 ) ) {
 

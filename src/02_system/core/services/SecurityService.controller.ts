@@ -1407,6 +1407,10 @@ export default class SecurityServiceController {
                                                          logger );
                                                          */
 
+          //Delete from cache the other tokens
+          userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
+          userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
+
           userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
           userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
 

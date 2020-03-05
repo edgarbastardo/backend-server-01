@@ -183,6 +183,7 @@ export default class SYSConfigValueDataService extends BaseService {
                                               strConfigId: string,
                                               strConfigOwner: string,
                                               strPostfix: string,
+                                              bCheckOnlyPostfix: boolean,
                                               transaction: any,
                                               logger: any ): Promise<any> {
 
@@ -253,6 +254,11 @@ export default class SYSConfigValueDataService extends BaseService {
             else if ( jsonConfig[ "#" + userSessionStatus.UserGroupName + "#" ] ) {
 
               jsonConfig = jsonConfig[ "#" + userSessionStatus.UserGroupName + "#" ];
+
+            }
+            else if ( bCheckOnlyPostfix && jsonConfig[ "#" + strPostfix + "#" ] ) {
+
+              jsonConfig = jsonConfig[ "#" + strPostfix + "#" ];
 
             }
             else {
@@ -586,6 +592,7 @@ export default class SYSConfigValueDataService extends BaseService {
                                                        strConfigId: string,
                                                        strConfigOwner: string,
                                                        strPostfix: string,
+                                                       bCheckOnlyPostfix: boolean,
                                                        transaction: any,
                                                        logger: any ): Promise<any> {
 
@@ -595,6 +602,7 @@ export default class SYSConfigValueDataService extends BaseService {
                                                                                       strConfigId,
                                                                                       strConfigOwner,
                                                                                       strPostfix,
+                                                                                      bCheckOnlyPostfix,
                                                                                       transaction,
                                                                                       logger );
 
@@ -615,6 +623,7 @@ export default class SYSConfigValueDataService extends BaseService {
                              strConfigOwner: string,
                              strDataToCheck: string,
                              strPostfix: string,
+                             bCheckOnlyPostfix: boolean,
                              transaction: any,
                              bForceResultZeroToOne: boolean,
                              logger: any ): Promise<any> {
@@ -627,6 +636,7 @@ export default class SYSConfigValueDataService extends BaseService {
                                                                                                 strConfigId,
                                                                                                 strConfigOwner,
                                                                                                 strPostfix,
+                                                                                                bCheckOnlyPostfix,
                                                                                                 transaction,
                                                                                                 logger );
 

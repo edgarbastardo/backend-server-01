@@ -32,6 +32,7 @@ import SYSUserGroupService from '../../common/database/services/SYSUserGroupServ
 import { SYSUserGroup } from '../../common/database/models/SYSUserGroup';
 import { SYSUser } from '../../common/database/models/SYSUser';
 import { SYSBinaryIndex } from '../../common/database/models/SYSBinaryIndex';
+import { AccessKind } from "../../common/CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
 
@@ -161,6 +162,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                                   strCategory,
+                                                                                  true,
                                                                                   transaction,
                                                                                   logger );
 
@@ -175,6 +177,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                                   strCategory,
+                                                                                  true,
                                                                                   transaction,
                                                                                   logger );
 
@@ -194,6 +197,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
                                                                                       strCategory,
+                                                                                      false,
                                                                                       transaction,
                                                                                       logger );
 
@@ -272,6 +276,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Owner,
                                                                                       strCategory,
+                                                                                      false,
                                                                                       transaction,
                                                                                       logger );
 
@@ -354,6 +359,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                     strCategory,
                                                                     "",
+                                                                    false,
                                                                     transaction,
                                                                     true,
                                                                     logger );
@@ -384,6 +390,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                     strMimeType,
                                                                     strCategory,
+                                                                    true,
                                                                     transaction,
                                                                     true,
                                                                     logger );
@@ -414,6 +421,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Owner,
                                                                                       strCategory,
+                                                                                      false,
                                                                                       transaction,
                                                                                       logger );
 
@@ -2648,7 +2656,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                     context,
                                                                                     true,
                                                                                     false,
-                                                                                    null,
+                                                                                    currentTransaction,
                                                                                     logger );
 
                 if ( userSessionStatus ) {
@@ -3398,6 +3406,8 @@ export default class BinaryServiceController extends BaseService {
 
     let bIsLocalTransaction = false;
 
+    let bApplyTransaction = false;
+
     let strLanguage = "";
 
     try {
@@ -3406,9 +3416,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const strMark = "9B7197376B5B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      let debugMark = debug.extend( strMark + "@" + ( cluster.isWorker ? cluster.worker.id : "0" ) );
+      let debugMark = debug.extend( '9B7197376B5B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( "uploadBinaryData" );
 
@@ -3431,7 +3439,7 @@ export default class BinaryServiceController extends BaseService {
 
         if ( uploadedFile.truncated === false ) {
 
-          if ( CommonUtilities.isNotNullOrEmpty( request.body.Category ) ) {
+          if ( request.body.Category ) {
 
             let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` ).toLowerCase();
@@ -3440,7 +3448,7 @@ export default class BinaryServiceController extends BaseService {
 
             const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
                                                                                         strCategory,
-                                                                                        transaction,
+                                                                                        currentTransaction,
                                                                                         logger );
 
             if ( allowedCategory.value === 1 ) {
@@ -3456,14 +3464,14 @@ export default class BinaryServiceController extends BaseService {
                   const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
                                                                                               fileDetectedType.mime,
                                                                                               strCategory,
-                                                                                              transaction,
+                                                                                              currentTransaction,
                                                                                               logger );
 
                   if ( allowedMimeType.value === 1 ) {
 
                     const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
                                                                                              strCategory,
-                                                                                             transaction,
+                                                                                             currentTransaction,
                                                                                              logger );
 
                     let strId = request.body.Id;
@@ -3521,7 +3529,7 @@ export default class BinaryServiceController extends BaseService {
                     let strRelativePath = "";
                     let strFullPath = "";
                     let expireAt = null;
-                    const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
+                    const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( currentTransaction,
                                                                                                    logger );
 
                     if ( request.body.StorageKind === "0" ) { //Persistent
@@ -3567,7 +3575,7 @@ export default class BinaryServiceController extends BaseService {
                     const thumbnailFactor = await this.getConfigBinaryDataThumbnail( context.UserSessionStatus,
                                                                                      strCategory,
                                                                                      fileDetectedType.mime,
-                                                                                     transaction,
+                                                                                     currentTransaction,
                                                                                      logger );
 
                     debugMark( "Generating thumbnail" );
@@ -3584,7 +3592,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                            strCategory,
                                                                                            fileDetectedType.mime,
                                                                                            uploadedFile.size,
-                                                                                           transaction,
+                                                                                           currentTransaction,
                                                                                            logger );
 
                     const strCurrentFileExtension = CommonUtilities.getFileExtension( uploadedFile.name );
@@ -3627,7 +3635,7 @@ export default class BinaryServiceController extends BaseService {
                     const sysBinaryIndex = await SYSBinaryIndexService.createOrUpdate( strId,
                                                                                        binaryIndexData,
                                                                                        true,
-                                                                                       transaction,
+                                                                                       currentTransaction,
                                                                                        logger );
 
                     if ( sysBinaryIndex &&
@@ -3647,7 +3655,7 @@ export default class BinaryServiceController extends BaseService {
                                  StatusCode: 200, //Ok
                                  Code: 'SUCCESS_BINARY_DATA_UPLOAD',
                                  Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
-                                 Mark: strMark,
+                                 Mark: '8030662B75FA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: false,
                                  Errors: [],
@@ -3657,6 +3665,8 @@ export default class BinaryServiceController extends BaseService {
                                          binaryIndexData
                                        ]
                                };
+
+                      bApplyTransaction = true;
 
                     }
                     else {
@@ -3669,7 +3679,7 @@ export default class BinaryServiceController extends BaseService {
                                  StatusCode: 500, //Internal server error
                                  Code: 'ERROR_UNEXPECTED',
                                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: strMark,
+                                 Mark: 'E8913CD0BAD0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.LogId,
                                  IsError: true,
                                  Errors: [
@@ -3692,15 +3702,16 @@ export default class BinaryServiceController extends BaseService {
                     result = {
                                StatusCode: 400, //Bad request
                                Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid.', fileDetectedType.mime ),
-                               Mark: strMark,
+                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
+                               Mark: '47946C96B03B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid.', fileDetectedType.mime ),
+                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
                                            Details: {
+                                                      Category: strCategory,
                                                       Detected: fileDetectedType.mime,
                                                       Denied: allowedMimeType.denied,
                                                       Allowed: allowedMimeType.allowed,
@@ -3721,7 +3732,7 @@ export default class BinaryServiceController extends BaseService {
                              StatusCode: 400, //Bad request
                              Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
                              Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
-                             Mark: strMark,
+                             Mark: '7FBB0F51D723' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -3748,7 +3759,7 @@ export default class BinaryServiceController extends BaseService {
                            StatusCode: 400, //Bad request
                            Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
                            Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
-                           Mark: strMark,
+                           Mark: '4E8EDBF7499A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
@@ -3758,7 +3769,7 @@ export default class BinaryServiceController extends BaseService {
                                        Details: {
                                                   1: "Public",
                                                   2: "Authenticated",
-                                                  3: "Tag"
+                                                  3: "Role"
                                                 }
                                      }
                                    ],
@@ -3776,7 +3787,7 @@ export default class BinaryServiceController extends BaseService {
                         StatusCode: 400, //Bad request
                         Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
                         Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
-                        Mark: strMark,
+                        Mark: '242D82D6BF0D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                         LogId: null,
                         IsError: true,
                         Errors: [
@@ -3804,7 +3815,7 @@ export default class BinaryServiceController extends BaseService {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
                        Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
-                       Mark: strMark,
+                       Mark: '0372A2B30F59' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -3833,7 +3844,7 @@ export default class BinaryServiceController extends BaseService {
                      StatusCode: 413, //Request Entity Too Large
                      Code: 'ERROR_FILE_TOO_BIG',
                      Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
-                     Mark: strMark,
+                     Mark: 'B7AF6279E7EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -3860,7 +3871,7 @@ export default class BinaryServiceController extends BaseService {
                    StatusCode: 400, //Bad request
                    Code: 'ERROR_NOT_FILE_UPLOADED',
                    Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
-                   Mark: strMark,
+                   Mark: '8E3E1D2078AE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3881,7 +3892,16 @@ export default class BinaryServiceController extends BaseService {
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
 
       }
 
@@ -3950,6 +3970,103 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
+  static async updateStorageKind( intNewStorageKind: number,
+                                  strBasePath: string,
+                                  strFullOldPath: string,
+                                  sysBinaryIndex: SYSBinaryIndex,
+                                  //transaction: any,
+                                  logger: any ): Promise<Error|boolean> {
+
+    let result = null;
+
+    //let strFullOldPath = "";
+    let strFullNewPath = "";
+
+    let strOldRelativePath = sysBinaryIndex.FilePath;
+    let strNewRelativePath = "";
+
+    try {
+
+      /*
+      const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
+                                                                                     logger );
+                                                                                     */
+
+      if ( sysBinaryIndex.StorageKind === 1 && intNewStorageKind === 0 ) { //From 1 = Temporal to 0 = Persistent
+
+        strNewRelativePath = strOldRelativePath.replace( "temporal/", "persistent/" );
+
+      }
+      else if ( sysBinaryIndex.StorageKind === 0 && intNewStorageKind === 1 ) { //From 0 = Persistent to 1 = Temporal
+
+        strNewRelativePath = strOldRelativePath.replace( "persistent/", "temporal/" );
+
+      }
+
+      if ( strBasePath.startsWith( "full://" ) ) {
+
+        //strFullOldPath = path.join( strBasePath.replace( "full://", "" ),
+        //                            strOldRelativePath );
+
+        strFullNewPath = path.join( strBasePath.replace( "full://", "" ),
+                                    strNewRelativePath );
+
+      }
+      else {
+
+        //strFullOldPath = path.join( SystemUtilities.baseRootPath,
+        //                            strBasePath,
+        //                            strOldRelativePath );
+
+        strFullNewPath = path.join( SystemUtilities.baseRootPath,
+                                    strBasePath,
+                                    strNewRelativePath );
+
+      }
+
+      result = await SystemUtilities.moveFilesPrefixedBy( strFullOldPath,
+                                                          strFullNewPath,
+                                                          sysBinaryIndex.Id,
+                                                          logger );
+
+      if ( result === true ) {
+
+        sysBinaryIndex.StorageKind = intNewStorageKind;
+        sysBinaryIndex.FilePath = strNewRelativePath;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.updateStorageKind.name;
+
+      const strMark = "96764A9F824A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async updateBinaryData( request: Request,
                                  transaction: any,
                                  logger: any ):Promise<any> {
@@ -3980,11 +4097,521 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const userSessionStatus = context.UserSessionStatus;
+      let userSessionStatus = context.UserSessionStatus;
 
-      //
+      let sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.body.Id,
+                                                                      null,
+                                                                      currentTransaction,
+                                                                      logger );
 
-      bApplyTransaction = true;
+      if ( sysBinaryIndexInDB instanceof Error ) {
+
+        const error = sysBinaryIndexInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '301F6A1F6FEE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysBinaryIndexInDB ) {
+
+        //ANCHOR Check is owner of BinaryData
+        const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                     sysBinaryIndexInDB.Owner,
+                                                                     userSessionStatus.UserId,
+                                                                     userSessionStatus.UserName,
+                                                                     userSessionStatus.UserGroupId,
+                                                                     userSessionStatus.UserGroupName,
+                                                                     logger
+                                                                   );
+
+        let checkUserRoles: ICheckUserRoles = {
+                                                isAuthorizedAdmin: false,
+                                                isAuthorizedL03: false,
+                                                isAuthorizedL02: false,
+                                                isAuthorizedL01: false,
+                                                isNotAuthorized: false
+                                              };
+
+        let ownerList = null;
+
+        if ( bIsOwner === false ) {
+
+          ownerList = BinaryServiceController.getUserOwner( sysBinaryIndexInDB.Owner, logger );
+
+          for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+            const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                            null,
+                                                            currentTransaction,
+                                                            logger );
+
+            checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                         sysUserInDB,
+                                                                         "UpdateBinary",
+                                                                         logger );
+
+            if ( checkUserRoles.isAuthorizedAdmin ||
+                 checkUserRoles.isAuthorizedL02 ) {
+
+              break;
+
+            }
+
+          }
+
+          if ( checkUserRoles.isAuthorizedAdmin === false &&
+               checkUserRoles.isAuthorizedL02 === false ) {
+
+            ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
+
+            for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+              const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger );
+
+              checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                sysUserGroupInDB,
+                                                                                "UpdateBinary",
+                                                                                logger );
+
+              if ( checkUserRoles.isAuthorizedL01 ||
+                   checkUserRoles.isAuthorizedL03 ) {
+
+                break;
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if ( bIsOwner ||
+             checkUserRoles.isAuthorizedAdmin ||
+             checkUserRoles.isAuthorizedL03 ||
+             checkUserRoles.isAuthorizedL02 ||
+             checkUserRoles.isAuthorizedL01 ) {
+
+          if ( request.body.Category ) {
+
+            let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
+                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` ).toLowerCase();
+
+            strCategory = CommonUtilities.unaccent( strCategory );
+
+            const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
+                                                                                        strCategory,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
+            if ( allowedCategory.value === 1 ) {
+
+              if ( request.body.AccessKind >= 1 && request.body.AccessKind <= 3 ) {
+
+                if ( request.body.StorageKind >= 0 && request.body.StorageKind <= 1 ) {
+
+                  const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
+                                                                                                 logger );
+                  let strFullPath = "";
+
+                  if ( strBasePath.startsWith( "full://" ) ) {
+
+                    strFullPath = path.join( strBasePath.replace( "full://", "" ),
+                                             sysBinaryIndexInDB.FilePath );
+
+                  }
+                  else {
+
+                    strFullPath = path.join( SystemUtilities.baseRootPath,
+                                             strBasePath,
+                                             sysBinaryIndexInDB.FilePath );
+
+                  }
+
+                  const fileDetectedType = SystemUtilities.getMimeType( strFullPath + sysBinaryIndexInDB.Id + "." + sysBinaryIndexInDB.FileExtension + ".data",
+                                                                        sysBinaryIndexInDB.MimeType,
+                                                                        logger );
+
+                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
+                                                                                              fileDetectedType.mime,
+                                                                                              strCategory,
+                                                                                              currentTransaction,
+                                                                                              logger );
+
+                  if ( allowedMimeType.value === 1 ) {
+
+                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
+                                                                                             strCategory,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+                    let updateStorageKindResult = null;
+
+                    if ( request.body.StorageKind !== sysBinaryIndexInDB.StorageKind ) {
+
+                      //Move the binary data to to new folder according with the storage type
+                      updateStorageKindResult = await this.updateStorageKind( request.body.StorageKind,
+                                                                              strBasePath,
+                                                                              strFullPath,
+                                                                              sysBinaryIndexInDB,
+                                                                              //currentTransaction,
+                                                                              logger );
+
+                    }
+                    else {
+
+                      updateStorageKindResult = true;
+
+                    }
+
+                    if ( updateStorageKindResult === true ) {
+
+                      sysBinaryIndexInDB.Owner =  SystemUtilities.mergeTokens( strDefaultOwners,
+                                                                               sysBinaryIndexInDB.Owner,
+                                                                               true,
+                                                                               logger );
+
+                      sysBinaryIndexInDB.Category = request.body.Category ? request.body.Category: sysBinaryIndexInDB.Category;
+                      sysBinaryIndexInDB.AccessKind = request.body.AccessKind ? request.body.AccessKind: sysBinaryIndexInDB.AccessKind;
+                      sysBinaryIndexInDB.Label = request.body.Label ? request.body.Label: sysBinaryIndexInDB.Label;
+
+                      if ( request.body.ExpireAt !== undefined ) {
+
+                        sysBinaryIndexInDB.ExpireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt: null;
+
+                      }
+
+                      if ( sysBinaryIndexInDB.Tag !== undefined ) {
+
+                        sysBinaryIndexInDB.Tag = request.body.Tag ? request.body.Tag: null;
+
+                      }
+
+                      if ( request.body.Context !== undefined ) {
+
+                        sysBinaryIndexInDB.Context = request.body.Context ? request.body.Context: null;
+
+                      }
+
+                      if ( request.body.Comment !== undefined ) {
+
+                        sysBinaryIndexInDB.Comment = request.body.Comment ? request.body.Comment: null;
+
+                      }
+
+                      if ( request.body.ShareCode !== undefined ) {
+
+                        sysBinaryIndexInDB.ShareCode = request.body.ShareCode ? request.body.ShareCode: null;
+
+                      }
+
+                      sysBinaryIndexInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_UNKNOWN_SYSTEM_NET;
+                      sysBinaryIndexInDB.UpdatedAt = null;
+
+                      sysBinaryIndexInDB = await SYSBinaryIndexService.createOrUpdate(
+                                                                                       sysBinaryIndexInDB.Id,
+                                                                                       ( sysBinaryIndexInDB as any ).dataValues,
+                                                                                       true,
+                                                                                       currentTransaction,
+                                                                                       logger
+                                                                                     );
+
+                      if ( sysBinaryIndexInDB instanceof Error ) {
+
+                        const error = sysBinaryIndexInDB as any;
+
+                        result = {
+                                   StatusCode: 500, //Internal server error
+                                   Code: 'ERROR_UNEXPECTED',
+                                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                   Mark: 'DB8042C7F21E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   LogId: error.LogId,
+                                   IsError: true,
+                                   Errors: [
+                                             {
+                                               Code: error.name,
+                                               Message: error.message,
+                                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                                             }
+                                           ],
+                                   Warnings: [],
+                                   Count: 0,
+                                   Data: []
+                                 };
+
+                      }
+                      else {
+
+                        let modelData = ( sysBinaryIndexInDB as any ).dataValues;
+
+                        const tempModelData = await SYSUser.convertFieldValues(
+                                                                                {
+                                                                                  Data: modelData,
+                                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                  Include: null,
+                                                                                  Logger: logger,
+                                                                                  ExtraInfo: {
+                                                                                               Request: request
+                                                                                             }
+                                                                                }
+                                                                              );
+
+                        if ( tempModelData ) {
+
+                          modelData = tempModelData;
+
+                        }
+
+                        result = {
+                                   StatusCode: 200, //Ok
+                                   Code: 'SUCCESS_BINARY_DATA_UPDATE',
+                                   Message: await I18NManager.translate( strLanguage, 'Success binary data update.' ),
+                                   Mark: 'FBE65384949A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   LogId: null,
+                                   IsError: false,
+                                   Errors: [],
+                                   Warnings: [],
+                                   Count: 1,
+                                   Data: [
+                                           modelData
+                                         ]
+                                 };
+
+                        bApplyTransaction = true;
+
+                      }
+
+                    }
+                    else {
+
+                      const error = updateStorageKindResult;
+
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: 'ERROR_UNEXPECTED',
+                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                 Mark: '10BA34FB2495' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: error.LogId,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: error.name,
+                                             Message: error.message,
+                                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               };
+
+                    }
+
+                  }
+                  else {
+
+                    result = {
+                               StatusCode: 400, //Bad request
+                               Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
+                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
+                               Mark: '47946C96B03B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: true,
+                               Errors: [
+                                         {
+                                           Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
+                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
+                                           Details: {
+                                                      Category: strCategory,
+                                                      Detected: fileDetectedType.mime,
+                                                      Denied: allowedMimeType.denied,
+                                                      Allowed: allowedMimeType.allowed,
+                                                    }
+                                         }
+                                       ],
+                               Warnings: [],
+                               Count: 0,
+                               Data: []
+                             };
+
+                  }
+
+                }
+                else {
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
+                             Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
+                             Mark: '7FBB0F51D723' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: null,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
+                                         Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
+                                         Details: {
+                                                    0: "Persistent",
+                                                    1: "Temporal",
+                                                  }
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           };
+
+                }
+
+              }
+              else {
+
+                result = {
+                          StatusCode: 400, //Bad request
+                          Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
+                          Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
+                          Mark: '63D318D61799' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                          LogId: null,
+                          IsError: true,
+                          Errors: [
+                                    {
+                                      Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
+                                      Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
+                                      Details: {
+                                                 1: "Public",
+                                                 2: "Authenticated",
+                                                 3: "Role"
+                                               }
+                                    }
+                                  ],
+                          Warnings: [],
+                          Count: 0,
+                          Data: []
+                        };
+
+              }
+
+            }
+            else {
+
+              result = {
+                        StatusCode: 400, //Bad request
+                        Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
+                        Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
+                        Mark: '1E13DBCFF853' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        LogId: null,
+                        IsError: true,
+                        Errors: [
+                                  {
+                                    Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
+                                    Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
+                                    Details: {
+                                               Category: strCategory,
+                                               Denied: allowedCategory.denied,
+                                               Allowed: allowedCategory.allowed,
+                                             }
+                                  }
+                                ],
+                        Warnings: [],
+                        Count: 0,
+                        Data: []
+                      };
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
+                       Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
+                       Mark: 'FDA7E437172D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
+                                   Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
+                                   Details: {
+                                              Valid: [ "A-Z", "a-z", "0-9", "_", "-" ],
+                                            }
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: "ERROR_CANNOT_UDPATE_BINARY_DATA",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to update the binary data" ),
+                     Mark: '05947E763583' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_CANNOT_UDPATE_BINARY_DATA",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to update the binary data" ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                   Mark: '1FCC26425B32' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -4234,9 +4861,9 @@ export default class BinaryServiceController extends BaseService {
 
             }
 
-            await SystemUtilities.deleteFilesPrefixBy( strFullPath + sysBinaryIndexInDB.FilePath,
-                                                       sysBinaryIndexInDB.Id,
-                                                       logger );
+            await SystemUtilities.deleteFilesPrefixedBy( strFullPath + sysBinaryIndexInDB.FilePath,
+                                                         sysBinaryIndexInDB.Id,
+                                                         logger );
 
           }
 

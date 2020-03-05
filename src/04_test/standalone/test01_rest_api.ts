@@ -2411,7 +2411,8 @@ export async function test_createUser_user98_at_TestL98( headers: any,
                                                          strFileName: string,
                                                          bIsFail: boolean,
                                                          bCreateUserGroup: boolean,
-                                                         bMustBeEmptyRoleAndTag: boolean ): Promise<boolean> {
+                                                         bMustBeEmptyRoleAndTag: boolean,
+                                                         bCheckGroupName: boolean ): Promise<boolean> {
 
   let bResult = false;
 
@@ -2424,6 +2425,8 @@ export async function test_createUser_user98_at_TestL98( headers: any,
     userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
     userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
     userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
+    userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
     userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
     userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
     userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
@@ -2449,11 +2452,11 @@ export async function test_createUser_user98_at_TestL98( headers: any,
                checkTokens( user98_at_TestL98_data.Role, "#MasterL01#" ) === false &&
                !user98_at_TestL98_data.Tag &&
                //!user98_at_TestL98_data.sysUserGroup.Role &&
-               checkTokens( user98_at_TestL98_data.SYSUserGroup.Role, "#MasterL01#" ) === false &&
+               checkTokens( user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
                !user98_at_TestL98_data.sysUserGroup.Tag &&
                user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
-               user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+               ( bCheckGroupName === false || user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
             user98_at_TestL98_data.Password = userRequest.Password;
             bResult = true;
@@ -2471,7 +2474,7 @@ export async function test_createUser_user98_at_TestL98( headers: any,
                user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
                user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
-               user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) {
+               ( bCheckGroupName === false || user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
             user98_at_TestL98_data.Password = userRequest.Password;
             bResult = true;
@@ -3472,7 +3475,8 @@ async function test_set01() {
                                                          "test_createUser_user98_at_TestL98_fail",
                                                          true,
                                                          false, //<--- Not auto create the group and the group no exists
-                                                         false ),
+                                                         false,
+                                                         true ),
                 'B7A8462E0A10: Creation of the user user98@TestL98 is OK with the fail',
                 'B7A8462E0A10: Creation of the user user98@TestL98 is FAILED' );
 
@@ -3483,7 +3487,8 @@ async function test_set01() {
                                                          "test_createUser_user98_at_TestL98_success",
                                                          false,
                                                          true, //<--- Auto create the group user98@TestL98
-                                                         false ),
+                                                         false,
+                                                         true ),
                 '8CF2731F0EC9: Creation of the user user98@TestL98 is OK',
                 '8CF2731F0EC9: Creation of the user user98@TestL98 is FAILED' );
 
@@ -3500,7 +3505,8 @@ async function test_set01() {
                                                          "test_createUser_user98_at_TestL98_fail",
                                                          true,
                                                          true, //<--- Fail to try to create the group again
-                                                         false ),
+                                                         false,
+                                                         true ),
                 'C69088FEAC85: Creation of the user user98@TestL98 is OK with the fail',
                 'C69088FEAC85: Creation of the user user98@TestL98 is FAILED' );
 
@@ -3510,7 +3516,8 @@ async function test_set01() {
                                                          "test_createUser_user98_at_TestL98_success",
                                                          false,
                                                          false, //<--- NOT try to create the group
-                                                         false ),
+                                                         false,
+                                                         true ),
                 '0E21DC94A0AE: Creation of the user user98@TestL98 is OK with the fail',
                 '0E21DC94A0AE: Creation of the user user98@TestL98 is FAILED' );
 
@@ -3695,31 +3702,42 @@ async function test_set01() {
                   "326E879A24CF: download image tower user01@TestL01 is FAILED" );
 
         myAssert( await test_getImageDetails( headers_user01_at_TestL01_Session1,
-                                                "SUCCESS_GET_INFORMATION",
-                                                "test_getImageDetailsTower_user01@TestL01_success",
-                                                "user01@TestL01_tower" ),
+                                              "SUCCESS_GET_INFORMATION",
+                                              "test_getImageDetailsTower_user01@TestL01_success",
+                                              "user01@TestL01_tower" ),
                   "EA9A3CA6AF6C: get image details tower user01@TestL01 is OK",
                   "EA9A3CA6AF6C: get image details tower user01@TestL01 is FAILED" );
 
-        //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new group
+        //Old version: Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
+        //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
         myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
-                                                           "ERROR_CANNOT_CREATE_USER",
-                                                           "test_createUser_user98_at_TestL98_fail",
-                                                           true,
-                                                           false, //<--- Not auto create the group and the group no exists
-                                                           false ),
-                  'CA07E27A0CC3: Creation of the user user98@TestL98 is OK with the fail',
+                                                           "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
+                                                           "test_createUser_user98_at_TestL98_success",
+                                                           false,
+                                                           false, //<--- Not auto create the user group
+                                                           true,  //Must be empty role and tag?
+                                                           false ), //<-- Check group name?
+                  'CA07E27A0CC3: Creation of the user user98@TestL98 is OK',
                   'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
 
-        //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new group
+        //*** Delete user user98@TestL98 ***
+        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
+                                         { Id: user98_at_TestL98_data.Id },
+                                         "SUCCESS_USER_DELETE",
+                                         "test_deleteUser_user98@TestL98_success" ),
+                  '951404204AFC: Delete of the user user98@TestL98 is OK',
+                  '951404204AFC: Delete of the user user98@TestL98 is FAILED' );
+
+        //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
         myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
                                                            "ERROR_CANNOT_CREATE_USER",
                                                            "test_createUser_user98_at_TestL98_fail",
                                                            true,
                                                            true, //<--- Auto create the group and the group no exists
-                                                           false ),
-                  'CA07E27A0CC3: Creation of the user user98@TestL98 is OK with the fail',
-                  'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
+                                                           false,
+                                                           true ),
+                  'B12D747CE86B: Creation of the user user98@TestL98 is OK with the fail',
+                  'B12D747CE86B: Creation of the user user98@TestL98 is FAILED' );
 
         //Fail because the user01@TestL01 already exists
         myAssert( await test_createUser_user01_at_TestL01( headers_user01_at_TestL01_Session1,
