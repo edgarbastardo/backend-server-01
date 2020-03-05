@@ -13,6 +13,8 @@ import SystemUtilities from '../../SystemUtilities';
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
 import BaseService from "./BaseService";
+import { SYSConfigValueData } from '../models/SYSConfigValueData';
+import { json } from 'express';
 
 const debug = require( 'debug' )( 'SYSConfigValueDataService' );
 
@@ -750,6 +752,121 @@ export default class SYSConfigValueDataService extends BaseService {
         logger.error( error );
 
       }
+
+    }
+
+    return result;
+
+  }
+
+  static async setConfigValueData( strConfigMetaDataId: string,
+                                   strOnwer: string,
+                                   jsonConfigData: any,
+                                   transaction: any,
+                                   logger: any ): Promise<Error|SYSConfigValueData> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+                        where: {
+                                 ConfigMetaDataId: strConfigMetaDataId,
+                                 Owner: strOnwer
+                               },
+                        transaction: currentTransaction,
+                      }
+
+      let configValueDataInDB = await SYSConfigValueData.findOne( options );
+
+      if ( configValueDataInDB === null ) {
+
+        await SYSConfigValueData.create(
+                                         {
+                                           ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+                                           Owner: strOnwer,
+                                           Value: CommonUtilities.jsonToString( jsonConfigData, logger ),
+                                           CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                         },
+                                         options.transaction
+                                       );
+
+      }
+      else {
+
+        configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+        configValueDataInDB.UpdatedAt = null;
+        configValueDataInDB.Value = CommonUtilities.jsonToString( jsonConfigData, logger );
+
+        await SYSConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+
+      }
+
+      result = await SYSConfigValueData.findOne( options );
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigValueData.name;
+
+      const strMark = "0AFC109A813E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+      result = error;
 
     }
 

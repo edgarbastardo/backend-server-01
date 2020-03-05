@@ -5908,7 +5908,7 @@ export default class UserServiceController {
 
       let strUserName = context.UserSessionStatus.UserName;
 
-      let strAutorization = context.Authorization;
+      let strAuthorization = context.Authorization;
 
       let userSessionStatus = null;
 
@@ -5928,37 +5928,37 @@ export default class UserServiceController {
           if ( userSessionStatus &&
                userSessionStatus instanceof Error == false ) {
 
-            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.shortToken;
+            strAuthorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.shortToken;
 
             strUserName = userSessionStatus.UserName ? userSessionStatus.UserName : null;
 
           }
           else {
 
-            strAutorization = request.query.shortToken;
+            strAuthorization = request.query.shortToken;
 
           }
 
         }
-        else if ( request.query.Token ) {
+        else if ( request.query.token ) {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( strAutorization,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
                                                                                              currentTransaction,
                                                                                              logger );
 
           if ( userSessionStatus &&
                userSessionStatus instanceof Error == false ) {
 
-            strAutorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.Token;
+            strAuthorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.Token;
 
             strUserName = userSessionStatus.UserName ? userSessionStatus.UserName : null;
 
           }
           else {
 
-            strAutorization = request.query.Token;
+            strAuthorization = request.query.Token;
 
           }
 
@@ -5972,14 +5972,14 @@ export default class UserServiceController {
         result = {
                    StatusCode: 404, //Not found
                    Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
                    Mark: '6AD438512BFA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
                                Details: null
                              }
                            ],
@@ -5997,7 +5997,7 @@ export default class UserServiceController {
         result = {
                    StatusCode: 404, //Not found
                    Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAutorization ),
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
                    Mark: '20E77DDE1001' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
@@ -6023,7 +6023,7 @@ export default class UserServiceController {
                                                                          useSoftCheck: true,
                                                                          notProcessExpireOn: true,
                                                                          useCustomResponse: true,
-                                                                         authorization: strAutorization,
+                                                                         authorization: strAuthorization,
                                                                          code: "SUCCESS_GET_SESSION_PROFILE",
                                                                          message: "Success get the user session profile information",
                                                                          mark: "1CB1DC7063D8",
@@ -9534,7 +9534,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setProfile.name;
+      sourcePosition.method = this.name + "." + this.deleteUser.name;
 
       const strMark = "A68F177F4DBF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -9887,7 +9887,7 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setProfile.name;
+      sourcePosition.method = this.name + "." + this.searchUser.name;
 
       const strMark = "52299BDE0903" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -10161,9 +10161,611 @@ export default class UserServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setProfile.name;
+      sourcePosition.method = this.name + "." + this.searchCountUser.name;
 
       const strMark = "AF049675D770" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getSettings( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bProfileOfAnotherUser = false;
+
+      let strAuthorization = context.Authorization;
+
+      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
+           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+
+        if ( request.query.shortToken ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
+
+          strAuthorization = request.query.shortToken;
+
+        }
+        else if ( request.query.token ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+          strAuthorization = request.query.token;
+
+        }
+
+      }
+
+      if ( bProfileOfAnotherUser &&
+           userSessionStatus === null ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( bProfileOfAnotherUser &&
+                userSessionStatus instanceof Error ) {
+
+        const error = userSessionStatus;
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+                                                                             userSessionStatus.UserId,
+                                                                             currentTransaction,
+                                                                             logger );
+
+        configData = configData.Value ? configData.Value : configData.Default;
+
+        configData = CommonUtilities.parseJSON( configData, logger );
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_SETTINGS',
+                   Message: await I18NManager.translate( strLanguage, 'Success get settings' ),
+                   Mark: '63AD7918CB3E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           configData
+                         ]
+                 }
+
+        bApplyTransaction = true;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getSettings.name;
+
+      const strMark = "CAE041CFD8FB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async setSettings( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      let strAuthorization = context.Authorization;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bProfileOfAnotherUser = false;
+
+      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
+           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+
+        if ( request.query.shortToken ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
+
+          strAuthorization = request.query.shortToken;
+
+        }
+        else if ( request.query.token ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+          strAuthorization = request.query.token;
+
+        }
+
+      }
+
+      if ( bProfileOfAnotherUser &&
+           userSessionStatus === null ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( bProfileOfAnotherUser &&
+                userSessionStatus instanceof Error ) {
+
+        const error = userSessionStatus;
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+                                                                               userSessionStatus.UserId,
+                                                                               request.body,
+                                                                               currentTransaction,
+                                                                               logger );
+
+        if ( configData instanceof Error ) {
+
+          const error = configData as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: "BA37B863BC6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: error.LogId,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_SET_SETTINGS',
+                     Message: await I18NManager.translate( strLanguage, 'Success set settings' ),
+                     Mark: '286871B2895A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             CommonUtilities.parseJSON( configData.Value, logger )
+                           ]
+                   }
+
+          bApplyTransaction = true;
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setSettings.name;
+
+      const strMark = "D3085AC4BCAC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getRoutes( request: Request,
+                          transaction: any,
+                          logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.currentInstance;
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_GET_ROUTES',
+                 Message: await I18NManager.translate( strLanguage, 'Success get routes' ),
+                 Mark: '1DD6E83147C6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               }
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getRoutes.name;
+
+      const strMark = "41C94BFA2E31" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

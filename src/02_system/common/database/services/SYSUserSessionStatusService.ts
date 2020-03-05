@@ -474,9 +474,9 @@ export default class SYSUserSessionStatusService extends BaseService {
       if ( CommonUtilities.isNullOrEmpty( userSessionStatusInDB ) ) {
 
         userSessionStatusInDB = await SYSUserSessionStatus.create(
-                                                                data,
-                                                                { transaction: currentTransaction }
-                                                              );
+                                                                   data,
+                                                                   { transaction: currentTransaction }
+                                                                 );
 
       }
       else if ( bUpdate ) {

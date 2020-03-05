@@ -540,16 +540,17 @@ export default class Always {
 
         await CommonUtilities.asyncForEach( configValueEntries as any, async ( configValueToCreate: any ) => {
 
-          const options = {
-
-            where: { ConfigMetaDataId: configValueToCreate.ConfigMetaDataId },
-            transaction: currentTransaction,
-
-          }
-
-          const configValueDataInDB = await SYSConfigValueData.findOne( options );
-
           try {
+
+            const options = {
+                              where: {
+                                      ConfigMetaDataId: configValueToCreate.ConfigMetaDataId,
+                                      Owner: configValueToCreate.Owner
+                                    },
+                              transaction: currentTransaction,
+                            }
+
+            const configValueDataInDB = await SYSConfigValueData.findOne( options );
 
             if ( configValueDataInDB === null ) {
 

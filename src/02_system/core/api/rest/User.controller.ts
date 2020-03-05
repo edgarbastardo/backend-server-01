@@ -77,6 +77,8 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteUserL01#,#DeleteUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteUserL01", "DeleteUserL02", "DeleteUserL03" ], Description: "Delete the user information" },
                                   { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Search for users information" },
                                   { Path: UserController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Count search users information result" },
+                                  { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user" },
+                                  { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/routes", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
@@ -539,6 +541,57 @@ export default class UserController {
     const result = await UserServiceController.searchCountUser( request,
                                                                 null,
                                                                 this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/settings",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async getSettings( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.getSettings( request,
+                                                            null,
+                                                            this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/settings",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async setSettings( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.setSettings( request,
+                                                            null,
+                                                            this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/routes",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async getRoute( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.getRoutes( request,
+                                                          null,
+                                                          this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 

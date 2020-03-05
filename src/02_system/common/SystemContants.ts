@@ -1584,6 +1584,32 @@ export default class SystemConstants {
                                                                 ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
                                                               };
 
+  static readonly _CONFIG_ENTRY_General_User_Settings_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_General_User_Settings = {
+                                                          Id: "09749c7d-5514-4635-8c19-c272747cf193",
+                                                          Scope: "user",
+                                                          Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                          Category: "User",
+                                                          Name: "system.general.user.settings",
+                                                          Default: JSON.stringify(
+                                                                                   {
+                                                                                     "entry":"value"
+                                                                                   }
+                                                                                 ),
+                                                          Label: "Configuration for user settings values",
+                                                          Description: "Configuration for user settings values",
+                                                          AllowTagAccessR: "#Administrator#",
+                                                          AllowTagAccessW: "#Administrator#",
+                                                          Example: JSON.stringify(
+                                                                                   {
+                                                                                     "entry":"value"
+                                                                                   }
+                                                                                 ),
+                                                          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                          ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                        };
+
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
@@ -1603,6 +1629,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
                                                SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service,
+                                               SystemConstants._CONFIG_ENTRY_General_User_Settings
                                              ];
 
 }
