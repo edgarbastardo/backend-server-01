@@ -1,64 +1,32 @@
 import cluster from 'cluster';
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 import {
   //Router,
   Request,
   //Response,
   //NextFunction
 } from 'express';
+
 //import bcrypt from 'bcrypt';
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../common/SystemContants";
+import { ICheckUserGroupRoles } from '../../common/SystemContants';
+import CommonConstants from "../../common/CommonConstants";
 
 import CommonUtilities from "../../common/CommonUtilities";
 import SystemUtilities from "../../common/SystemUtilities";
 
-//import { Role } from "../models/Role";
-//import { User } from "../../common/database/models/User";
-//import { UserSessionStatus } from "../models/UserSessionStatus";
-//import { UserGroup } from "../../common/database/models/UserGroup";
-//import { Person } from "../../common/database/models/Person";
-//import UserSessionStatusService from "../../common/database/services/UserSessionStatusService";
-//import CacheManager from "../../common/managers/CacheManager";
-//import { PasswordParameters } from "./SecurityService.controller";
-//import { UserSignup } from "../../common/database/models/UserSignup";
-//import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
 import DBConnectionManager from '../../common/managers/DBConnectionManager';
-//import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
-//import SYSUserService from "../../common/database/services/SYSUserService";
-import CommonConstants from "../../common/CommonConstants";
-//import SecurityServiceController from "./SecurityService.controller";
+
 import SYSUserGroupService from "../../common/database/services/SYSUserGroupService";
-//import NotificationManager from "../../common/managers/NotificationManager";
-//import SYSUserSignupService from "../../common/database/services/SYSUserSignupService";
-//import CipherManager from "../../common/managers/CipherManager";
-//import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../common/managers/I18Manager";
-//import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
-//import JobQueueManager from "../../common/managers/JobQueueManager";
-//import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
-//import GeoMapGoogle from "../../common/implementations/geomaps/GeoMapGoogle";
-//import GeoMapManager from "../../common/managers/GeoMapManager";
-//import { SYSUser } from "../../common/database/models/SYSUser";
-//import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
-//import { SYSPerson } from '../../common/database/models/SYSPerson';
-//import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
 
 const debug = require( 'debug' )( 'UserGroupServiceController' );
-
-export interface ICheckUserGroupRoles {
-
-  isAuthorizedAdmin: boolean,
-  //isAuthorizedL01: boolean,
-  //isAuthorizedL02: boolean,
-  isAuthorizedL03: boolean,
-  isNotAuthorized: boolean
-
-}
 
 export default class UserGroupServiceController {
 
@@ -450,12 +418,12 @@ export default class UserGroupServiceController {
                                   logger: any ): ICheckUserGroupRoles {
 
     let result: ICheckUserGroupRoles = {
-                                    isAuthorizedAdmin: false,
-                                    isAuthorizedL03: false,
-                                    //isAuthorizedL02: false,
-                                    //isAuthorizedL01: false,
-                                    isNotAuthorized: false
-                                  };
+                                         isAuthorizedAdmin: false,
+                                         isAuthorizedL03: false,
+                                         //isAuthorizedL02: false,
+                                         //isAuthorizedL01: false,
+                                         isNotAuthorized: false
+                                       };
 
     try {
 

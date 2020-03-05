@@ -9,6 +9,16 @@ export interface ICheckUserRoles {
 
 }
 
+export interface ICheckUserGroupRoles {
+
+  isAuthorizedAdmin: boolean,
+  //isAuthorizedL01: boolean,
+  //isAuthorizedL02: boolean,
+  isAuthorizedL03: boolean,
+  isNotAuthorized: boolean
+
+}
+
 export default class SystemConstants {
 
   static readonly _GROUP_SYSTEM_ADMINISTRATORS_NAME = "System_Administrators";
