@@ -5,7 +5,7 @@ require( 'dotenv' ).config(); //Read the .env file, in the root folder of projec
 
 test( `Test NotificationManager SMSGateway transport library 001`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 

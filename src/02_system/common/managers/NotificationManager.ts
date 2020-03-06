@@ -120,7 +120,7 @@ export default class NotificationManager {
 
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 
@@ -499,7 +499,7 @@ export default class NotificationManager {
       //ANCHOR  send
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 

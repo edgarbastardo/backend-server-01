@@ -569,7 +569,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -1163,7 +1163,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -1840,7 +1840,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -2460,7 +2460,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -3084,7 +3084,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -3738,7 +3738,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -4249,7 +4249,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -4839,7 +4839,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -5328,7 +5328,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -5897,7 +5897,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -6161,7 +6161,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -6652,7 +6652,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -7299,7 +7299,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -8261,7 +8261,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -9292,7 +9292,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -9615,7 +9615,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -9968,7 +9968,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -10242,7 +10242,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -10468,7 +10468,7 @@ export default class UserServiceController {
 
       let strAuthorization = context.Authorization;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -10715,7 +10715,7 @@ export default class UserServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 

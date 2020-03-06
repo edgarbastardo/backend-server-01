@@ -37,7 +37,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -209,7 +209,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 

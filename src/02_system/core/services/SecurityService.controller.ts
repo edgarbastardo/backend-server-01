@@ -591,7 +591,7 @@ export default class SecurityServiceController {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -1278,7 +1278,7 @@ export default class SecurityServiceController {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -1382,7 +1382,7 @@ export default class SecurityServiceController {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 

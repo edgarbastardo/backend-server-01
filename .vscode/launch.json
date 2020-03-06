@@ -55,7 +55,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program Test 01 REST API",
-      "program": "${workspaceFolder}/src/04_test/standalone/test01_rest_api.ts",
+      "program": "${workspaceFolder}/src/04_test/standalone/test01.ts --username=admin01@system.net --password=admin1.123456. --target=http://localhost",
       "outputCapture": "std",
       "preLaunchTask": "build-test01-rest-api",
       "console": "integratedTerminal",

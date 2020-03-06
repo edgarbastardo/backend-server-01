@@ -36,7 +36,7 @@ export default class SYSRoleService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -169,7 +169,7 @@ export default class SYSRoleService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 

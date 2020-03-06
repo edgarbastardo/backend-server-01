@@ -17,11 +17,19 @@ const debug = require( 'debug' )( 'DBConnectionManager' );
 
 export default class DBConnectionManager {
 
-  static currentInstance: any = null;
+  static dbConnection: any = null;
+
+  static dbConfig: any = null;
 
   static queryStatements: any = null;
 
-  static getDBConfig( dbConfig: any ) {
+  static getDBConfig() {
+
+    return { ... this.dbConfig }; //return a copy
+
+  }
+
+  static processDBConfig( dbConfig: any ) {
 
     //const result = dbConfig;
 
@@ -65,7 +73,7 @@ export default class DBConnectionManager {
 
   }
 
-  static async create( logger: any ): Promise<any> {
+  static async connect( logger: any ): Promise<any> {
 
     let result = null;
 
@@ -77,7 +85,7 @@ export default class DBConnectionManager {
 
       const dbConfigData = require( strConfigFile );
 
-      const dbConfig = DBConnectionManager.getDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+      const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
       dbConfig.models = [
 
@@ -180,12 +188,14 @@ export default class DBConnectionManager {
 
       }
 
+      this.dbConfig = dbConfig;
+
     }
     catch ( error ) {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.create.name;
+      sourcePosition.method = this.name + "." + this.connect.name;
 
       const strMark = "5B41B4AB9161" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -224,7 +234,7 @@ export default class DBConnectionManager {
 
       const dbConfigData = require( strConfigFile );
 
-      const dbConfig = DBConnectionManager.getDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+      const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
       result.systemQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/SystemQueries` ).default;
       result.businessQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/BusinessQueries` ).default;
@@ -268,7 +278,7 @@ export default class DBConnectionManager {
 
     try {
 
-      let strDialect = this.currentInstance ? this.currentInstance.options.dialect : "";
+      let strDialect = this.dbConnection ? this.dbConnection.options.dialect : "";
 
       if ( this.queryStatements ) {
 
@@ -339,9 +349,9 @@ export default class DBConnectionManager {
 
     try {
 
-      if ( DBConnectionManager.currentInstance ) {
+      if ( DBConnectionManager.dbConnection ) {
 
-        await DBConnectionManager.currentInstance.close();
+        await DBConnectionManager.dbConnection.close();
 
         bResult = true;
 

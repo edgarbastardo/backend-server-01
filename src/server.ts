@@ -303,11 +303,11 @@ export default async function main() {
 
     await DBMigrationManager.migrateUsingRawConnection( LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
 
-    DBConnectionManager.currentInstance = await DBConnectionManager.create( LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
+    DBConnectionManager.dbConnection = await DBConnectionManager.connect( LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
 
     DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( LoggerManager.mainLoggerInstance );
 
-    await DBMigrationManager.migrateUsingORMConnection( DBConnectionManager.currentInstance,
+    await DBMigrationManager.migrateUsingORMConnection( DBConnectionManager.dbConnection,
                                                         LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
 
     await ModelServiceManager.loadModelServices( LoggerManager.mainLoggerInstance );
@@ -315,7 +315,7 @@ export default async function main() {
     if ( intHTTPWorkerProcessCount === 0 ||
          process.env.WORKER_KIND === "http_worker_process" ) {
 
-      ApplicationManager.currentInstance = await ApplicationManager.create( DBConnectionManager.currentInstance,
+      ApplicationManager.currentInstance = await ApplicationManager.create( DBConnectionManager.dbConnection,
                                                                             LoggerManager.mainLoggerInstance );
 
     }
@@ -332,7 +332,7 @@ export default async function main() {
 
     if ( cluster.isMaster ) {
 
-      const logger = DBConnectionManager.currentInstance;
+      const logger = DBConnectionManager.dbConnection;
 
       if ( !cluster.settings.execArgv ) {
 

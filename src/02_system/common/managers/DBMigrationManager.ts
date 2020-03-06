@@ -30,7 +30,7 @@ export default class DBMigrationManager {
 
         const dbConfigData = require( strConfigFile );
 
-        const dbConfig = DBConnectionManager.getDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+        const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
         if ( dbConfig[ "dialect" ] === "mysql" ) {
 
@@ -90,7 +90,7 @@ export default class DBMigrationManager {
 
         const dbConfigData = require( strConfigFile );
 
-        const dbConfig = DBConnectionManager.getDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+        const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
         if ( dbConfig[ "dialect" ] === "mysql" ) {
 

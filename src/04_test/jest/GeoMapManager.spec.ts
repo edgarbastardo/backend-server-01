@@ -7,7 +7,7 @@ require( 'dotenv' ).config(); //Read the .env file, in the root folder of projec
 
 test( `Test geocodeServiceUsingAddress 001`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -23,7 +23,7 @@ test( `Test geocodeServiceUsingAddress 001`, async () => {
 
 test( `Test geocodeServiceUsingAddress 002`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -39,7 +39,7 @@ test( `Test geocodeServiceUsingAddress 002`, async () => {
 
 test( `Test geocodeServiceUsingAddress 003`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -56,7 +56,7 @@ test( `Test geocodeServiceUsingAddress 003`, async () => {
 
 test( `Test geocodeServiceUsingAddress 004`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -72,7 +72,7 @@ test( `Test geocodeServiceUsingAddress 004`, async () => {
 
 test( `Test geocodeServiceUsingAddress 005`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -88,7 +88,7 @@ test( `Test geocodeServiceUsingAddress 005`, async () => {
 
 test( `Test geocodeServiceUsingAddress 006`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -104,7 +104,7 @@ test( `Test geocodeServiceUsingAddress 006`, async () => {
 
 test( `Test geocodeServiceUsingAddress 007`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 
@@ -121,7 +121,7 @@ test( `Test geocodeServiceUsingAddress 007`, async () => {
 
 test( `Test geocodeServiceUsingAddress 008`, async () => {
 
-  DBConnectionManager.currentInstance = await DBConnectionManager.create( null ); //Init the connection to db using the orm
+  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
 
   DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
 

@@ -20,11 +20,11 @@ import SystemUtilities from "../../02_system/common/SystemUtilities";
 
 //const debug = require( 'debug' )( 'test01_test_api' );
 
-const strUser_admin01_at_system_net = "admin01@system.net";
-const strPassword_admin01_at_system_net = "admin1.123456.";
+let strStartUser = "admin01@system.net";
+let strStartPassword = "admin1.123456.";
 
-const strProtocol = "http://"
-const strHost = "127.0.0.1";
+let strProtocol = "http://"
+let strHost = "127.0.0.1";
 
 //let strAuthorization_admin01 = null;
 
@@ -127,19 +127,6 @@ const userRequestFull = {
                           }
                         }
 
-const binaryRequestFull = {
-                            "File": null,
-                            "AccessKind": 0,
-                            "StorageKind": 0,
-                            "Category": null,
-                            "ExpireAt": null,
-                            "Label": null,
-                            "Tag": null,
-                            "Context": null,
-                            "Comment": null,
-                            "ShareCode": null
-                          }
-
 let user01_at_TestL01_data = {} as any;
 let user02_at_TestL01_data = {} as any;
 
@@ -150,9 +137,9 @@ let user98_at_TestL98_data = {} as any;
 
 let upload_binary_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
 
-async function call_login( headers: any,
-                           strUser: string,
-                           strPassword: string ): Promise<any> {
+export async function call_login( headers: any,
+                                  strUser: string,
+                                  strPassword: string ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -202,7 +189,7 @@ async function call_login( headers: any,
 
 }
 
-async function call_tokenCheck( headers: any ): Promise<any> {
+export async function call_tokenCheck( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -245,7 +232,7 @@ async function call_tokenCheck( headers: any ): Promise<any> {
 
 }
 
-async function call_profile( headers: any ): Promise<any> {
+export async function call_profile( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -290,7 +277,7 @@ async function call_profile( headers: any ): Promise<any> {
 
 }
 
-async function call_logout( headers: any ): Promise<any> {
+export async function call_logout( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -333,8 +320,8 @@ async function call_logout( headers: any ): Promise<any> {
 
 }
 
-async function call_userSearch( headers: any,
-                                params: any ): Promise<any> {
+export async function call_userSearch( headers: any,
+                                       params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -432,8 +419,8 @@ async function call_userSearch( headers: any,
 
 }
 
-async function call_userSearchCount( headers: any,
-                                     params: any ): Promise<any> {
+export async function call_userSearchCount( headers: any,
+                                            params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -531,7 +518,7 @@ async function call_userSearchCount( headers: any,
 
 }
 
-async function call_change_password( headers: any, body: any ): Promise<any> {
+export async function call_change_password( headers: any, body: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -576,7 +563,7 @@ async function call_change_password( headers: any, body: any ): Promise<any> {
 
 }
 
-async function call_createUser( headers: any, body: any ): Promise<any> {
+export async function call_createUser( headers: any, body: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -621,7 +608,7 @@ async function call_createUser( headers: any, body: any ): Promise<any> {
 
 }
 
-async function call_updateUser( headers: any, body: any ): Promise<any> {
+export async function call_updateUser( headers: any, body: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -666,7 +653,7 @@ async function call_updateUser( headers: any, body: any ): Promise<any> {
 
 }
 
-async function call_deleteUser( headers: any, query: any ): Promise<any> {
+export async function call_deleteUser( headers: any, query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -711,7 +698,7 @@ async function call_deleteUser( headers: any, query: any ): Promise<any> {
 
 }
 
-async function call_deleteUserGroup( headers: any, query: any ): Promise<any> {
+export async function call_deleteUserGroup( headers: any, query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -756,7 +743,7 @@ async function call_deleteUserGroup( headers: any, query: any ): Promise<any> {
 
 }
 
-async function call_createAuth( headers: any ): Promise<any> {
+export async function call_createAuth( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -799,7 +786,7 @@ async function call_createAuth( headers: any ): Promise<any> {
 
 }
 
-async function call_deleteAuth( headers: any ): Promise<any> {
+export async function call_deleteAuth( headers: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -842,8 +829,8 @@ async function call_deleteAuth( headers: any ): Promise<any> {
 
 }
 
-async function call_binarySearch( headers: any,
-                                  params: any ): Promise<any> {
+export async function call_binarySearch( headers: any,
+                                         params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -941,8 +928,8 @@ async function call_binarySearch( headers: any,
 
 }
 
-async function call_binarySearchCount( headers: any,
-                                       params: any ): Promise<any> {
+export async function call_binarySearchCount( headers: any,
+                                              params: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -994,8 +981,9 @@ async function call_binarySearchCount( headers: any,
   return result;
 
 }
-async function call_uploadBinaryData( headers: any,
-                                      body: FormData ): Promise<any> {
+
+export async function call_uploadBinaryData( headers: any,
+                                             body: FormData ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -1101,8 +1089,8 @@ async function call_downloadBinaryData( headers: any, query: any ): Promise<any>
 
 }
 
-async function call_deleteBinaryData( headers: any,
-                                      query: any ): Promise<any> {
+export async function call_deleteBinaryData( headers: any,
+                                             query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -1147,8 +1135,8 @@ async function call_deleteBinaryData( headers: any,
 
 }
 
-async function call_getBinaryDataDetails( headers: any,
-                                          query: any ): Promise<any> {
+export async function call_getBinaryDataDetails( headers: any,
+                                                 query: any ): Promise<any> {
 
   let result = { input: null, output: null };
 
@@ -1191,7 +1179,7 @@ async function call_getBinaryDataDetails( headers: any,
 
 }
 
-function formatSequence( intSequence: number ): string {
+export function formatSequence( intSequence: number ): string {
 
   let strResult = "";
 
@@ -1215,7 +1203,7 @@ function formatSequence( intSequence: number ): string {
 
 }
 
-function saveInput( strFileName: string, inputs: any ) {
+export function saveInput( strFileName: string, inputs: any ) {
 
   try {
 
@@ -3404,8 +3392,8 @@ async function test_set01() {
 
     myAssert( await test_login( headers_admin01_at_system_net,
                                 {
-                                  Name: strUser_admin01_at_system_net,
-                                  Password: strPassword_admin01_at_system_net + "1" //Force to fail the login
+                                  Name: strStartUser,
+                                  Password: strStartPassword + "1" //Force to fail the login
                                 },
                                 "ERROR_LOGIN_FAILED",
                                 "test_login_admin01@system_net_fail",
@@ -3415,8 +3403,8 @@ async function test_set01() {
 
     myAssert( await test_login( headers_admin01_at_system_net,
                                 {
-                                  Name: strUser_admin01_at_system_net,
-                                  Password: strPassword_admin01_at_system_net
+                                  Name: strStartUser,
+                                  Password: strStartPassword
                                 },
                                 "SUCCESS_LOGIN",
                                 "test_login_admin01@system_net_success",

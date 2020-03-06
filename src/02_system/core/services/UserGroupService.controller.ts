@@ -52,7 +52,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -198,7 +198,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -315,7 +315,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -492,7 +492,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -804,7 +804,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -921,7 +921,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 

@@ -42,7 +42,7 @@ export default class SYSRouteService extends BaseService {
 
       if ( currentTransaction === null ) {
 
-        const dbConnection = DBConnectionManager.currentInstance;
+        const dbConnection = DBConnectionManager.dbConnection;
 
         currentTransaction = await dbConnection.transaction();
 
@@ -184,7 +184,7 @@ export default class SYSRouteService extends BaseService {
 
       if ( currentTransaction === null ) {
 
-        const dbConnection = DBConnectionManager.currentInstance;
+        const dbConnection = DBConnectionManager.dbConnection;
 
         currentTransaction = await dbConnection.transaction();
 

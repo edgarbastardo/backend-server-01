@@ -60,13 +60,13 @@ export default class DatabaseModelController {
 
     try {
 
-      if ( DBConnectionManager.currentInstance.models !== null ) {
+      if ( DBConnectionManager.dbConnection.models !== null ) {
 
         //const connection = DBConnectionManager.currentInstance;
 
-        for ( let strModelName of Object.keys( DBConnectionManager.currentInstance.models ) ) {
+        for ( let strModelName of Object.keys( DBConnectionManager.dbConnection.models ) ) {
 
-          const strTableMame = DBConnectionManager.currentInstance.models[ strModelName ].tableName;
+          const strTableMame = DBConnectionManager.dbConnection.models[ strModelName ].tableName;
 
           for ( let routeInfo of DatabaseModelController._ROUTE_INFO ) {
 
@@ -153,7 +153,7 @@ export default class DatabaseModelController {
 
       result = Router();
 
-      ModelToRestAPIServiceController.sequelizeModelList = DBConnectionManager.currentInstance.models;
+      ModelToRestAPIServiceController.sequelizeModelList = DBConnectionManager.dbConnection.models;
 
       // -> /database/model/:name
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 0 ].Path,
@@ -172,7 +172,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 1 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -280,7 +280,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 2 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -387,7 +387,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -494,7 +494,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -602,7 +602,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -709,7 +709,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -815,7 +815,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -922,7 +922,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
@@ -1027,7 +1027,7 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.currentInstance;
+          const dbConnection = DBConnectionManager.dbConnection;
           const model = dbConnection.models[ strModelName ];
 
           if ( ModelServiceManager.Services[ strModelName + "Service" ] &&

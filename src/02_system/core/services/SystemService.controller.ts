@@ -29,7 +29,7 @@ import SystemUtilities from "../../common/SystemUtilities";
 //import { PasswordParameters } from "./SecurityService.controller";
 //import { UserSignup } from "../../common/database/models/UserSignup";
 //import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
-import DBConnectionManager from '../../common/managers/DBConnectionManager';
+import DBConnectionManager from "../../common/managers/DBConnectionManager";
 //import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
 //import SYSUserService from "../../common/database/services/SYSUserService";
 import CommonConstants from "../../common/CommonConstants";
@@ -41,6 +41,7 @@ import SYSUserGroupService from "../../common/database/services/SYSUserGroupServ
 //import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../common/managers/I18Manager";
 import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
+import CacheManager from '../../common/managers/CacheManager';
 //import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
 //import JobQueueManager from "../../common/managers/JobQueueManager";
 //import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
@@ -77,7 +78,7 @@ export default class SystemServiceController {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.currentInstance;
+      const dbConnection = DBConnectionManager.dbConnection;
 
       if ( currentTransaction === null ) {
 
@@ -87,131 +88,58 @@ export default class SystemServiceController {
 
       }
 
-      /*
-      let userSessionStatus = context.UserSessionStatus;
+      if ( !CacheManager.currentInstance ) {
 
-      let bProfileOfAnotherUser = false;
+        let dbConfig = DBConnectionManager.getDBConfig();
 
-      let strAuthorization = context.Authorization;
-
-      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
-           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
-
-        if ( request.query.shortToken ) {
-
-          bProfileOfAnotherUser = true;
-
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
-                                                                                                  currentTransaction,
-                                                                                                  logger );
-
-          strAuthorization = request.query.shortToken;
-
-        }
-        else if ( request.query.token ) {
-
-          bProfileOfAnotherUser = true;
-
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
-                                                                                             currentTransaction,
-                                                                                             logger );
-
-          strAuthorization = request.query.token;
-
-        }
-
-      }
-
-      if ( bProfileOfAnotherUser &&
-           userSessionStatus === null ) {
+        delete dbConfig.Password;
 
         result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_NOT_DATABASE_CONNECTION',
+                   Message: await I18NManager.translate( strLanguage, 'Not database connection open' ),
+                   Mark: 'DA13E1748E25' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                               Details: null
+                               Code: 'ERROR_NOT_DATABASE_CONNECTION',
+                               Message: await I18NManager.translate( strLanguage, 'Not database connection open' ),
+                               Details: dbConfig
                              }
                            ],
                    Warnings: [],
-                   Count: 0,
-                   Data: []
-                 };
-
-      }
-      else if ( bProfileOfAnotherUser &&
-                userSessionStatus instanceof Error ) {
-
-        const error = userSessionStatus;
-
-        result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: error.name,
-                               Message: error.message,
-                               Details: await SystemUtilities.processErrorDetails( error ) //error
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
+                   Count: 1,
+                   Data: [
+                           SystemUtilities.info
+                         ]
                  };
 
       }
       else {
 
-        let routes = await SYSRoleHasRouteService.listRoutesOfRoles( userSessionStatus.Role,
-                                                                     context.FrontendId,
-                                                                     request.query.format,
-                                                                     currentTransaction,
-                                                                     logger );
+        let dbConfig = DBConnectionManager.getDBConfig();
 
-        let intCount = 0;
-
-        if ( routes ) {
-
-          if ( request.query.format === "1" ) {
-
-            intCount = routes.length;
-
-          }
-          else {
-
-            intCount = Object.keys( routes ).length;
-
-          }
-
-        }
+        delete dbConfig.Password;
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_ROUTES',
-                   Message: await I18NManager.translate( strLanguage, 'Success get routes' ),
-                   Mark: '29DB5C3384E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: 'SUCCESS_GET_STATUS',
+                   Message: await I18NManager.translate( strLanguage, 'Success get the status' ),
+                   Mark: '620A7376DB42' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
                    Warnings: [],
-                   Count: intCount,
-                   Data: routes
+                   Count: 1,
+                   Data: [
+                           SystemUtilities.info
+                         ]
                  }
 
         bApplyTransaction = true;
 
       }
-      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

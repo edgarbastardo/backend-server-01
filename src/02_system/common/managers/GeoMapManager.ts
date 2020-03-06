@@ -207,7 +207,7 @@ export default class GeoMapManager {
 
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 
@@ -400,7 +400,7 @@ export default class GeoMapManager {
       //ANCHOR  geocodeServiceUsingAddress
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 
@@ -499,7 +499,7 @@ export default class GeoMapManager {
       //ANCHOR  geocodeServiceUsingLatAndLng
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 
@@ -592,7 +592,7 @@ export default class GeoMapManager {
       //ANCHOR  getGeocodeData
       if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.currentInstance.transaction();
+        currentTransaction = await DBConnectionManager.dbConnection.transaction();
 
       }
 
