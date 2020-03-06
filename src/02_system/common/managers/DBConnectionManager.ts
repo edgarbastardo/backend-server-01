@@ -22,6 +22,8 @@ export default class DBConnectionManager {
 
   private static dbConnection: any = {};
 
+  private static dbConnectionError: any = {};
+
   private static queryStatements: any = {};
 
   static getDBConfig( strDatabase: string ): any {
@@ -45,6 +47,12 @@ export default class DBConnectionManager {
   static getAllDBConnection(): any {
 
     return this.dbConnection;
+
+  }
+
+  static getDBConnectionError( strDatabase: string ): any {
+
+    return this.dbConnectionError[ strDatabase ];
 
   }
 
@@ -131,9 +139,9 @@ export default class DBConnectionManager {
 
       for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
 
-        try {
+        const strCurrentDatabase = databaseList[ intDBIndex ];
 
-          const strCurrentDatabase = databaseList[ intDBIndex ];
+        try {
 
           const dbConfig = DBConnectionManager.processDBConfig( strCurrentDatabase,
                                                                 dbConfigData[ strCurrentDatabase ][ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
@@ -222,6 +230,13 @@ export default class DBConnectionManager {
                                         $col: Op.col
                                       };
 
+          this.dbConfig[ strCurrentDatabase ] = dbConfig;
+          this.dbConnection[ strCurrentDatabase ] = null;
+
+          result[ strCurrentDatabase ] = {};
+          result[ strCurrentDatabase ].dbConfig = dbConfig;
+          result[ strCurrentDatabase ].dbConnection = null;
+
           const dbConnection = new Sequelize(
                                               dbConfig[ 'database' ],
                                               dbConfig[ 'username' ],
@@ -245,11 +260,8 @@ export default class DBConnectionManager {
 
           }
 
-          this.dbConfig[ strCurrentDatabase ] = dbConfig;
           this.dbConnection[ strCurrentDatabase ] = dbConnection;
 
-          result[ strCurrentDatabase ] = {};
-          result[ strCurrentDatabase ].dbConfig = dbConfig;
           result[ strCurrentDatabase ].dbConnection = dbConnection;
 
         }
@@ -277,6 +289,10 @@ export default class DBConnectionManager {
             logger.error( error );
 
           }
+
+          this.dbConnectionError[ strCurrentDatabase ] = error;
+
+          result[ strCurrentDatabase ].dbError = error; //save the error
 
         }
 

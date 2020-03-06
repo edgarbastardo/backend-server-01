@@ -51,6 +51,8 @@ import CacheManager from '../../common/managers/CacheManager';
 //import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
 //import { SYSPerson } from '../../common/database/models/SYSPerson';
 //import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
+import dbConnection from "../../common/managers/DBConnectionManager";
+import { error } from 'winston';
 
 const debug = require( 'debug' )( 'SystemServiceController' );
 
@@ -78,9 +80,162 @@ export default class SystemServiceController {
 
       //strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const databaseList = Object.keys( DBConnectionManager.getAllDBConfig() );
 
-      
+      const databaseStatus = { success: {}, fail: {} };
+
+      let bConnectionToDbFailed = false;
+
+      const error = {};
+      const warning = {};
+
+      for ( let intDatabaseIndex = 0; intDatabaseIndex < databaseList.length; intDatabaseIndex++ ) {
+
+        if ( DBConnectionManager.getDBConnection( databaseList[ intDatabaseIndex ] ) === null ) {
+
+          //Database with no connection
+          const error = DBConnectionManager.getDBConnectionError( databaseList[ intDatabaseIndex ] );
+
+          databaseStatus.fail[ databaseList[ intDatabaseIndex ] ] = {
+                                                                      Code: error.name,
+                                                                      Message: error.message,
+                                                                      Details: await SystemUtilities.processErrorDetails( error ) //error
+                                                                    };
+          bConnectionToDbFailed = true;
+
+        }
+        else {
+
+          databaseStatus.success[ databaseList[ intDatabaseIndex ] ] = {
+                                                                         Code: "SUCCESS_CONNECTED_DATABASE",
+                                                                         Message: await I18NManager.translate( strLanguage, 'Success connection to database' ),
+                                                                         Details: null
+                                                                       };
+
+        }
+
+      }
+
+      if ( bConnectionToDbFailed ) {
+
+        error[ "database" ] = { ...databaseStatus.fail };
+
+      }
+
+      const data = {
+                     info: SystemUtilities.info,
+                     database: databaseStatus.success,
+                     cache: {}
+                   }
+
+      const cacheStatus = {
+                            Code: "",
+                            Message: "",
+                            Details: null,
+                          }
+
+      if ( CacheManager.currentInstance === null ) {
+
+        if ( process.env.USE_CACHE === "1" )  {
+
+          cacheStatus.Code = "ERROR_NOT_CONNECTED_CACHE"
+          cacheStatus.Message = await I18NManager.translate( strLanguage, "Failed connection to cache" );
+          cacheStatus.Details = "CacheManager.currentInstance === null";
+
+          error[ "cache" ] = cacheStatus;
+
+        }
+        else {
+
+          cacheStatus.Code = "WARNING_DISABLED_CACHE"
+          cacheStatus.Message = await I18NManager.translate( strLanguage, "Cache disabled by config entry" );
+          cacheStatus.Details = "env.USE_CACHE = 0";
+
+          warning[ "cache" ] = cacheStatus;
+
+        }
+
+      }
+      else {
+
+        const strStatus = CacheManager.currentInstance.status;
+
+        if ( strStatus === "ready" ) { //strStatus === "connecting" || strStatus === "reconnecting" ) {
+
+          cacheStatus.Code = "SUCCESS_CONNECTED_CACHE"
+          cacheStatus.Message = await I18NManager.translate( strLanguage, "Success connection to cache" );
+          cacheStatus.Details = null;
+
+          data[ "cache" ] = cacheStatus;
+
+        }
+        else {
+
+          cacheStatus.Code = "ERROR_NOT_CONNECTED_CACHE"
+          cacheStatus.Message = await I18NManager.translate( strLanguage, "Failed o delayed connection to cache" );
+          cacheStatus.Details = `CacheManager.currentInstance.status === '${strStatus}'`;
+
+          error[ "cache" ] = cacheStatus;
+
+        }
+
+      }
+
+      if ( Object.keys( error ).length > 0 ) {
+
+        const errors = [];
+        const warnings = [];
+
+        errors.push( error );
+
+        if ( Object.keys( warning ).length > 0 ) {
+
+          warnings.push( warning );
+
+        }
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_DATABASE_CONNECTION_FAILED',
+                   Message: await I18NManager.translate( strLanguage, 'One o more database connection failed' ),
+                   Mark: 'DA13E1748E25' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: errors,
+                   Warnings: warnings,
+                   Count: 1,
+                   Data: [
+                           data
+                         ]
+                 };
+
+      }
+      else {
+
+        const warnings = [];
+
+        if ( Object.keys( warning ).length > 0 ) {
+
+          warnings.push( warning );
+
+        }
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_STATUS',
+                   Message: await I18NManager.translate( strLanguage, 'Success status' ),
+                   Mark: '620A7376DB42' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: warnings,
+                   Count: 1,
+                   Data: [
+                           data
+                         ]
+                 }
+
+      }
 
       /*
       if ( currentTransaction === null ) {
