@@ -115,7 +115,7 @@ export default class SystemController {
 
   @httpGet(
             "/status",
-            MiddlewareManager.middlewareSetContext,
+            //MiddlewareManager.middlewareSetContext,
             //MiddlewareManager.middlewareCheckIsAuthenticated
           )
   async getStatus( request: Request, response: Response ) {

@@ -33,7 +33,7 @@ export default class SYSUserSessionPersistentService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

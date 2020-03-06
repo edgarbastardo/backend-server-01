@@ -2,8 +2,8 @@
 const debug = require( 'debug' )( 'SystemQueries' );
 
 import SqlString from 'sqlstring';
-import SystemUtilities from "../../../02_system/common/SystemUtilities";
-import CommonConstants from '../../../02_system/common/CommonConstants';
+import SystemUtilities from "../../../../02_system/common/SystemUtilities";
+import CommonConstants from '../../../../02_system/common/CommonConstants';
 
 export default class SystemQueries {
 

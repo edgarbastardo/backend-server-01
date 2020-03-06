@@ -16,7 +16,7 @@ const debug = require( 'debug' )( 'DBMigrationManager' );
 
 export default class DBMigrationManager {
 
-  static async createDatabaseIfNotExits( logger: any ):Promise<boolean> {
+  static async createDatabaseIfNotExits( strDatabase: string, logger: any ):Promise<boolean> {
 
     let bResult = false;
 
@@ -30,11 +30,72 @@ export default class DBMigrationManager {
 
         const dbConfigData = require( strConfigFile );
 
-        const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+        let databaseList = [];
 
-        if ( dbConfig[ "dialect" ] === "mysql" ) {
+        if ( strDatabase === "*" ) {
 
-          bResult = await DBMigrationManagerMYSQL.createDatabaseIfNotExits( dbConfig, logger );
+          const tempDatabaseList = Object.keys( dbConfigData );
+
+          for ( let intDBIndex = 0; intDBIndex < tempDatabaseList.length; intDBIndex++ ) {
+
+            const strCurrentDatabase = tempDatabaseList[ intDBIndex ];
+
+            if ( dbConfigData[ strCurrentDatabase ].connect ) {
+
+              databaseList.push( strCurrentDatabase );
+
+            }
+
+          }
+
+        }
+        else {
+
+          databaseList.push( strDatabase );
+
+        }
+
+        for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
+
+          try {
+
+            const strCurrentDatabase = databaseList[ intDBIndex ];
+
+            const dbConfig = DBConnectionManager.processDBConfig( strCurrentDatabase, dbConfigData[ strCurrentDatabase ][ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+
+            if ( dbConfig[ "dialect" ] === "mysql" ) {
+
+              bResult = await DBMigrationManagerMYSQL.createDatabaseIfNotExits( dbConfig, logger );
+
+            }
+
+          }
+          catch ( error ) {
+
+            const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+            sourcePosition.method = this.name + "." + this.createDatabaseIfNotExits.name;
+
+            const strMark = "23B90706AAA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+            const debugMark = debug.extend( strMark );
+
+            debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Catched on: %O", sourcePosition );
+
+            error.mark = strMark;
+            error.logId = SystemUtilities.getUUIDv4();
+
+            if ( logger &&
+                 typeof logger.error === "function" ) {
+
+              error.catchedOn = sourcePosition;
+              logger.error( error );
+
+            }
+
+          }
 
         }
 
@@ -76,7 +137,7 @@ export default class DBMigrationManager {
 
   }
 
-  static async migrateUsingRawConnection( logger: any ):Promise<boolean> {
+  static async migrateUsingRawConnection( strDatabase: string, logger: any ):Promise<boolean> {
 
     let bResult = false;
 
@@ -90,7 +151,7 @@ export default class DBMigrationManager {
 
         const dbConfigData = require( strConfigFile );
 
-        const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+        const dbConfig = DBConnectionManager.processDBConfig( strDatabase, dbConfigData[ strDatabase ][ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
 
         if ( dbConfig[ "dialect" ] === "mysql" ) {
 

@@ -36,7 +36,7 @@ export default class SYSRoleService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -169,7 +169,7 @@ export default class SYSRoleService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -179,7 +179,8 @@ export default class SYSRoleService extends BaseService {
 
       }
 
-      let strSQL = DBConnectionManager.getStatement( "getRolesFromRouteId",
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getRolesFromRouteId",
                                                      {
                                                        Id: strId
                                                      },
@@ -204,7 +205,8 @@ export default class SYSRoleService extends BaseService {
 
       }
 
-      strSQL = DBConnectionManager.getStatement( "getAllowTagAccessFromRouteId",
+      strSQL = DBConnectionManager.getStatement( "master",
+                                                 "getAllowTagAccessFromRouteId",
                                                  {
                                                    Id: strId
                                                  },

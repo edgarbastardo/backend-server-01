@@ -35,7 +35,7 @@ export default class SYSBinaryIndexService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -154,7 +154,7 @@ export default class SYSBinaryIndexService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -249,7 +249,7 @@ export default class SYSBinaryIndexService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

@@ -33,7 +33,7 @@ export default class SYSActionTokenService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -128,7 +128,7 @@ export default class SYSActionTokenService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -223,7 +223,7 @@ export default class SYSActionTokenService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -233,7 +233,8 @@ export default class SYSActionTokenService extends BaseService {
 
       }
 
-      const strSQL = DBConnectionManager.getStatement( "getCountActionTokenOnLastMinutes",
+      const strSQL = DBConnectionManager.getStatement( "master",
+                                                       "getCountActionTokenOnLastMinutes",
                                                        {
                                                          Kind: strKind, //"recover_password",
                                                          Owner: strOnwer,
@@ -326,7 +327,7 @@ export default class SYSActionTokenService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

@@ -64,22 +64,25 @@ export default class SystemServiceController {
 
     let result = null;
 
-    let currentTransaction = transaction;
+    //let currentTransaction = transaction;
 
-    let bIsLocalTransaction = false;
+    //let bIsLocalTransaction = false;
 
-    let bApplyTransaction = false;
+    //let bApplyTransaction = false;
 
     let strLanguage = "";
 
     try {
 
-      const context = ( request as any ).context;
+      //const context = ( request as any ).context;
 
-      strLanguage = context.Language;
+      //strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
+      
+
+      /*
       if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
@@ -88,9 +91,11 @@ export default class SystemServiceController {
 
       }
 
-      if ( !CacheManager.currentInstance ) {
 
-        let dbConfig = DBConnectionManager.getDBConfig();
+
+      if ( !CacheManager.getCurrent ) {
+
+        let dbConfig = DBConnectionManager.getDBConnection( "master" );
 
         delete dbConfig.Password;
 
@@ -118,7 +123,7 @@ export default class SystemServiceController {
       }
       else {
 
-        let dbConfig = DBConnectionManager.getDBConfig();
+        let dbConfig = DBConnectionManager.getDBConfig( "master" );
 
         delete dbConfig.Password;
 
@@ -157,6 +162,7 @@ export default class SystemServiceController {
         }
 
       }
+      */
 
     }
     catch ( error ) {
@@ -202,6 +208,7 @@ export default class SystemServiceController {
                  Data: []
                };
 
+      /*
       if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
 
@@ -216,6 +223,7 @@ export default class SystemServiceController {
         }
 
       }
+      */
 
     }
 

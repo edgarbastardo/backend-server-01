@@ -46,7 +46,7 @@ export default class Dev000ServicesController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

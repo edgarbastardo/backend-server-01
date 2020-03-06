@@ -299,23 +299,33 @@ export default async function main() {
     const intHTTPWorkerProcessCount = SystemUtilities.getHTTPWorkerProcessCount();
     const intJOBWorkerProcessCount = SystemUtilities.getJOBWorkerProcessCount();
 
-    await DBMigrationManager.createDatabaseIfNotExits( LoggerManager.mainLoggerInstance ); //Force create database if not exists
+    if ( process.env.DB_AUTO_MIGRATION === "1" ) {
 
-    await DBMigrationManager.migrateUsingRawConnection( LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
+      await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not exists
 
-    DBConnectionManager.dbConnection = await DBConnectionManager.connect( LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
+      await DBMigrationManager.migrateUsingRawConnection( "master", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
 
-    DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( LoggerManager.mainLoggerInstance );
+    }
 
-    await DBMigrationManager.migrateUsingORMConnection( DBConnectionManager.dbConnection,
-                                                        LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
+    //DBConnectionManager.dbConnection =
+    await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
 
-    await ModelServiceManager.loadModelServices( LoggerManager.mainLoggerInstance );
+    //DBConnectionManager.queryStatements =
+    await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
+
+    if ( process.env.DB_AUTO_MIGRATION === "1" ) {
+
+      await DBMigrationManager.migrateUsingORMConnection( DBConnectionManager.getDBConnection( "master" ),
+                                                          LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
+
+    }
+
+    await ModelServiceManager.loadModelServices( "*", LoggerManager.mainLoggerInstance );
 
     if ( intHTTPWorkerProcessCount === 0 ||
          process.env.WORKER_KIND === "http_worker_process" ) {
 
-      ApplicationManager.currentInstance = await ApplicationManager.create( DBConnectionManager.dbConnection,
+      ApplicationManager.currentInstance = await ApplicationManager.create( DBConnectionManager.getDBConnection( "master" ),
                                                                             LoggerManager.mainLoggerInstance );
 
     }
@@ -332,7 +342,7 @@ export default async function main() {
 
     if ( cluster.isMaster ) {
 
-      const logger = DBConnectionManager.dbConnection;
+      const logger = DBConnectionManager.getDBConnection( "master" );
 
       if ( !cluster.settings.execArgv ) {
 

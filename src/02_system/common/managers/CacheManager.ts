@@ -19,9 +19,13 @@ export default class CacheManager {
 
     try {
 
-      redisClient = await require( "ioredis" ).createClient( { port: process.env.REDIS_SERVER_PORT,
-                                                               host: process.env.REDIS_SERVER_IP,
-                                                               password: process.env.REDIS_SERVER_PASSWORD } );
+      if ( process.env.USE_CACHE === "1" ) {
+
+        redisClient = await require( "ioredis" ).createClient( { port: process.env.REDIS_SERVER_PORT,
+                                                                host: process.env.REDIS_SERVER_IP,
+                                                                password: process.env.REDIS_SERVER_PASSWORD } );
+
+      }
 
     }
     catch ( error ) {
@@ -65,31 +69,35 @@ export default class CacheManager {
 
     try {
 
-      const redlock = new Redlock(
-        // you should have one client for each independent redis node
-        // or cluster
-        [ redisClient ],
-        {
-            // the expected clock drift; for more details
-            // see http://redis.io/topics/distlock
-            driftFactor: 0.01, // time in ms
+      if ( redisClient ) {
 
-            // the max number of times Redlock will attempt
-            // to lock a resource before erroring
-            retryCount:  intRetryCount, //12
+        const redlock = new Redlock(
+          // you should have one client for each independent redis node
+          // or cluster
+          [ redisClient ],
+          {
+              // the expected clock drift; for more details
+              // see http://redis.io/topics/distlock
+              driftFactor: 0.01, // time in ms
 
-            // the time in ms between attempts
-            retryDelay:  intRetryDelay, //1000 * 5, // time in ms
+              // the max number of times Redlock will attempt
+              // to lock a resource before erroring
+              retryCount:  intRetryCount, //12
 
-            // the max time in ms randomly added to retries
-            // to improve performance under high contention
-            // see https://www.awsarchitectureblog.com/2015/03/backoff.html
-            retryJitter:  2000  // time in ms
-        }
+              // the time in ms between attempts
+              retryDelay:  intRetryDelay, //1000 * 5, // time in ms
 
-      );
+              // the max time in ms randomly added to retries
+              // to improve performance under high contention
+              // see https://www.awsarchitectureblog.com/2015/03/backoff.html
+              retryJitter:  2000  // time in ms
+          }
 
-      result = await redlock.lock( strResourceName, intTTL ); //Try for 1 minute
+        );
+
+        result = await redlock.lock( strResourceName, intTTL ); //Try for 1 minute
+
+      }
 
     }
     catch ( error ) {
@@ -129,12 +137,18 @@ export default class CacheManager {
 
     try {
 
-      await redLock.unlock();
+      if ( redLock ) {
 
-      let debugMark = debug.extend( "DAD04DE7C94F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        await redLock.unlock();
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `Success unlock the redis resource` );
+        let debugMark = debug.extend( "DAD04DE7C94F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+        debugMark( `Success unlock the redis resource` );
+
+        bResult = true;
+
+      }
 
     }
     catch ( error ) {
@@ -169,12 +183,20 @@ export default class CacheManager {
 
   static async setData( strKeyName: String,
                         keyData: any,
-                        logger: any ) {
+                        logger: any ): Promise<boolean> {
+
+    let bResult = false;
 
     try {
 
-      await CacheManager.currentInstance.set( strKeyName,
-                                              keyData );
+      if ( CacheManager.currentInstance ) {
+
+        await CacheManager.currentInstance.set( strKeyName,
+                                                keyData );
+
+        bResult = true;
+
+      }
 
     }
     catch ( error ) {
@@ -203,19 +225,29 @@ export default class CacheManager {
 
     }
 
+    return bResult;
+
   }
 
   static async setDataWithTTL( strKeyName: String,
                                keyData: any,
                                intTTL: number,
-                               logger: any ) {
+                               logger: any ): Promise<boolean> {
+
+    let bResult = false;
 
     try {
 
-      await CacheManager.currentInstance.set( strKeyName,
-                                              keyData,
-                                              "EX",
-                                              intTTL );
+      if ( CacheManager.currentInstance ) {
+
+        await CacheManager.currentInstance.set( strKeyName,
+                                                keyData,
+                                                "EX",
+                                                intTTL );
+
+        bResult = true;
+
+      }
 
     }
     catch ( error ) {
@@ -244,6 +276,8 @@ export default class CacheManager {
 
     }
 
+    return bResult;
+
   }
 
   static async getData( strKeyName: String,
@@ -253,7 +287,11 @@ export default class CacheManager {
 
     try {
 
-      result = await CacheManager.currentInstance.get( strKeyName );
+      if ( CacheManager.currentInstance ) {
+
+        result = await CacheManager.currentInstance.get( strKeyName );
+
+      }
 
     }
     catch ( error ) {
@@ -293,7 +331,11 @@ export default class CacheManager {
 
     try {
 
-      result = await CacheManager.currentInstance.del( strKeyName );
+      if ( CacheManager.currentInstance ) {
+
+        result = await CacheManager.currentInstance.del( strKeyName );
+
+      }
 
     }
     catch ( error ) {

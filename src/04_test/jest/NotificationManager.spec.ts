@@ -5,9 +5,11 @@ require( 'dotenv' ).config(); //Read the .env file, in the root folder of projec
 
 test( `Test NotificationManager SMSGateway transport library 001`, async () => {
 
-  DBConnectionManager.dbConnection = await DBConnectionManager.connect( null ); //Init the connection to db using the orm
+  //DBConnectionManager.dbConnection =
+  await DBConnectionManager.connect( "master", null ); //Init the connection to db using the orm
 
-  DBConnectionManager.queryStatements = await DBConnectionManager.loadQueryStatement( null );
+  //DBConnectionManager.queryStatements =
+  await DBConnectionManager.loadQueryStatement( "master", null );
 
   const bResult = await NotificationManager.send(
                                                   "sms",
@@ -24,7 +26,7 @@ test( `Test NotificationManager SMSGateway transport library 001`, async () => {
                                                   null,
                                                 );
 
-  await DBConnectionManager.close( null );
+  await DBConnectionManager.close( "master", null );
 
   expect( bResult ).toBe( true );
 

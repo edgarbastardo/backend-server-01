@@ -37,7 +37,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -209,7 +209,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -248,7 +248,8 @@ export default class SYSRoleHasRouteService extends BaseService {
 
           const strRole = roleList[ intRoleIndex ];
 
-          let strSQL = DBConnectionManager.getStatement( "getRoutesOfRole",
+          let strSQL = DBConnectionManager.getStatement( "master",
+                                                         "getRoutesOfRole",
                                                          {
                                                            //SelectFields: strSelectField,
                                                            Role: strRole.replace( "#", "" ).replace( "#", "" )

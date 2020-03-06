@@ -1482,7 +1482,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -1653,7 +1653,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -1889,7 +1889,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -1966,7 +1966,8 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      let strSQL = DBConnectionManager.getStatement( "searchBinaryData",
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "searchBinaryData",
                                                      {
                                                        //
                                                      },
@@ -2239,7 +2240,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -2316,7 +2317,8 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      let strSQL = DBConnectionManager.getStatement( "searchCountBinaryData",
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "searchCountBinaryData",
                                                      {
                                                        //
                                                      },
@@ -2536,7 +2538,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -3106,7 +3108,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -3420,7 +3422,7 @@ export default class BinaryServiceController extends BaseService {
       debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( "uploadBinaryData" );
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -4080,7 +4082,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -4726,7 +4728,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

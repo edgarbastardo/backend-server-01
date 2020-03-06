@@ -205,11 +205,11 @@ export default class GeoMapManager {
     //ANCHOR getConfigServiceType
     try {
 
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       let serviceConfig = null;
 
@@ -398,11 +398,11 @@ export default class GeoMapManager {
     try {
 
       //ANCHOR  geocodeServiceUsingAddress
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );
@@ -497,11 +497,11 @@ export default class GeoMapManager {
     try {
 
       //ANCHOR  geocodeServiceUsingLatAndLng
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );
@@ -590,11 +590,11 @@ export default class GeoMapManager {
     try {
 
       //ANCHOR  getGeocodeData
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );

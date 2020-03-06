@@ -60,13 +60,15 @@ export default class DatabaseModelController {
 
     try {
 
-      if ( DBConnectionManager.dbConnection.models !== null ) {
+      const models = DBConnectionManager.getDBConnection( "master" ).models;
+
+      if ( models !== null ) {
 
         //const connection = DBConnectionManager.currentInstance;
 
-        for ( let strModelName of Object.keys( DBConnectionManager.dbConnection.models ) ) {
+        for ( let strModelName of Object.keys( models ) ) {
 
-          const strTableMame = DBConnectionManager.dbConnection.models[ strModelName ].tableName;
+          const strTableMame = models[ strModelName ].tableName;
 
           for ( let routeInfo of DatabaseModelController._ROUTE_INFO ) {
 
@@ -153,7 +155,7 @@ export default class DatabaseModelController {
 
       result = Router();
 
-      ModelToRestAPIServiceController.sequelizeModelList = DBConnectionManager.dbConnection.models;
+      ModelToRestAPIServiceController.sequelizeModelList = DBConnectionManager.getDBConnection( "master" ).models;
 
       // -> /database/model/:name
       result.get( process.env.SERVER_ROOT_PATH + DatabaseModelController._ROUTE_INFO[ 0 ].Path,
@@ -172,10 +174,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 1 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.get( model,
@@ -280,10 +282,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 2 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.search( model,
@@ -387,10 +389,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             //ModelToRestAPI.sequelizeModelList = DBConnectionManager.currentInstance.models;
@@ -494,10 +496,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.create( model,
@@ -602,10 +604,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.bulkCreate( model,
@@ -709,10 +711,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.update( model,
@@ -815,10 +817,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.bulkUpdate( model,
@@ -922,10 +924,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.delete( model,
@@ -1027,10 +1029,10 @@ export default class DatabaseModelController {
 
           const strModelName = request.params.name; //pathSections[ pathSections.length - 3 ];
 
-          const dbConnection = DBConnectionManager.dbConnection;
+          const dbConnection = DBConnectionManager.getDBConnection( "master" );
           const model = dbConnection.models[ strModelName ];
 
-          if ( ModelServiceManager.Services[ strModelName + "Service" ] &&
+          if ( ModelServiceManager.Services[ "master" ][ strModelName + "Service" ] &&
                model ) {
 
             const result = await ModelToRestAPIServiceController.bulkDelete( model,

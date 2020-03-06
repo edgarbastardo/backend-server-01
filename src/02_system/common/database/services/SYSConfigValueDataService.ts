@@ -35,7 +35,7 @@ export default class SYSConfigValueDataService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 
@@ -45,7 +45,8 @@ export default class SYSConfigValueDataService extends BaseService {
 
       }
 
-      let strSQL = DBConnectionManager.getStatement( "getConfigValueData",
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getConfigValueData",
                                                      {
                                                        ConfigMetaDataId: strConfigMetaDataId,
                                                        Owner: strOnwer
@@ -69,11 +70,12 @@ export default class SYSConfigValueDataService extends BaseService {
       }
       else {
 
-        strSQL = DBConnectionManager.getStatement( "getConfigDefaultValueData",
-                                                    {
-                                                      ConfigMetaDataId: strConfigMetaDataId,
-                                                    },
-                                                    logger );
+        strSQL = DBConnectionManager.getStatement( "master",
+                                                   "getConfigDefaultValueData",
+                                                   {
+                                                     ConfigMetaDataId: strConfigMetaDataId,
+                                                   },
+                                                   logger );
 
         rows = await dbConnection.query( strSQL,
                                          {
@@ -798,7 +800,7 @@ export default class SYSConfigValueDataService extends BaseService {
 
     try {
 
-      const dbConnection = DBConnectionManager.dbConnection;
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
       if ( currentTransaction === null ) {
 

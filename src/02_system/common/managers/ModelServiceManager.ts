@@ -6,6 +6,7 @@ import CommonConstants from '../CommonConstants';
 
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
+import DBConnectionManager from "./DBConnectionManager";
 
 const debug = require( 'debug' )( 'ModelServiceManager' );
 
@@ -13,10 +14,10 @@ export default class ModelServiceManager {
 
   static readonly _PATH_TO_SCAN = [
                                     "/02_system/common/database/services",
-                                    "/03_business/common/database/services",
+                                    "/03_business/common/database/@__database__@/services",
                                   ]
 
-  static _read: boolean = true;
+  //static _read: boolean = true;
   static Services: any = {};
 
   /*
@@ -28,9 +29,15 @@ export default class ModelServiceManager {
   }
   */
 
-  static async _scan( directory: any, logger: any ) {
+  static async _scan( strDatabase: string, directory: any, logger: any ) {
 
     try {
+
+      if ( !ModelServiceManager.Services[ strDatabase ] ) {
+
+        ModelServiceManager.Services[ strDatabase ] = {};
+
+      }
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
@@ -52,7 +59,7 @@ export default class ModelServiceManager {
 
             if ( service._ID ) {
 
-              ModelServiceManager.Services[ service._ID ] = new service();
+              ModelServiceManager.Services[ strDatabase ][ service._ID ] = new service();
 
             }
 
@@ -66,7 +73,7 @@ export default class ModelServiceManager {
 
         if ( dir !== "template" ) {
 
-          await this._scan( path.join( directory, dir ), logger );
+          await this._scan( strDatabase, path.join( directory, dir ), logger );
 
         }
 
@@ -101,21 +108,97 @@ export default class ModelServiceManager {
 
   }
 
-  static async loadModelServices( logger: any ): Promise<any> {
+  static async loadModelServices( strDatabase: string, logger: any ): Promise<any> {
 
-    if ( this._read ) {
+    //if ( this._read ) {
 
-      for ( let intIndex = 0; intIndex < ModelServiceManager._PATH_TO_SCAN.length; intIndex++ ) {
+    try {
 
-        let strPath = SystemUtilities.baseRunPath + ModelServiceManager._PATH_TO_SCAN[ intIndex ];
 
-        await this._scan( strPath, logger );
+      let databaseList = [];
+
+      if ( strDatabase === "*" ) {
+
+        const tempDatabaseList = Object.keys( DBConnectionManager.getAllDBConfig() );
+
+        for ( let intDBIndex = 0; intDBIndex < tempDatabaseList.length; intDBIndex++ ) {
+
+          databaseList.push( tempDatabaseList[ intDBIndex ] );
+
+        }
+
+      }
+      else {
+
+        databaseList.push( strDatabase );
 
       }
 
-      this._read = false;
+      for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
+
+        try {
+
+          const strCurrentDatabase = databaseList[ intDBIndex ];
+
+          const dbConfigSystem = DBConnectionManager.getDBConfig( strCurrentDatabase ).system;
+
+          for ( let intIndex = 0; intIndex < ModelServiceManager._PATH_TO_SCAN.length; intIndex++ ) {
+
+            if ( ( intIndex === 0 && dbConfigSystem === 1 ) || intIndex > 0 ) {
+
+              let strPath = SystemUtilities.baseRunPath + ModelServiceManager._PATH_TO_SCAN[ intIndex ];
+
+              strPath = strPath.replace( "@__database__@", strCurrentDatabase );
+
+              if ( fs.existsSync( strPath ) ) {
+
+                await this._scan( strCurrentDatabase, strPath, logger );
+
+              }
+
+            }
+
+          }
+
+        }
+        catch ( error ) {
+
+          //
+
+        }
+
+      }
+
+      //this._read = false;
 
     }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = ModelServiceManager.name + "." + this.loadModelServices.name;
+
+      const strMark = "6C027BBAFAA8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    //}
 
     return ModelServiceManager.Services;
 

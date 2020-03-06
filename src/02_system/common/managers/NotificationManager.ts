@@ -118,11 +118,11 @@ export default class NotificationManager {
     //ANCHOR getConfigServiceType
     try {
 
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       let serviceConfig = null;
 
@@ -497,11 +497,11 @@ export default class NotificationManager {
     try {
 
       //ANCHOR  send
-      if ( currentTransaction === null ) {
+      //if ( currentTransaction === null ) {
 
-        currentTransaction = await DBConnectionManager.dbConnection.transaction();
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
 
-      }
+      //}
 
       if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
 

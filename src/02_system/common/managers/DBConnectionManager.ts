@@ -1,4 +1,5 @@
 import fs from 'fs'; //Load the filesystem module
+import path from 'path';
 import cluster from 'cluster';
 
 import { Transaction } from 'sequelize';
@@ -17,55 +18,73 @@ const debug = require( 'debug' )( 'DBConnectionManager' );
 
 export default class DBConnectionManager {
 
-  static dbConnection: any = null;
+  private static dbConfig: any = {};
 
-  static dbConfig: any = null;
+  private static dbConnection: any = {};
 
-  static queryStatements: any = null;
+  private static queryStatements: any = {};
 
-  static getDBConfig() {
+  static getDBConfig( strDatabase: string ): any {
 
-    return { ... this.dbConfig }; //return a copy
+    return { ...this.dbConfig[ strDatabase ] }; //Return a copy
 
   }
 
-  static processDBConfig( dbConfig: any ) {
+  static getAllDBConfig(): any {
+
+    return this.dbConfig;
+
+  }
+
+  static getDBConnection( strDatabase: string ): any {
+
+    return this.dbConnection[ strDatabase ];
+
+  }
+
+  static getAllDBConnection(): any {
+
+    return this.dbConnection;
+
+  }
+
+  static processDBConfig( strDatabase: string, dbConfig: any ) {
 
     //const result = dbConfig;
 
-    if ( process.env.DB_SERVER ) {
+    if ( process.env[ strDatabase + "_DB_SERVER" ] ) {
 
-      dbConfig.host = process.env.DB_SERVER;
-
-    }
-
-    if ( process.env.DB_SERVER_PORT ) {
-
-      dbConfig.port = process.env.DB_SERVER_PORT;
+      dbConfig.host = process.env[ strDatabase + "_DB_SERVER" ];
 
     }
 
-    if ( process.env.DB_SERVER_DB_NAME ) {
+    if ( process.env[ strDatabase + "_DB_SERVER_PORT" ] ) {
 
-      dbConfig.database = process.env.DB_SERVER_DB_NAME;
-
-    }
-
-    if ( process.env.DB_SERVER_USER ) {
-
-      dbConfig.username = process.env.DB_SERVER_USER;
+      dbConfig.port = process.env[ strDatabase + "_DB_SERVER_PORT" ];
 
     }
 
-    if ( process.env.DB_SERVER_PASSWORD ) {
+    if ( process.env[ strDatabase + "_DB_SERVER_DB_NAME" ] ) {
 
-      dbConfig.password = process.env.DB_SERVER_PASSWORD;
+      dbConfig.database = process.env[ strDatabase + "_DB_SERVER_DB_NAME" ];
+
+    }
+
+    if ( process.env[ strDatabase + "_DB_SERVER_USER" ] ) {
+
+      dbConfig.username = process.env[ strDatabase + "_DB_SERVER_USER" ];
+
+    }
+
+    if ( process.env[ strDatabase + "_DB_SERVER_PASSWORD" ] ) {
+
+      dbConfig.password = process.env[ strDatabase + "_DB_SERVER_PASSWORD" ];
 
 
     }
-    if ( process.env.DB_SERVER_DIALECT ) {
+    if ( process.env[ strDatabase + "_DB_SERVER_DIALECT" ] ) {
 
-      dbConfig.dialect = process.env.DB_SERVER_DIALECT;
+      dbConfig.dialect = process.env[ strDatabase + "_DB_SERVER_DIALECT" ];
 
     }
 
@@ -73,9 +92,9 @@ export default class DBConnectionManager {
 
   }
 
-  static async connect( logger: any ): Promise<any> {
+  static async connect( strDatabase: string, logger: any ): Promise<any> {
 
-    let result = null;
+    let result: any = {};
 
     try {
 
@@ -85,110 +104,183 @@ export default class DBConnectionManager {
 
       const dbConfigData = require( strConfigFile );
 
-      const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+      let databaseList = [];
 
-      dbConfig.models = [
+      if ( strDatabase === "*" ) {
 
-        __dirname + '/../database/models/',
-        __dirname + "/../../../03_business/common/database/models/"
+        const tempDatabaseList = Object.keys( dbConfigData );
 
-      ]
+        for ( let intDBIndex = 0; intDBIndex < tempDatabaseList.length; intDBIndex++ ) {
 
-      /*
-      dbConfig.migrations = [
+          const strCurrentDatabase = tempDatabaseList[ intDBIndex ];
 
-        __dirname + '/migrations/',
-        __dirname + "/../../business/common/database/migrations/"
+          if ( dbConfigData[ strCurrentDatabase ].connect ) {
 
-      ]
-      */
+            databaseList.push( strCurrentDatabase );
 
-      dbConfig.define = {
+          }
 
-        freezeTableName: true,
-        timestamps: false,
+        }
+
+      }
+      else {
+
+        databaseList.push( strDatabase );
 
       }
 
-      dbConfig.logging = ( param01: any, param02: any ) => {
+      for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
 
-        //let debugMark = debug.extend( "960C40D97F5F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        try {
 
-        //debugMark( param01 );
-        //debugMark( param02 );
+          const strCurrentDatabase = databaseList[ intDBIndex ];
+
+          const dbConfig = DBConnectionManager.processDBConfig( strCurrentDatabase,
+                                                                dbConfigData[ strCurrentDatabase ][ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+
+          dbConfig.models = [];
+
+          dbConfig.name = strCurrentDatabase;
+          dbConfig.system = dbConfigData[ strCurrentDatabase ].system;
+
+          if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
+
+            dbConfig.models.push( __dirname + `/../database/models/` );
+
+          }
+
+          if ( fs.existsSync( __dirname + `/../../../03_business/common/database/${strCurrentDatabase}/models/` ) ) {
+
+            dbConfig.models.push( __dirname + `/../../../03_business/common/database/${strCurrentDatabase}/models/` );
+
+          }
+
+          /*
+          dbConfig.migrations = [
+
+            __dirname + '/migrations/',
+            __dirname + "/../../business/common/database/migrations/"
+
+          ]
+          */
+
+          dbConfig.define = {
+
+            freezeTableName: true,
+            timestamps: false,
+
+          }
+
+          dbConfig.logging = ( param01: any, param02: any ) => {
+
+            //let debugMark = debug.extend( "960C40D97F5F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+            //debugMark( param01 );
+            //debugMark( param02 );
+
+          }
+
+          dbConfig.isolationLevel = Transaction.ISOLATION_LEVELS.READ_COMMITTED;
+
+          const Sequelize1 = require( 'sequelize' );
+          const Op = Sequelize1.Op;
+
+          dbConfig.operatorsAliases = {
+                                        $eq: Op.eq,
+                                        $ne: Op.ne,
+                                        $gte: Op.gte,
+                                        $gt: Op.gt,
+                                        $lte: Op.lte,
+                                        $lt: Op.lt,
+                                        $not: Op.not,
+                                        $in: Op.in,
+                                        $notIn: Op.notIn,
+                                        $is: Op.is,
+                                        $like: Op.like,
+                                        $notLike: Op.notLike,
+                                        $iLike: Op.iLike,
+                                        $notILike: Op.notILike,
+                                        $regexp: Op.regexp,
+                                        $notRegexp: Op.notRegexp,
+                                        $iRegexp: Op.iRegexp,
+                                        $notIRegexp: Op.notIRegexp,
+                                        $between: Op.between,
+                                        $notBetween: Op.notBetween,
+                                        $overlap: Op.overlap,
+                                        $contains: Op.contains,
+                                        $contained: Op.contained,
+                                        $adjacent: Op.adjacent,
+                                        $strictLeft: Op.strictLeft,
+                                        $strictRight: Op.strictRight,
+                                        $noExtendRight: Op.noExtendRight,
+                                        $noExtendLeft: Op.noExtendLeft,
+                                        $and: Op.and,
+                                        $or: Op.or,
+                                        $any: Op.any,
+                                        $all: Op.all,
+                                        $values: Op.values,
+                                        $col: Op.col
+                                      };
+
+          const dbConnection = new Sequelize(
+                                              dbConfig[ 'database' ],
+                                              dbConfig[ 'username' ],
+                                              dbConfig[ 'password' ],
+                                              dbConfig,
+                                            );
+
+          await dbConnection.sync( { force: false } );
+
+          const strMark = "C134AF0B2662" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( "Success connected to database: [%s]", dbConfig.database );
+
+          if ( logger &&
+              typeof logger.info === "function" ) {
+
+            logger.info( "Success connected to database: [%s]", dbConfig.database );
+
+          }
+
+          this.dbConfig[ strCurrentDatabase ] = dbConfig;
+          this.dbConnection[ strCurrentDatabase ] = dbConnection;
+
+          result[ strCurrentDatabase ] = {};
+          result[ strCurrentDatabase ].dbConfig = dbConfig;
+          result[ strCurrentDatabase ].dbConnection = dbConnection;
+
+        }
+        catch ( error ) {
+
+          const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+          sourcePosition.method = this.name + "." + this.connect.name;
+
+          const strMark = "FBC0855E5E86" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+          debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( "Catched on: %O", sourcePosition );
+
+          error.mark = strMark;
+          error.logId = SystemUtilities.getUUIDv4();
+
+          if ( logger &&
+               typeof logger.error === "function" ) {
+
+            error.catchedOn = sourcePosition;
+            logger.error( error );
+
+          }
+
+        }
 
       }
-
-      dbConfig.isolationLevel = Transaction.ISOLATION_LEVELS.READ_COMMITTED;
-
-      const Sequelize1 = require( 'sequelize' );
-      const Op = Sequelize1.Op;
-
-      dbConfig.operatorsAliases = {
-
-        $eq: Op.eq,
-        $ne: Op.ne,
-        $gte: Op.gte,
-        $gt: Op.gt,
-        $lte: Op.lte,
-        $lt: Op.lt,
-        $not: Op.not,
-        $in: Op.in,
-        $notIn: Op.notIn,
-        $is: Op.is,
-        $like: Op.like,
-        $notLike: Op.notLike,
-        $iLike: Op.iLike,
-        $notILike: Op.notILike,
-        $regexp: Op.regexp,
-        $notRegexp: Op.notRegexp,
-        $iRegexp: Op.iRegexp,
-        $notIRegexp: Op.notIRegexp,
-        $between: Op.between,
-        $notBetween: Op.notBetween,
-        $overlap: Op.overlap,
-        $contains: Op.contains,
-        $contained: Op.contained,
-        $adjacent: Op.adjacent,
-        $strictLeft: Op.strictLeft,
-        $strictRight: Op.strictRight,
-        $noExtendRight: Op.noExtendRight,
-        $noExtendLeft: Op.noExtendLeft,
-        $and: Op.and,
-        $or: Op.or,
-        $any: Op.any,
-        $all: Op.all,
-        $values: Op.values,
-        $col: Op.col
-
-      };
-
-      result = new Sequelize(
-
-        dbConfig[ 'database' ],
-        dbConfig[ 'username' ],
-        dbConfig[ 'password' ],
-        dbConfig,
-
-      )
-
-      await result.sync( { force: false } );
-
-      const strMark = "C134AF0B2662" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Success connected to database: [%s]", dbConfig.database );
-
-      if ( logger &&
-           typeof logger.info === "function" ) {
-
-        logger.info( "Success connected to database: [%s]", dbConfig.database );
-
-      }
-
-      this.dbConfig = dbConfig;
 
     }
     catch ( error ) {
@@ -222,7 +314,7 @@ export default class DBConnectionManager {
 
   }
 
-  static async loadQueryStatement( logger: any ): Promise<any> {
+  static async loadQueryStatement( strDatabase: string, logger: any ): Promise<any> {
 
     let result = { systemQueries: null, businessQueries: null };
 
@@ -234,10 +326,100 @@ export default class DBConnectionManager {
 
       const dbConfigData = require( strConfigFile );
 
-      const dbConfig = DBConnectionManager.processDBConfig( dbConfigData[ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+      let databaseList = [];
 
-      result.systemQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/SystemQueries` ).default;
-      result.businessQueries = require( `../../../01_database/05_query/${dbConfig.dialect}/BusinessQueries` ).default;
+      if ( strDatabase === "*" ) {
+
+        const tempDatabaseList = Object.keys( dbConfigData );
+
+        for ( let intDBIndex = 0; intDBIndex < tempDatabaseList.length; intDBIndex++ ) {
+
+          const strCurrentDatabase = tempDatabaseList[ intDBIndex ];
+
+          if ( dbConfigData[ strCurrentDatabase ].connect ) {
+
+            databaseList.push( strCurrentDatabase );
+
+          }
+
+        }
+
+      }
+      else {
+
+        databaseList.push( strDatabase );
+
+      }
+
+      for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
+
+        try {
+
+          const strCurrentDatabase = databaseList[ intDBIndex ];
+
+          const dbConfig = DBConnectionManager.processDBConfig( strCurrentDatabase,
+                                                                dbConfigData[ strCurrentDatabase ][ process.env.ENV ] ); //config[ process.env.ENV ]; //Get the config file
+
+          this.queryStatements[ strCurrentDatabase ] = {};
+
+          let strPath = path.resolve( __dirname, `../../../01_database/05_query/${strCurrentDatabase}/${dbConfig.dialect}/`, `SystemQueries.js` );
+
+          if ( dbConfig.system === 1 &&
+               fs.existsSync( strPath ) ) {
+
+            this.queryStatements[ strCurrentDatabase ].systemQueries = require( `../../../01_database/05_query/${strCurrentDatabase}/${dbConfig.dialect}/SystemQueries` ).default;
+
+          }
+          else {
+
+            this.queryStatements[ strCurrentDatabase ].systemQueries = {};
+
+          }
+
+          strPath = path.resolve( __dirname, `../../../01_database/05_query/${strCurrentDatabase}/${dbConfig.dialect}/`, `BusinessQueries.js` );
+
+          if ( fs.existsSync( strPath ) ) {
+
+            this.queryStatements[ strCurrentDatabase ].businessQueries = require( `../../../01_database/05_query/${strCurrentDatabase}/${dbConfig.dialect}/BusinessQueries` ).default;
+
+          }
+          else {
+
+            this.queryStatements[ strCurrentDatabase ].businessQueries = {};
+
+          }
+
+        }
+        catch ( error ) {
+
+          const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+          sourcePosition.method = this.name + "." + this.loadQueryStatement.name;
+
+          const strMark = "360B50D75EB1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+          debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( "Catched on: %O", sourcePosition );
+
+          error.mark = strMark;
+          error.logId = SystemUtilities.getUUIDv4();
+
+          if ( logger &&
+               typeof logger.error === "function" ) {
+
+            error.catchedOn = sourcePosition;
+            logger.error( error );
+
+          }
+
+        }
+
+      }
+
+      result = this.queryStatements;
 
     }
     catch ( error ) {
@@ -270,7 +452,8 @@ export default class DBConnectionManager {
 
   }
 
-  static getStatement( strName: string,
+  static getStatement( strDatabase: string,
+                       strName: string,
                        params: any,
                        logger: any ): string {
 
@@ -278,25 +461,25 @@ export default class DBConnectionManager {
 
     try {
 
-      let strDialect = this.dbConnection ? this.dbConnection.options.dialect : "";
+      let strDialect = this.dbConnection[ strDatabase ] ? this.dbConnection[ strDatabase ].options.dialect : "";
 
-      if ( this.queryStatements ) {
+      if ( this.queryStatements[ strDatabase ] ) {
 
-        if ( this.queryStatements.businessQueries ) {
+        if ( this.queryStatements[ strDatabase ].businessQueries ) {
 
-          strResult = this.queryStatements.businessQueries.getStatement( strDialect,
-                                                                         strName,
-                                                                         params,
-                                                                         logger );
+          strResult = this.queryStatements[ strDatabase ].businessQueries.getStatement( strDialect,
+                                                                                        strName,
+                                                                                        params,
+                                                                                        logger );
 
         }
 
-        if ( !strResult && this.queryStatements.systemQueries ) {
+        if ( !strResult && this.queryStatements[ strDatabase ].systemQueries ) {
 
-          strResult = this.queryStatements.systemQueries.getStatement( strDialect,
-                                                                       strName,
-                                                                       params,
-                                                                       logger );
+          strResult = this.queryStatements[ strDatabase ].systemQueries.getStatement( strDialect,
+                                                                                      strName,
+                                                                                      params,
+                                                                                      logger );
 
         }
 
@@ -343,7 +526,7 @@ export default class DBConnectionManager {
 
   }
 
-  static async close( logger: any ):Promise<boolean> {
+  static async close( strDatabase: string, logger: any ):Promise<boolean> {
 
     let bResult = false;
 
@@ -351,7 +534,7 @@ export default class DBConnectionManager {
 
       if ( DBConnectionManager.dbConnection ) {
 
-        await DBConnectionManager.dbConnection.close();
+        await DBConnectionManager.getDBConnection( strDatabase ).close();
 
         bResult = true;
 
