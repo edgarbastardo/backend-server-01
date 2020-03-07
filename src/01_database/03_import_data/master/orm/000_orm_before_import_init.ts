@@ -3,10 +3,10 @@
 //import os from 'os';
 import cluster from 'cluster';
 
-import CommonConstants from '../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 //import Hashes from 'jshashes';
 
 const debug = require( 'debug' )( '000_orm_before_import_init' );

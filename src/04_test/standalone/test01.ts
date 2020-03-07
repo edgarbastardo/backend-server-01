@@ -3384,7 +3384,44 @@ function myAssert( bCondition: boolean,
 
 async function test_set01() {
 
-  console.log( chalk.blue( "Starting the test set 01" ) );
+  const currentArgs = process.argv.slice( 2 );
+
+  if ( currentArgs &&
+       currentArgs.length > 0 ) {
+
+    if ( currentArgs[ 0 ] &&
+         currentArgs[ 0 ].startsWith( "--username=" ) ) {
+
+      strStartUser = currentArgs[ 0 ].replace( "--username=", "" ).trim();
+
+    }
+
+    if ( currentArgs.length >= 2 &&
+         currentArgs[ 1 ] &&
+         currentArgs[ 1 ].startsWith( "--password=" ) ) {
+
+      strStartPassword = currentArgs[ 1 ].replace( "--password=", "" ).trim();
+
+    }
+
+    if ( currentArgs.length >= 3 &&
+         currentArgs[ 2 ] &&
+         currentArgs[ 2 ].startsWith( "--target=" ) ) {
+
+      const targetParts = currentArgs[ 2 ].replace( "--target=", "" ).trim().split( "://" );
+
+      if ( targetParts.length >= 2 ) {
+
+        strProtocol = targetParts[ 0 ] + "://";
+        strHost = targetParts[ 1 ];
+
+      }
+
+    }
+
+  }
+
+  console.log( chalk.blue( "Starting the test01" ) );
 
   try {
 

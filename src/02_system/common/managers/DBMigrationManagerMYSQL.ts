@@ -92,13 +92,13 @@ export class DBMigrationManagerMYSQL {
 
   }
 
-  static async oneTimeExecute( dbConnection: any, logger: any ): Promise<boolean> {
+  static async oneTimeExecute( strDatabase: string, dbConnection: any, logger: any ): Promise<boolean> {
 
     let bResult: boolean = false;
 
     const strRootPath =  __dirname; //require( 'app-root-path' );
 
-    const strFullFilePath = strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_execute.sql";
+    const strFullFilePath = strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`;
 
     const bFileExists = fs.existsSync( strFullFilePath );
 
@@ -200,14 +200,14 @@ export class DBMigrationManagerMYSQL {
         if ( bException ||
              SystemUtilities.isNetworkLeader === false ) {
 
-          fs.renameSync( strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_execute.sql", //Old path
-                         strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_executed_0.sql" ); //New path
+          fs.renameSync( strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`, //Old path
+                         strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_executed_0.sql` ); //New path
 
         }
         else {
 
-          fs.renameSync( strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_execute.sql", //Old path
-                         strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_executed_1.sql" ); //New path
+          fs.renameSync( strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`, //Old path
+                         strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_executed_1.sql` ); //New path
 
           bResult = true;
 
@@ -258,8 +258,8 @@ export class DBMigrationManagerMYSQL {
 
       if ( bFileExists ) {
 
-        fs.renameSync( strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_execute.sql", //Old path
-                       strRootPath + "/../../../01_database/01_Before/mysql/00_one_time_executed_0.sql" ); //new path
+        fs.renameSync( strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`, //Old path
+                       strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_executed_0.sql` ); //new path
 
       }
 
@@ -269,7 +269,9 @@ export class DBMigrationManagerMYSQL {
 
   }
 
-  static async allTimeExecute( dbConnection: any, logger: any ): Promise<boolean> {
+  static async allTimeExecute( strDatabase: string,
+                               dbConnection: any,
+                               logger: any ): Promise<boolean> {
 
     let bResult: boolean = false;
 
@@ -277,7 +279,7 @@ export class DBMigrationManagerMYSQL {
     const fs = require( 'fs' );
     const strRootPath =  __dirname; //require( 'app-root-path' );
 
-    const strFullFilePath = strRootPath + "/../../../01_database/01_Before/mysql/01_all_time_execute.sql";
+    const strFullFilePath = strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql`;
 
     try {
 
@@ -347,9 +349,9 @@ export class DBMigrationManagerMYSQL {
 
       }
       /*
-      if ( fs.existsSync( strRootPath + "/../../../01_database/01_Before/mysql/01_all_time_execute.sql" ) ) {
+      if ( fs.existsSync( strRootPath + "/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql" ) ) {
 
-        let strSQLContents = fs.readFileSync( strRootPath + "/../../../01_database/01_Before/mysql/01_all_time_execute.sql", 'utf8' );
+        let strSQLContents = fs.readFileSync( strRootPath + "/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql", 'utf8' );
 
         strSQLContents = minify( strSQLContents, { compress: false } );
 
@@ -396,7 +398,9 @@ export class DBMigrationManagerMYSQL {
 
   }
 
-  static async createDatabaseIfNotExits( dbConfig: any, logger: any ): Promise<boolean> {
+  static async createDatabaseIfNotExits( strDatabase: string,
+                                         dbConfig: any,
+                                         logger: any ): Promise<boolean> {
 
     let bResult: boolean = false;
 
@@ -431,9 +435,13 @@ export class DBMigrationManagerMYSQL {
 
         await dbConnection.query( strCreatedDB );
 
-        await this.oneTimeExecute( dbConnection, logger );
+        await this.oneTimeExecute( strDatabase,
+                                   dbConnection,
+                                   logger );
 
-        await this.allTimeExecute( dbConnection, logger );
+        await this.allTimeExecute( strDatabase,
+                                   dbConnection,
+                                   logger );
 
         dbConnection.end();
 
@@ -477,8 +485,12 @@ export class DBMigrationManagerMYSQL {
 
       try {
 
-        await this.oneTimeExecute( dbConnection, logger );
-        await this.allTimeExecute( dbConnection, logger );
+        await this.oneTimeExecute( strDatabase,
+                                   dbConnection,
+                                   logger );
+        await this.allTimeExecute( strDatabase,
+                                   dbConnection,
+                                  logger );
 
         dbConnection.end();
 
@@ -757,7 +769,9 @@ export class DBMigrationManagerMYSQL {
 
   }
 
-  static async migrateDatabase( dbConfig: any, logger: any ): Promise<boolean> {
+  static async migrateDatabase( strDatabase: string,
+                                dbConfig: any,
+                                logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -771,11 +785,11 @@ export class DBMigrationManagerMYSQL {
                                                              logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
-      const strMigrationsFolder = strRootPath + '/../../../01_database/02_migration_data/mysql/';
+      const strMigrationsFolder = strRootPath + `/../../../01_database/02_migration_data/${strDatabase}/mysql/`;
       const path = require('path')
       const os = require( 'os' );
 
-      const dirs = fs.readdirSync( strMigrationsFolder );
+      const dirs = fs.existsSync( strMigrationsFolder ) ? fs.readdirSync( strMigrationsFolder ): [];
 
       const loopAsync = async () => {
 
@@ -942,7 +956,9 @@ export class DBMigrationManagerMYSQL {
 
   }
 
-  static async importDataToDatabase( dbConfig: any, logger: any ): Promise<boolean> {
+  static async importDataToDatabase( strDatabase: string,
+                                     dbConfig: any,
+                                     logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -956,11 +972,11 @@ export class DBMigrationManagerMYSQL {
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
-      const strImportDataFolder = strRootPath + '/../../../01_database/03_import_data/mysql/';
+      const strImportDataFolder = strRootPath + `/../../../01_database/03_import_data/${strDatabase}/mysql/`;
       const path = require('path')
       const os = require( 'os' );
 
-      const dirs = fs.readdirSync( strImportDataFolder );
+      const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
       const loopAsync = async () => {
 

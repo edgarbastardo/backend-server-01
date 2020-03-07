@@ -37,7 +37,7 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
 
       if ( CommonUtilities.isNullOrEmpty( values.ShortId ) ) {
 
-        this.ShortId = SystemUtilities.hashString( this.id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
+        this.ShortId = SystemUtilities.hashString( this.Id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
 
       }
 

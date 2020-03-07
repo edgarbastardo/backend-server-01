@@ -1478,7 +1478,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -1491,8 +1493,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      const userSessionStatus = context.UserSessionStatus;
 
       let strBinaryDataToken = null;
 
@@ -1649,7 +1649,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -1662,8 +1664,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      const userSessionStatus = context.UserSessionStatus;
 
       if ( userSessionStatus.Token.startsWith( "p:" ) === false ) {
 
@@ -1885,7 +1885,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -1898,8 +1900,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      const userSessionStatus = context.UserSessionStatus;
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
                                                           userSessionStatus.Role.includes( "#BManagerL99#" ): false;
@@ -2236,7 +2236,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -2249,8 +2251,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      const userSessionStatus = context.UserSessionStatus;
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
                                                           userSessionStatus.Role.includes( "#BManagerL99#" ): false;
@@ -2534,7 +2534,7 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
 
       strLanguage = context.Language;
 
@@ -2548,7 +2548,6 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      //const userSessionStatus = context.UserSessionStatus;
       const strId = request.query.id;
       const strAuth = request.query.auth;
       const strThumbnail = request.query.thumbnail;
@@ -2581,12 +2580,12 @@ export default class BinaryServiceController extends BaseService {
         }
 
         //const binaryIndexInDB = await SYSBinaryIndex.findOne( options );
-        const binaryIndexInDB = await SYSBinaryIndexService.getById( strId,
-                                                                     null,
-                                                                     currentTransaction,
-                                                                     logger );
+        const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( strId,
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger );
 
-        if ( binaryIndexInDB ) {
+        if ( sysBinaryIndexInDB ) {
 
           let binaryData = {
                              File: "",
@@ -2600,90 +2599,40 @@ export default class BinaryServiceController extends BaseService {
                strThumbnail === "0" ) {
 
             binaryData.File = path.join( strFullPath,
-                                         binaryIndexInDB.FilePath,
-                                         strId + "." + binaryIndexInDB.FileExtension + ".data" );
-            binaryData.FileName = binaryIndexInDB.FileName;
-            binaryData.FileSize = binaryIndexInDB.FileSize;
-            binaryData.MimeType = binaryIndexInDB.MimeType;
-            binaryData.Hash = binaryIndexInDB.Hash;
+                                         sysBinaryIndexInDB.FilePath,
+                                         strId + "." + sysBinaryIndexInDB.FileExtension + ".data" );
+            binaryData.FileName = sysBinaryIndexInDB.FileName;
+            binaryData.FileSize = sysBinaryIndexInDB.FileSize;
+            binaryData.MimeType = sysBinaryIndexInDB.MimeType;
+            binaryData.Hash = sysBinaryIndexInDB.Hash;
 
           }
           else {
 
             binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
-                                                                        path.join( strFullPath, binaryIndexInDB.FilePath ),
-                                                                        strId + "." + binaryIndexInDB.FileExtension + ".thumbnail",
-                                                                        binaryIndexInDB.FileName,
-                                                                        binaryIndexInDB.FileExtension,
-                                                                        binaryIndexInDB.MimeType,
-                                                                        binaryIndexInDB.FileSize,
+                                                                        path.join( strFullPath, sysBinaryIndexInDB.FilePath ),
+                                                                        strId + "." + sysBinaryIndexInDB.FileExtension + ".thumbnail",
+                                                                        sysBinaryIndexInDB.FileName,
+                                                                        sysBinaryIndexInDB.FileExtension,
+                                                                        sysBinaryIndexInDB.MimeType,
+                                                                        sysBinaryIndexInDB.FileSize,
                                                                         strThumbnail,
                                                                         logger );
 
           }
 
-          if ( fs.existsSync( binaryData.File ) ) {
+          if ( await SYSBinaryIndexService.checkDisabledById( sysBinaryIndexInDB.Id,
+                                                              currentTransaction,
+                                                              logger ) === false ) {
 
-            if ( binaryIndexInDB.AccessKind == 1 ||        //Public
-                 binaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
+            if ( await SYSBinaryIndexService.checkExpiredById( sysBinaryIndexInDB.Id,
+                                                               currentTransaction,
+                                                               logger ) === false ) {
 
-              result = {
-                         StatusCode: 200, //Ok
-                         File: binaryData.File,
-                         Name: binaryData.FileName,
-                         Mime: binaryData.MimeType,
-                         Size: binaryData.FileSize,
-                         "X-Body-Response": {
-                                              Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
-                                              Name: binaryData.FileName,
-                                              Mime: binaryData.MimeType,
-                                              Size: binaryData.FileSize,
-                                              Hash: binaryData.Hash,
-                                            }
-                       }
+              if ( fs.existsSync( binaryData.File ) ) {
 
-              bApplyTransaction = true;
-
-            }
-            else if ( CommonUtilities.isNotNullOrEmpty( strAuth ) ) { //Authenticated
-
-              let strAuthorization = null;
-
-              strAuthorization = await CacheManager.getData( strAuth,
-                                                             logger ); //get from cache the real authorization token
-
-              if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
-
-                let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
-                                                                                    context,
-                                                                                    true,
-                                                                                    false,
-                                                                                    currentTransaction,
-                                                                                    logger );
-
-                if ( userSessionStatus ) {
-
-                  context.UserSessionStatus = userSessionStatus;
-
-                }
-
-              }
-
-              ( request as any ).returnResult = 1; //Force to return the result
-
-              //Check for valid session token
-              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request,
-                                                                                       null, //Not write response back
-                                                                                       null );
-
-              if ( resultData &&
-                   resultData.StatusCode == 200 ) { //Ok the authorization token is valid
-
-                const userSessionStatus = context.UserSessionStatus;
-
-                if ( binaryIndexInDB.AccessKind == 2 ||
-                     userSessionStatus.Role.includes( "#Administrator#" ) ||
-                     userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
+                if ( sysBinaryIndexInDB.AccessKind == 1 ||        //Public
+                     sysBinaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
 
                   result = {
                              StatusCode: 200, //Ok
@@ -2703,159 +2652,274 @@ export default class BinaryServiceController extends BaseService {
                   bApplyTransaction = true;
 
                 }
-                else { //Tag
+                else if ( CommonUtilities.isNotNullOrEmpty( strAuth ) ) { //Authenticated
 
-                  //ANCHOR Check is owner of BinaryData
-                  const bIsOwner = await BinaryServiceController.checkIsOwner(
-                                                                               binaryIndexInDB.Owner,
-                                                                               userSessionStatus.UserId,
-                                                                               userSessionStatus.UserName,
-                                                                               userSessionStatus.UserGroupId,
-                                                                               userSessionStatus.UserGroupName,
-                                                                               logger
-                                                                             );
+                  let strAuthorization = null;
 
-                  let checkUserRoles: ICheckUserRoles = {
-                                                          isAuthorizedAdmin: false,
-                                                          isAuthorizedL03: false,
-                                                          isAuthorizedL02: false,
-                                                          isAuthorizedL01: false,
-                                                          isNotAuthorized: false
-                                                        };
+                  strAuthorization = await CacheManager.getData( strAuth,
+                                                                 logger ); //get from cache the real authorization token
 
-                  let ownerList = null;
+                  if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
-                  if ( bIsOwner === false ) {
+                    let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                                        context,
+                                                                                        true,
+                                                                                        false,
+                                                                                        currentTransaction,
+                                                                                        logger );
 
-                    ownerList = BinaryServiceController.getUserOwner( binaryIndexInDB.Owner, logger );
+                    if ( userSessionStatus ) {
 
-                    for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
-
-                      const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
-                                                                      null,
-                                                                      currentTransaction,
-                                                                      logger );
-
-                      checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
-                                                                                   sysUserInDB,
-                                                                                   "GetBinary",
-                                                                                   logger );
-
-                      if ( checkUserRoles.isAuthorizedAdmin ||
-                           checkUserRoles.isAuthorizedL02 ) {
-
-                        break;
-
-                      }
+                      context.UserSessionStatus = userSessionStatus; //Inject the user session status to context
 
                     }
 
-                    if ( checkUserRoles.isAuthorizedAdmin === false &&
-                         checkUserRoles.isAuthorizedL02 === false ) {
+                  }
 
-                      ownerList = BinaryServiceController.getUserGroupOwner( binaryIndexInDB.Owner, logger );
+                  ( request as any ).returnResult = 1; //Force to return the result
 
-                      for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+                  //Check for valid session token
+                  let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request,
+                                                                                           null, //Not write response back
+                                                                                           null );
 
-                        const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
-                                                                                  null,
-                                                                                  currentTransaction,
-                                                                                  logger );
+                  if ( resultData &&
+                      resultData.StatusCode == 200 ) { //Ok the authorization token is valid
 
-                        checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
-                                                                                          sysUserGroupInDB,
-                                                                                          "GetBinary",
-                                                                                          logger );
+                    const userSessionStatus = context.UserSessionStatus;
 
-                        if ( checkUserRoles.isAuthorizedL01 ||
-                             checkUserRoles.isAuthorizedL03 ) {
+                    if ( sysBinaryIndexInDB.AccessKind == 2 ||
+                         userSessionStatus.Role.includes( "#Administrator#" ) ||
+                         userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
 
-                          break;
+                      result = {
+                                 StatusCode: 200, //Ok
+                                 File: binaryData.File,
+                                 Name: binaryData.FileName,
+                                 Mime: binaryData.MimeType,
+                                 Size: binaryData.FileSize,
+                                 "X-Body-Response": {
+                                                      Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                      Name: binaryData.FileName,
+                                                      Mime: binaryData.MimeType,
+                                                      Size: binaryData.FileSize,
+                                                      Hash: binaryData.Hash,
+                                                    }
+                               }
+
+                      bApplyTransaction = true;
+
+                    }
+                    else { //Tag
+
+                      //ANCHOR Check is owner of BinaryData
+                      const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                                   sysBinaryIndexInDB.Owner,
+                                                                                   userSessionStatus.UserId,
+                                                                                   userSessionStatus.UserName,
+                                                                                   userSessionStatus.UserGroupId,
+                                                                                   userSessionStatus.UserGroupName,
+                                                                                   logger
+                                                                                 );
+
+                      let checkUserRoles: ICheckUserRoles = {
+                                                              isAuthorizedAdmin: false,
+                                                              isAuthorizedL03: false,
+                                                              isAuthorizedL02: false,
+                                                              isAuthorizedL01: false,
+                                                              isNotAuthorized: false
+                                                            };
+
+                      let ownerList = null;
+
+                      if ( bIsOwner === false ) {
+
+                        ownerList = BinaryServiceController.getUserOwner( sysBinaryIndexInDB.Owner, logger );
+
+                        for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                          const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                                          null,
+                                                                          currentTransaction,
+                                                                          logger );
+
+                          checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                                       sysUserInDB,
+                                                                                       "GetBinary",
+                                                                                       logger );
+
+                          if ( checkUserRoles.isAuthorizedAdmin ||
+                               checkUserRoles.isAuthorizedL02 ) {
+
+                            break;
+
+                          }
+
+                        }
+
+                        if ( checkUserRoles.isAuthorizedAdmin === false &&
+                             checkUserRoles.isAuthorizedL02 === false ) {
+
+                          ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
+
+                          for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                            const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                                      null,
+                                                                                      currentTransaction,
+                                                                                      logger );
+
+                            checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                              sysUserGroupInDB,
+                                                                                              "GetBinary",
+                                                                                              logger );
+
+                            if ( checkUserRoles.isAuthorizedL01 ||
+                                checkUserRoles.isAuthorizedL03 ) {
+
+                              break;
+
+                            }
+
+                          }
 
                         }
 
                       }
 
+                      if ( bIsOwner ||
+                           checkUserRoles.isAuthorizedAdmin ||
+                           checkUserRoles.isAuthorizedL03 ||
+                           checkUserRoles.isAuthorizedL02 ||
+                           checkUserRoles.isAuthorizedL01 ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
+
+                        result = {
+                                   StatusCode: 200, //Ok
+                                   File: binaryData.File,
+                                   Name: binaryData.FileName,
+                                   Mime: binaryData.MimeType,
+                                   Size: binaryData.FileSize,
+                                   "X-Body-Response": {
+                                                        Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                        Name: binaryData.FileName,
+                                                        Mime: binaryData.MimeType,
+                                                        Size: binaryData.FileSize,
+                                                        Hash: binaryData.Hash,
+                                                      }
+                                 }
+
+                        bApplyTransaction = true;
+
+                      }
+                      else {
+
+                        resultData = {
+                                       StatusCode: 403, //Forbidden
+                                       Code: "ERROR_ACCESS_NOT_ALLOWED",
+                                       Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
+                                       Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                       LogId: null,
+                                       IsError: true,
+                                       Errors: [
+                                                 {
+                                                   Code: "ERROR_ACCESS_NOT_ALLOWED",
+                                                   Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
+                                                   Details: null,
+                                                 }
+                                               ],
+                                       Warnings: [],
+                                       Count: 0,
+                                       Data: []
+                                     };
+
+                        //ANCHOR binary data download Fobidden
+                        result = {
+                                   StatusCode: resultData.StatusCode, //Forbidden
+                                   File: path.join( strFullPath, "/@default@/images/http_codes/403.png" ),
+                                   Name: "403.png",
+                                   Mime: "image/png",
+                                   Size: 13129,
+                                   "X-Body-Response": resultData
+                                 }
+
+                      }
+
                     }
-
-                  }
-
-                  if ( bIsOwner ||
-                       checkUserRoles.isAuthorizedAdmin ||
-                       checkUserRoles.isAuthorizedL03 ||
-                       checkUserRoles.isAuthorizedL02 ||
-                       checkUserRoles.isAuthorizedL01 ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
-
-                    result = {
-                               StatusCode: 200, //Ok
-                               File: binaryData.File,
-                               Name: binaryData.FileName,
-                               Mime: binaryData.MimeType,
-                               Size: binaryData.FileSize,
-                               "X-Body-Response": {
-                                                    Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
-                                                    Name: binaryData.FileName,
-                                                    Mime: binaryData.MimeType,
-                                                    Size: binaryData.FileSize,
-                                                    Hash: binaryData.Hash,
-                                                  }
-                             }
-
-                    bApplyTransaction = true;
 
                   }
                   else {
 
-                    resultData = {
-                                   StatusCode: 403, //Forbidden
-                                   Code: "ERROR_ACCESS_NOT_ALLOWED",
-                                   Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
-                                   Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                   LogId: null,
-                                   IsError: true,
-                                   Errors: [
-                                             {
-                                               Code: "ERROR_ACCESS_NOT_ALLOWED",
-                                               Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
-                                               Details: null,
-                                             }
-                                           ],
-                                   Warnings: [],
-                                   Count: 0,
-                                   Data: []
-                                 };
-
-                    //response.setHeader( "X-Body-Response",
-                    //                    JSON.stringify( resultData ) );
-
-                    //ANCHOR binary data download Fobidden
+                    //ANCHOR binary data download Unauthorized
                     result = {
-                               StatusCode: resultData.StatusCode, //Forbidden
-                               File: path.join( strFullPath, "/@default@/images/http_codes/403.png" ),
-                               Name: "403.png",
+                               StatusCode: resultData.StatusCode, //Unauthorized
+                               File: path.join( strFullPath, "/@default@/images/http_codes/401.png" ),
+                               Name: "401.png",
                                Mime: "image/png",
-                               Size: 13129,
+                               Size: 14591,
                                "X-Body-Response": resultData
-                              }
+                             }
 
                   }
+
+                }
+                else {
+
+                  const resultHeaders = {
+                                          StatusCode: 400, //Bad request
+                                          Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                          Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
+                                          Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          LogId: null,
+                                          IsError: true,
+                                          Errors: [
+                                                    {
+                                                      Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                                      Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
+                                                      Details: null,
+                                                    }
+                                                  ],
+                                          Warnings: [],
+                                          Count: 0,
+                                          Data: []
+                                        };
+
+                  result = {
+                             StatusCode: 400, //Bad request
+                             "X-Body-Response": resultHeaders
+                           }
 
                 }
 
               }
               else {
 
-                //response.setHeader( "X-Body-Response",
-                //                    JSON.stringify( resultData ) );
+                const resultHeaders = {
+                                        StatusCode: 404, //Not found
+                                        Code: 'ERROR_FILE_NOT_FOUND',
+                                        Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                        Mark: '1109E2A671E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        LogId: null,
+                                        IsError: true,
+                                        Errors: [
+                                                  {
+                                                    Code: 'ERROR_FILE_NOT_FOUND',
+                                                    Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                                    Details: null,
+                                                  }
+                                                ],
+                                        Warnings: [],
+                                        Count: 0,
+                                        Data: []
+                                      };
 
-                //ANCHOR binary data download Unauthorized
+                //ANCHOR binary data download FILE NOT FOUND
                 result = {
-                           StatusCode: resultData.StatusCode, //Unauthorized
-                           File: path.join( strFullPath, "/@default@/images/http_codes/401.png" ),
-                           Name: "401.png",
+                           StatusCode: 404, //Not found
+                           File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
+                           Name: "404.png",
                            Mime: "image/png",
-                           Size: 14591,
-                           "X-Body-Response": resultData
+                           Size: 13218,
+                           "X-Body-Response": resultHeaders
                          }
 
               }
@@ -2865,15 +2929,15 @@ export default class BinaryServiceController extends BaseService {
 
               const resultHeaders = {
                                       StatusCode: 400, //Bad request
-                                      Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
-                                      Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
-                                      Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: 'ERROR_BINARY_DATA_EXPIRED',
+                                      Message: await I18NManager.translate( strLanguage, 'The binary data is expired.' ),
+                                      Mark: 'C3B1BFFB4FF1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       LogId: null,
                                       IsError: true,
                                       Errors: [
                                                 {
-                                                  Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
-                                                  Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
+                                                  Code: 'ERROR_BINARY_DATA_EXPIRED',
+                                                  Message: await I18NManager.translate( strLanguage, 'The binary data is expired.' ),
                                                   Details: null,
                                                 }
                                               ],
@@ -2882,11 +2946,13 @@ export default class BinaryServiceController extends BaseService {
                                       Data: []
                                     };
 
-              //response.setHeader( "X-Body-Response",
-              //                    JSON.stringify( resultHeaders ) );
-
+              //ANCHOR binary data download EXPIRED
               result = {
-                         StatusCode: 400, //Bad request
+                         StatusCode: 400, //Not found
+                         File: path.join( strFullPath, "/@default@/images/others/expired.png" ),
+                         Name: "expired.png",
+                         Mime: "image/png",
+                         Size: 13218,
                          "X-Body-Response": resultHeaders
                        }
 
@@ -2896,16 +2962,16 @@ export default class BinaryServiceController extends BaseService {
           else {
 
             const resultHeaders = {
-                                    StatusCode: 404, //Not found
-                                    Code: 'ERROR_FILE_NOT_FOUND',
-                                    Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
-                                    Mark: '1109E2A671E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    StatusCode: 400, //Bad request
+                                    Code: 'ERROR_BINARY_DATA_DISABLED',
+                                    Message: await I18NManager.translate( strLanguage, 'The binary data is disabled.' ),
+                                    Mark: '7E8321B74295' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     LogId: null,
                                     IsError: true,
                                     Errors: [
                                               {
-                                                Code: 'ERROR_FILE_NOT_FOUND',
-                                                Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                                Code: 'ERROR_BINARY_DATA_DISABLED',
+                                                Message: await I18NManager.translate( strLanguage, 'The binary data is disabled.' ),
                                                 Details: null,
                                               }
                                             ],
@@ -2914,14 +2980,11 @@ export default class BinaryServiceController extends BaseService {
                                     Data: []
                                   };
 
-            //response.setHeader( "X-Body-Response",
-            //                    JSON.stringify( resultHeaders ) );
-
-            //ANCHOR binary data download FILE NOT FOUND
+            //ANCHOR binary data download DISABLED
             result = {
-                       StatusCode: 404, //Not found
-                       File: path.join( strFullPath, "/@default@/images/http_codes/404.png" ),
-                       Name: "404.png",
+                       StatusCode: 400, //Not found
+                       File: path.join( strFullPath, "/@default@/images/others/disabled.png" ),
+                       Name: "disabled.png",
                        Mime: "image/png",
                        Size: 13218,
                        "X-Body-Response": resultHeaders
@@ -2950,9 +3013,6 @@ export default class BinaryServiceController extends BaseService {
                                   Count: 0,
                                   Data: []
                                 };
-
-          //response.setHeader( "X-Body-Response",
-          //                    JSON.stringify( resultHeaders ) );
 
           //ANCHOR binary data download DB NOT FOUND
           result = {
@@ -2987,9 +3047,6 @@ export default class BinaryServiceController extends BaseService {
                                 Count: 0,
                                 Data: []
                               };
-
-        //response.setHeader( "X-Body-Response",
-        //                    JSON.stringify( resultHeaders ) );
 
         result = {
                    StatusCode: 400, //Bad request
@@ -3104,7 +3161,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -3117,8 +3176,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      const userSessionStatus = context.UserSessionStatus;
 
       const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
                                                                       null,
@@ -3414,7 +3471,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      const userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -3448,7 +3507,7 @@ export default class BinaryServiceController extends BaseService {
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
-            const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
+            const allowedCategory = await BinaryServiceController.checkAllowedCategory( userSessionStatus,
                                                                                         strCategory,
                                                                                         currentTransaction,
                                                                                         logger );
@@ -3463,7 +3522,7 @@ export default class BinaryServiceController extends BaseService {
                                                                         uploadedFile.mimetype,
                                                                         logger );
 
-                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
+                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( userSessionStatus,
                                                                                               fileDetectedType.mime,
                                                                                               strCategory,
                                                                                               currentTransaction,
@@ -3471,7 +3530,7 @@ export default class BinaryServiceController extends BaseService {
 
                   if ( allowedMimeType.value === 1 ) {
 
-                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
+                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( userSessionStatus,
                                                                                              strCategory,
                                                                                              currentTransaction,
                                                                                              logger );
@@ -3479,16 +3538,16 @@ export default class BinaryServiceController extends BaseService {
                     let strId = request.body.Id;
 
                     if ( !strId ||
-                         !context.UserSessionStatus.UserTag ||
-                         context.UserSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                         !userSessionStatus.UserTag ||
+                         userSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
 
                       if ( !strId ||
-                           !context.UserSessionStatus.UserGroupTag ||
-                           context.UserSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                           !userSessionStatus.UserGroupTag ||
+                           userSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
 
                         if ( !strId ||
-                             !context.UserSessionStatus.Tag ||
-                             context.UserSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                             !userSessionStatus.Tag ||
+                             userSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
 
                            strId = SystemUtilities.getUUIDv4();
 
@@ -3508,16 +3567,16 @@ export default class BinaryServiceController extends BaseService {
                     }
 
                     if ( !strDate ||
-                         !context.UserSessionStatus.UserTag ||
-                         context.UserSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                         !userSessionStatus.UserTag ||
+                         userSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
 
                       if ( !strDate ||
-                           !context.UserSessionStatus.UserGroupTag ||
-                           context.UserSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                           !userSessionStatus.UserGroupTag ||
+                           userSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
 
                         if ( !strDate ||
-                             !context.UserSessionStatus.Tag ||
-                             context.UserSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                             !userSessionStatus.Tag ||
+                             userSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
 
                           strDate = SystemUtilities.getCurrentDateAndTime().format( "YYYY-MM-DD-HH" );
 
@@ -3536,12 +3595,14 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( request.body.StorageKind === "0" ) { //Persistent
 
-                      strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + context.UserSessionStatus.UserName + "/";
+                      strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + "/";
+
+                      expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : null;
 
                     }
                     else if ( request.body.Storagekind === "1" ) { //Temporal
 
-                      strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + context.UserSessionStatus.UserName + "/";
+                      strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + "/";
 
                       expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format();
 
@@ -3573,8 +3634,24 @@ export default class BinaryServiceController extends BaseService {
 
                     await uploadedFile.mv( strFullPath + strId + "." + fileDetectedType.ext + ".data" );
 
+                    delete request.body.CreatedBy;
+                    delete request.body.CreatedAt;
+                    delete request.body.UpdatedBy;
+                    delete request.body.UpdatedAt;
+                    delete request.body.ExtraData;
+
+                    if ( request.body.DisabledBy !== "0" &&
+                         request.body.DisabledBy !== "1" ) {
+
+                      delete request.body.DisabledBy;
+
+                    }
+
+                    delete request.body.DisabledAt;
+                    delete request.body.ExtraData;
+
                     //Create thumbnail
-                    const thumbnailFactor = await this.getConfigBinaryDataThumbnail( context.UserSessionStatus,
+                    const thumbnailFactor = await this.getConfigBinaryDataThumbnail( userSessionStatus,
                                                                                      strCategory,
                                                                                      fileDetectedType.mime,
                                                                                      currentTransaction,
@@ -3590,7 +3667,7 @@ export default class BinaryServiceController extends BaseService {
 
                     debugMark( "Detect process needed" );
 
-                    const processData = await BinaryServiceController.detectProcessNeeded( context.UserSessionStatus,
+                    const processData = await BinaryServiceController.detectProcessNeeded( userSessionStatus,
                                                                                            strCategory,
                                                                                            fileDetectedType.mime,
                                                                                            uploadedFile.size,
@@ -3628,7 +3705,8 @@ export default class BinaryServiceController extends BaseService {
                                               ShareCode: CommonUtilities.isNotNullOrEmpty( request.body.ShareCode ) ? request.body.ShareCode: null,
                                               Owner: strDefaultOwners,
                                               ProcessNeeded: processData && processData.value ? processData.value : 0,
-                                              CreatedBy: context.UserSessionStatus.UserName,
+                                              CreatedBy: userSessionStatus.UserName,
+                                              DisabledBy: request.body.DisabledBy === "1"? "1@" + userSessionStatus.UserName: "0",
                                               ExtraData: JSON.stringify( extraData, null, 2 )
                                             }
 
@@ -3664,7 +3742,7 @@ export default class BinaryServiceController extends BaseService {
                                  Warnings: [],
                                  Count: 1,
                                  Data: [
-                                         binaryIndexData
+                                         ( sysBinaryIndex as any ).dataValues
                                        ]
                                };
 
@@ -4078,7 +4156,9 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      let userSessionStatus = context.UserSessionStatus;
 
       strLanguage = context.Language;
 
@@ -4091,8 +4171,6 @@ export default class BinaryServiceController extends BaseService {
         bIsLocalTransaction = true;
 
       }
-
-      let userSessionStatus = context.UserSessionStatus;
 
       let sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.body.Id,
                                                                       null,
@@ -4213,7 +4291,7 @@ export default class BinaryServiceController extends BaseService {
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
-            const allowedCategory = await BinaryServiceController.checkAllowedCategory( context.UserSessionStatus,
+            const allowedCategory = await BinaryServiceController.checkAllowedCategory( userSessionStatus,
                                                                                         strCategory,
                                                                                         currentTransaction,
                                                                                         logger );
@@ -4246,7 +4324,7 @@ export default class BinaryServiceController extends BaseService {
                                                                         sysBinaryIndexInDB.MimeType,
                                                                         logger );
 
-                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( context.UserSessionStatus,
+                  const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( userSessionStatus,
                                                                                               fileDetectedType.mime,
                                                                                               strCategory,
                                                                                               currentTransaction,
@@ -4254,7 +4332,7 @@ export default class BinaryServiceController extends BaseService {
 
                   if ( allowedMimeType.value === 1 ) {
 
-                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( context.UserSessionStatus,
+                    const strDefaultOwners = await BinaryServiceController.getDefaultOwners( userSessionStatus,
                                                                                              strCategory,
                                                                                              currentTransaction,
                                                                                              logger );
@@ -4279,6 +4357,21 @@ export default class BinaryServiceController extends BaseService {
                     }
 
                     if ( updateStorageKindResult === true ) {
+
+                      delete request.body.CreatedBy;
+                      delete request.body.CreatedAt;
+                      delete request.body.UpdatedBy;
+                      delete request.body.UpdatedAt;
+
+                      if ( request.body.DisabledBy !== "0" &&
+                           request.body.DisabledBy !== "1" ) {
+
+                        delete request.body.DisabledBy;
+
+                      }
+
+                      delete request.body.DisabledAt;
+                      delete request.body.ExtraData;
 
                       sysBinaryIndexInDB.Owner =  SystemUtilities.mergeTokens( strDefaultOwners,
                                                                                sysBinaryIndexInDB.Owner,
@@ -4321,6 +4414,7 @@ export default class BinaryServiceController extends BaseService {
 
                       sysBinaryIndexInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_UNKNOWN_SYSTEM_NET;
                       sysBinaryIndexInDB.UpdatedAt = null;
+                      sysBinaryIndexInDB.DisabledBy = request.body.DisabledBy === "1"? "1@" + userSessionStatus.UserName: "0";
 
                       sysBinaryIndexInDB = await SYSBinaryIndexService.createOrUpdate(
                                                                                        sysBinaryIndexInDB.Id,
@@ -4722,7 +4816,7 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      const context = ( request as any ).context;
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
 
       let userSessionStatus = context.UserSessionStatus;
 

@@ -3,17 +3,18 @@
 //import os from 'os';
 import cluster from 'cluster';
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
-import CommonConstants from '../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../02_system/common/CommonConstants';
+
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '005_migrate_02' );
+const debug = require( 'debug' )( '001_import_data_01'  ); //Ctrl+i
 
-//Example file migrate files using code
-export default class Migrate {
+//Example file import files using code
+export default class Import {
 
-  static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
+  static async importUp( dbConnection: any, logger: any ): Promise<any> {
 
     let bSuccess = false;
     let bEmptyContent = true;
@@ -25,9 +26,11 @@ export default class Migrate {
 
       const strShortId = SystemUtilities.hashString( strId, 2, null );
 
-      const strValues = "'" + strId + "','" + strShortId + "','Group01','#Administrator#','Group test created with migration','backend@system.net','" + moment().format() + "'";
+      const strValues = "'" + strId + "','" + strShortId + "','Group01','#Administrator#','Group test created with migration','backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
 
       const strSQL = `Insert Into \`sysUserGroup\`( Id, ShortId, Name, Role, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+
+      //debug( strSQL );
 
       await dbConnection.execute( strSQL );
 
@@ -40,9 +43,9 @@ export default class Migrate {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.migrateUp.name;
+      sourcePosition.method = this.name + "." + this.importUp.name;
 
-      const strMark = "6C9E8CDB8358" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "4E5FF306A170" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -57,8 +57,8 @@
       "name": "Launch Program Test 01 REST API",
       "program": "${workspaceFolder}/src/04_test/standalone/test01.ts",
       "args": [
-        "--username=admin01@system.net",
-        "--password=admin1.123456.",
+        "--username=admin05@system.net",
+        "--password=admin5.123456.",
         "--target=http://localhost"
     ],
       "outputCapture": "std",

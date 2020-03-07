@@ -9,14 +9,14 @@ import Hashes from 'jshashes';
 import cluster from 'cluster';
 import appRoot from 'app-root-path';
 
-import CommonConstants from '../../../02_system/common/CommonConstants';
-import SystemConstants from "../../../02_system/common/SystemContants";
+import CommonConstants from '../../../../02_system/common/CommonConstants';
+import SystemConstants from "../../../../02_system/common/SystemContants";
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSConfigMetaData } from "../../../02_system/common/database/models/SYSConfigMetaData";
-import { SYSConfigValueData } from '../../../02_system/common/database/models/SYSConfigValueData';
+import { SYSConfigMetaData } from "../../../../02_system/common/database/models/SYSConfigMetaData";
+import { SYSConfigValueData } from '../../../../02_system/common/database/models/SYSConfigValueData';
 
 const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
 

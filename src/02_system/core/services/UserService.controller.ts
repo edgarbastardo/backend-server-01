@@ -7819,7 +7819,7 @@ export default class UserServiceController {
                                                                        Comment: request.body.Comment,
                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                        CreatedAt: null,
-                                                                       DisabledBy: request.body.DisabledBy === "1"? "1@" + strUserName: null
+                                                                       DisabledBy: request.body.DisabledBy === "1"? "1@" + strUserName: "0"
                                                                      },
                                                                      false,
                                                                      currentTransaction,
@@ -8898,7 +8898,7 @@ export default class UserServiceController {
                   sysUserInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserInDB.Comment;
                   sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
                   sysUserInDB.UpdatedAt = null;
-                  sysUserInDB.DisabledBy = request.body.DisabledBy === "1"? "1@" + strUserName: null;
+                  sysUserInDB.DisabledBy = request.body.DisabledBy === "1"? "1@" + strUserName: "0";
 
                   sysUserInDB = await SYSUserService.createOrUpdate(
                                                                      ( sysUserInDB as any ).dataValues,

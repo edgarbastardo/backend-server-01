@@ -3,18 +3,18 @@
 //import os from 'os';
 import cluster from 'cluster';
 
-import CommonConstants from '../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '999_orm_after_import' );
+const debug = require( 'debug' )( '000_orm_before_migrate_init' );
 
-//Example file import files using code
-export default class Import {
+//Example file migrate files using code
+export default class Migrate {
 
-  static async importUp( dbConnection: any, logger: any ): Promise<any> {
+  static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
 
     //The dbConnection parameter is instance of ORM object (sequelize)
     let bSuccess = false;
@@ -43,9 +43,9 @@ export default class Import {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.importUp.name;
+      sourcePosition.method = this.name + "." + this.migrateUp.name;
 
-      const strMark = "6733ADEF7F0D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "06385987B821" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

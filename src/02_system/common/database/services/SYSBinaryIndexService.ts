@@ -325,4 +325,30 @@ export default class SYSBinaryIndexService extends BaseService {
 
   }
 
+  static async checkDisabledById( strId: string,
+                                  transaction: any,
+                                  logger: any ): Promise<boolean> {
+
+    const sysBinaryIndex = await this.getById( strId,
+                                               null,
+                                               transaction,
+                                               logger );
+
+    return sysBinaryIndex ? sysBinaryIndex.DisabledBy !== null || sysBinaryIndex.DisabledAt !== null : false;
+
+  }
+
+  static async checkExpiredById( strId: string,
+                                 transaction: any,
+                                 logger: any ): Promise<boolean> {
+
+    const sysBinaryIndex = await this.getById( strId,
+                                               null,
+                                               transaction,
+                                               logger );
+
+    return sysBinaryIndex ? SystemUtilities.isDateAndTimeAfter( sysBinaryIndex.ExpireAt ) : false;
+
+  }
+
 }

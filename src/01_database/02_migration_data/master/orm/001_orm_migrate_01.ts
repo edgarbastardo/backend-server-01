@@ -3,13 +3,14 @@
 //import os from 'os';
 import cluster from 'cluster';
 
-import CommonConstants from '../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
+//import { UserGroup } from '../../../02_system/common/database/models/UserGroup';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '000_orm_before_migrate_init' );
+const debug = require( 'debug' )( '001_orm_migrate_01' );
 
 //Example file migrate files using code
 export default class Migrate {
@@ -24,6 +25,7 @@ export default class Migrate {
 
     try {
 
+      /*
       if ( currentTransaction === null ) {
 
         currentTransaction = await dbConnection.transaction();
@@ -31,12 +33,49 @@ export default class Migrate {
       }
 
       //Migration code here
+      const strId = SystemUtilities.getUUIDv4();
+
+      const userGroupsToCreate = [
+        {
+          Id: strId,
+          Name: "Group01",
+          Role: "#Administrator#",
+          Comment: "Auto created from importation",
+          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+        }
+      ]
+
+      const groupsCreated = await UserGroup.bulkCreate( userGroupsToCreate, { individualHooks: true, validate: true } );
+
+      debug(  "%O", groupsCreated );
+
+      const saltRounds = 10;
+
+      const strCryptedPassword = bcrypt.hash( "admin.123456.", saltRounds );
+
+      const usersToCreate = [
+        {
+          GroupId: strId,
+          Name: "administrator01",
+          Password: strCryptedPassword,
+          Comment: "Auto created from importation",
+          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+        }
+      ]
+
+      const usersCreated = await User.bulkCreate( usersToCreate, { individualHooks: true, validate: true } );
+
+      debug( "%O", usersCreated );
 
       if ( currentTransaction !== null ) {
 
         await currentTransaction.commit();
 
       }
+
+      bSuccess = true;
+      bEmptyContent = false;
+      */
 
     }
     catch ( error ) {
@@ -45,7 +84,7 @@ export default class Migrate {
 
       sourcePosition.method = this.name + "." + this.migrateUp.name;
 
-      const strMark = "06385987B821" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "1B45E615BAFF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -6,16 +6,16 @@ import bcrypt from 'bcrypt';
 */
 import cluster from 'cluster';
 
-import CommonConstants from '../../../02_system/common/CommonConstants';
-import SystemConstants from "../../../02_system/common/SystemContants";
+import CommonConstants from '../../../../02_system/common/CommonConstants';
+import SystemConstants from "../../../../02_system/common/SystemContants";
 
-import CommonUtilities from '../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSUser } from '../../../02_system/common/database/models/SYSUser';
-import { SYSUserGroup } from '../../../02_system/common/database/models/SYSUserGroup';
+//import { User } from '../../../02_system/common/database/models/User';
+import { SYSUserGroup } from '../../../../02_system/common/database/models/SYSUserGroup';
 
-const debug = require( 'debug' )( '003_system_check_foreign_systems_groups_and_users_exists' );
+const debug = require( 'debug' )( '502_check_business_groups_and_users_exists' );
 
 //Example file import files using code
 export default class Always {
@@ -36,15 +36,21 @@ export default class Always {
 
     try {
 
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
       const userGroupEntries = [
                                  {
-                                   Id: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
-                                   Name: "Foreign_Systems",
-                                   Role: "#Foreign_Systems#",
-                                   Tag: "#Foreign_Systems#",
-                                   Comment: "Created from backend startup. Group of users associated to persistent sessions tokens and foreign systems.",
+                                   Id: "d7648ed4-1914-4fe4-9902-072a21db1f00",
+                                   Name: "Drivers",
+                                   Role: "#Drivers#",
+                                   Tag: "#Drivers#",
+                                   Comment: "Created from backend startup. Group of users for testing.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                   DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
                                ]
 
@@ -55,7 +61,7 @@ export default class Always {
           const options = {
 
             where: { Id: userGroupToCreate.Id },
-            individualHooks: true,
+            //individualHooks: true,
             transaction: currentTransaction,
 
           }
@@ -72,6 +78,7 @@ export default class Always {
 
             userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
+            //userGroup.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
             await SYSUserGroup.update( ( userGroupInDB as any ).dataValues, options );
 
@@ -83,6 +90,7 @@ export default class Always {
 
       await loopUserGroupEntriesAsync();
 
+      /*
       const userEntries = [
                             {
                               Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
@@ -92,9 +100,9 @@ export default class Always {
                               SessionsLimit: 0,
                               Name: "ForeignSystem01",
                               Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#",
-                              Tag: "#Foreign_Systems#",
-                              Comment: "Created from backend startup.",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. Mobile App Drivers, Restaurants. System Odin.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
@@ -106,9 +114,9 @@ export default class Always {
                               SessionsLimit: 0,
                               Name: "ForeignSystem02",
                               Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#",
-                              Tag: "#Foreign_Systems#",
-                              Comment: "Created from backend startup.",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. System Migration command line tool.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
@@ -120,37 +128,9 @@ export default class Always {
                               SessionsLimit: 0,
                               Name: "ForeignSystem03",
                               Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#",
-                              Tag: "#Foreign_Systems#",
-                              Comment: "Created from backend startup.",
-                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                            },
-                            {
-                              Id: "e4f82a85-c800-47bc-bc3a-f6a427f3da02",
-                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
-                              ForceChangePassword: 0,
-                              ChangePasswordEvery: 0,
-                              SessionsLimit: 0,
-                              Name: "ForeignSystem04",
-                              Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#",
-                              Tag: "#Foreign_Systems#",
-                              Comment: "Created from backend startup.",
-                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                            },
-                            {
-                              Id: "4607413a-3dca-4a8a-9f2b-2fee3617a990",
-                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
-                              ForceChangePassword: 0,
-                              ChangePasswordEvery: 0,
-                              SessionsLimit: 0,
-                              Name: "ForeignSystem05",
-                              Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#",
-                              Tag: "#Foreign_Systems#",
-                              Comment: "Created from backend startup.",
+                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
+                              Tag: "#Odin#",
+                              Comment: "Created from backend startup. System Migration command line tool.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
@@ -166,11 +146,11 @@ export default class Always {
 
           }
 
-          const userInDB = await SYSUser.findOne( options );
+          const userInDB = await User.findOne( options );
 
           if ( userInDB === null ) {
 
-            await SYSUser.create( userToCreate );
+            await User.create( userToCreate );
 
           }
           else if ( !userInDB.Tag ||
@@ -179,9 +159,8 @@ export default class Always {
             userInDB.Name = userToCreate.Name;
             userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
             userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userInDB.DisabledBy = userToCreate.DisabledBy;
 
-            await SYSUser.update( ( userInDB as any ).dataValues,
+            await User.update( ( userInDB as any ).dataValues,
                                options );
 
           }
@@ -191,6 +170,7 @@ export default class Always {
       };
 
       await loopUserEntriesAsync();
+      */
 
       if ( currentTransaction !== null ) {
 

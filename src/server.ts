@@ -303,7 +303,7 @@ export default async function main() {
 
       await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not exists
 
-      await DBMigrationManager.migrateUsingRawConnection( "master", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
+      await DBMigrationManager.migrateUsingRawConnection( "*", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
 
     }
 
@@ -315,7 +315,8 @@ export default async function main() {
 
     if ( process.env.DB_AUTO_MIGRATION === "1" ) {
 
-      await DBMigrationManager.migrateUsingORMConnection( DBConnectionManager.getDBConnection( "master" ),
+      await DBMigrationManager.migrateUsingORMConnection( "*",
+                                                          //DBConnectionManager.getDBConnection( "master" ),
                                                           LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
 
     }

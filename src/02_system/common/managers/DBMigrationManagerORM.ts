@@ -207,7 +207,7 @@ export class DBMigrationManagerORM {
 
   }
 
-  static async migrateDatabase( dbConnection: any, logger: any ): Promise<boolean> {
+  static async migrateDatabase( strDatabase: string, dbConnection: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -218,11 +218,11 @@ export class DBMigrationManagerORM {
                                                              null ); //Force silent errors
 
       const strRootPath = __dirname; //require( 'app-root-path' );
-      const strMigrationsFolder = strRootPath + '/../../../01_database/02_migration_data/orm/';
+      const strMigrationsFolder = strRootPath + `/../../../01_database/02_migration_data/${strDatabase}/orm/`;
       const path = require('path')
-      const os = require( 'os' );
+      //const os = require( 'os' );
 
-      const dirs = fs.readdirSync( strMigrationsFolder );
+      const dirs = fs.existsSync( strMigrationsFolder ) ? fs.readdirSync( strMigrationsFolder ): [];
 
       const loopAsync = async () => {
 
@@ -385,7 +385,9 @@ export class DBMigrationManagerORM {
 
   }
 
-  static async importDataToDatabase( dbConnection: any, logger: any ): Promise<boolean> {
+  static async importDataToDatabase( strDatabase: string,
+                                     dbConnection: any,
+                                     logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -396,11 +398,11 @@ export class DBMigrationManagerORM {
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
-      const strImportDataFolder = strRootPath + '/../../../01_database/03_import_data/orm/';
+      const strImportDataFolder = strRootPath + `/../../../01_database/03_import_data/${strDatabase}/orm/`;
       const path = require('path')
       const os = require( 'os' );
 
-      const dirs = fs.readdirSync( strImportDataFolder );
+      const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
       const loopAsync = async () => {
 
@@ -566,7 +568,9 @@ export class DBMigrationManagerORM {
 
   }
 
-  static async alwaysExecute( dbConnection: any, logger: any ): Promise<boolean> {
+  static async alwaysExecute( strDatabase: string,
+                              dbConnection: any,
+                              logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -577,11 +581,11 @@ export class DBMigrationManagerORM {
                                                                 logger );
 
       const strRootPath = __dirname; //require( 'app-root-path' );
-      const strImportDataFolder = strRootPath + '/../../../01_database/04_always_execute/orm/';
+      const strImportDataFolder = strRootPath + `/../../../01_database/04_always_execute/${strDatabase}/orm/`;
       const path = require('path')
       //const os = require( 'os' );
 
-      const dirs = fs.readdirSync( strImportDataFolder );
+      const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
       const loopAsync = async () => {
 

@@ -149,6 +149,7 @@ export default class DBConnectionManager {
           dbConfig.models = [];
 
           dbConfig.name = strCurrentDatabase;
+          dbConfig.migrate = dbConfigData[ strCurrentDatabase ].migrate;
           dbConfig.system = dbConfigData[ strCurrentDatabase ].system;
 
           if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
