@@ -5046,15 +5046,15 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: "ERROR_CANNOT_DELETE_THE_INFORMATION",
-                     Message: await I18NManager.translate( strLanguage, "Not allowed to delete the information" ),
+                     Code: "ERROR_CANNOT_DELETE_BINARY_DATA",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to delete the binary data" ),
                      Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: "ERROR_CANNOT_DELETE_THE_INFORMATION",
-                                 Message: await I18NManager.translate( strLanguage, "Not allowed to delete the information" ),
+                                 Code: "ERROR_CANNOT_DELETE_BINARY_DATA",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to delete the binary data" ),
                                  Details: null,
                                }
                              ],

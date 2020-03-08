@@ -1110,8 +1110,9 @@ export class ModelToRestAPIServiceController extends BaseService {
           else {
 
             intStatusCode = 202
-            strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been created. Please check the errors and warnings section' );
+            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been created. Please check the data and errors and warnings section' );
+            bIsError = errors && errors.length > 0;
 
           }
 
@@ -1624,8 +1625,9 @@ export class ModelToRestAPIServiceController extends BaseService {
           else {
 
             intStatusCode = 202
-            strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been updated. Please check the errors and warnings section' );
+            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been updated. Please check the data and errors and warnings section' );
+            bIsError = errors && errors.length > 0;
 
           }
 
@@ -2079,8 +2081,9 @@ export class ModelToRestAPIServiceController extends BaseService {
           else {
 
             intStatusCode = 202
-            strCode = 'WARNING_CHECK_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been deleted. Please check the errors and warnings section' );
+            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been deleted. Please check the data and errors and warnings section' );
+            bIsError = errors && errors.length > 0;
 
           }
 

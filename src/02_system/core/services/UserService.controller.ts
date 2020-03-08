@@ -8241,6 +8241,64 @@ export default class UserServiceController {
 
   }
 
+  static checkUsersEqualsRoleLevel( sysUserInDB: SYSUser,
+                                    userSessionStatus: any,
+                                    logger: any ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const sysUserRole = sysUserInDB.Role ? sysUserInDB.Role.split( "," ): [];
+      const sysUserGroupRole = sysUserInDB.sysUserGroup.Role ? sysUserInDB.sysUserGroup.Role.split( "," ): [];
+
+      if ( sysUserRole.includes( "#Administrator#" ) ||
+           sysUserRole.includes( "#BManagerL99#" ) ||
+           sysUserGroupRole.includes( "#Administrator#" ) ||
+           sysUserGroupRole.includes( "#BManagerL99#" ) ) {
+
+        //The user to check is administrator
+        bResult = userSessionStatus.Role.includes( "#Administrator#" ) ||
+                  userSessionStatus.Role.includes( "#BManagerL99#" ); //Check the current user session is administrator too
+
+      }
+      else { //The user is not administrator
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkUsersEqualsRoleLevel.name;
+
+      const strMark = "7BE2B8FC2DCF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
   static async updateUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
@@ -8331,22 +8389,27 @@ export default class UserServiceController {
         delete request.body.sysUserGroup.DisableAt;
         delete request.body.sysUserGroup.ExtraData;
 
-        sysUserInDB = await SYSUserService.getBy( {
+        sysUserInDB = await SYSUserService.getBy(
+                                                  {
                                                     Id: request.body.Id,
                                                     ShortId: request.body.ShortId,
                                                     Name: request.body.Name
                                                   },
                                                   null,
                                                   currentTransaction,
-                                                  logger );
+                                                  logger
+                                                );
 
         if ( !sysUserInDB ) {
 
-          const strMessage = await this.getMessageUser( strLanguage, {
-                                                                       Id: request.body.Id,
-                                                                       ShortId: request.body.ShortId,
-                                                                       Name: request.body.Name
-                                                                     } );
+          const strMessage = await this.getMessageUser(
+                                                        strLanguage,
+                                                        {
+                                                          Id: request.body.Id,
+                                                          ShortId: request.body.ShortId,
+                                                          Name: request.body.Name
+                                                        }
+                                                      );
 
           result = {
                      StatusCode: 404, //Not found
@@ -8414,6 +8477,30 @@ export default class UserServiceController {
                    }
 
         }
+        else if ( this.checkUsersEqualsRoleLevel( sysUserInDB,
+                                                  userSessionStatus,
+                                                  logger ) === false ) {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: 'ERROR_CANNOT_UDPATE_USER',
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but yout not had.' ),
+                     Mark: 'BD7C3154E5D3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_CANNOT_UPDATE_USER',
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but yout not had.' ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
         else if ( await SYSUserService.getNameIsFree( request.body.Id,
                                                       request.body.Name,
                                                       null,
@@ -8432,6 +8519,30 @@ export default class UserServiceController {
                                  Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
                                  Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
                                  Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( this.checkUsersEqualsRoleLevel( sysUserInDB,
+                                                  userSessionStatus,
+                                                  logger ) === false ) {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: 'ERROR_CANNOT_UDPATE_USER',
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you not had.' ),
+                     Mark: 'BD7C3154E5D3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_CANNOT_UPDATE_USER',
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you not had.' ),
+                                 Details: null,
                                }
                              ],
                      Warnings: [],
@@ -9271,6 +9382,961 @@ export default class UserServiceController {
 
   }
 
+  static async bulkUserOperation( strBulkOperation: string,
+                                  request: Request,
+                                  transaction: any,
+                                  logger: any ): Promise<any> {
+
+    let result: any = {
+                        data:[],
+                        errors:[],
+                        warnings: []
+                      };
+
+    let strLanguage = null;
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const bulkData = request.body.bulk;
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      for ( let intIndex= 0; intIndex < bulkData.length; intIndex++ ) {
+
+        const bulkUserData = bulkData[ intIndex ];
+
+        try {
+
+          let sysUserInDB = await SYSUserService.getBy(
+                                                        {
+                                                          Id: bulkUserData.Id,
+                                                          ShortId: bulkUserData.ShortId,
+                                                          Name: bulkUserData.Name
+                                                        },
+                                                        null,
+                                                        transaction,
+                                                        logger
+                                                      );
+
+          if ( !sysUserInDB ) {
+
+            const strMessage = await this.getMessageUser(
+                                                          strLanguage,
+                                                          {
+                                                            Id: bulkUserData.Id,
+                                                            ShortId: bulkUserData.ShortId,
+                                                            Name: bulkUserData.Name
+                                                          }
+                                                        );
+
+            result.errors.push (
+                                 {
+                                   Id: bulkUserData.Id,
+                                   ShortId: bulkUserData.ShortId,
+                                   Name: bulkUserData.Name,
+                                   Code: 'ERROR_USER_NOT_FOUND',
+                                   Mark: 'AF5B2A2B856B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Message: strMessage,
+                                   Details: null,
+                                 }
+                               );
+
+          }
+          else if ( sysUserInDB instanceof Error ) {
+
+            const error = sysUserInDB as any;
+
+            result.errors.push (
+                                 {
+                                   Id: bulkUserData.Id,
+                                   ShortId: bulkUserData.ShortId,
+                                   Name: bulkUserData.Name,
+                                   Code: error.name,
+                                   Mark: '4D8DB096189E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               );
+
+          }
+          else if ( sysUserInDB.Id === userSessionStatus.UserId ) {
+
+            let strMessage = "";
+
+            if ( strBulkOperation === "deleteUser" ) {
+
+              strMessage = await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' );
+
+            }
+            else {
+
+              strMessage = await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' );
+
+            }
+
+            result.errors.push(
+                                {
+                                  Id: sysUserInDB.Id,
+                                  ShortId: sysUserInDB.ShortId,
+                                  Name: sysUserInDB.Name,
+                                  Code: 'ERROR_USER_NOT_VALID',
+                                  Mark: 'DB0BF01CAA7A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Message: strMessage,
+                                  Details: null
+                                }
+                              );
+
+          }
+          else if ( this.checkUsersEqualsRoleLevel( sysUserInDB,
+                                                    userSessionStatus, //Current user
+                                                    logger ) === false ) {
+
+            let strCode = "";
+            let strMessage = "";
+
+            if ( strBulkOperation === "deleteUser" ) {
+
+              strCode = 'ERROR_CANNOT_DELETE_USER';
+              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' );
+
+            }
+            else {
+
+              strCode = 'ERROR_CANNOT_UPDATE_USER';
+              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you not had.' );
+
+            }
+
+            result.errors.push(
+                                {
+                                  Id: sysUserInDB.Id,
+                                  ShortId: sysUserInDB.ShortId,
+                                  Name: sysUserInDB.Name,
+                                  Code: strCode,
+                                  Message: strMessage,
+                                  Mark: '3BA7F38FA6DD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Details: null,
+                                }
+                              );
+
+          }
+          else {
+
+            //ANCHOR checkUserRoleLevel
+            let resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                                sysUserInDB,
+                                                                strBulkOperation === "deleteUser" ? "DeleteUser": "UpdateUser",
+                                                                logger );
+
+            if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+                 !resultCheckUserRoles.isAuthorizedL03 &&
+                 !resultCheckUserRoles.isAuthorizedL02 &&
+                 !resultCheckUserRoles.isAuthorizedL01 ) {
+
+              resultCheckUserRoles.isNotAuthorized = true;
+
+            }
+
+            if ( resultCheckUserRoles.isNotAuthorized ) {
+
+              if ( strBulkOperation === "deleteUser" ) {
+
+                result.errors.push(
+                                    {
+                                      Id: sysUserInDB.Id,
+                                      ShortId: sysUserInDB.ShortId,
+                                      Name: sysUserInDB.Name,
+                                      Code: 'ERROR_CANNOT_DELETE_USER',
+                                      Mark: '3CEF42A3B047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
+                                      Details: null
+                                    }
+                                  );
+
+              }
+              else {
+
+                result.errors.push(
+                                    {
+                                      Id: sysUserInDB.Id,
+                                      ShortId: sysUserInDB.ShortId,
+                                      Name: sysUserInDB.Name,
+                                      Code: 'ERROR_CANNOT_UDPATE_USER',
+                                      Mark: 'AF5B2A2B856B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user' ),
+                                      Details: null
+                                    }
+                                  );
+
+              };
+
+            }
+            else {
+
+              if ( strBulkOperation === "moveToUserGroup" ) {
+
+                resultCheckUserRoles = this.checkUserGroupRoleLevel(
+                                                                     userSessionStatus,
+                                                                     {
+                                                                       Id: bulkUserData.sysUserGroup.Id,
+                                                                       ShortId: bulkUserData.sysUserGroup.ShortId,
+                                                                       Name: bulkUserData.sysUserGroup.Name,
+                                                                     },
+                                                                     "UpdateUser",
+                                                                     logger
+                                                                   );
+
+              }
+
+            }
+
+            if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+                 !resultCheckUserRoles.isAuthorizedL03 &&
+                 !resultCheckUserRoles.isAuthorizedL02 &&
+                 !resultCheckUserRoles.isAuthorizedL01 ) {
+
+              result.errors.push(
+                                  {
+                                    Id: sysUserInDB.Id,
+                                    ShortId: sysUserInDB.ShortId,
+                                    Name: sysUserInDB.Name,
+                                    Code: 'ERROR_CANNOT_UDPATE_USER',
+                                    Mark: '7E8570FF7D8A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Message: await I18NManager.translate( strLanguage, 'Not allowed to move the user to the target user group' ),
+                                    Details: null
+                                  }
+                                );
+
+            }
+            else {
+
+              let sysUserGroupInDB = null;
+
+              sysUserInDB.UpdatedBy = userSessionStatus.UserName;
+              sysUserInDB.UpdatedAt = null;
+
+              if ( strBulkOperation === "moveToUserGroup" ) {
+
+                sysUserGroupInDB = await SYSUserGroupService.getBy(
+                                                                    {
+                                                                      Id: bulkUserData.sysUserGroup.Id,
+                                                                      ShortId: bulkUserData.sysUserGroup.ShortId,
+                                                                      Name: bulkUserData.sysUserGroup.Name,
+                                                                    },
+                                                                    null,
+                                                                    transaction,
+                                                                    logger
+                                                                  );
+
+                if ( sysUserGroupInDB !== null ) {
+
+                  sysUserInDB.GroupId = sysUserGroupInDB.Id;
+
+                }
+                else {
+
+                  result.errors.push(
+                                      {
+                                        Id: sysUserInDB.Id,
+                                        ShortId: sysUserInDB.ShortId,
+                                        Name: sysUserInDB.Name,
+                                        Code: 'ERROR_CANNOT_UDPATE_USER',
+                                        Mark: '97BAA8711727' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Message: await I18NManager.translate( strLanguage, 'The target user group not found in database' ),
+                                        Details: null
+                                      }
+                                    );
+
+                  sysUserInDB = null;
+
+                }
+
+              }
+              else if ( strBulkOperation === "disableUser" ) {
+
+                sysUserInDB.DisabledBy = "1@" + userSessionStatus.UserName;
+
+              }
+              else if ( strBulkOperation === "enableUser" ) {
+
+                sysUserInDB.DisabledBy = "0";
+
+              }
+
+              if (  sysUserInDB !== null ) {
+
+                if ( strBulkOperation === "deleteUser" ) {
+
+                  const deleteResult = await SYSUserService.deleteByModel( sysUserInDB,
+                                                                           transaction,
+                                                                           logger );
+
+                  if ( deleteResult instanceof Error ) {
+
+                    const error = deleteResult as Error;
+
+                    result.errors.push(
+                                        {
+                                          Id: sysUserInDB.Id,
+                                          ShortId: sysUserInDB.ShortId,
+                                          Name: sysUserInDB.Name,
+                                          Code: 'ERROR_UNEXPECTED',
+                                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                          Mark: '4B1421967200' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Details: await SystemUtilities.processErrorDetails( error ) //error
+                                        }
+                                      );
+
+
+                  }
+                  else if ( deleteResult === true ) {
+
+                    result.data.push(
+                                      {
+                                        Id: sysUserInDB.Id,
+                                        ShortId: sysUserInDB.ShortId,
+                                        Name: sysUserInDB.Name,
+                                        Code: 'SUCCESS_USER_DELETE',
+                                        Message: await I18NManager.translate( strLanguage, 'Success user delete.' ),
+                                        Mark: 'D746E4B3913A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Details: null
+                                      }
+                                    );
+
+                  }
+                  else {
+
+                    result.errors.push(
+                                        {
+                                          Id: sysUserInDB.Id,
+                                          ShortId: sysUserInDB.ShortId,
+                                          Name: sysUserInDB.Name,
+                                          Code: 'ERROR_USER_DELETE',
+                                          Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
+                                          Mark: '26ECAA#E77AAA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Details: "Method delete return false"
+                                        }
+                                      );
+
+                  }
+
+                }
+                else {
+
+                  sysUserInDB = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
+                                                                     true,
+                                                                     transaction,
+                                                                     logger );
+
+                  if ( sysUserInDB instanceof Error ) {
+
+                    const error = sysUserInDB as any;
+
+                    result.errors.push(
+                                        {
+                                          Id: sysUserInDB.Id,
+                                          ShortId: sysUserInDB.ShortId,
+                                          Name: sysUserInDB.Name,
+                                          Code: 'ERROR_UNEXPECTED',
+                                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                          Mark: '1F3070410157' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Details: await SystemUtilities.processErrorDetails( error ) //error
+                                        }
+                                      );
+
+                  }
+                  else {
+
+                    let details = {};
+
+                    if ( strBulkOperation === "moveToUserGroup" ) {
+
+                      details = {
+                                  sysUserGroup: {
+                                                  Id: sysUserGroupInDB.Id,
+                                                  ShortId: sysUserGroupInDB.ShortId,
+                                                  Name: sysUserGroupInDB.Name
+                                                },
+                                };
+
+                    }
+                    else {
+
+                      details = {
+                                  DisabledBy: sysUserInDB.DisabledBy,
+                                  DisabledAt: sysUserInDB.DisabledAt
+                                };
+
+                    }
+
+                    result.data.push(
+                                      {
+                                        Id: sysUserInDB.Id,
+                                        ShortId: sysUserInDB.ShortId,
+                                        Name: sysUserInDB.Name,
+                                        Code: 'SUCCESS_USER_UPDATE',
+                                        Message: await I18NManager.translate( strLanguage, 'Success user update.' ),
+                                        Mark: '14B48DBC5ECC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Details: details
+                                      }
+                                    );
+
+                  }
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+        catch ( error ) {
+
+          result.data.push(
+                            {
+                              Id: bulkUserData.Id,
+                              ShortId: bulkUserData.ShortId,
+                              Name: bulkUserData.Name,
+                              Code: 'ERROR_UNEXPECTED',
+                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                              Mark: 'AB36DD82F682' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                              Details: await SystemUtilities.processErrorDetails( error ) //error
+                            }
+                          );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.bulkUserOperation.name;
+
+      const strMark = "6C6A61A8A08B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result.errors.push(
+                          {
+                            Code: 'ERROR_UNEXPECTED',
+                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                            Mark: '14B48DBC5ECC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                            Details: await SystemUtilities.processErrorDetails( error ) //error
+                          }
+                        );
+
+    }
+
+    return result;
+
+  }
+
+  static async disableBulkUser( request: Request,
+                                transaction: any,
+                                logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkUserOperation( "disableUser",
+                                                       request,
+                                                       currentTransaction,
+                                                       logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_USER_DISABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL users' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_USER_DISABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the users. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been disabled. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: 'F750518D59A8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.disableBulkUser.name;
+
+      const strMark = "A1CFD3F24A43" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async enableBulkUser( request: Request,
+                               transaction: any,
+                               logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkUserOperation( "enableUser",
+                                                       request,
+                                                       currentTransaction,
+                                                       logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_USER_ENABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL users' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_USER_ENABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the users. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been enabled. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: 'B8A5ED6E6C21' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.enableBulkUser.name;
+
+      const strMark = "93AE7BE3681B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async moveBulkUser( request: Request,
+                             transaction: any,
+                             logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkUserOperation( "moveToUserGroup",
+                                                       request,
+                                                       currentTransaction,
+                                                       logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_USER_MOVE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success move ALL users to the user group' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_USER_MOVE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot move the users. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been moved. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: '340268D12456' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.moveBulkUser.name;
+
+      const strMark = "F8A432B3DEB9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   //ANCHOR deleteUser
   static async deleteUser( request: Request,
                            transaction: any,
@@ -9333,15 +10399,15 @@ export default class UserServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_DELETE_THE_INFORMATION',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the information' ),
+                   Code: 'ERROR_CANNOT_DELETE_USER',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
                    Mark: 'BA7F0A12AD3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_DELETE_THE_INFORMATION',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the information' ),
+                               Code: 'ERROR_CANNOT_DELETE_USER',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
                                Details: null,
                              }
                            ],
@@ -9351,8 +10417,108 @@ export default class UserServiceController {
                  }
 
       }
-      else if ( sysUserInDB != null &&
-                sysUserInDB instanceof Error === false ) {
+      else if ( !sysUserInDB ) {
+
+        const strMessage = await this.getMessageUser(
+                                                      strLanguage,
+                                                      {
+                                                        Id: request.body.Id,
+                                                        ShortId: request.body.ShortId,
+                                                        Name: request.body.Name
+                                                      }
+                                                    );
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_NOT_FOUND',
+                   Message: strMessage,
+                   Mark: '58A44EA21984' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_FOUND',
+                               Message: strMessage,
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( sysUserInDB instanceof Error ) {
+
+        const error = sysUserInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysUserInDB.Id === userSessionStatus.UserId ) {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_USER_NOT_VALID',
+                   Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
+                   Mark: '3576DA16A5CA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_VALID',
+                               Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( this.checkUsersEqualsRoleLevel( sysUserInDB,
+                                                userSessionStatus, //Current user
+                                                logger ) === false ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_CANNOT_DELETE_USER',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' ),
+                   Mark: '883398A57F61' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CANNOT_DELETE_USER',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
 
         const strPersonId = sysUserInDB.sysPerson ? sysUserInDB.sysPerson.Id: null;
 
@@ -9437,81 +10603,6 @@ export default class UserServiceController {
         }
 
       }
-      else if ( sysUserInDB instanceof Error ) {
-
-        const error = sysUserInDB as any;
-
-        result = {
-                   StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: error.name,
-                               Message: error.message,
-                               Details: await SystemUtilities.processErrorDetails( error ) //error
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 };
-
-      }
-      else if ( sysUserInDB &&
-                sysUserInDB.Id === userSessionStatus.UserId ) {
-
-        result = {
-                   StatusCode: 400, //Bad request
-                   Code: 'ERROR_USER_NOT_VALID',
-                   Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
-                   Mark: '3576DA16A5CA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_NOT_VALID',
-                               Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else {
-
-        const strMessage = await this.getMessageUser( strLanguage, {
-                                                                     Id: request.body.Id,
-                                                                     ShortId: request.body.ShortId,
-                                                                     Name: request.body.Name
-                                                                   } );
-
-        result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_NOT_FOUND',
-                   Message: strMessage,
-                   Mark: '58A44EA21984' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_NOT_FOUND',
-                               Message: strMessage,
-                               Details: null
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -9538,6 +10629,167 @@ export default class UserServiceController {
       sourcePosition.method = this.name + "." + this.deleteUser.name;
 
       const strMark = "A68F177F4DBF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async deleteBulkUser( request: Request,
+                               transaction: any,
+                               logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkUserOperation( "deleteUser",
+                                                       request,
+                                                       currentTransaction,
+                                                       logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_USER_DELETE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL users to the user group' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_USER_DELETE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot delete the users. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been deleted. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: '6AEBEABDD14A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteBulkUser.name;
+
+      const strMark = "0020061E70E8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -133,6 +133,8 @@ let user02_at_TestL01_data = {} as any;
 let user01_at_TestL02_data = {} as any;
 let user02_at_TestL02_data = {} as any;
 
+let user96_at_TestL98_data = {} as any;
+let user97_at_TestL98_data = {} as any;
 let user98_at_TestL98_data = {} as any;
 
 let upload_binary_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
@@ -684,6 +686,52 @@ export async function call_deleteUser( headers: any, query: any ): Promise<any> 
                                   };
 
     ( options as any ).body = query;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+
+export async function call_deleteBulkUser( headers: any, body: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'DELETE',
+                      body: JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/system/user/bulk";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = body;
 
     result.input = options;
 
@@ -1661,11 +1709,59 @@ export async function test_deleteUser( headers: any,
     let result = await call_deleteUser( headers, userRequest ); //This request must be fail
 
     saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-    result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_THE_INFORMATION"
+    result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
     saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
     if ( result &&
-         result.output.body.Code === strCode ) {  //"ERROR_CANNOT_DELETE_THE_INFORMATION"
+         result.output.body.Code === strCode ) {  //"ERROR_CANNOT_DELETE_USER"
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_deleteBulkUser( headers: any,
+                                           userData: any,
+                                           strCode: string,
+                                           strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    /*
+    let userRequest = {} as any;
+
+    if ( userData.Id ) {
+
+      userRequest.Id = userData.Id;
+
+    }
+    else if ( userData.Name ) {
+
+      userRequest.Name = userData.Name;
+
+    }
+    */
+
+    let result = await call_deleteBulkUser( headers, userData ); //This request must be fail
+
+    saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+    result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
+    saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+
+    if ( result &&
+         result.output.body.Code === strCode ) {  //"ERROR_CANNOT_DELETE_USER"
 
       bResult = true;
 
@@ -2465,6 +2561,200 @@ export async function test_createUser_user98_at_TestL98( headers: any,
                ( bCheckGroupName === false || user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
             user98_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_createUser_user97_at_TestL98( headers: any,
+                                                         strCode: string,
+                                                         strFileName: string,
+                                                         bIsFail: boolean,
+                                                         bCreateUserGroup: boolean,
+                                                         bMustBeEmptyRoleAndTag: boolean,
+                                                         bCheckGroupName: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const userRequest = { ... userRequestFull }; //Copy original information
+
+    userRequest.Name = "user97@TestL98";
+    userRequest.Password = "12345678";
+    userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
+    userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Business.Role = "#Role01#,#Role02#";
+    userRequest.Business.Tag = "#Tag01#,#Tag02#";
+
+    const result = await call_createUser( headers, userRequest ); //This request must be success
+
+    saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
+    result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+    saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+
+    if ( result &&
+         result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+
+      if ( bIsFail === false ) {
+
+        user97_at_TestL98_data = result.output.body.Data[ 0 ];
+
+        if ( bMustBeEmptyRoleAndTag ) {
+
+          if ( //!user97_at_TestL98_data.Role &&
+               checkTokens( user97_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+               !user97_at_TestL98_data.Tag &&
+               //!user97_at_TestL98_data.sysUserGroup.Role &&
+               checkTokens( user97_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+               !user97_at_TestL98_data.sysUserGroup.Tag &&
+               user97_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               ( bCheckGroupName === false || user97_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
+
+            user97_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+        else {
+
+          if ( //user97_at_TestL97_data.Role === "#MasterL01#" &&
+               checkTokens( user97_at_TestL98_data.Role, "#MasterL01#" ) &&
+               user97_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
+               //user97_at_TestL97_data.sysUserGroup.Role === "#MasterL01#" &&
+               checkTokens( user97_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+               user97_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
+               user97_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               ( bCheckGroupName === false || user97_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
+
+            user97_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_createUser_user96_at_TestL98( headers: any,
+                                                         strCode: string,
+                                                         strFileName: string,
+                                                         bIsFail: boolean,
+                                                         bCreateUserGroup: boolean,
+                                                         bMustBeEmptyRoleAndTag: boolean,
+                                                         bCheckGroupName: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const userRequest = { ... userRequestFull }; //Copy original information
+
+    userRequest.Name = "user96@TestL98";
+    userRequest.Password = "12345678";
+    userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
+    userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
+    userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+    userRequest.Business.Role = "#Role01#,#Role02#";
+    userRequest.Business.Tag = "#Tag01#,#Tag02#";
+
+    const result = await call_createUser( headers, userRequest ); //This request must be success
+
+    saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
+    result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+    saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+
+    if ( result &&
+         result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+
+      if ( bIsFail === false ) {
+
+        user96_at_TestL98_data = result.output.body.Data[ 0 ];
+
+        if ( bMustBeEmptyRoleAndTag ) {
+
+          if ( //!user96_at_TestL98_data.Role &&
+               checkTokens( user96_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+               !user96_at_TestL98_data.Tag &&
+               //!user96_at_TestL98_data.sysUserGroup.Role &&
+               checkTokens( user96_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+               !user96_at_TestL98_data.sysUserGroup.Tag &&
+               user96_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               ( bCheckGroupName === false || user96_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
+
+            user96_at_TestL98_data.Password = userRequest.Password;
+            bResult = true;
+
+          }
+
+        }
+        else {
+
+          if ( //user96_at_TestL97_data.Role === "#MasterL01#" &&
+               checkTokens( user96_at_TestL98_data.Role, "#MasterL01#" ) &&
+               user96_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
+               //user96_at_TestL97_data.sysUserGroup.Role === "#MasterL01#" &&
+               checkTokens( user96_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+               user96_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
+               user96_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
+               user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+               ( bCheckGroupName === false || user96_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
+
+            user96_at_TestL98_data.Password = userRequest.Password;
             bResult = true;
 
           }
@@ -3745,13 +4035,54 @@ async function test_set01() {
                   'CA07E27A0CC3: Creation of the user user98@TestL98 is OK',
                   'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
 
-        //*** Delete user user98@TestL98 ***
-        myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
-                                         { Id: user98_at_TestL98_data.Id },
-                                         "SUCCESS_USER_DELETE",
-                                         "test_deleteUser_user98@TestL98_success" ),
-                  '951404204AFC: Delete of the user user98@TestL98 is OK',
-                  '951404204AFC: Delete of the user user98@TestL98 is FAILED' );
+        //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
+        myAssert( await test_createUser_user97_at_TestL98( headers_user01_at_TestL01_Session1,
+                                                           "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
+                                                           "test_createUser_user97_at_TestL98_success",
+                                                           false,
+                                                           false, //<--- Not auto create the user group
+                                                           true,  //Must be empty role and tag?
+                                                           false ), //<-- Check group name?
+                  '2F6CC68DF536: Creation of the user user97@TestL98 is OK',
+                  '2F6CC68DF536: Creation of the user user97@TestL98 is FAILED' );
+
+        //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
+        myAssert( await test_createUser_user96_at_TestL98( headers_user01_at_TestL01_Session1,
+                                                           "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
+                                                           "test_createUser_user96_at_TestL98_success",
+                                                           false,
+                                                           false, //<--- Not auto create the user group
+                                                           true,  //Must be empty role and tag?
+                                                           false ), //<-- Check group name?
+                  'D3517EFAE8D8: Creation of the user user96@TestL98 is OK',
+                  'D3517EFAE8D8: Creation of the user user96@TestL98 is FAILED' );
+
+        //*** Delete user user9X@TestL98 ***
+        myAssert( await test_deleteBulkUser( headers_user01_at_TestL01_Session1,
+                                             {
+                                               bulk: [
+                                                       { Id: user96_at_TestL98_data.Id },
+                                                       { Id: user97_at_TestL98_data.Id },
+                                                       { Id: user98_at_TestL98_data.Id }
+                                                     ]
+                                             },
+                                             "SUCCESS_BULK_USER_DELETE",
+                                             "test_deleteBulkUser_user9X@TestL98_success" ),
+                  '951404204AFC: Bulk delete of the user user9X@TestL98 is OK',
+                  '951404204AFC: Bulk Delete of the user user9X@TestL98 is FAILED' );
+
+        //Fail because user01@TestL01 only has role MasterL01, cannot delete user of user group Administrator
+        //*** Delete user admin01@system.net ***
+        myAssert( await test_deleteBulkUser( headers_user01_at_TestL01_Session1,
+                                             {
+                                               bulk: [
+                                                       { Name: "admin01@system.net" }
+                                                     ]
+                                             },
+                                             "ERROR_BULK_USER_DELETE",
+                                             "test_deleteBulkUser_admin01@system_net_success" ),
+                  '54CEC84EB683: Bulk delete of the user admin01@system.net is OK with the fail',
+                  '54CEC84EB683: Bulk Delete of the user admin01@system.net is FAILED' );
 
         //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
         myAssert( await test_createUser_user98_at_TestL98( headers_user01_at_TestL01_Session1,
@@ -3869,7 +4200,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL01_success",
-                    2,
+                    1,
                     1 ),
                     '6CAE1B5074FE: Search of the binary data user02@TestL01 is OK',
                     '6CAE1B5074FE: Search of the binary data user02@TestL01 is FAILED' );
@@ -3878,7 +4209,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    2,
+                    1,
                     1 ),
                     'BA12C15C021E: Search count of the binary data user02@TestL01 is OK',
                     'BA12C15C021E: Search count of the binary data user02@TestL01 is FAILED' );
@@ -3887,7 +4218,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL01_success",
-                    2,
+                    1,
                     2 ),
                     '30CC59357B73: Search of the user user01@TestL01 is OK',
                     '30CC59357B73: Search of the user user01@TestL01 is FAILED' );
@@ -3896,7 +4227,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL01_success",
-                    2,
+                    1,
                     2 ),
                     '447DC61A3301: Search count of the binary data user01@TestL01 is OK',
                     '447DC61A3301: Search count of the binary data user01@TestL01 is FAILED' );
@@ -3958,7 +4289,7 @@ async function test_set01() {
         //Fail because the user bmanager02@system.net is not in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
         myAssert( await test_deleteUser( headers_user01_at_TestL01_Session1,
                                          { Name: "bmanager02@system.net" },
-                                         "ERROR_CANNOT_DELETE_THE_INFORMATION",
+                                         "ERROR_CANNOT_DELETE_USER",
                                          "test_deleteUser_bmanager02@system.net_fail" ),
                   '8E8766DECAD0: Delete of the user bmanager02@system.net is OK with the fail',
                   '8E8766DECAD0: Delete of the user bmanager02@system.net is FAILED' );
@@ -4177,7 +4508,7 @@ async function test_set01() {
                   {  },
                   "SUCCESS_SEARCH",
                   "test_search_user01@TestL02_success",
-                  2,
+                  1,
                   1 ),
                   '7C542CAC93F9: Search of the binary data user01@TestL02 is OK',
                   '7C542CAC93F9: Search of the binary data user01@TestL02 is FAILED' );
@@ -4186,7 +4517,7 @@ async function test_set01() {
                   {  },
                   "SUCCESS_SEARCH_COUNT",
                   "test_searchCount_user01@TestL02_success",
-                  2,
+                  1,
                   1 ),
                   '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is OK',
                   '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is FAILED' );
@@ -4296,7 +4627,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL02_success",
-                    2,
+                    1,
                     1 ),
                     'BA8DDFDEC334: Search of the binary data user02@TestL02 is OK',
                     'BA8DDFDEC334: Search of the binary data user02@TestL02 is FAILED' );
@@ -4305,7 +4636,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    2,
+                    1,
                     1 ),
                     'E21BF5EF740F: Search count of the binary data user02@TestL02 is OK',
                     'E21BF5EF740F: Search count of the binary data user02@TestL02 is FAILED' );
@@ -4314,7 +4645,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL02_success",
-                    2,
+                    1,
                     2 ),
                     'BA8DDFDEC334: Search of the binary data user01@TestL02 is OK',
                     'BA8DDFDEC334: Search of the binary data user01@TestL02 is FAILED' );
@@ -4323,7 +4654,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL02_success",
-                    2,
+                    1,
                     2 ),
                     'C107CF6AA8EB: Search count of the binary data user01@TestL02 is OK',
                     'C107CF6AA8EB: Search count of the binary data user01@TestL02 is FAILED' );
@@ -4414,7 +4745,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL01_success",
-                    2,
+                    1,
                     1 ),
                     '42D17A37758A: Search of the binary data user02@TestL01 is OK',
                     '42D17A37758A: Search of the binary data user02@TestL01 is FAILED' );
@@ -4423,7 +4754,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    2,
+                    1,
                     1 ),
                     '7A542D403847: Search count of the binary data user02@TestL01 is OK',
                     '7A542D403847: Search count of the binary data user02@TestL01 is FAILED' );
@@ -4432,7 +4763,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL02_success",
-                    2,
+                    1,
                     3 ),
                     'FA694F2DF9DB: Search of the binary data user01@TestL02 is OK',
                     'FA694F2DF9DB: Search of the binary data user01@TestL02 is FAILED' );
@@ -4441,7 +4772,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL02_success",
-                    2,
+                    1,
                     3 ),
                     '3C577FAE6D3C: Search count of the binary data user01@TestL02 is OK',
                     '3C577FAE6D3C: Search count of the binary data user01@TestL02 is FAILED' );

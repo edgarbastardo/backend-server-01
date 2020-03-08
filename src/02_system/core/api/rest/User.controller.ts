@@ -74,8 +74,9 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#GetUserL01#,#GetUserL02#,#GetUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "GetUserL01", "GetUserL02", "GetUserL03" ], Description: "Get the information for one user" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#CreateUserL01#,#CreateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "CreateUserL01", "CreateUserL03" ], Description: "Create new user information" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Update existent user information" },
-                                  { Path: UserController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Disable existent user group in bulk" },
-                                  { Path: UserController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Enable existent user group in bulk" },
+                                  { Path: UserController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Disable existent users in bulk" },
+                                  { Path: UserController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Enable existent users in bulk" },
+                                  { Path: UserController._BASE_PATH + "/move/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateUserL01#,#UpdateUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserL01", "UpdateUserL02", "UpdateUserL03" ], Description: "Move existent users to another user group in bulk" },
                                   { Path: UserController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteUserL01#,#DeleteUserL02#,#UpdateUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteUserL01", "DeleteUserL02", "DeleteUserL03" ], Description: "Delete the user information" },
                                   { Path: UserController._BASE_PATH + "/bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteUserL01#,#DeleteUserL02#,#DeleteUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteUserL01", "DeleteUserL02", "DeleteUserL03" ], Description: "Delete the user information in bulk" },
                                   { Path: UserController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchUserL01#,#SearchUserL02#,#SearchUserL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchUserL01", "SearchUserL02", "SearchUserL03" ], Description: "Search for users information" },
@@ -495,6 +496,60 @@ export default class UserController {
 
   }
 
+  @httpPut(
+            "/disable/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async disableBulkUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.disableBulkUser( request,
+                                                                null,
+                                                                this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/enable/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async enableBulkUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.enableBulkUser( request,
+                                                               null,
+                                                               this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/move/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async moveBulkUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.moveBulkUser( request,
+                                                             null,
+                                                             this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpDelete(
                "",
                MiddlewareManager.middlewareSetContext,
@@ -508,6 +563,24 @@ export default class UserController {
     const result = await UserServiceController.deleteUser( request,
                                                            null,
                                                            this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "/bulk",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized,
+             )
+  async deleteBulkUser( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserServiceController.deleteBulkUser( request,
+                                                               null,
+                                                               this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
