@@ -27,7 +27,7 @@ import SystemUtilities from '../../../../../../02_system/common/SystemUtilities'
 import SYSRouteService from '../../../../../../02_system/common/database/services/SYSRouteService';
 import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
 import MiddlewareManager from '../../../../../../02_system/common/managers/MiddlewareManager';
-import Dev000ServicesController from "../../../../services/Dev000Service.controller";
+import Dev000ServicesController from "../../../../services/v1/Dev000Service.controller";
 
 const debug = require( 'debug' )( 'Dev000.controller' );
 

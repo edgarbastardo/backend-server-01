@@ -6997,9 +6997,9 @@ export default class UserServiceController {
                                                             userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
           if ( result.isAuthorizedL01 &&
-                ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
-                  userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
-                  userSessionStatus.GroupId !== sysUserGroup.Id ) ) {
+               ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
+                 userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
+                 userSessionStatus.UserGroupId !== sysUserGroup.Id ) ) {
 
             //Uhathorized
             result.isNotAuthorized = true;
@@ -9501,13 +9501,13 @@ export default class UserServiceController {
             if ( strBulkOperation === "deleteUser" ) {
 
               strCode = 'ERROR_CANNOT_DELETE_USER';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' );
+              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you NOT has.' );
 
             }
             else {
 
               strCode = 'ERROR_CANNOT_UPDATE_USER';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you not had.' );
+              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you NOT has.' );
 
             }
 
@@ -9531,6 +9531,8 @@ export default class UserServiceController {
                                                                 sysUserInDB,
                                                                 strBulkOperation === "deleteUser" ? "DeleteUser": "UpdateUser",
                                                                 logger );
+
+            let resultCheckUserGroupRoles = null;
 
             if ( !resultCheckUserRoles.isAuthorizedAdmin &&
                  !resultCheckUserRoles.isAuthorizedL03 &&
@@ -9579,25 +9581,27 @@ export default class UserServiceController {
 
               if ( strBulkOperation === "moveToUserGroup" ) {
 
-                resultCheckUserRoles = this.checkUserGroupRoleLevel(
-                                                                     userSessionStatus,
-                                                                     {
-                                                                       Id: bulkUserData.sysUserGroup.Id,
-                                                                       ShortId: bulkUserData.sysUserGroup.ShortId,
-                                                                       Name: bulkUserData.sysUserGroup.Name,
-                                                                     },
-                                                                     "UpdateUser",
-                                                                     logger
-                                                                   );
+                resultCheckUserGroupRoles = this.checkUserGroupRoleLevel(
+                                                                          userSessionStatus,
+                                                                          {
+                                                                            Id: bulkUserData.sysUserGroup.Id,
+                                                                            ShortId: bulkUserData.sysUserGroup.ShortId,
+                                                                            Name: bulkUserData.sysUserGroup.Name,
+                                                                          },
+                                                                          "UpdateUser",
+                                                                          logger
+                                                                        );
+
+              }
+              else {
+
+                resultCheckUserGroupRoles = resultCheckUserRoles;
 
               }
 
             }
 
-            if ( !resultCheckUserRoles.isAuthorizedAdmin &&
-                 !resultCheckUserRoles.isAuthorizedL03 &&
-                 !resultCheckUserRoles.isAuthorizedL02 &&
-                 !resultCheckUserRoles.isAuthorizedL01 ) {
+            if ( resultCheckUserGroupRoles.isNotAuthorized ) {
 
               result.errors.push(
                                   {
@@ -9670,6 +9674,19 @@ export default class UserServiceController {
               if (  sysUserInDB !== null ) {
 
                 if ( strBulkOperation === "deleteUser" ) {
+
+                  const strPersonId = sysUserInDB.sysPerson ? sysUserInDB.sysPerson.Id: null;
+
+                  if ( strPersonId &&
+                       await SYSUserService.countUsersWithPerson( strPersonId,
+                                                                  transaction,
+                                                                  logger ) === 1 ) {
+
+                    await SYSPersonService.deleteByModel( sysUserInDB.sysPerson,
+                                                          transaction,
+                                                          logger );
+
+                  }
 
                   const deleteResult = await SYSUserService.deleteByModel( sysUserInDB,
                                                                            transaction,

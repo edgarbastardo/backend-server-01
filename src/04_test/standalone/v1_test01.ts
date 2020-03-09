@@ -160,7 +160,7 @@ export async function call_login( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/security/authentication/login";
+    strRequestPath = strRequestPath + "/v1/system/security/authentication/login";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -205,7 +205,7 @@ export async function call_tokenCheck( headers: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/security/authentication/token/check";
+    strRequestPath = strRequestPath + "/v1/system/security/authentication/token/check";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -248,7 +248,7 @@ export async function call_profile( headers: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user/profile";
+    strRequestPath = strRequestPath + "/v1/system/user/profile";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -293,7 +293,7 @@ export async function call_logout( headers: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/security/authentication/logout";
+    strRequestPath = strRequestPath + "/v1/system/security/authentication/logout";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -337,7 +337,7 @@ export async function call_userSearch( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user/search";
+    strRequestPath = strRequestPath + "/v1/system/user/search";
 
     let strQueryParams = "";
 
@@ -436,7 +436,7 @@ export async function call_userSearchCount( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user/search/count";
+    strRequestPath = strRequestPath + "/v1/system/user/search/count";
 
     let strQueryParams = "";
 
@@ -534,7 +534,7 @@ export async function call_change_password( headers: any, body: any ): Promise<a
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user/password/change";
+    strRequestPath = strRequestPath + "/v1/system/user/password/change";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -579,7 +579,7 @@ export async function call_createUser( headers: any, body: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user";
+    strRequestPath = strRequestPath + "/v1/system/user";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -624,7 +624,142 @@ export async function call_updateUser( headers: any, body: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user";
+    strRequestPath = strRequestPath + "/v1/system/user";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = body;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+export async function call_disableBulkUser( headers: any, body: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'PUT',
+                      body: JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/v1/system/user/disable/bulk";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = body;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+export async function call_moveBulkUser( headers: any, body: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'PUT',
+                      body: JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/v1/system/user/move/bulk";
+
+    const callResult = await fetch( strRequestPath,
+                                    options );
+
+    result.output = callResult ? {
+                                   status: callResult.status,
+                                   statusText: callResult.statusText,
+                                   body: await callResult.json()
+                                  }:
+                                  {
+                                   status: null,
+                                   statusText: null,
+                                   body: { Code: "" }
+                                  };
+
+    ( options as any ).body = body;
+
+    result.input = options;
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return result;
+
+}
+
+export async function call_enableBulkUser( headers: any, body: any ): Promise<any> {
+
+  let result = { input: null, output: null };
+
+  try {
+
+    const options = {
+                      method: 'PUT',
+                      body: JSON.stringify( body ),
+                      headers: headers,
+                    };
+
+    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+    strRequestPath = strRequestPath + "/v1/system/user/enable/bulk";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -669,7 +804,7 @@ export async function call_deleteUser( headers: any, query: any ): Promise<any> 
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
+    strRequestPath = strRequestPath + "/v1/system/user?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -700,7 +835,6 @@ export async function call_deleteUser( headers: any, query: any ): Promise<any> 
 
 }
 
-
 export async function call_deleteBulkUser( headers: any, body: any ): Promise<any> {
 
   let result = { input: null, output: null };
@@ -715,7 +849,7 @@ export async function call_deleteBulkUser( headers: any, body: any ): Promise<an
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/user/bulk";
+    strRequestPath = strRequestPath + "/v1/system/user/bulk";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -760,7 +894,7 @@ export async function call_deleteUserGroup( headers: any, query: any ): Promise<
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/usergroup?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
+    strRequestPath = strRequestPath + "/v1/system/usergroup?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -805,7 +939,7 @@ export async function call_createAuth( headers: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary/auth";
+    strRequestPath = strRequestPath + "/v1/system/binary/auth";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -848,7 +982,7 @@ export async function call_deleteAuth( headers: any ): Promise<any> {
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary/auth";
+    strRequestPath = strRequestPath + "/v1/system/binary/auth";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -892,7 +1026,7 @@ export async function call_binarySearch( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary/search";
+    strRequestPath = strRequestPath + "/v1/system/binary/search";
 
     let strQueryParams = "";
 
@@ -991,7 +1125,7 @@ export async function call_binarySearchCount( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary/search/count";
+    strRequestPath = strRequestPath + "/v1/system/binary/search/count";
 
     let strQueryParams = "";
 
@@ -1045,7 +1179,7 @@ export async function call_uploadBinaryData( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary";
+    strRequestPath = strRequestPath + "/v1/system/binary";
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -1090,7 +1224,7 @@ async function call_downloadBinaryData( headers: any, query: any ): Promise<any>
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary?id=" + query.Id + "&auth=" + headers.BinaryDataToken + "&thumbnail=" + query.Thumbnail;
+    strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id + "&auth=" + headers.BinaryDataToken + "&thumbnail=" + query.Thumbnail;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -1152,7 +1286,7 @@ export async function call_deleteBinaryData( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary?id=" + query.Id;
+    strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -1198,7 +1332,7 @@ export async function call_getBinaryDataDetails( headers: any,
 
     let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
 
-    strRequestPath = strRequestPath + "/system/binary/details?id=" + query.Id;
+    strRequestPath = strRequestPath + "/v1/system/binary/details?id=" + query.Id;
 
     const callResult = await fetch( strRequestPath,
                                     options );
@@ -2302,6 +2436,105 @@ export async function test_getImageDetails( headers: any,
                                                     {
                                                       Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
                                                     } ); //This request must be success
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_disableBulkUser( headers: any,
+                                           userData: any,
+                                           strCode: string,
+                                           strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    let result = await call_disableBulkUser( headers, userData ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_enableBulkUser( headers: any,
+                                           userData: any,
+                                           strCode: string,
+                                           strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    let result = await call_enableBulkUser( headers, userData ); //This request must be fail
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      bResult = true;
+
+    }
+
+  }
+  catch ( error ) {
+
+    console.log( error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_moveBulkUser( headers: any,
+                                         userData: any,
+                                         strCode: string,
+                                         strFileName: string ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    let result = await call_moveBulkUser( headers, userData ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -4057,6 +4290,73 @@ async function test_set01() {
                   'D3517EFAE8D8: Creation of the user user96@TestL98 is OK',
                   'D3517EFAE8D8: Creation of the user user96@TestL98 is FAILED' );
 
+        //*** Disable user user9X@TestL98 ***
+        myAssert( await test_disableBulkUser( headers_user01_at_TestL01_Session1,
+                                              {
+                                                bulk: [
+                                                        { Id: user96_at_TestL98_data.Id },
+                                                        { Id: user97_at_TestL98_data.Id },
+                                                        { Id: user98_at_TestL98_data.Id }
+                                                      ]
+                                              },
+                                              "SUCCESS_BULK_USER_DISABLE",
+                                              "test_disableBulkUser_user9X@TestL98_success" ),
+                  'A1B75AC57AD0: Bulk disable of the user user9X@TestL98 is OK',
+                  'A1B75AC57AD0: Bulk disable of the user user9X@TestL98 is FAILED' );
+
+        //*** Enable user user9X@TestL98 ***
+        myAssert( await test_enableBulkUser( headers_user01_at_TestL01_Session1,
+                                             {
+                                               bulk: [
+                                                       { Id: user96_at_TestL98_data.Id },
+                                                       { Id: user97_at_TestL98_data.Id },
+                                                       { Id: user98_at_TestL98_data.Id }
+                                                     ]
+                                             },
+                                             "SUCCESS_BULK_USER_ENABLE",
+                                             "test_enableBulkUser_user9X@TestL98_success" ),
+                  '7862BE0C629A: Bulk enable of the user user9X@TestL98 is OK',
+                  '7862BE0C629A: Bulk enable of the user user9X@TestL98 is FAILED' );
+
+        //*** Move user user9X@TestL98 to the user group System_Administrators ***
+        // Fail because not role to do
+        myAssert( await test_moveBulkUser( headers_user01_at_TestL01_Session1,
+                                           {
+                                             bulk: [
+                                                     { Id: user96_at_TestL98_data.Id, sysUserGroup: { Name: "System_Administrators" } },
+                                                     { Id: user97_at_TestL98_data.Id, sysUserGroup: { Name: "System_Administrators" } },
+                                                     { Id: user98_at_TestL98_data.Id, sysUserGroup: { Name: "System_Administrators" } }
+                                                   ]
+                                           },
+                                           "ERROR_BULK_USER_MOVE",
+                                           "test_moveBulkUser_user9X@TestL98_fail" ),
+                  '2F8ECA7DF210: Bulk move of the user user9X@TestL98 is OK with the fail',
+                  '2F8ECA7DF210: Bulk move of the user user9X@TestL98 is FAILED' );
+
+        //*** Disable user admin01@system.net ***
+        myAssert( await test_disableBulkUser( headers_user01_at_TestL01_Session1,
+                                              {
+                                                bulk: [
+                                                        { Name: "admin01@system.net" },
+                                                      ]
+                                              },
+                                              "ERROR_BULK_USER_DISABLE",
+                                              "test_disableBulkUser_admin01@system.net_fail" ),
+                  'DE215786AFEC: Bulk disable of the user admin01@system.net is OK with the fail',
+                  'DE215786AFEC: Bulk disable of the user admin01@system.net is FAILED' );
+
+        //*** Disable user admin01@system.net ***
+        myAssert( await test_enableBulkUser( headers_user01_at_TestL01_Session1,
+                                             {
+                                               bulk: [
+                                                       { Name: "admin01@system.net" },
+                                                     ]
+                                             },
+                                             "ERROR_BULK_USER_ENABLE",
+                                             "test_enableBulkUser_admin01@system.net_fail" ),
+                  '7862BE0C629A: Bulk enable of the user admin01@system.net is OK with the fail',
+                  '7862BE0C629A: Bulk enable of the user admin01@system.net is FAILED' );
+
         //*** Delete user user9X@TestL98 ***
         myAssert( await test_deleteBulkUser( headers_user01_at_TestL01_Session1,
                                              {
@@ -4467,6 +4767,82 @@ async function test_set01() {
                   2 ), //Count
                  '656BB66AC356: Search count of the user user02@TestL02 is OK',
                  '656BB66AC356: Search count of the user user02@TestL02 is FAILED' );
+
+        //*** Disable user user0X@TestL0X ***
+        myAssert( await test_disableBulkUser( headers_user01_at_TestL02,
+                                              {
+                                                bulk: [
+                                                        { Name: "user02@TestL01" },
+                                                        { Name: "user02@TestL02" }
+                                                      ]
+                                              },
+                                              "SUCCESS_BULK_USER_DISABLE",
+                                              "test_disableBulkUser_user0X@TestL0X_success" ),
+                  '8E9DB16E7023: Bulk disable of the user user0X@TestL0X is OK',
+                  '8E9DB16E7023: Bulk disable of the user user0X@TestL0X is FAILED' );
+
+        //*** Enable user user0X@TestL0X ***
+        myAssert( await test_enableBulkUser( headers_user01_at_TestL02,
+                                             {
+                                               bulk: [
+                                                       { Name: "user02@TestL01" },
+                                                       { Name: "user02@TestL02" }
+                                                     ]
+                                             },
+                                             "SUCCESS_BULK_USER_ENABLE",
+                                             "test_enableBulkUser_user0X@TestL0X_success" ),
+                  '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is OK',
+                  '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is FAILED' );
+
+        //*** Move user user02@TestL01 to the user group TestL02 ***
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+        myAssert( await test_moveBulkUser( headers_user01_at_TestL02,
+                                           {
+                                             bulk: [
+                                                     { Name: "user02@TestL01", sysUserGroup: { Name: "TestL02" } },
+                                                   ]
+                                           },
+                                           "SUCCESS_BULK_USER_MOVE",
+                                           "test_moveBulkUser_user02@TestL01_success" ),
+                  '6C86B6F735D4: Bulk move of the user user02@TestL01 is OK',
+                  '6C86B6F735D4: Bulk move of the user user02@TestL01 is FAILED' );
+
+        //*** Move user user02@TestL01 to the user group TestL01 ***
+        //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+        myAssert( await test_moveBulkUser( headers_user01_at_TestL02,
+                                           {
+                                             bulk: [
+                                                     { Name: "user02@TestL01", sysUSerGroup: { Name: "TestL01" } },
+                                                   ]
+                                           },
+                                           "SUCCESS_BULK_USER_MOVE",
+                                           "test_moveBulkUser_user02@TestL01_success" ),
+                  'A2C9A83F7C7C: Bulk move of the user user02@TestL01 is OK',
+                  'A2C9A83F7C7C: Bulk move of the user user02@TestL01 is FAILED' );
+
+        //*** Disable user admin01@system.net ***
+        myAssert( await test_disableBulkUser( headers_user01_at_TestL02,
+                                              {
+                                                bulk: [
+                                                        { Name: "admin01@system.net" },
+                                                      ]
+                                              },
+                                              "ERROR_BULK_USER_DISABLE",
+                                              "test_disableBulkUser_admin01@system.net_fail" ),
+                  'EF697A2EF29C: Bulk disable of the user admin01@system.net is OK with the fail',
+                  'EF697A2EF29C: Bulk disable of the user admin01@system.net is FAILED' );
+
+        //*** Disable user admin01@system.net ***
+        myAssert( await test_enableBulkUser( headers_user01_at_TestL02,
+                                             {
+                                               bulk: [
+                                                       { Name: "admin01@system.net" },
+                                                     ]
+                                             },
+                                             "ERROR_BULK_USER_ENABLE",
+                                             "test_enableBulkUser_admin01@system.net_fail" ),
+                  '0354A125E68F: Bulk enable of the user admin01@system.net is OK with the fail',
+                  '0354A125E68F: Bulk enable of the user admin01@system.net is FAILED' );
 
         myAssert( await test_uploadImageRoad( headers_user01_at_TestL02,
                                               "SUCCESS_BINARY_DATA_UPLOAD",

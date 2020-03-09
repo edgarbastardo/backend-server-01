@@ -55,7 +55,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program Test 01 REST API",
-      "program": "${workspaceFolder}/src/04_test/standalone/test01.ts",
+      "program": "${workspaceFolder}/src/04_test/standalone/v1_test01.ts",
       "args": [
         "--username=admin05@system.net",
         "--password=admin5.123456.",
