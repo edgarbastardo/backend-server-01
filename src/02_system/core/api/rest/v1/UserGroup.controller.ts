@@ -7,12 +7,12 @@ import {
   //NextFunction
 } from 'express';
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from '../../../../common/CommonConstants';
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -31,8 +31,8 @@ import {
   inject
 } from 'inversify';
 //import SecurityServiceController from '../../services/SecurityService.controller';
-import UserGroupServiceController from '../../services/UserGroupService.controller';
-import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+import UserGroupServiceController from '../../../services/v1/UserGroupService.controller';
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 //import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'UserGroup.controller' );
@@ -53,7 +53,7 @@ export default class UserGroupController {
   //Not for me: The secondary role for the user can be defined ExtraData
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/system/usergroup";
+  static readonly _BASE_PATH = "/v1/system/usergroup";
 
   static readonly _ROUTE_INFO = [
                                   { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#GetUserGroupL01#,#GetUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "GetUserGroupL01", "GetUserGroupL03" ], Description: "Get the information for one user group" },

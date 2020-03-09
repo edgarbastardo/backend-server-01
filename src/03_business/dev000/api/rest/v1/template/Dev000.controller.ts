@@ -19,15 +19,15 @@ import {
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 
-import CommonConstants from '../../../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../../../02_system/common/SystemUtilities';
 
-import SYSRouteService from '../../../../../02_system/common/database/services/SYSRouteService';
-import I18NManager from '../../../../../02_system/common/managers/I18Manager';
-import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
-import Dev000ServicesController from "../../../services/Dev000Service.controller";
+import SYSRouteService from '../../../../../../02_system/common/database/services/SYSRouteService';
+import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
+import MiddlewareManager from '../../../../../../02_system/common/managers/MiddlewareManager';
+import Dev000ServicesController from "../../../../services/Dev000Service.controller";
 
 const debug = require( 'debug' )( 'Dev000.controller' );
 
@@ -46,7 +46,7 @@ export default class Dev000Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/business/dev000/example";
+  static readonly _BASE_PATH = "/v1/business/dev000/example";
 
   static readonly _ROUTE_INFO = [
                                   { Path: Dev000Controller._BASE_PATH + "/", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
@@ -136,10 +136,10 @@ export default class Dev000Controller {
                    };
                    */
 
-    const result = await Dev000ServicesController.processDev000Example( request,
-                                                                        response,
-                                                                        null,
-                                                                        this._controllerLogger || context.Logger );
+    const result = await Dev000ServicesController.getDev000Example( request,
+                                                                    response,
+                                                                    null,
+                                                                    this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
 

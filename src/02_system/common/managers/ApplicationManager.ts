@@ -28,7 +28,7 @@ import SystemUtilities from "../SystemUtilities";
 //import CoreGraphQLApiLoader from '../../core/api/ModelToRestAPI/CoreGraphQLAPILoader';
 //import ModelServiceLoader from '../database/services/ModelServiceLoader';
 import I18NManager from "./I18Manager";
-import BinaryServiceController from "../../core/services/BinaryService.controller";
+import BinaryServiceController from "../../core/services/v1/BinaryService.controller";
 import GraphQLAPIManager from './GraphQLAPIManager';
 import RestAPIManager from './RestAPIManager';
 

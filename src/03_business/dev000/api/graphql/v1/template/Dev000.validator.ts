@@ -1,7 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
-import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
-import I18NManager from '../../../../../02_system/common/managers/I18Manager';
+import CommonUtilities from '../../../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../../../02_system/common/SystemUtilities';
+import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
 //import { extensions } from 'sequelize/types/lib/utils/validator-extras';
 
 const debug = require( 'debug' )( 'Dev000.validator' );
@@ -10,7 +10,7 @@ export const validators = {
 
   Query: {
 
-    getDev000: ( resolve: any, obj: any, args: any, context: any ) => {
+    getDev000V1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       const strLanguage = context.Language;
 
@@ -80,7 +80,7 @@ export const validators = {
 
   Mutation: {
 
-    addDev000: ( resolve: any, obj: any, args: any, context: any ) => {
+    addDev000V1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       const strLanguage = context.Language;
 

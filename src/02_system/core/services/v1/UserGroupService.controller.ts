@@ -15,16 +15,16 @@ import {
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../common/SystemContants";
-import { ICheckUserGroupRoles } from '../../common/SystemContants';
-import CommonConstants from "../../common/CommonConstants";
+import { ICheckUserGroupRoles } from '../../../common/SystemContants';
+import CommonConstants from "../../../common/CommonConstants";
 
-import CommonUtilities from "../../common/CommonUtilities";
-import SystemUtilities from "../../common/SystemUtilities";
+import CommonUtilities from "../../../common/CommonUtilities";
+import SystemUtilities from "../../../common/SystemUtilities";
 
-import DBConnectionManager from '../../common/managers/DBConnectionManager';
+import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 
-import SYSUserGroupService from "../../common/database/services/SYSUserGroupService";
-import I18NManager from "../../common/managers/I18Manager";
+import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
+import I18NManager from "../../../common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'UserGroupServiceController' );
 

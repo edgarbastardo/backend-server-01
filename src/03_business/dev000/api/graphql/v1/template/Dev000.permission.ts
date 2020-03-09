@@ -1,7 +1,7 @@
 import { allow, rule, and } from 'graphql-shield';
 import cluster from "cluster";
 
-import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
+import MiddlewareManager from '../../../../../../02_system/common/managers/MiddlewareManager';
 
 //import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
@@ -11,13 +11,13 @@ export const permissions = {
 
   Query: {
 
-    getDev000: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
+    getDev000V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
 
   },
 
   Mutation: {
 
-    addDev000: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
+    addDev000V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
 
   }
 
@@ -29,8 +29,8 @@ export const permissions = {
 
 export const roles = {
 
-  getDev000: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example query" },
-  addDev000: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example mutation" },
+  getDev000V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example query" },
+  addDev000V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example mutation" },
 
 }
 

@@ -1,13 +1,13 @@
 import { UserInputError } from 'apollo-server-express';
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from '../../../common/SystemUtilities';
-import I18NManager from '../../../common/managers/I18Manager';
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from '../../../../common/SystemUtilities';
+import I18NManager from '../../../../common/managers/I18Manager';
 
 export const validators = {
 
   Mutation: {
 
-    login: ( resolve: any, obj: any, args: any, context: any ) => {
+    loginV1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       const strLanguage = context.Language;
 
@@ -68,13 +68,13 @@ export const validators = {
 
     },
 
-    logout: ( resolve: any, obj: any, args: any, context: any ) => {
+    logoutV1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       return resolve( obj, args, context ); //No validation needed
 
     },
 
-    tokenCheck: ( resolve: any, obj: any, args: any, context: any ) => {
+    tokenCheckV1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       return resolve( obj, args, context ); //No validation needed
 

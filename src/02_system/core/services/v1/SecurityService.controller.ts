@@ -5,25 +5,25 @@ import cluster from 'cluster';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import bcrypt from 'bcrypt';
 
-import CommonConstants from "../../common/CommonConstants";
-import SystemConstants from "../../common/SystemContants";
+import CommonConstants from "../../../common/CommonConstants";
+import SystemConstants from "../../../common/SystemContants";
 
-import SystemUtilities from "../../common/SystemUtilities";
-import CommonUtilities from "../../common/CommonUtilities";
+import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from "../../../common/CommonUtilities";
 
 //import { SYSRole } from "../models/Role";
 //import { SYSUserSessionStatus } from "../models/UserSessionStatus";
 //import { SYSUser } from "../../common/database/models/SYSUser";
 //import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
 //import { SYSPerson } from "../../common/database/models/SYSPerson";
-import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
-import SYSUserSessionStatusService from "../../common/database/services/SYSUserSessionStatusService";
-import SYSUserService from "../../common/database/services/SYSUserService";
+import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
+import SYSUserSessionStatusService from "../../../common/database/services/SYSUserSessionStatusService";
+import SYSUserService from "../../../common/database/services/SYSUserService";
 
-import DBConnectionManager from '../../common/managers/DBConnectionManager';
-import CacheManager from "../../common/managers/CacheManager";
-import I18NManager from "../../common/managers/I18Manager";
-import { SYSUser } from '../../common/database/models/SYSUser';
+import DBConnectionManager from '../../../common/managers/DBConnectionManager';
+import CacheManager from "../../../common/managers/CacheManager";
+import I18NManager from "../../../common/managers/I18Manager";
+import { SYSUser } from '../../../common/database/models/SYSUser';
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 
@@ -1413,7 +1413,7 @@ export default class SecurityServiceController {
           userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
 
           userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
-          userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
+          userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
 
           userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                                                      ( userSessionStatus as any ).dataValues,

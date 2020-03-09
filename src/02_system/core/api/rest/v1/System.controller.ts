@@ -7,12 +7,12 @@ import {
   //NextFunction
 } from 'express';
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from '../../../../common/CommonConstants';
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -31,8 +31,8 @@ import {
   inject
 } from 'inversify';
 //import SecurityServiceController from '../../services/SecurityService.controller';
-import SystemServiceController from '../../services/SystemService.controller';
-import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+import SystemServiceController from '../../../services/v1/SystemService.controller';
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 //import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'System.controller' );
@@ -53,7 +53,7 @@ export default class SystemController {
   //Not for me: The secondary role for the user can be defined ExtraData
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/system";
+  static readonly _BASE_PATH = "/v1/system";
 
   static readonly _ROUTE_INFO = [
                                   { Path: SystemController._BASE_PATH + "/status", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the current status of the backend" },
@@ -124,7 +124,7 @@ export default class SystemController {
 
     const result = await SystemServiceController.getStatus( request,
                                                             null,
-                                                            this._controllerLogger || context.logger );
+                                                            this._controllerLogger || ( context ? context.logger : null ) );
 
     response.status( result.StatusCode ).send( result );
 

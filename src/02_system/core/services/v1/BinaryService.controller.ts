@@ -12,27 +12,27 @@ import {
   Response
 } from 'express';
 
-import CommonConstants from "../../common/CommonConstants";
-import SystemConstants, { ICheckUserRoles } from "../../common/SystemContants";
+import CommonConstants from "../../../common/CommonConstants";
+import SystemConstants, { ICheckUserRoles } from "../../../common/SystemContants";
 
-import CommonUtilities from "../../common/CommonUtilities";
-import SystemUtilities from "../../common/SystemUtilities";
+import CommonUtilities from "../../../common/CommonUtilities";
+import SystemUtilities from "../../../common/SystemUtilities";
 
-import DBConnectionManager from "../../common/managers/DBConnectionManager";
-import MiddlewareManager from '../../common/managers/MiddlewareManager';
-import CacheManager from "../../common/managers/CacheManager";
-import I18NManager from '../../common/managers/I18Manager';
+import DBConnectionManager from "../../../common/managers/DBConnectionManager";
+import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import CacheManager from "../../../common/managers/CacheManager";
+import I18NManager from '../../../common/managers/I18Manager';
 
-import BaseService from "../../common/database/services/BaseService";
-import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
-import SYSBinaryIndexService from "../../common/database/services/SYSBinaryIndexService";
-import SYSUserService from '../../common/database/services/SYSUserService';
-import SYSUserGroupService from '../../common/database/services/SYSUserGroupService';
+import BaseService from "../../../common/database/services/BaseService";
+import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
+import SYSBinaryIndexService from "../../../common/database/services/SYSBinaryIndexService";
+import SYSUserService from '../../../common/database/services/SYSUserService';
+import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
 
-import { SYSUserGroup } from '../../common/database/models/SYSUserGroup';
-import { SYSUser } from '../../common/database/models/SYSUser';
-import { SYSBinaryIndex } from '../../common/database/models/SYSBinaryIndex';
-import { AccessKind } from "../../common/CommonConstants";
+import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
+import { SYSUser } from '../../../common/database/models/SYSUser';
+import { SYSBinaryIndex } from '../../../common/database/models/SYSBinaryIndex';
+import { AccessKind } from "../../../common/CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
 

@@ -1,21 +1,21 @@
 import cluster from 'cluster';
 
-import CommonConstants, { HTTPMethod } from "../../../common/CommonConstants";
+import CommonConstants, { HTTPMethod } from "../../../../common/CommonConstants";
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
 import { Router, Request, Response, NextFunction } from 'express';
 
 //import { Route } from '../../../common/database/models/Route';
-import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
+import DBConnectionManager from "../../../../common/managers/DBConnectionManager";
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
 //import ModelServiceLoader from "../../../common/database/ModelServiceLoader";
-import { ModelToRestAPIServiceController } from '../../services/ModelToRestAPIService.controller';
+import { ModelToRestAPIServiceController } from '../../../services/v1/ModelToRestAPIService.controller';
 //import dbConnection from "../../../common/managers/DBConnectionManager";
-import ModelServiceManager from "../../../common/managers/ModelServiceManager";
-import I18NManager from "../../../common/managers/I18Manager";
-import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+import ModelServiceManager from "../../../../common/managers/ModelServiceManager";
+import I18NManager from "../../../../common/managers/I18Manager";
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 
 const debug = require( 'debug' )( 'DatabaseModel.controller' );
 
@@ -34,7 +34,7 @@ export default class DatabaseModelController {
 
   static readonly _TO_IOC_CONTAINER = false;
 
-  static readonly _BASE_PATH = "/database/model";
+  static readonly _BASE_PATH = "/v1/database/model";
 
   static readonly _ROUTE_INFO = [
                                   { Path: DatabaseModelController._BASE_PATH + "/:name", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Get model data by id" }, //GET

@@ -20,15 +20,15 @@ import {
   inject
 } from 'inversify';
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from '../../../../common/CommonConstants';
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
-import SecurityServiceController from '../../services/SecurityService.controller';
-import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import SecurityServiceController from '../../../services/v1/SecurityService.controller';
+import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
 
 const debug = require( 'debug' )( 'Authentication.controller' );
 
@@ -47,7 +47,7 @@ export default class AuthenticationController {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/system/security/authentication";
+  static readonly _BASE_PATH = "/v1/system/security/authentication";
 
   static readonly _ROUTE_INFO = [
                                   { Path: AuthenticationController._BASE_PATH + "/login", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },

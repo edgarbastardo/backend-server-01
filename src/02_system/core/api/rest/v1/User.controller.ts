@@ -7,13 +7,13 @@ import {
   //NextFunction
 } from 'express';
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from '../../../../common/CommonConstants';
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
 import { ApolloError } from 'apollo-server-express';
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -32,10 +32,10 @@ import {
   inject
 } from 'inversify';
 //import SecurityServiceController from '../../services/SecurityService.controller';
-import UserServiceController from '../../services/UserService.controller';
-import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+import UserServiceController from '../../../services/v1/UserService.controller';
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 //import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
-import I18NManager from '../../../common/managers/I18Manager';
+import I18NManager from '../../../../common/managers/I18Manager';
 
 const debug = require( 'debug' )( 'User.controller' );
 
@@ -55,7 +55,7 @@ export default class UserController {
   //Not for me: The secondary role for the user can be defined ExtraData
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/system/user";
+  static readonly _BASE_PATH = "/v1/system/user";
 
   static readonly _ROUTE_INFO = [
                                   { Path: UserController._BASE_PATH + "/signup", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account" },
@@ -84,6 +84,7 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/routes", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
+                                  //{ Path: UserController._BASE_PATH + "/routes1", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
   _controllerLogger = null;

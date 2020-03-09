@@ -42,7 +42,7 @@ import {
   JSONResolver,
   //JSONObjectResolver,
 } from 'graphql-scalars';
-import I18NManager from '../../../common/managers/I18Manager';
+import I18NManager from '../../../../common/managers/I18Manager';
 
 export const typeDefs = readFileSync(`${ __dirname }/root.graphql`, 'utf8');
 

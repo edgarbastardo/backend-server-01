@@ -1,0 +1,3621 @@
+{
+	"info": {
+		"_postman_id": "fea0f77d-1af0-4978-a9fe-671478c32a85",
+		"name": "Backend-Server-01-Node-JS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v1",
+			"item": [
+				{
+					"name": "/dabatase",
+					"item": [
+						{
+							"name": "sysUser",
+							"item": [
+								{
+									"name": "get",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/database/model/sysUser?include=[ { \"model\": \"sysUserGroup\" }, { \"model\": \"sysPerson\" } ]&where={ \"Id\": \"508a78a2-7906-4cb2-93ad-a7b0a80aa9a6\" }",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"database",
+												"model",
+												"sysUser"
+											],
+											"query": [
+												{
+													"key": "where",
+													"value": "{ \"$or\": [ { \"id\": { \"$eq\": 1 } }, { \"id\": { \"$eq\": 2 } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "attributes",
+													"value": "[ \"Name\" ]",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"$and\": [ { \"id\": { \"$eq\": 1 } }, { \"id\": { \"$eq\": 2 } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"Id\": \"092be78e-d953-441e-83e0-aca6bf200bba\" }",
+													"disabled": true
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\" }, { \"model\": \"sysPerson\" } ]"
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\", \"where\": { \"Name\": \"Business_Managers\" } } ] ",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"Id\": \"508a78a2-7906-4cb2-93ad-a7b0a80aa9a6\" }"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "search",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/database/model/sysUser/search?attributes=[ \"Name\", \"Password\" ]&offset=0&limit=200&order=[ [ \"Name\" , \"DESC\" ] ]&include=[ { \"model\": \"sysUserGroup\", \"where\": { \"Name\": \"Business_Managers\" }, \"attributes\": [ \"Name\" ]  } ] ",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"database",
+												"model",
+												"sysUser",
+												"search"
+											],
+											"query": [
+												{
+													"key": "where",
+													"value": "{ \"$or\": [ { \"Id\": { \"$eq\": \"1\" } }, { \"Id\": { \"$eq\": \"2\" } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"$and\": [ { \"Id\": { \"$eq\": \"1\" } }, { \"Id\": { \"$eq\": \"2\" } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "attributes",
+													"value": "[ \"Name\", \"Password\" ]"
+												},
+												{
+													"key": "offset",
+													"value": "0"
+												},
+												{
+													"key": "limit",
+													"value": "200"
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\" } ]",
+													"disabled": true
+												},
+												{
+													"key": "order",
+													"value": "[ [ \"Name\" , \"DESC\" ] ]",
+													"description": "[ [ \"process\" , \"ASC\" ] ]"
+												},
+												{
+													"key": "where",
+													"value": "{ \"$or\": [ { \"Name\": { \"$like\": \"%\\\\00%\" } }, { \"Id\": { \"$eq\": \"500\" } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\", \"where\": { \"Name\": \"Business_Managers\" }, \"attributes\": [ \"Name\" ]  } ] "
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "search/count",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/database/model/sysUser/search/count?include=[ { \"model\": \"sysUserGroup\", \"where\": { \"Name\": \"Business_Managers\" }, \"attributes\": [ \"Name\" ]  } ]",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"database",
+												"model",
+												"sysUser",
+												"search",
+												"count"
+											],
+											"query": [
+												{
+													"key": "where",
+													"value": "{ \"$or\": [ { \"Id\": { \"$eq\": \"1\" } }, { \"Id\": { \"$eq\": \"2\" } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"$and\": [ { \"Id\": { \"$eq\": \"1\" } }, { \"Id\": { \"$eq\": \"2\" } } ] }",
+													"description": "Return always zero rows",
+													"disabled": true
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\" } ]",
+													"disabled": true
+												},
+												{
+													"key": "where",
+													"value": "{ \"$or\": [ { \"Name\": { \"$like\": \"%\\\\00%\" } }, { \"Id\": { \"$eq\": \"500\" } } ] }",
+													"disabled": true
+												},
+												{
+													"key": "include",
+													"value": "[ { \"model\": \"sysUserGroup\", \"where\": { \"Name\": \"Business_Managers\" }, \"attributes\": [ \"Name\" ]  } ]"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n \t\"GroupId\": \"fe0476b1-d550-4b32-8731-1aa4c8a2c9bd\",\n    \"Name\": \"test01\",\n    \"Password\": \"12345678\",\n    \"PasswordSetAt\": \"2020-10-10T11:11:11\",\n    \"ForceChangePassword\": 0,\n    \"ChangePasswordEvery\": 0,\n    \"Comment\": \"Comment for test01\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/database/model/sysUser",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"database",
+												"model",
+												"sysUser"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create bulk",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"bulk\": [\n\t\t\t  {\n\t\t\t  \t\"GroupId\": \"fe0476b1-d550-4b32-8731-1aa4c8a2c9bd\",\n\t\t\t    \"Name\": \"test01\",\n\t\t\t    \"Password\": \"12345678\",\n\t\t\t    \"PasswordSetAt\": \"2020-10-10T11:11:11\",\n\t\t\t    \"ForceChangePassword\": 0,\n\t\t\t    \"ChangePasswordEvery\": 0,\n\t\t   \t    \"Comment\": \"Comment for test01\"\n\t\t\t  },\n\t\t\t  {\n\t\t\t  \t\"GroupId\": \"fe0476b1-d550-4b32-8731-1aa4c8a2c9bd\",\n\t\t\t    \"Name\": \"test02\",\n\t\t\t    \"Password\": \"12345678\",\n\t\t\t    \"PasswordSetAt\": \"2020-10-10T11:11:11\",\n\t\t\t    \"ForceChangePassword\": 0,\n\t\t\t    \"ChangePasswordEvery\": 0,\n\t\t   \t    \"Comment\": \"Comment for test02\"\n\t\t\t  }\n            ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/sysUser/bulk",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"sysUser",
+												"bulk"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"where\": { \"id\": \"12b1ec2c-eb97-48f6-bcdc-9b9555df8dbb\" },\n\t\"data\": {\n\t\t\"Comment\": \"Comment to bmanager02@system.net\"\n\t}\n\t\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/sysUser",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"sysUser"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update bulk",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"bulk\": [\n\t\t      {\n\t\t        \"where\": { \n\t\t        \t\t   \"Id\": \"092be78e-d953-441e-83e0-aca6bf200bba\"\n\t\t                 },\n\t\t\t\t\"data\": {\n\t\t\t   \t          \"Comment\": \"Comment to bmanager01@system.net\"\n\t\t\t\t        }\n\t\t      },\n\t\t      {\n\t\t        \"where\": { \n\t\t        \t\t   \"id\": \"12b1ec2c-eb97-48f6-bcdc-9b9555df8dbb\"\n\t\t                 },\n\t\t\t\t\"data\": {\n\t\t\t   \t          \"Comment\": \"Comment to bmanager021@system.net\"\n\t\t\t\t        }\n\t\t\t  }\n\t        ]\n}\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/sysUser/bulk",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"sysUser",
+												"bulk"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"where\": { \"Id\": \"4309cf3a-d3c2-4564-a481-c96ab5139492\" }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/sysUser",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"sysUser"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete bulk",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "{{Content-Type}}",
+												"type": "text"
+											},
+											{
+												"key": "Authorization",
+												"value": "{{Authorization}}",
+												"type": "text"
+											},
+											{
+												"key": "FrontendId",
+												"value": "{{FrontendId}}",
+												"type": "text"
+											},
+											{
+												"key": "TimeZoneId",
+												"value": "{{TimeZoneId}}",
+												"type": "text"
+											},
+											{
+												"key": "Language",
+												"value": "{{Language}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"bulk\": [\n\t\t      {\n\t\t        \"where\": { \n\t\t        \t\t   \"Id\": \"c7e37531-eaba-424c-8d88-0de8aa478931\"\n\t\t                 }\n\t\t      },\n\t\t      {\n\t\t        \"where\": { \n\t\t        \t\t   \"Id\": \"4309cf3a-d3c2-4564-a481-c96ab5139492\"\n\t\t                 }\n\t\t\t  }\n\t        ]\n}\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/sysUser/bulk",
+											"host": [
+												"{{Server.IP}}"
+											],
+											"path": [
+												"{{Backend.ContextApp}}",
+												"v1",
+												"sysUser",
+												"bulk"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "8dd42e27-4fa5-4420-889c-30387fefbf88",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "0d93ec67-af57-4ff9-a8a1-2d127199e81f",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "/system",
+					"item": [
+						{
+							"name": "status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/status",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"status"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "/system/security/authentication",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											"var responseData = JSON.parse(responseBody);",
+											"",
+											"postman.setEnvironmentVariable( \"Authorization\", responseData[\"Data\"][0][\"Authorization\"] );",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Username\": \"{{Username}}\", \n\t\"Password\": \"{{Password}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/security/authentication/login",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"security",
+										"authentication",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text",
+										"description": "p.508a78a2-7906-4cb2-93ad-a7b0a80aa9a6"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/security/authentication/logout",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"security",
+										"authentication",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "token/check",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/security/authentication/token/check",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"security",
+										"authentication",
+										"token",
+										"check"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aaf6114e-bd23-4d18-81b7-6f67c0e67a84",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2f7500b0-6cef-44c6-9a23-3cd319f024d6",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "/system/binary",
+					"item": [
+						{
+							"name": "auth create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "770fe000-72b2-4d57-9c8d-a3e2bf7e10f0",
+										"exec": [
+											"var responseData = JSON.parse(responseBody);",
+											"",
+											"postman.setEnvironmentVariable( \"BinaryDataAuth\", responseData[\"Data\"][0][\"Auth\"] );",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary/auth",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary",
+										"auth"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "auth delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "770fe000-72b2-4d57-9c8d-a3e2bf7e10f0",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary/auth",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary",
+										"auth"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "Id",
+											"value": "2a5f7d48-568c-4031-96bf-55d011703626",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "Date",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "File",
+											"type": "file",
+											"src": "/home/dsistemas/Imágenes/cat_dancing.gif"
+										},
+										{
+											"key": "AccessKind",
+											"value": "3",
+											"description": "1=Public, 2=Authenticated, 3=Tag",
+											"type": "text"
+										},
+										{
+											"key": "StorageKind",
+											"value": "0",
+											"description": "0=Persistent, 1=Temporal",
+											"type": "text"
+										},
+										{
+											"key": "Category",
+											"value": "ticket",
+											"type": "text"
+										},
+										{
+											"key": "ExpireAt",
+											"value": "2019-12-12",
+											"type": "text"
+										},
+										{
+											"key": "Label",
+											"value": "Test file",
+											"type": "text"
+										},
+										{
+											"key": "Tag",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "Context",
+											"value": "{ \"User\": \"user@domain.com\" }",
+											"description": "Foreign system user name",
+											"type": "text"
+										},
+										{
+											"key": "Comment",
+											"value": "A more long comment",
+											"type": "text"
+										},
+										{
+											"key": "ShareCode",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "DisabledBy",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "770fe000-72b2-4d57-9c8d-a3e2bf7e10f0",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary/details?id=cf80996c-3d74-4ff2-95a8-a3d138853e77",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary",
+										"details"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "cf80996c-3d74-4ff2-95a8-a3d138853e77"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "770fe000-72b2-4d57-9c8d-a3e2bf7e10f0",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Id\": \"ebe5ae72-eca7-41cc-a477-af3b788404b2\",\n\t\"Category\": \"ticket\",\n\t\"AccessKind\": 3,\n\t\"StorageKind\": 0,\n\t\"Label\": \"Cat Dancing\",\n\t\"ExpireAt\": \"\",\n\t\"Tag\": \"#Dancing#,#Cat#\",\n\t\"Context\": \"{ \\\"Address\\\": \\\"A valid address\\\" }\",\n\t\"Comment\": \"A cat dancing\",\n\t\"ShareCode\": \"\",\n\t\"DisabledBy\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "donwload",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}",
+										"disabled": true
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}",
+										"disabled": true
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}",
+										"disabled": true
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary?id=ebe5ae72-eca7-41cc-a477-af3b788404b2&auth={{BinaryDataAuth}}&thumbnail=0",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "ebe5ae72-eca7-41cc-a477-af3b788404b2"
+										},
+										{
+											"key": "auth",
+											"value": "{{BinaryDataAuth}}"
+										},
+										{
+											"key": "thumbnail",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "770fe000-72b2-4d57-9c8d-a3e2bf7e10f0",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary?id=f18d881f-62ab-4c02-b597-fb1f3df41986",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "f18d881f-62ab-4c02-b597-fb1f3df41986"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary/search?orderBy=A.Label&offset=0&limit=200",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary",
+										"search"
+									],
+									"query": [
+										{
+											"key": "where",
+											"value": "A.Category='ticket'",
+											"description": "A. => sysBinaryIndex",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "A.CreatedAt Like '%2020-02%' And A.Category = 'test'",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "C.Category Like '%test%'",
+											"disabled": true
+										},
+										{
+											"key": "orderBy",
+											"value": "A.Label"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "200"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search/count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/binary/search/count?where=A.Category='test'",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"binary",
+										"search",
+										"count"
+									],
+									"query": [
+										{
+											"key": "where",
+											"value": "A.Category='test'",
+											"description": "A. => sysBinaryIndex"
+										},
+										{
+											"key": "where",
+											"value": "A.CreatedAt Like '%2020-02%' And A.Category = 'test'",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "C.Category Like '%test%'",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "/system/user",
+					"item": [
+						{
+							"name": "signup",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Kind\": \"Driver\", \n\t\"Name\": \"test01\",\n\t\"FirstName\": \"Tomás R\",\n\t\"LastName\": \"Moreno P\",\n\t\"EMail\": \"sirlordt@gmail.com\",\n\t\"Phone\": \"1-305-776-9594\",\n\t\"Password\": \"12345678\",\n\t\"Comment\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/signup",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "signup/activate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Activation\": \"17c71ea5\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/signup/activate",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"signup",
+										"activate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "password/recover/code/send",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"Transport\": \"sms\",\n\t\"Name\": \"test01\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/password/recover/code/send",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"password",
+										"recover",
+										"code",
+										"send"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "password/recover",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Code\": \"e90072dd4be5d1df\",\n\t\"Password\": \"12345678\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/password/recover",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"password",
+										"recover"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "password/change",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"User\": \"admin02@system.net\",\n\t\"CurrentPassword\": \"admin2.123456.\",\n\t\"NewPassword\": \"12345678\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/password/change",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"password",
+										"change"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "email/change/code/send",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"CurrentPassword\": \"{{Password}}\",\n\t\"EMail\": \"sirlordicons@gmail.com, sirlordr@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/email/change/code/send",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"email",
+										"change",
+										"code",
+										"send"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "email/change",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "{{Content-Type}}",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "FrontendId",
+										"value": "{{FrontendId}}",
+										"type": "text"
+									},
+									{
+										"key": "TimeZoneId",
+										"value": "{{TimeZoneId}}",
+										"type": "text"
+									},
+									{
+										"key": "Language",
+										"value": "{{Language}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Code\": \"cf9b005579e5fc27\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/email/change",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"email",
+										"change"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "phone/number/change/code/send",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"CurrentPassword\": \"{{Password}}\",\n\t\"Phone\": \"13057769594, , 786806-2108,\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/phone/change/code/send",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"phone",
+										"change",
+										"code",
+										"send"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "phone/change",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Code\": \"dbe7b51387118fc9\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/phone/change",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"phone",
+										"change"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "profile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/profile?",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"profile"
+									],
+									"query": [
+										{
+											"key": "shortToken",
+											"value": "620f3c01834a",
+											"disabled": true
+										},
+										{
+											"key": "createdAt",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "token",
+											"value": "9321a116-2b9b-4353-8b7b-8d6ad460bea1",
+											"description": "long token",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "profile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Title\": \"Mr.\",\n\t\"FirstName\": \"Tomás Rafael\",\n\t\"LastName\": \"Moreno Poggio\",\n\t\"NickName\": \"sirlordt\",\n\t\"Abbreviation\": \"\",\n\t\"Gender\": 1,\n\t\"BirthDate\": \"1970-10-10\",\n\t\"Address\": \"1625 s walnut street, wa 98233, suite 102\",\n\t\"Address1\": \"134 not exits, wa 98233, suite 102\",\n\t\"Avatar\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/profile",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user?name=admin01@system.net",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "admin01@system.net"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Avatar\": null,\n\t\"Name\": \"test02\",\n\t\"Password\": \"12345678\",\n\t\"ForceChangePassword\": false,\n\t\"ChangePasswordEvery\": 0,\n\t\"SessionsLimit\": 0,\n\t\"Comment\": null,\n\t\"Role\": null,\n\t\"Tag\": null,\n\t\"ExpireAt\": null,\n\t\"DisabledBy\": \"1\",\n\t\"Notify\": \"email,sms\",\n\t\"sysUserGroup\": {\n\t  \"Create\": true,\n\t  \"Name\": \"Test\",\n\t  \"Id\": \"\",\n\t  \"ShortId\": \"\",\n\t  \"Role\": \"\",\n\t  \"Tag\": \"\"\n\t},\n\t\"sysPerson\": {\n\t  \"Title\": \"Ms.\",\n\t  \"FirstName\": \"Loly Valentina\",\n\t  \"LastName\": \"Gómez Fermín\",\n\t  \"NickName\": \"loly\",\n\t  \"Abbreviation\": \"\",\n\t  \"Gender\": 0,\n\t  \"BirthDate\": \"1980-11-11\",\n\t  \"Address\": \"1625 s walnut street, wa 98233, suite 102\",\n\t  \"EMail\": \"sirlordt@gmail.com, sirlordr@gmail.com\",\n\t  \"Phone\": \"1-305-776-9594, 1-786-806-2108\",\n\t  \"ImageId\": \"\"\n\t},\n\t\"Business\": {\n\t\t\"Role\": \"#Role01#,#Role02#\",\n\t\t\"Tag\": \"#Tag01#,#Tag02#\"\n\t}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"Id\": \"\",\n\t\"SId\": \"\",\n\t\"Avatar\": null,\n\t\"Name\": \"test03\",\n\t\"Password\": \"123456789\",\n\t\"ForceChangePassword\": false,\n\t\"ChangePasswordEvery\": 0,\n\t\"SessionsLimit\": 0,\n\t\"Comment\": null,\n\t\"Role\": null,\n\t\"Tag\": null,\n\t\"ExpireAt\": null,\n\t\"DisabledBy\": \"1\",\n\t\"Notify\": \"email,sms\",\n\t\"sysUserGroup\": {\n\t  \"Create\": true,\n\t  \"Name\": \"Test\",\n\t  \"Id\": \"\",\n\t  \"ShortId\": \"\",\n\t  \"Role\": \"\",\n\t  \"Tag\": \"\"\n\t},\n\t\"sysPerson\": {\n\t  \"Title\": \"Ms.\",\n\t  \"FirstName\": \"Loly Valentina\",\n\t  \"LastName\": \"Gómez Fermín\",\n\t  \"NickName\": \"loly\",\n\t  \"Abbreviation\": \"\",\n\t  \"Gender\": 0,\n\t  \"BirthDate\": \"1980-11-11\",\n\t  \"Address\": \"1625 s walnut street, wa 98233, suite 102\",\n\t  \"EMail\": \"sirlordt@gmail.com, sirlordr@gmail.com\",\n\t  \"Phone\": \"1-305-776-9594, 1-786-806-2108\",\n\t  \"ImageId\": \"\"\n\t},\n\t\"Business\": {\n\t\t\"Role\": \"#Role01#,#Role02#\",\n\t\t\"Tag\": \"#Tag01#,#Tag02#\"\n\t}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "disable/bulk",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bulk\": [\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem01\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem02\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"NoExistsUser\"\n\t}\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/disable/bulk",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"disable",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "enable/bulk",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bulk\": [\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem01\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem02\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"NoExistsUser\"\n\t}\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/enable/bulk",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"enable",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "move/bulk_1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bulk\": [\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem01\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Business_Managers\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem02\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Business_Managers\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"NoExistsUser\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Business_Managers\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem03\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"NoExistsUserGroup\"\n\t\t}\n\t}\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/move/bulk",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"move",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "move/bulk_2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bulk\": [\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem01\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Foreign_Systems\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem02\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Foreign_Systems\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"NoExistsUser\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"Foreign_Systems\"\n\t\t}\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem03\",\n\t\t\"sysUserGroup\": {\n\t\t\t\"Id\": \"\",\n\t\t\t\"ShortId\": \"\",\n\t\t\t\"Name\": \"NoExistsUserGroup\"\n\t\t}\n\t}\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/move/bulk",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"move",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user?id=9d2b30a0-74fd-4d50-9734-ff83bfb08f7d",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "9d2b30a0-74fd-4d50-9734-ff83bfb08f7d"
+										},
+										{
+											"key": "shortId",
+											"value": "12345",
+											"disabled": true
+										},
+										{
+											"key": "name",
+											"value": "test02@TestL01",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete/bulk",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"bulk\": [\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem01\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"ForeignSystem02\"\n\t},\n\t{\n\t\t\"Id\": \"\",\n\t\t\"ShortId\": \"\",\n\t\t\"Name\": \"NoExistsUser\"\n\t}\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/bulk",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"bulk"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/search?orderBy=A.Name Desc, B.Name Desc&offset=0&limit=200",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"search"
+									],
+									"query": [
+										{
+											"key": "where",
+											"value": "A.Name='test01' Or A.Name='admin01@system.net'",
+											"description": "A. => sysUser, B. => sysUserGroup, C => sysPerson",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "A.Name='test01'",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "C.FirstName Like '%Tomás%'",
+											"disabled": true
+										},
+										{
+											"key": "orderBy",
+											"value": "A.Name Desc, B.Name Desc"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "200"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search/count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/search/count?",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"search",
+										"count"
+									],
+									"query": [
+										{
+											"key": "where",
+											"value": "A.Name='test01' or A.Name='admin01@system.net'",
+											"description": "A. => sysUser, B. => sysUserGroup, C => sysPerson",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "A.Name='test01'",
+											"disabled": true
+										},
+										{
+											"key": "where",
+											"value": "A.Name='bmanager01@system.net'",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "settings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/settings?",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"settings"
+									],
+									"query": [
+										{
+											"key": "shortToken",
+											"value": "d46ee694d559",
+											"disabled": true
+										},
+										{
+											"key": "token",
+											"value": "9321a116-2b9b-4353-8b7b-8d6ad460bea1",
+											"description": "long token",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "settings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"ConfigTest01\": \"ValueTest01\",\n\t\"ConfigTest02\": \"ValueTest02\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/settings?token=9321a116-2b9b-4353-8b7b-8d6ad460bea1",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"settings"
+									],
+									"query": [
+										{
+											"key": "shortToken",
+											"value": "d46ee694d559",
+											"disabled": true
+										},
+										{
+											"key": "token",
+											"value": "9321a116-2b9b-4353-8b7b-8d6ad460bea1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "routes",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/user/routes?shortToken=d46ee694d559&format=1",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"user",
+										"routes"
+									],
+									"query": [
+										{
+											"key": "shortToken",
+											"value": "d46ee694d559"
+										},
+										{
+											"key": "token",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "format",
+											"value": "1",
+											"description": "1 = Plain, 2 = Struct"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "/system/usergroup",
+					"item": [
+						{
+							"name": "delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "07b12e1f-dd64-4e13-a6c8-927cdeab54f2",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/system/usergroup?id=9d2b30a0-74fd-4d50-9734-ff83bfb08f7d",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"system",
+										"usergroup"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "9d2b30a0-74fd-4d50-9734-ff83bfb08f7d"
+										},
+										{
+											"key": "shortId",
+											"value": "12345",
+											"disabled": true
+										},
+										{
+											"key": "name",
+											"value": "TestL01",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a9ffd0a0-b005-4d34-9cfd-50b7669905db",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e334dfec-d743-4107-8ea3-a987b20510bf",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "business/dev001/example",
+					"item": [
+						{
+							"name": "example",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/business/dev004/example/",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"business",
+										"dev004",
+										"example",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "business/dev007/example",
+					"item": [
+						{
+							"name": "example",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "{{Content-Type}}"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "FrontendId",
+										"type": "text",
+										"value": "{{FrontendId}}"
+									},
+									{
+										"key": "TimeZoneId",
+										"type": "text",
+										"value": "{{TimeZoneId}}"
+									},
+									{
+										"key": "Language",
+										"type": "text",
+										"value": "{{Language}}"
+									}
+								],
+								"url": {
+									"raw": "{{Server.IP}}/{{Backend.ContextApp}}/v1/business/dev007/example",
+									"host": [
+										"{{Server.IP}}"
+									],
+									"path": [
+										"{{Backend.ContextApp}}",
+										"v1",
+										"business",
+										"dev007",
+										"example"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8727ee76-5665-49f3-9d39-9827c3afe7bd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "60b9c465-6dc0-490c-968d-e22ca5264f50",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

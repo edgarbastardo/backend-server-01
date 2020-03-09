@@ -24,16 +24,16 @@ import {
   inject
 } from 'inversify';
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from '../../../../common/CommonConstants';
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from "../../../common/SystemUtilities";
+import CommonUtilities from '../../../../common/CommonUtilities';
+import SystemUtilities from "../../../../common/SystemUtilities";
 
 //import SecurityService from '../../../common/database/services/SecurityService';
-import SYSRouteService from '../../../common/database/services/SYSRouteService';
-import BinaryServiceController from "../../services/BinaryService.controller";
-import I18NManager from "../../../common/managers/I18Manager";
-import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import BinaryServiceController from "../../../services/v1/BinaryService.controller";
+import I18NManager from "../../../../common/managers/I18Manager";
+import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
 import { json } from 'sequelize/types';
 
 const debug = require( 'debug' )( 'Binary.controller' );
@@ -53,7 +53,7 @@ export default class BinaryController {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/system/binary";
+  static readonly _BASE_PATH = "/v1/system/binary";
 
   static readonly _ROUTE_INFO = [
                                   { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create a new auth token for access to binary data" },

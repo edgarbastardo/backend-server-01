@@ -1,8 +1,0 @@
-
-extend type Mutation {
-
-  login( Username: String!, Password: String! ): JSON!
-  logout: JSON!
-  tokenCheck: JSON!
-
-}

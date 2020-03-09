@@ -25,10 +25,10 @@ export default class Dev000ServicesController extends BaseService {
 
   //Common business services
 
-  static async processDev000Example( request: Request,
-                                     response: Response,
-                                     transaction: any,
-                                     logger: any ):Promise<any> {
+  static async getDev000Example( request: Request,
+                                 response: Response,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
 
     let result = null;
 
@@ -102,7 +102,7 @@ export default class Dev000ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.processDev000Example.name;
+      sourcePosition.method = this.name + "." + this.getDev000Example.name;
 
       const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -127,7 +127,7 @@ export default class Dev000ServicesController extends BaseService {
                  Code: 'ERROR_UNEXPECTED',
                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
                  LogId: error.LogId,
-                 Mark: 'A141D683118A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {

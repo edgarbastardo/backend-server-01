@@ -3,7 +3,7 @@ import cluster from "cluster";
 //import { bookService } from '../services/book.service';
 //import { AuthorByBookDataLoader } from '../dataloaders/author.dataloader';
 //import { UserDataLoader } from '../dataloaders/user.dataloader';
-import I18NManager from "../../../../../02_system/common/managers/I18Manager";
+import I18NManager from "../../../../../../02_system/common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Dev000.api' );
 
@@ -13,7 +13,7 @@ export const resolvers = {
 
   Query: {
 
-    getDev000: ( obj: any, args: any, context: any, info: any ) => {
+    getDev000V1: ( obj: any, args: any, context: any, info: any ) => {
 
       const strLanguage = context.Language;
 
@@ -32,7 +32,7 @@ export const resolvers = {
 
   Mutation: {
 
-    addDev000: ( obj: any, args: any, context: any, info: any ) => {
+    addDev000V1: ( obj: any, args: any, context: any, info: any ) => {
 
       const strLanguage = context.Language;
 

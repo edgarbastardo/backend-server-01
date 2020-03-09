@@ -1081,6 +1081,18 @@ export default class SystemUtilities {
 
           }
 
+          if ( userSessionStatus.LoggedOutBy ) {
+
+            dataToWriteToDB[ 'LoggedOutBy' ] = userSessionStatus.LoggedOutBy;
+
+          }
+
+          if ( userSessionStatus.LoggedOutAt ) {
+
+            dataToWriteToDB[ 'LoggedOutAt' ] = userSessionStatus.LoggedOutAt;
+
+          }
+
           result = await SYSUserSessionStatusService.createOrUpdate( userSessionStatus.UserId,
                                                                      strToken,
                                                                      dataToWriteToDB,
