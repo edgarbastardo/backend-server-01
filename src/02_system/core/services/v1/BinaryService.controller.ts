@@ -3700,8 +3700,6 @@ export default class BinaryServiceController extends BaseService {
                                               System: CommonUtilities.isNotNullOrEmpty( context.FrontendId ) ? context.FrontendId: null,
                                               Context: CommonUtilities.isNotNullOrEmpty( request.body.Context ) ? request.body.Context: null,
                                               Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
-                                              //DenyTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.DenyTagAccess ) ? request.body.DenyTagAccess: null,
-                                              //AllowTagAccess: CommonUtilities.isNotNullOrEmpty( request.body.AllowTagAccess ) ? request.body.AllowTagAccess: null,
                                               ShareCode: CommonUtilities.isNotNullOrEmpty( request.body.ShareCode ) ? request.body.ShareCode: null,
                                               Owner: strDefaultOwners,
                                               ProcessNeeded: processData && processData.value ? processData.value : 0,

@@ -1,7 +1,6 @@
 import cluster from 'cluster';
 
-//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
-
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import {
   //Router,
   Request,
@@ -25,6 +24,7 @@ import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 
 import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
 import I18NManager from "../../../common/managers/I18Manager";
+import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
 
 const debug = require( 'debug' )( 'UserGroupServiceController' );
 
@@ -412,6 +412,240 @@ export default class UserGroupServiceController {
 
   }
 
+  static async disableBulkUserGroup( request: Request,
+                                     transaction: any,
+                                     logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.disableBulkUserGroup.name;
+
+      const strMark = "AEAECBA9202F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async enableBulkUserGroup( request: Request,
+                                    transaction: any,
+                                    logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.enableBulkUserGroup.name;
+
+      const strMark = "55F974E46609" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static checkUserGroupRoleLevel( userSessionStatus: any,
                                   sysUserGroup: { Id: string, ShortId: string, Name: string },
                                   strActionRole: string,
@@ -419,9 +653,9 @@ export default class UserGroupServiceController {
 
     let result: ICheckUserGroupRoles = {
                                          isAuthorizedAdmin: false,
+                                         isAuthorizedL01: false,
                                          isAuthorizedL03: false,
-                                         //isAuthorizedL02: false,
-                                         //isAuthorizedL01: false,
+                                         isAuthorizedL04: false,
                                          isNotAuthorized: false
                                        };
 
@@ -432,12 +666,56 @@ export default class UserGroupServiceController {
 
       if ( result.isAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+        result.isAuthorizedL04 = userSessionStatus.Role.includes( "#" + strActionRole + "L04#" );
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#GName:*#" ) ||
-                                                            roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ) : false;
+        if ( result.isAuthorizedL04 === false ) {
+
+          let roleSubTag = null;
+
+          if ( strActionRole === "GetUserGroup" ||
+               strActionRole === "SearchUserGroup" ||
+               strActionRole === "SettingsUserGroup" ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+          }
+
+          if ( !roleSubTag ||
+                roleSubTag.length === 0 ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+
+          }
+
+          result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
+                                                              roleSubTag.includes( "#GName:*#" ) ||
+                                                              roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
+                                                              roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ) : false;
+
+          if ( result.isAuthorizedL03 === false ) {
+
+            if ( strActionRole === "GetUserGroup" ||
+                 strActionRole === "SearchUserGroup" ||
+                 strActionRole === "SettingsUserGroup" ) {
+
+              result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                                userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
+
+              if ( result.isAuthorizedL01 &&
+                  ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
+                    userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
+                    userSessionStatus.UserGroupId !== sysUserGroup.Id ) ) {
+
+                //Uhathorized
+                result.isNotAuthorized = true;
+
+              }
+
+            }
+
+          }
+
+        }
 
       }
 
@@ -524,7 +802,8 @@ export default class UserGroupServiceController {
                                                                  logger );
 
       if ( !resultCheckUserRoles.isAuthorizedAdmin &&
-            !resultCheckUserRoles.isAuthorizedL03 ) {
+           !resultCheckUserRoles.isAuthorizedL03 &&
+           !resultCheckUserRoles.isAuthorizedL04 ) {
 
         resultCheckUserRoles.isNotAuthorized = true;
 
@@ -784,6 +1063,123 @@ export default class UserGroupServiceController {
 
   }
 
+  static async deleteBulkUserGroup( request: Request,
+                                    transaction: any,
+                                    logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deleteBulkUserGroup.name;
+
+      const strMark = "621629BC6E22" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async searchUserGroup( request: Request,
                                 transaction: any,
                                 logger: any ): Promise<any> {
@@ -814,10 +1210,200 @@ export default class UserGroupServiceController {
 
       }
 
-      //ANCHOR searchUserGroup
-      let userSessionStatus = context.UserSessionStatus;
+      const userSessionStatus = context.UserSessionStatus;
 
-      //
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#SearchUserGroupL04#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserGroupL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
+
+        }
+
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchUserGroupL01#" ): false;
+
+        if ( bIsAuthorizedL01 ) {
+
+          strWhereL01 = " ( A.Id = '" + userSessionStatus.UserGroupId + "' )";
+
+        }
+
+      }
+
+      const strSelectField = SystemUtilities.createSelectAliasFromModels(
+                                                                          [
+                                                                            SYSUserGroup
+                                                                          ],
+                                                                          [
+                                                                            "A",
+                                                                          ]
+                                                                        );
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "searchUserGroup",
+                                                     {
+                                                       SelectFields: strSelectField,
+                                                     },
+                                                     logger );
+
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
+
+      let intLimit = 200;
+
+      const warnings = [];
+
+      if ( request.query.limit &&
+           isNaN( request.query.limit ) === false &&
+           parseInt( request.query.limit ) <= intLimit ) {
+
+        intLimit = parseInt( request.query.limit );
+
+      }
+      else {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
+                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
+                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                       }
+                     );
+
+      }
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
+                       }
+                     );
+
+      }
+
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+
+      //ANCHOR dbConnection.query
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows, [
+                                                                                                  SYSUserGroup,
+                                                                                                ],
+                                                                                                [
+                                                                                                  "A",
+                                                                                                ] );
+
+      const convertedRows = [];
+
+      for ( const currentRow of transformedRows ) {
+
+        const tempModelData = await SYSUserGroup.convertFieldValues(
+                                                                     {
+                                                                       Data: currentRow,
+                                                                       FilterFields: 1, //Force to remove fields like password and value
+                                                                       TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                       Include: null,
+                                                                       Logger: logger,
+                                                                       ExtraInfo: {
+                                                                                    Request: request
+                                                                                  }
+                                                                     }
+                                                                   );
+        if ( tempModelData ) {
+
+          convertedRows.push( tempModelData );
+
+        }
+        else {
+
+          convertedRows.push( currentRow );
+
+        }
+
+      }
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH',
+                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
+                 Mark: '7C478BDFA8F8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: convertedRows.length,
+                 Data: convertedRows
+               }
+
+      bApplyTransaction = true;
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -843,7 +1429,7 @@ export default class UserGroupServiceController {
 
       sourcePosition.method = this.name + "." + this.searchUserGroup.name;
 
-      const strMark = "F0940A4AA57E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "CF32E88EB366" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -931,10 +1517,133 @@ export default class UserGroupServiceController {
 
       }
 
-      //ANCHOR searchUserGroupCount
-      let userSessionStatus = context.UserSessionStatus;
+      const userSessionStatus = context.UserSessionStatus;
 
-      //
+      const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#SearchUserGroupL04#" ): false;
+
+      let bIsAuthorizedL03 = false;
+      let strWhereL03 = "";
+      let bIsAuthorizedL01 = false;
+      let strWhereL01 = "";
+
+      if ( bIsAuthorizedAdmin === false ) {
+
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+
+        if ( !roleSubTag ||
+              roleSubTag.length === 0 ) {
+
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserGroupL03#" );
+
+        }
+
+        if ( roleSubTag &&
+             roleSubTag.length > 0 ) {
+
+          bIsAuthorizedL03 = true;
+
+          strWhereL03 = CommonUtilities.tranformTagListToWhere( roleSubTag, "A", "Or" );
+
+        }
+
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+                                                    userSessionStatus.Role.includes( "#SearchUserGroupL01#" ): false;
+
+        if ( bIsAuthorizedL01 ) {
+
+          strWhereL01 = " ( A.Id = '" + userSessionStatus.UserGroupId + "' )";
+
+        }
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "searchCountUserGroup",
+                                                     {
+                                                       //SelectFields: strSelectField,
+                                                     },
+                                                     logger );
+
+      strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        let strBeforeParenthesis = " And ( ";
+
+        if ( bIsAuthorizedL03 ) {
+
+          strSQL = strSQL + strBeforeParenthesis + strWhereL03;
+
+          strBeforeParenthesis = "";
+
+        }
+
+        if ( bIsAuthorizedL01 ) {
+
+          if ( !strBeforeParenthesis ) {
+
+            strSQL = strSQL + " Or " + strBeforeParenthesis + strWhereL01;
+
+          }
+          else {
+
+            strSQL = strSQL + strBeforeParenthesis + strWhereL01;
+            strBeforeParenthesis = "";
+
+          }
+
+        }
+
+        if ( !strBeforeParenthesis ) {
+
+          strSQL = strSQL + " )";
+
+        }
+
+      }
+
+      const warnings = [];
+
+      if ( !bIsAuthorizedAdmin ) {
+
+        warnings.push(
+                       {
+                         Code: 'WARNING_DATA_RESTRICTED',
+                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not counted due to limitations in their roles' ),
+                         Details: {
+                                    Role: userSessionStatus.Role
+                                  }
+                       }
+                     );
+
+      }
+
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_SEARCH_COUNT',
+                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
+                 Mark: '660DFC71AA33' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: warnings,
+                 Count: 1,
+                 Data: [
+                         {
+                           Count: rows.length > 0 ? rows[ 0 ].Count: 0
+                         }
+                       ]
+               }
+
+      bApplyTransaction = true;
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -1017,5 +1726,358 @@ export default class UserGroupServiceController {
     return result;
 
   }
+
+  static async getSettings( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getSettings.name;
+
+      const strMark = "3F54F1AD829E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async setSettings( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setSettings.name;
+
+      const strMark = "CF8E4986C5AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  /*
+  static async setSettings( request: Request,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //ANCHOR updateUserGroup
+      let userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setSettings.name;
+
+      const strMark = "EF05E51DA6CB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+  */
 
 }

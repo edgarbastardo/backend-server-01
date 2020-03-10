@@ -59,7 +59,8 @@
       "args": [
         "--username=admin05@system.net",
         "--password=admin5.123456.",
-        "--target=http://localhost"
+        "--target=http://localhost",
+        "--outputFormat=screen"
     ],
       "outputCapture": "std",
       "preLaunchTask": "build-test01-rest-api",

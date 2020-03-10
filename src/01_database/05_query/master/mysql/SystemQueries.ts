@@ -58,6 +58,16 @@ export default class SystemQueries {
         strResult = `Select Count( A.Id ) As Count From sysUser As A Inner Join sysUserGroup As B On A.GroupId = B.Id Left Outer Join sysPerson As C On C.Id = A.PersonId Where `;
 
       }
+      else if ( strName === "searchUserGroup" ) {
+
+        strResult = `Select ${params.SelectFields} From sysUserGroup As A Where `;
+
+      }
+      else if ( strName === "searchCountUserGroup" ) {
+
+        strResult = `Select Count( A.Id ) As Count From sysUserGroup As A Where `;
+
+      }
       else if ( strName === "searchBinaryData" ) {
 
         strResult = `SELECT A.* FROM sysBinaryIndex As A Where `; //( A.Category = 'test' ) And ( A.AccessKind = 1 Or A.AccessKind = 2 Or ( A.AccessKind = 3 And ( A.Owner Like '%#UName:admin01@system.net#%' Or A.Owner Like '%#UId:xxxx#%' Or A.Owner Like '%#USId:xxx#%' Or A.Owner Like '%#GName:admin01@system.net#%' Or A.Owner Like '%#GId:xxxx#%' Or A.Owner Like '%#GSId:xxx#%' ) ) )`;

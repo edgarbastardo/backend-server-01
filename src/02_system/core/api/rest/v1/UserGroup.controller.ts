@@ -50,23 +50,22 @@ export default class UserGroupController {
   //RequestKind: 3 PUT
   //RequestKind: 4 DELETE
 
-  //Not for me: The secondary role for the user can be defined ExtraData
   static readonly _TO_IOC_CONTAINER = true;
 
   static readonly _BASE_PATH = "/v1/system/usergroup";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#GetUserGroupL01#,#GetUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "GetUserGroupL01", "GetUserGroupL03" ], Description: "Get the information for one user group" },
-                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#CreateUserGroupL01#,#CreateUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "CreateUserGroupL01", "CreateUserGroupL03" ], Description: "Create new user group information" },
-                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#UpdateUserGroupL01#,#UpdateUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "UpdateUserGroupL01", "UpdateUserGroupL03" ], Description: "Update existent user group information" },
-                                  { Path: UserGroupController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#UpdateUserGroupL01#,#UpdateUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserGroupL01", "UpdateUserGroupL03" ], Description: "Disable existent user account in bulk" },
-                                  { Path: UserGroupController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#UpdateUserGroupL01#,#UpdateUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateUserGroupL01", "UpdateUserGroupL03" ], Description: "Enable existent user account in bulk" },
-                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#DeleteUserGroupL01#,#DeleteUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "DeleteUserGroupL01", "DeleteUserGroupL03" ], Description: "Delete the user group information" },
-                                  { Path: UserGroupController._BASE_PATH + "/bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#DeleteUserGroupL01#,#DeleteUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "DeleteUserGroupL01", "DeleteUserGroupL03" ], Description: "Delete the user information in bulk" },
-                                  { Path: UserGroupController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SearchUserGroupL01#,#SearchUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SearchUserGroupL01", "SearchUserGroupL03" ], Description: "Search for user groups information" },
-                                  { Path: UserGroupController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SearchUserGroupL01#,#SearchUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SearchUserGroupL01", "SearchUserGroupL03" ], Description: "Count search user groups information result" },
+                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#GetUserGroupL01#,#GetUserGroupL03#,#GetUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "GetUserGroupL01", "GetUserGroupL03", "GetUserGroupL04" ], Description: "Get the information for one user group" },
+                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#CreateUserGroupL03#,#CreateUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "CreateUserGroupL03", "CreateUserGroupL04" ], Description: "Create new user group information" },
+                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#UpdateUserGroupL03#,#UpdateUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "UpdateUserGroupL03", "UpdateUserGroupL04" ], Description: "Update existent user group information" },
+                                  { Path: UserGroupController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#UpdateUserGroupL03#,#UpdateUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "UpdateUserGroupL03", "UpdateUserGroupL04" ], Description: "Disable existent user account in bulk" },
+                                  { Path: UserGroupController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#UpdateUserGroupL03#,#UpdateUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "UpdateUserGroupL03", "UpdateUserGroupL04" ], Description: "Enable existent user account in bulk" },
+                                  { Path: UserGroupController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#DeleteUserGroupL03#,#DeleteUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "DeleteUserGroupL03", "DeleteUserGroupL04" ], Description: "Delete the user group information" },
+                                  { Path: UserGroupController._BASE_PATH + "/bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#DeleteUserGroupL03#,#DeleteUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "DeleteUserGroupL03", "DeleteUserGroupL04" ], Description: "Delete the user information in bulk" },
+                                  { Path: UserGroupController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SearchUserGroupL01#,#SearchUserGroupL03#,#SearchUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SearchUserGroupL01", "SearchUserGroupL03", "SearchUserGroupL04" ], Description: "Search for user groups information" },
+                                  { Path: UserGroupController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SearchUserGroupL01#,#SearchUserGroupL03#,#SearchUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SearchUserGroupL01", "SearchUserGroupL03", "SearchUserGroupL04" ], Description: "Count search user groups information result" },
                                   { Path: UserGroupController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user group" },
-                                  { Path: UserGroupController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SettingsUserGroupL01#,#SettingsUserGroupL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SettingsUserGroupL01", "SettingsUserGroupL03" ], Description: "Set settings for the current user group" },
+                                  { Path: UserGroupController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL03#,#SettingsUserGroupL01#,#SettingsUserGroupL03#,#SettingsUserGroupL04#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL03", "SettingsUserGroupL03", "SettingsUserGroupL04" ], Description: "Set settings for the current user group" },
                                 ]
 
   _controllerLogger = null;
@@ -129,7 +128,7 @@ export default class UserGroupController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userGet( request: Request, response: Response ) {
+  async getUserGroup( request: Request, response: Response ) {
 
     const result = await UserGroupServiceController.getUserGroup( request,
                                                                   null,
@@ -145,7 +144,7 @@ export default class UserGroupController {
              MiddlewareManager.middlewareCheckIsAuthenticated,
              MiddlewareManager.middlewareCheckIsAuthorized,
            )
-  async userPost( request: Request, response: Response ) {
+  async createUserGroup( request: Request, response: Response ) {
 
     const result = await UserGroupServiceController.createUserGroup( request,
                                                                      null,
@@ -161,11 +160,43 @@ export default class UserGroupController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async userPut( request: Request, response: Response ) {
+  async updateUserGroup( request: Request, response: Response ) {
 
     const result = await UserGroupServiceController.updateUserGroup( request,
                                                                      null,
                                                                      this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async disableBulkUserGroup( request: Request, response: Response ) {
+
+    const result = await UserGroupServiceController.disableBulkUserGroup( request,
+                                                                          null,
+                                                                          this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async enableBulkUserGroup( request: Request, response: Response ) {
+
+    const result = await UserGroupServiceController.enableBulkUserGroup( request,
+                                                                         null,
+                                                                         this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -177,11 +208,28 @@ export default class UserGroupController {
                MiddlewareManager.middlewareCheckIsAuthenticated,
                MiddlewareManager.middlewareCheckIsAuthorized,
              )
-  async userDelete( request: Request, response: Response ) {
+  async deleteUserGroup( request: Request, response: Response ) {
 
     const result = await UserGroupServiceController.deleteUserGroup( request,
                                                                      null,
                                                                      this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+
+  @httpDelete(
+               "",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized,
+             )
+  async deleteBulkUserGroup( request: Request, response: Response ) {
+
+    const result = await UserGroupServiceController.deleteBulkUserGroup( request,
+                                                                         null,
+                                                                         this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -214,6 +262,38 @@ export default class UserGroupController {
     const result = await UserGroupServiceController.searchUserGroupCount( request,
                                                                           null,
                                                                           this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getSettings( request: Request, response: Response ) {
+
+    const result = await UserGroupServiceController.getSettings( request,
+                                                                 null,
+                                                                 this._controllerLogger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async setSettings( request: Request, response: Response ) {
+
+    const result = await UserGroupServiceController.setSettings( request,
+                                                                 null,
+                                                                 this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 

@@ -115,8 +115,6 @@ CREATE TABLE IF NOT EXISTS `sysUserGroup` (
   `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   `Name` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of group. Must be unique will can apply a restriction (Unique).',
   `Role` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name of roles. Example:\n\n #Roles01#, #Roles02#',
-  `DenyTagAccess` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to deny access this group\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated first with the allow groups counterpart\n\n* Indicate nobody access to this group from outside server',
-  `AllowTagAccess` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'List of name/id of groups or users to allow access this group\n\nExample:\n\n#group01#, #sellers#, #exporter#\n\nThis field is evaluated later with the deny groups counterpart\n\n* = Any access to this group if not * or listed in DenyTagAccess',
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this user group',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',

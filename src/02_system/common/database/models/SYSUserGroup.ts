@@ -45,12 +45,6 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   Role: string;
 
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  DenyTagAccess: string;
-
-  @Column( { type: DataType.STRING( 2048 ), allowNull: true } )
-  AllowTagAccess: string;
-
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ExpireAt: string;
 
@@ -150,6 +144,13 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
           result.ExtraData = extraData;
 
         }
+
+      }
+      else {
+
+        delete result.ExtraData;
+
+        result.Business = {};
 
       }
 

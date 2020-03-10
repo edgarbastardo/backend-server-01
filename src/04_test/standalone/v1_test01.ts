@@ -4,10 +4,10 @@ import fs from 'fs'; //Load the filesystem module
 import os from 'os'; //Load the os module
 //import cluster from "cluster";
 
-const assert = require('assert').strict;
+//const assert = require('assert').strict;
 import appRoot from 'app-root-path';
 
-import fetch from 'node-fetch';
+//import fetch from 'node-fetch';
 import FormData from 'form-data';
 
 import logSymbols from 'log-symbols';
@@ -18,6 +18,11 @@ import CommonUtilities from '../../02_system/common/CommonUtilities';
 
 import SystemUtilities from "../../02_system/common/SystemUtilities";
 
+import { UserRequestServiceV1 } from './UserRequestServiceV1';
+import { UserGroupRequestServiceV1 } from './UserGroupRequestServiceV1';
+import { SystemSecurityAuthenticationServiceV1 } from './SystemSecurityAuthenticationServiceV1';
+import { BinaryRequestServiceV1 } from './BinaryRequestServiceV1';
+
 //const debug = require( 'debug' )( 'test01_test_api' );
 
 let strStartUser = "admin01@system.net";
@@ -25,6 +30,7 @@ let strStartPassword = "admin1.123456.";
 
 let strProtocol = "http://"
 let strHost = "127.0.0.1";
+let strOutputFormat = "screen";
 
 //let strAuthorization_admin01 = null;
 
@@ -139,1227 +145,10 @@ let user98_at_TestL98_data = {} as any;
 
 let upload_binary_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
 
-export async function call_login( headers: any,
-                                  strUser: string,
-                                  strPassword: string ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const body = {
-                   Username: strUser,
-                   Password: strPassword
-                 }
-
-    const options = {
-                      method: 'POST',
-                      headers: headers,
-                      body: JSON.stringify( body ),
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/security/authentication/login";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     ( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_tokenCheck( headers: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'POST',
-                      headers: headers,
-                      body: null, //JSON.stringify( body ),
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/security/authentication/token/check";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_profile( headers: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      headers: headers,
-                      body: null,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/profile";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     //( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_logout( headers: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'POST',
-                      headers: headers,
-                      body: null, //JSON.stringify( body ),
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/security/authentication/logout";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_userSearch( headers: any,
-                                       params: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      headers: headers,
-                      body: null,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/search";
-
-    let strQueryParams = "";
-
-    if ( params.where ) {
-
-      strQueryParams = "?where=" + params.where;
-
-    }
-
-    if ( params.orderBy ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
-
-      }
-      else {
-
-        strRequestPath = "?orderBy=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.offset ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&offset=" + params.offset;
-
-      }
-      else {
-
-        strRequestPath = "?offset=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.limit ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&limit=" + params.limit;
-
-      }
-      else {
-
-        strRequestPath = "?limit=" + params.limit;
-
-      }
-
-    }
-
-    const callResult = await fetch( strRequestPath + strQueryParams,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     //( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_userSearchCount( headers: any,
-                                            params: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      headers: headers,
-                      body: null,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/search/count";
-
-    let strQueryParams = "";
-
-    if ( params.where ) {
-
-      strQueryParams = "?where=" + params.where;
-
-    }
-
-    if ( params.orderBy ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
-
-      }
-      else {
-
-        strRequestPath = "?orderBy=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.offset ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&offset=" + params.offset;
-
-      }
-      else {
-
-        strRequestPath = "?offset=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.limit ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&limit=" + params.limit;
-
-      }
-      else {
-
-        strRequestPath = "?limit=" + params.limit;
-
-      }
-
-    }
-
-    const callResult = await fetch( strRequestPath + strQueryParams,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     //( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_change_password( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'PUT',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/password/change";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_createUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'POST',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                 }:
-                                 {
-                                  status: null,
-                                  statusText: null,
-                                  body: { Code: "" }
-                                 };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_updateUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'PUT',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_disableBulkUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'PUT',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/disable/bulk";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_moveBulkUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'PUT',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/move/bulk";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_enableBulkUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'PUT',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/enable/bulk";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_deleteUser( headers: any, query: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'DELETE',
-                      body: null, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = query;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_deleteBulkUser( headers: any, body: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'DELETE',
-                      body: JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/user/bulk";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_deleteUserGroup( headers: any, query: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'DELETE',
-                      body: null, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/usergroup?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    ( options as any ).body = query;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_createAuth( headers: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'POST',
-                      body: null, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary/auth";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_deleteAuth( headers: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'DELETE',
-                      body: null, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary/auth";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_binarySearch( headers: any,
-                                         params: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      headers: headers,
-                      body: null,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary/search";
-
-    let strQueryParams = "";
-
-    if ( params.where ) {
-
-      strQueryParams = "?where=" + params.where;
-
-    }
-
-    if ( params.orderBy ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&orderBy=" + params.orderBy;
-
-      }
-      else {
-
-        strRequestPath = "?orderBy=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.offset ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&offset=" + params.offset;
-
-      }
-      else {
-
-        strRequestPath = "?offset=" + params.orderBy;
-
-      }
-
-    }
-
-    if ( params.limit ) {
-
-      if ( strQueryParams ) {
-
-        strRequestPath = strQueryParams + "&limit=" + params.limit;
-
-      }
-      else {
-
-        strRequestPath = "?limit=" + params.limit;
-
-      }
-
-    }
-
-    const callResult = await fetch( strRequestPath + strQueryParams,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     //( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_binarySearchCount( headers: any,
-                                              params: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      headers: headers,
-                      body: null,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary/search/count";
-
-    let strQueryParams = "";
-
-    if ( params.where ) {
-
-      strQueryParams = "?where=" + params.where;
-
-    }
-
-    const callResult = await fetch( strRequestPath + strQueryParams,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                  }:
-                                  {
-                                   status: null,
-                                   statusText: null,
-                                   body: { Code: "" }
-                                  };
-
-     //( options as any ).body = body;
-
-     result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_uploadBinaryData( headers: any,
-                                             body: FormData ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'POST',
-                      body: body, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary";
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                 }:
-                                 {
-                                  status: null,
-                                  statusText: null,
-                                  body: { Code: "" }
-                                 };
-
-    ( options as any ).body = body;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-async function call_downloadBinaryData( headers: any, query: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      body: null,
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id + "&auth=" + headers.BinaryDataToken + "&thumbnail=" + query.Thumbnail;
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    const strXBodyResponse = callResult.headers.get( "x-body-response" ) as any; //callResult.headers.raw()
-
-    const jsonXBodyResponse = CommonUtilities.parseJSON( strXBodyResponse, null );
-
-    const strPath = query.SavePath + '/' + jsonXBodyResponse.Name;
-
-    fs.mkdirSync( query.SavePath, { recursive: true }  );
-
-    const destinationFileStream = fs.createWriteStream( strPath );
-
-    await new Promise( ( resolve: any, reject: any ) => {
-
-      callResult.body.pipe( destinationFileStream ).on( 'close', () => { resolve( true ) } ); //Wait for the stream finish to write to file system
-
-    } );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: jsonXBodyResponse
-                                 }:
-                                 {
-                                  status: null,
-                                  statusText: null,
-                                  body: { Code: "" }
-                                 };
-
-    //( options as any ).body = jsonXBodyResponse; //callResult.headers[ "X-Body-Response" ];
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_deleteBinaryData( headers: any,
-                                             query: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'DELETE',
-                      body: null, //query, //JSON.stringify( body ),
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id;
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                 }:
-                                 {
-                                  status: null,
-                                  statusText: null,
-                                  body: { Code: "" }
-                                 };
-
-    ( options as any ).body = query;
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
-
-export async function call_getBinaryDataDetails( headers: any,
-                                                 query: any ): Promise<any> {
-
-  let result = { input: null, output: null };
-
-  try {
-
-    const options = {
-                      method: 'GET',
-                      body: null,
-                      headers: headers,
-                    };
-
-    let strRequestPath = strProtocol + strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
-
-    strRequestPath = strRequestPath + "/v1/system/binary/details?id=" + query.Id;
-
-    const callResult = await fetch( strRequestPath,
-                                    options );
-
-    result.output = callResult ? {
-                                   status: callResult.status,
-                                   statusText: callResult.statusText,
-                                   body: await callResult.json()
-                                 }:
-                                 {
-                                  status: null,
-                                  statusText: null,
-                                  body: { Code: "" }
-                                 };
-
-    result.input = options;
-
-  }
-  catch ( error ) {
-
-    console.log( error );
-
-  }
-
-  return result;
-
-}
+let userRequestServiceV1: UserRequestServiceV1 = null;
+let userGroupRequestServiceV1: UserGroupRequestServiceV1 = null;
+let systemSecurityAuthenticationServiceV1: SystemSecurityAuthenticationServiceV1 = null;
+let binaryRequestServiceV1: BinaryRequestServiceV1 = null;
 
 export function formatSequence( intSequence: number ): string {
 
@@ -1404,7 +193,7 @@ export function saveInput( strFileName: string, inputs: any ) {
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1427,7 +216,7 @@ function saveResult( strFileName: string, result: any ) {
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1443,9 +232,9 @@ export async function test_login( headers: any,
 
   try {
 
-    const result = await call_login( headers,
-                                     userData.Name,
-                                     userData.Password );
+    const result = await systemSecurityAuthenticationServiceV1.callLogin( headers,
+                                                                          userData.Name,
+                                                                          userData.Password );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1475,7 +264,7 @@ export async function test_login( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1491,7 +280,7 @@ export async function test_token( headers: any,
 
   try {
 
-    const result = await call_tokenCheck( headers );
+    const result = await systemSecurityAuthenticationServiceV1.callTokenCheck( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1507,7 +296,7 @@ export async function test_token( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1523,7 +312,7 @@ export async function test_logout( headers: any,
 
   try {
 
-    const result = await call_logout( headers );
+    const result = await systemSecurityAuthenticationServiceV1.callLogout( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1539,7 +328,7 @@ export async function test_logout( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1556,8 +345,8 @@ export async function test_change_password( headers: any,
 
   try {
 
-    const result = await call_change_password( headers,
-                                               userData );
+    const result = await userRequestServiceV1.callChangePassword( headers,
+                                                                  userData );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1573,7 +362,7 @@ export async function test_change_password( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1591,7 +380,7 @@ export async function test_profile_at_less_one_role( headers: any,
 
   try {
 
-    const result = await call_profile( headers );
+    const result = await userRequestServiceV1.callProfile( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1641,7 +430,7 @@ export async function test_profile_at_less_one_role( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1658,7 +447,7 @@ export async function test_profile_all_roles( headers: any,
 
   try {
 
-    const result = await call_profile( headers );
+    const result = await userRequestServiceV1.callProfile( headers );
 
     const resultOfTest = []; //rolesToTest[ intRoleToTestIndex ]
 
@@ -1700,7 +489,7 @@ export async function test_profile_all_roles( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1708,7 +497,7 @@ export async function test_profile_all_roles( headers: any,
 
 }
 
-export async function test_userSearch( headers: any,
+export async function test_searchUser( headers: any,
                                        params: any,
                                        strCode: string,
                                        strFileName: string,
@@ -1719,7 +508,7 @@ export async function test_userSearch( headers: any,
 
   try {
 
-    const result = await call_userSearch( headers,
+    const result = await userRequestServiceV1.callSearchUser( headers,
                                           params );
 
     saveInput( strFileName, result.input );
@@ -1755,7 +544,7 @@ export async function test_userSearch( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1763,7 +552,7 @@ export async function test_userSearch( headers: any,
 
 }
 
-export async function test_userSearchCount( headers: any,
+export async function test_searchCountUser( headers: any,
                                             params: any,
                                             strCode: string,
                                             strFileName: string,
@@ -1774,7 +563,7 @@ export async function test_userSearchCount( headers: any,
 
   try {
 
-    const result = await call_userSearchCount( headers,
+    const result = await userRequestServiceV1.callSearchCountUser( headers,
                                                params );
 
     saveInput( strFileName, result.input );
@@ -1810,7 +599,7 @@ export async function test_userSearchCount( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1840,7 +629,7 @@ export async function test_deleteUser( headers: any,
 
     }
 
-    let result = await call_deleteUser( headers, userRequest ); //This request must be fail
+    let result = await userRequestServiceV1.callDeleteUser( headers, userRequest ); //This request must be fail
 
     saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
     result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
@@ -1856,7 +645,7 @@ export async function test_deleteUser( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1873,22 +662,7 @@ export async function test_deleteBulkUser( headers: any,
 
   try {
 
-    /*
-    let userRequest = {} as any;
-
-    if ( userData.Id ) {
-
-      userRequest.Id = userData.Id;
-
-    }
-    else if ( userData.Name ) {
-
-      userRequest.Name = userData.Name;
-
-    }
-    */
-
-    let result = await call_deleteBulkUser( headers, userData ); //This request must be fail
+    let result = await userRequestServiceV1.callDeleteBulkUser( headers, userData ); //This request must be fail
 
     saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
     result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
@@ -1904,7 +678,138 @@ export async function test_deleteBulkUser( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
+
+  }
+
+  return bResult;
+
+}
+
+
+export async function test_searchUserGroup( headers: any,
+                                            params: any,
+                                            strCode: string,
+                                            strFileName: string,
+                                            intConditionType: number,
+                                            intCount: number,
+                                            bIsFail: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await userGroupRequestServiceV1.callSearchUserGroup( headers,
+                                                                        params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( bIsFail === false ) {
+
+        if ( intConditionType === 0 ) {       //<=
+
+          bResult = result.output.body.Count <= intCount;
+
+        }
+        else if ( intConditionType === 1 ) {  //>=
+
+          bResult = result.output.body.Count >= intCount;
+
+        }
+        else if ( intConditionType === 2 ) {  //===
+
+          bResult = result.output.body.Count === intCount;
+
+        }
+        else if ( intConditionType === 3 ) {  //!==
+
+          bResult = result.output.body.Count !== intCount;
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    consoleLog( "Error", error );
+
+  }
+
+  return bResult;
+
+}
+
+export async function test_searchCountUserGroup( headers: any,
+                                                 params: any,
+                                                 strCode: string,
+                                                 strFileName: string,
+                                                 intConditionType: number,
+                                                 intCount: number,
+                                                 bIsFail: boolean ): Promise<boolean> {
+
+  let bResult = false;
+
+  try {
+
+    const result = await userGroupRequestServiceV1.callSearchCountUserGroup( headers,
+                                                                             params );
+
+    saveInput( strFileName, result.input );
+    result.output.expected = { Code: strCode };
+    saveResult( strFileName, result.output );
+
+    if ( result &&
+         result.output.body.Code === strCode ) {
+
+      if ( bIsFail === false ) {
+
+        if ( intConditionType === 0 ) {       //<=
+
+          bResult = result.output.body.Data[ 0 ].Count <= intCount;
+
+        }
+        else if ( intConditionType === 1 ) {  //>=
+
+          bResult = result.output.body.Data[ 0 ].Count >= intCount;
+
+        }
+        else if ( intConditionType === 2 ) {  //===
+
+          bResult = result.output.body.Data[ 0 ].Count === intCount;
+
+        }
+        else if ( intConditionType === 3 ) {  //!==
+
+          bResult = result.output.body.Data[ 0 ].Count !== intCount;
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    consoleLog( "Error", error );
 
   }
 
@@ -1934,7 +839,7 @@ export async function test_deleteUserGroup( headers: any,
 
     }
 
-    let result = await call_deleteUserGroup( headers, userGroupRequest ); //This request must be success
+    let result = await userGroupRequestServiceV1.call_deleteUserGroup( headers, userGroupRequest ); //This request must be success
 
     saveInput( strFileName, result.input ); //"test_deleteUserGroup_TestL01_success"
     result.output.expected = { Code: strCode }; //"SUCCESS_USER_GROUP_DELETE"
@@ -1950,7 +855,7 @@ export async function test_deleteUserGroup( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -1967,7 +872,7 @@ export async function test_createAuth( headers: any,
 
   try {
 
-    const result = await call_createAuth( headers );
+    const result = await binaryRequestServiceV1.callCreateAuth( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -1997,7 +902,7 @@ export async function test_createAuth( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2014,7 +919,7 @@ export async function test_deleteAuth( headers: any,
 
   try {
 
-    const result = await call_deleteAuth( headers );
+    const result = await binaryRequestServiceV1.callDeleteAuth( headers );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2041,7 +946,7 @@ export async function test_deleteAuth( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2052,7 +957,8 @@ export async function test_deleteAuth( headers: any,
 export async function test_uploadImageTiger( headers: any,
                                              strCode: string,
                                              strFileName: string,
-                                             strUploadBinaryDataKey: string ): Promise<boolean> {
+                                             strUploadBinaryDataKey: string,
+                                             contextData: any ): Promise<boolean> {
 
   let bResult = false;
 
@@ -2072,14 +978,14 @@ export async function test_uploadImageTiger( headers: any,
     binaryRequest.append( "Category", "Test" );
     binaryRequest.append( "Label", "Tiger File" );
     binaryRequest.append( "Tag", "#Tiger#,#Image#,#Test#" );
-    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tiger" } ) );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tiger", ...contextData } ) );
     binaryRequest.append( "Comment", "A tiger image..." );
 
     let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
 
     delete headersMultipart[ "Content-Type" ];
 
-    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+    const result = await binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2097,7 +1003,7 @@ export async function test_uploadImageTiger( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2109,7 +1015,8 @@ export async function test_uploadImageTiger( headers: any,
 export async function test_uploadImageTower( headers: any,
                                              strCode: string,
                                              strFileName: string,
-                                             strUploadBinaryDataKey: string ): Promise<boolean> {
+                                             strUploadBinaryDataKey: string,
+                                             contextData: any ): Promise<boolean> {
 
   let bResult = false;
 
@@ -2129,14 +1036,14 @@ export async function test_uploadImageTower( headers: any,
     binaryRequest.append( "Category", "Test" );
     binaryRequest.append( "Label", "Tower File" );
     binaryRequest.append( "Tag", "#Tower#,#Image#,#Test#" );
-    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tower" } ) );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tower", ...contextData } ) );
     binaryRequest.append( "Comment", "A tower image..." );
 
     let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
 
     delete headersMultipart[ "Content-Type" ];
 
-    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+    const result = await binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2154,7 +1061,7 @@ export async function test_uploadImageTower( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2165,7 +1072,8 @@ export async function test_uploadImageTower( headers: any,
 export async function test_uploadImageRoad( headers: any,
                                             strCode: string,
                                             strFileName: string,
-                                            strUploadBinaryDataKey: string ): Promise<boolean> {
+                                            strUploadBinaryDataKey: string,
+                                            contextData: any ): Promise<boolean> {
 
   let bResult = false;
 
@@ -2183,14 +1091,14 @@ export async function test_uploadImageRoad( headers: any,
     binaryRequest.append( "Category", "Test" );
     binaryRequest.append( "Label", "Road File" );
     binaryRequest.append( "Tag", "#Road#,#Image#,#Test#" );
-    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Road" } ) );
+    binaryRequest.append( "Context", JSON.stringify( { "MyData": "Road", ...contextData } ) );
     binaryRequest.append( "Comment", "A road image..." );
 
     let headersMultipart = { ...headers, ...binaryRequest.getHeaders() }; //"multipart/form-data";
 
     delete headersMultipart[ "Content-Type" ];
 
-    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+    const result = await binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2207,7 +1115,7 @@ export async function test_uploadImageRoad( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2218,7 +1126,8 @@ export async function test_uploadImageRoad( headers: any,
 export async function test_uploadImageCastle( headers: any,
                                               strCode: string,
                                               strFileName: string,
-                                              strUploadBinaryDataKey: string ): Promise<boolean> {
+                                              strUploadBinaryDataKey: string,
+                                              contextData: any ): Promise<boolean> {
 
   let bResult = false;
 
@@ -2243,7 +1152,7 @@ export async function test_uploadImageCastle( headers: any,
 
     delete headersMultipart[ "Content-Type" ];
 
-    const result = await call_uploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
+    const result = await binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2260,7 +1169,7 @@ export async function test_uploadImageCastle( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2283,12 +1192,12 @@ export async function test_downloadImageThumbnail( headers: any,
                     SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
                     "/data/" + strUploadBinaryDataKey + "_thumbnail";
 
-    const result = await call_downloadBinaryData( headers,
-                                                  {
-                                                    Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
-                                                    Thumbnail: 1,
-                                                    SavePath: strPath
-                                                  } ); //This request must be success
+    const result = await binaryRequestServiceV1.callDownloadBinaryData( headers,
+                                                                        {
+                                                                          Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                                          Thumbnail: 1,
+                                                                          SavePath: strPath
+                                                                        } ); //This request must be success
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2304,7 +1213,7 @@ export async function test_downloadImageThumbnail( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2328,12 +1237,12 @@ export async function test_downloadImage( headers: any,
                     SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
                     "/data/" + strUploadBinaryDataKey + "_full";
 
-    const result = await call_downloadBinaryData( headers,
-                                                  {
-                                                    Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
-                                                    Thumbnail: 0,
-                                                    SavePath: strPath
-                                                  } ); //This request must be success
+    const result = await binaryRequestServiceV1.callDownloadBinaryData( headers,
+                                                                        {
+                                                                          Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                                          Thumbnail: 0,
+                                                                          SavePath: strPath
+                                                                        } ); //This request must be success
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2379,7 +1288,7 @@ export async function test_downloadImage( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2396,10 +1305,10 @@ export async function test_deleteImage( headers: any,
 
   try {
 
-    const result = await call_deleteBinaryData( headers,
-                                                {
-                                                  Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
-                                                } ); //This request must be success
+    const result = await binaryRequestServiceV1.callDeleteBinaryData( headers,
+                                                                      {
+                                                                        Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                                      } ); //This request must be success
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2415,7 +1324,7 @@ export async function test_deleteImage( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2432,10 +1341,10 @@ export async function test_getImageDetails( headers: any,
 
   try {
 
-    const result = await call_getBinaryDataDetails( headers,
-                                                    {
-                                                      Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
-                                                    } ); //This request must be success
+    const result = await binaryRequestServiceV1.callGetBinaryDataDetails( headers,
+                                                                          {
+                                                                            Id: upload_binary_data[ strUploadBinaryDataKey ].Id,
+                                                                          } ); //This request must be success
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2451,7 +1360,7 @@ export async function test_getImageDetails( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2460,15 +1369,15 @@ export async function test_getImageDetails( headers: any,
 }
 
 export async function test_disableBulkUser( headers: any,
-                                           userData: any,
-                                           strCode: string,
-                                           strFileName: string ): Promise<boolean> {
+                                            userData: any,
+                                            strCode: string,
+                                            strFileName: string ): Promise<boolean> {
 
   let bResult = false;
 
   try {
 
-    let result = await call_disableBulkUser( headers, userData ); //This request must be fail
+    let result = await userRequestServiceV1.callDisableBulkUser( headers, userData ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2484,7 +1393,7 @@ export async function test_disableBulkUser( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2501,7 +1410,7 @@ export async function test_enableBulkUser( headers: any,
 
   try {
 
-    let result = await call_enableBulkUser( headers, userData ); //This request must be fail
+    let result = await userRequestServiceV1.callEnableBulkUser( headers, userData ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2517,7 +1426,7 @@ export async function test_enableBulkUser( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2534,7 +1443,7 @@ export async function test_moveBulkUser( headers: any,
 
   try {
 
-    let result = await call_moveBulkUser( headers, userData ); //This request must be fail
+    let result = await userRequestServiceV1.callMoveBulkUser( headers, userData ); //This request must be fail
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2550,7 +1459,7 @@ export async function test_moveBulkUser( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2569,8 +1478,8 @@ export async function test_binarySearch( headers: any,
 
   try {
 
-    const result = await call_binarySearch( headers,
-                                            params );
+    const result = await binaryRequestServiceV1.callBinarySearch( headers,
+                                                                  params );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2605,7 +1514,7 @@ export async function test_binarySearch( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2624,8 +1533,8 @@ export async function test_binarySearchCount( headers: any,
 
   try {
 
-    const result = await call_binarySearchCount( headers,
-                                                 params );
+    const result = await binaryRequestServiceV1.callBinarySearchCount( headers,
+                                                                       params );
 
     saveInput( strFileName, result.input );
     result.output.expected = { Code: strCode };
@@ -2660,7 +1569,7 @@ export async function test_binarySearchCount( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2684,7 +1593,7 @@ export async function test_createUser_user01_at_TestL01( headers: any,
     userRequest.sysUserGroup.Create = false;    //No request create
     userRequest.sysUserGroup.Name = "TestL01";  //This group not exists
 
-    const result = await call_createUser( headers, userRequest ); //This request must be fail
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
     saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
     result.output.expected = { Code: strCode }; //"ERROR_USER_GROUP_NOT_FOUND"
@@ -2700,7 +1609,7 @@ export async function test_createUser_user01_at_TestL01( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2750,7 +1659,7 @@ export async function test_createUser_user98_at_TestL98( headers: any,
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
     result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
@@ -2812,7 +1721,7 @@ export async function test_createUser_user98_at_TestL98( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2847,7 +1756,7 @@ export async function test_createUser_user97_at_TestL98( headers: any,
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
     result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
@@ -2909,7 +1818,7 @@ export async function test_createUser_user97_at_TestL98( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -2944,7 +1853,7 @@ export async function test_createUser_user96_at_TestL98( headers: any,
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
     result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
@@ -3006,7 +1915,7 @@ export async function test_createUser_user96_at_TestL98( headers: any,
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3033,7 +1942,7 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_createUser_user01_at_TestL01_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_CREATE" };
@@ -3064,7 +1973,7 @@ export async function test_createUser_user01_at_TestL01_success( headers: any ):
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3089,7 +1998,7 @@ export async function test_createUser_user01_at_TestL02_success( headers: any ):
     userRequest.Business.Role = "#Role10#,#Role11#";
     userRequest.Business.Tag = "#Tag10#,#Tag11#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_createUser_user01_at_TestL02_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_CREATE" };
@@ -3107,7 +2016,7 @@ export async function test_createUser_user01_at_TestL02_success( headers: any ):
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3135,7 +2044,7 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
     userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
     userRequest.Business.Tag = "#Tag20#,#Tag21#"; //<---- This roles must be ignored
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_createUser_user02_at_TestL02_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_CREATE" };
@@ -3165,7 +2074,7 @@ export async function test_createUser_user02_at_TestL02_success( headers: any ):
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3204,7 +2113,7 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
     userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user02_at_TestL02_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
@@ -3234,7 +2143,7 @@ export async function test_updateUser_user02_at_TestL02_success( headers: any, u
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3273,7 +2182,7 @@ export async function test_updateUser_user02_at_TestL02_fail( headers: any, user
     userRequest.sysUserGroup.Tag = "#Tag11#";  //<-- This tag is ignored
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
     result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" };
@@ -3289,7 +2198,7 @@ export async function test_updateUser_user02_at_TestL02_fail( headers: any, user
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3329,7 +2238,7 @@ export async function test_updateUser_user99_at_TestL01_success( headers: any, u
     userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user99_at_TestL01_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
@@ -3359,7 +2268,7 @@ export async function test_updateUser_user99_at_TestL01_success( headers: any, u
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3386,7 +2295,7 @@ export async function test_createUser_user01_at_TestL01_again_fail( headers: any
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be fail
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
     saveInput( "test_createUser_user01_at_TestL01_again_fail", result.input );
     result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" };
@@ -3402,7 +2311,7 @@ export async function test_createUser_user01_at_TestL01_again_fail( headers: any
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3429,7 +2338,7 @@ export async function test_createUser_user_group_TestL01_again_fail( headers: an
     userRequest.Business.Role = "#Role01#,#Role02#";
     userRequest.Business.Tag = "#Tag01#,#Tag02#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be fail
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
     saveInput( "test_createUser_user_group_TestL01_again_fail", result.input );
     result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" };
@@ -3445,7 +2354,7 @@ export async function test_createUser_user_group_TestL01_again_fail( headers: an
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3483,7 +2392,7 @@ export async function test_updateUser_user01_at_TestL01_success( headers: any, u
     userRequest.sysUserGroup.Tag = "";
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user01_at_TestL01_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
@@ -3507,7 +2416,7 @@ export async function test_updateUser_user01_at_TestL01_success( headers: any, u
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3546,7 +2455,7 @@ export async function test_updateUser_user01_at_TestL01_fail( headers: any, user
     userRequest.sysUserGroup.Tag = "";
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user01_at_TestL01_fail", result.input );
     result.output.expected = { Code: "ERROR_USER_NOT_VALID" };
@@ -3562,7 +2471,7 @@ export async function test_updateUser_user01_at_TestL01_fail( headers: any, user
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3601,7 +2510,7 @@ export async function test_updateUser_user99_at_TestL02_fail( headers: any, user
     userRequest.sysUserGroup.Tag = "";
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be fail
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be fail
 
     saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
     result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" };
@@ -3618,7 +2527,7 @@ export async function test_updateUser_user99_at_TestL02_fail( headers: any, user
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3659,7 +2568,7 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
     userRequest.sysUserGroup.Tag = ""; //This tag must be NOT ignored
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user99_at_TestL02_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
@@ -3687,7 +2596,7 @@ export async function test_updateUser_user99_at_TestL02_success( headers: any, u
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3710,7 +2619,7 @@ export async function test_createUser_user02_at_TestL02_fail( headers: any ): Pr
     userRequest.sysUserGroup.Create = false;      //No request to create, This request must be fail
     userRequest.sysUserGroup.Name = "TestL02";    //This group not exists
 
-    const result = await call_createUser( headers, userRequest ); //This request must be fail
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
     saveInput( "test_createUser_user02_at_TestL02_fail", result.input );
     result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER" };
@@ -3726,7 +2635,7 @@ export async function test_createUser_user02_at_TestL02_fail( headers: any ): Pr
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3753,7 +2662,7 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
     userRequest.Business.Role = "#Role03#,#Role04#";
     userRequest.Business.Tag = "#Tag03#,#Tag04#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be success
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_createUser_user02_at_TestL01_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_CREATE" };
@@ -3783,7 +2692,7 @@ export async function test_createUser_user02_at_TestL01_success( headers: any ):
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3822,7 +2731,7 @@ export async function test_updateUser_user02_at_TestL01_success( headers: any, u
     userRequest.sysUserGroup.Tag = "";
     userRequest.Business = userData.Business;
 
-    let result = await call_updateUser( headers, userRequest ); //This request must be success
+    let result = await userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
     saveInput( "test_updateUser_user02_at_TestL01_success", result.input );
     result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
@@ -3840,7 +2749,7 @@ export async function test_updateUser_user02_at_TestL01_success( headers: any, u
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3864,7 +2773,7 @@ export async function test_createUser_user03_at_TestL01_fail( headers: any ): Pr
     userRequest.Business.Role = "#Role03#,#Role04#";
     userRequest.Business.Tag = "#Tag03#,#Tag04#";
 
-    const result = await call_createUser( headers, userRequest ); //This request must be fail
+    const result = await userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
     saveInput( "test_createUser_user03_at_TestL01_fail", result.input );
     result.output.expected = { Code: "ERROR_FORBIDEN_ACCESS" };
@@ -3880,7 +2789,7 @@ export async function test_createUser_user03_at_TestL01_fail( headers: any ): Pr
   }
   catch ( error ) {
 
-    console.log( error );
+    consoleLog( "Error", error );
 
   }
 
@@ -3894,12 +2803,88 @@ function myAssert( bCondition: boolean,
 
   if ( bCondition ) {
 
-    console.log( logSymbols.success, chalk.green( strMessageSuccess ) );
+    if ( strOutputFormat === "json" ) {
+
+      const jsonOutput = {
+                           Kind: "Result",
+                           Code: "Success",
+                           Message: strMessageSuccess.split( ": " )[ 1 ],
+                           Mark: strMessageSuccess.split( ": " )[ 0 ],
+                         }
+
+      console.log( jsonOutput );
+
+    }
+    else {
+
+      console.log( logSymbols.success, chalk.green( strMessageSuccess ) );
+
+    }
 
   }
   else {
 
-    assert( false, logSymbols.error + " " + chalk.red( strMessageFail ) );
+    //assert( false, logSymbols.error + " " + chalk.red( strMessageFail ) );
+    if ( strOutputFormat === "json" ) {
+
+      const jsonOutput = {
+                           Kind: "Result",
+                           Code: "Failed",
+                           Message: strMessageFail.split( ": " )[ 1 ],
+                           Mark: strMessageFail.split( ": " )[ 0 ],
+                         }
+
+      console.log( jsonOutput );
+
+    }
+
+    throw new Error( strMessageFail );
+
+  }
+
+}
+
+function consoleLog( strKind: string, data: any ) {
+
+  if ( strOutputFormat === "json" ) {
+
+    const jsonOutput = {
+                         Kind: strKind.split( "." )[ 0 ],
+                         Code: null,
+                         Message: data instanceof Error ? data.message : data,
+                         Mark: null
+                       }
+
+    console.log( jsonOutput );
+
+  }
+  else {
+
+    if ( strKind.endsWith( ".blue" ) ) {
+
+      console.log( chalk.blue( data ) );
+
+    }
+    else if ( strKind.endsWith( ".red" ) ) {
+
+      console.log( chalk.blue( data ) );
+
+    }
+    else if ( strKind.endsWith( ".green" ) ) {
+
+      console.log( chalk.blue( data ) );
+
+    }
+    else if ( data instanceof Error ) {
+
+      console.log( logSymbols.error + " " + chalk.red( data.message ) );
+
+    }
+    else {
+
+      console.log( data );
+
+    }
 
   }
 
@@ -3907,48 +2892,16 @@ function myAssert( bCondition: boolean,
 
 async function test_set01() {
 
-  const currentArgs = process.argv.slice( 2 );
+  systemSecurityAuthenticationServiceV1 = new SystemSecurityAuthenticationServiceV1( strProtocol, strHost );
+  userRequestServiceV1 = new UserRequestServiceV1( strProtocol, strHost );
+  userGroupRequestServiceV1 = new UserGroupRequestServiceV1( strProtocol, strHost );
+  binaryRequestServiceV1 = new BinaryRequestServiceV1( strProtocol, strHost );
 
-  if ( currentArgs &&
-       currentArgs.length > 0 ) {
-
-    if ( currentArgs[ 0 ] &&
-         currentArgs[ 0 ].startsWith( "--username=" ) ) {
-
-      strStartUser = currentArgs[ 0 ].replace( "--username=", "" ).trim();
-
-    }
-
-    if ( currentArgs.length >= 2 &&
-         currentArgs[ 1 ] &&
-         currentArgs[ 1 ].startsWith( "--password=" ) ) {
-
-      strStartPassword = currentArgs[ 1 ].replace( "--password=", "" ).trim();
-
-    }
-
-    if ( currentArgs.length >= 3 &&
-         currentArgs[ 2 ] &&
-         currentArgs[ 2 ].startsWith( "--target=" ) ) {
-
-      const targetParts = currentArgs[ 2 ].replace( "--target=", "" ).trim().split( "://" );
-
-      if ( targetParts.length >= 2 ) {
-
-        strProtocol = targetParts[ 0 ] + "://";
-        strHost = targetParts[ 1 ];
-
-      }
-
-    }
-
-  }
-
-  console.log( chalk.blue( "Starting the test01" ) );
+  consoleLog( "Message.blue", "Starting the test01" );
 
   try {
 
-    console.log( chalk.blue( ">******************** admin01@system.net ********************<" ) );
+    consoleLog( "Separator.blue", ">******************** admin01@system.net ********************<" );
 
     myAssert( await test_login( headers_admin01_at_system_net,
                                 {
@@ -3977,7 +2930,8 @@ async function test_set01() {
       myAssert( await test_uploadImageTiger( headers_admin01_at_system_net,
                                                "SUCCESS_BINARY_DATA_UPLOAD",
                                                "test_uploadImageTiger_admin01@system.net_success",
-                                               "admin01@system.net_tiger" ),
+                                               "admin01@system.net_tiger",
+                                               { Mark: "5143BE7B1AE1" } ),
                 "5143BE7B1AE1: upload image tiger is OK",
                 "5143BE7B1AE1: upload image tiger is FAILED" );
 
@@ -4134,27 +3088,47 @@ async function test_set01() {
                 '84945A9B59D0: Update of the user user02@TestL02 is OK',
                 '84945A9B59D0: Update of the user user02@TestL02 is FAILED' );
 
-      myAssert( await test_userSearch( headers_admin01_at_system_net,
+      myAssert( await test_searchUser( headers_admin01_at_system_net,
                 {  },
                 "SUCCESS_SEARCH",
-                "test_search_admin01@system.net_success",
+                "test_search_user_admin01@system.net_success",
                 1,
                 5 ),
                'FA89A381FFA5: Search of the user admin01@system.net is OK',
                'FA89A381FFA5: Search of the user admin01@system.net is FAILED' );
 
-      myAssert( await test_userSearchCount( headers_admin01_at_system_net,
+      myAssert( await test_searchCountUser( headers_admin01_at_system_net,
                 {  },
                 "SUCCESS_SEARCH_COUNT",
-                "test_search_admin01@system.net_success",
+                "test_search_count_user_admin01@system.net_success",
                 1,
                 5 ),
                '95F1AB5D6C89: Search count of the user admin01@system.net is OK',
                '95F1AB5D6C89: Search count of the user admin01@system.net is FAILED' );
 
+      myAssert( await test_searchUserGroup( headers_admin01_at_system_net,
+                {  },
+                "SUCCESS_SEARCH",
+                "test_search_user_group_admin01@system.net_success",
+                1,
+                2,
+                false ),
+               'CD546F4F0552: Search of the user group admin01@system.net is OK',
+               'CD546F4F0552: Search of the user group admin01@system.net is FAILED' );
+
+      myAssert( await test_searchCountUserGroup( headers_admin01_at_system_net,
+                {  },
+                "SUCCESS_SEARCH_COUNT",
+                "test_search_count_user_group_admin01@system.net_success",
+                1,
+                2,
+                false ),
+               '2487E4D62455: Search count of the user group admin01@system.net is OK',
+               '2487E4D62455: Search count of the user group admin01@system.net is FAILED' );
+
       try {
 
-        console.log( chalk.blue( ">******************** user01@TestL01 ********************<" ) );
+        consoleLog( "Separator.blue", ">******************** user01@TestL01 ********************<" );
 
         headers_user01_at_TestL01_Session1.Authorization = "12345"; //Create invalid authentication token
 
@@ -4223,7 +3197,8 @@ async function test_set01() {
         myAssert( await test_uploadImageTower( headers_user01_at_TestL01_Session1,
                                                  "SUCCESS_BINARY_DATA_UPLOAD",
                                                  "test_uploadImageTower_user01@TestL01_success",
-                                                 "user01@TestL01_tower" ),
+                                                 "user01@TestL01_tower",
+                                                 { Mark: "DCF30CA926BB" } ),
                   "DCF30CA926BB: upload image tower user01@TestL01 is OK",
                   "DCF30CA926BB: upload image tower user01@TestL01 is FAILED" );
 
@@ -4333,6 +3308,26 @@ async function test_set01() {
                   '2F8ECA7DF210: Bulk move of the user user9X@TestL98 is OK with the fail',
                   '2F8ECA7DF210: Bulk move of the user user9X@TestL98 is FAILED' );
 
+        myAssert( await test_searchUserGroup( headers_user01_at_TestL01_Session1,
+                  {  },
+                  "SUCCESS_SEARCH",
+                  "test_search_user_group_user01@TestL01_success",
+                  1,
+                  1,
+                  false ),
+                 'D8A05E994039: Search of the user group user01@TestL01 is OK',
+                 'D8A05E994039: Search of the user group user01@TestL01 is FAILED' );
+
+        myAssert( await test_searchCountUserGroup( headers_user01_at_TestL01_Session1,
+                  {  },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_count_user_group_user01@TestL01_success",
+                  1,
+                  1,
+                  false ),
+                  'FA177DD39D68: Search count of the user group user01@TestL01 is OK',
+                  'FA177DD39D68: Search count of the user group user01@TestL01 is FAILED' );
+
         //*** Disable user admin01@system.net ***
         myAssert( await test_disableBulkUser( headers_user01_at_TestL01_Session1,
                                               {
@@ -4419,19 +3414,19 @@ async function test_set01() {
                   '95543470C81F: Creation of the user user02@TestL01 is OK',
                   '95543470C81F: Creation of the user user02@TestL01 is FAILED' );
 
-        myAssert( await test_userSearch( headers_user01_at_TestL01_Session1,
+        myAssert( await test_searchUser( headers_user01_at_TestL01_Session1,
                   {  },
                   "SUCCESS_SEARCH",
-                  "test_search_user01@TestL01_success",
+                  "test_search_user_user01@TestL01_success",
                   2,   //Condition ===
                   2 ), //Count
                  'F720C51DE6FA: Search of the user user01@TestL01 is OK',
                  'F720C51DE6FA: Search of the user user01@TestL01 is FAILED' );
 
-        myAssert( await test_userSearchCount( headers_user01_at_TestL01_Session1,
+        myAssert( await test_searchCountUser( headers_user01_at_TestL01_Session1,
                   {  },
                   "SUCCESS_SEARCH_COUNT",
-                  "test_search_user01@TestL01_success",
+                  "test_search_count_user_user01@TestL01_success",
                   2,   //Condition ===
                   2 ), //Count
                  'F77C16FE2082: Search count of the user user01@TestL01 is OK',
@@ -4439,7 +3434,7 @@ async function test_set01() {
 
         try {
 
-          console.log( chalk.blue( ">******************** user02@TestL01 ********************<" ) );
+          consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<" );
 
           myAssert( await test_login( headers_user02_at_TestL01,
                                       {
@@ -4463,9 +3458,10 @@ async function test_set01() {
           myAssert( await test_uploadImageRoad( headers_user02_at_TestL01,
                                                 "SUCCESS_BINARY_DATA_UPLOAD",
                                                 "test_uploadImageRoad_user02@TestL01_success",
-                                                "user02@TestL01_road" ),
-                    "DCF30CA926BB: upload image road user02@TestL01 is OK",
-                    "DCF30CA926BB: upload image road user02@TestL01 is FAILED" );
+                                                "user02@TestL01_road",
+                                                { Mark: "830515981236" } ),
+                    "830515981236: upload image road user02@TestL01 is OK",
+                    "830515981236: upload image road user02@TestL01 is FAILED" );
 
           myAssert( await test_createAuth( headers_user02_at_TestL01,
                                            "SUCCESS_AUTH_TOKEN_CREATED",
@@ -4500,7 +3496,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL01_success",
-                    1,
+                    2,
                     1 ),
                     '6CAE1B5074FE: Search of the binary data user02@TestL01 is OK',
                     '6CAE1B5074FE: Search of the binary data user02@TestL01 is FAILED' );
@@ -4509,7 +3505,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    1,
+                    2,
                     1 ),
                     'BA12C15C021E: Search count of the binary data user02@TestL01 is OK',
                     'BA12C15C021E: Search count of the binary data user02@TestL01 is FAILED' );
@@ -4518,7 +3514,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL01_success",
-                    1,
+                    2,
                     2 ),
                     '30CC59357B73: Search of the user user01@TestL01 is OK',
                     '30CC59357B73: Search of the user user01@TestL01 is FAILED' );
@@ -4527,7 +3523,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL01_success",
-                    1,
+                    2,
                     2 ),
                     '447DC61A3301: Search count of the binary data user01@TestL01 is OK',
                     '447DC61A3301: Search count of the binary data user01@TestL01 is FAILED' );
@@ -4538,6 +3534,26 @@ async function test_set01() {
                                             "user02@TestL01_road" ),
                     "2940D61E1827: delete image road user02@TestL01 is OK",
                     "2940D61E1827: delete image road user02@TestL01 is FAILED" );
+
+          myAssert( await test_searchUserGroup( headers_user02_at_TestL01,
+                    {  },
+                    "ERROR_FORBIDEN_ACCESS",
+                    "test_search_user_group_user02@TestL01_success",
+                    1,
+                    1,
+                    false ),
+                    '3953DA466671: Search of the user group user02@TestL01 is OK with the fail',
+                    '3953DA466671: Search of the user group user02@TestL01 is FAILED' );
+
+          myAssert( await test_searchCountUserGroup( headers_user02_at_TestL01,
+                    {  },
+                    "ERROR_FORBIDEN_ACCESS",
+                    "test_search_count_user_group_user01@TestL01_success",
+                    1,
+                    1,
+                    true ),
+                    'F3D7172A7E01: Search count of the user group user01@TestL01 is OK with the fail',
+                    'F3D7172A7E01: Search count of the user group user01@TestL01 is FAILED' );
 
           //Fail because user03@TestL01 not have role to made this request
           myAssert( await test_createUser_user03_at_TestL01_fail( headers_user02_at_TestL01 ),
@@ -4558,15 +3574,13 @@ async function test_set01() {
                     '9D731B62D922: Logout with user user02@TestL01 is OK',
                     '9D731B62D922: Logout with user user02@TestL01 is FAILED' );
 
-          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
+          consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
 
         }
         catch ( error ) {
 
-          console.log( "user02@TestL02" );
-          console.log( error );
-
-          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
+          consoleLog( "Error", error );
+          consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
 
         }
 
@@ -4608,14 +3622,13 @@ async function test_set01() {
                   '1AF9D40E118A: Delete of the user user01@TestL01 is OK with the fail',
                   '1AF9D40E118A: Delete of the user user01@TestL01 is FAILED' );
 
-        console.log( chalk.blue( "<******************** user01@TestL01 ********************>" ) );
+        consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>" );
 
       }
       catch ( error ) {
 
-        console.log( "user01@TestL01" );
-        console.log( error );
-        console.log( chalk.blue( "<******************** user01@TestL01 ********************>" ) );
+        consoleLog( "Error", error );
+        consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>" );
 
       }
 
@@ -4626,7 +3639,7 @@ async function test_set01() {
 
       try {
 
-        console.log( chalk.blue( ">******************** user01@TestL02 ********************<" ) );
+        consoleLog( "Separator.blue", ">******************** user01@TestL02 ********************<" );
 
         myAssert( await test_login( headers_user01_at_TestL02,
                                     {
@@ -4694,79 +3707,119 @@ async function test_set01() {
                   '79736CBA890B: Creation of the user user02@TestL01 is OK',
                   '79736CBA890B: Creation of the user user02@TestL01 is FAILED' );
 
-        myAssert( await test_userSearch( headers_user01_at_TestL02,
+        myAssert( await test_searchUser( headers_user01_at_TestL02,
                   {  },
                   "SUCCESS_SEARCH",
-                  "test_search_user01@TestL01_success",
+                  "test_search_user_user01@TestL01_success",
                   2,   //Condition ===
                   4 ), //Count
                  'AD0B5775D644: Search of the user user01@TestL02 is OK',
                  'AD0B5775D644: Search of the user user01@TestL02 is FAILED' );
 
-        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
+        myAssert( await test_searchCountUser( headers_user01_at_TestL02,
                   {  },
                   "SUCCESS_SEARCH_COUNT",
-                  "test_search_user01@TestL01_success",
+                  "test_search_count_user_user01@TestL01_success",
                   2,   //Condition ===
                   4 ), //Count
                  'C095D0EA6182: Search count of the user user01@TestL02 is OK',
                  'C095D0EA6182: Search count of the user user01@TestL02 is FAILED' );
 
         //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
-        myAssert( await test_userSearch( headers_user01_at_TestL02,
+        myAssert( await test_searchUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'admin01@system.net'" },
                   "SUCCESS_SEARCH",
-                  "test_search_admin01@system.net_success",
+                  "test_search_user_admin01@system.net_success",
                   2,   //Condition ===
                   0 ), //Count
                  '0C4F58078409: Search of the user user01@TestL02 is OK',
                  '0C4F58078409: Search of the user user01@TestL02 is FAILED' );
 
         //Return zero because the use admin01@system.net is not allowed by the user01@TestL02
-        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
+        myAssert( await test_searchCountUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'admin01@system.net'" },
                   "SUCCESS_SEARCH_COUNT",
-                  "test_search_admin01@system.net_success",
+                  "test_search_count_user_admin01@system.net_success",
                   2,   //Condition ===
                   0 ), //Count
                  '89A4483AD09F: Search count of the user user01@TestL02 is OK',
                  'A972F4A5400E: Search count of the user user01@TestL02 is FAILED' );
 
-        myAssert( await test_userSearch( headers_user01_at_TestL02,
+        myAssert( await test_searchUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02'" },
                   "SUCCESS_SEARCH",
-                  "test_search_user02@TestL02_success",
+                  "test_search_user_user02@TestL02_success",
                   2,   //Condition ===
                   1 ), //Count
                  '0C4F58078409: Search of the user user02@TestL02 is OK',
                  '0C4F58078409: Search of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
+        myAssert( await test_searchCountUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02'" },
                   "SUCCESS_SEARCH_COUNT",
-                  "test_search_user02@TestL02_success",
+                  "test_search_count_user_user02@TestL02_success",
                   2,   //Condition ===
                   1 ), //Count
                  '89A4483AD09F: Search count of the user user02@TestL02 is OK',
                  '89A4483AD09F: Search count of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_userSearch( headers_user01_at_TestL02,
+        myAssert( await test_searchUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
                   "SUCCESS_SEARCH",
-                  "test_search_user02@TestL02_success",
+                  "test_search_user_user02@TestL02_success",
                   2,   //Condition ===
                   2 ), //Count
                  '6F000511292F: Search of the user user02@TestL02 is OK',
                  '6F000511292F: Search of the user user02@TestL02 is FAILED' );
 
-        myAssert( await test_userSearchCount( headers_user01_at_TestL02,
+        myAssert( await test_searchCountUser( headers_user01_at_TestL02,
                   { where: "A.Name = 'user02@TestL02' Or A.Name = 'user01@TestL02'" },
                   "SUCCESS_SEARCH_COUNT",
-                  "test_search_user02@TestL02_success",
+                  "test_search_count_user_user02@TestL02_success",
                   2,   //Condition ===
                   2 ), //Count
                  '656BB66AC356: Search count of the user user02@TestL02 is OK',
                  '656BB66AC356: Search count of the user user02@TestL02 is FAILED' );
+
+        myAssert( await test_searchUserGroup( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH",
+                  "test_search_user_group_user02@TestL02_success",
+                  1,
+                  2,
+                  false ),
+                 'D8A05E994039: Search of the user group user02@TestL02 is OK',
+                 'D8A05E994039: Search of the user group user02@TestL02 is FAILED' );
+
+        myAssert( await test_searchCountUserGroup( headers_user01_at_TestL02,
+                  {  },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_count_user_group_user02@TestL02_success",
+                  1,
+                  2,
+                  false ),
+                  '5635246C0BF4: Search count of the user group user02@TestL02 is OK',
+                  '5635246C0BF4: Search count of the user group user02@TestL02 is FAILED' );
+
+        myAssert( await test_searchUserGroup( headers_user01_at_TestL02,
+                  { where: "A.Name = 'System_Administrators'" },
+                  "SUCCESS_SEARCH",
+                  "test_search_user_group_user02@TestL02_success",
+                  1,
+                  0,
+                  false ),
+                 '3645B5EF721C: Search of the user group user02@TestL02 is OK',
+                 '3645B5EF721C: Search of the user group user02@TestL02 is FAILED' );
+
+        myAssert( await test_searchCountUserGroup( headers_user01_at_TestL02,
+                  { where: "A.Name = 'System_Administrators'" },
+                  "SUCCESS_SEARCH_COUNT",
+                  "test_search_count_user_group_user02@TestL02_success",
+                  1,
+                  0,
+                  false ),
+                  '3B45905010B9: Search count of the user group user02@TestL02 is OK',
+                  '3B45905010B9: Search count of the user group user02@TestL02 is FAILED' );
 
         //*** Disable user user0X@TestL0X ***
         myAssert( await test_disableBulkUser( headers_user01_at_TestL02,
@@ -4847,7 +3900,8 @@ async function test_set01() {
         myAssert( await test_uploadImageRoad( headers_user01_at_TestL02,
                                               "SUCCESS_BINARY_DATA_UPLOAD",
                                               "test_uploadImageRoad_user01@TestL02_success",
-                                              "user01@TestL02_road" ),
+                                              "user01@TestL02_road",
+                                              { Mark: "C23E1CE5725E" } ),
                   "C23E1CE5725E: upload image road user01@TestL02 is OK",
                   "C23E1CE5725E: upload image road user01@TestL02 is FAILED" );
 
@@ -4884,7 +3938,7 @@ async function test_set01() {
                   {  },
                   "SUCCESS_SEARCH",
                   "test_search_user01@TestL02_success",
-                  1,
+                  2,
                   1 ),
                   '7C542CAC93F9: Search of the binary data user01@TestL02 is OK',
                   '7C542CAC93F9: Search of the binary data user01@TestL02 is FAILED' );
@@ -4893,14 +3947,14 @@ async function test_set01() {
                   {  },
                   "SUCCESS_SEARCH_COUNT",
                   "test_searchCount_user01@TestL02_success",
-                  1,
+                  2,
                   1 ),
                   '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is OK',
                   '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is FAILED' );
 
         try {
 
-          console.log( chalk.blue( ">******************** user02@TestL02 ********************<" ) );
+          consoleLog( "Separator.blue", ">******************** user02@TestL02 ********************<" );
 
           myAssert( await test_login( headers_user02_at_TestL02,
                                       {
@@ -4966,7 +4020,8 @@ async function test_set01() {
           myAssert( await test_uploadImageRoad( headers_user02_at_TestL02,
                                                 "SUCCESS_BINARY_DATA_UPLOAD",
                                                 "test_uploadImageRoad_user02@TestL02_success",
-                                                "user02@TestL02_road" ),
+                                                "user02@TestL02_road",
+                                                { Mark: "09436E9FE7B4" } ),
                     "09436E9FE7B4: upload image road user02@TestL02 is OK",
                     "09436E9FE7B4: upload image road user02@TestL02 is FAILED" );
 
@@ -5003,7 +4058,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL02_success",
-                    1,
+                    2,
                     1 ),
                     'BA8DDFDEC334: Search of the binary data user02@TestL02 is OK',
                     'BA8DDFDEC334: Search of the binary data user02@TestL02 is FAILED' );
@@ -5012,7 +4067,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    1,
+                    2,
                     1 ),
                     'E21BF5EF740F: Search count of the binary data user02@TestL02 is OK',
                     'E21BF5EF740F: Search count of the binary data user02@TestL02 is FAILED' );
@@ -5021,7 +4076,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL02_success",
-                    1,
+                    2,
                     2 ),
                     'BA8DDFDEC334: Search of the binary data user01@TestL02 is OK',
                     'BA8DDFDEC334: Search of the binary data user01@TestL02 is FAILED' );
@@ -5030,7 +4085,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL02_success",
-                    1,
+                    2,
                     2 ),
                     'C107CF6AA8EB: Search count of the binary data user01@TestL02 is OK',
                     'C107CF6AA8EB: Search count of the binary data user01@TestL02 is FAILED' );
@@ -5047,20 +4102,19 @@ async function test_set01() {
                     '56FE7F65DC57: Logout with user user02@TestL02 is OK with the fail',
                     '56FE7F65DC57: Logout with user user02@TestL02 is FAILED' );
 
-          console.log( chalk.blue( "<******************** user02@TestL02 ********************>" ) );
+          consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>" );
 
         }
         catch ( error ) {
 
-          console.log( "user01@TestL01" );
-          console.log( error );
-          console.log( chalk.blue( "<******************** user02@TestL02 ********************>" ) );
+          consoleLog( "Error", error );
+          consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>" );
 
         }
 
         try {
 
-          console.log( chalk.blue( ">******************** user02@TestL01 ********************<" ) );
+          consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<" );
 
           myAssert( await test_login( headers_user02_at_TestL01,
                                       {
@@ -5084,7 +4138,8 @@ async function test_set01() {
           myAssert( await test_uploadImageCastle( headers_user02_at_TestL01,
                                                   "SUCCESS_BINARY_DATA_UPLOAD",
                                                   "test_uploadImageCastle_user02@TestL01_success",
-                                                  "user02@TestL01_castle" ),
+                                                  "user02@TestL01_castle",
+                                                  { Mark: "6355B124499E" } ),
                     "6355B124499E: upload image castle user02@TestL01 is OK",
                     "6355B124499E: upload image castle user02@TestL01 is FAILED" );
 
@@ -5121,7 +4176,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user02@TestL01_success",
-                    1,
+                    2,
                     1 ),
                     '42D17A37758A: Search of the binary data user02@TestL01 is OK',
                     '42D17A37758A: Search of the binary data user02@TestL01 is FAILED' );
@@ -5130,7 +4185,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user02@TestL01_success",
-                    1,
+                    2,
                     1 ),
                     '7A542D403847: Search count of the binary data user02@TestL01 is OK',
                     '7A542D403847: Search count of the binary data user02@TestL01 is FAILED' );
@@ -5139,7 +4194,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH",
                     "test_search_user01@TestL02_success",
-                    1,
+                    2,
                     3 ),
                     'FA694F2DF9DB: Search of the binary data user01@TestL02 is OK',
                     'FA694F2DF9DB: Search of the binary data user01@TestL02 is FAILED' );
@@ -5148,7 +4203,7 @@ async function test_set01() {
                     {  },
                     "SUCCESS_SEARCH_COUNT",
                     "test_searchCount_user01@TestL02_success",
-                    1,
+                    2,
                     3 ),
                     '3C577FAE6D3C: Search count of the binary data user01@TestL02 is OK',
                     '3C577FAE6D3C: Search count of the binary data user01@TestL02 is FAILED' );
@@ -5166,14 +4221,13 @@ async function test_set01() {
                     'A82203930794: Logout with user user02@TestL01 is OK',
                     'A82203930794: Logout with user user02@TestL01 is FAILED' );
 
-          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
+          consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
 
         }
         catch ( error ) {
 
-          console.log( "user01@TestL01" );
-          console.log( error );
-          console.log( chalk.blue( "<******************** user02@TestL01 ********************>" ) );
+          consoleLog( "Error", error );
+          consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
 
         }
 
@@ -5213,14 +4267,13 @@ async function test_set01() {
                   '56FE7F65DC57: Logout with user user01@TestL02 is OK',
                   '56FE7F65DC57: Logout with user user01@TestL02 is FAILED' );
 
-        console.log( chalk.blue( "<******************** user01@TestL02 ********************>" ) );
+        consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>" );
 
       }
       catch ( error ) {
 
-        console.log( "user01@TestL02" );
-        console.log( error );
-        console.log( chalk.blue( "<******************** user01@TestL02 ********************>" ) );
+        consoleLog( "Error", error );
+        consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>" );
 
       }
 
@@ -5276,8 +4329,7 @@ async function test_set01() {
     }
     catch ( error ) {
 
-      console.log( "admin01@system.net" );
-      console.log( error );
+      consoleLog( "Error", error );
 
     }
 
@@ -5287,20 +4339,64 @@ async function test_set01() {
               '0E7222800B26: Logout with user admin01@system.net is OK',
               '0E7222800B26: Logout with user admin01@system.net is FAILED' );
 
-    console.log( chalk.blue( "<******************** admin01@system.net ********************>" ) );
+    consoleLog( "Separator.blue", "<******************** admin01@system.net ********************>" );
 
   }
   catch ( error ) {
 
-    console.log( error );
-
-    console.log( chalk.blue( "<******************** admin01@system.net ********************>" ) );
+    consoleLog( "Error", error );
+    consoleLog( "Separator.blue", "<******************** admin01@system.net ********************>" );
 
   }
 
 }
 
 export default async function main() {
+
+  const currentArgs = process.argv.slice( 2 );
+
+  if ( currentArgs &&
+       currentArgs.length > 0 ) {
+
+    if ( currentArgs[ 0 ] &&
+         currentArgs[ 0 ].startsWith( "--username=" ) ) {
+
+      strStartUser = currentArgs[ 0 ].replace( "--username=", "" ).trim();
+
+    }
+
+    if ( currentArgs.length >= 2 &&
+         currentArgs[ 1 ] &&
+         currentArgs[ 1 ].startsWith( "--password=" ) ) {
+
+      strStartPassword = currentArgs[ 1 ].replace( "--password=", "" ).trim();
+
+    }
+
+    if ( currentArgs.length >= 3 &&
+         currentArgs[ 2 ] &&
+         currentArgs[ 2 ].startsWith( "--target=" ) ) {
+
+      const targetParts = currentArgs[ 2 ].replace( "--target=", "" ).trim().split( "://" );
+
+      if ( targetParts.length >= 2 ) {
+
+        strProtocol = targetParts[ 0 ] + "://";
+        strHost = targetParts[ 1 ];
+
+      }
+
+    }
+
+    if ( currentArgs.length >= 4 &&
+         currentArgs[ 3 ] &&
+         currentArgs[ 3 ].startsWith( "--outputFormat=" ) ) {
+
+      strOutputFormat = currentArgs[ 3 ].replace( "--outputFormat=", "" ).trim();
+
+    }
+
+  }
 
   SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 

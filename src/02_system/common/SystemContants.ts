@@ -12,9 +12,9 @@ export interface ICheckUserRoles {
 export interface ICheckUserGroupRoles {
 
   isAuthorizedAdmin: boolean,
-  //isAuthorizedL01: boolean,
-  //isAuthorizedL02: boolean,
+  isAuthorizedL01: boolean,
   isAuthorizedL03: boolean,
+  isAuthorizedL04: boolean,
   isNotAuthorized: boolean
 
 }
