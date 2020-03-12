@@ -100,7 +100,7 @@ async function test_set01() {
                 "4E99438DE0A9: download image tiger admin01@system.net is FAILED" );
 
       CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_admin01_at_system_net,
-                                              "SUCCESS_GET_INFORMATION",
+                                              "SUCCESS_GET_BINARY_DATA_DETAILS",
                                               "test_getImageDetailsTiger_admin01@system.net_success",
                                               "admin01@system.net_tiger" ),
                 "4D93C17B6B3C: get image details tiger admin01@system.net is OK",
@@ -367,7 +367,7 @@ async function test_set01() {
                   "326E879A24CF: download image tower user01@TestL01 is FAILED" );
 
         CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user01_at_TestL01_Session1,
-                                              "SUCCESS_GET_INFORMATION",
+                                              "SUCCESS_GET_BINARY_DATA_DETAILS",
                                               "test_getImageDetailsTower_user01@TestL01_success",
                                               "user01@TestL01_tower" ),
                   "EA9A3CA6AF6C: get image details tower user01@TestL01 is OK",
@@ -628,7 +628,7 @@ async function test_set01() {
                     "326E879A24CF: download image road user02@TestL01 is FAILED" );
 
           CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL01,
-                                                "SUCCESS_GET_INFORMATION",
+                                                "SUCCESS_BINARY_DATA_DETAILS",
                                                 "test_getImageDetailsRoad_user02@TestL01_success",
                                                 "user02@TestL01_road" ),
                     "EA9A3CA6AF6C: get image details road user02@TestL01 is OK",
@@ -1070,7 +1070,7 @@ async function test_set01() {
                   "0B1CD13DAD0B: download image road user01@TestL02 is FAILED" );
 
         CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user01_at_TestL02,
-                                              "SUCCESS_GET_INFORMATION",
+                                              "SUCCESS_GET_BINARY_DATA_DETAILS",
                                               "test_getImageDetailsRoad_user01@TestL02_success",
                                               "user01@TestL02_road" ),
                   "EA9A3CA6AF6C: get image details road user01@TestL02 is OK",
@@ -1190,7 +1190,7 @@ async function test_set01() {
                     "D4F7EE1786AE: download image road user02@TestL02 is FAILED" );
 
           CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL02,
-                                                "SUCCESS_GET_INFORMATION",
+                                                "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                 "test_getImageDetailsRoad_user02@TestL02_success",
                                                 "user02@TestL02_road" ),
                     "D121F8FC1A6E: get image details road user02@TestL02 is OK",
@@ -1308,7 +1308,7 @@ async function test_set01() {
                     "15FC200672CD: download image castle user02@TestL01 is FAILED" );
 
           CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL01,
-                                                "SUCCESS_GET_INFORMATION",
+                                                "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                 "test_getImageDetailsCatle_user02@TestL01_success",
                                                 "user02@TestL01_castle" ),
                     "C4D63A79B8C6: get image details castle user02@TestL01 is OK",

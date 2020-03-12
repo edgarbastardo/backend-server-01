@@ -27,12 +27,12 @@ import BaseService from "../../../common/database/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
 import SYSBinaryIndexService from "../../../common/database/services/SYSBinaryIndexService";
 import SYSUserService from '../../../common/database/services/SYSUserService';
-import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
 
 import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
 import { SYSUser } from '../../../common/database/models/SYSUser';
 import { SYSBinaryIndex } from '../../../common/database/models/SYSBinaryIndex';
 import { AccessKind } from "../../../common/CommonConstants";
+import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
 
@@ -3312,7 +3312,7 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_GET_INFORMATION',
+                     Code: 'SUCCESS_GET_BINARY_DATA_DETAILS',
                      Message: await I18NManager.translate( strLanguage, 'Success binary data details from the id %s', sysBinaryIndexInDB.Id ),
                      Mark: 'F5509D216548' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
@@ -3330,15 +3330,15 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: "ERROR_CANNOT_GET_THE_INFORMATION",
-                     Message: await I18NManager.translate( strLanguage, "Not allowed to get the information" ),
+                     Code: "ERROR_CANNOT_GET_BINARY_DATA",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to get the binary data information" ),
                      Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: "ERROR_CANNOT_GET_THE_INFORMATION",
-                                 Message: await I18NManager.translate( strLanguage, "Not allowed to get the information" ),
+                                 Code: "ERROR_CANNOT_GET_BINARY_DATA",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to get the binary data information" ),
                                  Details: null,
                                }
                              ],
@@ -4171,9 +4171,9 @@ export default class BinaryServiceController extends BaseService {
       }
 
       let sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.body.Id,
-                                                                      null,
-                                                                      currentTransaction,
-                                                                      logger );
+                                                                    null,
+                                                                    currentTransaction,
+                                                                    logger );
 
       if ( sysBinaryIndexInDB instanceof Error ) {
 
@@ -4798,6 +4798,668 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
+  static async bulkBinaryDataOperation( strBulkOperation: string,
+                                        request: Request,
+                                        transaction: any,
+                                        logger: any ): Promise<any> {
+
+    let result: any = {
+                        data:[],
+                        errors:[],
+                        warnings: []
+                      };
+
+    let strLanguage = null;
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const bulkData = request.body.bulk;
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      for ( let intIndex= 0; intIndex < bulkData.length; intIndex++ ) {
+
+        const bulkUserData = bulkData[ intIndex ];
+
+        try {
+
+          let sysBinaryIndexInDB = await SYSBinaryIndexService.getById( bulkUserData.Id,
+                                                                        null,
+                                                                        transaction,
+                                                                        logger );
+
+          if ( !sysBinaryIndexInDB ) {
+
+            result.errors.push (
+                                 {
+                                   Id: bulkUserData.Id,
+                                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
+                                   Mark: 'CA9D0E3BB1FE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Message: 'The binary data not found in database.',
+                                   Details: null,
+                                 }
+                               );
+
+          }
+          else if ( sysBinaryIndexInDB instanceof Error ) {
+
+            const error = sysBinaryIndexInDB as any;
+
+            result.errors.push (
+                                 {
+                                   Id: bulkUserData.Id,
+                                   Code: error.name,
+                                   Mark: 'D7CB3D1C049C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               );
+
+          }
+          else {
+
+            //ANCHOR Check is owner of BinaryData
+            const bIsOwner = await BinaryServiceController.checkIsOwner(
+                                                                        sysBinaryIndexInDB.Owner,
+                                                                        userSessionStatus.UserId,
+                                                                        userSessionStatus.UserName,
+                                                                        userSessionStatus.UserGroupId,
+                                                                        userSessionStatus.UserGroupName,
+                                                                        logger
+                                                                      );
+
+            let checkUserRoles: ICheckUserRoles = {
+                                                    isAuthorizedAdmin: false,
+                                                    isAuthorizedL03: false,
+                                                    isAuthorizedL02: false,
+                                                    isAuthorizedL01: false,
+                                                    isNotAuthorized: false
+                                                  };
+
+            let ownerList = null;
+
+            if ( bIsOwner === false ) {
+
+              ownerList = BinaryServiceController.getUserOwner( sysBinaryIndexInDB.Owner, logger );
+
+              for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                const sysUserInDB = await SYSUserService.getBy( ownerList[ intOnwerIndex ],
+                                                                null,
+                                                                transaction,
+                                                                logger );
+
+                checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
+                                                                             sysUserInDB,
+                                                                             strBulkOperation === "deleteBinaryData" ? "DeleteBinaryData": "UpdateBinary",
+                                                                             logger );
+
+                if ( checkUserRoles.isAuthorizedAdmin ||
+                     checkUserRoles.isAuthorizedL02 ) {
+
+                  break;
+
+                }
+
+              }
+
+              if ( checkUserRoles.isAuthorizedAdmin === false &&
+                   checkUserRoles.isAuthorizedL02 === false ) {
+
+                ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
+
+                for ( let intOnwerIndex = 0; intOnwerIndex < ownerList.length; intOnwerIndex++ ) {
+
+                  const sysUserGroupInDB = await SYSUserGroupService.getBy( ownerList[ intOnwerIndex ],
+                                                                            null,
+                                                                            transaction,
+                                                                            logger );
+
+                  checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
+                                                                                    sysUserGroupInDB,
+                                                                                    strBulkOperation === "deleteBinary" ? "DeleteBinary": "UpdateBinary",
+                                                                                    logger );
+
+                  if ( checkUserRoles.isAuthorizedL01 ||
+                      checkUserRoles.isAuthorizedL03 ) {
+
+                    break;
+
+                  }
+
+                }
+
+              }
+
+            }
+
+            if ( !bIsOwner &&
+                 !checkUserRoles.isAuthorizedAdmin &&
+                 !checkUserRoles.isAuthorizedL03 &&
+                 !checkUserRoles.isAuthorizedL02 &&
+                 !checkUserRoles.isAuthorizedL01 ) {
+
+              if ( strBulkOperation === "deleteBinary" ) {
+
+                result.errors.push(
+                                    {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      Code: 'ERROR_CANNOT_DELETE_BINARY_DATA',
+                                      Mark: 'FE62746C4B68' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the binary data' ),
+                                      Details: null
+                                    }
+                                  );
+
+              }
+              else {
+
+                result.errors.push(
+                                    {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      Code: 'ERROR_CANNOT_UDPATE_BINARY_DATA',
+                                      Mark: '1C70E75F0D28' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the binary data' ),
+                                      Details: null
+                                    }
+                                  );
+
+              };
+
+            }
+            else if ( strBulkOperation === "deleteBinary" ) {
+
+              const deleteResult = await SYSBinaryIndexService.deleteByModel( sysBinaryIndexInDB,
+                                                                              transaction,
+                                                                              logger );
+
+              if ( deleteResult instanceof Error ) {
+
+                const error = deleteResult as Error;
+
+                result.errors.push(
+                                    {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      Code: 'ERROR_UNEXPECTED',
+                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                      Mark: '18851D6A2F26' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Details: await SystemUtilities.processErrorDetails( error ) //error
+                                    }
+                                  );
+
+
+              }
+              else if ( deleteResult === true ) {
+
+                result.data.push(
+                                  {
+                                    Id: sysBinaryIndexInDB.Id,
+                                    Code: 'SUCCESS_BINARY_DATA_DELETE',
+                                    Message: await I18NManager.translate( strLanguage, 'Success binary data with id %s deleted.', sysBinaryIndexInDB.Id ),
+                                    Mark: '1EE09075BE43' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Details: null
+                                  }
+                                );
+
+              }
+              else {
+
+                result.errors.push(
+                                    {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      Code: 'ERROR_BINARY_DATA_DELETE',
+                                      Message: await I18NManager.translate( strLanguage, 'Error in binary data delete.' ),
+                                      Mark: '8E5B5D6B1FE4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Details: "Method deleteByModel return false"
+                                    }
+                                  );
+
+              }
+
+            }
+            else {
+
+              sysBinaryIndexInDB.UpdatedBy = userSessionStatus.UserName;
+              sysBinaryIndexInDB.UpdatedAt = null;
+
+              if ( strBulkOperation === "disableBinary" ) {
+
+                sysBinaryIndexInDB.DisabledBy = "1@" + userSessionStatus.UserName;
+
+              }
+              else if ( strBulkOperation === "enableBinary" ) {
+
+                sysBinaryIndexInDB.DisabledBy = "0";
+
+              }
+
+              sysBinaryIndexInDB = await SYSBinaryIndexService.createOrUpdate( sysBinaryIndexInDB.Id,
+                                                                               ( sysBinaryIndexInDB as any ).dataValues,
+                                                                               true,
+                                                                               transaction,
+                                                                               logger );
+
+              if ( sysBinaryIndexInDB instanceof Error ) {
+
+                const error = sysBinaryIndexInDB as any;
+
+                result.errors.push(
+                                    {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      Code: 'ERROR_UNEXPECTED',
+                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                      Mark: 'E1FF18F8269C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Details: await SystemUtilities.processErrorDetails( error ) //error
+                                    }
+                                  );
+
+              }
+              else {
+
+                result.data.push(
+                                  {
+                                    Id: sysBinaryIndexInDB.Id,
+                                    Code: 'SUCCESS_BINARY_DATA_UPDATE',
+                                    Message: await I18NManager.translate( strLanguage, 'Success binary data update.' ),
+                                    Mark: '5BF69F0B73CE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Details: {
+                                               DisabledBy: sysBinaryIndexInDB.DisabledBy,
+                                               DisabledAt: sysBinaryIndexInDB.DisabledAt
+                                             }
+                                  }
+                                );
+
+              }
+
+            }
+
+          }
+
+        }
+        catch ( error ) {
+
+          result.data.push(
+                            {
+                              Id: bulkUserData.Id,
+                              ShortId: bulkUserData.ShortId,
+                              Name: bulkUserData.Name,
+                              Code: 'ERROR_UNEXPECTED',
+                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                              Mark: '348D1629BE0B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                              Details: await SystemUtilities.processErrorDetails( error ) //error
+                            }
+                          );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.bulkBinaryDataOperation.name;
+
+      const strMark = "D2FE308E9041" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result.errors.push(
+                          {
+                            Code: 'ERROR_UNEXPECTED',
+                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                            Mark: strMark,
+                            Details: await SystemUtilities.processErrorDetails( error ) //error
+                          }
+                        );
+
+    }
+
+    return result;
+
+  }
+
+  static async disableBulkBinaryData( request: Request,
+                                      transaction: any,
+                                      logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkBinaryDataOperation( "disableBinary",
+                                                             request,
+                                                             currentTransaction,
+                                                             logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_BINARY_DATA_DISABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL binary data' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_BINARY_DATA_DIABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the binary data. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been disabled. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: 'CBEFF0A51342' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.disableBulkBinaryData.name;
+
+      const strMark = "12E562ACC8F8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async enableBulkBinaryData( request: Request,
+                                     transaction: any,
+                                     logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkBinaryDataOperation( "enableBinary",
+                                                             request,
+                                                             currentTransaction,
+                                                             logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_BINARY_DATA_ENABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL binary data' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_BINARY_DATA_ENABLE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the binary data. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been enabled. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: 'DB9BB148AE82' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.enableBulkBinaryData.name;
+
+      const strMark = "F8E2AADC8FF8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async deleteBinaryData( request: Request,
                                  transaction: any,
                                  logger: any ):Promise<any> {
@@ -5021,14 +5683,14 @@ export default class BinaryServiceController extends BaseService {
             result = {
                        StatusCode: 500, //Ok
                        Code: 'ERROR_BINARY_DATA_DELETE',
-                       Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
-                       Mark: '6E317472B7E2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Message: await I18NManager.translate( strLanguage, 'Error in binary data delete.' ),
+                       Mark: 'CDAC887D1CB4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [
                                  {
                                    Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                   Message: 'Method delete return false',
+                                   Message: 'Method deleteByModel return false',
                                    Details: null
                                  }
                                ],
@@ -5112,6 +5774,167 @@ export default class BinaryServiceController extends BaseService {
       sourcePosition.method = this.name + "." + this.deleteBinaryData.name;
 
       const strMark = "AB5BE4A80EF8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async deleteBulkBinaryData( request: Request,
+                                     transaction: any,
+                                     logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const bulkResult = await this.bulkBinaryDataOperation( "deleteBinary",
+                                                             request,
+                                                             currentTransaction,
+                                                             logger );
+
+      let intStatusCode = -1;
+      let strCode = "";
+      let strMessage = "";
+      let bIsError = false;
+
+      if ( bulkResult.errors.length === 0 ) {
+
+        intStatusCode = 200
+        strCode = 'SUCCESS_BULK_BINARY_DATA_DELETE';
+        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL binary data' );
+
+      }
+      else if ( bulkResult.errors.length === request.body.bulk.length ) {
+
+        intStatusCode = 400
+        strCode = 'ERROR_BULK_BINARY_DATA_DELETE';
+        strMessage = await I18NManager.translate( strLanguage, 'Cannot delete the binary data. Please check the errors and warnings section' );
+        bIsError = true;
+
+      }
+      else {
+
+        intStatusCode = 202
+        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
+        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been deleted. Please check the data and errors and warnings section' );
+        bIsError = bulkResult.errors && bulkResult.errors.length > 0;
+
+      }
+
+      result = {
+                 StatusCode: intStatusCode,
+                 Code: strCode,
+                 Message: strMessage,
+                 Mark: '3D4D0F25EAB5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: bIsError,
+                 Errors: bulkResult.errors,
+                 Warnings: bulkResult.warnings,
+                 Count: request.body.bulk.length - bulkResult.errors.length,
+                 Data: bulkResult.data
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.enableBulkBinaryData.name;
+
+      const strMark = "7032FDAF4C3B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

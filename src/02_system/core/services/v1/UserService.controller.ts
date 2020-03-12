@@ -2992,10 +2992,18 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#GName:*#" ) ||
-                                                            roleSubTag.includes( "#GId:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#GSId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ) : false;
+        if ( !roleSubTag ) {
+
+          roleSubTag = [];
+
+        }
+
+        result.isAuthorizedL03 = userSessionStatus.Role && sysUserInDB ? ( roleSubTag.includes( "#GName:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
+                                                                           roleSubTag.includes( "#GName:*#" ) ||
+                                                                           roleSubTag.includes( "#GId:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
+                                                                           roleSubTag.includes( "#GId:*#" ) ||
+                                                                           roleSubTag.includes( "#GSId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ||
+                                                                           roleSubTag.includes( "#GSId:*#" ) ): false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -3008,9 +3016,18 @@ export default class UserServiceController {
 
           }
 
-          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
-                                                              roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
-                                                              roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ) : false;
+          if ( !roleSubTag ) {
+
+            roleSubTag = [];
+
+          }
+
+          result.isAuthorizedL02 = userSessionStatus.Role && sysUserInDB ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
+                                                                             roleSubTag.includes( "#UName:*#" ) ||
+                                                                             roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
+                                                                             roleSubTag.includes( "#UId:*#" ) ||
+                                                                             roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ||
+                                                                             roleSubTag.includes( "#USId:*#" ) ) : false;
 
           if ( result.isAuthorizedL02 === false ) {
 
@@ -3018,7 +3035,8 @@ export default class UserServiceController {
                                                               userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
             if ( result.isAuthorizedL01 &&
-                 userSessionStatus.UserGroupId !== sysUserInDB.sysUserGroup.Id ) {
+                 ( !sysUserInDB ||
+                   userSessionStatus.UserGroupId !== sysUserInDB.sysUserGroup.Id ) ) {
 
               //Uhathorized
               result.isNotAuthorized = true;
@@ -5996,10 +6014,10 @@ export default class UserServiceController {
         const error = userSessionStatus;
 
         result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '20E77DDE1001' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '578DFED7CD84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -6665,45 +6683,14 @@ export default class UserServiceController {
       //ANCHOR getUser
       let userSessionStatus = context.UserSessionStatus;
 
-      //let bIsNotAuthorized = false;
-
-      /*
-      let sysUserInDB = null;
-
-      if ( request.query.id ) {
-
-        sysUserInDB = await SYSUserService.getById( request.query.id,
-                                                 null,
-                                                 currentTransaction,
-                                                 logger );
-
-      }
-      if ( request.query.shortId ) {
-
-        sysUserInDB = await SYSUserService.getByShortId( request.query.shortId,
-                                                      null,
-                                                      currentTransaction,
-                                                      logger );
-
-      }
-      else {
-
-        sysUserInDB = await SYSUserService.getByName( request.query.name,
-                                                   null,
-                                                   currentTransaction,
-                                                   logger );
-
-      }
-      */
-
-     let sysUserInDB = await SYSUserService.getBy( {
-                                                     Id: request.query.id,
-                                                     ShortId: request.query.shortId,
-                                                     Name: request.query.name
-                                                   },
-                                                   null,
-                                                   currentTransaction,
-                                                   logger );
+      let sysUserInDB = await SYSUserService.getBy( {
+                                                      Id: request.query.id,
+                                                      ShortId: request.query.shortId,
+                                                      Name: request.query.name
+                                                    },
+                                                    null,
+                                                    currentTransaction,
+                                                    logger );
 
       const resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
                                                             sysUserInDB,
@@ -6723,15 +6710,15 @@ export default class UserServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the information' ),
+                   Code: 'ERROR_CANNOT_GET_USER',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user information' ),
                    Mark: '49BC23FE5772' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_GET_THE_INFORMATION',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the information' ),
+                               Code: 'ERROR_CANNOT_GET_USER',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user information' ),
                                Details: null,
                              }
                            ],
@@ -6740,59 +6727,39 @@ export default class UserServiceController {
                    Data: []
                  }
 
-      } //ANCHOR getUser
-      else if ( sysUserInDB != null &&
-                sysUserInDB instanceof Error === false ) {
+      }
+      else if ( !sysUserInDB ) {
 
-        let modelData = ( sysUserInDB as any ).dataValues;
-
-        const tempModelData = await SYSUser.convertFieldValues(
-                                                                {
-                                                                  Data: modelData,
-                                                                  FilterFields: 1, //Force to remove fields like password and value
-                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                  Include: null,
-                                                                  Logger: logger,
-                                                                  ExtraInfo: {
-                                                                               Request: request
-                                                                             }
-                                                                }
-                                                              );
-
-        if ( tempModelData ) {
-
-          modelData = tempModelData;
-
-        }
-
-        /*
-        if ( !resultCheckUserRoles.isAuthorizedAdmin &&
-             modelData.Person ) {
-
-          delete modelData.Person.ImageId;
-
-        }
-        */
+        const strMessage = await this.getMessageUser(
+                                                      strLanguage,
+                                                      {
+                                                        Id: request.query.id,
+                                                        ShortId: request.query.shortId,
+                                                        Name: request.query.name
+                                                      }
+                                                    );
 
         result = {
-                   StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_INFORMATION',
-                   Message: await I18NManager.translate( strLanguage, 'Success get the information.' ),
-                   Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_NOT_FOUND',
+                   Message: strMessage,
+                   Mark: 'C0A0710239A6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
-                   IsError: false,
-                   Errors: [],
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_NOT_FOUND',
+                               Message: strMessage,
+                               Details: null,
+                             }
+                           ],
                    Warnings: [],
-                   Count: 1,
-                   Data: [
-                           modelData
-                         ]
+                   Count: 0,
+                   Data: []
                  }
 
-        bApplyTransaction = true;
-
       }
-      else {
+      else if ( sysUserInDB instanceof Error ) {
 
         const error = sysUserInDB as any;
 
@@ -6816,64 +6783,47 @@ export default class UserServiceController {
                  };
 
       }
+      else {
 
-      /*
-      //let userSessionStatus = context.UserSessionStatus;
-      //let strUserName = context.UserSessionStatus.UserName;
+        let modelData = ( sysUserInDB as any ).dataValues;
 
-      request.query.include = [ { "model": "Person" }, { "model": "UserGroup" } ];
-      delete request.query.attributes;
+        const tempModelData = await SYSUser.convertFieldValues(
+                                                                {
+                                                                  Data: modelData,
+                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                  Include: null,
+                                                                  Logger: logger,
+                                                                  ExtraInfo: {
+                                                                               Request: request
+                                                                             }
+                                                                }
+                                                              );
 
-      const resultData = await ModelToRestAPIServiceController.get( User,
-                                                                    request,
-                                                                    null,
-                                                                    logger );
+        if ( tempModelData ) {
 
-      result = resultData;
-      */
+          modelData = tempModelData;
 
-      /*
-      if ( resultData.statusCode === 200 ) {
+        }
 
         result = {
                    StatusCode: 200, //Ok
                    Code: 'SUCCESS_GET_USER',
-                   Message: await I18NManager.translate( strLanguage, 'Success get the user.' ),
-                   Mark: '3E14265E7A10' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Message: await I18NManager.translate( strLanguage, 'Success get the user information.' ),
+                   Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
-                   Warnings: null,
-                   Count: 0,
+                   Warnings: [],
+                   Count: 1,
                    Data: [
-                           userData
+                           modelData
                          ]
                  }
 
-      }
-      else {
-
-        result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'User not found in database' ),
-                   Mark: '454854885291' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: 'ERROR_USER_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The user not found in database' ),
-                               Details: null,
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
+        bApplyTransaction = true;
 
       }
-      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -6958,7 +6908,11 @@ export default class UserServiceController {
   }
 
   static checkUserGroupRoleLevel( userSessionStatus: any,
-                                  sysUserGroup: { Id: string, ShortId: string, Name: string },
+                                  sysUserGroup: {
+                                                  Id: string,
+                                                  ShortId: string,
+                                                  Name: string
+                                                },
                                   strActionRole: string,
                                   logger: any ): ICheckUserRoles {
 
@@ -6986,10 +6940,18 @@ export default class UserServiceController {
 
         }
 
-        result.isAuthorizedL03 = userSessionStatus.Role ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
-                                                            roleSubTag.includes( "#GName:*#" ) ||
-                                                            roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
-                                                            roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ) : false;
+        if ( !roleSubTag ) {
+
+          roleSubTag = [];
+
+        }
+
+        result.isAuthorizedL03 = userSessionStatus.Role && sysUserGroup ? ( roleSubTag.includes( "#GName:" +  sysUserGroup.Name + "#" ) ||
+                                                                            roleSubTag.includes( "#GName:*#" ) ||
+                                                                            roleSubTag.includes( "#GId:" +  sysUserGroup.Id + "#" ) ||
+                                                                            roleSubTag.includes( "#GId:*#" ) ||
+                                                                            roleSubTag.includes( "#GSId:" +  sysUserGroup.ShortId + "#" ) ||
+                                                                            roleSubTag.includes( "#GSId:*#" ) ) : false;
 
         if ( result.isAuthorizedL03 === false ) {
 
@@ -6997,9 +6959,10 @@ export default class UserServiceController {
                                                             userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
           if ( result.isAuthorizedL01 &&
-               ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
-                 userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
-                 userSessionStatus.UserGroupId !== sysUserGroup.Id ) ) {
+               ( !sysUserGroup ||
+                 ( userSessionStatus.UserGroupName !== sysUserGroup.Name &&
+                   userSessionStatus.UserGroupShortId !== sysUserGroup.ShortId &&
+                   userSessionStatus.UserGroupId !== sysUserGroup.Id ) ) ) {
 
             //Uhathorized
             result.isNotAuthorized = true;
@@ -7792,7 +7755,8 @@ export default class UserServiceController {
                                                                            currentTransaction,
                                                                            logger );
 
-                  if ( resultCheckUserRoles.isAuthorizedAdmin && request.body.Role ) {
+                  if ( resultCheckUserRoles.isAuthorizedAdmin &&
+                       request.body.Role ) {
 
                     strRoleToApply = SystemUtilities.mergeTokens( request.body.Role,
                                                                   strRoleToApply,
@@ -8340,7 +8304,7 @@ export default class UserServiceController {
       let userRules = {
                         Avatar: [ 'present', 'string', 'min:36' ],
                         Id: [ 'required', 'string', 'min:36' ],
-                        ShortId: [ 'present', 'string', 'min:8' ],
+                        //ShortId: [ 'present', 'string', 'min:8' ],
                         Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
                         ExpireAt: [ 'present', 'date' ],
                         Notify: [ 'present', 'min:3' ],
@@ -8350,7 +8314,7 @@ export default class UserServiceController {
                         sysUserGroup: {
                           Create: [ 'required', 'boolean' ],
                           Id: [ 'present', 'string', 'min:36' ],
-                          ShortId: [ 'present', 'string', 'min:8' ],
+                          //ShortId: [ 'present', 'string', 'min:8' ],
                           Name: [ 'present', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
                           Role: [ 'present', 'string' ],
                           Tag: [ 'present', 'string' ],
@@ -8469,30 +8433,6 @@ export default class UserServiceController {
                                  Code: 'ERROR_USER_NOT_VALID',
                                  Message: await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' ),
                                  Details: null
-                               }
-                             ],
-                     Warnings: [],
-                     Count: 0,
-                     Data: []
-                   }
-
-        }
-        else if ( this.checkUsersEqualsRoleLevel( sysUserInDB,
-                                                  userSessionStatus,
-                                                  logger ) === false ) {
-
-          result = {
-                     StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_UDPATE_USER',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but yout not had.' ),
-                     Mark: 'BD7C3154E5D3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: true,
-                     Errors: [
-                               {
-                                 Code: 'ERROR_CANNOT_UPDATE_USER',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but yout not had.' ),
-                                 Details: null,
                                }
                              ],
                      Warnings: [],
@@ -9734,8 +9674,8 @@ export default class UserServiceController {
                                           Name: sysUserInDB.Name,
                                           Code: 'ERROR_USER_DELETE',
                                           Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
-                                          Mark: '26ECAA#E77AAA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                          Details: "Method delete return false"
+                                          Mark: '26ECAAE77AAA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Details: "Method deleteByModel return false"
                                         }
                                       );
 
@@ -9860,7 +9800,7 @@ export default class UserServiceController {
                           {
                             Code: 'ERROR_UNEXPECTED',
                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                            Mark: '14B48DBC5ECC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                            Mark: strMark,
                             Details: await SystemUtilities.processErrorDetails( error ) //error
                           }
                         );
@@ -10608,7 +10548,7 @@ export default class UserServiceController {
                      Errors: [
                                {
                                  Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                 Message: 'Method delete return false',
+                                 Message: 'Method deleteByModel return false',
                                  Details: null
                                }
                              ],
@@ -10747,7 +10687,7 @@ export default class UserServiceController {
 
         intStatusCode = 200
         strCode = 'SUCCESS_BULK_USER_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL users to the user group' );
+        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL users' );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
@@ -11586,10 +11526,10 @@ export default class UserServiceController {
         const error = userSessionStatus;
 
         result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '3D8CA79D0E51' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -11607,7 +11547,7 @@ export default class UserServiceController {
       }
       else {
 
-        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_User_Setting.Id,
                                                                              userSessionStatus.UserId,
                                                                              currentTransaction,
                                                                              logger );
@@ -11810,10 +11750,10 @@ export default class UserServiceController {
         const error = userSessionStatus;
 
         result = {
-                   StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '565583BCF8EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -11831,7 +11771,7 @@ export default class UserServiceController {
       }
       else {
 
-        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_User_Setting.Id,
                                                                                userSessionStatus.UserId,
                                                                                request.body,
                                                                                currentTransaction,
@@ -11853,6 +11793,28 @@ export default class UserServiceController {
                                  Code: error.name,
                                  Message: error.message,
                                  Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else if ( !configData ) {
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_CANNOT_CREATE_SETTING',
+                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                     Mark: "7AF91E5F4B19" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_CANNOT_CREATE_SETTING',
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                                 Details: 'Method setConfigValueData return null' //error
                                }
                              ],
                      Warnings: [],

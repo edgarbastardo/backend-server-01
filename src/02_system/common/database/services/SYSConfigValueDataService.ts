@@ -824,7 +824,7 @@ export default class SYSConfigValueDataService extends BaseService {
 
         await SYSConfigValueData.create(
                                          {
-                                           ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_General_User_Settings.Id,
+                                           ConfigMetaDataId: strConfigMetaDataId,
                                            Owner: strOnwer,
                                            Value: CommonUtilities.jsonToString( jsonConfigData, logger ),
                                            CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,

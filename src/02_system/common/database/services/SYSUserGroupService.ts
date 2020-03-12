@@ -7,11 +7,11 @@ import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 import { SYSUserGroup } from "../models/SYSUserGroup";
-import { SYSUser } from '../models/SYSUser';
 
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
 import BaseService from "./BaseService";
+import { SYSUser } from '../models/SYSUser';
 
 const debug = require( 'debug' )( 'SYSUserGroupService' );
 
@@ -247,6 +247,106 @@ export default class SYSUserGroupService extends BaseService {
 
   }
 
+  static async getNameIsFree( strId: string,
+                              strName: string,
+                              strTimeZoneId: string,
+                              transaction: any,
+                              logger: any ): Promise<SYSUserGroup> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //const Sequelize = require( 'sequelize' );
+      //const notEqual = Sequelize.Op.ne;
+
+      const options = {
+
+        where: { Id: { $ne: strId }, Name: strName },
+        transaction: currentTransaction
+
+      }
+
+      result = await SYSUserGroup.findOne( options );
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = SYSUserGroupService.name + "." + this.getNameIsFree.name;
+
+      const strMark = "A2CE756EBE10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
   static async getByName( strName: string,
                           strTimeZoneId: string,
                           transaction: any,
@@ -473,9 +573,9 @@ export default class SYSUserGroupService extends BaseService {
       if ( result === null ) {
 
         result = await SYSUserGroup.create(
-                                         createOrUpdateData,
-                                         { transaction: currentTransaction }
-                                       );
+                                            createOrUpdateData,
+                                            { transaction: currentTransaction }
+                                          );
 
       }
       else if ( bUpdate ) {

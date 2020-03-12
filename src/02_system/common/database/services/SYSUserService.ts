@@ -437,7 +437,7 @@ export default class SYSUserService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = SYSUserService.name + "." + this.getByName.name;
+      sourcePosition.method = SYSUserService.name + "." + this.getNameIsFree.name;
 
       const strMark = "E8DDEF95875E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

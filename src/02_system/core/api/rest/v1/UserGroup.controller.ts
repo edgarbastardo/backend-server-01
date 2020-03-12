@@ -171,7 +171,7 @@ export default class UserGroupController {
   }
 
   @httpPut(
-            "",
+            "/disable/bulk",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
@@ -187,7 +187,7 @@ export default class UserGroupController {
   }
 
   @httpPut(
-            "",
+            "/enable/bulk",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
@@ -218,9 +218,8 @@ export default class UserGroupController {
 
   }
 
-
   @httpDelete(
-               "",
+               "/bulk",
                MiddlewareManager.middlewareSetContext,
                MiddlewareManager.middlewareCheckIsAuthenticated,
                MiddlewareManager.middlewareCheckIsAuthorized,
@@ -268,7 +267,7 @@ export default class UserGroupController {
   }
 
   @httpGet(
-            "",
+            "/settings",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
@@ -284,7 +283,7 @@ export default class UserGroupController {
   }
 
   @httpPut(
-            "",
+            "/settings",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,

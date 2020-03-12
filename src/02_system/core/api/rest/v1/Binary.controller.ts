@@ -64,7 +64,10 @@ export default class BinaryController {
                                   { Path: BinaryController._BASE_PATH + "/details", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary meta data details from backend server" }, //,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03# , "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03"
                                   { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadBinary#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadBinary" ], Description: "Upload binary data to the backend server" },
                                   { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Update the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Disable existent information metadata binary data in bulk" },
+                                  { Path: BinaryController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Enable existent information metadata binary data in bulk" },
                                   { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data in bulk from backend server" },
                                 ]
 
   _controllerLogger = null;
@@ -378,6 +381,42 @@ export default class BinaryController {
 
   }
 
+  @httpPut(
+            "/disable/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized
+          )
+  async disableBulkBinaryData( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await BinaryServiceController.disableBulkBinaryData( request,
+                                                                        null,
+                                                                        this._controllerLogger || context.Logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/enable/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized
+          )
+  async enableBulkBinaryData( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await BinaryServiceController.enableBulkBinaryData( request,
+                                                                       null,
+                                                                       this._controllerLogger || context.Logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpDelete(
                "",
                MiddlewareManager.middlewareSetContext,
@@ -391,6 +430,22 @@ export default class BinaryController {
     const result = await BinaryServiceController.deleteBinaryData( request,
                                                                    null,
                                                                    this._controllerLogger || context.Logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "/bulk",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized,
+             )
+  async deleteBulkBinaryData( request: Request, response: Response ) {
+
+    const result = await BinaryServiceController.deleteBulkBinaryData( request,
+                                                                       null,
+                                                                       this._controllerLogger );
 
     response.status( result.StatusCode ).send( result );
 

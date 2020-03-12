@@ -134,7 +134,24 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
         if ( !params.KeepGroupExtraData ||
              params.KeepGroupExtraData === 0 ) {
 
-          result.Business = extraData;
+          if ( extraData.Business ) {
+
+            result.Business = extraData.Business;
+
+            delete extraData.Business;
+
+            if ( extraData ) {
+
+              result.Business = { ...result.Business, ...extraData };
+
+            }
+
+          }
+          else {
+
+            result.Business = extraData;
+
+          }
 
           delete result.ExtraData;
 

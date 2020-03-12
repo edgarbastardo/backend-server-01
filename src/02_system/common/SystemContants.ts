@@ -39,7 +39,7 @@ export default class SystemConstants {
   static readonly _LOCK_RESOURCE_START = "startLock:689d7b6b";
   static readonly _LOCK_RESOURCE_UPDATE_SESSION_STATUS = "sessionStatus:8f0468c6:";
   static readonly _LOCK_RESOURCE_UPDATE_ROLES_OF_ROUTE = "rolesOfRoute:17def5ee:";
- 
+
   //Group System Administrators
   static readonly _GROUP_SYSTEM_ADMINISTRATORS = {
                                                    Id: "c4d61857-482f-40a0-bcec-93206091d37f",
@@ -212,7 +212,7 @@ export default class SystemConstants {
                                                              Scope: "system",
                                                              Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                              Category: "Authentication",
-                                                             Name: "system.authentication.ExpireTimeAuthentication",
+                                                             Name: "system.authentication.expire.time.authentication",
                                                              Default: JSON.stringify(
                                                                                       {
                                                                                         "@__default__@": {
@@ -353,7 +353,7 @@ export default class SystemConstants {
                                                                Scope: "system",
                                                                Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                                Category: "Security",
-                                                               Name: "system.Security.PasswordStrengthParameters",
+                                                               Name: "system.security.password.strength.parameters",
                                                                Default: JSON.stringify(
                                                                                         {
                                                                                           "@__default__@":{
@@ -492,7 +492,7 @@ export default class SystemConstants {
                                                        Scope: "system",
                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                        Category: "Binary Data",
-                                                       Name: "system.binary.data.BasePath",
+                                                       Name: "system.binary.data.base.path",
                                                        Default: "binary_data/",
                                                        Label: "Default full path to binary data folder",
                                                        Description: "Default full path to resources folder. Empty for to assume the path to relative path binary_data/",
@@ -508,7 +508,7 @@ export default class SystemConstants {
                                                           Scope: "system",
                                                           Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                           Category: "Binary Data",
-                                                          Name: "system.binary.data.BinaryDataMaximumSize",
+                                                          Name: "system.binary.data.maximum.size",
                                                           Default: "10240",
                                                           Label: "Maximum size in kilobytes for binary data file",
                                                           Description: "Maximum size in kilobytes for binary data file",
@@ -524,7 +524,7 @@ export default class SystemConstants {
                                                        Scope: "system",
                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                        Category: "Binary Data",
-                                                       Name: "system.binary.data.BinaryDataExpireAt",
+                                                       Name: "system.binary.data.expire.at",
                                                        Default: "720",
                                                        Label: "Expire in hours",
                                                        Description: "Expire in hours",
@@ -581,7 +581,7 @@ export default class SystemConstants {
                                                               Scope: "system",
                                                               Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                               Category: "Binary Data",
-                                                              Name: "system.binary.data.AllowedCategory",
+                                                              Name: "system.binary.data.allowed.category",
                                                               Default: JSON.stringify(
                                                                                        {
                                                                                          "@__default__@": {
@@ -619,7 +619,7 @@ export default class SystemConstants {
                                                               Scope: "system",
                                                               Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                               Category: "Binary Data",
-                                                              Name: "system.binary.data.AllowedMimeType",
+                                                              Name: "system.binary.data.allowed.mime.type",
                                                               Default: JSON.stringify(
                                                                                        {
                                                                                          "@__default__@": {
@@ -678,7 +678,7 @@ export default class SystemConstants {
                                                            Scope: "system",
                                                            Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                            Category: "Binary Data",
-                                                           Name: "system.binary.data.DefaultOwners",
+                                                           Name: "system.binary.data.default.owner",
                                                            Default: JSON.stringify(
                                                                                     {
                                                                                       "@__default__@": "#@@UserName@@#,#@@Category@@#"
@@ -754,7 +754,7 @@ export default class SystemConstants {
                                                         Scope: "system",
                                                         Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                         Category: "Binary Data",
-                                                        Name: "system.binary.data.Thumbnail",
+                                                        Name: "system.binary.data.thumbnail",
                                                         Default: JSON.stringify(
                                                                                  {
                                                                                    "@__default__@":[
@@ -851,7 +851,7 @@ export default class SystemConstants {
                                                       Scope: "system",
                                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                       Category: "Binary Data",
-                                                      Name: "system.binary.data.Process",
+                                                      Name: "system.binary.data.process",
                                                       Default: JSON.stringify(
                                                                                {
                                                                                  "@__default__@":[
@@ -984,7 +984,7 @@ export default class SystemConstants {
                                                       Scope: "system",
                                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                       Category: "Singup",
-                                                      Name: "system.user.signup.Process",
+                                                      Name: "system.user.signup.process",
                                                       Default: JSON.stringify(
                                                                                {
                                                                                  "@__default__@":{
@@ -1073,7 +1073,7 @@ export default class SystemConstants {
                                                        Scope: "system",
                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                        Category: "User",
-                                                       Name: "system.user.autorole.Assign",
+                                                       Name: "system.user.role.auto.assign",
                                                        Default: JSON.stringify(
                                                                                 {
                                                                                   "create": {
@@ -1088,8 +1088,8 @@ export default class SystemConstants {
                                                                                   }
                                                                                 }
                                                                               ),
-                                                       Label: "Process auto assign of role to the user creation",
-                                                       Description: "Process auto assign of role in the user creation. When the user that create has the role.",
+                                                       Label: "Process auto assign of role to the user creation or update",
+                                                       Description: "Process auto assign of role in the user creation or update. When the user that create or update has the role.",
                                                        AllowTagAccessR: "#Administrator#",
                                                        AllowTagAccessW: "#Administrator#",
                                                        Example: JSON.stringify(
@@ -1122,6 +1122,63 @@ export default class SystemConstants {
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                        ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA}" }`
                                                      };
+
+  static readonly _CONFIG_ENTRY_UserGroupAutoRoleAssign_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_UserGroupAutoRoleAssign = {
+                                                            Id: "bbcb8119-26f3-4c07-b04e-5d22e6458941",
+                                                            Scope: "system",
+                                                            Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                            Category: "User Group",
+                                                            Name: "system.user.group.role.auto.assign",
+                                                            Default: JSON.stringify(
+                                                                                      {
+                                                                                        "create": {
+                                                                                          "@__default__@":{
+                                                                                            "@__default__@": ""
+                                                                                          }
+                                                                                        },
+                                                                                        "update": {
+                                                                                          "@__default__@":{
+                                                                                            "@__default__@": ""
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    ),
+                                                            Label: "Process auto assign of role to the user group creation or update",
+                                                            Description: "Process auto assign of role in the user group creation or update. When the user group that create or update has the role.",
+                                                            AllowTagAccessR: "#Administrator#",
+                                                            AllowTagAccessW: "#Administrator#",
+                                                            Example: JSON.stringify(
+                                                                                     {
+                                                                                       "create": {
+                                                                                         "@__default__@":{
+                                                                                           "@__default__@": ""
+                                                                                         },
+                                                                                         "#MasterL01#": {
+                                                                                           "@__default__@": "#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                                         },
+                                                                                         "#MasterL02#": {
+                                                                                           "@__default__@": "#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                                         },
+                                                                                         "#MasterL03#": {
+                                                                                           "@__default__@": "#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                                         },
+                                                                                         "#RoleName01#": {
+                                                                                           "#GroupName01#": "#RoleName02#,#RoleName03#",
+                                                                                           "@__default__@": "#RoleName02#"
+                                                                                         }
+                                                                                       },
+                                                                                       "update": {
+                                                                                         "@__default__@":{
+                                                                                           "@__default__@": ""
+                                                                                         },
+                                                                                       }
+                                                                                     }
+                                                                                   ),
+                                                            CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                            ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA}" }`
+                                                          };
 
   static readonly _CONFIG_ENTRY_EMail_Service_SCHEMA = "";
 
@@ -1574,6 +1631,7 @@ export default class SystemConstants {
                                                                 Name: "system.general.default.information",
                                                                 Default: JSON.stringify(
                                                                                          {
+                                                                                           "feed_back_email":"feedback@mycompany.com",
                                                                                            "no_response_email":"no-response@mycompany.com",
                                                                                            "company_name":"MY COMPANY LLC",
                                                                                            "company_address":"1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
@@ -1602,31 +1660,57 @@ export default class SystemConstants {
                                                                 ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
                                                               };
 
-  static readonly _CONFIG_ENTRY_General_User_Settings_SCHEMA = "";
+  static readonly _CONFIG_ENTRY_User_Settings_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_General_User_Settings = {
-                                                          Id: "09749c7d-5514-4635-8c19-c272747cf193",
-                                                          Scope: "user",
-                                                          Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                          Category: "User",
-                                                          Name: "system.general.user.settings",
-                                                          Default: JSON.stringify(
-                                                                                   {
-                                                                                     "entry":"value"
-                                                                                   }
-                                                                                 ),
-                                                          Label: "Configuration for user settings values",
-                                                          Description: "Configuration for user settings values",
-                                                          AllowTagAccessR: "#Administrator#",
-                                                          AllowTagAccessW: "#Administrator#",
-                                                          Example: JSON.stringify(
-                                                                                   {
-                                                                                     "entry":"value"
-                                                                                   }
-                                                                                 ),
-                                                          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                          ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
-                                                        };
+  static readonly _CONFIG_ENTRY_User_Setting = {
+                                                 Id: "09749c7d-5514-4635-8c19-c272747cf193",
+                                                 Scope: "user",
+                                                 Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                 Category: "User",
+                                                 Name: "system.user.setting",
+                                                 Default: JSON.stringify(
+                                                                          {
+                                                                            "entry":"value"
+                                                                          }
+                                                                        ),
+                                                 Label: "Configuration for user settings values",
+                                                 Description: "Configuration for user settings values",
+                                                 AllowTagAccessR: "#Administrator#",
+                                                 AllowTagAccessW: "#Administrator#",
+                                                 Example: JSON.stringify(
+                                                                          {
+                                                                            "entry":"value"
+                                                                          }
+                                                                        ),
+                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                               };
+
+  static readonly _CONFIG_ENTRY_UserGroup_Settings_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_UserGroup_Setting = {
+                                                      Id: "92417fa1-c477-4df0-868c-e970619c47f9",
+                                                      Scope: "usergroup",
+                                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                      Category: "User Group",
+                                                      Name: "system.user.group.setting",
+                                                      Default: JSON.stringify(
+                                                                               {
+                                                                                 "entry":"value"
+                                                                               }
+                                                                             ),
+                                                      Label: "Configuration for user group settings values",
+                                                      Description: "Configuration for user group settings values",
+                                                      AllowTagAccessR: "#Administrator#",
+                                                      AllowTagAccessW: "#Administrator#",
+                                                      Example: JSON.stringify(
+                                                                               {
+                                                                                 "entry":"value"
+                                                                               }
+                                                                             ),
+                                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                      ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                    };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -1647,7 +1731,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
                                                SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service,
-                                               SystemConstants._CONFIG_ENTRY_General_User_Settings
+                                               SystemConstants._CONFIG_ENTRY_User_Setting,
+                                               SystemConstants._CONFIG_ENTRY_UserGroup_Setting
                                              ];
 
 }
