@@ -18,11 +18,14 @@ export default class SecurityAuthenticationTestV1 {
                                                                                       userData.Password );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_LOGIN"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
+
 
         if ( bIsFail === false ) {
 
@@ -64,11 +67,13 @@ export default class SecurityAuthenticationTestV1 {
       const result = await CommonTest.systemSecurityAuthenticationServiceV1.callTokenCheck( headers );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_LOGIN"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -96,11 +101,13 @@ export default class SecurityAuthenticationTestV1 {
       const result = await CommonTest.systemSecurityAuthenticationServiceV1.callLogout( headers );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_LOGOUT"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 

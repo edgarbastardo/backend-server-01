@@ -1631,6 +1631,8 @@ export default class SystemConstants {
                                                                 Name: "system.general.default.information",
                                                                 Default: JSON.stringify(
                                                                                          {
+                                                                                           "sys_admin_email":"admin@mycompany.com",
+                                                                                           "sys_admin_phone":"+1-336-776-9897",
                                                                                            "feed_back_email":"feedback@mycompany.com",
                                                                                            "no_response_email":"no-response@mycompany.com",
                                                                                            "company_name":"MY COMPANY LLC",
@@ -1647,6 +1649,9 @@ export default class SystemConstants {
                                                                 AllowTagAccessW: "#Administrator#",
                                                                 Example: JSON.stringify(
                                                                                          {
+                                                                                           "sys_admin_email":"admin@mycompany.com, otheradmin@domain.com",
+                                                                                           "sys_admin_phone":"1-336-776-9897, 1-360-767-9192",
+                                                                                           "feed_back_email":"feedback@mycompany.com",
                                                                                            "no_response_email":"no-response@mycompany.com",
                                                                                            "company_name":"MY COMPANY LLC",
                                                                                            "company_address":"1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
@@ -1662,55 +1667,55 @@ export default class SystemConstants {
 
   static readonly _CONFIG_ENTRY_User_Settings_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_User_Setting = {
-                                                 Id: "09749c7d-5514-4635-8c19-c272747cf193",
-                                                 Scope: "user",
-                                                 Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                 Category: "User",
-                                                 Name: "system.user.setting",
-                                                 Default: JSON.stringify(
-                                                                          {
-                                                                            "entry":"value"
-                                                                          }
-                                                                        ),
-                                                 Label: "Configuration for user settings values",
-                                                 Description: "Configuration for user settings values",
-                                                 AllowTagAccessR: "#Administrator#",
-                                                 AllowTagAccessW: "#Administrator#",
-                                                 Example: JSON.stringify(
-                                                                          {
-                                                                            "entry":"value"
-                                                                          }
-                                                                        ),
-                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                 ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
-                                               };
+  static readonly _CONFIG_ENTRY_User_Settings = {
+                                                  Id: "09749c7d-5514-4635-8c19-c272747cf193",
+                                                  Scope: "user",
+                                                  Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                  Category: "User",
+                                                  Name: "system.user.settings",
+                                                  Default: JSON.stringify(
+                                                                           {
+                                                                             "entry":"value"
+                                                                           }
+                                                                         ),
+                                                  Label: "Configuration for user settings values",
+                                                  Description: "Configuration for user settings values",
+                                                  AllowTagAccessR: "#Administrator#",
+                                                  AllowTagAccessW: "#Administrator#",
+                                                  Example: JSON.stringify(
+                                                                           {
+                                                                             "entry":"value"
+                                                                           }
+                                                                         ),
+                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                  ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                };
 
   static readonly _CONFIG_ENTRY_UserGroup_Settings_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_UserGroup_Setting = {
-                                                      Id: "92417fa1-c477-4df0-868c-e970619c47f9",
-                                                      Scope: "usergroup",
-                                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                                      Category: "User Group",
-                                                      Name: "system.user.group.setting",
-                                                      Default: JSON.stringify(
-                                                                               {
-                                                                                 "entry":"value"
-                                                                               }
-                                                                             ),
-                                                      Label: "Configuration for user group settings values",
-                                                      Description: "Configuration for user group settings values",
-                                                      AllowTagAccessR: "#Administrator#",
-                                                      AllowTagAccessW: "#Administrator#",
-                                                      Example: JSON.stringify(
-                                                                               {
-                                                                                 "entry":"value"
-                                                                               }
-                                                                             ),
-                                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                      ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
-                                                    };
+  static readonly _CONFIG_ENTRY_UserGroup_Settings = {
+                                                       Id: "92417fa1-c477-4df0-868c-e970619c47f9",
+                                                       Scope: "usergroup",
+                                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                       Category: "User Group",
+                                                       Name: "system.user.group.settings",
+                                                       Default: JSON.stringify(
+                                                                                {
+                                                                                  "entry":"value"
+                                                                                }
+                                                                              ),
+                                                       Label: "Configuration for user group settings values",
+                                                       Description: "Configuration for user group settings values",
+                                                       AllowTagAccessR: "#Administrator#",
+                                                       AllowTagAccessW: "#Administrator#",
+                                                       Example: JSON.stringify(
+                                                                                {
+                                                                                  "entry":"value"
+                                                                                }
+                                                                              ),
+                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                       ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                     };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -1731,8 +1736,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
                                                SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service,
-                                               SystemConstants._CONFIG_ENTRY_User_Setting,
-                                               SystemConstants._CONFIG_ENTRY_UserGroup_Setting
+                                               SystemConstants._CONFIG_ENTRY_User_Settings,
+                                               SystemConstants._CONFIG_ENTRY_UserGroup_Settings
                                              ];
 
 }

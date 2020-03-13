@@ -22,11 +22,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callCreateAuth( headers );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -69,11 +71,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callDeleteAuth( headers );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -135,11 +139,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum = "md5://" + strFileCheckSum;
@@ -192,11 +198,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ].FileCheckSum = "md5://" + strFileCheckSum;
@@ -247,11 +255,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
         bResult = true;
@@ -301,11 +311,13 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         CommonTest.upload_binary_data[ strUploadBinaryDataKey ] = result.output.body.Data[ 0 ];
         bResult = true;
@@ -346,11 +358,13 @@ export default class BinaryTestV1 {
                                                                                     } ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -391,11 +405,13 @@ export default class BinaryTestV1 {
                                                                                     } ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( strCheckSum ) {
 
@@ -457,11 +473,13 @@ export default class BinaryTestV1 {
                                                                                   } ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -493,11 +511,13 @@ export default class BinaryTestV1 {
                                                                                       } ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -529,11 +549,13 @@ export default class BinaryTestV1 {
                                                                     params );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( intConditionType === 0 ) {       //<=
 
@@ -584,11 +606,13 @@ export default class BinaryTestV1 {
                                                                         params );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( intConditionType === 0 ) {       //<=
 

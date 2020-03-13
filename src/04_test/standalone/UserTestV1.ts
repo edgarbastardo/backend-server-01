@@ -17,11 +17,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callProfile( headers );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_GET_SESSION_PROFILE"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -86,11 +88,13 @@ export default class UserTestV1 {
       const resultOfTest = []; //rolesToTest[ intRoleToTestIndex ]
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_GET_SESSION_PROFILE"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         const currentRoles = result.output.body.Data[ 0 ].Role.split( "," );
 
@@ -144,11 +148,13 @@ export default class UserTestV1 {
                                                                                userData );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -180,11 +186,13 @@ export default class UserTestV1 {
                                                                           params );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( intConditionType === 0 ) {       //<=
 
@@ -235,11 +243,13 @@ export default class UserTestV1 {
                                                                                 params );
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( intConditionType === 0 ) {       //<=
 
@@ -300,11 +310,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callDeleteUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-      result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
       CommonTest.saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
-          result.output.body.Code === strCode ) {  //"ERROR_CANNOT_DELETE_USER"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -334,11 +346,13 @@ export default class UserTestV1 {
                                                                             userData ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-      result.output.expected = { Code: strCode }; //"ERROR_CANNOT_DELETE_USER"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
       CommonTest.saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
-          result.output.body.Code === strCode ) {  //"ERROR_CANNOT_DELETE_USER"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -368,11 +382,13 @@ export default class UserTestV1 {
                                                                               userData ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -401,11 +417,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callEnableBulkUser( headers, userData ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -434,11 +452,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callMoveBulkUser( headers, userData ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result.output.expected = { Code: strCode };
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveResult( strFileName, result.output );
 
       if ( result &&
-          result.output.body.Code === strCode ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -475,11 +495,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
-      result.output.expected = { Code: strCode }; //"ERROR_USER_GROUP_NOT_FOUND"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
       CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"ERROR_USER_GROUP_NOT_FOUND"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         bResult = true;
 
@@ -526,11 +548,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -623,11 +647,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -720,11 +746,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result.output.expected = { Code: strCode }; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
-          result.output.body.Code === strCode ) { //"SUCCESS_USER_CREATE"
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
 
         if ( bIsFail === false ) {
 
@@ -809,11 +837,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL01_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_CREATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
       CommonTest.saveResult( "test_createUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
         CommonTest.user01_at_TestL01_data = result.output.body.Data[ 0 ];
 
@@ -865,11 +895,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL02_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_CREATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
       CommonTest.saveResult( "test_createUser_user01_at_TestL02_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
         CommonTest.user01_at_TestL02_data = result.output.body.Data[ 0 ];
         CommonTest.user01_at_TestL02_data.Password = userRequest.Password;
@@ -911,11 +943,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL02_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_CREATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
       CommonTest.saveResult( "test_createUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
         CommonTest.user02_at_TestL02_data = result.output.body.Data[ 0 ];
 
@@ -968,11 +1002,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL01_again_fail", result.input );
-      result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" };
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
       CommonTest.saveResult( "test_createUser_user01_at_TestL01_again_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_USER_NAME_ALREADY_EXISTS" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_USER_NAME_ALREADY_EXISTS" ) {
 
         bResult = true;
 
@@ -1011,11 +1047,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( "test_createUser_user_group_TestL01_again_fail", result.input );
-      result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" };
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
       CommonTest.saveResult( "test_createUser_user_group_TestL01_again_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_USER_GROUP_ALREADY_EXISTS" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_USER_GROUP_ALREADY_EXISTS" ) {
 
         bResult = true;
 
@@ -1050,11 +1088,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL02_fail", result.input );
-      result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER" };
+      result && result.output ? result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER" }: null;
       CommonTest.saveResult( "test_createUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_CANNOT_CREATE_USER" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_CANNOT_CREATE_USER" ) {
 
         bResult = true;
 
@@ -1093,11 +1133,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL01_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_CREATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
       CommonTest.saveResult( "test_createUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_CREATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_CREATE" ) {
 
         CommonTest.user02_at_TestL01_data = result.output.body.Data[ 0 ];
 
@@ -1147,11 +1189,13 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( "test_createUser_user03_at_TestL01_fail", result.input );
-      result.output.expected = { Code: "ERROR_FORBIDEN_ACCESS" };
+      result && result.output ? result.output.expected = { Code: "ERROR_FORBIDDEN_ACCESS" }: null;
       CommonTest.saveResult( "test_createUser_user03_at_TestL01_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_FORBIDEN_ACCESS" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_FORBIDDEN_ACCESS" ) {
 
         bResult = true;
 
@@ -1202,11 +1246,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
       CommonTest.saveResult( "test_updateUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
         CommonTest.user02_at_TestL02_data = result.output.body.Data[ 0 ];
 
@@ -1271,11 +1317,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
-      result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" };
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
       CommonTest.saveResult( "test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_USER_NAME_ALREADY_EXISTS" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_USER_NAME_ALREADY_EXISTS" ) {
 
         bResult = true;
 
@@ -1327,11 +1375,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user99_at_TestL01_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
       CommonTest.saveResult( "test_updateUser_user99_at_TestL01_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
         CommonTest.user02_at_TestL02_data = result.output.body.Data[ 0 ];
 
@@ -1395,16 +1445,18 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user01_at_TestL01_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
       CommonTest.saveResult( "test_updateUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
         CommonTest.user01_at_TestL01_data = result.output.body.Data[ 0 ];
 
         if ( CommonTest.user01_at_TestL01_data.Name === "user99@TestL02" &&
-            CommonTest.user01_at_TestL01_data.sysUserGroup.Name === "TestL02" ) {
+             CommonTest.user01_at_TestL01_data.sysUserGroup.Name === "TestL02" ) {
 
           CommonTest.user01_at_TestL01_data.Password = userRequest.Password;
           bResult = true;
@@ -1458,11 +1510,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user01_at_TestL01_fail", result.input );
-      result.output.expected = { Code: "ERROR_USER_NOT_VALID" };
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NOT_VALID" }: null;
       CommonTest.saveResult( "test_updateUser_user01_at_TestL01_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_USER_NOT_VALID" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_USER_NOT_VALID" ) {
 
         bResult = true;
 
@@ -1513,11 +1567,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be fail
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
-      result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" };
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
       CommonTest.saveResult( "test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
-          result.output.body.Code === "ERROR_USER_GROUP_ALREADY_EXISTS" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "ERROR_USER_GROUP_ALREADY_EXISTS" ) {
 
         //user_at_test01_data = result.output.body.Data[ 0 ];
         bResult = true;
@@ -1571,11 +1627,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user99_at_TestL02_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
       CommonTest.saveResult( "test_updateUser_user99_at_TestL02_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
         CommonTest.user01_at_TestL01_data = result.output.body.Data[ 0 ];
 
@@ -1638,11 +1696,13 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL01_success", result.input );
-      result.output.expected = { Code: "SUCCESS_USER_UPDATE" };
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
       CommonTest.saveResult( "test_updateUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
-          result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === "SUCCESS_USER_UPDATE" ) {
 
         CommonTest.user02_at_TestL01_data = result.output.body.Data[ 0 ];
         CommonTest.user02_at_TestL01_data.Password = userRequest.Password;

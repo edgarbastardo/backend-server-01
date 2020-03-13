@@ -620,14 +620,14 @@ export default class MiddlewareManager {
 
       const result = {
                        StatusCode: 403, //Forbidden
-                       Code: 'ERROR_FORBIDEN_ACCESS',
+                       Code: 'ERROR_FORBIDDEN_ACCESS',
                        Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
                        Mark: '1ED45DB6E425' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_FORBIDEN_ACCESS',
+                                   Code: 'ERROR_FORBIDDEN_ACCESS',
                                    Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
                                  }
                                ],
@@ -815,7 +815,7 @@ export default class MiddlewareManager {
                              LogId: SystemUtilities.getUUIDv4()
                            };
 
-        result = new ApolloError( "Not authorized to access", "ERROR_FORBIDEN_ACCESS", extensions );
+        result = new ApolloError( "Not authorized to access", "ERROR_FORBIDDEN_ACCESS", extensions );
 
       }
 

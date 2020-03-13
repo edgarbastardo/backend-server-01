@@ -11547,7 +11547,7 @@ export default class UserServiceController {
       }
       else {
 
-        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_User_Setting.Id,
+        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_User_Settings.Id,
                                                                              userSessionStatus.UserId,
                                                                              currentTransaction,
                                                                              logger );
@@ -11771,7 +11771,7 @@ export default class UserServiceController {
       }
       else {
 
-        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_User_Setting.Id,
+        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_User_Settings.Id,
                                                                                userSessionStatus.UserId,
                                                                                request.body,
                                                                                currentTransaction,
@@ -11805,15 +11805,15 @@ export default class UserServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_CANNOT_CREATE_SETTING',
-                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
                      Mark: "7AF91E5F4B19" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CREATE_SETTING',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
                                  Details: 'Method setConfigValueData return null' //error
                                }
                              ],

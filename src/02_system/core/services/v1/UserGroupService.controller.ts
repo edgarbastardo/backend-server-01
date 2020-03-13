@@ -2170,6 +2170,14 @@ export default class UserGroupServiceController {
 
               }
 
+              if ( strActionRole === "SettingsUserGroup" &&
+                   userSessionStatus.UserGroupId === sysUserGroup.Id  ) {
+
+                result.isNotAuthorized = false;
+                result.isAuthorizedL01 = true;
+
+              }
+
             }
 
           }
@@ -2357,6 +2365,30 @@ export default class UserGroupServiceController {
                              {
                                Code: 'ERROR_USER_GROUP_IS_NOT_USER_EMPTY',
                                Message: await I18NManager.translate( strLanguage, 'The user group have users assigned' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( this.checkUsersEqualsRoleLevel( sysUserGroupInDB,
+                                                userSessionStatus,
+                                                logger ) === false ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_CANNOT_DELETE_USER_GROUP',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group. The user group has #Administrator# role, but you not had.' ),
+                   Mark: '28E5A0825F4E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group. The user group has #Administrator# role, but you not had.' ),
                                Details: null,
                              }
                            ],
@@ -3260,6 +3292,89 @@ export default class UserGroupServiceController {
 
       }
 
+      //ANCHOR setSetting
+      const userSessionStatus = context.UserSessionStatus;
+
+      let sysUserGroupInDB = await SYSUserGroupService.getBy( {
+                                                                Id: request.query.id,
+                                                                ShortId: request.query.shortId,
+                                                                Name: request.query.name
+                                                              },
+                                                              null,
+                                                              currentTransaction,
+                                                              logger );
+
+      const resultCheckUserRoles = this.checkUserGroupRoleLevel( userSessionStatus,
+                                                                 {
+                                                                   Id: sysUserGroupInDB ? sysUserGroupInDB.Id: userSessionStatus.UserGroupId,
+                                                                   ShortId: sysUserGroupInDB ? sysUserGroupInDB.ShortId: userSessionStatus.UserGroupShortId,
+                                                                   Name: sysUserGroupInDB ? sysUserGroupInDB.Name: userSessionStatus.UserGroupName
+                                                                 },
+                                                                 "SettingsUserGroup",
+                                                                 logger );
+
+      if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+           !resultCheckUserRoles.isAuthorizedL01 &&
+           !resultCheckUserRoles.isAuthorizedL03 &&
+           !resultCheckUserRoles.isAuthorizedL04 ) {
+
+        resultCheckUserRoles.isNotAuthorized = true;
+
+      }
+
+      if ( resultCheckUserRoles.isNotAuthorized ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_GET_USER_GROUP_SETTINGS',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group settings' ),
+                   Mark: '70E7C8CCE185' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_GET_USER_GROUP_SETTINGS',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group settings' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Settings.Id,
+                                                                             sysUserGroupInDB ? sysUserGroupInDB.Id: userSessionStatus.UserGroupId,
+                                                                             currentTransaction,
+                                                                             logger );
+
+        configData = configData.Value ? configData.Value : configData.Default;
+
+        configData = CommonUtilities.parseJSON( configData, logger );
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_SETTINGS',
+                   Message: await I18NManager.translate( strLanguage, 'Success get settings' ),
+                   Mark: '6A6B0A77414D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           configData
+                         ]
+                 }
+
+        bApplyTransaction = true;
+
+      }
+
+      /*
       let userSessionStatus = context.UserSessionStatus;
 
       let bProfileOfAnotherUser = false;
@@ -3344,7 +3459,7 @@ export default class UserGroupServiceController {
       }
       else {
 
-        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Setting.Id,
+        let configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Settings.Id,
                                                                              userSessionStatus.UserGroupId,
                                                                              currentTransaction,
                                                                              logger );
@@ -3371,6 +3486,7 @@ export default class UserGroupServiceController {
         bApplyTransaction = true;
 
       }
+      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -3474,7 +3590,7 @@ export default class UserGroupServiceController {
 
       strLanguage = context.Language;
 
-      let strAuthorization = context.Authorization;
+      //let strAuthorization = context.Authorization;
 
       const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
@@ -3486,7 +3602,162 @@ export default class UserGroupServiceController {
 
       }
 
+      //ANCHOR setSetting
+      const userSessionStatus = context.UserSessionStatus;
 
+      let sysUserGroupInDB = await SYSUserGroupService.getBy( {
+                                                                Id: request.query.id,
+                                                                ShortId: request.query.shortId,
+                                                                Name: request.query.name
+                                                              },
+                                                              null,
+                                                              currentTransaction,
+                                                              logger );
+
+      const resultCheckUserRoles = this.checkUserGroupRoleLevel( userSessionStatus,
+                                                                 {
+                                                                   Id: sysUserGroupInDB ? sysUserGroupInDB.Id: userSessionStatus.UserGroupId,
+                                                                   ShortId: sysUserGroupInDB ? sysUserGroupInDB.ShortId: userSessionStatus.UserGroupShortId,
+                                                                   Name: sysUserGroupInDB ? sysUserGroupInDB.Name: userSessionStatus.UserGroupName
+                                                                 },
+                                                                 "SettingsUserGroup",
+                                                                 logger );
+
+      if ( !resultCheckUserRoles.isAuthorizedAdmin &&
+           !resultCheckUserRoles.isAuthorizedL01 &&
+           !resultCheckUserRoles.isAuthorizedL03 &&
+           !resultCheckUserRoles.isAuthorizedL04 ) {
+
+        resultCheckUserRoles.isNotAuthorized = true;
+
+      }
+
+      if ( resultCheckUserRoles.isNotAuthorized ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_SET_USER_GROUP_SETTINGS',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to set the user group settings' ),
+                   Mark: '70E7C8CCE185' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_SET_USER_GROUP_SETTINGS',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to set the user group settings' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( this.checkUsersEqualsRoleLevel( {
+                                                  Role: sysUserGroupInDB ? sysUserGroupInDB.Role: userSessionStatus.Role,
+                                                } as any,
+                                                userSessionStatus,
+                                                logger ) === false ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: 'ERROR_SET_USER_GROUP_SETTINGS',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had.' ),
+                   Mark: '366658DFEE18' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_SET_USER_GROUP_SETTINGS',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had.' ),
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Settings.Id,
+                                                                               sysUserGroupInDB ? sysUserGroupInDB.Id: userSessionStatus.UserGroupId,
+                                                                               request.body,
+                                                                               currentTransaction,
+                                                                               logger );
+
+        if ( configData instanceof Error ) {
+
+          const error = configData as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: "AFBF4AA7BE2C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: error.LogId,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else if ( !configData ) {
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
+                     Mark: "2BCD86F73CE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
+                                 Details: 'Method setConfigValueData return null' //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_SET_SETTINGS',
+                     Message: await I18NManager.translate( strLanguage, 'Success set settings' ),
+                     Mark: 'B90F830F6786' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             CommonUtilities.parseJSON( configData.Value, logger )
+                           ]
+                   }
+
+          bApplyTransaction = true;
+
+        }
+
+      }
+
+      /*
       let userSessionStatus = context.UserSessionStatus;
 
       let bProfileOfAnotherUser = false;
@@ -3569,7 +3840,7 @@ export default class UserGroupServiceController {
       }
       else {
 
-        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Setting.Id,
+        const configData = await SYSConfigValueDataService.setConfigValueData( SystemConstants._CONFIG_ENTRY_UserGroup_Settings.Id,
                                                                                userSessionStatus.UserGroupId,
                                                                                request.body,
                                                                                currentTransaction,
@@ -3603,15 +3874,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_CANNOT_CREATE_SETTING',
-                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
                      Mark: "2BCD86F73CE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CREATE_SETTING',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the setting entry.' ),
+                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
+                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
                                  Details: 'Method setConfigValueData return null' //error
                                }
                              ],
@@ -3643,6 +3914,7 @@ export default class UserGroupServiceController {
         }
 
       }
+      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
