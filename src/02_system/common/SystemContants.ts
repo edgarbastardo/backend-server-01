@@ -591,7 +591,7 @@ export default class SystemConstants {
                                                                                        }
                                                                                      ),
                                                               Label: "Define witch categories are allowed",
-                                                              Description: "Define witch categories are allowed to create or add binary data inside",
+                                                              Description: "Define witch categories are allowed to create or add binary data inside. Always the config entry defined in lowercase, to match with any input combination.",
                                                               AllowTagAccessR: "#Administrator#",
                                                               AllowTagAccessW: "#Administrator#",
                                                               Ecample: JSON.stringify(

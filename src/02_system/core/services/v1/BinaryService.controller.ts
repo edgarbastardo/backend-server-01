@@ -3503,12 +3503,12 @@ export default class BinaryServiceController extends BaseService {
           if ( request.body.Category ) {
 
             let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
-                                                                `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` ).toLowerCase();
+                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` );
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
             const allowedCategory = await BinaryServiceController.checkAllowedCategory( userSessionStatus,
-                                                                                        strCategory,
+                                                                                        strCategory.toLowerCase(),
                                                                                         currentTransaction,
                                                                                         logger );
 
@@ -3524,14 +3524,14 @@ export default class BinaryServiceController extends BaseService {
 
                   const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( userSessionStatus,
                                                                                               fileDetectedType.mime,
-                                                                                              strCategory,
+                                                                                              strCategory.toLowerCase(),
                                                                                               currentTransaction,
                                                                                               logger );
 
                   if ( allowedMimeType.value === 1 ) {
 
                     const strDefaultOwners = await BinaryServiceController.getDefaultOwners( userSessionStatus,
-                                                                                             strCategory,
+                                                                                             strCategory.toLowerCase(),
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -4285,12 +4285,12 @@ export default class BinaryServiceController extends BaseService {
           if ( request.body.Category ) {
 
             let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
-                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` ).toLowerCase();
+                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` );
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
             const allowedCategory = await BinaryServiceController.checkAllowedCategory( userSessionStatus,
-                                                                                        strCategory,
+                                                                                        strCategory.toLowerCase(),
                                                                                         currentTransaction,
                                                                                         logger );
 
@@ -4324,14 +4324,14 @@ export default class BinaryServiceController extends BaseService {
 
                   const allowedMimeType = await BinaryServiceController.checkAllowedMimeType( userSessionStatus,
                                                                                               fileDetectedType.mime,
-                                                                                              strCategory,
+                                                                                              strCategory.toLowerCase(),
                                                                                               currentTransaction,
                                                                                               logger );
 
                   if ( allowedMimeType.value === 1 ) {
 
                     const strDefaultOwners = await BinaryServiceController.getDefaultOwners( userSessionStatus,
-                                                                                             strCategory,
+                                                                                             strCategory.toLowerCase(),
                                                                                              currentTransaction,
                                                                                              logger );
 

@@ -14,7 +14,7 @@ export default class UserTestV1 {
 
     try {
 
-      const result = await CommonTest.userRequestServiceV1.callProfile( headers );
+      const result = await CommonTest.userRequestServiceV1.callGetProfile( headers, {} );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
@@ -83,7 +83,7 @@ export default class UserTestV1 {
 
     try {
 
-      const result = await CommonTest.userRequestServiceV1.callProfile( headers );
+      const result = await CommonTest.userRequestServiceV1.callGetProfile( headers, {} );
 
       const resultOfTest = []; //rolesToTest[ intRoleToTestIndex ]
 
@@ -379,7 +379,7 @@ export default class UserTestV1 {
     try {
 
       let result = await CommonTest.userRequestServiceV1.callDisableBulkUser( headers,
-                                                                              userData ); //This request must be fail
+                                                                              userData );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
@@ -414,7 +414,7 @@ export default class UserTestV1 {
 
     try {
 
-      let result = await CommonTest.userRequestServiceV1.callEnableBulkUser( headers, userData ); //This request must be fail
+      let result = await CommonTest.userRequestServiceV1.callEnableBulkUser( headers, userData );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
@@ -475,7 +475,6 @@ export default class UserTestV1 {
 
   }
 
-
   static async test_createUser_user01_at_TestL01( headers: any,
                                                   strCode: string,
                                                   strFileName: string ): Promise<boolean> {
@@ -489,8 +488,11 @@ export default class UserTestV1 {
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#";
+      userRequest.Business.Tag = "#UserTestV1#";
       userRequest.sysUserGroup.Create = false;    //No request create
       userRequest.sysUserGroup.Name = "TestL01";  //This group not exists
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
@@ -536,14 +538,16 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#Tag11#,#Tag12#,#UserTestV1#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -569,7 +573,7 @@ export default class UserTestV1 {
                 CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
                 !CommonTest.user98_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-                CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+                CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
                 ( bCheckGroupName === false || CommonTest.user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
               CommonTest.user98_at_TestL98_data.Password = userRequest.Password;
@@ -580,6 +584,8 @@ export default class UserTestV1 {
           }
           else {
 
+            const local = CommonTest.user98_at_TestL98_data;
+
             if ( //CommonTest.user98_at_TestL98_data.Role === "#MasterL01#" &&
                 CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#MasterL01#" ) &&
                 CommonTest.user98_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
@@ -587,7 +593,7 @@ export default class UserTestV1 {
                 CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
                 CommonTest.user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
                 CommonTest.user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-                CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+                CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
                 ( bCheckGroupName === false || CommonTest.user98_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
               CommonTest.user98_at_TestL98_data.Password = userRequest.Password;
@@ -635,14 +641,16 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -668,7 +676,7 @@ export default class UserTestV1 {
                 CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
                 !CommonTest.user97_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user97_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-                CommonTest.user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+                CommonTest.user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
                 ( bCheckGroupName === false || CommonTest.user97_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
               CommonTest.user97_at_TestL98_data.Password = userRequest.Password;
@@ -734,14 +742,16 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = bCreateUserGroup;    //Ask to create
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -767,7 +777,7 @@ export default class UserTestV1 {
                 CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
                 !CommonTest.user96_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user96_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
-                CommonTest.user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
+                CommonTest.user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
                 ( bCheckGroupName === false || CommonTest.user96_at_TestL98_data.sysUserGroup.Name === "user98@TestL98" ) ) {
 
               CommonTest.user96_at_TestL98_data.Password = userRequest.Password;
@@ -827,12 +837,14 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#"; //This roles must be NOT ignored
       userRequest.Tag = "#Tag11#,#Tag12#"; //This tags must be NOT ignored
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = true;    //Ask to create
       userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
       userRequest.sysUserGroup.Role = "";  //This roles must be NOT ignored
       userRequest.sysUserGroup.Tag = ""; //This tags must be NOT ignored
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -854,7 +866,7 @@ export default class UserTestV1 {
             CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
             !CommonTest.user01_at_TestL01_data.sysUserGroup.Tag &&
             CommonTest.user01_at_TestL01_data.Business.Role === "#Role01#,#Role02#" &&
-            CommonTest.user01_at_TestL01_data.Business.Tag === "#Tag01#,#Tag02#" &&
+            CommonTest.user01_at_TestL01_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
             CommonTest.user01_at_TestL01_data.sysUserGroup.Name === "TestL01" ) {
 
           CommonTest.user01_at_TestL01_data.Password = userRequest.Password;
@@ -886,11 +898,13 @@ export default class UserTestV1 {
       userRequest.Id = null;
       userRequest.Name = "user01@TestL02";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#";
+      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL56#";
+      userRequest.Business.Role = "#Role10#,#Role11#";
+      userRequest.Business.Tag = "#Tag10#,#Tag11#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;         //Ask to create
       userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
-      userRequest.Business.Role = "#Role10#,#Role11#";
-      userRequest.Business.Tag = "#Tag10#,#Tag11#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -933,12 +947,14 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#"; //<---- This roles must be ignored
       userRequest.Tag = "#Tag01#"; //<---- This tag must be ignored
+      userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
+      userRequest.Business.Tag = "#Tag20#,#Tag21#,#UserTestV1#"; //<---- This roles must be ignored
       userRequest.sysUserGroup.Create = false;         //Ask to create
       userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
       userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#"; //<---- This roles must be ignored
       userRequest.sysUserGroup.Tag = "#Tag02#"; //<---- This tag must be ignored
-      userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
-      userRequest.Business.Tag = "#Tag20#,#Tag21#"; //<---- This roles must be ignored
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#"; //<---- This roles must be ignored
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -992,12 +1008,14 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#";
       userRequest.Tag = "#Tag11#,#Tag12#";
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;    //Ask to create
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
       userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
@@ -1037,12 +1055,14 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#";
       userRequest.Tag = "#Tag11#,#Tag12#";
+      userRequest.Business.Role = "#Role01#,#Role02#";
+      userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = true;    //Ask to create
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
       userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
-      userRequest.Business.Role = "#Role01#,#Role02#";
-      userRequest.Business.Tag = "#Tag01#,#Tag02#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
@@ -1084,6 +1104,7 @@ export default class UserTestV1 {
       userRequest.Role = "#MasterL01#,#Administrator#,#BManarageL01#"; //<--- This roles ignored
       userRequest.sysUserGroup.Create = false;      //No request to create, This request must be fail
       userRequest.sysUserGroup.Name = "TestL02";    //This group not exists
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
@@ -1123,12 +1144,14 @@ export default class UserTestV1 {
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
       userRequest.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
+      userRequest.Business.Role = "#Role03#,#Role04#";
+      userRequest.Business.Tag = "#Tag03#,#Tag04#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;
       userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
       userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
-      userRequest.Business.Role = "#Role03#,#Role04#";
-      userRequest.Business.Tag = "#Tag03#,#Tag04#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
@@ -1150,7 +1173,7 @@ export default class UserTestV1 {
             CommonTest.checkTokens( CommonTest.user02_at_TestL01_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
             !CommonTest.user02_at_TestL01_data.sysUserGroup.Tag &&
             userRequest.Business.Role === "#Role03#,#Role04#" &&
-            userRequest.Business.Tag === "#Tag03#,#Tag04#" ) {
+            userRequest.Business.Tag === "#Tag03#,#Tag04#,#UserTestV1#" ) {
 
           CommonTest.user02_at_TestL01_data.Password = userRequest.Password;
           bResult = true;
@@ -1181,10 +1204,12 @@ export default class UserTestV1 {
       userRequest.Name = "user03@TestL01";
       userRequest.Password = "12345678";
       userRequest.Role = "#MasterL01#";
+      userRequest.Business.Role = "#Role03#,#Role04#";
+      userRequest.Business.Tag = "#Tag03#,#Tag04#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;
       userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
-      userRequest.Business.Role = "#Role03#,#Role04#";
-      userRequest.Business.Tag = "#Tag03#,#Tag04#";
+      userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
@@ -1242,6 +1267,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
       userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
@@ -1371,6 +1397,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
       userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
@@ -1506,6 +1533,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = "#Administrator#"; //<--- This role is ignored
       userRequest.sysUserGroup.Tag = "";
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
@@ -1563,6 +1591,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = "";
       userRequest.sysUserGroup.Tag = "";
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be fail
 
@@ -1623,6 +1652,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = ""; //This role must be NOT ignored
       userRequest.sysUserGroup.Tag = ""; //This tag must be NOT ignored
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
@@ -1692,6 +1722,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Role = "";
       userRequest.sysUserGroup.Tag = "";
       userRequest.Business = userData.Business;
+      userRequest.sysPerson.Business.Tag = "#UserTestV1#";
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 

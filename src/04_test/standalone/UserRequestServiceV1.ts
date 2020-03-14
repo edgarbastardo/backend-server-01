@@ -14,7 +14,89 @@ export class UserRequestServiceV1 {
 
   }
 
-  async callProfile( headers: any ): Promise<any> {
+  async callGetUser( headers: any,
+                     query: any ): Promise<any> {
+
+    let result = { input: null, output: null };
+
+    try {
+
+      const options = {
+                        method: 'GET',
+                        headers: headers,
+                        body: null,
+                      };
+
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+      strRequestPath = strRequestPath + "/v1/system/user";
+
+      let strQueryParams = "";
+
+      if ( query.Id ) {
+
+        strQueryParams = "?id=" + query.Id;
+
+      }
+
+      if ( query.ShortId ) {
+
+        if ( strQueryParams ) {
+
+          strQueryParams = strQueryParams + "&shortId=" + query.ShortId;
+
+        }
+        else {
+
+          strQueryParams = strQueryParams + "?shortId=" + query.ShortId;
+
+        }
+
+      }
+
+      if ( query.Name ) {
+
+        if ( strQueryParams ) {
+
+          strQueryParams = strQueryParams + "&name=" + query.Name;
+
+        }
+        else {
+
+          strQueryParams = strQueryParams + "?name=" + query.Name;
+
+        }
+
+      }
+
+      const callResult = await fetch( strRequestPath + strQueryParams,
+                                      options );
+
+      result.output = callResult ? {
+                                     status: callResult.status,
+                                     statusText: callResult.statusText,
+                                     body: await callResult.json()
+                                   }:
+                                   {
+                                     status: null,
+                                     statusText: null,
+                                     body: { Code: "" }
+                                   };
+
+       result.input = options;
+    }
+    catch ( error ) {
+
+      console.log( error );
+
+    }
+
+    return result;
+
+  }
+
+  async callGetProfile( headers: any,
+                        query: any ): Promise<any> {
 
     let result = { input: null, output: null };
 
@@ -30,7 +112,45 @@ export class UserRequestServiceV1 {
 
       strRequestPath = strRequestPath + "/v1/system/user/profile";
 
-      const callResult = await fetch( strRequestPath,
+      let strQueryParams = "";
+
+      if ( query.ShortToken ) {
+
+        strQueryParams = "?shortToken=" + query.Id;
+
+      }
+
+      if ( query.CreatedAt ) {
+
+        if ( strQueryParams ) {
+
+          strQueryParams = strQueryParams + "&createdAt=" + query.CreatedAt;
+
+        }
+        else {
+
+          strQueryParams = strQueryParams + "?createdAt=" + query.CreatedAt;
+
+        }
+
+      }
+
+      if ( query.Token ) {
+
+        if ( strQueryParams ) {
+
+          strQueryParams = strQueryParams + "&token=" + query.Token;
+
+        }
+        else {
+
+          strQueryParams = strQueryParams + "?token=" + query.Token;
+
+        }
+
+      }
+
+      const callResult = await fetch( strRequestPath + strQueryParams,
                                       options );
 
       result.output = callResult ? {

@@ -126,7 +126,7 @@ export default class BinaryTestV1 {
       binaryRequest.append( "File", fs.createReadStream( strPath ) );
       binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
-      binaryRequest.append( "Category", "Test" );
+      binaryRequest.append( "Category", "BinaryTestL01_Image" );
       binaryRequest.append( "Label", "Tiger File" );
       binaryRequest.append( "Tag", "#Tiger#,#Image#,#Test#" );
       binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tiger", ...contextData } ) );
@@ -185,7 +185,7 @@ export default class BinaryTestV1 {
       binaryRequest.append( "File", fs.createReadStream( strPath ) );
       binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
-      binaryRequest.append( "Category", "Test" );
+      binaryRequest.append( "Category", "BinaryTestL01_Image" );
       binaryRequest.append( "Label", "Tower File" );
       binaryRequest.append( "Tag", "#Tower#,#Image#,#Test#" );
       binaryRequest.append( "Context", JSON.stringify( { "MyData": "Tower", ...contextData } ) );
@@ -242,7 +242,7 @@ export default class BinaryTestV1 {
       binaryRequest.append( "File", fs.createReadStream( strPath ) );
       binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
-      binaryRequest.append( "Category", "Test" );
+      binaryRequest.append( "Category", "BinaryTestL01_Image" );
       binaryRequest.append( "Label", "Road File" );
       binaryRequest.append( "Tag", "#Road#,#Image#,#Test#" );
       binaryRequest.append( "Context", JSON.stringify( { "MyData": "Road", ...contextData } ) );
@@ -298,7 +298,7 @@ export default class BinaryTestV1 {
       binaryRequest.append( "File", fs.createReadStream( strPath ) );
       binaryRequest.append( "AccessKind", "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", "0" ); //0 = Persistent 1 = Temporal
-      binaryRequest.append( "Category", "Test" );
+      binaryRequest.append( "Category", "BinaryTestL01_Image" );
       binaryRequest.append( "Label", "Castle File" );
       binaryRequest.append( "Tag", "#Castle#,#Image#,#Test#" );
       binaryRequest.append( "Context", JSON.stringify( { "MyData": "Castle", ...contextData } ) );
@@ -603,7 +603,7 @@ export default class BinaryTestV1 {
     try {
 
       const result = await CommonTest.binaryRequestServiceV1.callBinarySearchCount( headers,
-                                                                        params );
+                                                                                    params );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;

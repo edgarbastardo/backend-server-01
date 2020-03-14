@@ -13,6 +13,7 @@ import { UserRequestServiceV1 } from "./UserRequestServiceV1";
 import { SystemSecurityAuthenticationServiceV1 } from "./SystemSecurityAuthenticationServiceV1";
 import { UserGroupRequestServiceV1 } from "./UserGroupRequestServiceV1";
 import { BinaryRequestServiceV1 } from "./BinaryRequestServiceV1";
+import { DatabaseRequestServiceV1 } from './DatabaseRequestServiceV1';
 
 export default class CommonTest {
 
@@ -27,7 +28,7 @@ export default class CommonTest {
 
   static intSequence = 0;
 
-  static headers_admin01_at_system_net = {
+  static headers_adminXX_at_system_net = {
                                            "Authorization": "",
                                            "Content-Type": "application/json",
                                            "FrontendId": "ccc1",
@@ -81,7 +82,6 @@ export default class CommonTest {
                                        "BinaryDataToken": ""
                                      }
 
-  //Test request failed
   static userRequestFull = {
                              "Avatar": null,
                              "Id": null,
@@ -103,6 +103,10 @@ export default class CommonTest {
                                "Name": "",
                                "Role": "",
                                "Tag": "",
+                               "Business": {
+                                 "Role": "",
+                                 "Tag": ""
+                               }
                              },
                              "sysPerson": {
                                "Id": null,
@@ -116,13 +120,30 @@ export default class CommonTest {
                                "Address": "1625 s walnut street, wa 98233, suite 102",
                                "EMail": "sirlordt@gmail.com, sirlordr@gmail.com",
                                "Phone": "1-305-776-9594, 1-786-806-2108",
-                               "ImageId": ""
-                             },
+                               "ImageId": "",
+                               "Tag": "",
+                               "Business": {
+                                "Tag": ""
+                              }
+                            },
                              "Business": {
                                "Role": "",
                                "Tag": ""
                              }
                            }
+
+  static userGroupRequestFull = {
+                                  "Name": "",
+                                  "Role": null,
+                                  "ExpireAt": null,
+                                  "Tag": null,
+                                  "Comment": "Comment",
+                                  "DisabledBy": "1",
+                                  "Business": {
+                                    "Role": "#Role01#,#Role02#",
+                                    "Tag": "#Tag01#,#Tag02#"
+                                  }
+                                }
 
   static user01_at_TestL01_data = {} as any;
   static user02_at_TestL01_data = {} as any;
@@ -134,12 +155,19 @@ export default class CommonTest {
   static user97_at_TestL98_data = {} as any;
   static user98_at_TestL98_data = {} as any;
 
+  static TestL55_data = {} as any;
+  static TestL56_data = {} as any;
+  static TestL57_data = {} as any;
+
   static upload_binary_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
 
   static userRequestServiceV1: UserRequestServiceV1 = null;
   static userGroupRequestServiceV1: UserGroupRequestServiceV1 = null;
   static systemSecurityAuthenticationServiceV1: SystemSecurityAuthenticationServiceV1 = null;
   static binaryRequestServiceV1: BinaryRequestServiceV1 = null;
+  static databaseRequestServiceV1: DatabaseRequestServiceV1 = null;
+
+  static database_data = {} as any; //{ "admin01@system.net_tiger" : { "Id": .... } }
 
   static formatSequence( intSequence: number ): string {
 

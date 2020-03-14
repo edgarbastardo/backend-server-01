@@ -397,11 +397,11 @@ export default class UserGroupServiceController {
 
   }
 
-  static async getConfigAutoAssignRole( strOperation: string,
-                                        strRoles: string,
-                                        strUserGroupName: string,
-                                        transaction: any,
-                                        logger: any ): Promise<string> {
+  static async getConfigUserGroupAutoAssignRole( strOperation: string,
+                                                 strRoles: string,
+                                                 strUserGroupName: string,
+                                                 transaction: any,
+                                                 logger: any ): Promise<string> {
 
     let strResult = null;
 
@@ -471,7 +471,7 @@ export default class UserGroupServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getConfigAutoAssignRole.name;
+      sourcePosition.method = this.name + "." + this.getConfigUserGroupAutoAssignRole.name;
 
       const strMark = "C5FB6039FDEC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -616,11 +616,11 @@ export default class UserGroupServiceController {
 
             const strUserName = context.UserSessionStatus.UserName;
 
-            let strRoleToApply = await this.getConfigAutoAssignRole( "create",
-                                                                     userSessionStatus.Role,
-                                                                     request.body.Name,
-                                                                     currentTransaction,
-                                                                     logger );
+            let strRoleToApply = await this.getConfigUserGroupAutoAssignRole( "create",
+                                                                              userSessionStatus.Role,
+                                                                              request.body.Name,
+                                                                              currentTransaction,
+                                                                              logger );
 
             if ( resultCheckUserGroupRoles.isAuthorizedAdmin &&
                  request.body.Role ) {
@@ -636,6 +636,7 @@ export default class UserGroupServiceController {
                                                                          {
                                                                            Name: request.body.Name,
                                                                            Comment: request.body.Comment,
+                                                                           ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
                                                                            Role: strRoleToApply ? strRoleToApply : null, //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
                                                                            Tag: resultCheckUserGroupRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
                                                                            ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
@@ -1171,13 +1172,11 @@ export default class UserGroupServiceController {
 
           const strUserName = context.UserSessionStatus.UserName;
 
-
-
-          let strRoleToApply = await this.getConfigAutoAssignRole( "update",
-                                                                   userSessionStatus.Role,
-                                                                   sysUserGroupInDB.Name,
-                                                                   currentTransaction,
-                                                                   logger );
+          let strRoleToApply = await this.getConfigUserGroupAutoAssignRole( "update",
+                                                                            userSessionStatus.Role,
+                                                                            sysUserGroupInDB.Name,
+                                                                            currentTransaction,
+                                                                            logger );
 
           if ( resultCheckUserRoles.isAuthorizedAdmin &&
                request.body.Role !== undefined ) {
@@ -1200,7 +1199,7 @@ export default class UserGroupServiceController {
           sysUserGroupInDB.Name = request.body.Name ? request.body.Name: sysUserGroupInDB.Name;
           sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null,
           sysUserGroupInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserGroupInDB.Tag;
-          sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null;
+          sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): sysUserGroupInDB.ExpireAt;
           sysUserGroupInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserGroupInDB.Comment;
           sysUserGroupInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
           sysUserGroupInDB.UpdatedAt = null;
