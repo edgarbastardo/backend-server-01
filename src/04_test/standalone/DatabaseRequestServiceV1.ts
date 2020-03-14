@@ -144,5 +144,47 @@ export class DatabaseRequestServiceV1 {
 
   }
 
+  async callDeleteBulk( headers: any, body: any ): Promise<any> {
+
+    let result = { input: null, output: null };
+
+    try {
+
+      const options = {
+                        method: 'DELETE',
+                        body: JSON.stringify( body ),
+                        headers: headers,
+                      };
+
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+
+      strRequestPath = strRequestPath + "/v1/database/model/" + body.Table + "/bulk";
+
+      const callResult = await fetch( strRequestPath,
+                                      options );
+
+      result.output = callResult ? {
+                                     status: callResult.status,
+                                     statusText: callResult.statusText,
+                                     body: await callResult.json()
+                                   }:
+                                   {
+                                     status: null,
+                                     statusText: null,
+                                     body: { Code: "" }
+                                   };
+
+      result.input = options;
+
+    }
+    catch ( error ) {
+
+      console.log( error );
+
+    }
+
+    return result;
+
+  }
 
 }

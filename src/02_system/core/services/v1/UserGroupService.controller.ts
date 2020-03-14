@@ -1023,7 +1023,7 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_UDPATE_USER_GROUP',
+                     Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group' ),
                      Mark: '1331F50D4BEB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
@@ -1150,7 +1150,7 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_UDPATE_USER_GROUP',
+                     Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group. The user group has #Administrator# role, but you not had.' ),
                      Mark: '8CD2C6F786E7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
@@ -1196,7 +1196,11 @@ export default class UserGroupServiceController {
 
           }
 
-          sysUserGroupInDB.Name = request.body.Name ? request.body.Name: sysUserGroupInDB.Name;
+          sysUserGroupInDB.Name = resultCheckUserRoles.isAuthorizedAdmin &&
+                                  request.body.Name &&
+                                  ( resultCheckUserRoles.isAuthorizedL03 === false ||
+                                    this.checkNameAuthorized( userSessionStatus.Role, request.body.Name ) ) ?
+                                  request.body.Name: sysUserGroupInDB.Name;
           sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null,
           sysUserGroupInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserGroupInDB.Tag;
           sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): sysUserGroupInDB.ExpireAt;
@@ -1583,7 +1587,7 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_CANNOT_UDPATE_USER_GROUP',
+                                      Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
                                       Mark: 'ED1C0AAB4ADE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group' ),
                                       Details: null
@@ -1812,14 +1816,14 @@ export default class UserGroupServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_DISABLE';
+        strCode = 'SUCCESS_BULK_USER_GROUP_DISABLE';
         strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL user groups' );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_DISABLE';
+        strCode = 'ERROR_BULK_USER_GROUP_DISABLE';
         strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the user groups. Please check the errors and warnings section' );
         bIsError = true;
 
@@ -1973,14 +1977,14 @@ export default class UserGroupServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_ENABLE';
+        strCode = 'SUCCESS_BULK_USER_GROUP_ENABLE';
         strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL user groups' );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_ENABLE';
+        strCode = 'ERROR_BULK_USER_GROUP_ENABLE';
         strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the user groups. Please check the errors and warnings section' );
         bIsError = true;
 
@@ -2091,6 +2095,35 @@ export default class UserGroupServiceController {
 
   }
 
+  static checkNameAuthorized( strRole: any,
+                              strName: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      let roleSubTag = CommonUtilities.getSubTagFromComposeTag( strRole, "#MasterL03#" );
+
+      if ( !roleSubTag ) {
+
+        roleSubTag = [];
+
+      }
+
+      bResult = strRole ? ( roleSubTag.includes( "#GName:" +  strName + "#" ) ||
+                            roleSubTag.includes( "#GName:*#" )  ) : false;
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
   static checkUserGroupRoleLevel( userSessionStatus: any,
                                   sysUserGroup: {
                                                   Id: string,
@@ -2121,18 +2154,20 @@ export default class UserGroupServiceController {
 
           let roleSubTag = null;
 
-          if ( strActionRole === "GetUserGroup" ||
+          if ( strActionRole === "CreateUserGroup" ||
+               strActionRole === "UpdateUserGroup" ||
+               strActionRole === "GetUserGroup" ||
                strActionRole === "SearchUserGroup" ||
                strActionRole === "SettingsUserGroup" ) {
 
             roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
 
-          }
+            if ( !roleSubTag ||
+                 roleSubTag.length === 0 ) {
 
-          if ( !roleSubTag ||
-                roleSubTag.length === 0 ) {
+              roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
 
-            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+            }
 
           }
 

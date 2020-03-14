@@ -18,7 +18,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -89,7 +89,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -149,7 +149,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -187,7 +187,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -244,7 +244,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -311,7 +311,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
-      CommonTest.saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
            result.output &&
@@ -347,7 +347,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
-      CommonTest.saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
            result.output &&
@@ -383,7 +383,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -418,7 +418,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -453,7 +453,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -498,7 +498,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -553,7 +553,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
            result.output &&
@@ -656,7 +656,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
            result.output &&
@@ -757,7 +757,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
            result.output &&
@@ -850,7 +850,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL01_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveResult( "test_createUser_user01_at_TestL01_success", result.output );
+      CommonTest.saveOutput( "test_createUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -898,7 +898,7 @@ export default class UserTestV1 {
       userRequest.Id = null;
       userRequest.Name = "user01@TestL02";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL56#";
+      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL56#+#GName:TestL46#";
       userRequest.Business.Role = "#Role10#,#Role11#";
       userRequest.Business.Tag = "#Tag10#,#Tag11#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;         //Ask to create
@@ -910,7 +910,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL02_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveResult( "test_createUser_user01_at_TestL02_success", result.output );
+      CommonTest.saveOutput( "test_createUser_user01_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -960,7 +960,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL02_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveResult( "test_createUser_user02_at_TestL02_success", result.output );
+      CommonTest.saveOutput( "test_createUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1021,7 +1021,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user01_at_TestL01_again_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
-      CommonTest.saveResult( "test_createUser_user01_at_TestL01_again_fail", result.output );
+      CommonTest.saveOutput( "test_createUser_user01_at_TestL01_again_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1068,7 +1068,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user_group_TestL01_again_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
-      CommonTest.saveResult( "test_createUser_user_group_TestL01_again_fail", result.output );
+      CommonTest.saveOutput( "test_createUser_user_group_TestL01_again_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1110,7 +1110,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL02_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER" }: null;
-      CommonTest.saveResult( "test_createUser_user02_at_TestL02_fail", result.output );
+      CommonTest.saveOutput( "test_createUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1157,7 +1157,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user02_at_TestL01_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveResult( "test_createUser_user02_at_TestL01_success", result.output );
+      CommonTest.saveOutput( "test_createUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1215,7 +1215,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_createUser_user03_at_TestL01_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_FORBIDDEN_ACCESS" }: null;
-      CommonTest.saveResult( "test_createUser_user03_at_TestL01_fail", result.output );
+      CommonTest.saveOutput( "test_createUser_user03_at_TestL01_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1273,7 +1273,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveResult( "test_updateUser_user02_at_TestL02_success", result.output );
+      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1344,7 +1344,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
-      CommonTest.saveResult( "test_updateUser_user02_at_TestL02_fail", result.output );
+      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1403,7 +1403,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user99_at_TestL01_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveResult( "test_updateUser_user99_at_TestL01_success", result.output );
+      CommonTest.saveOutput( "test_updateUser_user99_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1473,7 +1473,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user01_at_TestL01_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveResult( "test_updateUser_user01_at_TestL01_success", result.output );
+      CommonTest.saveOutput( "test_updateUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1539,7 +1539,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user01_at_TestL01_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_USER_NOT_VALID" }: null;
-      CommonTest.saveResult( "test_updateUser_user01_at_TestL01_fail", result.output );
+      CommonTest.saveOutput( "test_updateUser_user01_at_TestL01_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1597,7 +1597,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
       result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
-      CommonTest.saveResult( "test_updateUser_user02_at_TestL02_fail", result.output );
+      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1658,7 +1658,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user99_at_TestL02_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveResult( "test_updateUser_user99_at_TestL02_success", result.output );
+      CommonTest.saveOutput( "test_updateUser_user99_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1728,7 +1728,7 @@ export default class UserTestV1 {
 
       CommonTest.saveInput( "test_updateUser_user02_at_TestL01_success", result.input );
       result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveResult( "test_updateUser_user02_at_TestL01_success", result.output );
+      CommonTest.saveOutput( "test_updateUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&

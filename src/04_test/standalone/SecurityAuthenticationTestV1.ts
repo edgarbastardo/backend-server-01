@@ -19,7 +19,7 @@ export default class SecurityAuthenticationTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -68,7 +68,7 @@ export default class SecurityAuthenticationTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -102,7 +102,7 @@ export default class SecurityAuthenticationTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&

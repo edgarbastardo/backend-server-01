@@ -1095,14 +1095,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_CREATE_BULK';
+            strCode = 'SUCCESS_BULK_CREATE';
             strMessage = await I18NManager.translate( strLanguage, 'Success created ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_CREATE_BULK';
+            strCode = 'ERROR_BULK_CREATE';
             strMessage = await I18NManager.translate( strLanguage, 'Cannot create ANY new information. Please check the errors and warnings section' );
             bIsError = true;
 
@@ -1610,14 +1610,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_UPDATE_BULK';
+            strCode = 'SUCCESS_BULK_UPDATE';
             strMessage = await I18NManager.translate( strLanguage, 'Success updated ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_UPDATE_BULK';
+            strCode = 'ERROR_BULK_UPDATE';
             strMessage = await I18NManager.translate( strLanguage, 'Cannot update ANY information. Please check the errors and warnings section' );
             bIsError = true;
 
@@ -2066,14 +2066,14 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_DELETE_BULK';
+            strCode = 'SUCCESS_BULK_DELETE';
             strMessage = await I18NManager.translate( strLanguage, 'Success deleted the ALL information' );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_DELETE_BULK';
+            strCode = 'ERROR_BULK_DELETE';
             strMessage = await I18NManager.translate( strLanguage, 'Cannot delete ANY information. Please check the errors and warnings section' );
             bIsError = true;
 

@@ -218,7 +218,7 @@ export default class CommonTest {
 
   }
 
-  static saveResult( strFileName: string, result: any ) {
+  static saveOutput( strFileName: string, result: any ) {
 
     try {
 
@@ -230,7 +230,7 @@ export default class CommonTest {
 
       fs.mkdirSync( strPath, { recursive: true } );
 
-      fs.writeFileSync( strPath + CommonTest.formatSequence( CommonTest.intSequence ) + "_" + strFileName + "_result.json", JSON.stringify( result, null, 2 ) );
+      fs.writeFileSync( strPath + CommonTest.formatSequence( CommonTest.intSequence ) + "_" + strFileName + "_output.json", JSON.stringify( result, null, 2 ) );
 
     }
     catch ( error ) {
@@ -272,7 +272,7 @@ export default class CommonTest {
       }
       else {
 
-        console.log( logSymbols.success, chalk.green( strMessageSuccess ) );
+        console.log( chalk.green( logSymbols.success + " " + strMessageSuccess ) );
 
       }
 
@@ -299,7 +299,7 @@ export default class CommonTest {
 
   }
 
-  static consoleLog( strKind: string, data: any ) {
+  static consoleLog( strKind: string, data: any, strIcon: string = "success" ) {
 
     if ( CommonTest.strOutputFormat === "json" ) {
 
@@ -315,24 +315,36 @@ export default class CommonTest {
     }
     else {
 
+      const iconList = {
+                         "success": logSymbols.success,
+                         "error": logSymbols.error,
+                         "warning": logSymbols.warning,
+                         "none": ""
+                       }
+
       if ( strKind.endsWith( ".blue" ) ) {
 
-        console.log( chalk.blue( data ) );
+        console.log( chalk.blue( iconList[ strIcon ] + " " + data ) );
 
       }
       else if ( strKind.endsWith( ".red" ) ) {
 
-        console.log( chalk.blue( data ) );
+        console.log( chalk.red( iconList[ strIcon ] + " " + data ) );
 
       }
       else if ( strKind.endsWith( ".green" ) ) {
 
-        console.log( chalk.blue( data ) );
+        console.log( chalk.green( iconList[ strIcon ] + " " + data ) );
+
+      }
+      else if ( strKind.endsWith( ".yellow" ) ) {
+
+        console.log( chalk.yellow( iconList[ strIcon ] + " " + data ) );
 
       }
       else if ( data instanceof Error ) {
 
-        console.log( logSymbols.error + " " + chalk.red( data.message ) );
+        console.log( chalk.red( logSymbols.error + " " + data.message ) );
 
       }
       else {

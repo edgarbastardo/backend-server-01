@@ -38,8 +38,8 @@ async function test_phase_clean() {
 
   CommonTest.myAssert( await DatabaseTestV1.test_search_sysUserGroups( CommonTest.headers_adminXX_at_system_net,
                                                                        "SUCCESS_SEARCH",
-                                                                       "test_search_sysUserGroup_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
-                                                                       true,
+                                                                       "test_search_sysUserGroup_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                                       false,
                                                                        encodeURIComponent(
                                                                                            JSON.stringify(
                                                                                                            {
@@ -63,6 +63,105 @@ async function test_phase_clean() {
                        '5B46340C7336: Search with user ' + CommonTest.strStartUser + ' in table sysUserGroup is OK',
                        '5B46340C7336: Search with user ' + CommonTest.strStartUser + ' in table sysUserGroup is FAILED' );
 
+  CommonTest.myAssert( await DatabaseTestV1.test_search_sysPerson( CommonTest.headers_adminXX_at_system_net,
+                                                                   "SUCCESS_SEARCH",
+                                                                   "test_search_sysPerson_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                                   false,
+                                                                   encodeURIComponent(
+                                                                                       JSON.stringify(
+                                                                                                       {
+                                                                                                         "ExtraData": {
+                                                                                                                        "$regexp": "\s*\"Tag\":\".*#UserTestV1#.*\""
+                                                                                                                      }
+                                                                                                       }
+                                                                                                     )
+                                                                                     ),
+                                                                   CommonTest.strStartUser + "_sysPerson_Data",
+                                                                   CommonTest.database_data ),
+                       'A721E6F2E483: Search with user ' + CommonTest.strStartUser + ' in table sysPerson is OK',
+                       'A721E6F2E483: Search with user ' + CommonTest.strStartUser + ' in table sysPerson is FAILED' );
+
+  CommonTest.myAssert( await DatabaseTestV1.test_search_sysBinaryIndex( CommonTest.headers_adminXX_at_system_net,
+                                                                        "SUCCESS_SEARCH",
+                                                                        "test_search_sysBinaryIndex_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                                        false,
+                                                                        encodeURIComponent(
+                                                                                            JSON.stringify(
+                                                                                                            {
+                                                                                                              "Category": {
+                                                                                                                            "$eq": "BinaryTestL01_Image"
+                                                                                                                          }
+                                                                                                            }
+                                                                                                          )
+                                                                                          ),
+                                                                        CommonTest.strStartUser + "_sysBinaryIndex_Data",
+                                                                        CommonTest.database_data ),
+                       'AF71A6C0E494: Search with user ' + CommonTest.strStartUser + ' in table sysBinaryIndex is OK',
+                       'AF71A6C0E494: Search with user ' + CommonTest.strStartUser + ' in table sysBinaryIndex is FAILED' );
+
+  if ( CommonTest.database_data[ CommonTest.strStartUser + "_sysUserGroup_Data" ].length > 0 ) {
+
+    CommonTest.consoleLog( "Warning.yellow", "70D46D9E73A9: Data rows found in table sysUserGroup. Maybe from old fail test run?.", "warning" );
+
+    CommonTest.myAssert( await DatabaseTestV1.test_deleteBulk( CommonTest.headers_adminXX_at_system_net,
+                                                               "SUCCESS_BULK_DELETE",
+                                                               "test_deleteBulk_sysUserGroup_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                               false,
+                                                               "sysUserGroup",
+                                                               CommonTest.strStartUser + "_sysUserGroup_Data",
+                                                               CommonTest.database_data ),
+                         '70D46D9E73A9: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysUserGroup is OK',
+                         '70D46D9E73A9: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysUserGroup is FAILED' );
+
+  }
+  else {
+
+    CommonTest.consoleLog( "Message.green", "833C4AF7A007: NOT data rows found in table sysUserGroup." );
+
+  }
+
+  if ( CommonTest.database_data[ CommonTest.strStartUser + "_sysPerson_Data" ].length > 0 ) {
+
+    CommonTest.consoleLog( "Warning.yellow", "4201EFC54E66: Data rows found in table sysPerson. Maybe from old fail test run?.", "warning" );
+
+    CommonTest.myAssert( await DatabaseTestV1.test_deleteBulk( CommonTest.headers_adminXX_at_system_net,
+                                                               "SUCCESS_BULK_DELETE",
+                                                               "test_deleteBulk_sysPerson_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                               false,
+                                                               "sysPerson",
+                                                               CommonTest.strStartUser + "_sysPerson_Data",
+                                                               CommonTest.database_data ),
+                         '487E9137E1F8: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysPerson is OK',
+                         '487E9137E1F8: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysPerson is FAILED' );
+
+  }
+  else {
+
+    CommonTest.consoleLog( "Message.green", "18E1088E3195: NOT data rows found in table sysPerson." );
+
+  }
+
+  if ( CommonTest.database_data[ CommonTest.strStartUser + "_sysBinaryIndex_Data" ].length > 0 ) {
+
+    CommonTest.consoleLog( "Warning.yellow", "5EA5925A4BB0: Data rows found in table sysBinaryIndex. Maybe from old fail test run?.", "warning" );
+
+    CommonTest.myAssert( await DatabaseTestV1.test_deleteBulk( CommonTest.headers_adminXX_at_system_net,
+                                                               "SUCCESS_BULK_DELETE",
+                                                               "test_deleteBulk_sysBinaryIndex_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
+                                                               false,
+                                                               "sysBinaryIndex",
+                                                               CommonTest.strStartUser + "_sysBinaryIndex_Data",
+                                                               CommonTest.database_data ),
+                         '238348AC0B05: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysBinaryIndex is OK',
+                         '238348AC0B05: Bulk delete with user ' + CommonTest.strStartUser + ' in table sysBinaryIndex is FAILED' );
+
+  }
+  else {
+
+    CommonTest.consoleLog( "Message.green", "AA3280663458: NOT data rows found in table sysBinaryIndex." );
+
+  }
+
   //SELECT * FROM BackendServer01DB.sysUserGroup Where ExtraData REGEXP '\s*"Tag":".*#UserGroupTestV1#.*"' Or ExtraData REGEXP '\s*"Tag":".*#UserTestV1#.*"';
   //SELECT * FROM BackendServer01DB.sysPerson Where ExtraData REGEXP '\s*"Tag":".*#UserTestV1#.*"';
   //SELECT * FROM BackendServer01DB.sysBinaryIndex Where Category = "BinaryTestL01_Image";
@@ -71,7 +170,7 @@ async function test_phase_clean() {
 
 async function test_v1_phase01() {
 
-  CommonTest.consoleLog( "Separator.blue", ">********************" + CommonTest.strStartUser + "********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">********************" + CommonTest.strStartUser + "********************<", "none" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_login( CommonTest.headers_adminXX_at_system_net,
                                                                       {
@@ -106,7 +205,7 @@ async function test_v1_phase01() {
                        'EF56F748EC63: Login with user ' + CommonTest.strStartUser + ' is OK',
                        'EF56F748EC63: Login with user ' + CommonTest.strStartUser + ' is FAILED' );
 
-  test_phase_clean();
+  await test_phase_clean();
 
   //Fail because cannot delete yourself
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_adminXX_at_system_net,
@@ -239,37 +338,37 @@ async function test_v1_phase02() {
                                                                   "test_uploadImageTiger_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                                   "admin01@system.net_tiger",
                                                                   { Mark: "5143BE7B1AE1" } ),
-                                                                  "5143BE7B1AE1: upload image tiger is OK",
-                                                                  "5143BE7B1AE1: upload image tiger is FAILED" );
+                                                                  "5143BE7B1AE1: Upload image tiger is OK",
+                                                                  "5143BE7B1AE1: Upload image tiger is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_adminXX_at_system_net,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
                                                            "test_createAuth_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                            false ),
-                       "79991E80365A: create auth ' + CommonTest.strStartUser + ' is OK",
-                       "79991E80365A: create auth ' + CommonTest.strStartUser + ' is FAILED" );
+                       "79991E80365A: Create auth ' + CommonTest.strStartUser + ' is OK",
+                       "79991E80365A: Create auth ' + CommonTest.strStartUser + ' is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImageThumbnail( CommonTest.headers_adminXX_at_system_net,
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageTigerThumbnail_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                                        "admin01@system.net_tiger" ),
-                       "D8C8CF834EE9: download image thumbnail tiger ' + CommonTest.strStartUser + ' is OK",
-                       "D8C8CF834EE9: download image thumbnail tiger ' + CommonTest.strStartUser + ' is FAILED" );
+                       "D8C8CF834EE9: Download image thumbnail tiger ' + CommonTest.strStartUser + ' is OK",
+                       "D8C8CF834EE9: Download image thumbnail tiger ' + CommonTest.strStartUser + ' is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_adminXX_at_system_net,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageTiger_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                               "admin01@system.net_tiger",
                                                               null ),
-                       "4E99438DE0A9: download image tiger ' + CommonTest.strStartUser + ' is OK",
-                       "4E99438DE0A9: download image tiger ' + CommonTest.strStartUser + ' is FAILED" );
+                       "4E99438DE0A9: Download image tiger ' + CommonTest.strStartUser + ' is OK",
+                       "4E99438DE0A9: Download image tiger ' + CommonTest.strStartUser + ' is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_adminXX_at_system_net,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsTiger_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                                 "admin01@system.net_tiger" ),
-                       "4D93C17B6B3C: get image details tiger ' + CommonTest.strStartUser + ' is OK",
-                       "4D93C17B6B3C: get image details tiger ' + CommonTest.strStartUser + ' is FAILED" );
+                       "4D93C17B6B3C: Get image details tiger ' + CommonTest.strStartUser + ' is OK",
+                       "4D93C17B6B3C: Get image details tiger ' + CommonTest.strStartUser + ' is FAILED" );
 
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_adminXX_at_system_net,
                                                          { Name: "noexists@systems.net" },
@@ -490,9 +589,19 @@ async function test_v1_phase02() {
                        '784793DCC7D4: Update the user group TestL55 is OK',
                        '784793DCC7D4: Update the user group TestL55 is FAILED' );
 
+  CommonTest.myAssert( await UserGroupTestV1.test_getUserGroup( CommonTest.headers_adminXX_at_system_net,
+                                                                {
+                                                                  Name: "TestL45"
+                                                                },
+                                                                "SUCCESS_GET_USER_GROUP",
+                                                                "test_getUserGroup_TestL55_success",
+                                                                false ),
+                       'BF22EA1E9935: Get the user group TestL45 is OK',
+                       'BF22EA1E9935: Get the user group TestL45 is FAILED' );
+
   //Success because the group is now empty
   CommonTest.myAssert( await UserGroupTestV1.test_deleteUserGroup( CommonTest.headers_adminXX_at_system_net,
-                                                                   { Name: "TestL55" },
+                                                                   { Name: "TestL45" },
                                                                    "SUCCESS_USER_GROUP_DELETE",
                                                                    "test_deleteUserGroup_TestL55_success" ),
                        '41D7D612B5CB: Delete of the user group TestL55 is OK',
@@ -578,10 +687,10 @@ async function test_v1_phase02() {
                                                                                   { Name: "System_Administrators" },
                                                                                 ]
                                                                         },
-                                                                        "ERROR_BULK_USER_DISABLE",
+                                                                        "ERROR_BULK_USER_GROUP_DISABLE",
                                                                         "test_disableBulkUserGroup_System_Administrators_fail" ),
-                       '595898CDF5D7: Bulk disable of the user group System_Administrators is OK with the fail',
-                       '595898CDF5D7: Bulk disable of the user group System_Administrators is FAILED' );
+                       'C9EE6CEEE392: Bulk disable of the user group System_Administrators is OK with the fail',
+                       'C9EE6CEEE392: Bulk disable of the user group System_Administrators is FAILED' );
 
   //Fail beacuse cannot enable your own group
   CommonTest.myAssert( await UserGroupTestV1.test_enableBulkUserGroup( CommonTest.headers_adminXX_at_system_net,
@@ -590,7 +699,7 @@ async function test_v1_phase02() {
                                                                                   { Name: "System_Administrators" },
                                                                                 ]
                                                                         },
-                                                                        "ERROR_BULK_USER_ENABLE",
+                                                                        "ERROR_BULK_USER_GROUP_ENABLE",
                                                                         "test_enableBulkUserGroup_System_Administrators_fail" ),
                        'F687E4496FBC: Bulk enable of the user group System_Administrators is OK with the fail',
                        'F687E4496FBC: Bulk enable of the user group System_Administrators is FAILED' );
@@ -602,7 +711,7 @@ async function test_v1_phase02() {
                                                                                   { Name: "System_Administrators" },
                                                                                ]
                                                                        },
-                                                                       "ERROR_BULK_USER_DELETE",
+                                                                       "ERROR_BULK_USER_GROUP_DELETE",
                                                                        "test_deleteBulkUserGroup_System_Administrators_fail" ),
                        '8B78C8472833: Bulk delete of the user group System_Administrators is OK with the fail',
                        '8B78C8472833: Bulk delete of the user group System_Administrators is FAILED' );
@@ -610,7 +719,7 @@ async function test_v1_phase02() {
   //Fail beacuse cannot delete your own group
   CommonTest.myAssert( await UserGroupTestV1.test_deleteUserGroup( CommonTest.headers_adminXX_at_system_net,
                                                                    { Name: "System_Administrators" },
-                                                                   "ERROR_USER_GROUP_DELETE",
+                                                                   "ERROR_USER_GROUP_IS_NOT_USER_EMPTY",
                                                                    "test_deleteUserGroup_System_Administrators_fail" ),
                        'ED671119B620: Delete of the user group System_Administrators is OK with the fail',
                        'ED671119B620: Delete of the user group System_Administrators is FAILED' );
@@ -619,7 +728,7 @@ async function test_v1_phase02() {
 
 export async function test_v1_phase03() {
 
-  CommonTest.consoleLog( "Separator.blue", ">******************** user01@TestL01 ********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">******************** user01@TestL01 ********************<", "none" );
 
   CommonTest.headers_user01_at_TestL01_Session1.Authorization = "12345"; //Create invalid authentication token
 
@@ -699,37 +808,37 @@ export async function test_v1_phase03() {
                                                                  {
                                                                    Mark: "DCF30CA926BB"
                                                                  } ),
-                       "DCF30CA926BB: upload image tower user01@TestL01 is OK",
-                       "DCF30CA926BB: upload image tower user01@TestL01 is FAILED" );
+                       "DCF30CA926BB: Upload image tower user01@TestL01 is OK",
+                       "DCF30CA926BB: Upload image tower user01@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user01_at_TestL01_Session1,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
                                                            "test_createAuth_user01@TestL01_success",
                                                            false ),
-                       "6F30C8E983E3: create auth user01@TestL01 is OK",
-                       "6F30C8E983E3: create auth user01@TestL01 is FAILED" );
+                       "6F30C8E983E3: Create auth user01@TestL01 is OK",
+                       "6F30C8E983E3: Create auth user01@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImageThumbnail( CommonTest.headers_user01_at_TestL01_Session1,
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageTowerThumbnail_user01@TestL01_success",
                                                                        "user01@TestL01_tower" ),
-                       "DF6BC73BB52F: download image thumbnail tower user01@TestL01 is OK",
-                       "DF6BC73BB52F: download image thumbnail tower user01@TestL01 is FAILED" );
+                       "DF6BC73BB52F: Download image thumbnail tower user01@TestL01 is OK",
+                       "DF6BC73BB52F: Download image thumbnail tower user01@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_user01_at_TestL01_Session1,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageTower_user01@TestL01_success",
                                                               "user01@TestL01_tower",
                                                               null ),
-                       "326E879A24CF: download image tower user01@TestL01 is OK",
-                       "326E879A24CF: download image tower user01@TestL01 is FAILED" );
+                       "326E879A24CF: Download image tower user01@TestL01 is OK",
+                       "326E879A24CF: Download image tower user01@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user01_at_TestL01_Session1,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsTower_user01@TestL01_success",
                                                                 "user01@TestL01_tower" ),
-                       "E28E266351E5: get image details tower user01@TestL01 is OK",
-                       "E28E266351E5: get image details tower user01@TestL01 is FAILED" );
+                       "E28E266351E5: Get image details tower user01@TestL01 is OK",
+                       "E28E266351E5: Get image details tower user01@TestL01 is FAILED" );
 
   //Old version: Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
   //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
@@ -1042,7 +1151,7 @@ export async function test_v1_phase03() {
 
 export async function test_v1_phase04() {
 
-  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<", "none" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_login( CommonTest.headers_user02_at_TestL01,
                                                                       {
@@ -1068,8 +1177,8 @@ export async function test_v1_phase04() {
                                                                 "test_uploadImageRoad_user02@TestL01_success",
                                                                 "user02@TestL01_road",
                                                                 { Mark: "830515981236" } ),
-                       "830515981236: upload image road user02@TestL01 is OK",
-                       "830515981236: upload image road user02@TestL01 is FAILED" );
+                       "830515981236: Upload image road user02@TestL01 is OK",
+                       "830515981236: Upload image road user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user02_at_TestL01,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
@@ -1082,23 +1191,23 @@ export async function test_v1_phase04() {
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageRoadThumbnail_user02@TestL01_success",
                                                                        "user02@TestL01_road" ),
-                       "237980EFB1D6: download image thumbnail road user02@TestL01 is OK",
-                       "237980EFB1D6: download image thumbnail road user02@TestL01 is FAILED" );
+                       "237980EFB1D6: Download image thumbnail road user02@TestL01 is OK",
+                       "237980EFB1D6: Download image thumbnail road user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_user02_at_TestL01,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageRoad_user02@TestL01_success",
                                                               "user02@TestL01_road",
                                                               null ),
-                       "326E879A24CF: download image road user02@TestL01 is OK",
-                       "326E879A24CF: download image road user02@TestL01 is FAILED" );
+                       "326E879A24CF: Download image road user02@TestL01 is OK",
+                       "326E879A24CF: Download image road user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL01,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsRoad_user02@TestL01_success",
                                                                 "user02@TestL01_road" ),
-                       "7ABA97178AC8: get image details road user02@TestL01 is OK",
-                       "7ABA97178AC8: get image details road user02@TestL01 is FAILED" );
+                       "7ABA97178AC8: Get image details road user02@TestL01 is OK",
+                       "7ABA97178AC8: Get image details road user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_binarySearch( CommonTest.headers_user02_at_TestL01,
                                                              {  },
@@ -1140,8 +1249,8 @@ export async function test_v1_phase04() {
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageRoad_user02@TestL01_success",
                                                             "user02@TestL01_road" ),
-                       "2940D61E1827: delete image road user02@TestL01 is OK",
-                       "2940D61E1827: delete image road user02@TestL01 is FAILED" );
+                       "2940D61E1827: Delete image road user02@TestL01 is OK",
+                       "2940D61E1827: Delete image road user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await UserGroupTestV1.test_searchUserGroup( CommonTest.headers_user02_at_TestL01,
                                                                    {  },
@@ -1213,7 +1322,7 @@ export async function test_v1_phase04() {
                        '9D731B62D922: Logout with user user02@TestL01 is OK',
                        '9D731B62D922: Logout with user user02@TestL01 is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>", "none" );
 
 }
 
@@ -1223,8 +1332,8 @@ export async function test_v1_phase05() {
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageTower_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                             "user01@TestL01_tower" ),
-                       "7D2AB0B58075: delete image tower ' + CommonTest.strStartUser + ' is OK",
-                       "7D2AB0B58075: delete image tower ' + CommonTest.strStartUser + ' is FAILED" );
+                       "7D2AB0B58075: Delete image tower ' + CommonTest.strStartUser + ' is OK",
+                       "7D2AB0B58075: Delete image tower ' + CommonTest.strStartUser + ' is FAILED" );
 
   //Success because the user user02@TestL01 is in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
   //*** Delete user user02@TestL01 ***
@@ -1257,13 +1366,13 @@ export async function test_v1_phase05() {
                        '1AF9D40E118A: Delete of the user user01@TestL01 is OK with the fail',
                        '1AF9D40E118A: Delete of the user user01@TestL01 is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>", "none" );
 
 }
 
 export async function test_v1_phase06() {
 
-  CommonTest.consoleLog( "Separator.blue", ">******************** user01@TestL02 ********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">******************** user01@TestL02 ********************<", "none" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_login( CommonTest.headers_user01_at_TestL02,
                                                                       {
@@ -1295,29 +1404,70 @@ export async function test_v1_phase06() {
   CommonTest.myAssert( await UserGroupTestV1.test_createUserGroup_TestL56( CommonTest.headers_user01_at_TestL02,
                                                                            "SUCCESS_USER_GROUP_CREATE",
                                                                            "test_createUserGroup_TestL56_success",
-                                                                           false,
+                                                                           true,
                                                                            false ),
                        '09527F1FCA05: Create the user group TestL56 is OK',
                        '09527F1FCA05: Create of the user group TestL56 is FAILED' );
 
+  //Change the Name TestL56 => TestL46
   CommonTest.myAssert( await UserGroupTestV1.test_updateUserGroup_TestL56( CommonTest.headers_user01_at_TestL02,
-                                                                           "SUCCESS_USER_GROUP_CREATE",
-                                                                           "test_createUserGroup_TestL56_success",
-                                                                           CommonTest.TestL55_data,
-                                                                           false,
+                                                                           "SUCCESS_USER_GROUP_UPDATE",
+                                                                           "test_updateUserGroup_TestL56_success",
+                                                                           CommonTest.TestL56_data,
+                                                                           true,
                                                                            false ),
                        'F984D3179239: Update the user group TestL56 is OK',
                        'F984D3179239: Update the user group TestL56 is FAILED' );
 
+  CommonTest.myAssert( await UserGroupTestV1.test_getUserGroup( CommonTest.headers_user01_at_TestL02,
+                                                                {
+                                                                  Name: "TestL01"
+                                                                },
+                                                                "SUCCESS_GET_USER_GROUP",
+                                                                "test_getUserGroup_TestL01_success",
+                                                                false ),
+                       'BAB0076CCD42: Get the user group TestL01 is OK',
+                       'BAB0076CCD42: Get the user group TestL01 is FAILED' );
+
+  CommonTest.myAssert( await UserGroupTestV1.test_getUserGroup( CommonTest.headers_user01_at_TestL02,
+                                                                {
+                                                                  Name: "TestL02"
+                                                                },
+                                                                "SUCCESS_GET_USER_GROUP",
+                                                                "test_getUserGroup_TestL02_success",
+                                                                false ),
+                       '60410DE8CB0A: Get the user group TestL02 is OK',
+                       '60410DE8CB0A: Get the user group TestL02 is FAILED' );
+
+  CommonTest.myAssert( await UserGroupTestV1.test_getUserGroup( CommonTest.headers_user01_at_TestL02,
+                                                                {
+                                                                  Name: "TestL46"
+                                                                },
+                                                                "SUCCESS_GET_USER_GROUP",
+                                                                "test_getUserGroup_TestL55_success",
+                                                                false ),
+                       'B4BA2DC5813D: Get the user group TestL46 is OK',
+                       'B4BA2DC5813D: Get the user group TestL46 is FAILED' );
+
+  CommonTest.myAssert( await UserGroupTestV1.test_getUserGroup( CommonTest.headers_user01_at_TestL02,
+                                                                {
+                                                                  Name: "System_Administrators"
+                                                                },
+                                                                "ERROR_CANNOT_GET_USER_GROUP",
+                                                                "test_getUserGroup_System_Administrators_fail",
+                                                                true ),
+                       '0F16D9A60A44: Get the user group System_Administrators is OK',
+                       '0F16D9A60A44: Get the user group System_Administrators is FAILED' );
+
   //Success because the group is now empty
   CommonTest.myAssert( await UserGroupTestV1.test_deleteUserGroup( CommonTest.headers_adminXX_at_system_net,
-                                                                   { Name: "TestL56" },
+                                                                   { Name: "TestL46" },
                                                                    "SUCCESS_USER_GROUP_DELETE",
                                                                    "test_deleteUserGroup_TestL56_success" ),
-                       '6E97A554929E: Delete of the user group TestL56 is OK',
-                       '6E97A554929E: Delete of the user group TestL56 is FAILED' );
+                       '6E97A554929E: Delete of the user group TestL46 is OK',
+                       '6E97A554929E: Delete of the user group TestL46 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //*** Create the user user02@TestL02 ***
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL02_success( CommonTest.headers_user01_at_TestL02 ),
                        '595AA97F14E3: Creation of the user user02@TestL02 is OK',
@@ -1325,14 +1475,14 @@ export async function test_v1_phase06() {
 
   //Change the user name from user02@TestL02 => user99@TestL01
   //Change the user group name from TestL02 => TestL01
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_updateUser_user02_at_TestL02_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL02_data ), //The user is another group
                        '5CE1E61F0840: Update of the user user02@TestL02 is OK',
                        '5CE1E61F0840: Update of the user user02@TestL02 is FAILED' );
 
   //Change the user name from user99@TestL01 => user02@TestL02
   //Change the user group name from TestL01 => TestL02
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //Set the field sysUser.ForceChangePassword = 1
   CommonTest.myAssert( await UserTestV1.test_updateUser_user99_at_TestL01_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL02_data ), //The user is another group
                        'F59085E6DF03: Update of the user user99@TestL01 is OK',
@@ -1345,13 +1495,13 @@ export async function test_v1_phase06() {
                        'F15260F5B6AD: Update of the user user02@TestL02 is OK with the fail',
                        'F15260F5B6AD: Update of the user user02@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //*** Create the user user02@TestL01 ***
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL01_success( CommonTest.headers_user01_at_TestL02 ),
                        'F717131C21AA: Creation of the user user02@TestL01 is OK',
                        'F717131C21AA: Creation of the user user02@TestL01 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_updateUser_user02_at_TestL01_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL01_data ), //The user is another group
                        '79736CBA890B: Creation of the user user02@TestL01 is OK',
                        '79736CBA890B: Creation of the user user02@TestL01 is FAILED' );
@@ -1513,7 +1663,7 @@ export async function test_v1_phase06() {
                        '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is FAILED' );
 
   //*** Move user user02@TestL01 to the user group TestL02 ***
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_moveBulkUser( CommonTest.headers_user01_at_TestL02,
                                                            {
                                                              bulk: [
@@ -1526,7 +1676,7 @@ export async function test_v1_phase06() {
                        '6C86B6F735D4: Bulk move of the user user02@TestL01 is FAILED' );
 
   //*** Move user user02@TestL01 to the user group TestL01 ***
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_moveBulkUser( CommonTest.headers_user01_at_TestL02,
                                                            {
                                                              bulk: [
@@ -1567,37 +1717,37 @@ export async function test_v1_phase06() {
                                                                 "test_uploadImageRoad_user01@TestL02_success",
                                                                 "user01@TestL02_road",
                                                                 { Mark: "C23E1CE5725E" } ),
-                       "C23E1CE5725E: upload image road user01@TestL02 is OK",
-                       "C23E1CE5725E: upload image road user01@TestL02 is FAILED" );
+                       "C23E1CE5725E: Upload image road user01@TestL02 is OK",
+                       "C23E1CE5725E: Upload image road user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user01_at_TestL02,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
                                                            "test_createAuth_user01@TestL02_success",
                                                            false ),
-                       "C539A2B57526: create auth user01@TestL02 is OK",
-                       "C539A2B57526: create auth user01@TestL02 is FAILED" );
+                       "C539A2B57526: Create auth user01@TestL02 is OK",
+                       "C539A2B57526: Create auth user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImageThumbnail( CommonTest.headers_user01_at_TestL02,
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageRoadThumbnail_user01@TestL02_success",
                                                                        "user01@TestL02_road" ),
-                       "EDD23DB9B25D: download image thumbnail road user01@TestL02 is OK",
-                       "EDD23DB9B25D: download image thumbnail road user01@TestL02 is FAILED" );
+                       "EDD23DB9B25D: Download image thumbnail road user01@TestL02 is OK",
+                       "EDD23DB9B25D: Download image thumbnail road user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_user01_at_TestL02,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageRoad_user01@TestL02_success",
                                                               "user01@TestL02_road",
                                                               null ),
-                       "0B1CD13DAD0B: download image road user01@TestL02 is OK",
-                       "0B1CD13DAD0B: download image road user01@TestL02 is FAILED" );
+                       "0B1CD13DAD0B: Download image road user01@TestL02 is OK",
+                       "0B1CD13DAD0B: Download image road user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user01_at_TestL02,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsRoad_user01@TestL02_success",
                                                                 "user01@TestL02_road" ),
-                       "EA9A3CA6AF6C: get image details road user01@TestL02 is OK",
-                       "EA9A3CA6AF6C: get image details road user01@TestL02 is FAILED" );
+                       "EA9A3CA6AF6C: Get image details road user01@TestL02 is OK",
+                       "EA9A3CA6AF6C: Get image details road user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_binarySearch( CommonTest.headers_user01_at_TestL02,
                                                              {  },
@@ -1617,7 +1767,7 @@ export async function test_v1_phase06() {
                        '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is OK',
                        '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL01"
@@ -1640,7 +1790,7 @@ export async function test_v1_phase06() {
                        '6DA562F7B229: Set settings of the user group TestL01 using user user01@TestL02 is OK',
                        '6DA562F7B229: Set settings of the user group TestL01 using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL02"
@@ -1663,7 +1813,7 @@ export async function test_v1_phase06() {
                        '7E9555969A8A: Set settings of the user group TestL02 using user user01@TestL02 is OK',
                        '7E9555969A8A: Set settings of the user group TestL02 using user user01@TestL02 is FAILED' );
 
-  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#, no allowed to write the settings of the user group System_Administrators
+  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "System_Administrators"
@@ -1680,7 +1830,7 @@ export async function test_v1_phase06() {
                        '2AFD61979617: Set settings of the user group System_Administrators using user user01@TestL02 is OK with the fail',
                        '2AFD61979617: Set settings of the user group System_Administrators using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_getSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL01"
@@ -1698,7 +1848,7 @@ export async function test_v1_phase06() {
                        'EAEE8CDC1FB7: Get settings of the user group TestL01 using user user01@TestL02 is OK',
                        'EAEE8CDC1FB7: Get settings of the user group TestL01 using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_getSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL02"
@@ -1716,7 +1866,7 @@ export async function test_v1_phase06() {
                        '5284AFC6F9C4: Get settings of the user group TestL02 using user user01@TestL02 is OK',
                        '5284AFC6F9C4: Get settings of the user group TestL02 using user user01@TestL02 is FAILED' );
 
-  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#, no allowed to write the settings of the user group System_Administrators
+  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "System_Administrators"
@@ -1737,7 +1887,7 @@ export async function test_v1_phase06() {
 
 export async function test_v1_phase07() {
 
-  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL02 ********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL02 ********************<", "none" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_login( CommonTest.headers_user02_at_TestL02,
                                                                       {
@@ -1831,37 +1981,37 @@ export async function test_v1_phase07() {
                                                                 {
                                                                   Mark: "09436E9FE7B4"
                                                                 } ),
-                       "09436E9FE7B4: upload image road user02@TestL02 is OK",
-                       "09436E9FE7B4: upload image road user02@TestL02 is FAILED" );
+                       "09436E9FE7B4: Upload image road user02@TestL02 is OK",
+                       "09436E9FE7B4: Upload image road user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user02_at_TestL02,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
                                                            "test_createAuth_user02@TestL02_success",
                                                            false ),
-                       "68A9AE102E89: create auth user02@TestL02 is OK",
-                       "68A9AE102E89: create auth user02@TestL02 is FAILED" );
+                       "68A9AE102E89: Create auth user02@TestL02 is OK",
+                       "68A9AE102E89: Create auth user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImageThumbnail( CommonTest.headers_user02_at_TestL02,
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageRoadThumbnail_user02@TestL02_success",
                                                                        "user02@TestL02_road" ),
-                       "29EA767C6CF1: download image thumbnail road user02@TestL02 is OK",
-                       "29EA767C6CF1: download image thumbnail road user02@TestL02 is FAILED" );
+                       "29EA767C6CF1: Download image thumbnail road user02@TestL02 is OK",
+                       "29EA767C6CF1: Download image thumbnail road user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_user02_at_TestL02,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageRoad_user02@TestL02_success",
                                                               "user02@TestL02_road",
                                                               null ),
-                       "D4F7EE1786AE: download image road user02@TestL02 is OK",
-                       "D4F7EE1786AE: download image road user02@TestL02 is FAILED" );
+                       "D4F7EE1786AE: Download image road user02@TestL02 is OK",
+                       "D4F7EE1786AE: Download image road user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL02,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsRoad_user02@TestL02_success",
                                                                 "user02@TestL02_road" ),
-                       "D121F8FC1A6E: get image details road user02@TestL02 is OK",
-                       "D121F8FC1A6E: get image details road user02@TestL02 is FAILED" );
+                       "D121F8FC1A6E: Get image details road user02@TestL02 is OK",
+                       "D121F8FC1A6E: Get image details road user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_binarySearch( CommonTest.headers_user02_at_TestL02,
                                                              {  },
@@ -1911,13 +2061,13 @@ export async function test_v1_phase07() {
                        '56FE7F65DC57: Logout with user user02@TestL02 is OK with the fail',
                        '56FE7F65DC57: Logout with user user02@TestL02 is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>", "none" );
 
 }
 
 export async function test_v1_phase08() {
 
-  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<" );
+  CommonTest.consoleLog( "Separator.blue", ">******************** user02@TestL01 ********************<", "none" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_login( CommonTest.headers_user02_at_TestL01,
                                                                       {
@@ -1945,37 +2095,37 @@ export async function test_v1_phase08() {
                                                                   {
                                                                     Mark: "6355B124499E"
                                                                   } ),
-                       "6355B124499E: upload image castle user02@TestL01 is OK",
-                       "6355B124499E: upload image castle user02@TestL01 is FAILED" );
+                       "6355B124499E: Upload image castle user02@TestL01 is OK",
+                       "6355B124499E: Upload image castle user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user02_at_TestL01,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",
                                                            "test_createAuth_user02@TestL01_success",
                                                            false ),
-                       "68A9AE102E89: create auth user02@TestL01 is OK",
-                       "68A9AE102E89: create auth user02@TestL01 is FAILED" );
+                       "68A9AE102E89: Create auth user02@TestL01 is OK",
+                       "68A9AE102E89: Create auth user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImageThumbnail( CommonTest.headers_user02_at_TestL01,
                                                                        "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                                        "test_downloadImageCastleThumbnail_user02@TestL01_success",
                                                                        "user02@TestL01_castle" ),
-                       "8C71B4C27928: download image thumbnail castle user02@TestL01 is OK",
-                       "8C71B4C27928: download image thumbnail castle user02@TestL01 is FAILED" );
+                       "8C71B4C27928: Download image thumbnail castle user02@TestL01 is OK",
+                       "8C71B4C27928: Download image thumbnail castle user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_downloadImage( CommonTest.headers_user02_at_TestL01,
                                                               "SUCCESS_BINARY_DATA_DOWNLOAD",
                                                               "test_downloadImageCastle_user02@TestL01_success",
                                                               "user02@TestL01_castle",
                                                               null ),
-                       "15FC200672CD: download image castle user02@TestL01 is OK",
-                       "15FC200672CD: download image castle user02@TestL01 is FAILED" );
+                       "15FC200672CD: Download image castle user02@TestL01 is OK",
+                       "15FC200672CD: Download image castle user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_getImageDetails( CommonTest.headers_user02_at_TestL01,
                                                                 "SUCCESS_GET_BINARY_DATA_DETAILS",
                                                                 "test_getImageDetailsCatle_user02@TestL01_success",
                                                                 "user02@TestL01_castle" ),
-                       "C4D63A79B8C6: get image details castle user02@TestL01 is OK",
-                       "C4D63A79B8C6: get image details castle user02@TestL01 is FAILED" );
+                       "C4D63A79B8C6: Get image details castle user02@TestL01 is OK",
+                       "C4D63A79B8C6: Get image details castle user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_binarySearch( CommonTest.headers_user02_at_TestL01,
                                                              {  },
@@ -2017,8 +2167,8 @@ export async function test_v1_phase08() {
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageCastle_user02@TestL01_success",
                                                             "user02@TestL01_castle" ),
-                       "61FD3EFB09E7: delete image castle user02@TestL01 is OK",
-                       "61FD3EFB09E7: delete image castle user02@TestL01 is FAILED" );
+                       "61FD3EFB09E7: Delete image castle user02@TestL01 is OK",
+                       "61FD3EFB09E7: Delete image castle user02@TestL01 is FAILED" );
 
   CommonTest.myAssert( await SecurityAuthenticationTestV1.test_logout( CommonTest.headers_user02_at_TestL01,
                                                                        "SUCCESS_LOGOUT",
@@ -2026,7 +2176,7 @@ export async function test_v1_phase08() {
                        'A82203930794: Logout with user user02@TestL01 is OK',
                        'A82203930794: Logout with user user02@TestL01 is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>", "none" );
 
 }
 
@@ -2036,17 +2186,17 @@ export async function test_v1_phase09() {
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageRoad_user01@TestL02_success",
                                                             "user02@TestL02_road" ),
-                       "DC8835AA08C0: delete image road user01@TestL02 is OK",
-                       "DC8835AA08C0: delete image road user01@TestL02 is FAILED" );
+                       "DC8835AA08C0: Delete image road user01@TestL02 is OK",
+                       "DC8835AA08C0: Delete image road user01@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_deleteImage( CommonTest.headers_user01_at_TestL02,
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageRoad_user01@TestL02_success",
                                                             "user01@TestL02_road" ),
-                       "D02C1566D62C: delete image road user01@TestL02 is OK",
-                       "D02C1566D62C: delete image road user01@TestL02 is FAILED" );
+                       "D02C1566D62C: Delete image road user01@TestL02 is OK",
+                       "D02C1566D62C: Delete image road user01@TestL02 is FAILED" );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL02,
                                                          {
                                                            Id: CommonTest.user02_at_TestL02_data.Id
@@ -2056,7 +2206,7 @@ export async function test_v1_phase09() {
                        'B266409B2D82: Delete of the user user02@TestL02 is OK',
                        'B266409B2D82: Delete of the user user02@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#
+  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL02,
                                                          {
                                                            Id: CommonTest.user02_at_TestL01_data.Id
@@ -2072,7 +2222,7 @@ export async function test_v1_phase09() {
                        '56FE7F65DC57: Logout with user user01@TestL02 is OK',
                        '56FE7F65DC57: Logout with user user01@TestL02 is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>", "none" );
 
 }
 
@@ -2082,8 +2232,8 @@ export async function test_v1_phase10() {
                                                             "SUCCESS_BINARY_DATA_DELETE",
                                                             "test_deleteImageTiger_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
                                                             "admin01@system.net_tiger" ),
-                       "B916F1ECD54E: delete image tiger ' + CommonTest.strStartUser + ' is OK",
-                       "B916F1ECD54E: delete image tiger ' + CommonTest.strStartUser + ' is FAILED" );
+                       "B916F1ECD54E: Delete image tiger ' + CommonTest.strStartUser + ' is OK",
+                       "B916F1ECD54E: Delete image tiger ' + CommonTest.strStartUser + ' is FAILED" );
 
   CommonTest.myAssert( await UserGroupTestV1.test_deleteUserGroup( CommonTest.headers_adminXX_at_system_net,
                                                                    {
@@ -2149,7 +2299,7 @@ export async function test_v1_phase11() {
                        '0E7222800B26: Logout with user ' + CommonTest.strStartUser + ' is OK',
                        '0E7222800B26: Logout with user ' + CommonTest.strStartUser + ' is FAILED' );
 
-  CommonTest.consoleLog( "Separator.blue", "<******************** ' + CommonTest.strStartUser + ' ********************>" );
+  CommonTest.consoleLog( "Separator.blue", "<******************** " + CommonTest.strStartUser + " ********************>", "none" );
 
 }
 
@@ -2183,7 +2333,7 @@ async function test01_v1() {
         catch ( error ) {
 
           CommonTest.consoleLog( "Error", error );
-          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
+          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>", "none" );
 
         }
 
@@ -2193,7 +2343,7 @@ async function test01_v1() {
       catch ( error ) {
 
         CommonTest.consoleLog( "Error", error );
-        CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>" );
+        CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL01 ********************>", "none" );
 
       }
 
@@ -2209,7 +2359,7 @@ async function test01_v1() {
         catch ( error ) {
 
           CommonTest.consoleLog( "Error", error );
-          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>" );
+          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL02 ********************>", "none" );
 
         }
 
@@ -2221,7 +2371,7 @@ async function test01_v1() {
         catch ( error ) {
 
           CommonTest.consoleLog( "Error", error );
-          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>" );
+          CommonTest.consoleLog( "Separator.blue", "<******************** user02@TestL01 ********************>", "none" );
 
         }
 
@@ -2231,7 +2381,7 @@ async function test01_v1() {
       catch ( error ) {
 
         CommonTest.consoleLog( "Error", error );
-        CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>" );
+        CommonTest.consoleLog( "Separator.blue", "<******************** user01@TestL02 ********************>", "none" );
 
       }
 
@@ -2250,7 +2400,7 @@ async function test01_v1() {
   catch ( error ) {
 
     CommonTest.consoleLog( "Error", error );
-    CommonTest.consoleLog( "Separator.blue", "<******************** ' + CommonTest.strStartUser + ' ********************>" );
+    CommonTest.consoleLog( "Separator.blue", "<******************** " + CommonTest.strStartUser + " ********************>", "none" );
 
   }
 

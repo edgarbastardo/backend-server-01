@@ -3,6 +3,61 @@ import CommonTest from "./CommonTest";
 
 export default class UserGroupTestV1 {
 
+  static async test_getUserGroup( headers: any,
+                                  query: any,
+                                  strCode: string,
+                                  strFileName: string,
+                                  bIsFail: boolean ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const result = await CommonTest.userGroupRequestServiceV1.callGetUserGroup( headers,
+                                                                                  query );
+
+      CommonTest.saveInput( strFileName, result.input );
+      result && result.output ? result.output.expected = { Code: strCode }: null;
+      CommonTest.saveOutput( strFileName, result.output );
+
+      if ( result &&
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
+
+        if ( bIsFail === false ) {
+
+          if ( query.Name === result.output.body.Data[ 0 ].Name ) {
+
+            bResult = true;
+
+          }
+          else if ( query.Id === result.output.body.Data[ 0 ].Id ) {
+
+            bResult = true;
+
+          }
+
+        }
+        else {
+
+          bResult = true;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      CommonTest.consoleLog( "Error", error );
+
+    }
+
+    return bResult;
+
+  }
+
   static async test_searchUserGroup( headers: any,
                                      params: any,
                                      strCode: string,
@@ -16,11 +71,11 @@ export default class UserGroupTestV1 {
     try {
 
       const result = await CommonTest.userGroupRequestServiceV1.callSearchUserGroup( headers,
-                                                                                    params );
+                                                                                     params );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -87,7 +142,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -164,7 +219,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUserGroup_TestL01_success"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_GROUP_DELETE"
-      CommonTest.saveResult( strFileName, result.output ); //"test_deleteUserGroup_TestL01_success"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUserGroup_TestL01_success"
 
       if ( result &&
            result.output &&
@@ -202,7 +257,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -265,7 +320,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -336,7 +391,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -417,7 +472,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -428,8 +483,8 @@ export default class UserGroupTestV1 {
 
           if ( bMustEmptyRole ) {
 
-            bResult = result.output.body.Data[ 0 ].Role === "" &&
-                      result.output.body.Data[ 0 ].Tag === "" &&
+            bResult = !result.output.body.Data[ 0 ].Role &&
+                      !result.output.body.Data[ 0 ].Tag &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role01#,#Role02#" &&
                       result.output.body.Data[ 0 ].Business.Tag === "#Tag01#,#Tag02#,#UserGroupTestV1#";
 
@@ -498,7 +553,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -571,7 +626,7 @@ export default class UserGroupTestV1 {
 
       const userGroupRequest = { ... userGroupData }; //Copy original information
 
-      userGroupRequest.Name = "TestL55";
+      userGroupRequest.Name = "TestL45";
       userGroupRequest.Role = "#RoleL01#,#RoleL02#";
       userGroupRequest.Tag = "#TagL01#,#TagL02#";
       userGroupRequest.Business.Role = "#Role03#,#Role04#";    //No request create
@@ -582,7 +637,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -655,7 +710,7 @@ export default class UserGroupTestV1 {
 
       const userGroupRequest = { ... userGroupData }; //Copy original information
 
-      userGroupRequest.Name = "TestL55";
+      userGroupRequest.Name = "TestL46";
       userGroupRequest.Role = "#RoleL01#,#RoleL02#";
       userGroupRequest.Tag = "#TagL01#,#TagL02#";
       userGroupRequest.Business.Role = "#Role03#,#Role04#";    //No request create
@@ -666,7 +721,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -678,8 +733,8 @@ export default class UserGroupTestV1 {
           if ( bMustEmptyRole ) {
 
             bResult = result.output.body.Data[ 0 ].Name = "TestL56" &&
-                      result.output.body.Data[ 0 ].Role === "" &&
-                      result.output.body.Data[ 0 ].Tag === "" &&
+                      !result.output.body.Data[ 0 ].Role &&
+                      !result.output.body.Data[ 0 ].Tag &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
                       result.output.body.Data[ 0 ].Business.Tag === "#Tag03#,#Tag04#,#UserGroupTestV1#";
 
@@ -739,7 +794,7 @@ export default class UserGroupTestV1 {
 
       const userGroupRequest = { ... userGroupData }; //Copy original information
 
-      userGroupRequest.Name = "TestL58";
+      userGroupRequest.Name = "TestL47";
       userGroupRequest.Role = "#RoleL01#,#RoleL02#";
       userGroupRequest.Tag = "#TagL01#,#TagL02#";
       userGroupRequest.Business.Role = "#Role03#,#Role04#";    //No request create
@@ -750,7 +805,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
-      CommonTest.saveResult( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
            result.output &&
@@ -824,7 +879,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -860,7 +915,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
-      CommonTest.saveResult( strFileName, result.output );
+      CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
            result.output &&
@@ -896,7 +951,7 @@ export default class UserGroupTestV1 {
 
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
       result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
-      CommonTest.saveResult( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
            result.output &&
