@@ -181,7 +181,7 @@ export default class CacheManager {
 
   }
 
-  static async setData( strKeyName: String,
+  static async setData( strKeyName: string,
                         keyData: any,
                         logger: any ): Promise<boolean> {
 
@@ -229,7 +229,7 @@ export default class CacheManager {
 
   }
 
-  static async setDataWithTTL( strKeyName: String,
+  static async setDataWithTTL( strKeyName: string,
                                keyData: any,
                                intTTL: number,
                                logger: any ): Promise<boolean> {
@@ -280,7 +280,7 @@ export default class CacheManager {
 
   }
 
-  static async getData( strKeyName: String,
+  static async getData( strKeyName: string,
                         logger: any ):Promise<any> {
 
     let result = null;
@@ -324,7 +324,7 @@ export default class CacheManager {
 
   }
 
-  static async deleteData( strKeyName: String,
+  static async deleteData( strKeyName: string,
                            logger: any ):Promise<any> {
 
     let result = null;

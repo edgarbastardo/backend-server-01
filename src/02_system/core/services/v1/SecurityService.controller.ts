@@ -281,17 +281,13 @@ export default class SecurityServiceController {
       if ( intResult == 0 &&
           CommonUtilities.isNotNullOrEmpty( strAllowedValue ) ) {
 
-        if ( strAllowedValue === SystemConstants._VALUE_ANY ) {
-
-          intResult = 1; //Explicit allowed
-
-        }
-        else if ( strAllowedValue.includes( "#" + strUserId + "#" ) ||
-                  strAllowedValue.includes( "#" + strUserName + "#" ) ||
-                  CommonUtilities.isInMultiSimpleList( strAllowedValue, ",", strUserTag, false, logger ) ||
-                  strAllowedValue.includes( "#" + strGroupId + "#" ) ||
-                  strAllowedValue.includes( "#" + strGroupName + "#" ) ||
-                  CommonUtilities.isInMultiSimpleList( strAllowedValue, ",", strGroupTag, false, logger ) ) {
+        if ( strAllowedValue === SystemConstants._VALUE_ANY ||
+             strAllowedValue.includes( "#" + strUserId + "#" ) ||
+             strAllowedValue.includes( "#" + strUserName + "#" ) ||
+             CommonUtilities.isInMultiSimpleList( strAllowedValue, ",", strUserTag, false, logger ) ||
+             strAllowedValue.includes( "#" + strGroupId + "#" ) ||
+             strAllowedValue.includes( "#" + strGroupName + "#" ) ||
+             CommonUtilities.isInMultiSimpleList( strAllowedValue, ",", strGroupTag, false, logger ) ) {
 
           intResult = 1; //Explicit allowed
 

@@ -11,7 +11,7 @@ import SystemUtilities from '../SystemUtilities';
 import { DBMigrationManagerORM } from './DBMigrationManagerORM';
 import DBConnectionManager from './DBConnectionManager';
 import CommonConstants from '../CommonConstants';
-import dbConnection from "./DBConnectionManager";
+//import dbConnection from "./DBConnectionManager";
 
 const debug = require( 'debug' )( 'DBMigrationManager' );
 

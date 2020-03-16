@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
-import { SPLAT } from 'triple-beam';
+//import { SPLAT } from 'triple-beam';
 import TransportStream from 'winston-transport';
 import { Produce } from 'glossy';
-import { inspect } from 'util';
+//import { inspect } from 'util';
 import { hostname } from "os";
 import { createConnection } from "net";
 import { connect } from "tls";
@@ -57,7 +57,7 @@ interface ItransportOptions {
 
   logFormat: ( level: any, message: any ) => string;
 
-};
+}
 
 export class PapertrailConnection extends EventEmitter {
 

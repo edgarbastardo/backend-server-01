@@ -81,7 +81,7 @@ export default class CommonUtilities {
 
   }
 
-  static getAccessKindFromNumber( intAccessKind: number ): String {
+  static getAccessKindFromNumber( intAccessKind: number ): string {
 
     let strResult: string;
 
@@ -479,7 +479,7 @@ export default class CommonUtilities {
 
   }
 
-  static formatErrorStack( stack: String ): string[] {
+  static formatErrorStack( stack: string ): string[] {
 
     let result = [];
 

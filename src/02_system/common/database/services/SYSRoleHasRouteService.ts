@@ -13,10 +13,10 @@ import { SYSRoleHasRoute } from "../models/SYSRoleHasRoute";
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
 import BaseService from "./BaseService";
-import { SYSRole } from '../models/SYSRole';
-import { SYSRoute } from '../models/SYSRoute';
+//import { SYSRole } from '../models/SYSRole';
+//import { SYSRoute } from '../models/SYSRoute';
 import SYSConfigValueDataService from "./SYSConfigValueDataService";
-import { config } from 'bluebird';
+//import { config } from 'bluebird';
 
 const debug = require( 'debug' )( 'SYSRoleHasRouteService' );
 
