@@ -509,7 +509,7 @@ export default class CommonUtilities {
 
         result = Object.assign( {}, dataObject );
 
-        fieldNamesToRemove.map( ( strFieldName: string, intIndex: number ) => {
+        fieldNamesToRemove.forEach( ( strFieldName: string, intIndex: number ) => {
 
           delete result[ strFieldName ];
 
@@ -1002,7 +1002,7 @@ export default class CommonUtilities {
 
         }
 
-      };
+      }
 
     }
     catch ( error ) {
@@ -1165,7 +1165,7 @@ export default class CommonUtilities {
 
         }
 
-      };
+      }
 
     }
     catch ( error ) {
@@ -1567,7 +1567,7 @@ export default class CommonUtilities {
 
         const dateAsNum = date.getTime();
 
-        if ( dateAsNum && dateAsNum !== NaN ) {
+        if ( dateAsNum && isNaN( dateAsNum ) === false ) {
 
           bResult = date.toISOString().slice( 0,10 ) === strDate;
 

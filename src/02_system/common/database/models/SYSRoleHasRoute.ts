@@ -67,7 +67,7 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
 
         if ( Array.isArray( results ) ) {
 
-          results.map( ( row ) => {
+          results.forEach( ( row ) => {
 
             SystemUtilities.transformModelTimeZoneFromUTC( row.dataValues, options.context.TimeZoneId );
 

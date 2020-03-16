@@ -163,7 +163,7 @@ export class DBMigrationManagerORM {
         }
 
         /*
-        tableContent[ 0 ].map( ( row: any, intIndex: number ) => {
+        tableContent[ 0 ].forEach( ( row: any, intIndex: number ) => {
 
           let debugMark = debug.extend( '3F31461C084F' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
           debugMark( "FilePath => ", strFilePath );

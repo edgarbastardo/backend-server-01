@@ -241,7 +241,7 @@ export default class NetworkLeaderManager {
 
         });
 
-      };
+      }
 
     }
     catch ( error ) {

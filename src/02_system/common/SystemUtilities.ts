@@ -1667,9 +1667,9 @@ export default class SystemUtilities {
 
     let strResult = "";
 
-    models.map( ( model: any, intIndex: number ) => {
+    models.forEach( ( model: any, intIndex: number ) => {
 
-      Object.keys( model.rawAttributes ).map( ( attribute ) => {
+      Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
         let bAddField: boolean = true;
 
@@ -1733,15 +1733,15 @@ export default class SystemUtilities {
 
     let result: any[] = [];
 
-    rows.map( ( row ) => {
+    rows.forEach( ( row ) => {
 
       let newRow: any[] = [];
 
-      models.map( ( model: any, intIndex: number ) => {
+      models.forEach( ( model: any, intIndex: number ) => {
 
         let newDataStruct = {};
 
-        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+        Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
           if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
 
@@ -1770,15 +1770,15 @@ export default class SystemUtilities {
 
     let result: any[] = [];
 
-    rows.map( ( row ) => {
+    rows.forEach( ( row ) => {
 
       let newRow: any = {};
 
-      models.map( ( model: any, intIndex: number ) => {
+      models.forEach( ( model: any, intIndex: number ) => {
 
         let newDataStruct = {};
 
-        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+        Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
           if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
 
@@ -1807,15 +1807,15 @@ export default class SystemUtilities {
 
     let result: any[] = [];
 
-    rows.map( ( row ) => {
+    rows.forEach( ( row ) => {
 
       let newRow: any = {};
 
-      models.map( ( model: any, intIndex: number ) => {
+      models.forEach( ( model: any, intIndex: number ) => {
 
         let newDataStruct = {};
 
-        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+        Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
           if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
 
@@ -1853,17 +1853,17 @@ export default class SystemUtilities {
 
     let result: any[] = [];
 
-    rows.map( ( row ) => {
+    rows.forEach( ( row ) => {
 
       let newRow: any = {};
 
       let strRoot = "";
 
-      models.map( ( model: any, intIndex: number ) => {
+      models.forEach( ( model: any, intIndex: number ) => {
 
         let newDataStruct = {};
 
-        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+        Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
           if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
 
@@ -1904,15 +1904,15 @@ export default class SystemUtilities {
 
     let result: any[] = [];
 
-    rows.map( ( row ) => {
+    rows.forEach( ( row ) => {
 
       let newRow: any[] = [];
 
-      models.map( ( model: any, intIndex: number ) => {
+      models.forEach( ( model: any, intIndex: number ) => {
 
         let newDataStruct = {};
 
-        Object.keys( model.rawAttributes ).map( ( attribute ) => {
+        Object.keys( model.rawAttributes ).forEach( ( attribute ) => {
 
           if ( row[ alias[ intIndex ] + "_" + attribute ] !== undefined || bIncludeUndefined === true  ) {
 
@@ -2304,7 +2304,7 @@ export default class SystemUtilities {
 
                               }
 
-                            };
+                            }
 
                             return bResult;
 
@@ -2342,7 +2342,7 @@ export default class SystemUtilities {
 
                               }
 
-                            };
+                            }
 
                             return bResult;
 
@@ -2638,7 +2638,7 @@ export default class SystemUtilities {
       intResult = os.cpus().length;
 
     }
-    else if ( parseInt( strHTTPWorkerProcessCount ) !== NaN ) {
+    else if ( isNaN( parseInt( strHTTPWorkerProcessCount ) ) === false ) {
 
       intResult = parseInt( strHTTPWorkerProcessCount );
 
@@ -2659,7 +2659,7 @@ export default class SystemUtilities {
       intResult = os.cpus().length;
 
     }
-    else if ( parseInt( strJOBWorkerProcessCount ) !== NaN ) {
+    else if ( isNaN( parseInt( strJOBWorkerProcessCount ) ) === false ) {
 
       intResult = parseInt( strJOBWorkerProcessCount );
 

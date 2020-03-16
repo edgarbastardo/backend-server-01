@@ -663,7 +663,7 @@ export class DBMigrationManagerMYSQL {
         }
 
         /*
-        tableContent[ 0 ].map( ( row: any, intIndex: number ) => {
+        tableContent[ 0 ].forEach( ( row: any, intIndex: number ) => {
 
           let debugMark = debug.extend( "F42473B14422" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "FilePath => ", strFilePath );

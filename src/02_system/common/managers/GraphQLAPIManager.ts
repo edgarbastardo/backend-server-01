@@ -99,7 +99,7 @@ export default class GraphQLAPIManager {
           let debugMark = debug.extend( "983A73D8C9C7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
           debugMark( obj.roles );
-          Object.keys( obj.roles ).map( ( strResolverName: string, intIndex: number ) => {
+          Object.keys( obj.roles ).forEach( ( strResolverName: string, intIndex: number ) => {
 
             //debugMark( "Name => ", strResolverName );
             //debugMark( "AccessKind => ", obj.roles[ strResolverName ].AccessKind );

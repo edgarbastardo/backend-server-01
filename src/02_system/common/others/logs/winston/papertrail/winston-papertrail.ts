@@ -409,7 +409,7 @@ export class PapertrailTransport extends TransportStream {
       }
       else if ( meta ) {
 
-        output += '\n' + meta.map( ( data: any ) => {
+        output += '\n' + meta.forEach( ( data: any ) => {
 
           return inspect(
                           data,

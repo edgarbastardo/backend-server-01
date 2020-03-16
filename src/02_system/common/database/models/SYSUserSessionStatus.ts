@@ -5,8 +5,8 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
-         HasOne,
-         ForeignKey,
+//         HasOne,
+//         ForeignKey,
          BelongsTo,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
