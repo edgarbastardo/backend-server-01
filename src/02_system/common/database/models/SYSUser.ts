@@ -33,6 +33,7 @@ import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSUser' );
 
@@ -129,7 +130,7 @@ export class SYSUser extends Model<SYSUser> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   DisabledAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BelongsTo( () => SYSUserGroup, "GroupId" )
@@ -184,12 +185,26 @@ export class SYSUser extends Model<SYSUser> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUser",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSUser, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUser",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -198,6 +213,11 @@ export class SYSUser extends Model<SYSUser> {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUser",
+                                             "delete",
+                                             instance,
+                                             null );
   }
 
   static async convertFieldValues( params: any ): Promise<any> {
@@ -466,6 +486,12 @@ export class SYSUser extends Model<SYSUser> {
 
     return result;
     //return null; //return null for not show the row
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

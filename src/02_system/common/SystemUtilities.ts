@@ -3148,7 +3148,6 @@ export default class SystemUtilities {
 
   }
 
-
   static async moveFilesPrefixedBy( strFullOldPath: string,
                                     strFullNewPath: string,
                                     strPrefix: string,

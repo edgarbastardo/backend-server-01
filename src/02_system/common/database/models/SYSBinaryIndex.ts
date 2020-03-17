@@ -20,6 +20,7 @@ import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSBinaryIndex' );
 
@@ -124,14 +125,13 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ProcessStartedAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
   static beforeValidateHook( instance: SYSBinaryIndex, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
-
   }
 
   @BeforeCreate
@@ -139,12 +139,26 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysBinaryIndex",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSBinaryIndex, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysBinaryIndex",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -152,6 +166,12 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   static beforeDestroyHook( instance: SYSBinaryIndex, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysBinaryIndex",
+                                             "delete",
+                                             instance,
+                                             null );
 
   }
 
@@ -284,6 +304,12 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
     }
 
     return result;
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

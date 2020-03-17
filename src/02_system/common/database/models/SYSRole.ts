@@ -22,6 +22,7 @@ import { SYSRoute } from "./SYSRoute";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
@@ -34,6 +35,7 @@ export class SYSRole extends Model<SYSRole> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
 
       if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
@@ -50,6 +52,7 @@ export class SYSRole extends Model<SYSRole> {
       }
 
     }
+    */
 
   }
 
@@ -81,7 +84,7 @@ export class SYSRole extends Model<SYSRole> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BelongsToMany( () => SYSRoute, () => SYSRoleHasRoute )
@@ -99,12 +102,26 @@ export class SYSRole extends Model<SYSRole> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRole",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSRole, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValuess };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRole",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -112,6 +129,18 @@ export class SYSRole extends Model<SYSRole> {
   static beforeDestroyHook( instance: SYSRole, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRole",
+                                             "delete",
+                                             instance,
+                                             null );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

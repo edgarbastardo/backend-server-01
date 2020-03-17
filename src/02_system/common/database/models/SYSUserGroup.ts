@@ -19,6 +19,7 @@ import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 const debug = require( 'debug' )( 'SYSUserGroup' );
 
@@ -75,7 +76,7 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   DisabledAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -90,12 +91,26 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserGroup",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSUserGroup, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserGroup",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -103,6 +118,12 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   static beforeDestroyHook( instance: SYSUserGroup, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserGroup",
+                                             "delete",
+                                             instance,
+                                             null );
 
   }
 
@@ -224,6 +245,12 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
     }
 
     return result;
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

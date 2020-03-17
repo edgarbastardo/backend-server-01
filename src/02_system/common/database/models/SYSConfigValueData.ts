@@ -19,6 +19,7 @@ import { BuildOptions } from "sequelize/types";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSConfigValueData' );
 
@@ -85,7 +86,7 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -100,12 +101,26 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysConfigValueData",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSConfigValueData, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysConfigValueData",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -113,6 +128,12 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
   static beforeDestroyHook( instance: SYSConfigValueData, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "ConfigMetaDataId", "Owner" ];
 
   }
 

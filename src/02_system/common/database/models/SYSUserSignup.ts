@@ -32,6 +32,7 @@ import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 import CipherManager from "../../managers/CipherManager";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSUserSignup' );
 
@@ -124,7 +125,7 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   ExpireAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -146,12 +147,26 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSignup",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSUserSignup, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSignup",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -159,6 +174,12 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
   static beforeDestroyHook( instance: SYSUserSignup, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSignup",
+                                             "delete",
+                                             instance,
+                                             null );
 
   }
 
@@ -235,4 +256,9 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
   }
 
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
+
+  }
 }

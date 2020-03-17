@@ -22,6 +22,7 @@ import { SYSRoute } from "./SYSRoute";
 import SystemUtilities from "../../SystemUtilities";
 
 import SYSRoleHasRouteService from "../services/SYSRoleHasRouteService";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
@@ -65,12 +66,26 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoleHasRoute",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSRoleHasRouteService, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoleHasRoute",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -78,6 +93,18 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   static beforeDestroyHook( instance: SYSRoleHasRouteService, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoleHasRoute",
+                                             "delete",
+                                             instance,
+                                             null );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "RoleId", "RouteId" ];
 
   }
 

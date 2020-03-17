@@ -17,6 +17,7 @@ import { BuildOptions } from "sequelize/types";
 
 //import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 //const debug = require( 'debug' )( 'SYSConfigMetaData' );
 
@@ -125,7 +126,7 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -140,12 +141,26 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysConfigMetaData",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSConfigMetaData, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysConfigMetaData",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -153,6 +168,18 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
   static beforeDestroyHook( instance: SYSConfigMetaData, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysConfigMetaData",
+                                             "delete",
+                                             instance,
+                                             null );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

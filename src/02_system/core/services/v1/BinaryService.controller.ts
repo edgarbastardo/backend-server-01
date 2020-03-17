@@ -3705,7 +3705,7 @@ export default class BinaryServiceController extends BaseService {
                                               ProcessNeeded: processData && processData.value ? processData.value : 0,
                                               CreatedBy: userSessionStatus.UserName,
                                               DisabledBy: request.body.DisabledBy === "1"? "1@" + userSessionStatus.UserName: "0",
-                                              ExtraData: JSON.stringify( extraData, null, 2 )
+                                              ExtraData: extraData
                                             }
 
                     debugMark( "Writing info to database" );

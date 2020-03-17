@@ -538,7 +538,17 @@ export default class Always {
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
-                                 ]
+                                   {
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_Database_Log_Tables.Id,
+                                     Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                     Value: JSON.stringify(
+                                                            {
+                                                              "master.sysUserGroup": [ "create", "update", "delete" ]
+                                                            }
+                                                          ),
+                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   },
+                                ]
 
       const loopConfigValueEntriesAsync = async () => {
 
@@ -557,7 +567,7 @@ export default class Always {
             const sysConfigValueDataInDB = await SYSConfigValueData.findOne( options );
 
             /*
-            if ( configValueToCreate.ConfigMetaDataId === "e87b5ce8-e488-4869-be72-a754314e5f75" )  {
+            if ( configValueToCreate.ConfigMetaDataId === "247df833-ab0b-453b-9420-e927d60d71c2" )  {
 
               let debugMark = debug.extend( 'BD51BB47C210' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
               debugMark( "Id => %O", configValueToCreate.ConfigMetaDataId );

@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `sysBinaryIndex` (
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ProcessNeeded` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0=No, 1=Yes',
   `ProcessStartedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'When started to work',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysBinaryIndex_ShortId_idx` (`ShortId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the index for saved binary (files) entities ( .JPG , .PNG , .PDF) on system operating file system.';
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `sysPerson` (
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysPerson_ShortId_idx` (`ShortId`),
   KEY `sysPerson_Phone_idx` (`Phone`),
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `sysUserGroup` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row',
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysUserGroup_ShortId_idx` (`ShortId`),
   UNIQUE KEY `UNQ_sysUserGroup_Name_UNIQUE_idx` (`Name`)
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `sysUser` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row',
   `DisabledAt` varchar(30) DEFAULT NULL COMMENT 'Disable Date and time of the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysUser_ShortId_idx` (`ShortId`),
   UNIQUE KEY `UNQ_sysUser_Name_UNIQUE_idx` (`Name`),
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `sysActionToken` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Set the expire date and time for this token',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   KEY `sysActionToken_Token_idx` (`Owner`),
   UNIQUE KEY `UNQ_sysActionToken_Token_idx` (`Token`)
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `sysUserSignup` (
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Set the expire date and time for this user signup',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user auto signup table information';
 
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `sysUserDevice` (
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`,`Token`),
   KEY `FK_SessionStatus_Token_idx` (`Token`),
   CONSTRAINT `FK_sysUserDevice_UserId_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionStatus` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT'Date and time of last update to the row.',
   `LoggedOutBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user that logged out the session.',
   `LoggedOutAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the date and time of logout, to be different from NULL, it is assumed that the session which represents the row is no longer valid.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`,`Token`),
   UNIQUE KEY `UNQ_sysUserSessionStatus_Token_idx` (`Token`),
   UNIQUE KEY `UNQ_sysUserSessionStatus_ShortToken_idx` (`ShortToken`),
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionPersistent` (
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row.',
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExpireAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Expiration date and time of the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   KEY `FK_sysUserSessionPersistent_UserId_idx` (`UserId`),
   UNIQUE KEY `UNQ_sysUserSessionPersistent_Token_idx` (`Token`),
@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS `sysRoute` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row.',
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store all routes in the backend';
 
@@ -299,7 +299,7 @@ CREATE TABLE IF NOT EXISTS `sysRole` (
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row.',
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysRole_ShortId_idx` (`ShortId`),
   UNIQUE KEY `UNQ_sysRole_Name_idx` (`Name`)
@@ -311,8 +311,8 @@ CREATE TABLE IF NOT EXISTS `sysRoleHasRoute` (
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   PRIMARY KEY (`RoleId`,`RouteId`),
-  KEY `sysRoleHasRoute_RoleId` (`RoleId`),
-  KEY `sysRoleHasRoute_RouteId` (`RouteId`),
+  KEY `sysRoleHasRoute_RoleId_idx` (`RoleId`),
+  KEY `sysRoleHasRoute_RouteId_idx` (`RouteId`),
   CONSTRAINT `sysRoleHasRoute_RoleId_From_sysRole_Id` FOREIGN KEY (`RoleId`) REFERENCES `sysRole` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `sysRoleHasRoute_RouteId_From_sysRoute_Id` FOREIGN KEY (`RouteId`) REFERENCES `sysRoute` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store relations between role and route';
@@ -394,7 +394,7 @@ CREATE TABLE IF NOT EXISTS `sysConfigMetaData` (
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UNQ_sysConfigMetaData_ShortId_idx` (`ShortId`),
   UNIQUE KEY `UNQ_sysConfigMetaData_Name_idx` (`Name`)
@@ -403,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `sysConfigMetaData` (
 CREATE TABLE IF NOT EXISTS `sysConfigValueData` (
   `ConfigMetaDataId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'foreign key to Id field on table sysConfigMetaData. that indicates that the shares belong config. GUID.',
   `Owner` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Owner form config value entry\n\nExample:\n\nSystem.Administrators\n971406fe-2aa5-4cb0-82d8-4c90c090f6cc\n',
-  `Value` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Value from config',
+  `Value` longtext NOT NULL COMMENT 'Value from config',
   `ValueLabel` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Indicates the meaning of a value\n\nExample:\nWhen Value = 0, ValueLabel = Deny\n\nWhen Value = 1, ValueLabel = Allow\n',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -411,7 +411,22 @@ CREATE TABLE IF NOT EXISTS `sysConfigValueData` (
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`ConfigMetaDataId`,`Owner`),
   CONSTRAINT `FK_sysConfigVData_ConfigMetaDataId_From_sysConfigMData_Id` FOREIGN KEY (`ConfigMetaDataId`) REFERENCES `sysConfigMetaData` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `sysDatabaseLog` (
+  `Id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'The event is an increasing self-generated , Why not a GUID ? to detect rows elimination of sequences should always be continuous.',
+  `Operation` varchar(10) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Database operation name. Example: creat or update or delete',
+  `Database` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Database name',
+  `Table` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Table name in the database',
+  `Data` json NOT NULL COMMENT 'Log data from table',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`Id`),
+  KEY `sysDatabaseLog_Operation_idx` (`Operation`),
+  KEY `sysDatabaseLog_Table_idx` (`Table`),
+  KEY `sysDatabaseLog_CreatedAt_idx` (`CreatedAt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

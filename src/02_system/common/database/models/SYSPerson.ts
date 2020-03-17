@@ -20,6 +20,7 @@ import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSPerson' );
 
@@ -94,7 +95,7 @@ export class SYSPerson extends Model<SYSPerson> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -109,12 +110,26 @@ export class SYSPerson extends Model<SYSPerson> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysPerson",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSPerson, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValuess };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysPerson",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -122,6 +137,12 @@ export class SYSPerson extends Model<SYSPerson> {
   static beforeDestroyHook( instance: SYSPerson, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysPerson",
+                                             "delete",
+                                             instance,
+                                             null );
 
   }
 
@@ -219,6 +240,12 @@ export class SYSPerson extends Model<SYSPerson> {
     }
 
     return result;
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

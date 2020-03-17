@@ -18,6 +18,7 @@ import { BuildOptions } from "sequelize/types";
 
 //import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 @Table( {
   timestamps: false,
@@ -124,14 +125,28 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
 
     instance.SystemId = os.hostname();
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysDBMigratedData",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSDBMigratedData, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     instance.SystemId = os.hostname();
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysDBMigratedData",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -139,6 +154,18 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
   static beforeDestroyHook( instance: SYSDBMigratedData, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysDBMigratedData",
+                                             "delete",
+                                             instance,
+                                             null );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

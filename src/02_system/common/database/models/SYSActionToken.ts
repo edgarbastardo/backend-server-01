@@ -20,6 +20,7 @@ import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSActionToken' );
 
@@ -70,7 +71,7 @@ export class SYSActionToken extends Model<SYSActionToken> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ExpireAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -85,12 +86,26 @@ export class SYSActionToken extends Model<SYSActionToken> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysActionToken",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSActionToken, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysActionToken",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -98,6 +113,12 @@ export class SYSActionToken extends Model<SYSActionToken> {
   static beforeDestroyHook( instance: SYSActionToken, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysActionToken",
+                                             "delete",
+                                             instance,
+                                             null );
 
   }
 
@@ -170,6 +191,12 @@ export class SYSActionToken extends Model<SYSActionToken> {
     }
 
     return result;
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

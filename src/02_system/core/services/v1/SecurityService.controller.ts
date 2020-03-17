@@ -984,13 +984,11 @@ export default class SecurityServiceController {
                                         ExpireOn: configData.on,
                                         HardLimit: configData.hardLimit,
                                         Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
-                                        ExtraData: JSON.stringify(
-                                                                   {
-                                                                     Business: {
-                                                                                 Role: strBusinessRolesMerged
-                                                                               }
-                                                                   }
-                                                                 ),
+                                        ExtraData: {
+                                                     Business: {
+                                                                 Role: strBusinessRolesMerged
+                                                               }
+                                                   },
                                         Business: {
                                                     Role: strBusinessRolesMerged
                                                   },

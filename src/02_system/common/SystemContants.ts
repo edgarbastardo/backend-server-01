@@ -242,7 +242,7 @@ export default class SystemConstants {
                                                                                       }
                                                                                     ),
                                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                             ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication_SCHEMA} }`
+                                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication_SCHEMA }
                                                            };
 
   static readonly _CONFIG_ENTRY_PasswordStrengthParameters_SCHEMA = JSON.stringify(
@@ -484,7 +484,7 @@ export default class SystemConstants {
                                                                                         }
                                                                                       ),
                                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                               ExtraData: `{ "Type": "struct/json", "Schema": ${SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters_SCHEMA} }`
+                                                               ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters_SCHEMA }
                                                              };
 
   static readonly _CONFIG_ENTRY_BinaryDataBasePath = {
@@ -500,7 +500,7 @@ export default class SystemConstants {
                                                        AllowTagAccessW: "#Administrator#",
                                                        Example: "Any valid path in the server file system, relative or absolute. Example: binary_data/",
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                       ExtraData: `{ "Type": "string" }`
+                                                       ExtraData: { "Type": "string" }
                                                      };
 
   static readonly _CONFIG_ENTRY_BinaryDataMaximumSize = {
@@ -516,7 +516,7 @@ export default class SystemConstants {
                                                           AllowTagAccessW: "#Administrator#",
                                                           Example: "10240 => 10MB",
                                                           CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                          ExtraData: `{ "Type": "integer", "Minimal": 1, "Maximal": 153600 }`
+                                                          ExtraData: { "Type": "integer", "Minimal": 1, "Maximal": 153600 }
                                                         };
 
   static readonly _CONFIG_ENTRY_BinaryDataExpireAt = {
@@ -532,7 +532,7 @@ export default class SystemConstants {
                                                        AllowTagAccessW: "#Administrator#",
                                                        Example: "720 => 720 Hours => 30 days",
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                       ExtraData: `{ "Type": "integer", "Minimal": 1, "Maximal": 150000 }`
+                                                       ExtraData: { "Type": "integer", "Minimal": 1, "Maximal": 150000 }
                                                      };
 
   static readonly _CONFIG_ENTRY_Deny_Allow_SCHEMA = JSON.stringify(
@@ -594,7 +594,7 @@ export default class SystemConstants {
                                                               Description: "Define witch categories are allowed to create or add binary data inside. Always the config entry defined in lowercase, to match with any input combination.",
                                                               AllowTagAccessR: "#Administrator#",
                                                               AllowTagAccessW: "#Administrator#",
-                                                              Ecample: JSON.stringify(
+                                                              Example: JSON.stringify(
                                                                                        {
                                                                                          "@__default__@":{
                                                                                            "denied":"*",
@@ -611,7 +611,7 @@ export default class SystemConstants {
                                                                                        }
                                                                                      ),
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                              ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA}" }`
+                                                              ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA }
                                                             };
 
   static readonly _CONFIG_ENTRY_BinaryDataAllowedMimeType = {
@@ -649,7 +649,7 @@ export default class SystemConstants {
                                                                                        }
                                                                                      ),
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                              ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA}" }`
+                                                              ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA }
                                                             };
 
   static readonly _CONFIG_ENTRY_BinaryDataDefaultOwner_SCHEMA = JSON.stringify(
@@ -697,7 +697,7 @@ export default class SystemConstants {
                                                                                     }
                                                                                   ),
                                                            CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                           ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner_SCHEMA}" }`
+                                                           ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner_SCHEMA }
                                                          };
 
     static readonly _CONFIG_ENTRY_BinaryDataThumbnail_SCHEMA =  JSON.stringify(
@@ -786,7 +786,7 @@ export default class SystemConstants {
                                                                                  }
                                                                                ),
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                        ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail_SCHEMA}" }`
+                                                        ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail_SCHEMA }
                                                       };
 
   static readonly _CONFIG_ENTRY_BinaryDataProcess_SCHEMA = JSON.stringify(
@@ -889,7 +889,7 @@ export default class SystemConstants {
                                                                                }
                                                                              ),
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                      ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_BinaryDataProcess_SCHEMA}" }`
+                                                      ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataProcess_SCHEMA }
                                                     };
 
   static readonly _CONFIG_ENTRY_UserSignupProcess_SCHEMA = JSON.stringify(
@@ -1063,7 +1063,7 @@ export default class SystemConstants {
                                                                                }
                                                                              ),
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                      ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_UserSignupProcess_SCHEMA}" }`
+                                                      ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserSignupProcess_SCHEMA }
                                                     };
 
   static readonly _CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA = "";
@@ -1120,7 +1120,7 @@ export default class SystemConstants {
                                                                                 }
                                                                               ),
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                       ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA}" }`
+                                                       ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA }
                                                      };
 
   static readonly _CONFIG_ENTRY_UserGroupAutoRoleAssign_SCHEMA = "";
@@ -1177,7 +1177,7 @@ export default class SystemConstants {
                                                                                      }
                                                                                    ),
                                                             CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                            ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA}" }`
+                                                            ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA }
                                                           };
 
   static readonly _CONFIG_ENTRY_EMail_Service_SCHEMA = "";
@@ -1231,7 +1231,7 @@ export default class SystemConstants {
                                                                            }
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                  ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA}" }`
+                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA }
                                                 };
 
   static readonly _CONFIG_ENTRY_SMS_Service_SCHEMA = "";
@@ -1277,7 +1277,7 @@ export default class SystemConstants {
                                                                          }
                                                                        ),
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA}" }`
+                                                ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA }
                                               };
 
   static readonly _CONFIG_ENTRY_PUSH_Service_SCHEMA = "";
@@ -1321,7 +1321,7 @@ export default class SystemConstants {
                                                                           }
                                                                         ),
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                 ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_PUSH_Service_SCHEMA}" }`
+                                                 ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_PUSH_Service_SCHEMA }
                                                };
 
   static readonly _CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA = "";
@@ -1363,7 +1363,7 @@ export default class SystemConstants {
                                                                                  }
                                                                                ),
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                        ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA}" }`
+                                                        ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA }
                                                       };
 
   static readonly _CONFIG_ENTRY_MAP_DISTANCE_Service_SCHEMA = "";
@@ -1405,7 +1405,7 @@ export default class SystemConstants {
                                                                                   }
                                                                                 ),
                                                          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                         ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA}" }`
+                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA }
                                                        };
 
   static readonly _CONFIG_ENTRY_Frontend_Rules_SCHEMA = JSON.stringify(
@@ -1618,7 +1618,7 @@ export default class SystemConstants {
                                                    AllowTagAccessW: "#Administrator#",
                                                    Example: SystemConstants._CONFIG_ENTRY_Frontend_Rules_EXAMPLE,
                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                   ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_Frontend_Rules_SCHEMA}" }`
+                                                   ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Frontend_Rules_SCHEMA }
                                                  };
 
   static readonly _CONFIG_ENTRY_General_Default_Information_SCHEMA = "";
@@ -1662,7 +1662,7 @@ export default class SystemConstants {
                                                                                          }
                                                                                        ),
                                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                                ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA }
                                                               };
 
   static readonly _CONFIG_ENTRY_User_Settings_SCHEMA = "";
@@ -1688,7 +1688,7 @@ export default class SystemConstants {
                                                                            }
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                  ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_User_Settings_SCHEMA }
                                                 };
 
   static readonly _CONFIG_ENTRY_UserGroup_Settings_SCHEMA = "";
@@ -1714,8 +1714,36 @@ export default class SystemConstants {
                                                                                 }
                                                                               ),
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                       ExtraData: `{ "Type": "struct/json", "Schema": "${SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA}" }`
+                                                       ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserGroup_Settings_SCHEMA }
                                                      };
+
+  static readonly _CONFIG_ENTRY_Database_Log_Tables_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_Database_Log_Tables = {
+                                                        Id: "247df833-ab0b-453b-9420-e927d60d71c2",
+                                                        Scope: "database",
+                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                        Category: "Database",
+                                                        Name: "database.log.tables",
+                                                        Default: JSON.stringify(
+                                                                                 {
+                                                                                   "master.sysTableNoExists": [ "create", "update", "delete" ]
+                                                                                 }
+                                                                               ),
+                                                        Label: "Configuration for database log tables",
+                                                        Description: "Configuration for database log tables",
+                                                        AllowTagAccessR: "#Administrator#",
+                                                        AllowTagAccessW: "#Administrator#",
+                                                        Example: JSON.stringify(
+                                                                                 {
+                                                                                   "master.sysUser": [ "create", "update", "delete" ],
+                                                                                   "master.sysUserGroup": [ "create", "delete" ],
+                                                                                   "master.bizOtherTable": [ "delete" ],
+                                                                                 }
+                                                                               ),
+                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                        ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
+                                                      };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -1737,7 +1765,8 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
                                                SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service,
                                                SystemConstants._CONFIG_ENTRY_User_Settings,
-                                               SystemConstants._CONFIG_ENTRY_UserGroup_Settings
+                                               SystemConstants._CONFIG_ENTRY_UserGroup_Settings,
+                                               SystemConstants._CONFIG_ENTRY_Database_Log_Tables
                                              ];
 
 }

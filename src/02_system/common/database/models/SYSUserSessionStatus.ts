@@ -24,6 +24,7 @@ import SystemConstants from "../../SystemContants";
 
 //import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
@@ -110,7 +111,7 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   LoggedOutAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BelongsTo( () => SYSUser, "UserId" )
@@ -150,12 +151,26 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionStatus",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSUserSessionStatus, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionStatus",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -163,6 +178,19 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
   static beforeDestroyHook( instance: SYSUserSessionStatus, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionStatus",
+                                             "delete",
+                                             instance,
+                                             null );
+
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "UserId", "UserGroupId", "Token" ];
 
   }
 

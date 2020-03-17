@@ -17,6 +17,7 @@ import { BuildOptions } from "sequelize/types";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
@@ -86,7 +87,7 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ExpireAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BeforeValidate
@@ -101,12 +102,26 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionPersistent",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSUserSessionPersistent, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValues };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionPersistent",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -114,6 +129,17 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
   static beforeDestroyHook( instance: SYSUserSessionPersistent, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysUserSessionPersistent",
+                                             "delete",
+                                             instance,
+                                             null );
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 

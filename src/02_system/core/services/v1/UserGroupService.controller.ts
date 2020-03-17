@@ -1198,7 +1198,6 @@ export default class UserGroupServiceController {
 
           sysUserGroupInDB.Name = request.body.Name &&
                                   ( resultCheckUserRoles.isAuthorizedAdmin ||
-                                    resultCheckUserRoles.isAuthorizedL03 === false ||
                                     this.checkNameAuthorized( userSessionStatus.Role,
                                                               request.body.Name,
                                                               "UpdateUserGroup" ) ) ?

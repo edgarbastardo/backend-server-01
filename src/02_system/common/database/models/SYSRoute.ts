@@ -28,6 +28,7 @@ import { SYSRole } from "./SYSRole";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
@@ -95,7 +96,7 @@ export class SYSRoute extends Model<SYSRoute> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   DisabledAt: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
   @BelongsToMany( () => SYSRole, () => SYSRoleHasRoute )
@@ -121,12 +122,26 @@ export class SYSRoute extends Model<SYSRoute> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoute",
+                                             "create",
+                                             instance,
+                                             null );
+
   }
 
   @BeforeUpdate
   static beforeUpdateHook( instance: SYSRoute, options: any ): void {
 
+    const oldDataValues = { ...( instance as any )._previousDataValuess };
+
     SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoute",
+                                             "update",
+                                             instance,
+                                             oldDataValues );
 
   }
 
@@ -134,6 +149,18 @@ export class SYSRoute extends Model<SYSRoute> {
   static beforeDestroyHook( instance: SYSRoute, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
+
+    SYSDatabaseLogService.logTableOperation( "master",
+                                             "sysRoute",
+                                             "delete",
+                                             instance,
+                                             null );
+
+  }
+
+  public getPrimaryKey(): string[] {
+
+    return [ "Id" ];
 
   }
 
