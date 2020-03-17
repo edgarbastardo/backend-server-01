@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Table,
          Model,
@@ -5,6 +7,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -14,6 +19,8 @@ import { BuildOptions } from "sequelize/types";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+const debug = require( 'debug' )( 'SYSConfigValueData' );
 
 @Table( {
   timestamps: false,
@@ -84,30 +91,28 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSConfigValueData, options: any ): void {
 
-    /*
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSConfigValueData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ) {
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
+  }
 
-    }
-    */
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSConfigValueData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+  }
 
-    }
-    else {
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSConfigValueData, options: any ): void {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

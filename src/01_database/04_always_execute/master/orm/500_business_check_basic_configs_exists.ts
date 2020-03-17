@@ -138,20 +138,26 @@ export default class Always {
 
           }
 
-          const configValueDataInDB = await SYSConfigValueData.findOne( options );
+          const sysConfigValueDataInDB = await SYSConfigValueData.findOne( options );
 
-          if ( configValueDataInDB === null ) {
+          if ( sysConfigValueDataInDB === null ) {
 
-            await SYSConfigValueData.create( configValueToCreate );
+            await SYSConfigValueData.create(
+                                             configValueToCreate,
+                                             { transaction: currentTransaction }
+                                           );
 
           }
-          else if ( !configValueDataInDB.Tag ||
-                    configValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          else if ( !sysConfigValueDataInDB.Tag ||
+                    sysConfigValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            configValueDataInDB.Value = configValueToCreate.Value;
+            sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysConfigValueDataInDB.Value = configValueToCreate.Value;
 
-            await SYSConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+            //await sysConfigValueDataInDB.save( { transaction: currentTransaction } );
+
+            await sysConfigValueDataInDB.update( ( sysConfigValueDataInDB as any ).dataValues,
+                                                 options );
 
           }
 

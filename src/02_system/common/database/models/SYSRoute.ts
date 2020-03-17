@@ -12,6 +12,9 @@ import {
          //IsUUID,
          //BeforeSave,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 //import { Sequelize as OriginSequelize, Utils } from "sequelize";
@@ -37,6 +40,7 @@ export class SYSRoute extends Model<SYSRoute> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) &&
          CommonUtilities.isNullOrEmpty( values.Id ) &&
          CommonUtilities.isNotNullOrEmpty( values.RequestKind ) &&
@@ -45,6 +49,7 @@ export class SYSRoute extends Model<SYSRoute> {
       this.Id = SystemUtilities.hashString( values.RequestKind + ":" + values.Path, 1, null ); //xxxhash algoritm
 
     }
+    */
 
   }
 
@@ -99,24 +104,36 @@ export class SYSRoute extends Model<SYSRoute> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSRoute, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) &&
-         CommonUtilities.isNotNullOrEmpty( instance.RequestKind ) &&
-         CommonUtilities.isNotNullOrEmpty( instance.Path ) ) {
+    if ( !instance.Id &&
+         instance.RequestKind &&
+         instance.Path ) {
 
       instance.Id = SystemUtilities.hashString( instance.RequestKind + ":" + instance.Path, 1, null );
 
     }
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+  }
 
-    }
-    else {
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSRoute, options: any ): void {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-    }
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSRoute, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSRoute, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

@@ -14,6 +14,7 @@ import { SYSBinaryIndex } from "../models/SYSBinaryIndex";
 import DBConnectionManager from "../../managers/DBConnectionManager";
 
 import BaseService from "./BaseService";
+import SystemConstants from '../../SystemContants';
 
 const debug = require( 'debug' )( 'SYSBinaryIndexService' );
 
@@ -22,7 +23,7 @@ export default class SYSBinaryIndexService extends BaseService {
   static readonly _ID = "sysBinaryIndexService";
 
   static async createOrUpdate( strId: string,
-                               data: any,
+                               createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
                                logger: any ): Promise<SYSBinaryIndex> {
@@ -47,37 +48,35 @@ export default class SYSBinaryIndexService extends BaseService {
 
       const options = {
 
-        where: { "Id": strId },
-        transaction: currentTransaction,
+                        where: { "Id": strId },
+                        transaction: currentTransaction,
 
-      }
+                      }
 
       let sysBinaryIndexInDB = await SYSBinaryIndex.findOne( options );
 
-      if ( CommonUtilities.isNullOrEmpty( sysBinaryIndexInDB ) ) {
+      if ( sysBinaryIndexInDB === null ) {
 
         sysBinaryIndexInDB = await SYSBinaryIndex.create(
-                                                          data,
+                                                          createOrUpdateData,
                                                           { transaction: currentTransaction }
                                                         );
 
       }
       else if ( bUpdate ) {
 
-        const updateResult = await SYSBinaryIndex.update( data,
-                                                          options );
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          sysBinaryIndexInDB = await SYSBinaryIndex.findOne( options );
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-      }
-      else {
+        await sysBinaryIndexInDB.update( createOrUpdateData,
+                                         options );
 
-        result = sysBinaryIndexInDB;
+        //sysBinaryIndexInDB = await sysBinaryIndexInDB.save( { transaction: currentTransaction } );
+
+        sysBinaryIndexInDB = await SYSBinaryIndex.findOne( options );
 
       }
 

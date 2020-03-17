@@ -7,13 +7,16 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
 //import uuidv4 from 'uuid/v4';
 //import moment from "moment-timezone";
 
-import CommonUtilities from "../../CommonUtilities";
+//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
@@ -31,6 +34,7 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) &&
          CommonUtilities.isNullOrEmpty( values.Id ) ) {
 
@@ -43,6 +47,7 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
       values.SystemId = os.hostname();
 
     }
+    */
 
   }
 
@@ -83,6 +88,9 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSDBMigratedData, options: any ): void {
 
+    SystemUtilities.commonBeforeValidateHook( instance, options );
+
+    /*
     if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
 
       instance.Id = SystemUtilities.getUUIDv4();
@@ -105,6 +113,32 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
       instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
 
     }
+    */
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSDBMigratedData, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+    instance.SystemId = os.hostname();
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSDBMigratedData, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+    instance.SystemId = os.hostname();
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSDBMigratedData, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

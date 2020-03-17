@@ -427,7 +427,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
   static async createOrUpdate( strUserId: string,
                                strToken: string,
-                               data: any,
+                               createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
                                logger: any ): Promise<SYSUserSessionStatus> {
@@ -450,64 +450,55 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      //const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
-
-      //let debugMark = debug.extend( '3ADAB615F2D9' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-      //debugMark( strId );
-
       const options = {
 
         where: { "UserId": strUserId, "Token": strToken },
         transaction: currentTransaction,
-        //context: { TimeZoneId: "America/Los_Angeles" }
 
       }
 
-      let userSessionStatusInDB = null;
+      let sysUserSessionStatusInDB = null;
 
       if ( bUpdate ) {
 
-        userSessionStatusInDB = await SYSUserSessionStatus.findOne( options );
+        sysUserSessionStatusInDB = await SYSUserSessionStatus.findOne( options );
 
       }
 
-      if ( CommonUtilities.isNullOrEmpty( userSessionStatusInDB ) ) {
+      if ( sysUserSessionStatusInDB === null ) {
 
-        userSessionStatusInDB = await SYSUserSessionStatus.create(
-                                                                   data,
-                                                                   { transaction: currentTransaction }
-                                                                 );
+        sysUserSessionStatusInDB = await SYSUserSessionStatus.create(
+                                                                      createOrUpdateData,
+                                                                      { transaction: currentTransaction }
+                                                                    );
 
       }
       else if ( bUpdate ) {
 
-        if ( userSessionStatusInDB.CreatedBy && !data.CreatedBy ) {
+        /*
+        if ( sysUserSessionStatusInDB.CreatedBy && !createOrUpdateData.CreatedBy ) {
 
-          data.CreatedBy = userSessionStatusInDB.CreatedBy;
-
-        }
-
-        if ( userSessionStatusInDB.CreatedAt && !data.CreatedAt ) {
-
-          data.CreatedAt = userSessionStatusInDB.CreatedAt;
+          createOrUpdateData.CreatedBy = sysUserSessionStatusInDB.CreatedBy;
 
         }
 
-        if ( userSessionStatusInDB.UpdatedBy && !data.UpdatedBy ) {
+        if ( sysUserSessionStatusInDB.CreatedAt && !createOrUpdateData.CreatedAt ) {
 
-          data.UpdatedBy = userSessionStatusInDB.UpdatedBy; //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.CreatedAt = sysUserSessionStatusInDB.CreatedAt;
+
+        }
+        */
+
+        if ( !createOrUpdateData.UpdatedBy ) { //sysUserSessionStatusInDB.UpdatedBy &&
+
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET; //sysUserSessionStatusInDB.UpdatedBy;
 
         }
 
-        const updateResult = await SYSUserSessionStatus.update( data,
-                                                             options );
+        await sysUserSessionStatusInDB.update( createOrUpdateData,
+                                               options );
 
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSUserSessionStatus.findOne( options );
-
-        }
+        sysUserSessionStatusInDB = await SYSUserSessionStatus.findOne( options );
 
       }
 
@@ -519,7 +510,7 @@ export default class SYSUserSessionStatusService extends BaseService {
 
       }
 
-      result = userSessionStatusInDB;
+      result = sysUserSessionStatusInDB;
 
     }
     catch ( error ) {

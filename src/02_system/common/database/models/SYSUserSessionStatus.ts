@@ -8,6 +8,9 @@ import {
 //         HasOne,
 //         ForeignKey,
          BelongsTo,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -123,17 +126,10 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
 
     if ( !instance.ShortToken ) {
 
-      instance.ShortToken =  SystemUtilities.hashString( instance.Token, 2, null ) + SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 2, null ).substring( 4 );
+      instance.ShortToken =  SystemUtilities.hashString( instance.Token, 2, null ) +
+                             SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 2, null ).substring( 4 );
 
     }
-
-    /*
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
-
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
-    */
 
     if ( !instance.UpdatedBy ) {
 
@@ -146,6 +142,27 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
       instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
 
     }
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSUserSessionStatus, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSUserSessionStatus, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSUserSessionStatus, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

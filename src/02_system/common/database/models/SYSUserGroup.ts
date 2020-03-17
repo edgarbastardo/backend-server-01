@@ -7,6 +7,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //BeforeUpdate,
          //AfterUpdate,
        } from "sequelize-typescript";
@@ -79,6 +82,27 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   static beforeValidateHook( instance: SYSUserGroup, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSUserGroup, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSUserGroup, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSUserGroup, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

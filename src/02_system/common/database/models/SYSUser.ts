@@ -17,6 +17,9 @@ import {
          NotEmpty,
          IsUUID,
          Unique,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
@@ -141,9 +144,6 @@ export class SYSUser extends Model<SYSUser> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSUser, options: any ): any {
 
-    //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-    //debugMark( "context:\n %O", options.context );
-
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
     if ( instance.Password &&
@@ -153,11 +153,7 @@ export class SYSUser extends Model<SYSUser> {
 
     }
 
-    //if ( instance.isNewRecord ) {
-    if ( !options ||
-         !options.type ||
-         options.type.toUpperCase() === "BULKCREATE" ||
-         options.type.toUpperCase() === "CREATE" ) {
+    if ( instance.isNewRecord ) {
 
       if ( !instance.ForceChangePassword ) {
 
@@ -180,6 +176,27 @@ export class SYSUser extends Model<SYSUser> {
       instance.PasswordSetAt = instance.CreatedAt;
 
     }
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSUser, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSUser, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSUser, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

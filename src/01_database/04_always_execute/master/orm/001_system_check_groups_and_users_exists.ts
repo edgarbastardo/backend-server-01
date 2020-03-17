@@ -93,14 +93,17 @@ export default class Always {
 
           }
 
-          const userInDB = await SYSUser.findOne( options );
+          const sysUserInDB = await SYSUser.findOne( options );
 
-          if ( userInDB === null ) {
+          if ( sysUserInDB === null ) {
 
             //userToCreate.Password = await bcrypt.hash( userToCreate.Password, 10 );
 
             //const userCreated =
-            await SYSUser.create( userToCreate );
+            await SYSUser.create(
+                                  userToCreate,
+                                  { transaction: currentTransaction }
+                                );
 
             /*
             if ( userCreated ) {
@@ -111,19 +114,21 @@ export default class Always {
             */
 
           }
-          else if ( CommonUtilities.isNotNullOrEmpty( userInDB ) && //The user exists in the db
-                    CommonUtilities.isNullOrEmpty( userInDB.Password ) && //The password is '', set again the default password
-                    CommonUtilities.isNullOrEmpty( userInDB.DisabledAt ) && //But the user is not disabled
-                    ( !userInDB.Tag || userInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) { //And not tagged to not update at startup
+          else if ( CommonUtilities.isNotNullOrEmpty( sysUserInDB ) && //The user exists in the db
+                    CommonUtilities.isNullOrEmpty( sysUserInDB.Password ) && //The password is '', set again the default password
+                    CommonUtilities.isNullOrEmpty( sysUserInDB.DisabledAt ) && //But the user is not disabled
+                    ( !sysUserInDB.Tag || sysUserInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) { //And not tagged to not update at startup
 
-            userInDB.Name = userToCreate.Name;
-            userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
-            userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userInDB.DisabledBy = userToCreate.DisabledBy;
+            sysUserInDB.Name = userToCreate.Name;
+            sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
+            sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserInDB.DisabledBy = userToCreate.DisabledBy;
+
+            //await userInDB.save( { transaction: currentTransaction } );
 
             //const userUpdated =
-            await SYSUser.update( ( userInDB as any).dataValues,
-                               options );
+            await sysUserInDB.update( ( sysUserInDB as any).dataValues,
+                                      options );
 
             /*
             if ( userUpdated ) {

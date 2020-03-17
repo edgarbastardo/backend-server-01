@@ -7,6 +7,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //HasOne,
          //ForeignKey,
          //BelongsTo,
@@ -74,6 +77,27 @@ export class SYSActionToken extends Model<SYSActionToken> {
   static beforeValidateHook( instance: SYSActionToken, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSActionToken, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSActionToken, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSActionToken, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

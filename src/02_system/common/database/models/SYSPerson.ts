@@ -7,6 +7,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -98,6 +101,27 @@ export class SYSPerson extends Model<SYSPerson> {
   static beforeValidateHook( instance: SYSPerson, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSPerson, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSPerson, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSPerson, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

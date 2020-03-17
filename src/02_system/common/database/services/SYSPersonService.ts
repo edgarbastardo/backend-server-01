@@ -115,6 +115,7 @@ export default class SYSPersonService extends BaseService {
     return result;
 
   }
+
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
@@ -145,35 +146,28 @@ export default class SYSPersonService extends BaseService {
 
       }
 
-      result = await SYSPerson.findOne( options );
+      let sysPerson = await SYSPerson.findOne( options );
 
-      if ( result === null ) {
+      if ( sysPerson === null ) {
 
-        result = await SYSPerson.create(
-                                         createOrUpdateData,
-                                         { transaction: currentTransaction }
-                                       );
+        sysPerson = await SYSPerson.create(
+                                            createOrUpdateData,
+                                            { transaction: currentTransaction }
+                                          );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = createOrUpdateData; //( result as any ).dataValues;
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
-
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-        result = await SYSPerson.update( currentValues,
-                                         options );
+        await sysPerson.update( createOrUpdateData,
+                                options );
 
-        if ( result.length > 0 &&
-             result[ 0 ] >= 1 ) {
-
-          result = await SYSPerson.findOne( options );
-
-        }
+        sysPerson = await SYSPerson.findOne( options );
 
       }
 
@@ -184,6 +178,8 @@ export default class SYSPersonService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysPerson;
 
     }
     catch ( error ) {

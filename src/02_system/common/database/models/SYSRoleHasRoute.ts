@@ -6,16 +6,22 @@ import {
          DataType,
          ForeignKey,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //AfterFind
        } from "sequelize-typescript";
+import { BuildOptions } from "sequelize/types";
 
 import { SYSRole } from "./SYSRole";
 import { SYSRoute } from "./SYSRoute";
 
 //import moment = require("moment-timezone");
 
-import CommonUtilities from "../../CommonUtilities";
+//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+import SYSRoleHasRouteService from "../services/SYSRoleHasRouteService";
 
 @Table( {
   timestamps: false,
@@ -23,6 +29,12 @@ import SystemUtilities from "../../SystemUtilities";
   modelName: "sysRoleHasRoute"
 } )
 export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
+
+  constructor( values?: any, options?: BuildOptions ) {
+
+    super( values, options );
+
+  }
 
   @ForeignKey( () => SYSRole )
   @PrimaryKey
@@ -44,11 +56,28 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSRoleHasRoute, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSRoleHasRouteService, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSRoleHasRouteService, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSRoleHasRouteService, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

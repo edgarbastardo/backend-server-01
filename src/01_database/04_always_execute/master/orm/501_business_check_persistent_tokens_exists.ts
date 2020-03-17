@@ -77,19 +77,25 @@ export default class Always {
 
           }
 
-          const userSessionPersistent = await SYSUserSessionPersistent.findOne( options );
+          const sysUserSessionPersistentInDB = await SYSUserSessionPersistent.findOne( options );
 
-          if ( userSessionPersistent === null ) {
+          if ( sysUserSessionPersistentInDB === null ) {
 
-            await SYSUserSessionPersistent.create( userSessionPersistentToCreate );
+            await SYSUserSessionPersistent.create(
+                                                   userSessionPersistentToCreate,
+                                                   { transaction: currentTransaction }
+                                                 );
 
           }
-          else if ( !userSessionPersistent.Tag ||
-                    userSessionPersistent.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          else if ( !sysUserSessionPersistentInDB.Tag ||
+                    sysUserSessionPersistentInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            userSessionPersistent.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-            await SYSUserSessionPersistent.update( ( userSessionPersistent as any ).dataValues, options );
+            //await sysUserSessionPersistentInDB.save( { transaction: currentTransaction } );
+
+            await sysUserSessionPersistentInDB.update( ( sysUserSessionPersistentInDB as any ).dataValues,
+                                                       options );
 
           }
 

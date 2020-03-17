@@ -7,6 +7,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -128,6 +131,27 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   static beforeValidateHook( instance: SYSBinaryIndex, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSBinaryIndex, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSBinaryIndex, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSBinaryIndex, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

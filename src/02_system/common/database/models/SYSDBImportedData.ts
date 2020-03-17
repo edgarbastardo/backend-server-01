@@ -7,6 +7,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -26,19 +29,6 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   constructor( values?: any, options?: BuildOptions ) {
 
     super( values, options );
-
-    if ( CommonUtilities.isNotNullOrEmpty( values ) &&
-         CommonUtilities.isNullOrEmpty( values.Id ) ) {
-
-      this.Id = SystemUtilities.getUUIDv4();
-
-    }
-
-    if ( CommonUtilities.isNullOrEmpty( values.SystemId ) ) {
-
-      values.SystemId = os.hostname();
-
-    }
 
   }
 
@@ -79,28 +69,32 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSDBImportedData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSDBImportedData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.SystemId ) ) {
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-      instance.SystemId = os.hostname();
+    instance.SystemId = os.hostname();
 
-    }
+  }
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSDBImportedData, options: any ): void {
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-    }
-    else {
+    instance.SystemId = os.hostname();
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+  }
 
-    }
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSDBImportedData, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

@@ -22,7 +22,7 @@ import {
   //response,
   //requestParam,
   //requestBody,
-  request,
+  //request,
   httpPut,
   httpGet,
   httpDelete

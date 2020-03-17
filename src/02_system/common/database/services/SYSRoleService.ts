@@ -46,58 +46,39 @@ export default class SYSRoleService extends BaseService {
 
       }
 
-      //const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
-
-      //let debugMark = debug.extend( 'B5F561459005' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-      //debugMark( "%s", strId );
-
       const options = {
 
         where: { "Name": strName },
         transaction: currentTransaction,
-        //context: { TimeZoneId: "America/Los_Angeles" }
 
       }
 
-      let roleInDB = await SYSRole.findOne( options );
+      let sysRoleInDB = await SYSRole.findOne( options );
 
-      //debugMark( "1 => %O", role );
+      if ( sysRoleInDB === null ) {
 
-      if ( CommonUtilities.isNullOrEmpty( roleInDB ) ) {
-
-        result = await SYSRole.create(
-                                       {
-                                         Name: strName,
-                                         Comment: strComment,
-                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                       },
-                                       { transaction: currentTransaction }
-                                     );
+        sysRoleInDB = await SYSRole.create(
+                                            {
+                                              Name: strName,
+                                              Comment: strComment,
+                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                            },
+                                            { transaction: currentTransaction }
+                                          );
 
       }
       else if ( bUpdate &&
-              ( !roleInDB.Tag ||
-                roleInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) {
+              ( !sysRoleInDB.Tag ||
+                sysRoleInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) {
 
-        const currentValues = ( roleInDB as any ).dataValues;
-        currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+        sysRoleInDB.Name = strName;
+        sysRoleInDB.Comment = strComment;
+        sysRoleInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-        //debugMark( "2 => %O", role );
+        await sysRoleInDB.update( ( sysRoleInDB as any ).dataValues,
+                                  options );
 
-        const updateResult = await SYSRole.update( currentValues,
-                                                   options );
-
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSRole.findOne( options );
-
-        }
-
-      }
-      else {
-
-        result = roleInDB;
+        sysRoleInDB = await SYSRole.findOne( options );
 
       }
 
@@ -108,6 +89,8 @@ export default class SYSRoleService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysRoleInDB;
 
     }
     catch ( error ) {

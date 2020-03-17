@@ -17,6 +17,9 @@ import {
          NotEmpty,
          IsUUID,
          Unique,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //Default,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
@@ -127,9 +130,6 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
   @BeforeValidate
   static async beforeValidateHook( instance: SYSUserSignup, options: any ): Promise<any> {
 
-    //let debugMark = debug.extend( 'A4A8FE#63F0C' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-    //debugMark( "context:\n %O", options.context );
-
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
     if ( instance.Password &&
@@ -138,6 +138,27 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
       instance.Password = await CipherManager.encrypt( instance.Password, null );
 
     }
+
+  }
+
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSUserSignup, options: any ): void {
+
+    SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  }
+
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSUserSignup, options: any ): void {
+
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
+
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSUserSignup, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

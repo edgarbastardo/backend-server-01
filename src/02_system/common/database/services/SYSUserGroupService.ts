@@ -568,35 +568,28 @@ export default class SYSUserGroupService extends BaseService {
 
       }
 
-      result = await SYSUserGroup.findOne( options );
+      let sysUserGroupInDB = await SYSUserGroup.findOne( options );
 
-      if ( result === null ) {
+      if ( sysUserGroupInDB === null ) {
 
-        result = await SYSUserGroup.create(
-                                            createOrUpdateData,
-                                            { transaction: currentTransaction }
-                                          );
+        sysUserGroupInDB = await SYSUserGroup.create(
+                                                      createOrUpdateData,
+                                                      { transaction: currentTransaction }
+                                                    );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = createOrUpdateData; //( result as any ).dataValues;
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
-
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-        const updateResult = await SYSUserGroup.update( currentValues,
-                                                     options );
+        await sysUserGroupInDB.update( createOrUpdateData,
+                                       options );
 
-        if ( updateResult.length > 0 &&
-          updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSUserGroup.findOne( options );
-
-        }
+        sysUserGroupInDB = await SYSUserGroup.findOne( options );
 
       }
 
@@ -607,6 +600,8 @@ export default class SYSUserGroupService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysUserGroupInDB;
 
     }
     catch ( error ) {

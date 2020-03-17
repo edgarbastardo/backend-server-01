@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeCreate,
+         BeforeUpdate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -12,8 +15,10 @@ import { BuildOptions } from "sequelize/types";
 //import Hashes from 'jshashes';
 //import moment from "moment-timezone";
 
-import CommonUtilities from "../../CommonUtilities";
+//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
+//const debug = require( 'debug' )( 'SYSConfigMetaData' );
 
 @Table( {
   timestamps: false,
@@ -26,6 +31,7 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
 
       if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
@@ -42,6 +48,7 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
       }
 
     }
+    */
 
   }
 
@@ -124,29 +131,28 @@ export class SYSConfigMetaData extends Model<SYSConfigMetaData> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSConfigMetaData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSConfigMetaData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ||
-         instance.ShortId === '0' ) {
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
+  }
 
-    }
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSConfigMetaData, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+  }
 
-    }
-    else {
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSConfigMetaData, options: any ): void {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
-
-    }
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

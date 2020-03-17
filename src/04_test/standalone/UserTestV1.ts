@@ -372,7 +372,8 @@ export default class UserTestV1 {
   static async test_disableBulkUser( headers: any,
                                      userData: any,
                                      strCode: string,
-                                     strFileName: string ): Promise<boolean> {
+                                     strFileName: string,
+                                     bIsFail: boolean ): Promise<boolean> {
 
     let bResult = false;
 
@@ -392,10 +393,28 @@ export default class UserTestV1 {
 
         bResult = true;
 
+        if ( bIsFail === false ) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( !result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 !result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
       }
 
     }
     catch ( error ) {
+
+      bResult = false;
 
       CommonTest.consoleLog( "Error", error );
 
@@ -408,7 +427,8 @@ export default class UserTestV1 {
   static async test_enableBulkUser( headers: any,
                                     userData: any,
                                     strCode: string,
-                                    strFileName: string ): Promise<boolean> {
+                                    strFileName: string,
+                                    bIsFail: boolean ): Promise<boolean> {
 
     let bResult = false;
 
@@ -427,10 +447,28 @@ export default class UserTestV1 {
 
         bResult = true;
 
+        if ( bIsFail === false) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
       }
 
     }
     catch ( error ) {
+
+      bResult = false;
 
       CommonTest.consoleLog( "Error", error );
 

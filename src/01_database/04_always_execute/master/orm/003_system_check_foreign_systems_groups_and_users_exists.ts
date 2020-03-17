@@ -64,7 +64,10 @@ export default class Always {
 
           if ( userGroupInDB === null ) {
 
-            await SYSUserGroup.create( userGroupToCreate );
+            await SYSUserGroup.create(
+                                       userGroupToCreate,
+                                       { transaction: currentTransaction }
+                                     );
 
           }
           else if ( !userGroupInDB.Tag ||
@@ -73,7 +76,10 @@ export default class Always {
             userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
 
-            await SYSUserGroup.update( ( userGroupInDB as any ).dataValues, options );
+            //await userGroupInDB.save( { transaction: currentTransaction } );
+
+            await userGroupInDB.update( ( userGroupInDB as any ).dataValues,
+                                        options );
 
           }
 
@@ -166,23 +172,25 @@ export default class Always {
 
           }
 
-          const userInDB = await SYSUser.findOne( options );
+          const sysUserInDB = await SYSUser.findOne( options );
 
-          if ( userInDB === null ) {
+          if ( sysUserInDB === null ) {
 
             await SYSUser.create( userToCreate );
 
           }
-          else if ( !userInDB.Tag ||
-                    userInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          else if ( !sysUserInDB.Tag ||
+                    sysUserInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            userInDB.Name = userToCreate.Name;
-            userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
-            userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userInDB.DisabledBy = userToCreate.DisabledBy;
+            sysUserInDB.Name = userToCreate.Name;
+            sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
+            sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserInDB.DisabledBy = userToCreate.DisabledBy;
 
-            await SYSUser.update( ( userInDB as any ).dataValues,
-                               options );
+            //await userInDB.save( { transaction: currentTransaction } );
+
+            await sysUserInDB.update( ( sysUserInDB as any ).dataValues,
+                                      options );
 
           }
 

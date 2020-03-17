@@ -66,21 +66,26 @@ export default class Always {
 
           }
 
-          const userGroupInDB = await SYSUserGroup.findOne( options );
+          const sysUserGroupInDB = await SYSUserGroup.findOne( options );
 
-          if ( userGroupInDB === null ) {
+          if ( sysUserGroupInDB === null ) {
 
-            await SYSUserGroup.create( userGroupToCreate );
+            await SYSUserGroup.create(
+                                       userGroupToCreate,
+                                       { transaction: currentTransaction }
+                                     );
 
           }
-          else if ( !userGroupInDB.Tag ||
-                     userGroupInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          else if ( !sysUserGroupInDB.Tag ||
+                     sysUserGroupInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
-            //userGroup.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+            sysUserGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
 
-            await SYSUserGroup.update( ( userGroupInDB as any ).dataValues, options );
+            //await sysUserGroupInDB.save( { transaction: currentTransaction } );
+
+            await sysUserGroupInDB.update( ( sysUserGroupInDB as any ).dataValues,
+                                           options );
 
           }
 
@@ -146,22 +151,27 @@ export default class Always {
 
           }
 
-          const userInDB = await User.findOne( options );
+          const sysUserInDB = await User.findOne( options );
 
-          if ( userInDB === null ) {
+          if ( sysUserInDB === null ) {
 
-            await User.create( userToCreate );
+            await User.create(
+                               userToCreate,
+                               { transaction: currentTransaction }
+                             );
 
           }
-          else if ( !userInDB.Tag ||
-                    userInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+          else if ( !sysUserInDB.Tag ||
+                    sysUserInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            userInDB.Name = userToCreate.Name;
-            userInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
-            userInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserInDB.Name = userToCreate.Name;
+            sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
+            sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-            await User.update( ( userInDB as any ).dataValues,
-                               options );
+            //await sysUserInDB.save( { transaction: currentTransaction } ),
+
+            await sysUserInDB.update( ( sysUserInDB as any ).dataValues,
+                                      options );
 
           }
 

@@ -754,6 +754,37 @@ export default class SystemUtilities {
           sysUserSessionPersistentData[ "UserGroupName" ] = sysUserGroupInDB.Name;
           sysUserSessionPersistentData[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
 
+          const jsonExtraData = CommonUtilities.parseJSON( sysUserSessionPersistentData[ "ExtraData" ],
+                                                           logger );
+
+          delete result[ "ExtraData" ];
+
+          if ( jsonExtraData ) {
+
+            if ( jsonExtraData.Private ) {
+
+              delete jsonExtraData.Private;
+
+            }
+
+            if ( jsonExtraData.Business ) {
+
+              sysUserSessionPersistentData[ "Business" ] = jsonExtraData.Business;
+
+            }
+            else {
+
+              sysUserSessionPersistentData[ "Business" ] = {};
+
+            }
+
+          }
+          else {
+
+            sysUserSessionPersistentData[ "Business" ] = {};
+
+          }
+
           bFromCache = false;
 
         }
@@ -947,6 +978,38 @@ export default class SystemUtilities {
           result[ "UserGroupId" ] = sysUserGroupInDB.Id;
           result[ "UserGroupName" ] = sysUserGroupInDB.Name;
           result[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
+
+          const jsonExtraData = CommonUtilities.parseJSON( result[ "ExtraData" ],
+                                                           logger );
+
+          delete result[ "ExtraData" ];
+
+          if ( jsonExtraData ) {
+
+            if ( jsonExtraData.Private ) {
+
+              delete jsonExtraData.Private;
+
+            }
+
+            if ( jsonExtraData.Business ) {
+
+              result[ "Business" ] = jsonExtraData.Business;
+
+            }
+            else {
+
+              result[ "Business" ] = {};
+
+            }
+
+          }
+          else {
+
+            result[ "Business" ] = {};
+
+          }
+
           result.UpdatedBy = sysUserInDB.Name;
 
           bFromCache = false;
@@ -1962,10 +2025,12 @@ export default class SystemUtilities {
       if ( options.type === "BULKUPDATE" ||
            options.type === "UPDATE" ) {  //!options.where ) {
       */
-      if ( !options ||
-           !options.type ||
-           options.type.toUpperCase() === "BULKCREATE" ||
-           options.type.toUpperCase() === "CREATE" ) {
+      if ( instance.isNewRecord === true ) { // &&
+          /* ( !options ||
+             !options.type  ||
+             options.type.toUpperCase() === "BULKCREATE" ||
+             options.type.toUpperCase() === "CREATE" ) {
+               */
 
         if ( instance.rawAttributes[ "CreatedBy" ] &&
              !instance.createdBy  ) {
@@ -1993,9 +2058,11 @@ export default class SystemUtilities {
         }
 
       }
+      /*
       else {
 
-        instance.isNewRecord = false;
+        //instance.isNewRecord = false;
+        //instance._changed[ "UpdatedAt" ] = true;
 
         if ( instance.rawAttributes[ "UpdatedBy" ] ) {
 
@@ -2012,6 +2079,7 @@ export default class SystemUtilities {
 
           }
 
+          / *
           const intIndexUpdatedBy = options.skip.indexOf( "UpdatedBy" );
 
           if ( intIndexUpdatedBy >= 0 ) {
@@ -2019,6 +2087,7 @@ export default class SystemUtilities {
             options.skip.splice( intIndexUpdatedBy, 1 );
 
           }
+          * /
 
         }
 
@@ -2026,6 +2095,7 @@ export default class SystemUtilities {
 
           instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
 
+          / *
           const intIndexUpdatedAt = options.skip.indexOf( "UpdatedAt" );
 
           if ( intIndexUpdatedAt >= 0 ) {
@@ -2033,6 +2103,7 @@ export default class SystemUtilities {
             options.skip.splice( intIndexUpdatedAt, 1 );
 
           }
+          * /
 
         }
 
@@ -2068,6 +2139,7 @@ export default class SystemUtilities {
 
             instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
 
+            / *
             const intIndexDisabledAt = options.skip.indexOf( "DisabledAt" );
 
             if ( intIndexDisabledAt >= 0 ) {
@@ -2075,6 +2147,7 @@ export default class SystemUtilities {
               options.skip.splice( intIndexDisabledAt, 1 );
 
             }
+            * /
 
           }
 
@@ -2084,6 +2157,7 @@ export default class SystemUtilities {
           instance.DisabledBy = null;
           instance.DisabledAt = null;
 
+          / *
           const intIndexDisabledBy = options.skip.indexOf( "DisabledBy" );
 
           if ( intIndexDisabledBy >= 0 ) {
@@ -2099,6 +2173,96 @@ export default class SystemUtilities {
             options.skip.splice( intIndexDisabledAt, 1 );
 
           }
+          * /
+
+        }
+
+      }
+      */
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.commonBeforeValidateHook.name;
+
+      const strMark = "9132A5362A48" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( options.context &&
+           options.context.logger &&
+           typeof options.context.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        options.context.logger.error( error );
+
+      }
+      else if ( LoggerManager.mainLoggerInstance &&
+                typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
+  public static commonBeforeCreateHook( instance: any, options: any ) {
+
+    try {
+
+      if ( instance.isNewRecord ) {
+
+        if ( instance.rawAttributes[ "DisabledBy" ] ) {
+
+          if ( instance.DisabledBy === "1" ||
+               ( instance.DisabledBy &&
+                 instance.DisabledBy.startsWith( "1@" ) ) ) {
+
+            if ( options.context &&
+                 options.context.UserSessionStatus &&
+                 options.context.UserSessionStatus.Name ) {
+
+              instance.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+            }
+            else if ( instance.DisabledBy.startsWith( "1@" ) ) {
+
+              const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
+
+              instance.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+            }
+            else {
+
+              instance.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+            }
+
+            if ( instance.rawAttributes[ "DisabledAt" ] ) {
+
+              instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+
+            }
+
+          }
+          else if ( instance.DisabledBy === "0" ) {
+
+            instance.DisabledBy = null;
+            instance.DisabledAt = null;
+
+          }
 
         }
 
@@ -2109,9 +2273,164 @@ export default class SystemUtilities {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.commonBeforeValidateHook.name;
+      sourcePosition.method = this.name + "." + this.commonBeforeCreateHook.name;
 
-      const strMark = "9132A5362A48" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "614287AEE870" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( options.context &&
+           options.context.logger &&
+           typeof options.context.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        options.context.logger.error( error );
+
+      }
+      else if ( LoggerManager.mainLoggerInstance &&
+                typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
+  public static commonBeforeUpdateHook( instance: any, options: any ) {
+
+    try {
+
+      if ( instance.isNewRecord === false ) {
+
+        if ( instance.rawAttributes[ "UpdatedBy" ] ) {
+
+          if ( options.context &&
+               options.context.UserSessionStatus &&
+               options.context.UserSessionStatus.Name ) {
+
+            instance.UpdatedBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+          }
+          else if ( instance.UpdatedBy === null ) {
+
+            instance.UpdatedBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+
+        }
+
+        if ( instance.rawAttributes[ "UpdatedAt" ] ) {
+
+          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+
+        }
+
+      }
+
+      if ( instance.rawAttributes[ "DisabledBy" ] ) {
+
+        if ( instance.DisabledBy === "1" ||
+             ( instance.DisabledBy &&
+               instance.DisabledBy.startsWith( "1@" ) ) ) {
+
+          if ( options.context &&
+               options.context.UserSessionStatus &&
+               options.context.UserSessionStatus.Name ) {
+
+            instance.DisabledBy = ( instance as any ).options.context.UserSessionStatus.Name;
+
+          }
+          else if ( instance.DisabledBy.startsWith( "1@" ) ) {
+
+            const strDisabledBy = instance.DisabledBy.substring( 2 ).trim();
+
+            instance.DisabledBy = strDisabledBy ? strDisabledBy : SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+          else { //if ( instance.DisabledBy === null ) {
+
+            instance.DisabledBy = SystemConstants._CREATED_BY_UNKNOWN_SYSTEM_NET;
+
+          }
+
+          if ( instance.rawAttributes[ "DisabledAt" ] ) {
+
+            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+
+          }
+
+        }
+        else if ( instance.DisabledBy === "0" ) {
+
+          instance.DisabledBy = null;
+          instance.DisabledAt = null;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.commonBeforeUpdateHook.name;
+
+      const strMark = "78D3E3DDAD87" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( options.context &&
+           options.context.logger &&
+           typeof options.context.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        options.context.logger.error( error );
+
+      }
+      else if ( LoggerManager.mainLoggerInstance &&
+                typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
+  public static commonBeforeDestroyHook( instance: any, options: any ) {
+
+    try {
+
+      //
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.commonBeforeDestroyHook.name;
+
+      const strMark = "778A7C602725" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

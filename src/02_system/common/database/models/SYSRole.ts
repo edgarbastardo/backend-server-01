@@ -6,6 +6,9 @@ import {
          DataType,
          BelongsToMany,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
          //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
@@ -78,12 +81,6 @@ export class SYSRole extends Model<SYSRole> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  DisabledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
-
   @Column( { type: DataType.TEXT, allowNull: true } )
   ExtraData: string;
 
@@ -93,29 +90,28 @@ export class SYSRole extends Model<SYSRole> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSRole, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSRole, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.ShortId ) ||
-         instance.ShortId === '0' ) {
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-      instance.ShortId = SystemUtilities.hashString( instance.Id, 2, null ); //Hashes.CRC32( instance.Id ).toString( 16 );
+  }
 
-    }
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSRole, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+  }
 
-    }
-    else {
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSRole, options: any ): void {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
-
-    }
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

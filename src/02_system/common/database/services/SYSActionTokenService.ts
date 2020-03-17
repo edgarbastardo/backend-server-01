@@ -339,40 +339,33 @@ export default class SYSActionTokenService extends BaseService {
 
       const options = {
 
-        where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
-        transaction: currentTransaction,
+                        where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
+                        transaction: currentTransaction,
 
-      }
+                      }
 
-      result = await SYSActionToken.findOne( options );
+      let sysActionToken = await SYSActionToken.findOne( options );
 
-      if ( result === null ) {
+      if ( sysActionToken === null ) {
 
-        result = await SYSActionToken.create(
-                                           createOrUpdateData,
-                                           { transaction: currentTransaction }
-                                         );
+        sysActionToken = await SYSActionToken.create(
+                                                      createOrUpdateData,
+                                                      { transaction: currentTransaction }
+                                                    );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = createOrUpdateData; //( result as any ).dataValues;
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
-
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-        const updateResult = await SYSActionToken.update( currentValues,
-                                                       options );
+        await sysActionToken.update( createOrUpdateData,
+                                     options );
 
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSActionToken.findOne( options );
-
-        }
+        sysActionToken = await SYSActionToken.findOne( options );
 
       }
 
@@ -383,6 +376,8 @@ export default class SYSActionTokenService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysActionToken;
 
     }
     catch ( error ) {

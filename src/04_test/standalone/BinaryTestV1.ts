@@ -648,4 +648,150 @@ export default class BinaryTestV1 {
 
   }
 
+  static async test_disableBulkBinary( headers: any,
+                                       userGroupData: any,
+                                       strCode: string,
+                                       strFileName: string,
+                                       bIsFail: boolean ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      let result = await CommonTest.binaryRequestServiceV1.callDisableBulkBinary( headers,
+                                                                                  userGroupData );
+
+      CommonTest.saveInput( strFileName, result.input );
+      result && result.output ? result.output.expected = { Code: strCode }: null;
+      CommonTest.saveOutput( strFileName, result.output );
+
+      if ( result &&
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
+
+        bResult = true;
+
+        if ( bIsFail === false ) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( !result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 !result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      bResult = false;
+
+      CommonTest.consoleLog( "Error", error );
+
+    }
+
+    return bResult;
+
+  }
+
+  static async test_enableBulkBinary( headers: any,
+                                      userGroupData: any,
+                                      strCode: string,
+                                      strFileName: string,
+                                      bIsFail: boolean ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      let result = await CommonTest.binaryRequestServiceV1.callEnableBulkBinary( headers,
+                                                                                 userGroupData );
+
+      CommonTest.saveInput( strFileName, result.input );
+      result && result.output ? result.output.expected = { Code: strCode }: null;
+      CommonTest.saveOutput( strFileName, result.output );
+
+      if ( result &&
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
+
+        bResult = true;
+
+        if ( bIsFail === false ) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      bResult = false;
+
+      CommonTest.consoleLog( "Error", error );
+
+    }
+
+    return bResult;
+
+  }
+
+  static async test_deleteBulkBinary( headers: any,
+                                      userData: any,
+                                      strCode: string,
+                                      strFileName: string ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      let result = await CommonTest.binaryRequestServiceV1.callDeleteBulkBinary( headers,
+                                                                                 userData ); //This request must be fail
+
+      CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
+      CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
+
+      if ( result &&
+           result.output &&
+           result.output.body &&
+           result.output.body.Code === strCode ) {
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      CommonTest.consoleLog( "Error", error );
+
+    }
+
+    return bResult;
+
+  }
+
 }

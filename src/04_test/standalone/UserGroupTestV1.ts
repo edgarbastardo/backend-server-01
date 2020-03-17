@@ -648,7 +648,7 @@ export default class UserGroupTestV1 {
 
           if ( bMustEmptyRole ) {
 
-            bResult = result.output.body.Data[ 0 ].Name = "TestL55" &&
+            bResult = result.output.body.Data[ 0 ].Name === "TestL45" &&
                       result.output.body.Data[ 0 ].Role === "" &&
                       result.output.body.Data[ 0 ].Tag === "" &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
@@ -732,7 +732,7 @@ export default class UserGroupTestV1 {
 
           if ( bMustEmptyRole ) {
 
-            bResult = result.output.body.Data[ 0 ].Name = "TestL56" &&
+            bResult = result.output.body.Data[ 0 ].Name === "TestL46" &&
                       !result.output.body.Data[ 0 ].Role &&
                       !result.output.body.Data[ 0 ].Tag &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
@@ -747,7 +747,7 @@ export default class UserGroupTestV1 {
           }
           else {
 
-            bResult = result.output.body.Data[ 0 ].Name = "TestL56" &&
+            bResult = result.output.body.Data[ 0 ].Name = "TestL46" &&
                       result.output.body.Data[ 0 ].Role === "#RoleL01#,#RoleL02#" &&
                       result.output.body.Data[ 0 ].Tag === "#TagL01#,#TagL02#" &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
@@ -816,7 +816,7 @@ export default class UserGroupTestV1 {
 
           if ( bMustEmptyRole ) {
 
-            bResult = result.output.body.Data[ 0 ].Name = "TestL58" &&
+            bResult = result.output.body.Data[ 0 ].Name === "TestL47" &&
                       result.output.body.Data[ 0 ].Role === "" &&
                       result.output.body.Data[ 0 ].Tag === "" &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
@@ -831,7 +831,7 @@ export default class UserGroupTestV1 {
           }
           else {
 
-            bResult = result.output.body.Data[ 0 ].Name = "TestL58" &&
+            bResult = result.output.body.Data[ 0 ].Name === "TestL47" &&
                       result.output.body.Data[ 0 ].Role === "#RoleL01#,#RoleL02#" &&
                       result.output.body.Data[ 0 ].Tag === "#TagL01#,#TagL02#" &&
                       result.output.body.Data[ 0 ].Business.Role === "#Role03#,#Role04#" &&
@@ -868,7 +868,8 @@ export default class UserGroupTestV1 {
   static async test_disableBulkUserGroup( headers: any,
                                           userGroupData: any,
                                           strCode: string,
-                                          strFileName: string ): Promise<boolean> {
+                                          strFileName: string,
+                                          bIsFail: boolean ): Promise<boolean> {
 
     let bResult = false;
 
@@ -888,10 +889,28 @@ export default class UserGroupTestV1 {
 
         bResult = true;
 
+        if ( bIsFail === false ) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( !result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 !result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
       }
 
     }
     catch ( error ) {
+
+      bResult = false;
 
       CommonTest.consoleLog( "Error", error );
 
@@ -904,7 +923,8 @@ export default class UserGroupTestV1 {
   static async test_enableBulkUserGroup( headers: any,
                                          userGroupData: any,
                                          strCode: string,
-                                         strFileName: string ): Promise<boolean> {
+                                         strFileName: string,
+                                         bIsFail: boolean ): Promise<boolean> {
 
     let bResult = false;
 
@@ -924,10 +944,28 @@ export default class UserGroupTestV1 {
 
         bResult = true;
 
+        if ( bIsFail === false ) {
+
+          for ( let intIndex = 0; intIndex < result.output.body.Data.length; intIndex++ ) {
+
+            if ( result.output.body.Data[ intIndex ].Details.DisabledBy ||
+                 result.output.body.Data[ intIndex ].Details.DisabledAt ) {
+
+              bResult = false;
+              break;
+
+            }
+
+          }
+
+        }
+
       }
 
     }
     catch ( error ) {
+
+      bResult = false;
 
       CommonTest.consoleLog( "Error", error );
 
@@ -940,7 +978,8 @@ export default class UserGroupTestV1 {
   static async test_deleteBulkUserGroup( headers: any,
                                          userData: any,
                                          strCode: string,
-                                         strFileName: string ): Promise<boolean> {
+                                         strFileName: string,
+                                         bIsFail: boolean ): Promise<boolean> {
 
     let bResult = false;
 

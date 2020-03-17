@@ -19,10 +19,10 @@ export default class SYSConfigMetaDataService extends BaseService {
   static readonly _ID = "sysConfigMetaDataService";
 
   /*
-  static async createOrUpdate( configMetaDataToCreate: any,
+  static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<ConfigMetaData> {
+                               logger: any ): Promise<SYSConfigMetaData> {
 
     let result = null;
 
@@ -44,41 +44,35 @@ export default class SYSConfigMetaDataService extends BaseService {
 
       const options = {
 
-        where: { "Name": configMetaDataToCreate.Name },
-        transaction: currentTransaction,
-        //context: { TimeZoneId: "America/Los_Angeles" }
+                        where: { "Name": createOrUpdateData.Name },
+                        transaction: currentTransaction,
 
-      }
+                      }
 
-      let configMetaDataInDB = await ConfigMetaData.findOne( options );
+      let sysConfigMetaDataInDB = await SYSConfigMetaData.findOne( options );
 
-      if ( CommonUtilities.isNullOrEmpty( configMetaDataInDB ) ) {
+      if ( sysConfigMetaDataInDB === null ) {
 
-        result = await ConfigMetaData.create(
-                                              configMetaDataToCreate,
-                                              { transaction: currentTransaction }
-                                            );
+        sysConfigMetaDataInDB = await SYSConfigMetaData.create(
+                                                                createOrUpdateData,
+                                                                { transaction: currentTransaction }
+                                                              );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = ( configMetaDataInDB as any ).dataValues;
+        //const currentValues = ( sysConfigMetaDataInDB as any ).dataValues;
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-
-        }
-
-        const updateResult = await ConfigMetaData.update( currentValues,
-                                                          options );
-
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await ConfigMetaData.findOne( options );
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
+
+        await sysConfigMetaDataInDB.update( createOrUpdateData,
+                                            options );
+
+        sysConfigMetaDataInDB = await SYSConfigMetaData.findOne( options );
 
       }
 
@@ -89,6 +83,8 @@ export default class SYSConfigMetaDataService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysConfigMetaDataInDB;
 
     }
     catch ( error ) {

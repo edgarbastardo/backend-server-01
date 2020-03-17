@@ -52,60 +52,46 @@ export default class SYSRouteService extends BaseService {
 
       const strId = SystemUtilities.hashString( intRequestKind + ":" + strPath, 1, null );
 
-      //let debugMark = debug.extend( '7287EB53C0BF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-      //debugMark( strId );
-
       const options = {
 
         where: { "Id": strId },
         transaction: currentTransaction,
-        //context: { TimeZoneId: "America/Los_Angeles" }
 
       }
 
-      let routeInDB = await SYSRoute.findOne( options );
+      let sysRouteInDB = await SYSRoute.findOne( options );
 
-      //debugMark( "1 =>", routeInDB );
+      if ( CommonUtilities.isNullOrEmpty( sysRouteInDB ) ) {
 
-      if ( CommonUtilities.isNullOrEmpty( routeInDB ) ) {
-
-        result = await SYSRoute.create(
-                                     {
-                                       AccessKind: intAccessKind,
-                                       RequestKind: intRequestKind,
-                                       Path: strPath,
-                                       AllowTagAccess: strAllowTagAccess,
-                                       Description: strDescription,
-                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                     },
-                                     { transaction: currentTransaction }
-                                   );
+        sysRouteInDB = await SYSRoute.create(
+                                              {
+                                                AccessKind: intAccessKind,
+                                                RequestKind: intRequestKind,
+                                                Path: strPath,
+                                                AllowTagAccess: strAllowTagAccess,
+                                                Description: strDescription,
+                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                              },
+                                              { transaction: currentTransaction }
+                                            );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = ( routeInDB as any ).dataValues;
-        currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+        sysRouteInDB.AccessKind = intAccessKind;
+        sysRouteInDB.RequestKind = intRequestKind;
+        sysRouteInDB.Path = strPath;
+        sysRouteInDB.AllowTagAccess = SystemUtilities.mergeTokens( sysRouteInDB.AllowTagAccess,
+                                                                   strAllowTagAccess,
+                                                                   true,
+                                                                   logger );
+        sysRouteInDB.Description = strDescription;
+        sysRouteInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-        currentValues.AllowTagAccess = SystemUtilities.mergeTokens( currentValues.AllowTagAccess,
-                                                                    strAllowTagAccess,
-                                                                    false,
-                                                                    logger );
+        await sysRouteInDB.update( ( sysRouteInDB as any ).dataValues,
+                                   options );
 
-        const updateResult = await SYSRoute.update( currentValues,
-                                                 options );
-
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSRoute.findOne( options );
-
-        }
-
-      }
-      else {
-
-        result = routeInDB;
+        sysRouteInDB = await SYSRoute.findOne( options );
 
       }
 
@@ -116,6 +102,8 @@ export default class SYSRouteService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysRouteInDB;
 
     }
     catch ( error ) {

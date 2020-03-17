@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          Column,
          BeforeValidate,
+         BeforeUpdate,
+         BeforeCreate,
+         BeforeDestroy,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -26,6 +29,7 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
 
     super( values, options );
 
+    /*
     if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
 
       if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
@@ -35,6 +39,7 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
       }
 
     }
+    */
 
   }
 
@@ -87,22 +92,28 @@ export class SYSUserSessionPersistent extends Model<SYSUserSessionPersistent> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSUserSessionPersistent, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.Id ) ) {
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-      instance.Id = SystemUtilities.getUUIDv4();
+  }
 
-    }
+  @BeforeCreate
+  static beforeCreateHook( instance: SYSUserSessionPersistent, options: any ): void {
 
-    if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
+    SystemUtilities.commonBeforeCreateHook( instance, options );
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+  }
 
-    }
-    else {
+  @BeforeUpdate
+  static beforeUpdateHook( instance: SYSUserSessionPersistent, options: any ): void {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+    SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-    }
+  }
+
+  @BeforeDestroy
+  static beforeDestroyHook( instance: SYSUserSessionPersistent, options: any ): void {
+
+    SystemUtilities.commonBeforeDestroyHook( instance, options );
 
   }
 

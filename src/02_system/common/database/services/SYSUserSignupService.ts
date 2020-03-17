@@ -144,36 +144,28 @@ export default class SYSUserSignupService extends BaseService {
 
       }
 
-      result = await SYSUserSignup.findOne( options );
+      let sysUserSignupInDB = await SYSUserSignup.findOne( options );
 
-      if ( result === null ) {
+      if ( sysUserSignupInDB === null ) {
 
-        result = await SYSUserSignup.create(
-                                             createOrUpdateData,
-                                             { transaction: currentTransaction }
-                                           );
+        sysUserSignupInDB = await SYSUserSignup.create(
+                                                        createOrUpdateData,
+                                                        { transaction: currentTransaction }
+                                                      );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues = createOrUpdateData;  //( result as any ).dataValues;
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
-
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-        const updateResult = await SYSUserSignup.update( currentValues,
-                                                         options );
+        await sysUserSignupInDB.update( createOrUpdateData,
+                                        options );
 
-
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSUserSignup.findOne( options );
-
-        }
+        sysUserSignupInDB = await SYSUserSignup.findOne( options );
 
       }
 
@@ -184,6 +176,8 @@ export default class SYSUserSignupService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysUserSignupInDB;
 
     }
     catch ( error ) {

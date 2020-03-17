@@ -818,32 +818,34 @@ export default class SYSConfigValueDataService extends BaseService {
                         transaction: currentTransaction,
                       }
 
-      let configValueDataInDB = await SYSConfigValueData.findOne( options );
+      let sysConfigValueDataInDB = await SYSConfigValueData.findOne( options );
 
-      if ( configValueDataInDB === null ) {
+      if ( sysConfigValueDataInDB === null ) {
 
-        await SYSConfigValueData.create(
-                                         {
-                                           ConfigMetaDataId: strConfigMetaDataId,
-                                           Owner: strOnwer,
-                                           Value: CommonUtilities.jsonToString( jsonConfigData, logger ),
-                                           CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                         },
-                                         options.transaction
-                                       );
+        sysConfigValueDataInDB = await SYSConfigValueData.create(
+                                                                  {
+                                                                    ConfigMetaDataId: strConfigMetaDataId,
+                                                                    Owner: strOnwer,
+                                                                    Value: CommonUtilities.jsonToString( jsonConfigData, logger ),
+                                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                  },
+                                                                  { transaction: options.transaction }
+                                                                );
 
       }
       else {
 
-        configValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-        configValueDataInDB.UpdatedAt = null;
-        configValueDataInDB.Value = CommonUtilities.jsonToString( jsonConfigData, logger );
+        sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+        sysConfigValueDataInDB.Value = CommonUtilities.jsonToString( jsonConfigData, logger );
 
-        await SYSConfigValueData.update( ( configValueDataInDB as any ).dataValues, options );
+        //await sysConfigValueDataInDB.save( { transaction: currentTransaction } ); //hooks: true,
+
+        sysConfigValueDataInDB = await sysConfigValueDataInDB.update( ( sysConfigValueDataInDB as any ).dataValues,
+                                                                      options );
 
       }
 
-      result = await SYSConfigValueData.findOne( options );
+      //result = await SYSConfigValueData.findOne( options );
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -852,6 +854,8 @@ export default class SYSConfigValueDataService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysConfigValueDataInDB;
 
     }
     catch ( error ) {

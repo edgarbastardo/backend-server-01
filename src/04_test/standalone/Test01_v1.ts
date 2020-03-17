@@ -219,11 +219,14 @@ async function test_v1_phase01() {
   CommonTest.myAssert( await UserTestV1.test_disableBulkUser( CommonTest.headers_adminXX_at_system_net,
                                                               {
                                                                 bulk: [
-                                                                        { Name: CommonTest.strStartUser },
+                                                                        {
+                                                                          Name: CommonTest.strStartUser
+                                                                        },
                                                                       ]
                                                               },
                                                               "ERROR_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                              true ),
                        'F80AEB410009: Bulk disable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        'F80AEB410009: Bulk disable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -235,7 +238,8 @@ async function test_v1_phase01() {
                                                                      ]
                                                              },
                                                              "ERROR_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                             true ),
                        '7862BE0C629A: Bulk enable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        '7862BE0C629A: Bulk enable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -284,7 +288,8 @@ async function test_v1_phase01() {
                                                                       ]
                                                               },
                                                               "ERROR_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_noexitent@noexist_fail" ),
+                                                              "test_disableBulkUser_noexitent@noexist_fail",
+                                                              true ),
                        '68932373522C: Bulk disable of the user noexitent@noexist is OK with the fail',
                        '68932373522C: Bulk disable of the user noexitent@noexist is FAILED' );
 
@@ -296,7 +301,8 @@ async function test_v1_phase01() {
                                                                      ]
                                                              },
                                                              "ERROR_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_noexitent@noexist_fail" ),
+                                                             "test_enableBulkUser_noexitent@noexist_fail",
+                                                             true ),
                        'CA1441D19262: Bulk enable of the user noexitent@noexist is OK with the fail',
                        'CA1441D19262: Bulk enable of the user noexitent@noexist is FAILED' );
 
@@ -650,9 +656,10 @@ async function test_v1_phase02() {
                                                                                 ]
                                                                         },
                                                                         "SUCCESS_BULK_USER_GROUP_DISABLE",
-                                                                        "test_disableBulkUserGroup_TestL5X_success" ),
-                       '595898CDF5D7: Bulk disable of the user group TestL5X is OK',
-                       '595898CDF5D7: Bulk disable of the user group TestL5X is FAILED' );
+                                                                        "test_disableBulkUserGroup_TestL5X_success",
+                                                                        false ),
+                       '43DAF6776FCA: Bulk disable of the user group TestL5X is OK',
+                       '43DAF6776FCA: Bulk disable of the user group TestL5X is FAILED' );
 
   CommonTest.myAssert( await UserGroupTestV1.test_enableBulkUserGroup( CommonTest.headers_adminXX_at_system_net,
                                                                        {
@@ -663,7 +670,8 @@ async function test_v1_phase02() {
                                                                                ]
                                                                        },
                                                                        "SUCCESS_BULK_USER_GROUP_ENABLE",
-                                                                       "test_enableBulkUserGroup_TestL5X_success" ),
+                                                                       "test_enableBulkUserGroup_TestL5X_success",
+                                                                       false ),
                        'F687E4496FBC: Bulk enable of the user group TestL5X is OK',
                        'F687E4496FBC: Bulk enable of the user group TestL5X is FAILED' );
 
@@ -676,7 +684,8 @@ async function test_v1_phase02() {
                                                                                ]
                                                                        },
                                                                        "SUCCESS_BULK_USER_GROUP_DELETE",
-                                                                       "test_deleteBulkUserGroup_TestL5X_success" ),
+                                                                       "test_deleteBulkUserGroup_TestL5X_success",
+                                                                       false ),
                        'B4A86820CB65: Bulk delete of the user group TestL5X is OK',
                        'B4A86820CB65: Bulk delete of the user group TestL5X is FAILED' );
 
@@ -688,7 +697,8 @@ async function test_v1_phase02() {
                                                                                 ]
                                                                         },
                                                                         "ERROR_BULK_USER_GROUP_DISABLE",
-                                                                        "test_disableBulkUserGroup_System_Administrators_fail" ),
+                                                                        "test_disableBulkUserGroup_System_Administrators_fail",
+                                                                        true ),
                        'C9EE6CEEE392: Bulk disable of the user group System_Administrators is OK with the fail',
                        'C9EE6CEEE392: Bulk disable of the user group System_Administrators is FAILED' );
 
@@ -700,7 +710,8 @@ async function test_v1_phase02() {
                                                                                 ]
                                                                         },
                                                                         "ERROR_BULK_USER_GROUP_ENABLE",
-                                                                        "test_enableBulkUserGroup_System_Administrators_fail" ),
+                                                                        "test_enableBulkUserGroup_System_Administrators_fail",
+                                                                        true ),
                        'F687E4496FBC: Bulk enable of the user group System_Administrators is OK with the fail',
                        'F687E4496FBC: Bulk enable of the user group System_Administrators is FAILED' );
 
@@ -712,7 +723,8 @@ async function test_v1_phase02() {
                                                                                ]
                                                                        },
                                                                        "ERROR_BULK_USER_GROUP_DELETE",
-                                                                       "test_deleteBulkUserGroup_System_Administrators_fail" ),
+                                                                       "test_deleteBulkUserGroup_System_Administrators_fail",
+                                                                       true ),
                        '8B78C8472833: Bulk delete of the user group System_Administrators is OK with the fail',
                        '8B78C8472833: Bulk delete of the user group System_Administrators is FAILED' );
 
@@ -884,7 +896,8 @@ export async function test_v1_phase03() {
                                                                       ]
                                                               },
                                                               "SUCCESS_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_user9X@TestL98_success" ),
+                                                              "test_disableBulkUser_user9X@TestL98_success",
+                                                              false ),
                        'A1B75AC57AD0: Bulk disable of the user user9X@TestL98 is OK',
                        'A1B75AC57AD0: Bulk disable of the user user9X@TestL98 is FAILED' );
 
@@ -898,7 +911,8 @@ export async function test_v1_phase03() {
                                                                      ]
                                                              },
                                                              "SUCCESS_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_user9X@TestL98_success" ),
+                                                             "test_enableBulkUser_user9X@TestL98_success",
+                                                             false ),
                        '7862BE0C629A: Bulk enable of the user user9X@TestL98 is OK',
                        '7862BE0C629A: Bulk enable of the user user9X@TestL98 is FAILED' );
 
@@ -945,7 +959,8 @@ export async function test_v1_phase03() {
                                                                       ]
                                                               },
                                                               "ERROR_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                              true ),
                        'DE215786AFEC: Bulk disable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        'DE215786AFEC: Bulk disable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -957,7 +972,8 @@ export async function test_v1_phase03() {
                                                                      ]
                                                              },
                                                              "ERROR_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                             true ),
                        '7862BE0C629A: Bulk enable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        '7862BE0C629A: Bulk enable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -1645,7 +1661,8 @@ export async function test_v1_phase06() {
                                                                       ]
                                                               },
                                                               "SUCCESS_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_user0X@TestL0X_success" ),
+                                                              "test_disableBulkUser_user0X@TestL0X_success",
+                                                              false ),
                        '8E9DB16E7023: Bulk disable of the user user0X@TestL0X is OK',
                        '8E9DB16E7023: Bulk disable of the user user0X@TestL0X is FAILED' );
 
@@ -1658,7 +1675,8 @@ export async function test_v1_phase06() {
                                                                      ]
                                                              },
                                                              "SUCCESS_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_user0X@TestL0X_success" ),
+                                                             "test_enableBulkUser_user0X@TestL0X_success",
+                                                             false ),
                        '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is OK',
                        '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is FAILED' );
 
@@ -1696,7 +1714,8 @@ export async function test_v1_phase06() {
                                                                       ]
                                                               },
                                                               "ERROR_BULK_USER_DISABLE",
-                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                              "test_disableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                              true ),
                        'EF697A2EF29C: Bulk disable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        'EF697A2EF29C: Bulk disable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -1708,7 +1727,8 @@ export async function test_v1_phase06() {
                                                                      ]
                                                              },
                                                              "ERROR_BULK_USER_ENABLE",
-                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail" ),
+                                                             "test_enableBulkUser_" + CommonTest.strStartUser.replace( ".", "_" ) + "_fail",
+                                                             true ),
                        '0354A125E68F: Bulk enable of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        '0354A125E68F: Bulk enable of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
@@ -1974,6 +1994,16 @@ export async function test_v1_phase07() {
                        'DEF3E36E35C4: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
                        'DEF3E36E35C4: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
 
+  CommonTest.myAssert( await BinaryTestV1.test_uploadImageTiger( CommonTest.headers_user02_at_TestL02,
+                                                                 "SUCCESS_BINARY_DATA_UPLOAD",
+                                                                 "test_uploadImageTiger_user02@TestL02_success",
+                                                                 "user02@TestL02_tiger",
+                                                                 {
+                                                                   Mark: "3E0415B6F023"
+                                                                 } ),
+                       "3E0415B6F023: Upload image road user02@TestL02 is OK",
+                       "3E0415B6F023: Upload image road user02@TestL02 is FAILED" );
+
   CommonTest.myAssert( await BinaryTestV1.test_uploadImageRoad( CommonTest.headers_user02_at_TestL02,
                                                                 "SUCCESS_BINARY_DATA_UPLOAD",
                                                                 "test_uploadImageRoad_user02@TestL02_success",
@@ -1983,6 +2013,67 @@ export async function test_v1_phase07() {
                                                                 } ),
                        "09436E9FE7B4: Upload image road user02@TestL02 is OK",
                        "09436E9FE7B4: Upload image road user02@TestL02 is FAILED" );
+
+  CommonTest.myAssert( await BinaryTestV1.test_uploadImageTower( CommonTest.headers_user02_at_TestL02,
+                                                                 "SUCCESS_BINARY_DATA_UPLOAD",
+                                                                 "test_uploadImageTower_user02@TestL02_success",
+                                                                 "user02@TestL02_tower",
+                                                                 {
+                                                                   Mark: "3AB80F84BD41"
+                                                                 } ),
+                       "3AB80F84BD41: Upload image road user02@TestL02 is OK",
+                       "3AB80F84BD41: Upload image road user02@TestL02 is FAILED" );
+
+  CommonTest.myAssert( await BinaryTestV1.test_disableBulkBinary( CommonTest.headers_user02_at_TestL02,
+                                                                  {
+                                                                    bulk: [
+                                                                            { Id: CommonTest.upload_binary_data[ "user02@TestL02_tiger" ].Id },
+                                                                            { Id: CommonTest.upload_binary_data[ "user02@TestL02_road" ].Id },
+                                                                            { Id: CommonTest.upload_binary_data[ "user02@TestL02_tower" ].Id }
+                                                                          ]
+                                                                  },
+                                                                  "SUCCESS_BULK_BINARY_DATA_DISABLE",
+                                                                  "test_disableBulkBinary_user02@TestL02_success",
+                                                                  false ),
+                       '595898CDF5D7: Bulk disable of the binary user02@TestL02 is OK',
+                       '595898CDF5D7: Bulk disable of the binary user02@TestL02 is FAILED' );
+
+  CommonTest.myAssert( await BinaryTestV1.test_enableBulkBinary( CommonTest.headers_user02_at_TestL02,
+                                                                 {
+                                                                   bulk: [
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_tiger" ].Id },
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_road" ].Id },
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_tower" ].Id }
+                                                                         ]
+                                                                 },
+                                                                 "SUCCESS_BULK_BINARY_DATA_ENABLE",
+                                                                 "test_enableBulkBinary_user02@TestL02_success",
+                                                                 false ),
+                       'F687E4496FBC: Bulk enable of the binary user02@TestL02 is OK',
+                       'F687E4496FBC: Bulk enable of the binary user02@TestL02 is FAILED' );
+
+  CommonTest.myAssert( await BinaryTestV1.test_deleteBulkBinary( CommonTest.headers_user02_at_TestL02,
+                                                                 {
+                                                                   bulk: [
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_tiger" ].Id },
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_road" ].Id },
+                                                                           { Id: CommonTest.upload_binary_data[ "user02@TestL02_tower" ].Id }
+                                                                         ]
+                                                                 },
+                                                                 "SUCCESS_BULK_BINARY_DATA_DELETE",
+                                                                 "test_deleteBulkBinary_user02@TestL02_success" ),
+                       'B4A86820CB65: Bulk delete of the binary user02@TestL02 is OK',
+                       'B4A86820CB65: Bulk delete of the binary user02@TestL02 is FAILED' );
+
+  CommonTest.myAssert( await BinaryTestV1.test_uploadImageRoad( CommonTest.headers_user02_at_TestL02,
+                                                                 "SUCCESS_BINARY_DATA_UPLOAD",
+                                                                 "test_uploadImageRoad_user02@TestL02_success",
+                                                                 "user02@TestL02_road",
+                                                                 {
+                                                                   Mark: "C16FC48FF980"
+                                                                 } ),
+                       "C16FC48FF980: Upload image road user02@TestL02 is OK",
+                       "C16FC48FF980: Upload image road user02@TestL02 is FAILED" );
 
   CommonTest.myAssert( await BinaryTestV1.test_createAuth( CommonTest.headers_user02_at_TestL02,
                                                            "SUCCESS_AUTH_TOKEN_CREATED",

@@ -1196,10 +1196,12 @@ export default class UserGroupServiceController {
 
           }
 
-          sysUserGroupInDB.Name = resultCheckUserRoles.isAuthorizedAdmin &&
-                                  request.body.Name &&
-                                  ( resultCheckUserRoles.isAuthorizedL03 === false ||
-                                    this.checkNameAuthorized( userSessionStatus.Role, request.body.Name ) ) ?
+          sysUserGroupInDB.Name = request.body.Name &&
+                                  ( resultCheckUserRoles.isAuthorizedAdmin ||
+                                    resultCheckUserRoles.isAuthorizedL03 === false ||
+                                    this.checkNameAuthorized( userSessionStatus.Role,
+                                                              request.body.Name,
+                                                              "UpdateUserGroup" ) ) ?
                                   request.body.Name: sysUserGroupInDB.Name;
           sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null,
           sysUserGroupInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserGroupInDB.Tag;
@@ -2096,13 +2098,21 @@ export default class UserGroupServiceController {
   }
 
   static checkNameAuthorized( strRole: any,
-                              strName: string ): boolean {
+                              strName: string,
+                              strActionRole: string ): boolean {
 
     let bResult = false;
 
     try {
 
       let roleSubTag = CommonUtilities.getSubTagFromComposeTag( strRole, "#MasterL03#" );
+
+      if ( !roleSubTag ||
+           roleSubTag.length === 0 ) {
+
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( strRole, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+
+      }
 
       if ( !roleSubTag ) {
 

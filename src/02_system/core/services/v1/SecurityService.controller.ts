@@ -693,6 +693,13 @@ export default class SecurityServiceController {
                                                                       fieldsToDelete,
                                                                       logger );
 
+          /*
+          strGroupBusinessRoles = sysUserInDB.sysUserGroup.ExtraData &&
+                                  sysUserInDB.sysUserGroup.ExtraData[ "Business" ] &&
+                                  sysUserInDB.sysUserGroup.ExtraData[ "Business" ].Role ?
+                                  sysUserInDB.sysUserGroup.ExtraData[ "Business" ].Role: null; //Save the role field value
+          */
+
         }
 
         let userPersonDataResponse = null;
@@ -705,10 +712,17 @@ export default class SecurityServiceController {
 
         }
 
-        const userRoles = ( sysUserInDB as any ).dataValues.Role; //Save the role field value
-        const userTags = ( sysUserInDB as any ).dataValues.Tag; //Save the role field value
+        const strUserRoles = sysUserInDB.Role; //Save the role field value
+        const strUserTags = sysUserInDB.Tag; //Save the role field value
 
-        const createdAt = ( sysUserInDB as any ).dataValues.CreatedAt; //Save the CreatedAt field value
+        /*
+                                         sysUserInDB.ExtraData &&
+                                         sysUserInDB.ExtraData[ "Business" ] &&
+                                         sysUserInDB.ExtraData[ "Business" ].Role ?
+                                         sysUserInDB.ExtraData[ "Business" ].Role: null; //Save the role field value
+                                       */
+
+        const createdAt = sysUserInDB.CreatedAt; //Save the CreatedAt field value
 
         let userDataResponse = CommonUtilities.deleteObjectFields( ( sysUserInDB as any ).dataValues,
                                                                    fieldsToDelete,
@@ -727,10 +741,33 @@ export default class SecurityServiceController {
                                                                Include: null,
                                                                Logger: logger,
                                                                ExtraInfo: {
-                                                                             Request: null
-                                                                           }
+                                                                            Request: null
+                                                                          }
                                                              }
                                                            );
+
+        let strUserGroupBusinessRoles = "";
+        let strUserBusinessRoles = "";
+
+        if ( userDataResponse.sysUserGroup &&
+             userDataResponse.sysUserGroup.Business &&
+             userDataResponse.sysUserGroup.Business.Role ) {
+
+          strUserGroupBusinessRoles = userDataResponse.sysUserGroup.Business.Role;
+
+          delete userDataResponse.sysUserGroup.Business.Role;
+
+        }
+
+        if ( userDataResponse.Business &&
+             userDataResponse.Business.Role ) {
+
+          strUserBusinessRoles = userDataResponse.Business.Role;
+
+          delete userDataResponse.Business.Role;
+
+        }
+
         /*
         SystemUtilities.transformObjectToTimeZone( userDataResponse,
                                                    context.TimeZoneId,
@@ -819,7 +856,7 @@ export default class SecurityServiceController {
         }
 
         const strRolesMerged = SystemUtilities.mergeTokens( strGroupRoles,
-                                                            userRoles,
+                                                            strUserRoles,
                                                             true,
                                                             logger );
 
@@ -859,6 +896,11 @@ export default class SecurityServiceController {
           }
 
         }
+
+        const strBusinessRolesMerged = SystemUtilities.mergeTokens( strUserGroupBusinessRoles,
+                                                                    strUserBusinessRoles,
+                                                                    true,
+                                                                    logger );
 
         const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
                                                                       userDataResponse,
@@ -942,6 +984,16 @@ export default class SecurityServiceController {
                                         ExpireOn: configData.on,
                                         HardLimit: configData.hardLimit,
                                         Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
+                                        ExtraData: JSON.stringify(
+                                                                   {
+                                                                     Business: {
+                                                                                 Role: strBusinessRolesMerged
+                                                                               }
+                                                                   }
+                                                                 ),
+                                        Business: {
+                                                    Role: strBusinessRolesMerged
+                                                  },
                                         CreatedBy: processOptions.useSecondaryUserToCreatedBy === true && strSecondaryUser ? strSecondaryUser : strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                         CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format(): null,
                                         UpdatedBy: !strSecondaryUser ? strUserName : strSecondaryUser, //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
@@ -976,7 +1028,7 @@ export default class SecurityServiceController {
 
         }
 
-        userSessionStatusData[ "UserTag" ] = userTags;
+        userSessionStatusData[ "UserTag" ] = strUserTags;
         //userSessionStatusData[ "User" ] = user.Name;
         userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
         userSessionStatusData[ "UserGroupShortId" ] = userGroupDataResponse.ShortId;
@@ -985,6 +1037,8 @@ export default class SecurityServiceController {
         userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
         userSessionStatusData[ "LoggedOutBy" ] = null;
         userSessionStatusData[ "LoggedOutAt" ] = null;
+
+        delete userSessionStatusData[ "ExtraData" ];
 
         await CacheManager.setDataWithTTL( strAuthorization,
                                            JSON.stringify( userSessionStatusData ),
@@ -1015,6 +1069,9 @@ export default class SecurityServiceController {
                                  ShortToken: userSessionStatus.ShortToken,
                                  Role: strRolesMerged + strBasicRoles,
                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                 Business: {
+                                             Role: strBusinessRolesMerged
+                                           },
                                  sysUser: userDataResponse,
                                  //sysUserGroup: userGroupDataResponse,
                                  //sysPerson: userPersonDataResponse
@@ -1041,6 +1098,9 @@ export default class SecurityServiceController {
                                  SupportToken: userSessionStatus.ShortToken,
                                  Role: strRolesMerged + strBasicRoles,
                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                 Business: {
+                                             Role: strBusinessRolesMerged
+                                           },
                                  sysUser: userDataResponse,
                                  //Group: userGroupDataResponse,
                                  //Person: userPersonDataResponse

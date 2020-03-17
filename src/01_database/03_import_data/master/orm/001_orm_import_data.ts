@@ -39,14 +39,14 @@ export default class Import {
       const strId = SystemUtilities.getUUIDv4();
 
       const userGroupsToCreate = [
-        {
-          Id: strId,
-          Name: "Administrators",
-          Role: "#Administrator#",
-          Comment: "Auto created from importation",
-          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-        }
-      ]
+                                   {
+                                     Id: strId,
+                                     Name: "Administrators",
+                                     Role: "#Administrator#",
+                                     Comment: "Auto created from importation",
+                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                   }
+                                 ]
 
       const groupsCreated = await UserGroup.bulkCreate( userGroupsToCreate, { individualHooks: true, validate: true } );
 
@@ -59,14 +59,14 @@ export default class Import {
       const strCryptedPassword = await bcrypt.hash( "admin.123456.", saltRounds );
 
       const usersToCreate = [
-        {
-          GroupId: strId,
-          Name: "administrator01",
-          Password: strCryptedPassword.toString(),
-          Comment: "Auto created from importation",
-          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-        }
-      ]
+                              {
+                                GroupId: strId,
+                                Name: "administrator01",
+                                Password: strCryptedPassword.toString(),
+                                Comment: "Auto created from importation",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                              }
+                            ]
 
       const usersCreated = await User.bulkCreate( usersToCreate, { individualHooks: true, validate: true } );
 

@@ -619,35 +619,28 @@ export default class SYSUserService extends BaseService {
 
       }
 
-      result = await SYSUser.findOne( options );
+      let sysUserInDB = await SYSUser.findOne( options );
 
-      if ( result === null ) {
+      if ( sysUserInDB === null ) {
 
-        result = await SYSUser.create(
-                                    createOrUpdateData,
-                                    { transaction: currentTransaction }
-                                  );
+        sysUserInDB = await SYSUser.create(
+                                            createOrUpdateData,
+                                            { transaction: currentTransaction }
+                                          );
 
       }
       else if ( bUpdate ) {
 
-        const currentValues =  createOrUpdateData; //( result as any ).dataValues;
+        if ( !createOrUpdateData.UpdatedBy ) {
 
-        if ( CommonUtilities.isNullOrEmpty( currentValues.UpdatedBy ) ) {
-
-          currentValues.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
         }
 
-        const updateResult = await SYSUser.update( currentValues,
-                                                   options );
+        await sysUserInDB.update( createOrUpdateData,
+                                  options );
 
-        if ( updateResult.length > 0 &&
-             updateResult[ 0 ] >= 1 ) {
-
-          result = await SYSUser.findOne( options );
-
-        }
+        sysUserInDB = await SYSUser.findOne( options );
 
       }
 
@@ -658,6 +651,8 @@ export default class SYSUserService extends BaseService {
         await currentTransaction.commit();
 
       }
+
+      result = sysUserInDB;
 
     }
     catch ( error ) {

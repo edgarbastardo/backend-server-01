@@ -55,17 +55,18 @@ export default class SYSRoleHasRouteService extends BaseService {
 
       }
 
-      let roleHasRoute = await SYSRoleHasRoute.findOne( options );
+      let sysRoleHasRoute = await SYSRoleHasRoute.findOne( options );
 
-      if ( CommonUtilities.isNullOrEmpty( roleHasRoute ) ) {
+      if ( CommonUtilities.isNullOrEmpty( sysRoleHasRoute ) ) {
 
-        roleHasRoute = await SYSRoleHasRoute.create(
-                                                  { RoleId: strRoleId,
-                                                    RouteId: strRouteId,
-                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
-                                                  },
-                                                  { transaction: currentTransaction }
-                                                );
+        sysRoleHasRoute = await SYSRoleHasRoute.create(
+                                                        {
+                                                          RoleId: strRoleId,
+                                                          RouteId: strRouteId,
+                                                          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                                        },
+                                                        { transaction: currentTransaction }
+                                                      );
 
       }
 
@@ -77,7 +78,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
       }
 
-      result = roleHasRoute;
+      result = sysRoleHasRoute;
 
     }
     catch ( error ) {
