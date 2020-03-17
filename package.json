@@ -127,7 +127,7 @@
     "inquirer": "^7.0.3",
     "jest": "^25.1.0",
     "log-symbols": "^3.0.0",
-    "nodemon": "^1.19.4",
+    "nodemon": "^2.0.2",
     "recursive-copy": "^2.0.10",
     "ssh2": "^0.8.7",
     "ssh2-promise": "^0.1.6",
