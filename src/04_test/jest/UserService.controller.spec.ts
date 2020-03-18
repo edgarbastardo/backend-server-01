@@ -38,10 +38,10 @@ test( `Test validatorjs library 001`, async () => {
                 Test: 'required|dummy'
               };
 
-  let validator = SystemUtilities.createCustomValidatorSync( data,
-                                                             rules,
-                                                             customRegister,
-                                                             null );
+  const validator = SystemUtilities.createCustomValidatorSync( data,
+                                                               rules,
+                                                               customRegister,
+                                                               null );
 
   const bResult = validator.passes();
 

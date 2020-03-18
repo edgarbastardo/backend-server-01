@@ -260,19 +260,15 @@ export default class SecurityServiceController {
 
       if ( CommonUtilities.isNotNullOrEmpty( strDeniedValue ) ) {
 
-        if ( strDeniedValue === SystemConstants._VALUE_ANY ) {
+        if ( strDeniedValue === SystemConstants._VALUE_ANY ||
+             strDeniedValue.includes( "#" + strUserId + "#" ) ||
+             strDeniedValue.includes( "#" + strUserName + "#" ) ||
+             CommonUtilities.isInMultiSimpleList( strDeniedValue, ",", strUserTag, false, logger ) ||
+             strDeniedValue.includes( "#" + strGroupId + "#" ) ||
+             strDeniedValue.includes( "#" + strGroupName + "#" ) ||
+             CommonUtilities.isInMultiSimpleList( strDeniedValue, ",", strGroupTag, false, logger ) ) {
 
-           intResult = -1; //Explicit denied
-
-        }
-        else if ( strDeniedValue.includes( "#" + strUserId + "#" ) ||
-                  strDeniedValue.includes( "#" + strUserName + "#" ) ||
-                  CommonUtilities.isInMultiSimpleList( strDeniedValue, ",", strUserTag, false, logger ) ||
-                  strDeniedValue.includes( "#" + strGroupId + "#" ) ||
-                  strDeniedValue.includes( "#" + strGroupName + "#" ) ||
-                  CommonUtilities.isInMultiSimpleList( strDeniedValue, ",", strGroupTag, false, logger ) ) {
-
-           intResult = -1; //Explicit denied
+          intResult = -1; //Explicit denied
 
         }
 

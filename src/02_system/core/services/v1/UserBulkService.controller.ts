@@ -216,7 +216,7 @@ export default class UserBulkServiceController {
                                     }
                                   );
 
-              };
+              }
 
             }
             else {

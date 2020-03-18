@@ -483,10 +483,10 @@ export default class UserCreateServiceController {
                             Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
                           };
 
-              const validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
-                                                                           rules,
-                                                                           null,
-                                                                           logger );
+              validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
+                                                                     rules,
+                                                                     null,
+                                                                     logger );
 
               if ( validator.passes() ) { //Validate request.body field values
 

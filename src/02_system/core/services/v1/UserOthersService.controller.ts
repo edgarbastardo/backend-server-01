@@ -149,14 +149,10 @@ export default class UserOthersServiceController {
 
       if ( CommonUtilities.isNotNullOrEmpty( strDeniedValue ) ) {
 
-        if ( strDeniedValue === SystemConstants._VALUE_ANY ) {
+        if ( strDeniedValue === SystemConstants._VALUE_ANY ||
+             strDeniedValue.includes( "#" + strKind + "#" ) ) {
 
-           intResult = -1; //Explicit denied
-
-        }
-        else if ( strDeniedValue.includes( "#" + strKind + "#" ) ) {
-
-           intResult = -1; //Explicit denied
+          intResult = -1; //Explicit denied
 
         }
 
@@ -931,7 +927,7 @@ export default class UserOthersServiceController {
                 sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
                 sysUserInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-                const userWithPasswordChanged = await SYSUserService.createOrUpdate( ( sysUserInDB as any).dataValues,
+                const userWithPasswordChanged = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
                                                                                      true,
                                                                                      currentTransaction,
                                                                                      logger );

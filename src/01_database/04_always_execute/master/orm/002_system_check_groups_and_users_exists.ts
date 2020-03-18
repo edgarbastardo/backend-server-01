@@ -127,7 +127,7 @@ export default class Always {
             //await userInDB.save( { transaction: currentTransaction } );
 
             //const userUpdated =
-            await sysUserInDB.update( ( sysUserInDB as any).dataValues,
+            await sysUserInDB.update( ( sysUserInDB as any ).dataValues,
                                       options );
 
             /*

@@ -93,10 +93,10 @@ export default class UserUpdateServiceController {
                         Business: [ 'present' ],
                       };
 
-      const validator = SystemUtilities.createCustomValidatorSync( request.body,
-                                                                   userRules,
-                                                                   null,
-                                                                   logger );
+      let validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                 userRules,
+                                                                 null,
+                                                                 logger );
 
       if ( validator.passes() ) { //Validate request.body field values
 
@@ -610,10 +610,10 @@ export default class UserUpdateServiceController {
                             Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
                           };
 
-              const validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
-                                                                           rules,
-                                                                           null,
-                                                                           logger );
+              validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
+                                                                     rules,
+                                                                     null,
+                                                                     logger );
 
               if ( validator.passes() ) { //Validate request.body field values
 

@@ -2,7 +2,7 @@ import cluster from 'cluster';
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
-import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import CommonConstants from "../../CommonConstants";
 import SystemConstants from "../../SystemContants";
@@ -10,16 +10,16 @@ import SystemConstants from "../../SystemContants";
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-import { SYSRole } from "../models/SYSRole";
+//import { SYSRole } from "../models/SYSRole";
 
 import DBConnectionManager from '../../managers/DBConnectionManager';
 import LoggerManager from '../../managers/LoggerManager';
 
 import BaseService from "./BaseService";
-import SYSConfigMetaDataService from "./SYSConfigMetaDataService";
+//import SYSConfigMetaDataService from "./SYSConfigMetaDataService";
 import SYSConfigValueDataService from "./SYSConfigValueDataService";
 import { SYSDatabaseLog } from "../models/SYSDatabaseLog";
-import { config } from 'bluebird';
+//import { config } from 'bluebird';
 
 const debug = require( 'debug' )( 'SYSDatabaseLogService' );
 
@@ -118,7 +118,8 @@ export default class SYSDatabaseLogService extends BaseService {
                                    configData,
                                    logger ) ) {
 
-        if ( strOperation === "create" ) {
+        if ( strOperation === "create" ||
+             strOperation === "delete" ) {
 
           sysDatabaseLogInDB = await SYSDatabaseLog.create(
                                                             {
@@ -193,24 +194,6 @@ export default class SYSDatabaseLogService extends BaseService {
             bApplyTransaction = true;
 
           }
-
-        }
-        else if ( strOperation === "delete" ) {
-
-          sysDatabaseLogInDB = await SYSDatabaseLog.create(
-                                                            {
-                                                              Operation: strOperation,
-                                                              Database: strDatabase,
-                                                              Table: strTable,
-                                                              Data: ( instance as any ).dataValues,
-                                                              CreatedBy: instance.CreatedBy,
-                                                              CreatedAt: SystemUtilities.getCurrentDateAndTime().format(),
-                                                              ExtraData: null
-                                                            },
-                                                            { transaction: currentTransaction }
-                                                          );
-
-          bApplyTransaction = true;
 
         }
 
