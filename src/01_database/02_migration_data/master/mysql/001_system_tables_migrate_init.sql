@@ -269,6 +269,32 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionPersistent` (
   CONSTRAINT `FK_sysSessionPersistent_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the persistent user session for access with only session token and not with username/password';
 
+CREATE TABLE IF NOT EXISTS `sysUserSessionDevice` (
+  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `PushToken` varchar(175) COLLATE utf8_unicode_ci NOT NULL,
+  `Device` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`UserSessionStatusToken`),
+  CONSTRAINT `FK_sysUserSessionDevice_Token_From_sysUserSessionStatus_Token` FOREIGN KEY (`UserSessionStatusToken`) REFERENCES `sysUserSessionStatus` (`Token`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store user device information associated to the session';
+
+CREATE TABLE IF NOT EXISTS `sysUserSessionPresence` (
+  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `PresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
+  `Server` varchar(120) COLLATE utf8_unicode_ci NOT NULL,
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`UserSessionStatusToken`),
+  CONSTRAINT `FK_sysUserSessionPresence_Token_From_sysUserSessionStatus_Token` FOREIGN KEY (`UserSessionStatusToken`) REFERENCES `sysUserSessionStatus` (`Token`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence information associated to the session';
+
 CREATE TABLE IF NOT EXISTS `sysRoute` (
   `Id` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Id from path, generated with xxhash',
   `AccessKind` tinyint(3) unsigned DEFAULT NULL COMMENT '1=Public, 2=Authenticated, 3=Role',

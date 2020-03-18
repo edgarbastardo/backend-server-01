@@ -1,31 +1,25 @@
-import os from 'os';
-
 import {
-         Table,
          Model,
-         DataType,
-         PrimaryKey,
          Column,
+         Table,
+         PrimaryKey,
+         DataType,
          BeforeValidate,
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
+         //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-
-//import uuidv4 from 'uuid/v4';
-//import moment from "moment-timezone";
-
-//import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
-import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
+import SystemUtilities from "../../../../../../02_system/common/SystemUtilities";
+import SYSDatabaseLogService from "../../../../../../02_system/common/database/services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
-  tableName: "sysDBImportedData",
-  modelName: "sysDBImportedData"
+  tableName: "bizExample",
+  modelName: "bizExample"
 } )
-export class SYSDBImportedData extends Model<SYSDBImportedData> {
+export class BIZExample extends Model<BIZExample> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -38,22 +32,10 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   Id: string;
 
   @Column( { type: DataType.STRING( 75 ) } )
-  SystemId: string;
-
-  @Column( { type: DataType.STRING( 2048 ) } )
-  FilePath: string;
+  Name: string;
 
   @Column( { type: DataType.STRING( 512 ) } )
-  FileName: string;
-
-  @Column( { type: DataType.STRING( 20 ) } )
-  FullPathCheckSum: string;
-
-  @Column( { type: DataType.STRING( 20 ) } )
-  ContentCheckSum: string;
-
-  @Column( { type: DataType.TINYINT } )
-  Success: number;
+  Comment: string;
 
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
@@ -67,22 +49,23 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
+  @Column( { type: DataType.JSON, allowNull: true } )
+  ExtraData: string;
+
   @BeforeValidate
-  static beforeValidateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeValidateHook( instance: BIZExample, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeCreateHook( instance: BIZExample, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
-    instance.SystemId = os.hostname();
-
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "bizExample",
                                              "create",
                                              instance,
                                              null );
@@ -90,16 +73,14 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeUpdateHook( instance: BIZExample, options: any ): void {
 
-    const oldDataValues = { ...( instance as any )._previousDataValues };
+    const oldDataValues = { ...( instance as any )._previousDataValuess };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-    instance.SystemId = os.hostname();
-
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "bizExample",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -107,12 +88,12 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeDestroyHook( instance: BIZExample, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "bizExample",
                                              "delete",
                                              instance,
                                              null );

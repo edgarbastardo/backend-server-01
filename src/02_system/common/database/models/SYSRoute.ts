@@ -26,8 +26,9 @@ import { BuildOptions } from "sequelize/types";
 import { SYSRoleHasRoute } from "./SYSRoleHasRoute";
 import { SYSRole } from "./SYSRole";
 
-import CommonUtilities from "../../CommonUtilities";
+//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {

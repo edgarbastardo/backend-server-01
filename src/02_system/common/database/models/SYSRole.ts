@@ -20,8 +20,9 @@ import { SYSRoute } from "./SYSRoute";
 //import Hashes from 'jshashes';
 //import moment from "moment-timezone";
 
-import CommonUtilities from "../../CommonUtilities";
+//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {

@@ -1,31 +1,28 @@
-import os from 'os';
-
 import {
-         Table,
          Model,
-         DataType,
-         PrimaryKey,
          Column,
+         Table,
+         PrimaryKey,
+         DataType,
+         //BelongsToMany,
          BeforeValidate,
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
+         //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
-//import uuidv4 from 'uuid/v4';
-//import moment from "moment-timezone";
-
-//import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
-import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
+
+import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
-  tableName: "sysDBImportedData",
-  modelName: "sysDBImportedData"
+  tableName: "sysUserSessionPresence",
+  modelName: "sysUserSessionPresence"
 } )
-export class SYSDBImportedData extends Model<SYSDBImportedData> {
+export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -35,25 +32,13 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
 
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
-  Id: string;
+  UserSessionStatusToken: string;
 
   @Column( { type: DataType.STRING( 75 ) } )
-  SystemId: string;
+  PresenceId: string;
 
-  @Column( { type: DataType.STRING( 2048 ) } )
-  FilePath: string;
-
-  @Column( { type: DataType.STRING( 512 ) } )
-  FileName: string;
-
-  @Column( { type: DataType.STRING( 20 ) } )
-  FullPathCheckSum: string;
-
-  @Column( { type: DataType.STRING( 20 ) } )
-  ContentCheckSum: string;
-
-  @Column( { type: DataType.TINYINT } )
-  Success: number;
+  @Column( { type: DataType.STRING( 120 ) } )
+  Server: string;
 
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
@@ -67,22 +52,23 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
+  @Column( { type: DataType.JSON, allowNull: true } )
+  ExtraData: string;
+
   @BeforeValidate
-  static beforeValidateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeValidateHook( instance: SYSUserSessionPresence, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeCreateHook( instance: SYSUserSessionPresence, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
-    instance.SystemId = os.hostname();
-
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "sysUserSessionPresence",
                                              "create",
                                              instance,
                                              null );
@@ -90,16 +76,14 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeUpdateHook( instance: SYSUserSessionPresence, options: any ): void {
 
-    const oldDataValues = { ...( instance as any )._previousDataValues };
+    const oldDataValues = { ...( instance as any )._previousDataValuess };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-    instance.SystemId = os.hostname();
-
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "sysUserSessionPresence",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -107,12 +91,12 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSDBImportedData, options: any ): void {
+  static beforeDestroyHook( instance: SYSUserSessionPresence, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysDBImportedData",
+                                             "sysUserSessionPresence",
                                              "delete",
                                              instance,
                                              null );
@@ -121,7 +105,7 @@ export class SYSDBImportedData extends Model<SYSDBImportedData> {
 
   public getPrimaryKey(): string[] {
 
-    return [ "Id" ];
+    return [ "UserSessionStatusToken" ];
 
   }
 

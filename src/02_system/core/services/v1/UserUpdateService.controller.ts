@@ -734,7 +734,7 @@ export default class UserUpdateServiceController {
                   sysUserInDB.ChangePasswordEvery = request.body.ChangePasswordEvery;
                   sysUserInDB.SessionsLimit = request.body.SessionsLimit;
                   sysUserInDB.Password = request.body.Password ? request.body.Password: sysUserInDB.Password;
-                  sysUserInDB.Role = strRoleToApply ? strRoleToApply: null, //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
+                  sysUserInDB.Role = strRoleToApply ? strRoleToApply: null; //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: sysUserInDB.Role;
                   sysUserInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserInDB.Tag;
 
                   if ( request.body.Business ) {

@@ -24,6 +24,7 @@ import SystemConstants from "../../SystemContants";
 
 //import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {

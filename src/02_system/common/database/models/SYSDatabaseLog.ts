@@ -4,7 +4,7 @@ import {
          Table,
          PrimaryKey,
          DataType,
-         BelongsToMany,
+         //BelongsToMany,
          BeforeValidate,
          BeforeUpdate,
          BeforeCreate,

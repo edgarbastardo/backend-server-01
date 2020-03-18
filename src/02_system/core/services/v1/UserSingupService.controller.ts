@@ -113,7 +113,7 @@ export default class UserSingupServiceController {
 
                 strTag = !signupProcessData.passwordParameterTag ? "#" + request.body.Name + "#" : "";
 
-              };
+              }
 
               strTag = signupProcessData.passwordParameterTag ? signupProcessData.passwordParameterTag : strTag;
 
