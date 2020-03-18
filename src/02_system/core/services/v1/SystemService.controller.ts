@@ -40,7 +40,7 @@ import SYSUserGroupService from "../../../common/database/services/SYSUserGroupS
 //import CipherManager from "../../common/managers/CipherManager";
 //import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../../common/managers/I18Manager";
-import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
+//import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
 import CacheManager from '../../../common/managers/CacheManager';
 //import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
 //import JobQueueManager from "../../common/managers/JobQueueManager";
@@ -51,8 +51,8 @@ import CacheManager from '../../../common/managers/CacheManager';
 //import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
 //import { SYSPerson } from '../../common/database/models/SYSPerson';
 //import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
-import dbConnection from "../../../common/managers/DBConnectionManager";
-import { error } from 'winston';
+//import dbConnection from "../../../common/managers/DBConnectionManager";
+//import { error } from 'winston';
 
 const debug = require( 'debug' )( 'SystemServiceController' );
 

@@ -1,5 +1,7 @@
-import SystemUtilities from "../../../../common/SystemUtilities";
+//import SystemUtilities from "../../../../common/SystemUtilities";
+
 import { allow } from "graphql-shield";
+
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 
 const debug = require( 'debug' )( 'Security.permission' );

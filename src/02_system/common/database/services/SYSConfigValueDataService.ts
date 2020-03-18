@@ -674,12 +674,8 @@ export default class SYSConfigValueDataService extends BaseService {
 
       if ( CommonUtilities.isNotNullOrEmpty( result.denied ) ) {
 
-        if ( result.denied === SystemConstants._VALUE_ANY ) {
-
-          result.value = -1; //Explicit denied
-
-        }
-        else if ( result.denied.includes( "#" + strDataToCheck + "#" ) ) {
+        if ( result.denied === SystemConstants._VALUE_ANY ||
+             result.denied.includes( "#" + strDataToCheck + "#" ) ) {
 
           result.value = -1; //Explicit denied
 

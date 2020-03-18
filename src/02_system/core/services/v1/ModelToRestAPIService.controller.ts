@@ -2272,7 +2272,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             delete includeItem.attributes;
 
-          };
+          }
 
           if ( includeArray[ i ].include ) {
 

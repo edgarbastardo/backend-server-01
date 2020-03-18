@@ -26,7 +26,7 @@ import SYSUserGroupService from "../../../common/database/services/SYSUserGroupS
 import I18NManager from "../../../common/managers/I18Manager";
 import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
 import SYSConfigValueDataService from '../../../common/database/services/SYSConfigValueDataService';
-import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
+//import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
 
 const debug = require( 'debug' )( 'UserGroupServiceController' );
 

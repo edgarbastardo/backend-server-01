@@ -27,12 +27,12 @@ import BaseService from "../../../common/database/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
 import SYSBinaryIndexService from "../../../common/database/services/SYSBinaryIndexService";
 import SYSUserService from '../../../common/database/services/SYSUserService';
+import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
 
 import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
 import { SYSUser } from '../../../common/database/models/SYSUser';
 import { SYSBinaryIndex } from '../../../common/database/models/SYSBinaryIndex';
-import { AccessKind } from "../../../common/CommonConstants";
-import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
+//import { AccessKind } from "../../../common/CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
 

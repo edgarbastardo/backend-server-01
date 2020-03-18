@@ -139,7 +139,7 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;;
+      result && result.output ? result.output.expected = { Code: strCode }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
