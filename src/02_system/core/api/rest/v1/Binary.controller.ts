@@ -34,7 +34,6 @@ import SYSRouteService from '../../../../common/database/services/SYSRouteServic
 import BinaryServiceController from "../../../services/v1/BinaryService.controller";
 import I18NManager from "../../../../common/managers/I18Manager";
 import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
-import { json } from 'sequelize/types';
 
 const debug = require( 'debug' )( 'Binary.controller' );
 

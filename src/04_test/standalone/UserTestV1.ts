@@ -5,7 +5,7 @@ import CommonTest from "./CommonTest";
 export default class UserTestV1 {
 
   static async test_profile_at_less_one_role( headers: any,
-                                              rolesToTest: string[] | string[],
+                                              rolesToTest: string[],
                                               strCode: string,
                                               strFileName: string,
                                               bIsFail: boolean ): Promise<boolean> {
@@ -75,7 +75,7 @@ export default class UserTestV1 {
   }
 
   static async test_profile_all_roles( headers: any,
-                                       rolesToTest: string[] | string[],
+                                       rolesToTest: string[],
                                        strCode: string,
                                        strFileName: string ): Promise<boolean> {
 
@@ -622,7 +622,7 @@ export default class UserTestV1 {
           }
           else {
 
-            const local = CommonTest.user98_at_TestL98_data;
+            //const local = CommonTest.user98_at_TestL98_data;
 
             if ( //CommonTest.user98_at_TestL98_data.Role === "#MasterL01#" &&
                 CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#MasterL01#" ) &&

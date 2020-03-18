@@ -1,6 +1,6 @@
 import cluster from 'cluster';
 
-import CommonConstants, { HTTPMethod } from "../../../../common/CommonConstants";
+import CommonConstants from "../../../../common/CommonConstants";
 
 import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";

@@ -1202,7 +1202,7 @@ export default class UserGroupServiceController {
                                                               request.body.Name,
                                                               "UpdateUserGroup" ) ) ?
                                   request.body.Name: sysUserGroupInDB.Name;
-          sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null,
+          sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null;
           sysUserGroupInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserGroupInDB.Tag;
           sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): sysUserGroupInDB.ExpireAt;
           sysUserGroupInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserGroupInDB.Comment;
@@ -1595,7 +1595,7 @@ export default class UserGroupServiceController {
                                     }
                                   );
 
-              };
+              }
 
             }
             else if ( strBulkOperation === "deleteUserGroup" ) {
