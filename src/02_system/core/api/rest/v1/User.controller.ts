@@ -32,10 +32,18 @@ import {
   inject
 } from 'inversify';
 //import SecurityServiceController from '../../services/SecurityService.controller';
-import UserServiceController from '../../../services/v1/UserService.controller';
+import UserOthersServiceController from '../../../services/v1/UserOthersService.controller';
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 //import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 import I18NManager from '../../../../common/managers/I18Manager';
+import UserCreateServiceController from '../../../services/v1/UserCreateService.controller';
+import UserUpdateServiceController from '../../../services/v1/UserUpdateService.controller';
+import UserDeleteServiceController from '../../../services/v1/UserDeleteService.controller';
+import UserBulkServiceController from '../../../services/v1/UserBulkService.controller';
+import UserPasswordServiceController from '../../../services/v1/UserPasswordService.controller';
+import UserSignupServiceController from '../../../services/v1/UserSingupService.controller';
+import UserEMailServiceController from '../../../services/v1/UserEMailService.controller';
+import UserPhoneServiceController from '../../../services/v1/UserPhoneService.controller';
 
 const debug = require( 'debug' )( 'User.controller' );
 
@@ -221,13 +229,13 @@ export default class UserController {
       for ( let routeInfo of UserController._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                        routeInfo.RequestKind,
-                                                        routeInfo.Path, //Path
-                                                        routeInfo.AllowTagAccess,
-                                                        routeInfo.Roles as any,
-                                                        routeInfo.Description,
-                                                        null,
-                                                        logger );
+                                                           routeInfo.RequestKind,
+                                                           routeInfo.Path, //Path
+                                                           routeInfo.AllowTagAccess,
+                                                           routeInfo.Roles as any,
+                                                           routeInfo.Description,
+                                                           null,
+                                                           logger );
 
       }
 
@@ -268,9 +276,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.signup( request,
-                                                       null,
-                                                       this._controllerLogger || context.logger );
+    const result = await UserSignupServiceController.signup( request,
+                                                             null,
+                                                             this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -284,9 +292,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.signupActivate( request,
-                                                               null,
-                                                               this._controllerLogger || context.logger );
+    const result = await UserSignupServiceController.signupActivate( request,
+                                                                     null,
+                                                                     this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -300,9 +308,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.passwordRecoverCodeSend( request,
-                                                                        null,
-                                                                        this._controllerLogger || context.logger );
+    const result = await UserPasswordServiceController.passwordRecoverCodeSend( request,
+                                                                                null,
+                                                                                this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -316,9 +324,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.passwordRecover( request,
-                                                                null,
-                                                                this._controllerLogger || context.logger );
+    const result = await UserPasswordServiceController.passwordRecover( request,
+                                                                        null,
+                                                                        this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -333,9 +341,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.passwordChange( request,
-                                                               null,
-                                                               this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.passwordChange( request,
+                                                                     null,
+                                                                     this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -350,9 +358,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.emailChangeCodeSend( request,
-                                                                    null,
-                                                                    this._controllerLogger || context.logger );
+    const result = await UserEMailServiceController.emailChangeCodeSend( request,
+                                                                         null,
+                                                                         this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -367,9 +375,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.emailChange( request,
-                                                            null,
-                                                            this._controllerLogger || context.logger);
+    const result = await UserEMailServiceController.emailChange( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger);
 
     response.status( result.StatusCode ).send( result );
 
@@ -384,9 +392,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.phoneChangeCodeSend( request,
-                                                                    null,
-                                                                    this._controllerLogger || context.logger );
+    const result = await UserPhoneServiceController.phoneChangeCodeSend( request,
+                                                                         null,
+                                                                         this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -401,9 +409,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.phoneNumberChange( request,
-                                                                  null,
-                                                                  this._controllerLogger || context.logger );
+    const result = await UserPhoneServiceController.phoneNumberChange( request,
+                                                                       null,
+                                                                       this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -418,9 +426,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.getProfile( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.getProfile( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -435,9 +443,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.setProfile( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.setProfile( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -453,9 +461,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.getUser( request,
-                                                        null,
-                                                        this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.getUser( request,
+                                                              null,
+                                                              this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -471,9 +479,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.createUser( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserCreateServiceController.createUser( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -489,9 +497,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.updateUser( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserUpdateServiceController.updateUser( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -507,9 +515,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.disableBulkUser( request,
-                                                                null,
-                                                                this._controllerLogger || context.logger );
+    const result = await UserBulkServiceController.disableBulkUser( request,
+                                                                    null,
+                                                                    this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -525,9 +533,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.enableBulkUser( request,
-                                                               null,
-                                                               this._controllerLogger || context.logger );
+    const result = await UserBulkServiceController.enableBulkUser( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -543,9 +551,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.moveBulkUser( request,
-                                                             null,
-                                                             this._controllerLogger || context.logger );
+    const result = await UserBulkServiceController.moveBulkUser( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -561,9 +569,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.deleteUser( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserDeleteServiceController.deleteUser( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -579,9 +587,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.deleteBulkUser( request,
-                                                               null,
-                                                               this._controllerLogger || context.logger );
+    const result = await UserBulkServiceController.deleteBulkUser( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -597,9 +605,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.searchUser( request,
-                                                           null,
-                                                           this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.searchUser( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -615,9 +623,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.searchCountUser( request,
-                                                                null,
-                                                                this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.searchCountUser( request,
+                                                                      null,
+                                                                      this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -632,9 +640,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.getSettings( request,
-                                                            null,
-                                                            this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.getSettings( request,
+                                                                  null,
+                                                                  this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -649,9 +657,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.setSettings( request,
-                                                            null,
-                                                            this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.setSettings( request,
+                                                                  null,
+                                                                  this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -666,9 +674,9 @@ export default class UserController {
 
     const context = ( request as any ).context;
 
-    const result = await UserServiceController.getRoutes( request,
-                                                          null,
-                                                          this._controllerLogger || context.logger );
+    const result = await UserOthersServiceController.getRoutes( request,
+                                                                null,
+                                                                this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 
