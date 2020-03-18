@@ -161,12 +161,8 @@ export default class UserOthersServiceController {
       if ( intResult == 0 &&
           CommonUtilities.isNotNullOrEmpty( strAllowedValue ) ) {
 
-        if ( strAllowedValue === SystemConstants._VALUE_ANY ) {
-
-          intResult = 1; //Explicit allowed
-
-        }
-        else if ( strAllowedValue.includes( "#" + strKind + "#" ) ) {
+        if ( strAllowedValue === SystemConstants._VALUE_ANY ||
+             strAllowedValue.includes( "#" + strKind + "#" ) ) {
 
           intResult = 1; //Explicit allowed
 

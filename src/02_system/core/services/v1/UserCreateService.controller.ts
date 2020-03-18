@@ -93,10 +93,10 @@ export default class UserCreateServiceController {
                         Business: [ 'present' ],
                       };
 
-      const validator = SystemUtilities.createCustomValidatorSync( request.body,
-                                                                   userRules,
-                                                                   null,
-                                                                   logger );
+      let validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                 userRules,
+                                                                 null,
+                                                                 logger );
 
       if ( validator.passes() ) { //Validate request.body field values
 

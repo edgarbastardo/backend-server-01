@@ -14,7 +14,7 @@ import DBConnectionManager from "../../managers/DBConnectionManager";
 
 import BaseService from "./BaseService";
 import { SYSConfigValueData } from '../models/SYSConfigValueData';
-import { json } from 'express';
+//import { json } from 'express';
 
 const debug = require( 'debug' )( 'SYSConfigValueDataService' );
 

@@ -13,26 +13,30 @@ import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";
 
 import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
   //httpGet,
-  httpPost,
+  //httpPost,
   //response,
   //requestParam,
   //requestBody,
-  request,
-  httpPut,
+  //request,
+  //httpPut,
   httpGet,
-  httpDelete
+  //httpDelete
 } from "inversify-express-utils";
 import {
   //injectable,
   inject
 } from 'inversify';
+
 //import SecurityServiceController from '../../services/SecurityService.controller';
 import SystemServiceController from '../../../services/v1/SystemService.controller';
-import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
+
+//import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
+
 //import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'System.controller' );

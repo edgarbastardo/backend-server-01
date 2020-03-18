@@ -276,7 +276,7 @@ export class DBMigrationManagerMYSQL {
     let bResult: boolean = false;
 
     //const minify = require( 'pg-minify' );
-    const fs = require( 'fs' );
+    //const fs = require( 'fs' );
     const strRootPath =  __dirname; //require( 'app-root-path' );
 
     const strFullFilePath = strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql`;
@@ -815,7 +815,7 @@ export class DBMigrationManagerMYSQL {
 
               bSuccess = resultCall.bSuccess;
               bEmptyContent = resultCall.bEmptyContent;
-              strContentCheckSum = resultCall.strContentCheckSum;
+              //strContentCheckSum = resultCall.strContentCheckSum;
 
             }
             else if ( strFileExt === ".js" ||
@@ -1061,9 +1061,17 @@ export class DBMigrationManagerMYSQL {
 
               try {
 
-                const strFullPathCheckSum = strContentCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strImportDataFolder + "/" + strFileName ).toString( 16 );
+                const strFullPathCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strImportDataFolder + "/" + strFileName ).toString( 16 );
 
-                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strImportDataFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
+                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" +
+                                  os.hostname() + "','" +
+                                  strImportDataFolder + "','" +
+                                  strFileName + "','" +
+                                  strFullPathCheckSum + "','" +
+                                  strContentCheckSum + "'," +
+                                  ( bSuccess ? 1 : 0 ) +
+                                  ",NULL,'backend@system.net','" +
+                                  SystemUtilities.getCurrentDateAndTime().format() + "'";
 
                 const strSQL = `Insert Into sysDBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 

@@ -265,7 +265,7 @@ export default class SYSRoleService extends BaseService {
   }
 
   static async getRolesFromRoutePath( intRequestKind: number,
-                                      strPath: String,
+                                      strPath: string,
                                       transaction: any,
                                       logger: any ): Promise<any> {
 

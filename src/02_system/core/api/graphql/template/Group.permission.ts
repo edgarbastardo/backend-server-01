@@ -1,5 +1,10 @@
-import { allow, rule, and } from 'graphql-shield';
-import SystemUtilities from "../../../../common/SystemUtilities";
+import {
+  //allow,
+  //rule,
+  and } from 'graphql-shield';
+
+  //import SystemUtilities from "../../../../common/SystemUtilities";
+
 import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
 
 export const permissions = {
