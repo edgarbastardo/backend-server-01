@@ -648,13 +648,14 @@ export default async function main() {
         if ( bResult ) {
 
           //Execute remote install script
-          bResult = await executeInstallScriptInRemoteServer( target.protocol,
-                                                              target.host,
-                                                              target.port,
-                                                              target.user,
-                                                              target.password,
-                                                              target.password,
-                                                              process.env.APP_NAME );
+          //bResult = 
+          await executeInstallScriptInRemoteServer( target.protocol,
+                                                    target.host,
+                                                    target.port,
+                                                    target.user,
+                                                    target.password,
+                                                    target.password,
+                                                    process.env.APP_NAME );
 
                                                               /*
           await testSUDOCommand( "scp",

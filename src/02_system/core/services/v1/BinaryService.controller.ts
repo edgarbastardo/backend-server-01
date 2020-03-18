@@ -4956,7 +4956,7 @@ export default class BinaryServiceController extends BaseService {
                                     }
                                   );
 
-              };
+              }
 
             }
             else if ( strBulkOperation === "deleteBinary" ) {
