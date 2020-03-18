@@ -634,7 +634,7 @@ export default async function main() {
 
       if ( target.password ) {
 
-        process.exit( 0 );
+        //process.exit( 0 );
 
         let bResult = await copyInstallBundleToRemoteServer( target.protocol,
                                                              target.host,

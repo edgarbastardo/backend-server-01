@@ -400,7 +400,7 @@ export class DBMigrationManagerORM {
       const strRootPath = __dirname; //require( 'app-root-path' );
       const strImportDataFolder = strRootPath + `/../../../01_database/03_import_data/${strDatabase}/orm/`;
       const path = require('path')
-      const os = require( 'os' );
+      //const os = require( 'os' );
 
       const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 

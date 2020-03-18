@@ -1020,22 +1020,10 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      if ( strOwners.includes( "#UId:" + strUserId + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( strOwners.includes( "#UName:" + strUserName + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( strOwners.includes( "#GId:" + strGroupId + "#" ) ) {
-
-        bResult = true;
-
-      }
-      else if ( strOwners.includes( "#GName:" + strGroupName + "#" ) ) {
+      if ( strOwners.includes( "#UId:" + strUserId + "#" ) ||
+           strOwners.includes( "#UName:" + strUserName + "#" ) ||
+           strOwners.includes( "#GId:" + strGroupId + "#" ) ||
+           strOwners.includes( "#GName:" + strGroupName + "#" ) ) {
 
         bResult = true;
 

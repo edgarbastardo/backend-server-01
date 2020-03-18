@@ -71,15 +71,15 @@ export default class SecurityServiceController {
 
         if ( jsonConfigValue[ "#" + strOperatorId + "#" ] ) {
 
-          result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
+          result.kind = jsonConfigValue[ "#" + strOperatorId + "#" ].kind;
+          result.on = jsonConfigValue[ "#" + strOperatorId + "#" ].on;
           bSet = true;
 
         }
         else if ( jsonConfigValue[ "#" + strOperatorName + "#" ] ) {
 
-          result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
+          result.kind = jsonConfigValue[ "#" + strOperatorName + "#" ].kind;
+          result.on = jsonConfigValue[ "#" + strOperatorName + "#" ].on;
           bSet = true;
 
         }
