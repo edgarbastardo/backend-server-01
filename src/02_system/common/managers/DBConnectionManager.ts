@@ -549,9 +549,12 @@ export default class DBConnectionManager {
 
     try {
 
-      if ( DBConnectionManager.dbConnection ) {
+      if ( DBConnectionManager.dbConnection &&
+           DBConnectionManager.dbConnection[ strDatabase ] ) {
 
         await DBConnectionManager.getDBConnection( strDatabase ).close();
+
+        delete DBConnectionManager.dbConnection[ strDatabase ];
 
         bResult = true;
 

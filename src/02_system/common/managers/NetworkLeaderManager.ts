@@ -25,16 +25,23 @@ export default class NetworkLeaderManager {
 
       await new Promise<any>( function( resolve, reject ) {
 
-        result = new Discover();
+        const opts = {
+
+                       port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
+
+                     }
+
+        result = new Discover( opts );
 
         let bResolvePending = true;
 
-        result.on( "promotion", function () {
+        result.on( "promotion", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
           SystemUtilities.isNetworkLeader = true;
-          SystemUtilities.isNetworkLeaderAt = dateTime;
+          SystemUtilities.isNetworkLeaderFrom = dateTime;
+          SystemUtilities.networkId = obj.id ? obj.id : "@";
           process.env.IS_NETWORK_LEADER = "1";
 
           if ( logger &&
@@ -57,7 +64,8 @@ export default class NetworkLeaderManager {
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
           SystemUtilities.isNetworkLeader = false;
-          SystemUtilities.isNetworkLeaderAt = dateTime;
+          SystemUtilities.isNetworkLeaderFrom = null;
+          SystemUtilities.networkId = null;
           process.env.IS_NETWORK_LEADER = "1";
 
           if ( logger &&
@@ -207,7 +215,8 @@ export default class NetworkLeaderManager {
             debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             debugMark( "Success to join to networkLeader channel." );
 
-            if ( SystemUtilities.isNetworkLeader === false ) {
+            if ( SystemUtilities.isNetworkLeader === false &&
+                 process.env.REPLACE_NETWORK_LEADER_BY_NEW_RELEASE === "1" ) {
 
               result.send( "networkLeader", { command: "getCurrentInfo" } );
 

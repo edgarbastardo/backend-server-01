@@ -13,6 +13,8 @@ import CommonConstants from '../../CommonConstants';
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
+import RedisConnectionManager from "../../managers/RedisConnectionManager";
+//import { Redis, Cluster } from 'ioredis';
 
 const debug = require( 'debug' )( 'SampleJob' );
 
@@ -30,73 +32,117 @@ export default class SampleJob {
 
     try {
 
-      //SampleJob.completedJobs = []; //Only work if one worker
+      if ( RedisConnectionManager.useRedis() ) {
 
-      //Here your code of init
-      this.sampleJobQueue = new Queue(
-                                       this.Name,
-                                       {
-                                         redis: {
-                                           host: process.env.REDIS_SERVER_IP,
-                                           port: parseInt( process.env.REDIS_SERVER_PORT ),
-                                           password: process.env.REDIS_SERVER_PASSWORD
-                                         },
-                                         settings:{
-                                           stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
-                                         }
-                                       }
-                                     );
+        //SampleJob.completedJobs = []; //Only work if one worker
+        await RedisConnectionManager.connect( "bullQueueClient", logger );
+        await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
+        await RedisConnectionManager.connect( "bullQueueDefault", logger );
 
-      if ( process.env.WORKER_KIND === "job_worker_process" ) {
+        const opt = {
 
-        this.sampleJobQueue.process( ( jobData: any, done: any ) => {
+                      createClient: function ( type: string ) {
 
-          //if ( SampleJob.completedJobs.includes( jobData.id ) === false ) {
+                        let result = null;
 
-            let debugMark = debug.extend( 'D8726991B32E' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+                        switch ( type ) {
 
-            debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-            //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
-            debugMark( "JOB token: [%s]", jobData.queue.token );
-            debugMark( "JOB id: [%s]", jobData.id );
+                          case 'client': {
 
-            // n iterations before giving someone else a turn
-            for ( let i = 1; i <= 35; i++ ) {
+                            result = RedisConnectionManager.getRedisConnection( "bullQueueClient" );
 
-              debugMark( "Working: [%s]", i );
-              CommonUtilities.sleep( 1 );
-              //console.log(`Iter ${i}`);
+                          }
+                          case 'subscriber': {
+
+                            result = RedisConnectionManager.getRedisConnection( "bullQueueSubscriber" );
+
+                          }
+                          default: {
+
+                            result = RedisConnectionManager.getRedisConnection( "bullQueueDefault" );
+
+                          }
+
+                        }
+
+                        return result;
+
+                      },
+                      /*
+                      redis: {
+
+                        host: process.env.REDIS_SERVER_IP,
+                        port: parseInt( process.env.REDIS_SERVER_PORT ),
+                        password: process.env.REDIS_SERVER_PASSWORD
+
+                      },
+                      */
+                      settings: {
+
+                        stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
+
+                      }
+
+                    };
+
+        //Here your code of init
+        this.sampleJobQueue = new Queue(
+                                         this.Name,
+                                         opt
+                                       );
+
+        if ( process.env.WORKER_KIND === "job_worker_process" ) {
+
+          this.sampleJobQueue.process( ( jobData: any, done: any ) => {
+
+            //if ( SampleJob.completedJobs.includes( jobData.id ) === false ) {
+
+              let debugMark = debug.extend( 'D8726991B32E' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+
+              debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+              //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
+              debugMark( "JOB token: [%s]", jobData.queue.token );
+              debugMark( "JOB id: [%s]", jobData.id );
+
+              // n iterations before giving someone else a turn
+              for ( let i = 1; i <= 35; i++ ) {
+
+                debugMark( "Working: [%s]", i );
+                CommonUtilities.sleep( 1 );
+                //console.log(`Iter ${i}`);
+
+              }
+
+              debugMark( "Finish time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+              debugMark( "%O", jobData.data );
+              jobData.data[ "completed" ] = true;
+
+              //await this.sampleJobQueue.removeRepeatable( this.Name, jobData.opts );
+              //SampleJob.completedJobs.push( jobData.id );
+              //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
+              //done( null, { result: "ok" } );
+              done();
+
+              /*
+            }
+            else {
+
+              done();
 
             }
+            */
 
-            debugMark( "Finish time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-            debugMark( "%O", jobData.data );
-            jobData.data[ "completed" ] = true;
+          } );
 
-            //await this.sampleJobQueue.removeRepeatable( this.Name, jobData.opts );
-            //SampleJob.completedJobs.push( jobData.id );
-            //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
-            //done( null, { result: "ok" } );
-            done();
+          const debugMark = debug.extend( "6CDD18E1A4B6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-            /*
-          }
-          else {
+          debugMark( "Registered process function for the job queue with name: %s, worker id: %s", this.Name, cluster.worker.id );
 
-            done();
+        }
 
-          }
-          */
-
-        } );
-
-        const debugMark = debug.extend( "6CDD18E1A4B6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-        debugMark( "Registered process function for the job queue with name: %s, worker id: %s", this.Name, cluster.worker.id );
+        bResult = true;
 
       }
-
-      bResult = true;
 
     }
     catch ( error ) {

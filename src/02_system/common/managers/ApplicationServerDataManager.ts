@@ -4,20 +4,25 @@ import {
   ApolloServer,
   //ApolloError
 } from 'apollo-server-express';
+
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import depthLimit from 'graphql-depth-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
+
 import {
   Request,
   Response,
   NextFunction
 } from 'express';
+
 import fileUpload from 'express-fileupload';
+
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { Container } from 'inversify';
+
 //import { GraphQLFormattedError } from 'graphql/error';
 
 import CommonConstants from '../CommonConstants';
@@ -36,7 +41,7 @@ const debug = require( 'debug' )( 'ApplicationManager' );
 
 //sentry.init( { dsn: 'https://f7af458c288e4b2193ef4b7e05686f04@sentry.io/1797264' } );
 
-export default class ApplicationManager {
+export default class ApplicationServerDataManager {
 
   static currentInstance: any = null;
 

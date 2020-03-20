@@ -6,6 +6,7 @@ import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
+import RedisConnectionManager from "./RedisConnectionManager";
 
 const debug = require( 'debug' )( 'CacheManager' );
 
@@ -13,17 +14,31 @@ export default class CacheManager {
 
   static currentInstance: any = null;
 
+  static useCache(): boolean {
+
+    return process.env.USE_CACHE === "1";
+
+  }
+
   static async create( logger: any ): Promise<any> {
 
     let redisClient = null;
 
     try {
 
-      if ( process.env.USE_CACHE === "1" ) {
+      if ( CacheManager.useCache() ) {
 
-        redisClient = await require( "ioredis" ).createClient( { port: process.env.REDIS_SERVER_PORT,
-                                                                host: process.env.REDIS_SERVER_IP,
-                                                                password: process.env.REDIS_SERVER_PASSWORD } );
+        /*
+        redisClient = await require( "ioredis" ).createClient(
+                                                               {
+                                                                 port: process.env.REDIS_SERVER_PORT,
+                                                                 host: process.env.REDIS_SERVER_IP,
+                                                                 password: process.env.REDIS_SERVER_PASSWORD
+                                                               }
+                                                             );
+                                                             */
+
+        redisClient = RedisConnectionManager.connect( "cacheManager", logger );
 
       }
 

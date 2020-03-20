@@ -13,6 +13,8 @@ import TransportSMTP from "../implementations/notifications/TransportSMTP";
 import TransportSendGrid from "../implementations/notifications/TransportSendGrid";
 import TransportSMSGateway from "../implementations/notifications/TransportSMSGateway";
 import TransportOneSignal from "../implementations/notifications/TransportOneSignal";
+import TransportRedis from '../implementations/notifications/TransportRedis';
+import dbConnection from "./RedisConnectionManager";
 
 const debug = require( 'debug' )( 'NotificationManager' );
 
@@ -496,12 +498,13 @@ export default class NotificationManager {
 
     try {
 
-      //ANCHOR  send
-      //if ( currentTransaction === null ) {
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
-      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+      if ( dbConnection !== null ) {
 
-      //}
+        currentTransaction = await dbConnection.transaction();
+
+      }
 
       if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
 
@@ -591,6 +594,15 @@ export default class NotificationManager {
         }
 
       }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "redis" ) {
+
+        const redisServiceConfig = {};
+
+        bResult = await TransportRedis.send( redisServiceConfig,
+                                             messageOptions,
+                                             logger );
+
+      }
 
       if ( currentTransaction !== null ) {
 
@@ -639,6 +651,192 @@ export default class NotificationManager {
       }
 
     }
+
+    return bResult;
+
+  }
+
+  static async listen( strTransport: string,
+                       listenOptions: object,
+                       logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = null;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( dbConnection ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "sms" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "push" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "redis" ) {
+
+        bResult = await TransportRedis.listen( listenOptions,
+                                               logger );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.listen.name;
+
+      const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+
+    return bResult;
+
+  }
+
+  static async unlisten( strTransport: string,
+                         listenOptions: object,
+                         logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = null;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( dbConnection ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "sms" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "push" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "redis" ) {
+
+        bResult = await TransportRedis.unlisten( listenOptions,
+                                                 logger );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.unlisten.name;
+
+      const strMark = "641B6A513851" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
 
     return bResult;
 

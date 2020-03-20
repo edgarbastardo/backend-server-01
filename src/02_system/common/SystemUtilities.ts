@@ -48,7 +48,9 @@ export default class SystemUtilities {
   static baseRunPath: string = null;
   static baseRootPath: string = null;
   static isNetworkLeader: boolean = false;
-  static isNetworkLeaderAt: Moment = null;
+  static isNetworkLeaderFrom: Moment = null;
+  static networkId = null;
+
   static info = {
                   release: null
                 } //Fill with the info.json in the root of project
@@ -979,8 +981,18 @@ export default class SystemUtilities {
           result[ "UserGroupName" ] = sysUserGroupInDB.Name;
           result[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
 
-          const jsonExtraData = CommonUtilities.parseJSON( result[ "ExtraData" ],
-                                                           logger );
+          let jsonExtraData = { Private: null, Business: null } as any;
+
+          if ( typeof result[ "ExtraData" ] === "string" ) {
+
+            jsonExtraData = CommonUtilities.parseJSON( result[ "ExtraData" ], logger );
+
+          }
+          else if ( typeof result[ "ExtraData" ] === "object" ) {
+
+            jsonExtraData = result[ "ExtraData" ];
+
+          }
 
           delete result[ "ExtraData" ];
 
@@ -3219,6 +3231,12 @@ export default class SystemUtilities {
     }
 
     return result;
+
+  }
+
+  static getHostName(): string {
+
+    return os.hostname();
 
   }
 

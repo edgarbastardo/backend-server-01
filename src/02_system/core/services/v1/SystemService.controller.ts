@@ -53,6 +53,8 @@ import CacheManager from '../../../common/managers/CacheManager';
 //import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
 //import dbConnection from "../../../common/managers/DBConnectionManager";
 //import { error } from 'winston';
+import NetworkLeaderManager from "../../../common/managers/NetworkLeaderManager";
+import RedisConnectionManager from "../../../common/managers/RedisConnectionManager";
 
 const debug = require( 'debug' )( 'SystemServiceController' );
 
@@ -124,6 +126,16 @@ export default class SystemServiceController {
 
       const data = {
                      info: SystemUtilities.info,
+                     date: SystemUtilities.getCurrentDateAndTime().format(),
+                     startedAt: SystemUtilities.startRun.format(),
+                     isNetworkLeader: SystemUtilities.isNetworkLeader,
+                     isNetworkLeaderFrom: SystemUtilities.isNetworkLeaderFrom ? SystemUtilities.isNetworkLeaderFrom.format() : "",
+                     networkId: SystemUtilities.networkId,
+                     host: SystemUtilities.getHostName(),
+                     server: process.env.USE_NETWORK_ID_AS_SERVER_NAME === "1" && SystemUtilities.networkId ? SystemUtilities.networkId: SystemUtilities.getHostName(),
+                     rootPath: SystemUtilities.baseRootPath,
+                     runPath: SystemUtilities.baseRunPath,
+                     worker: cluster.worker && cluster.worker.id ? cluster.worker.id : "master",
                      database: databaseStatus.success,
                      cache: {}
                    }
@@ -176,6 +188,25 @@ export default class SystemServiceController {
           cacheStatus.Details = `CacheManager.currentInstance.status === '${strStatus}'`;
 
           error[ "cache" ] = cacheStatus;
+
+        }
+
+      }
+
+      if ( RedisConnectionManager.useRedis() ) {
+
+        data[ "redis" ] = [];
+
+        const redisConnectionList = Object.keys( RedisConnectionManager.getAllRedisConnection() );
+
+        for ( let intRedisConnectionIndex = 0; intRedisConnectionIndex < redisConnectionList.length; intRedisConnectionIndex++ ) {
+
+          data[ "redis" ].push(
+                                {
+                                  name: redisConnectionList[ intRedisConnectionIndex ],
+                                  subscribed: RedisConnectionManager.getRedisConnectionOn( redisConnectionList[ intRedisConnectionIndex ] )
+                                }
+                              );
 
         }
 

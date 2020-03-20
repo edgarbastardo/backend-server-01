@@ -16,7 +16,7 @@ import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from "./02_system/common/managers/LoggerManager";
-import ApplicationManager from './02_system/common/managers/ApplicationManager';
+import ApplicationServerDataManager from './02_system/common/managers/ApplicationServerDataManager';
 import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
@@ -24,7 +24,8 @@ import ModelServiceManager from "./02_system/common/managers/ModelServiceManager
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
-//import NotificationManager from "./02_system/common/managers/NotificationManager";
+//import NotificationManager from './02_system/common/managers/NotificationManager';
+//import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
 let debug = null; //require( 'debug' )( 'server' );
 
@@ -296,6 +297,48 @@ export default async function main() {
 
     }
 
+    const handlerFunction = ( strTopic: string, message: any ) => {
+
+      debugMark( `Received message "%s", in topic "%s"`, message, strTopic );
+
+    };
+
+    /*
+    await NotificationManager.listen(
+                                      "redis",
+                                      {
+                                        Connection: "listenConnection",
+                                        Topic: "TestTopic01",
+                                        Handler: handlerFunction
+                                      },
+                                      LoggerManager.mainLoggerInstance
+                                    );
+
+    await NotificationManager.listen(
+                                      "redis",
+                                      {
+                                        Connection: "listenConnection",
+                                        Topic: "TestTopic02",
+                                        Handler: handlerFunction
+                                      },
+                                      LoggerManager.mainLoggerInstance
+                                    );
+                                    */
+
+    /*
+    const redisConnection1 = await RedisConnectionManager.connect( "listenConnection", LoggerManager.mainLoggerInstance );
+
+    await redisConnection1.on( "message", handlerFunction );
+
+    await redisConnection1.subscribe( "TestTopic01" );
+    */
+
+    /*
+    const redisConnection2 = await RedisConnectionManager.connect( "default", LoggerManager.mainLoggerInstance );
+
+    redisConnection2.publish( "TestTopic01", "Hello" );
+    */
+
     const intHTTPWorkerProcessCount = SystemUtilities.getHTTPWorkerProcessCount();
     const intJOBWorkerProcessCount = SystemUtilities.getJOBWorkerProcessCount();
 
@@ -326,8 +369,8 @@ export default async function main() {
     if ( intHTTPWorkerProcessCount === 0 ||
          process.env.WORKER_KIND === "http_worker_process" ) {
 
-      ApplicationManager.currentInstance = await ApplicationManager.create( DBConnectionManager.getDBConnection( "master" ),
-                                                                            LoggerManager.mainLoggerInstance );
+      ApplicationServerDataManager.currentInstance = await ApplicationServerDataManager.create( DBConnectionManager.getDBConnection( "master" ),
+                                                                                                LoggerManager.mainLoggerInstance );
 
     }
 
@@ -526,7 +569,7 @@ export default async function main() {
 
         const intPort = process.env.PORT || 9090;
 
-        ApplicationManager.currentInstance.listen(
+        ApplicationServerDataManager.currentInstance.listen(
 
           intPort,
           async () => {
@@ -535,12 +578,12 @@ export default async function main() {
 
             debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
-            debugMark( `Main process running on *:%d%s`, intPort, ApplicationManager.currentInstance.apolloServer.graphqlPath );
+            debugMark( `Main process running on *:%d%s`, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
             debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
             debugMark( `Main process is starting the JobQueueManager` );
 
             await JobQueueManager.create( null,
-                                          ApplicationManager.currentInstance );
+                                          ApplicationServerDataManager.currentInstance );
 
           }
 
@@ -553,7 +596,7 @@ export default async function main() {
 
       const intPort = process.env.PORT || 9090;
 
-      ApplicationManager.currentInstance.listen(
+      ApplicationServerDataManager.currentInstance.listen(
 
         intPort,
         async () => {
@@ -563,11 +606,11 @@ export default async function main() {
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
           debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
           debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, process.env.SERVER_ROOT_PATH );
-          debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, ApplicationManager.currentInstance.apolloServer.graphqlPath );
+          debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
           debugMark( `HTTP worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
 
           await JobQueueManager.create( null,
-                                        ApplicationManager.currentInstance );
+                                        ApplicationServerDataManager.currentInstance );
 
           process.send( { command: "start_done" } ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
@@ -587,7 +630,7 @@ export default async function main() {
       process.send( { command: "start_done" } );  //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
       await JobQueueManager.create( null,
-                                    ApplicationManager.currentInstance );
+                                    ApplicationServerDataManager.currentInstance );
 
     }
 
