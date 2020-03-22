@@ -341,6 +341,16 @@ export default class UserPasswordServiceController {
                                                         logger
                                                       ) ) {
 
+                      NotificationManager.publishOnTopic( "SystemEvent",
+                                                          {
+                                                            Name: "UserPasswordChangeRequestEMailSuccess",
+                                                            UserId: sysUserInDB.Id,
+                                                            UserName: sysUserInDB.Name,
+                                                            UserGroupId: sysUserInDB.sysUserGroup.Id,
+                                                            UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                          },
+                                                          logger );
+
                       result = {
                                  StatusCode: 200, //Ok
                                  Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL',
@@ -403,6 +413,16 @@ export default class UserPasswordServiceController {
                                                          },
                                                          logger
                                                        ) ) {
+
+                      NotificationManager.publishOnTopic( "SystemEvent",
+                                                          {
+                                                            Name: "UserPasswordChangeRequestSMSSuccess",
+                                                            UserId: sysUserInDB.Id,
+                                                            UserName: sysUserInDB.Name,
+                                                            UserGroupId: sysUserInDB.sysUserGroup.Id,
+                                                            UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                          },
+                                                          logger );
 
                       result = {
                                  StatusCode: 200, //Ok
@@ -925,6 +945,16 @@ export default class UserPasswordServiceController {
                                    );
 
                     }
+
+                    NotificationManager.publishOnTopic( "SystemEvent",
+                                                        {
+                                                          Name: "UserPasswordChangeSuccess",
+                                                          UserId: sysUserInDB.Id,
+                                                          UserName: sysUserInDB.Name,
+                                                          UserGroupId: sysUserInDB.sysUserGroup.Id,
+                                                          UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                        },
+                                                        logger );
 
                     result = {
                                StatusCode: 200, //Ok

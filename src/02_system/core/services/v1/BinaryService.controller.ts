@@ -1484,7 +1484,8 @@ export default class BinaryServiceController extends BaseService {
 
       let strBinaryDataToken = null;
 
-      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ) {
+      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ||
+           ( request.query.Force === "1" && userSessionStatus.Token.startsWith( "p:" ) === false ) ) {
 
         const strId = SystemUtilities.getUUIDv4();
 
@@ -1522,7 +1523,7 @@ export default class BinaryServiceController extends BaseService {
       result = {
                  StatusCode: 200, //Ok
                  Code: 'SUCCESS_AUTH_TOKEN_CREATED',
-                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success created.' ),
+                 Message: await I18NManager.translate( strLanguage, 'The binary data authorization token has been success created.' ),
                  Mark: '73057DAD2CAF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
@@ -1677,7 +1678,7 @@ export default class BinaryServiceController extends BaseService {
           result = {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_AUTH_TOKEN_DELETED',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token has been success deleted.' ),
+                     Message: await I18NManager.translate( strLanguage, 'The binary data authorization token has been success deleted.' ),
                      Mark: '473D6FEA3F86' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -1695,14 +1696,14 @@ export default class BinaryServiceController extends BaseService {
           result = {
                      StatusCode: 404, //Not found
                      Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                     Message: await I18NManager.translate( strLanguage, 'The binary data authorization token not found.' ),
                      Mark: '3B11E61CDD49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The binary data auth token not found.' ),
+                                 Message: await I18NManager.translate( strLanguage, 'The binary data authorization token not found.' ),
                                }
                              ],
                      Warnings: [],

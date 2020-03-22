@@ -24,6 +24,7 @@ import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import { SYSUser } from '../../../common/database/models/SYSUser';
+import NotificationManager from '../../../common/managers/NotificationManager';
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 
@@ -1041,6 +1042,16 @@ export default class SecurityServiceController {
 
         if ( userSessionStatus !== null ) {
 
+          NotificationManager.publishOnTopic( "SystemEvent",
+                                              {
+                                                Name: processOptions.operation + "Success",
+                                                Token: userSessionStatusData.Token,
+                                                UserId: userSessionStatusData.UserId,
+                                                UserName: userSessionStatusData.UserName,
+                                                UserGroupId: userSessionStatusData.UserGroupId,
+                                              },
+                                              logger );
+
           //userDataResponse.sysUserGroup = userGroupDataResponse;
           //userDataResponse.sysPerson = userPersonDataResponse;
 
@@ -1219,6 +1230,13 @@ export default class SecurityServiceController {
       }
       else {
 
+        NotificationManager.publishOnTopic( "SystemEvent",
+                                            {
+                                              Name: "UserLoginFailed",
+                                              UserName: strUserName
+                                            },
+                                            logger );
+
         result = {
                    StatusCode: 401, //Unauthorized
                    Code: 'ERROR_LOGIN_FAILED',
@@ -1339,7 +1357,7 @@ export default class SecurityServiceController {
       }
 
       result = await SecurityServiceController.processSessionStatus( context,
-                                                                     {},
+                                                                     { operation: "UserLogin" },
                                                                      strUserName,
                                                                      strPassword,
                                                                      null,
@@ -1501,6 +1519,16 @@ export default class SecurityServiceController {
 
           }
           else {
+
+            NotificationManager.publishOnTopic( "SystemEvent",
+                                                {
+                                                  Name: "UserLogoutSuccess",
+                                                  Token: userSessionStatus.Token,
+                                                  UserId: userSessionStatus.UserId,
+                                                  UserName: userSessionStatus.UserName,
+                                                  UserGroupId: userSessionStatus.UserGroupId
+                                                },
+                                                logger );
 
             result = {
                        StatusCode: 200, //Ok
@@ -1738,6 +1766,13 @@ export default class SecurityServiceController {
                            strToken: string,
                            transaction: any,
                            logger: any ): Promise<any> {
+
+    NotificationManager.publishOnTopic( "SystemEvent",
+                                        {
+                                          Name: "UserTokenCheckSuccess",
+                                          Token: strToken
+                                        },
+                                        logger );
 
     const result = {
                      StatusCode: 200, //Ok

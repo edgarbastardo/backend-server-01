@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+
 import {
          Model,
          Column,
@@ -9,13 +11,21 @@ import {
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
+         ForeignKey,
          //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
+import CommonConstants from '../../CommonConstants';
+
+import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
+import { SYSUserSessionStatus } from "./SYSUserSessionStatus";
+
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
+
+const debug = require( 'debug' )( 'SYSUserSessionDevice' );
 
 @Table( {
   timestamps: false,
@@ -30,20 +40,21 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
 
   }
 
+  @ForeignKey( () => SYSUserSessionStatus )
   @PrimaryKey
-  @Column( { type: DataType.STRING( 40 ) } )
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserSessionStatusToken: string;
 
-  @Column( { type: DataType.STRING( 175 ) } )
+  @Column( { type: DataType.STRING( 175 ), allowNull: true } )
   PushToken: string;
 
-  @Column( { type: DataType.STRING( 250 ) } )
+  @Column( { type: DataType.STRING( 250 ), allowNull: false } )
   Device: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
@@ -106,6 +117,133 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
   public getPrimaryKey(): string[] {
 
     return [ "UserSessionStatusToken" ];
+
+  }
+
+  static async convertFieldValues( params: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      result = params.Data;
+
+      if ( params.TimeZoneId ) {
+
+        const strTimeZoneId = params.TimeZoneId; //params.ExtraInfo.Request.header( "timezoneid" );
+
+        result = SystemUtilities.transformObjectToTimeZone( params.Data,
+                                                            strTimeZoneId,
+                                                            params.Logger );
+
+        result.PasswordSetAt = SystemUtilities.transformToTimeZone( result.PassswordSetAt,
+                                                                    strTimeZoneId,
+                                                                    undefined,
+                                                                    params.logger );
+
+        if ( Array.isArray( params.Include ) ) {
+
+          for ( const modelIncluded of params.Include ) {
+
+            if ( modelIncluded.model &&
+                 result[ modelIncluded.model.name ] ) {
+
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
+                                                                                              result[ modelIncluded.model.name ].dataValues:
+                                                                                              result[ modelIncluded.model.name ],
+                                                                                              strTimeZoneId,
+                                                                                              params.Logger );
+
+            }
+
+          }
+
+        }
+
+      }
+
+      if ( result.ExtraData ) {
+
+        const extraData = CommonUtilities.parseJSON( result.ExtraData,
+                                                     params.logger );
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        if ( !params.KeepGroupExtraData ||
+             params.KeepGroupExtraData === 0 ) {
+
+          if ( extraData.Business ) {
+
+            result.Business = extraData.Business;
+
+            delete extraData.Business;
+
+            if ( extraData ) {
+
+              result.Business = { ...result.Business, ...extraData };
+
+            }
+
+          }
+          else {
+
+            result.Business = extraData;
+
+          }
+
+          delete result.ExtraData;
+
+        }
+        else {
+
+          result.ExtraData = extraData;
+
+        }
+
+      }
+      else {
+
+        delete result.ExtraData;
+
+        result.Business = {};
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.convertFieldValues.name;
+
+      const strMark = "E3BC7ECE9074" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( params.logger &&
+           typeof params.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        params.logger.error( error );
+
+      }
+
+    }
+
+    return result;
+    //return null; //return null for not show the row
 
   }
 

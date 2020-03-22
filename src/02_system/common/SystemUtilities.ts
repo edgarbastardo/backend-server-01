@@ -1132,37 +1132,37 @@ export default class SystemUtilities {
                                     UpdatedAt: userSessionStatus.UpdatedAt
                                   }
 
-          if ( userSessionStatus.BinaryDataToken ) {
+          if ( userSessionStatus.BinaryDataToken !== undefined ) {
 
             dataToWriteToDB[ 'BinaryDataToken' ] = userSessionStatus.BinaryDataToken;
 
           }
 
-          if ( userSessionStatus.SocketToken ) {
+          if ( userSessionStatus.SocketToken !== undefined ) {
 
             dataToWriteToDB[ 'SocketToken' ] = userSessionStatus.SocketToken;
 
           }
 
-          if ( userSessionStatus.Tag ) {
+          if ( userSessionStatus.Tag !== undefined ) {
 
             dataToWriteToDB[ 'Tag' ] = userSessionStatus.Tag;
 
           }
 
-          if ( userSessionStatus.ExtraData ) {
+          if ( userSessionStatus.ExtraData !== undefined ) {
 
             dataToWriteToDB[ 'ExtraData' ] = userSessionStatus.ExtraData;
 
           }
 
-          if ( userSessionStatus.LoggedOutBy ) {
+          if ( userSessionStatus.LoggedOutBy !== undefined ) {
 
             dataToWriteToDB[ 'LoggedOutBy' ] = userSessionStatus.LoggedOutBy;
 
           }
 
-          if ( userSessionStatus.LoggedOutAt ) {
+          if ( userSessionStatus.LoggedOutAt !== undefined ) {
 
             dataToWriteToDB[ 'LoggedOutAt' ] = userSessionStatus.LoggedOutAt;
 

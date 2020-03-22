@@ -15,7 +15,7 @@ export default class NetworkLeaderManager {
 
   static currentInstance: any = null;
 
-  static async create( logger: any ): Promise<any> {
+  static async create( options: any, logger: any ): Promise<any> {
 
     let result = null;
 
@@ -25,13 +25,15 @@ export default class NetworkLeaderManager {
 
       await new Promise<any>( function( resolve, reject ) {
 
+        /*
         const opts = {
 
-                       port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
+                       port: options.Port // process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT
 
                      }
+                     */
 
-        result = new Discover( opts );
+        result = new Discover( options.Discover );
 
         let bResolvePending = true;
 

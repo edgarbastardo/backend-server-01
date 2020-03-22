@@ -842,4 +842,42 @@ export default class NotificationManager {
 
   }
 
+  static async publishOnTopic( strTopic: string,
+                               dataToPublish: any,
+                               logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    bResult = await NotificationManager.send( "redis",
+                                              {
+                                                Connection: "default",
+                                                Topic: strTopic,
+                                                dataToPublish
+                                              },
+                                              logger );
+
+    return bResult;
+
+  }
+
+  static async publishOnQueue( strTopic: string,
+                               dataToPublish: any,
+                               logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    /*
+    let bResult = await NotificationManager.send( "redis",
+                                                  {
+                                                    Connection: "default",
+                                                    Topic: strTopic,
+                                                    dataToPublish
+                                                  },
+                                                  logger );
+                                                  */
+
+    return bResult;
+
+  }
+
 }

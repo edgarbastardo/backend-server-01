@@ -302,17 +302,17 @@ export default class UserGroupServiceController {
 
     if ( by.Name ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with name %s not exists', by.Name );
+      strResult = await I18NManager.translate( strLanguage, 'The user group with name %s not found', by.Name );
 
     }
     else if ( by.Id ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not exists', by.Id );
+      strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not found', by.Id );
 
     }
     else if ( by.ShortId ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not exists', by.ShortId );
+      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not found', by.ShortId );
 
     }
 

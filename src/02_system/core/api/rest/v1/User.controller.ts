@@ -44,6 +44,9 @@ import UserPasswordServiceController from '../../../services/v1/UserPasswordServ
 import UserSignupServiceController from '../../../services/v1/UserSingupService.controller';
 import UserEMailServiceController from '../../../services/v1/UserEMailService.controller';
 import UserPhoneServiceController from '../../../services/v1/UserPhoneService.controller';
+import UserDeviceServiceController from '../../../services/v1/UserDeviceService.controller';
+import UserPushServiceController from '../../../services/v1/UserPushService.controller';
+import UserInstantMessageServiceController from '../../../services/v1/UserInstantMessageService.controller';
 
 const debug = require( 'debug' )( 'User.controller' );
 
@@ -92,6 +95,12 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/settings", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/routes", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
+                                  { Path: UserController._BASE_PATH + "/device", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
+                                  { Path: UserController._BASE_PATH + "/device", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
+                                  { Path: UserController._BASE_PATH + "/push/message/test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send push test message" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/auth", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/auth", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
+                                  { Path: UserController._BASE_PATH + "/instant/message", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant message to another live connected user" },
                                   //{ Path: UserController._BASE_PATH + "/routes1", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
@@ -677,6 +686,108 @@ export default class UserController {
     const result = await UserOthersServiceController.getRoutes( request,
                                                                 null,
                                                                 this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/device",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async register( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserDeviceServiceController.register( request,
+                                                               null,
+                                                               this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "/device",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated
+             )
+  async delete( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserDeviceServiceController.delete( request,
+                                                             null,
+                                                             this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/push/message/test",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async pushMessageTest( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserPushServiceController.pushMessageTest( request,
+                                                                    null,
+                                                                    this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/instant/message/auth",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async createInstantMessageAuth( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.createInstantMessageAuthorization( request,
+                                                                                                null,
+                                                                                                this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "/instant/message/auth",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated
+             )
+  async deleteInstantMessageAuth( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.deleteInstantMessageAuthorization( request,
+                                                                                                null,
+                                                                                                this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/instant/message",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async createInstantMessage( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.createInstantMessage( request,
+                                                                                   null,
+                                                                                   this._controllerLogger || ( context ? context.logger : null ) );
 
     response.status( result.StatusCode ).send( result );
 

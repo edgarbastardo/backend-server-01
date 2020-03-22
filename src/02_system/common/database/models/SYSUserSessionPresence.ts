@@ -9,11 +9,14 @@ import {
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
+         ForeignKey,
          //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
 import SystemUtilities from "../../SystemUtilities";
+
+import { SYSUserSessionStatus } from "./SYSUserSessionStatus";
 
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
@@ -30,6 +33,7 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   }
 
+  @ForeignKey( () => SYSUserSessionStatus )
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
   UserSessionStatusToken: string;
@@ -39,6 +43,9 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   @Column( { type: DataType.STRING( 120 ) } )
   Server: string;
+
+  @Column( { type: DataType.STRING( 2048 ) } )
+  Room: string;
 
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;

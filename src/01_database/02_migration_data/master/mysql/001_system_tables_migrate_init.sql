@@ -270,9 +270,9 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionPersistent` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the persistent user session for access with only session token and not with username/password';
 
 CREATE TABLE IF NOT EXISTS `sysUserSessionDevice` (
-  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
-  `PushToken` varchar(175) COLLATE utf8_unicode_ci NOT NULL,
-  `Device` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID. And foreign key from Token field value in table sysUserSessionStatus',
+  `PushToken` varchar(175) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Token provided by push provider.',
+  `Device` varchar(250) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Device information.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
@@ -283,9 +283,10 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionDevice` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store user device information associated to the session';
 
 CREATE TABLE IF NOT EXISTS `sysUserSessionPresence` (
-  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
-  `PresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
-  `Server` varchar(120) COLLATE utf8_unicode_ci NOT NULL,
+  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID. And foreign key from Token field value in table sysUserSessionStatus',
+  `PresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Socket Id',
+  `Server` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name host name or server where the user is connected right now',
+  `Room` varchar(2048) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the rooms where the user has right to write. Example: #Support#,#Drivers#',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',

@@ -29,22 +29,25 @@ import I18NManager from "./02_system/common/managers/I18Manager";
 
 let debug = null; //require( 'debug' )( 'server' );
 
+/*
 if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
-  debug = require( 'debug' )( 'server@http_worker' );
+  debug = require( 'debug' )( 'server_intant_message@http_worker' );
 
 }
-else if ( process.env.WORKER_KIND === "job_worker_process" ) {
+*/
+if ( process.env.WORKER_KIND === "job_worker_process" ) {
 
-  debug = require( 'debug' )( 'server@job_worker' );
+  debug = require( 'debug' )( 'server_intant_message@job_worker' );
 
 }
 else {
 
-  debug = require( 'debug' )( 'server@main_process' );
+  debug = require( 'debug' )( 'server_intant_message@main_process' );
 
 }
 
+/*
 function httpWorkerProcessExit( httpWorkerProcess: any,
                                 strCode: any,
                                 strSignal: any,
@@ -208,6 +211,7 @@ function jobProcessWorkerExit( jobProcessWorker: any,
   }
 
 }
+*/
 
 export default async function main() {
 
@@ -227,6 +231,7 @@ export default async function main() {
 
   }
 
+  /*
   let debugMark = null;
 
   if ( cluster.isMaster ) {
@@ -254,6 +259,7 @@ export default async function main() {
     debugMark( "JOB worker process started with id: %d", cluster.worker.id );
 
   }
+  */
 
   try {
 
@@ -261,12 +267,20 @@ export default async function main() {
 
     CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
 
+    /*
     let resourceLocked = null;
 
     if ( cluster.isMaster ) { //Only the master process lock
 
       //Register in the net cluster manager
-      NetworkLeaderManager.currentInstance = await NetworkLeaderManager.create( LoggerManager.mainLoggerInstance );
+      NetworkLeaderManager.currentInstance = await NetworkLeaderManager.create(
+                                                                                {
+                                                                                  Discover: {
+                                                                                              Port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
+                                                                                            }
+                                                                                },
+                                                                                LoggerManager.mainLoggerInstance
+                                                                              );
 
       if ( process.env.ENV === "prod" ||
            process.env.ENV === "test" ) {
@@ -303,7 +317,7 @@ export default async function main() {
 
     };
 
-    /*
+    / *
     await NotificationManager.listen(
                                       "redis",
                                       {
@@ -323,28 +337,14 @@ export default async function main() {
                                       },
                                       LoggerManager.mainLoggerInstance
                                     );
-                                    */
-
-    /*
-    const redisConnection1 = await RedisConnectionManager.connect( "listenConnection", LoggerManager.mainLoggerInstance );
-
-    await redisConnection1.on( "message", handlerFunction );
-
-    await redisConnection1.subscribe( "TestTopic01" );
-    */
-
-    /*
-    const redisConnection2 = await RedisConnectionManager.connect( "default", LoggerManager.mainLoggerInstance );
-
-    redisConnection2.publish( "TestTopic01", "Hello" );
-    */
+                                    * /
 
     const intHTTPWorkerProcessCount = SystemUtilities.getHTTPWorkerProcessCount();
     const intJOBWorkerProcessCount = SystemUtilities.getJOBWorkerProcessCount();
 
     if ( process.env.DB_AUTO_MIGRATION === "1" ) {
 
-      await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not exists
+      await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not found
 
       await DBMigrationManager.migrateUsingRawConnection( "*", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
 
@@ -467,25 +467,6 @@ export default async function main() {
           });
 
           //intWorkerCount = SystemUtilities.countWorkers( cluster.workers );
-
-            /*
-          }
-          else {
-
-            httpWorker = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker
-
-            httpWorker.on( "message", async ( msg: any ) => {
-
-              if ( msg.command === "listen" ) {
-
-                debugMark( "HTTP worker process with id [%d] now listen", httpWorker.id );
-
-              }
-
-            });
-
-          }
-          */
 
         }
 
@@ -633,15 +614,16 @@ export default async function main() {
                                     ApplicationServerDataManager.currentInstance );
 
     }
+    */
 
   }
   catch ( error ) {
 
     const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-    sourcePosition.method = "server." + main.name;
+    sourcePosition.method = "instant_message_server." + main.name;
 
-    const strMark = "54117181D87F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+    const strMark = "281495306155" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
     const debugMark = debug.extend( strMark );
 

@@ -334,6 +334,13 @@ export default class UserSingupServiceController {
                                                            logger
                                                          ) ) {
 
+                        NotificationManager.publishOnTopic( "SystemEvent",
+                                                            {
+                                                              Name: "UserSignupRequestSuccess",
+                                                              UserName: request.body.Name,
+                                                            },
+                                                            logger );
+
                         result = {
                                    StatusCode: 200, //Ok
                                    Code: 'SUCCESS_USER_SIGNUP',
@@ -351,6 +358,13 @@ export default class UserSingupServiceController {
 
                       }
                       else {
+
+                        NotificationManager.publishOnTopic( "SystemEvent",
+                                                            {
+                                                              Name: "UserSignupRequestFailed",
+                                                              UserName: request.body.Name,
+                                                            },
+                                                            logger );
 
                         result = {
                                    StatusCode: 500, //Internal server error //ok
@@ -982,6 +996,16 @@ export default class UserSingupServiceController {
                                        );
 
                         }
+
+                        NotificationManager.publishOnTopic( "SystemEvent",
+                                                            {
+                                                              Name: "UserSignupActivateSuccess",
+                                                              UserId: sysUserSignupInDB.Id,
+                                                              UserName: sysUserSignupInDB.Name,
+                                                              UserGroupId: sysUserGroup.Id,
+                                                              UserGroupName: sysUserGroup.Name
+                                                            },
+                                                            logger );
 
                         result = {
                                    StatusCode: 200, //Ok
