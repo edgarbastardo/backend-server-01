@@ -448,7 +448,7 @@ export default class UserUpdateServiceController {
 
             }
             else if ( !sysUserGroupInDB &&
-                      request.body.sysUserGroup.Create == false ) {
+                      request.body.sysUserGroup.Create === false ) {
 
               const strMessage = await UserOthersServiceController.getMessageUserGroup( strLanguage, {
                                                                                         Id: request.body.sysUserGroup.Id,

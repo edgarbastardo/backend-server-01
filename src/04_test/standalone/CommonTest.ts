@@ -197,7 +197,7 @@ export default class CommonTest {
 
     try {
 
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/standalone/result/" +
                       os.hostname + "/" +
                       SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
@@ -222,7 +222,7 @@ export default class CommonTest {
 
     try {
 
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/standalone/result/" +
                       os.hostname + "/" +
                       SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +

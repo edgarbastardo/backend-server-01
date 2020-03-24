@@ -44,7 +44,7 @@ export default class CommonUtilities {
     if ( value === null ||
          value === undefined ||
          ( ( ( typeof value ) === "string" && value.trim() === "" ) ||
-           ( Array.isArray( value ) && value.length == 0 ) ||
+           ( Array.isArray( value ) && value.length === 0 ) ||
            ( ( typeof value ) === "object" && Object.keys( value ).length === 0 ) ) ) {
 
       bResult = true;
@@ -375,7 +375,7 @@ export default class CommonUtilities {
     let bResult = false;
 
     if ( this.isNotNullOrEmpty( objectToTest ) &&
-         typeof objectToTest[ functionName ] == 'function' ) {
+         typeof objectToTest[ functionName ] === 'function' ) {
 
       bResult = true;
 
@@ -457,7 +457,7 @@ export default class CommonUtilities {
 
     }
 
-    if ( intFormat == 0 ) {
+    if ( intFormat === 0 ) {
 
       const strFuncName = strFunctionName ? strFunctionName + ":" : "";
 
@@ -674,9 +674,9 @@ export default class CommonUtilities {
       if ( CommonUtilities.isNotNullOrEmpty( strList1 ) &&
            CommonUtilities.isNotNullOrEmpty( strList2 ) ) {
 
-        const strLocalList1 = bSensibleCase == false ? strList1.toLowerCase() : strList1;
+        const strLocalList1 = bSensibleCase === false ? strList1.toLowerCase() : strList1;
 
-        const list2 = bSensibleCase == false ? strList2.toLowerCase().split( strDivisor ) : strList2.split( strDivisor );
+        const list2 = bSensibleCase === false ? strList2.toLowerCase().split( strDivisor ) : strList2.split( strDivisor );
 
         for ( let strItem of list2 ) {
 

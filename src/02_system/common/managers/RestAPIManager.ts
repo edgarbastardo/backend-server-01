@@ -147,7 +147,7 @@ export default class RestAPIManager {
 
         for ( let intIndex = 0; intIndex < pathToScan.length; intIndex++ ) {
 
-          let strPath = SystemUtilities.baseRunPath + pathToScan[ intIndex ];
+          let strPath = SystemUtilities.strBaseRunPath + pathToScan[ intIndex ];
 
           try {
 

@@ -43,7 +43,7 @@ export default class LoggerManager {
           file: {
 
             //level: 'error',
-            filename: `${appRoot}/logs/${os.hostname}/${strDateTimeFormat}_${strWorkerId}/main.logger.log`,
+            filename: `${appRoot}/logs/${os.hostname}/${strDateTimeFormat}_${strWorkerId}/${SystemUtilities.strAPPName}/main.logger.log`,
             handleExceptions: true,
             json: false,
             maxsize: 5242880, // 5MB
@@ -98,7 +98,7 @@ export default class LoggerManager {
 
               level: "debug",
               program: strHostname,
-              hostname: process.env.APP_NAME + "_" + process.env.ENV,
+              hostname: SystemUtilities.strAPPName + "_" + process.env.ENV,
               inlineMeta: true,
               depth: 1,
 

@@ -171,7 +171,7 @@ export class SYSRoute extends Model<SYSRoute> {
 
     instance.PathHash = SystemUtilities.hashString( instance.RequestKind + ":" + instance.Path, 2, null ); //Hashes.CRC32( instance.RequestKind + ":" + instance.Path ).toString( 16 );
 
-    if ( instance.CreatedAt == null ) {
+    if ( instance.CreatedAt === null ) {
 
       instance.CreatedAt = new Date().toISOString();
 

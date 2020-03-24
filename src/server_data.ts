@@ -213,8 +213,9 @@ export default async function main() {
 
   SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 
-  SystemUtilities.baseRunPath = __dirname;
-  SystemUtilities.baseRootPath = appRoot.path;
+  SystemUtilities.strBaseRunPath = __dirname;
+  SystemUtilities.strBaseRootPath = appRoot.path;
+  SystemUtilities.strAPPName = process.env.APP_SERVER_DATA_NAME;
 
   if ( fs.existsSync( appRoot.path + "/info.json" ) ) {
 
@@ -235,7 +236,7 @@ export default async function main() {
 
     debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
     debugMark( "Main process started" );
-    debugMark( "Running from: [%s]", SystemUtilities.baseRunPath );
+    debugMark( "Running from: [%s]", SystemUtilities.strBaseRunPath );
 
   }
   else if ( process.env.WORKER_KIND === "http_worker_process" ) {
@@ -269,8 +270,13 @@ export default async function main() {
       NetworkLeaderManager.currentInstance = await NetworkLeaderManager.create(
                                                                                 {
                                                                                   Discover: {
-                                                                                              Port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
-                                                                                            }
+                                                                                              port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
+                                                                                            },
+                                                                                  OnPromotion: null,
+                                                                                  OnDemotion: null,
+                                                                                  OnNewNetworkLeader: null,
+                                                                                  OnAdded: null,
+                                                                                  OnRemoved: null
                                                                                 },
                                                                                 LoggerManager.mainLoggerInstance
                                                                               );
@@ -304,13 +310,13 @@ export default async function main() {
 
     }
 
+    /*
     const handlerFunction = ( strTopic: string, message: any ) => {
 
       debugMark( `Received message "%s", in topic "%s"`, message, strTopic );
 
     };
 
-    /*
     await NotificationManager.listen(
                                       "redis",
                                       {
@@ -418,7 +424,7 @@ export default async function main() {
 
           //let httpWorker = null;
 
-          //if ( intWorkerCount == 0 ) {
+          //if ( intWorkerCount === 0 ) {
 
           //init the HTTP worker
           await new Promise<boolean>( ( resolve, reject ) => {
@@ -574,7 +580,7 @@ export default async function main() {
 
       if ( intHTTPWorkerProcessCount === 0 ) { //Launch the main to handle the http request
 
-        const intPort = process.env.PORT || 9090;
+        const intPort = process.env.APP_SERVER_DATA_PORT || 9090;
 
         ApplicationServerDataManager.currentInstance.listen(
 
@@ -586,7 +592,7 @@ export default async function main() {
             debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
             debugMark( `Main process running on *:%d%s`, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
-            debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
+            debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
             debugMark( `Main process is starting the JobQueueManager` );
 
             await JobQueueManager.create( null,
@@ -601,7 +607,7 @@ export default async function main() {
     }
     else if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
-      const intPort = process.env.PORT || 9090;
+      const intPort = process.env.APP_SERVER_DATA_PORT || 9090;
 
       ApplicationServerDataManager.currentInstance.listen(
 
@@ -611,7 +617,7 @@ export default async function main() {
           let debugMark = debug.extend( "56C70776F9AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
+          debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
           debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, process.env.SERVER_ROOT_PATH );
           debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
           debugMark( `HTTP worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
@@ -631,7 +637,7 @@ export default async function main() {
       let debugMark = debug.extend( "12D457F51385" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
+      debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
       debugMark( `JOB worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
 
       process.send( { command: "start_done" } );  //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process

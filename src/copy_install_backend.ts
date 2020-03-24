@@ -620,9 +620,9 @@ export default async function main() {
 
     const deployTarget = require( strConfigFile );
 
-    const target = deployTarget[ process.env.APP_NAME ][ process.env.DEPLOY_TARGET ];
+    const target = deployTarget[ process.env.APP_PROJECT_NAME ][ process.env.DEPLOY_TARGET ];
 
-    const resultData = await createInstallBundle( process.env.APP_NAME );
+    const resultData = await createInstallBundle( process.env.APP_PROJECT_NAME );
 
     if ( resultData ) {
 
@@ -641,7 +641,7 @@ export default async function main() {
                                                              target.port,
                                                              target.user,
                                                              target.password,
-                                                             process.env.APP_NAME,
+                                                             process.env.APP_PROJECT_NAME,
                                                              resultData.path,
                                                              resultData.name );
 
@@ -655,7 +655,7 @@ export default async function main() {
                                                     target.user,
                                                     target.password,
                                                     target.password,
-                                                    process.env.APP_NAME );
+                                                    process.env.APP_PROJECT_NAME );
 
                                                               /*
           await testSUDOCommand( "scp",

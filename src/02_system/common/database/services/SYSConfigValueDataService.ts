@@ -687,7 +687,7 @@ export default class SYSConfigValueDataService extends BaseService {
 
       if ( CommonUtilities.isNotNullOrEmpty( result.allowed ) ) {
 
-        if ( result.value == 0 ) {
+        if ( result.value === 0 ) {
 
           if ( result.allowed === SystemConstants._VALUE_ANY ) {
 
@@ -744,7 +744,7 @@ export default class SYSConfigValueDataService extends BaseService {
 
       }
 
-      if ( result.value == 0 &&
+      if ( result.value === 0 &&
            bForceResultZeroToOne ) {
 
         result.value = 1;

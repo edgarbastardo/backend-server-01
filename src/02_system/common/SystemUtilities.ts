@@ -45,11 +45,12 @@ const debug = require( 'debug' )( 'SystemUtilities' );
 export default class SystemUtilities {
 
   static startRun: Moment = null;
-  static baseRunPath: string = null;
-  static baseRootPath: string = null;
-  static isNetworkLeader: boolean = false;
-  static isNetworkLeaderFrom: Moment = null;
-  static networkId = null;
+  static strAPPName = null;
+  static strBaseRunPath: string = null;
+  static strBaseRootPath: string = null;
+  static bIsNetworkLeader: boolean = false;
+  static bIsNetworkLeaderFrom: Moment = null;
+  static strNetworkId = null;
 
   static info = {
                   release: null
@@ -398,12 +399,12 @@ export default class SystemUtilities {
 
     try {
 
-      if ( intAlgorimts == 1 ) {
+      if ( intAlgorimts === 1 ) {
 
         strResult = XXHash.h64( strToHash, _SEED ).toString( 16 );
 
       }
-      else if ( intAlgorimts == 2 ) {
+      else if ( intAlgorimts === 2 ) {
 
         strResult = crc.crc32( Buffer.from( strToHash, 'utf8' ) ).toString( 'hex' ); //Hashes.CRC32( strToHash ).toString( 16 );
 

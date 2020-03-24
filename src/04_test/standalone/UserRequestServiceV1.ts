@@ -27,7 +27,7 @@ export class UserRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user";
 
@@ -108,7 +108,7 @@ export class UserRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/profile";
 
@@ -189,7 +189,7 @@ export class UserRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/search";
 
@@ -288,7 +288,7 @@ export class UserRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/search/count";
 
@@ -387,7 +387,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/password/change";
 
@@ -433,7 +433,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user";
 
@@ -479,7 +479,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user";
 
@@ -525,7 +525,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/disable/bulk";
 
@@ -571,7 +571,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/enable/bulk";
 
@@ -617,7 +617,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/move/bulk";
 
@@ -663,7 +663,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
 
@@ -709,7 +709,7 @@ export class UserRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/user/bulk";
 

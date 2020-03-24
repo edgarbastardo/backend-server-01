@@ -105,9 +105,12 @@ export default class TransportRedis {
 
     try {
 
-      bResult = await RedisConnectionManager.unsubscribe( listenOptions.Connection || "default",
+      bResult = await RedisConnectionManager.unsubscribe( listenOptions.Connection,
                                                           listenOptions.Topic,
                                                           logger );
+
+      await RedisConnectionManager.close( listenOptions.Connection,
+                                          logger );
 
     }
     catch ( error ) {

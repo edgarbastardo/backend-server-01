@@ -146,7 +146,7 @@ export default class ModelServiceManager {
 
             if ( ( intIndex === 0 && dbConfigSystem === 1 ) || intIndex > 0 ) {
 
-              let strPath = SystemUtilities.baseRunPath + ModelServiceManager._PATH_TO_SCAN[ intIndex ];
+              let strPath = SystemUtilities.strBaseRunPath + ModelServiceManager._PATH_TO_SCAN[ intIndex ];
 
               strPath = strPath.replace( "@__database__@", strCurrentDatabase );
 

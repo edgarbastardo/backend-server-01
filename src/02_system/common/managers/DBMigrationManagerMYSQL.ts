@@ -63,7 +63,7 @@ export class DBMigrationManagerMYSQL {
 
       intDBCode = error.errno;
 
-      if ( intDBCode == this._CODE_UNKNOWN_DATABASE ) {
+      if ( intDBCode === this._CODE_UNKNOWN_DATABASE ) {
 
         debugMark( "Database [%s] NOT exists!", dbConfig[ "database" ] );
 
@@ -109,7 +109,7 @@ export class DBMigrationManagerMYSQL {
       const dateTime = SystemUtilities.getCurrentDateAndTime();
 
       //ANCHOR check is network leader
-      if ( SystemUtilities.isNetworkLeader &&
+      if ( SystemUtilities.bIsNetworkLeader &&
            bFileExists ) {
 
         if ( logger &&
@@ -198,7 +198,7 @@ export class DBMigrationManagerMYSQL {
       if ( bFileExists ) {
 
         if ( bException ||
-             SystemUtilities.isNetworkLeader === false ) {
+             SystemUtilities.bIsNetworkLeader === false ) {
 
           fs.renameSync( strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`, //Old path
                          strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_executed_0.sql` ); //New path
@@ -415,7 +415,7 @@ export class DBMigrationManagerMYSQL {
     //process.exit( 0 );
 
     if ( dbConnection === null &&
-         dbCode == this._CODE_UNKNOWN_DATABASE ) { //Error code mysql for unknown DB
+         dbCode === this._CODE_UNKNOWN_DATABASE ) { //Error code mysql for unknown DB
 
       try {
 
@@ -806,7 +806,7 @@ export class DBMigrationManagerMYSQL {
 
             const strFileExt = path.extname( strFileName );
 
-            if ( strFileExt == ".sql" ) {
+            if ( strFileExt === ".sql" ) {
 
               const resultCall = await this.executeSQLFile( dbConnection,
                                                             strMigrationsFolder,
@@ -993,7 +993,7 @@ export class DBMigrationManagerMYSQL {
 
             const strFileExt = path.extname( strFileName );
 
-            if ( strFileExt == ".sql" ) {
+            if ( strFileExt === ".sql" ) {
 
               const resultCall = await this.executeSQLFile( dbConnection,
                                                             strImportDataFolder,

@@ -880,4 +880,44 @@ export default class NotificationManager {
 
   }
 
+  static async listenOnTopic( strConnection: string,
+                              strTopic: string,
+                              handlerFunction: any,
+                              logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    bResult = await NotificationManager.listen(
+                                                "redis",
+                                                {
+                                                  Connection: strConnection,
+                                                  Topic: strTopic,
+                                                  Handler: handlerFunction
+                                                },
+                                                logger
+                                              );
+
+    return bResult;
+
+  }
+
+  static async unlistenOnTopic( strConnection: string,
+                                strTopic: string,
+                                logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    bResult = await NotificationManager.unlisten(
+                                                  "redis",
+                                                  {
+                                                    Connection: strConnection,
+                                                    Topic: strTopic,
+                                                  },
+                                                  logger
+                                                );
+
+    return bResult;
+
+  }
+
 }

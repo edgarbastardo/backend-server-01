@@ -116,7 +116,7 @@ export default class BinaryTestV1 {
     try {
 
       //const binaryRequest = { ... binaryRequestFull }; //Copy original information
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/input/data/images/tiger.jpg";
 
       const strFileCheckSum = await SystemUtilities.getFileHash( strPath, "md5", null );
@@ -175,7 +175,7 @@ export default class BinaryTestV1 {
     try {
 
       //const binaryRequest = { ... binaryRequestFull }; //Copy original information
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/input/data/images/tower.jpg";
 
       const strFileCheckSum = await SystemUtilities.getFileHash( strPath, "md5", null );
@@ -234,7 +234,7 @@ export default class BinaryTestV1 {
     try {
 
       //const binaryRequest = { ... binaryRequestFull }; //Copy original information
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/input/data/images/road.jpg";
 
       const binaryRequest = new FormData();
@@ -290,7 +290,7 @@ export default class BinaryTestV1 {
     try {
 
       //const binaryRequest = { ... binaryRequestFull }; //Copy original information
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/input/data/images/castle.jpg";
 
       const binaryRequest = new FormData();
@@ -344,7 +344,7 @@ export default class BinaryTestV1 {
 
     try {
 
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/standalone/result/" +
                       os.hostname + "/" +
                       SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +
@@ -391,7 +391,7 @@ export default class BinaryTestV1 {
 
     try {
 
-      const strPath = SystemUtilities.baseRootPath +
+      const strPath = SystemUtilities.strBaseRootPath +
                       "/test/standalone/result/" +
                       os.hostname + "/" +
                       SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 ) +

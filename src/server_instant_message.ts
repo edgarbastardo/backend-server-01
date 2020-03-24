@@ -1,642 +1,825 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
-import fs from 'fs'; //Load the filesystem module
 import cluster from 'cluster';
-//import os from 'os';
+import * as http from "http";
 
 import appRoot from 'app-root-path';
-//import moment = require('moment-timezone');
-//import { createServer } from 'http';
-//import { Route } from './system/database/models/Route';
 
 import CommonConstants from './02_system/common/CommonConstants';
-import SystemConstants from "./02_system/common/SystemContants";
 
 import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from "./02_system/common/managers/LoggerManager";
-import ApplicationServerDataManager from './02_system/common/managers/ApplicationServerDataManager';
-import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
+import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
-import ModelServiceManager from "./02_system/common/managers/ModelServiceManager";
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
-import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
-//import NotificationManager from './02_system/common/managers/NotificationManager';
-//import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
-let debug = null; //require( 'debug' )( 'server' );
+import SYSUserSessionPresenceService from "./02_system/common/database/services/SYSUserSessionPresenceService";
+import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
 
-/*
-if ( process.env.WORKER_KIND === "http_worker_process" ) {
+let debug = require( 'debug' )( 'server_intant_message@main_process' );
 
-  debug = require( 'debug' )( 'server_intant_message@http_worker' );
+export default class InstantMessageServer {
 
-}
-*/
-if ( process.env.WORKER_KIND === "job_worker_process" ) {
+  static serverHTTP = null;
+  static socketIO = null;
 
-  debug = require( 'debug' )( 'server_intant_message@job_worker' );
+  static checkIntervalHandler = null;
+  static strTopicServer = null;
 
-}
-else {
+  static peerServersLastReport = { };
 
-  debug = require( 'debug' )( 'server_intant_message@main_process' );
+  static async disconnect( strServer: string,
+                           message: any,
+                           logger: any ): Promise<boolean> {
 
-}
+    let bResult = false;
 
-/*
-function httpWorkerProcessExit( httpWorkerProcess: any,
-                                strCode: any,
-                                strSignal: any,
-                                logger: any ) {
+    let currentTransaction = null;
 
-  if ( httpWorkerProcess &&
-       cluster.isMaster ) {
+    try {
 
-    let debugMark = debug.extend( "1BF1A2E6B008" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
-    if ( strSignal ) {
+      if ( currentTransaction === null ) {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorkerProcess.id, strSignal );
-
-      if ( logger && typeof logger.warning === "function" ) {
-
-        logger.warning( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorkerProcess.id, strSignal );
+        currentTransaction = await dbConnection.transaction();
 
       }
 
-      httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
+      const sysUserSessionPresence = await SYSUserSessionPresenceService.getByPresenceId( message.PresenceId,
+                                                                                          null,
+                                                                                          currentTransaction,
+                                                                                          logger );
 
-      httpWorkerProcess.on( 'exit', ( strCode: any, strSignal: any ) => {
+      if ( sysUserSessionPresence instanceof Error === false &&
+           sysUserSessionPresence.Server === strServer ) {
 
-        httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
+        await SYSUserSessionPresenceService.deleteByModel( sysUserSessionPresence,
+                                                           currentTransaction,
+                                                           logger );
 
-      });
+        if ( currentTransaction !== null &&
+            currentTransaction.finished !== "rollback" ) {
 
-      httpWorkerProcess.on( 'online', async () => {
+          await currentTransaction.commit();
 
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %d is online', httpWorkerProcess.id );
+        }
 
-      });
+        InstantMessageServer.socketIO.in( message.PresenceId ).disconnect();
 
-    }
-    else if ( strCode !== 0 ) {
-
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorkerProcess.id, strCode );
-
-      if ( logger &&
-           typeof logger.warning === "function" ) {
-
-        logger.warning( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorkerProcess.id, strCode );
+        bResult = true;
 
       }
+      else {
 
-      httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
+        if ( currentTransaction !== null &&
+            currentTransaction.finished !== "rollback" ) {
 
-      httpWorkerProcess.on( 'exit', ( strCode: any, strSignal: any ) => {
+          await currentTransaction.commit();
 
-        httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
-
-      });
-
-      httpWorkerProcess.on( 'online', async () => {
-
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %d is online', httpWorkerProcess.id );
-
-      });
-
-    }
-    else {
-
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( 'HTTP worker process with id: %s success!', httpWorkerProcess.id );
-
-      if ( logger && typeof logger.warning === "function" ) {
-
-        logger.info( 'HTTP worker process with id: %s success!', httpWorkerProcess.id );
+        }
 
       }
 
     }
+    catch ( error ) {
 
-  }
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-}
+      sourcePosition.method = this.name + "." + this.disconnect.name;
 
-function jobProcessWorkerExit( jobProcessWorker: any,
-                               strCode: any,
-                               strSignal: any,
-                               logger: any ) {
+      const strMark = "38A89266EC83" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-  if ( jobProcessWorker &&
-       cluster.isMaster ) {
+      const debugMark = debug.extend( strMark );
 
-    let debugMark = debug.extend( "7CF8309CAA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
 
-    if ( strSignal ) {
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobProcessWorker.id, strSignal );
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
 
-      if ( logger && typeof logger.warning === "function" ) {
-
-        logger.warning( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobProcessWorker.id, strSignal );
+        LoggerManager.mainLoggerInstance.error( error );
 
       }
 
-      jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
+      if ( currentTransaction !== null ) {
 
-      jobProcessWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
+        try {
 
-        jobProcessWorkerExit( jobProcessWorker, strCode, strSignal, logger );
+          await currentTransaction.rollback();
 
-      });
+        }
+        catch ( error1 ) {
 
-      jobProcessWorker.on( 'online', async () => {
 
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'JOB worker process with id: %d is online', jobProcessWorker.id );
-
-      });
-
-    }
-    else if ( strCode !== 0 ) {
-
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobProcessWorker.id, strCode );
-
-      if ( logger &&
-           typeof logger.warning === "function" ) {
-
-        logger.warning( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobProcessWorker.id, strCode );
-
-      }
-
-      jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
-
-      jobProcessWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
-
-        httpWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
-
-      });
-
-      jobProcessWorker.on( 'online', async () => {
-
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'JOB worker process with id: %d is online', jobProcessWorker.id );
-
-      });
-
-    }
-    else {
-
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( 'Worker process with id: %s success!', jobProcessWorker.id );
-
-      if ( logger && typeof logger.warning === "function" ) {
-
-        logger.info( 'Worker process with id: %s success!', jobProcessWorker.id );
+        }
 
       }
 
     }
 
-  }
-
-}
-*/
-
-export default async function main() {
-
-  SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
-
-  SystemUtilities.baseRunPath = __dirname;
-  SystemUtilities.baseRootPath = appRoot.path;
-
-  if ( fs.existsSync( appRoot.path + "/info.json" ) ) {
-
-    SystemUtilities.info = require( appRoot.path + "/info.json" );
-
-  }
-  else {
-
-    SystemUtilities.info.release = `No info.json file found in the folder ${appRoot.path}`;
+    return bResult;
 
   }
 
-  /*
-  let debugMark = null;
+  static async send( strServer: string,
+                     message: any,
+                     logger: any ): Promise<boolean> {
 
-  if ( cluster.isMaster ) {
+    let bResult = false;
 
-    debugMark = debug.extend( "FF835436FAE7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+    let currentTransaction = null;
 
-    debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-    debugMark( "Main process started" );
-    debugMark( "Running from: [%s]", SystemUtilities.baseRunPath );
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      const userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( strServer,
+                                                                                                              message.To.Name,
+                                                                                                              currentTransaction,
+                                                                                                              logger );
+
+      if ( userSessionPresenceList instanceof Error === false ) {
+
+        for ( let intIndex = 0; intIndex < ( userSessionPresenceList as any ).length; intIndex++ ) {
+
+          try {
+
+            InstantMessageServer.socketIO.in( userSessionPresenceList[ intIndex ].PresenceId ).emit( "NewMessage", message );
+
+            //TODO Implent a log of message sended
+
+          }
+          catch ( error ) {
+
+
+          }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.send.name;
+
+      const strMark = "F64FEDFB548F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return bResult;
 
   }
-  else if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
-    debugMark = debug.extend( "00E0873DACD7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+  static async handlerFunction( strTopic: string, message: any ): Promise<void> {
 
-    debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-    debugMark( "HTTP worker process started with id: %d", cluster.worker.id );
+    try {
+
+      if ( strTopic &&
+           message ) {
+
+        if ( strTopic === "ServerAlive" ) {
+
+          if ( message.Name === "Pong" &&
+               message.Server &&
+               message.Mark ) {
+
+            InstantMessageServer.peerServersLastReport[ message.Server ] = message.Mark;
+
+          }
+
+        }
+        else if ( strTopic === InstantMessageServer.strTopicServer ) {
+
+          if ( message.Name === "Ping" ) {
+
+            //Publish
+            NotificationManager.publishOnTopic( message.Topic,
+                                                {
+                                                  Name: "Pong",
+                                                  Server: this.strTopicServer,
+                                                  Mark: SystemUtilities.getCurrentDateAndTime().format()
+                                                },
+                                                LoggerManager.mainLoggerInstance );
+
+          }
+
+        }
+        else if ( strTopic === "InstantMessage" ) {
+
+          if ( message.Name === "Disconnect" ) {
+
+            if ( message.PresenceId !== "@error" &&
+                 message.Server === this.strTopicServer ) {
+
+              await InstantMessageServer.disconnect( this.strTopicServer,
+                                                     message,
+                                                     LoggerManager.mainLoggerInstance );
+
+            }
+
+          }
+          else if ( message.Name === "Send" ) {
+
+            await InstantMessageServer.send( this.strTopicServer,
+                                             message,
+                                             LoggerManager.mainLoggerInstance );
+
+          }
+
+        }
+
+        let debugMark = debug.extend( "43C94E85E6B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+        debugMark( `Received message "%s", in topic "%s"`, message, strTopic );
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.handlerFunction.name;
+
+      const strMark = "E5D24EF6854B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  };
+
+  static async checkServersAlive(): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = null;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      //Select Distinct A.Server From sysUserSessionPresence As A
+      const serverList = await SYSUserSessionPresenceService.getUserSessionPresenceServerList( this.strTopicServer,
+                                                                                               currentTransaction,
+                                                                                               LoggerManager.mainLoggerInstance );
+
+      if ( serverList instanceof Error === false ) {
+
+        //Build object { "Server01": "2019-10-01T112:34:23Z-07:00", "Sever02": "2019-10-01T112:34:23Z-07:00" }
+        for ( let intIndex = 0; intIndex < ( serverList as any ).length; intIndex++ ) {
+
+          if ( !this.peerServersLastReport[ serverList[ intIndex ] ] ) {
+
+            this.peerServersLastReport[ serverList[ intIndex ] ] = SystemUtilities.getCurrentDateAndTime().format();
+
+          }
+          else {
+
+            //Check the las date in the build object and is mode old to 30 seconds remove from table sysUserSessionPresence
+            const strLastReport = this.peerServersLastReport[ serverList[ intIndex ] ];
+
+            const intSeconds = SystemUtilities.getCurrentDateAndTime().diff( strLastReport, "seconds" );
+
+            if ( intSeconds >= 30 ) {
+
+              await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( serverList[ intIndex ],
+                                                                                     currentTransaction,
+                                                                                     LoggerManager.mainLoggerInstance );
+
+            }
+
+          }
+
+          //Publish on topic Server01 => { "Name": "ping", "Topic": "ServerAlive" }, Server02 => { "Name": "ping", "Topic": "ServerAlive" }
+          for ( let intIndex = 0; intIndex < ( serverList as any ).length; intIndex++ ) {
+
+            NotificationManager.publishOnTopic( serverList[ intIndex ],
+                                                {
+                                                  Name: "Ping",
+                                                  Topic: "ServerAlive"
+                                                },
+                                                LoggerManager.mainLoggerInstance );
+
+          }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkServersAlive.name;
+
+      const strMark = "05C57E71F63D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return bResult;
 
   }
-  else if ( process.env.WORKER_KIND === "job_worker_process" ) {
 
-    debugMark = debug.extend( "FD9CA65E15F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+  //Promoted to network leader
+  static async nodeIsNetworkLeader( data: any ) {
 
-    debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-    debugMark( "JOB worker process started with id: %d", cluster.worker.id );
+    try {
+
+      if ( SystemUtilities.bIsNetworkLeader ) {
+
+        //Listen on
+        await NotificationManager.listenOnTopic( "connectionListenServerAlive",
+                                                 "ServerAlive",
+                                                 InstantMessageServer.handlerFunction,
+                                                 LoggerManager.mainLoggerInstance );
+
+        const intCountResult = NetworkLeaderManager.countNodes();
+
+        if ( intCountResult > 0 ) {
+
+          //Clear the table Delete From sysUserSessionPresence As A Where A.Server = strServer
+          await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( InstantMessageServer.strTopicServer,
+                                                                                 null,
+                                                                                 LoggerManager.mainLoggerInstance );
+
+        }
+        else {
+
+          //Clear the table Delete From sysUserSessionPresence As A
+          await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( "*",
+                                                                                 null,
+                                                                                 LoggerManager.mainLoggerInstance );
+
+        }
+
+        InstantMessageServer.checkIntervalHandler = setInterval( InstantMessageServer.checkServersAlive,
+                                                                 15000 ); //Every 15 seconds
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.nodeIsNetworkLeader.name;
+
+      const strMark = "70AC7F233821" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
 
   }
-  */
 
-  try {
+  //Demoted of network leader
+  static async nodeIsNotNetworkLeader( data: any ) {
 
-    LoggerManager.mainLoggerInstance = await LoggerManager.createMainLogger(); //Create the main logger
+    try {
 
-    CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
+      clearInterval( InstantMessageServer.checkIntervalHandler );
 
-    /*
-    let resourceLocked = null;
+      //Unlisten on
+      await NotificationManager.unlistenOnTopic( "connectionListenServerAlive",
+                                                 "ServerAlive",
+                                                 LoggerManager.mainLoggerInstance );
 
-    if ( cluster.isMaster ) { //Only the master process lock
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.nodeIsNotNetworkLeader.name;
+
+      const strMark = "C2C32F5C8603" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
+  static async checkValidAuthToken( strAuth: string,
+                                    logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = null;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+      }
+
+      let request = {
+                      context: {
+                                 Logger: LoggerManager.mainLoggerInstance,
+                                 UserSessionStatus: null,
+                                 Languaje: null
+                               },
+                    };
+
+      let strAuthorization = null;
+
+      strAuthorization = await CacheManager.getData( strAuth,
+                                                     logger ); //get from cache the real authorization token
+
+      if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
+
+        const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( strAuthorization,
+                                                                                       null,
+                                                                                       currentTransaction,
+                                                                                       logger );
+
+        if ( sysUserSessionPresence ) {
+
+          let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                              null,
+                                                                              true,
+                                                                              false,
+                                                                              currentTransaction,
+                                                                              logger );
+
+          request.context.UserSessionStatus = userSessionStatus;
+
+        }
+
+        ( request as any ).returnResult = 1; //Force to return the result
+
+        //Check for valid session token
+        let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request as any,
+                                                                                 null, //Not write response back
+                                                                                 null );
+
+        if ( resultData &&
+             resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+
+          bResult = true;
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkValidAuthToken.name;
+
+      const strMark = "FE441E322957" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  static async main() {
+
+    SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
+
+    SystemUtilities.strBaseRunPath = __dirname;
+    SystemUtilities.strBaseRootPath = appRoot.path;
+    SystemUtilities.strAPPName = process.env.APP_SERVER_IM_NAME;
+
+    try {
+
+      InstantMessageServer.strTopicServer = SystemUtilities.getHostName();
+
+      if ( process.env.USE_NETWORK_ID_AS_SERVER_NAME === "1" &&
+           SystemUtilities.strNetworkId ) {
+
+        InstantMessageServer.strTopicServer = SystemUtilities.strNetworkId;
+
+      }
+
+      let debugMark = debug.extend( "96FC81DDF449" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+      debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Main process started" );
+      debugMark( "Running from: [%s]", SystemUtilities.strBaseRunPath );
+      debugMark( "Topic server: [%s]", InstantMessageServer.strTopicServer );
+
+      LoggerManager.mainLoggerInstance = await LoggerManager.createMainLogger(); //Create the main logger
+
+      CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
+
+      await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
+
+      await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
+
+      await I18NManager.create( {},
+                                LoggerManager.createMainLogger );
 
       //Register in the net cluster manager
       NetworkLeaderManager.currentInstance = await NetworkLeaderManager.create(
                                                                                 {
                                                                                   Discover: {
-                                                                                              Port: parseInt( process.env.APP_SERVER_DATA_INSTANCES_DISCOVER_PORT )
-                                                                                            }
+                                                                                              port: parseInt( process.env.APP_SERVER_IM_INSTANCES_DISCOVER_PORT )
+                                                                                            },
+                                                                                  OnPromotion: InstantMessageServer.nodeIsNetworkLeader,
+                                                                                  OnDemotion: InstantMessageServer.nodeIsNotNetworkLeader,
+                                                                                  OnNewNetworkLeader: null,
+                                                                                  OnAdded: null,
+                                                                                  OnRemoved: null
                                                                                 },
                                                                                 LoggerManager.mainLoggerInstance
                                                                               );
 
-      if ( process.env.ENV === "prod" ||
-           process.env.ENV === "test" ) {
+      await NotificationManager.listenOnTopic( "connectionListenIM",
+                                               "InstantMessage",
+                                               InstantMessageServer.handlerFunction,
+                                               LoggerManager.mainLoggerInstance );
 
-        resourceLocked = await CacheManager.lockResource( undefined, //Deault = CacheManager.currentInstance,
-                                                          SystemConstants._LOCK_RESOURCE_START,
-                                                          1000 * 60 * 1, //For 1 Minute TTL of the redis lock
-                                                          undefined, //Default 12 try
-                                                          undefined, //Default 5000 milliseconds
-                                                          LoggerManager.mainLoggerInstance );
+      /*
+      await NotificationManager.listen(
+                                        "redis",
+                                        {
+                                          Connection: "listenConnection",
+                                          Topic: "TestTopic01",
+                                          Handler: handlerFunction
+                                        },
+                                        LoggerManager.mainLoggerInstance
+                                      );
 
-        let debugMark = debug.extend( "A9B7C8761DA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      await NotificationManager.listen(
+                                        "redis",
+                                        {
+                                          Connection: "listenConnection",
+                                          Topic: "TestTopic02",
+                                          Handler: handlerFunction
+                                        },
+                                        LoggerManager.mainLoggerInstance
+                                      );
+                                      */
 
-        if ( resourceLocked ) {
+      //new ChatServer();
 
-          debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( "Success to lock the resource [%s]", SystemConstants._LOCK_RESOURCE_START );
+      InstantMessageServer.serverHTTP = http.createServer(); // this.app );
+
+      InstantMessageServer.socketIO = require( "socket.io" ).listen(
+                                                                     InstantMessageServer.serverHTTP,
+                                                                     {
+                                                                       resource: process.env.SERVER_ROOT_PATH + '/server/instant/message', //Very important
+                                                                       origins: '*:*'
+                                                                     }
+                                                                   );
+
+      const intPort = process.env.APP_SERVER_IM_PORT; //APP_SERVER_IM_PORT
+
+      InstantMessageServer.serverHTTP.listen( intPort, () => {
+
+        debugMark( `Running server on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH + '/server/instant/message' );
+
+      });
+
+      InstantMessageServer.socketIO.use( async ( socket: any, next: Function ) => {
+
+        if ( await InstantMessageServer.checkValidAuthToken( socket.handshake.query.auth,
+                                                             LoggerManager.mainLoggerInstance ) ) {
+
+          return next();
 
         }
         else {
 
-          debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( "Failed to lock the resource [%s]", SystemConstants._LOCK_RESOURCE_START );
+          debugMark( "Auth %s is invalid", socket.handshake.query.auth );
+
+          next( new Error( 'Authentication token error' ) );
 
         }
 
-      }
+      });
+
+      InstantMessageServer.socketIO.on( "connect", ( socket: any ) => {
+
+        debugMark( "Connected client on port %s.", intPort );
+
+        socket.on( "NewMessage", ( message: any ) => {
+
+          //debugMark( "[server](message): %s", JSON.stringify( message ), socketId );
+
+          InstantMessageServer.socketIO.in( socket.id ).emit( "NewMessage", message );
+
+        });
+
+        socket.on( "disconnect", () => {
+
+          debugMark( "Client disconnected" );
+
+        });
+
+      });
 
     }
+    catch ( error ) {
 
-    const handlerFunction = ( strTopic: string, message: any ) => {
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      debugMark( `Received message "%s", in topic "%s"`, message, strTopic );
+      sourcePosition.method = this.name + "." + this.main.name;
 
-    };
+      const strMark = "D3EB365EE1D0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-    / *
-    await NotificationManager.listen(
-                                      "redis",
-                                      {
-                                        Connection: "listenConnection",
-                                        Topic: "TestTopic01",
-                                        Handler: handlerFunction
-                                      },
-                                      LoggerManager.mainLoggerInstance
-                                    );
+      const debugMark = debug.extend( strMark );
 
-    await NotificationManager.listen(
-                                      "redis",
-                                      {
-                                        Connection: "listenConnection",
-                                        Topic: "TestTopic02",
-                                        Handler: handlerFunction
-                                      },
-                                      LoggerManager.mainLoggerInstance
-                                    );
-                                    * /
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
 
-    const intHTTPWorkerProcessCount = SystemUtilities.getHTTPWorkerProcessCount();
-    const intJOBWorkerProcessCount = SystemUtilities.getJOBWorkerProcessCount();
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
 
-    if ( process.env.DB_AUTO_MIGRATION === "1" ) {
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
 
-      await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not found
-
-      await DBMigrationManager.migrateUsingRawConnection( "*", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
-
-    }
-
-    //DBConnectionManager.dbConnection =
-    await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
-
-    //DBConnectionManager.queryStatements =
-    await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
-
-    if ( process.env.DB_AUTO_MIGRATION === "1" ) {
-
-      await DBMigrationManager.migrateUsingORMConnection( "*",
-                                                          //DBConnectionManager.getDBConnection( "master" ),
-                                                          LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
-
-    }
-
-    await ModelServiceManager.loadModelServices( "*", LoggerManager.mainLoggerInstance );
-
-    if ( intHTTPWorkerProcessCount === 0 ||
-         process.env.WORKER_KIND === "http_worker_process" ) {
-
-      ApplicationServerDataManager.currentInstance = await ApplicationServerDataManager.create( DBConnectionManager.getDBConnection( "master" ),
-                                                                                                LoggerManager.mainLoggerInstance );
-
-    }
-
-    if ( resourceLocked !== null ) {
-
-      await CacheManager.unlockResource( resourceLocked,
-                                         LoggerManager.mainLoggerInstance );
-
-    }
-
-    await I18NManager.create( {},
-                              LoggerManager.createMainLogger );
-
-    if ( cluster.isMaster ) {
-
-      const logger = DBConnectionManager.getDBConnection( "master" );
-
-      if ( !cluster.settings.execArgv ) {
-
-        cluster.settings.execArgv = [];
+        LoggerManager.mainLoggerInstance.error( error );
 
       }
-
-      let intDebugPort = 9229; //Default debug port for nodejs
-
-      if ( intHTTPWorkerProcessCount > 0 ) { //Launch the http worker process
-
-        let debugMark = debug.extend( "8DC0B75CB0A0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( `Creating %d HTTP worker process`, intHTTPWorkerProcessCount );
-
-        let intWorkerCount = 0;
-
-        for ( let intWorker = 0; intWorker < intHTTPWorkerProcessCount; intWorker++ ) {
-
-          //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-
-          //let httpWorker = null;
-
-          //if ( intWorkerCount == 0 ) {
-
-          //init the HTTP worker
-          await new Promise<boolean>( ( resolve, reject ) => {
-
-            debugMark( "Forking main process" );
-
-            if ( process.env.ENV === "dev" ) {
-
-              intDebugPort = intDebugPort + 1;
-
-              debugMark( "Child process debug port: %d", intDebugPort );
-
-              cluster.settings.execArgv.push( "--inspect-brk=" + intDebugPort );
-
-            }
-
-            const httpWorker = cluster.fork( { WORKER_KIND: "http_worker_process", WORKER_INDEX: intWorker, ...process.env } ); //Start the first http worker
-
-            if ( process.env.ENV === "dev" ) {
-
-              cluster.settings.execArgv.pop();
-
-            }
-
-            httpWorker.on( "message", async ( msg: any ) => {
-
-              if ( msg.command === "start_done" ) { //VERY IMPORTANT listen for this custom message. To resolve the promise
-
-                debugMark( "HTTP worker process with id %d now started and listen.", httpWorker.id );
-                intWorkerCount += 1;
-                resolve( true );
-
-              }
-
-            });
-
-            httpWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
-
-              httpWorkerProcessExit( httpWorker,
-                                     strCode,
-                                     strSignal,
-                                     logger );
-
-            });
-
-            httpWorker.on( 'online', async () => {
-
-              debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-              debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
-
-            });
-
-          });
-
-          //intWorkerCount = SystemUtilities.countWorkers( cluster.workers );
-
-        }
-
-        debugMark( "Started and listen HTTP worker process count: %d", intWorkerCount );
-
-      }
-
-      if ( intJOBWorkerProcessCount > 0 ) { //Launch the job worker process
-
-        let debugMark = debug.extend( "967512E9AC03" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-        debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( `Creating %d JOB worker process`, intJOBWorkerProcessCount );
-
-        let intWorkerCount = 0;
-
-        for ( let intWorker = 0; intWorker < intJOBWorkerProcessCount; intWorker++ ) {
-
-          //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-
-          //init the HTTP worker
-          await new Promise<boolean>( ( resolve, reject ) => {
-
-            debugMark( "Forking main process" );
-
-            if ( process.env.ENV === "dev" ) {
-
-              intDebugPort = intDebugPort + 1;
-
-              debugMark( "Child process debug port: %d", intDebugPort );
-
-              cluster.settings.execArgv.push( "--inspect-brk" ); // + intDebugPort );
-
-            }
-
-            const jobWorker = cluster.fork( { WORKER_KIND: "job_worker_process", WORKER_INDEX: intWorker, ...process.env } ); //Start the job worker
-
-            if ( process.env.ENV === "dev" ) {
-
-              cluster.settings.execArgv.pop();
-
-            }
-
-            jobWorker.on( "message", async ( msg: any ) => {
-
-              if ( msg.command === "start_done" ) { //VERY IMPORTANT listen for this custom message. To resolve the promise
-
-                debugMark( "JOB worker process with id [%d] now started.", jobWorker.id );
-                intWorkerCount += 1;
-                resolve( true );
-
-              }
-
-            });
-
-            jobWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
-
-              jobProcessWorkerExit( jobWorker,
-                                    strCode,
-                                    strSignal,
-                                    logger );
-
-            });
-
-            jobWorker.on( 'online', async () => {
-
-              debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-              debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
-
-            });
-
-          });
-
-        }
-
-        debugMark( "Started JOB worker process count: %d", intWorkerCount );
-
-      }
-
-      if ( intHTTPWorkerProcessCount === 0 ) { //Launch the main to handle the http request
-
-        const intPort = process.env.PORT || 9090;
-
-        ApplicationServerDataManager.currentInstance.listen(
-
-          intPort,
-          async () => {
-
-            let debugMark = debug.extend( "182DD8473CBE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-            debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-            debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
-            debugMark( `Main process running on *:%d%s`, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
-            debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
-            debugMark( `Main process is starting the JobQueueManager` );
-
-            await JobQueueManager.create( null,
-                                          ApplicationServerDataManager.currentInstance );
-
-          }
-
-        );
-
-      }
-
-    }
-    else if ( process.env.WORKER_KIND === "http_worker_process" ) {
-
-      const intPort = process.env.PORT || 9090;
-
-      ApplicationServerDataManager.currentInstance.listen(
-
-        intPort,
-        async () => {
-
-          let debugMark = debug.extend( "56C70776F9AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-          debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
-          debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, process.env.SERVER_ROOT_PATH );
-          debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
-          debugMark( `HTTP worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
-
-          await JobQueueManager.create( null,
-                                        ApplicationServerDataManager.currentInstance );
-
-          process.send( { command: "start_done" } ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
-
-        }
-
-      );
-
-    }
-    else if ( process.env.WORKER_KIND === "job_worker_process" ) {
-
-      let debugMark = debug.extend( "12D457F51385" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER == '1'? "Yes":"No"}` );
-      debugMark( `JOB worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
-
-      process.send( { command: "start_done" } );  //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
-
-      await JobQueueManager.create( null,
-                                    ApplicationServerDataManager.currentInstance );
-
-    }
-    */
-
-  }
-  catch ( error ) {
-
-    const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-    sourcePosition.method = "instant_message_server." + main.name;
-
-    const strMark = "281495306155" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-    const debugMark = debug.extend( strMark );
-
-    debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-    debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-    debugMark( "Catched on: %O", sourcePosition );
-
-    error.mark = strMark;
-    error.logId = SystemUtilities.getUUIDv4();
-
-    if ( LoggerManager.mainLoggerInstance && typeof LoggerManager.mainLoggerInstance.error === "function" ) {
-
-      LoggerManager.mainLoggerInstance.error( error );
 
     }
 
@@ -644,4 +827,4 @@ export default async function main() {
 
 }
 
-main();
+InstantMessageServer.main();

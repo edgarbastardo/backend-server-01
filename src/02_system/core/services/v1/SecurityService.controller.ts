@@ -25,6 +25,7 @@ import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import { SYSUser } from '../../../common/database/models/SYSUser';
 import NotificationManager from '../../../common/managers/NotificationManager';
+import SYSUserSessionPresenceService from '../../../common/database/services/SYSUserSessionPresenceService';
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 
@@ -275,7 +276,7 @@ export default class SecurityServiceController {
 
       }
 
-      if ( intResult == 0 &&
+      if ( intResult === 0 &&
           CommonUtilities.isNotNullOrEmpty( strAllowedValue ) ) {
 
         if ( strAllowedValue === SystemConstants._VALUE_ANY ||
@@ -292,7 +293,7 @@ export default class SecurityServiceController {
 
       }
 
-      if ( intResult == 0 ) {
+      if ( intResult === 0 ) {
 
         intResult = 1;
 
@@ -1475,10 +1476,15 @@ export default class SecurityServiceController {
                                                          logger );
                                                          */
 
+          const strSavedSocketToken = userSessionStatus.SocketToken;
+
           //Delete from cache the other tokens
           await CacheManager.deleteData( userSessionStatus.Token, logger );
           userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
           userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
+
+          userSessionStatus.BinaryDataToken = null;
+          userSessionStatus.SocketToken = null;
 
           userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
           userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
@@ -1520,6 +1526,58 @@ export default class SecurityServiceController {
           }
           else {
 
+            const warnings = [];
+
+            if ( strSavedSocketToken ) {
+
+              const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                             null,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+              if ( sysUserSessionPresence ) {
+
+                if ( sysUserSessionPresence instanceof Error ) {
+
+                  NotificationManager.publishOnTopic( "InstantMessage",
+                                                      {
+                                                        Name: "Disconnect",
+                                                        Token: userSessionStatus.Token,
+                                                        SocketToken: strSavedSocketToken,
+                                                        PresenceId: "@error",
+                                                        Server: "@error"
+                                                      },
+                                                      logger );
+
+                  const error = sysUserSessionPresence as any;
+
+                  warnings.push(
+                                 {
+                                   Code: 'WARNING_PRESENCE_DATA',
+                                   Message: await I18NManager.translate( strLanguage, 'Error to try to get the data presence' ),
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               );
+
+                }
+                else {
+
+                  NotificationManager.publishOnTopic( "InstantMessage",
+                                                      {
+                                                        Name: "Disconnect",
+                                                        Token: userSessionStatus.Token,
+                                                        SocketToken: strSavedSocketToken,
+                                                        PresenceId: sysUserSessionPresence.PresenceId,
+                                                        Server: sysUserSessionPresence.Server
+                                                      },
+                                                      logger );
+
+                }
+
+              }
+
+            }
+
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
                                                   Name: "UserLogoutSuccess",
@@ -1538,7 +1596,7 @@ export default class SecurityServiceController {
                        LogId: null,
                        IsError: false,
                        Errors: [],
-                       Warnings: [],
+                       Warnings: warnings,
                        Count: 0,
                        Data: []
                      };

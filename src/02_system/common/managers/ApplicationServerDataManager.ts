@@ -70,7 +70,7 @@ export default class ApplicationServerDataManager {
       app.use( fileUpload(
                            {
                              useTempFiles: true,
-                             tempFileDir : SystemUtilities.baseRootPath + '/temp/',
+                             tempFileDir : SystemUtilities.strBaseRootPath + '/temp/',
                              limits: { fileSize: intBinaryDataMaximumSize },
                              createParentPath: true,
                            }
@@ -196,7 +196,7 @@ export default class ApplicationServerDataManager {
 
               errors.push(
                            {
-                             Code: ( error.originalError as any).extensions.code,
+                             Code: ( error.originalError as any ).extensions.code,
                              Message: ( error.originalError as any).message,
                              Details: Object.keys( filteredDetails ).length > 0 ? filteredDetails : null
                            }

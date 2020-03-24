@@ -1252,7 +1252,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       );
 
       if ( whereFnResult.IsError ||
-           Object.keys( whereFnResult.Result ).length == 0 ) {
+           Object.keys( whereFnResult.Result ).length === 0 ) {
 
         result = {
                    StatusCode: 400, //Bad request
@@ -1445,7 +1445,7 @@ export class ModelToRestAPIServiceController extends BaseService {
               );
 
               if ( whereFnResult.IsError ||
-                   Object.keys( whereFnResult.Result ).length == 0 ) {
+                   Object.keys( whereFnResult.Result ).length === 0 ) {
 
                 warnings.push(
                                {
@@ -1766,7 +1766,7 @@ export class ModelToRestAPIServiceController extends BaseService {
       );
 
       if ( whereFnResult.IsError ||
-           Object.keys( whereFnResult.Result ).length == 0 ) {
+           Object.keys( whereFnResult.Result ).length === 0 ) {
 
         result = {
                    StatusCode: 400, //Bad request
@@ -1931,7 +1931,7 @@ export class ModelToRestAPIServiceController extends BaseService {
               );
 
               if ( whereFnResult.IsError ||
-                   Object.keys( whereFnResult.Result ).length == 0 ) {
+                   Object.keys( whereFnResult.Result ).length === 0 ) {
 
                 warnings.push(
                                {
@@ -2204,7 +2204,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
     try {
 
-      const data = typeof( whereObject ) == "string" ? JSON.parse( whereObject ) : whereObject;
+      const data = typeof( whereObject ) === "string" ? JSON.parse( whereObject ) : whereObject;
 
       result = { Result: data, IsError: false, Errors: [] };
 
@@ -2225,7 +2225,7 @@ export class ModelToRestAPIServiceController extends BaseService {
 
     try {
 
-      const data = typeof( attributesArray ) == "string" ? JSON.parse( attributesArray ) : attributesArray;
+      const data = typeof( attributesArray ) === "string" ? JSON.parse( attributesArray ) : attributesArray;
 
       result = { Result: data, IsError: false, Errors: [] };
 

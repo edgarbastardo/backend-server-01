@@ -158,7 +158,7 @@ export default class UserOthersServiceController {
 
       }
 
-      if ( intResult == 0 &&
+      if ( intResult === 0 &&
           CommonUtilities.isNotNullOrEmpty( strAllowedValue ) ) {
 
         if ( strAllowedValue === SystemConstants._VALUE_ANY ||
@@ -170,7 +170,7 @@ export default class UserOthersServiceController {
 
       }
 
-      if ( intResult == 0 ) {
+      if ( intResult === 0 ) {
 
         intResult = 1;
 
@@ -1293,7 +1293,7 @@ export default class UserOthersServiceController {
                                                                                                   logger );
 
           if ( userSessionStatus &&
-               userSessionStatus instanceof Error == false ) {
+               userSessionStatus instanceof Error === false ) {
 
             strAuthorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.shortToken;
 
@@ -1316,7 +1316,7 @@ export default class UserOthersServiceController {
                                                                                              logger );
 
           if ( userSessionStatus &&
-               userSessionStatus instanceof Error == false ) {
+               userSessionStatus instanceof Error === false ) {
 
             strAuthorization = userSessionStatus.Token ? userSessionStatus.Token : request.query.Token;
 

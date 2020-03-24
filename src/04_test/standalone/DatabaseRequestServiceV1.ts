@@ -30,7 +30,7 @@ export class DatabaseRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/database/model/" + query.Table + "/search";
 
@@ -156,7 +156,7 @@ export class DatabaseRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/database/model/" + body.Table + "/bulk";
 

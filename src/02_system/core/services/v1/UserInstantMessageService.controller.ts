@@ -14,11 +14,13 @@ import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from '../../../common/managers/CacheManager';
 import NotificationManager from "../../../common/managers/NotificationManager";
+import SYSUserSessionPresenceService from '../../../common/database/services/SYSUserSessionPresenceService';
 
 /*
 import NotificationManager from '../../../common/managers/NotificationManager';
 import SYSUserSessionDeviceService from '../../../common/database/services/SYSUserSessionDeviceService';
 import { SYSUserSessionDevice } from "../../../common/database/models/SYSUserSessionDevice";
+import { SYSUserSessionPresence } from "../../../common/database/models/SYSUserSessionPresence";
 */
 
 const debug = require( 'debug' )( 'UserInstantMessageServiceController' );
@@ -233,7 +235,7 @@ export default class UserInstantMessageServiceController {
 
       if ( userSessionStatus.SocketToken ) {
 
-        const strSocketToken = userSessionStatus.SocketToken;
+        const strSavedSocketToken = userSessionStatus.SocketToken;
 
         await CacheManager.deleteData( userSessionStatus.SocketToken,
                                        logger ); //Remove from cache
@@ -252,13 +254,52 @@ export default class UserInstantMessageServiceController {
                                                                currentTransaction,
                                                                logger );
 
-        NotificationManager.publishOnTopic( "InstantMessage",
-                                            {
-                                              Name: "Disconnect",
-                                              Token: userSessionStatus.Token,
-                                              SocketToken: strSocketToken
-                                            },
-                                            logger );
+        const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                       null,
+                                                                                       currentTransaction,
+                                                                                       logger );
+
+        const warnings = [];
+
+        if ( sysUserSessionPresence ) {
+
+          if ( sysUserSessionPresence instanceof Error ) {
+
+            NotificationManager.publishOnTopic( "InstantMessage",
+                                                {
+                                                  Name: "Disconnect",
+                                                  Token: userSessionStatus.Token,
+                                                  SocketToken: strSavedSocketToken,
+                                                  PresenceId: "@error",
+                                                  Server: "@error"
+                                                },
+                                                logger );
+
+            const error = sysUserSessionPresence as any;
+
+            warnings.push(
+                           {
+                             Code: 'WARNING_PRESENCE_DATA',
+                             Message: await I18NManager.translate( strLanguage, 'Error to try to get the data presence' ),
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         );
+          }
+          else {
+
+            NotificationManager.publishOnTopic( "InstantMessage",
+                                                {
+                                                  Name: "Disconnect",
+                                                  Token: userSessionStatus.Token,
+                                                  SocketToken: strSavedSocketToken,
+                                                  PresenceId: sysUserSessionPresence.PresenceId,
+                                                  Server: sysUserSessionPresence.Server
+                                                },
+                                                logger );
+
+          }
+
+        }
 
         result = {
                    StatusCode: 200, //Ok
@@ -268,7 +309,7 @@ export default class UserInstantMessageServiceController {
                    LogId: null,
                    IsError: false,
                    Errors: [],
-                   Warnings: [],
+                   Warnings: warnings,
                    Count: 0,
                    Data: []
                  };

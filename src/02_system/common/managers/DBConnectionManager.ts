@@ -505,7 +505,7 @@ export default class DBConnectionManager {
 
         /*
       }
-      else if ( dbConfig.dialect == "pgsql" ) {
+      else if ( dbConfig.dialect === "pgsql" ) {
 
         result = require( '../../../01_database/05_query/pgsql/queries' ).default;
 

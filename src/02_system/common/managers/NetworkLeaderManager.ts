@@ -41,9 +41,9 @@ export default class NetworkLeaderManager {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
-          SystemUtilities.isNetworkLeader = true;
-          SystemUtilities.isNetworkLeaderFrom = dateTime;
-          SystemUtilities.networkId = obj.id ? obj.id : "@";
+          SystemUtilities.bIsNetworkLeader = true;
+          SystemUtilities.bIsNetworkLeaderFrom = dateTime;
+          SystemUtilities.strNetworkId = obj.id ? obj.id : "@";
           process.env.IS_NETWORK_LEADER = "1";
 
           if ( logger &&
@@ -59,15 +59,21 @@ export default class NetworkLeaderManager {
           bResolvePending ? resolve() : null;
           bResolvePending = false;
 
+          if ( options.OnPromotion ) {
+
+            options.OnPromotion( obj );
+
+          }
+
         });
 
-        result.on( "demotion", function () {
+        result.on( "demotion", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
-          SystemUtilities.isNetworkLeader = false;
-          SystemUtilities.isNetworkLeaderFrom = null;
-          SystemUtilities.networkId = null;
+          SystemUtilities.bIsNetworkLeader = false;
+          SystemUtilities.bIsNetworkLeaderFrom = null;
+          SystemUtilities.strNetworkId = null;
           process.env.IS_NETWORK_LEADER = "1";
 
           if ( logger &&
@@ -82,6 +88,12 @@ export default class NetworkLeaderManager {
 
           bResolvePending ? resolve() : null;
           bResolvePending = false;
+
+          if ( options.OnDemotion ) {
+
+            options.OnDemotion( obj );
+
+          }
 
         });
 
@@ -102,6 +114,12 @@ export default class NetworkLeaderManager {
           //bResolvePending ? resolve() : null;
           //bResolvePending = false;
 
+          if ( options.OnAdded ) {
+
+            options.OnAdded( obj );
+
+          }
+
         });
 
         result.on( "removed", function ( obj: any ) {
@@ -121,6 +139,12 @@ export default class NetworkLeaderManager {
           //bResolvePending ? resolve() : null;
           //bResolvePending = false;
 
+          if ( options.OnRemoved ) {
+
+            options.OnRemoved( obj );
+
+          }
+
         });
 
         result.on( "master", function ( obj: any ) {
@@ -139,6 +163,12 @@ export default class NetworkLeaderManager {
 
           bResolvePending ? resolve() : null;
           bResolvePending = false;
+
+          if ( options.OnNewNetworkLeader ) {
+
+            options.OnNewNetworkLeader( obj );
+
+          }
 
         });
 
@@ -161,7 +191,7 @@ export default class NetworkLeaderManager {
 
             if ( data.command === "getCurrentInfo" ) {
 
-              if ( SystemUtilities.isNetworkLeader ) {
+              if ( SystemUtilities.bIsNetworkLeader ) {
 
                 debugMark( "Sending network leader current info %O", SystemUtilities.info );
 
@@ -217,7 +247,7 @@ export default class NetworkLeaderManager {
             debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             debugMark( "Success to join to networkLeader channel." );
 
-            if ( SystemUtilities.isNetworkLeader === false &&
+            if ( SystemUtilities.bIsNetworkLeader === false &&
                  process.env.REPLACE_NETWORK_LEADER_BY_NEW_RELEASE === "1" ) {
 
               result.send( "networkLeader", { command: "getCurrentInfo" } );
@@ -282,6 +312,29 @@ export default class NetworkLeaderManager {
     }
 
     return result;
+
+  }
+
+  static countNodes(): number {
+
+    let intResult = 0;
+
+    try {
+
+      NetworkLeaderManager.currentInstance.eachNode( function () { //node: any
+
+        intResult = intResult + 1;
+
+      });
+
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
 
   }
 

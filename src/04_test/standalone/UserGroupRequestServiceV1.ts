@@ -27,7 +27,7 @@ export class UserGroupRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup";
 
@@ -108,7 +108,7 @@ export class UserGroupRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/search";
 
@@ -207,7 +207,7 @@ export class UserGroupRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/search/count";
 
@@ -306,7 +306,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup";
 
@@ -352,7 +352,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup";
 
@@ -398,7 +398,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/disable/bulk";
 
@@ -444,7 +444,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/enable/bulk";
 
@@ -489,7 +489,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup?id="+query.Id+"&shortId="+query.ShortId+"&name="+query.Name;
 
@@ -535,7 +535,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/bulk";
 
@@ -581,7 +581,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/settings";
 
@@ -666,7 +666,7 @@ export class UserGroupRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/usergroup/settings";
 

@@ -8,7 +8,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Backend Server Process (Main)",
+      "name": "Debug Backend Server Data Process (Main)",
       //"program": "${workspaceFolder}/src/server.ts",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "start:debug"],
@@ -24,32 +24,46 @@
     {
       "type": "node",
       "request":"attach",
-      "name": "Debug Backend Server Process (Fork 01)",
+      "name": "Debug Backend Server Data Process (Fork 01)",
       "processId": "${command:PickProcess}"
     },
     {
       "type": "node",
       "request":"attach",
-      "name": "Debug Backend Server Process (Fork 02)",
+      "name": "Debug Backend Server Data Process (Fork 02)",
       "processId": "${command:PickProcess}"
     },
     {
       "type": "node",
       "request":"attach",
-      "name": "Debug Backend Server Process (Fork 03)",
+      "name": "Debug Backend Server Data Process (Fork 03)",
       "processId": "${command:PickProcess}"
     },
     {
       "type": "node",
       "request":"attach",
-      "name": "Debug Backend Server Process (Fork 04)",
+      "name": "Debug Backend Server Data Process (Fork 04)",
       "processId": "${command:PickProcess}"
     },
     {
       "type": "node",
       "request":"attach",
-      "name": "Debug Backend Server Process (Fork 05)",
+      "name": "Debug Backend Server Data Process (Fork 05)",
       "processId": "${command:PickProcess}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend Server IM Process (Main)",
+      "program": "${workspaceFolder}/src/server_instant_message.ts",
+      "args": [],
+      "outputCapture": "std",
+      "preLaunchTask": "build-im-server",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ]
     },
     {
       "type": "node",
@@ -61,7 +75,7 @@
         "--password=admin5.123456.",
         "--target=http://localhost",
         "--outputFormat=screen"
-    ],
+      ],
       "outputCapture": "std",
       "preLaunchTask": "build-test01-rest-api",
       "console": "integratedTerminal",

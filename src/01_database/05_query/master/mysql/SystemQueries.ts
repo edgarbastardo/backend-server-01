@@ -70,7 +70,7 @@ export default class SystemQueries {
       }
       else if ( strName === "searchBinaryData" ) {
 
-        strResult = `SELECT A.* FROM sysBinaryIndex As A Where `; //( A.Category = 'test' ) And ( A.AccessKind = 1 Or A.AccessKind = 2 Or ( A.AccessKind = 3 And ( A.Owner Like '%#UName:admin01@system.net#%' Or A.Owner Like '%#UId:xxxx#%' Or A.Owner Like '%#USId:xxx#%' Or A.Owner Like '%#GName:admin01@system.net#%' Or A.Owner Like '%#GId:xxxx#%' Or A.Owner Like '%#GSId:xxx#%' ) ) )`;
+        strResult = `Select A.* FROM sysBinaryIndex As A Where `; //( A.Category = 'test' ) And ( A.AccessKind = 1 Or A.AccessKind = 2 Or ( A.AccessKind = 3 And ( A.Owner Like '%#UName:admin01@system.net#%' Or A.Owner Like '%#UId:xxxx#%' Or A.Owner Like '%#USId:xxx#%' Or A.Owner Like '%#GName:admin01@system.net#%' Or A.Owner Like '%#GId:xxxx#%' Or A.Owner Like '%#GSId:xxx#%' ) ) )`;
 
       }
       else if ( strName === "searchCountBinaryData" ) {
@@ -80,7 +80,54 @@ export default class SystemQueries {
       }
       else if ( strName === "getRoutesOfRole" ) {
 
-        strResult = SqlString.format( `SELECT B.Name, C.Path, C.AccessKind, C.RequestKind FROM sysRoleHasRoute As A Inner Join sysRole As B On A.RoleId = B.Id Inner Join sysRoute As C On C.Id = A.RouteId Where ( B.Name = ? ) Order By C.RequestKind, C.Path;`, params.Role );
+        strResult = SqlString.format( `Select B.Name, C.Path, C.AccessKind, C.RequestKind FROM sysRoleHasRoute As A Inner Join sysRole As B On A.RoleId = B.Id Inner Join sysRoute As C On C.Id = A.RouteId Where ( B.Name = ? ) Order By C.RequestKind, C.Path`, params.Role );
+
+      }
+      else if ( strName === "deleteUserSessionPresenceByServer" ) {
+
+        strResult = SqlString.format( `Delete From sysUserSessionPresence As A Where A.Server = ?`, params.Server );
+
+      }
+      else if ( strName === "deleteUserSessionPresenceAll" ) {
+
+        strResult = `Delete From sysUserSessionPresence`;
+
+      }
+      else if ( strName === "getUserSessionPresenceServerList" ) {
+
+        strResult = SqlString.format( `Select Distinct Server From sysUserSessionPresence Where Server = ?`, params.Server );
+
+      }
+      else if ( strName === "getUserSessionPresenceIdByUserName" ) {
+
+        strResult = SqlString.format( `Select B.* From
+                                        sysUserSessionStatus As A Inner Join
+                                        sysUserSessionPresence As B On A.Token = B.UserSessionStatusToken Where
+                                          A.LoggedOutBy Is Null And
+                                          A.LoggedOutAt Is Null And
+                                          (
+                                            A.Tag Is Null Or
+                                            (
+                                              A.Tag Not Like '%#USER_GROUP_DISABLED#%' And
+                                              A.Tag Not Like '%#USER_GROUP_EXPIRED#%' And
+                                              A.Tag Not Like '%#USER_DISABLED#%' And
+                                              A.Tag Not Like '%#USER_EXPIRED#%'
+                                            )
+                                          )
+                                          And
+                                          (
+                                            ( A.ExpireKind = 0 Or TIMESTAMP( A.UpdatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) And
+                                            ( A.ExpireKind = 1 Or TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) And
+                                            ( A.ExpireKind = 2 Or A.ExpireKind = 3 Or TIMESTAMP( A.ExpireOn ) >= NOW() )
+                                          )
+                                          And
+                                          (
+                                            A.HardLimit Is Null Or
+                                            TIMESTAMP( A.HardLimit ) >= NOW()
+                                          )
+                                          And
+                                          B.Server = ? And
+                                          A.UserName = ?`, [ params.Server, params.UserName ] );
 
       }
 

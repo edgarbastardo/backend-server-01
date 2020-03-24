@@ -2546,8 +2546,8 @@ export default async function main() {
 
   SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 
-  SystemUtilities.baseRunPath = __dirname;
-  SystemUtilities.baseRootPath = appRoot.path;
+  SystemUtilities.strBaseRunPath = __dirname;
+  SystemUtilities.strBaseRootPath = appRoot.path;
 
   await test01_v1();
 

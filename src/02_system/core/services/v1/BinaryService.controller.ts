@@ -2564,7 +2564,7 @@ export default class BinaryServiceController extends BaseService {
         }
         else {
 
-          strFullPath = path.join( SystemUtilities.baseRootPath, strBasePath );
+          strFullPath = path.join( SystemUtilities.strBaseRootPath, strBasePath );
 
         }
 
@@ -2620,7 +2620,7 @@ export default class BinaryServiceController extends BaseService {
 
               if ( fs.existsSync( binaryData.File ) ) {
 
-                if ( sysBinaryIndexInDB.AccessKind == 1 ||        //Public
+                if ( sysBinaryIndexInDB.AccessKind === 1 ||        //Public
                      sysBinaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
 
                   result = {
@@ -2673,11 +2673,11 @@ export default class BinaryServiceController extends BaseService {
                                                                                            null );
 
                   if ( resultData &&
-                      resultData.StatusCode == 200 ) { //Ok the authorization token is valid
+                       resultData.StatusCode === 200 ) { //Ok the authorization token is valid
 
                     const userSessionStatus = context.UserSessionStatus;
 
-                    if ( sysBinaryIndexInDB.AccessKind == 2 ||
+                    if ( sysBinaryIndexInDB.AccessKind === 2 ||
                          userSessionStatus.Role.includes( "#Administrator#" ) ||
                          userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
 
@@ -3604,7 +3604,7 @@ export default class BinaryServiceController extends BaseService {
                     }
                     else {
 
-                      strFullPath = path.join( SystemUtilities.baseRootPath,
+                      strFullPath = path.join( SystemUtilities.strBaseRootPath,
                                                strBasePath,
                                                strRelativePath );
 
@@ -4078,7 +4078,7 @@ export default class BinaryServiceController extends BaseService {
       }
       else {
 
-        strFullNewPath = path.join( SystemUtilities.baseRootPath,
+        strFullNewPath = path.join( SystemUtilities.strBaseRootPath,
                                     strBasePath,
                                     strNewRelativePath );
 
@@ -4301,7 +4301,7 @@ export default class BinaryServiceController extends BaseService {
                   }
                   else {
 
-                    strFullPath = path.join( SystemUtilities.baseRootPath,
+                    strFullPath = path.join( SystemUtilities.strBaseRootPath,
                                              strBasePath,
                                              sysBinaryIndexInDB.FilePath );
 
@@ -4447,7 +4447,7 @@ export default class BinaryServiceController extends BaseService {
                         }
                         else {
 
-                          strFullPath = path.join( SystemUtilities.baseRootPath,
+                          strFullPath = path.join( SystemUtilities.strBaseRootPath,
                                                    strBasePath,
                                                    modelData.FilePath );
 
@@ -5610,7 +5610,7 @@ export default class BinaryServiceController extends BaseService {
             }
             else {
 
-              strFullPath = path.join( SystemUtilities.baseRootPath,
+              strFullPath = path.join( SystemUtilities.strBaseRootPath,
                                        strBasePath );
 
             }
