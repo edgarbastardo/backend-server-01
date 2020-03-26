@@ -179,7 +179,17 @@ export default class RedisConnectionManager {
 
     if ( redisConnection ) {
 
-      await redisConnection.publish( strTopic, message );
+      if ( message instanceof Object ) {
+
+        redisConnection.publish( strTopic, JSON.stringify( message ) );
+
+      }
+      else {
+
+        redisConnection.publish( strTopic, message );
+
+      }
+      //Not wait to publish
 
       bResult = true;
 

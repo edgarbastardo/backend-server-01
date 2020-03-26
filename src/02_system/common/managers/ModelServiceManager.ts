@@ -71,7 +71,9 @@ export default class ModelServiceManager {
 
       for ( const dir of dirs ) {
 
-        if ( dir !== "template" ) {
+        if ( dir !== "template" &&
+             dir !== "disabled" &&
+             dir.startsWith( "disabled_" ) === false ) {
 
           await this._scan( strDatabase, path.join( directory, dir ), logger );
 

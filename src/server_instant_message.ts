@@ -69,7 +69,11 @@ export default class InstantMessageServer {
 
         }
 
-        InstantMessageServer.socketIO.in( message.PresenceId ).disconnect();
+        if ( !message.Disconnected ) {
+
+          InstantMessageServer.socketIO.in( message.PresenceId ).disconnect();
+
+        }
 
         bResult = true;
 
@@ -103,10 +107,10 @@ export default class InstantMessageServer {
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
 
-      if ( LoggerManager.mainLoggerInstance &&
-           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+      if ( logger &&
+           typeof logger.error === "function" ) {
 
-        LoggerManager.mainLoggerInstance.error( error );
+        logger.error( error );
 
       }
 
@@ -148,30 +152,68 @@ export default class InstantMessageServer {
 
       }
 
-      const userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( strServer,
-                                                                                                              message.To.Name,
-                                                                                                              currentTransaction,
-                                                                                                              logger );
+      /*
+      for ( let intToIndex = 0; intToIndex < message.To.length; intToIndex++ ) {
 
-      if ( userSessionPresenceList instanceof Error === false ) {
+        const strTo = message.To[ intToIndex ];
 
-        for ( let intIndex = 0; intIndex < ( userSessionPresenceList as any ).length; intIndex++ ) {
+        const userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( strServer,
+                                                                                                                strTo,
+                                                                                                                currentTransaction,
+                                                                                                                logger );
 
-          try {
+        if ( userSessionPresenceList instanceof Error === false &&
+            ( userSessionPresenceList as any ).length > 0  ) {
 
-            InstantMessageServer.socketIO.in( userSessionPresenceList[ intIndex ].PresenceId ).emit( "NewMessage", message );
+          for ( let intIndex = 0; intIndex < ( userSessionPresenceList as any ).length; intIndex++ ) {
 
-            //TODO Implent a log of message sended
+            try {
 
-          }
-          catch ( error ) {
+              let request = {
+                              context: {
+                                        Logger: LoggerManager.mainLoggerInstance,
+                                        UserSessionStatus: null,
+                                        Languaje: null
+                                      },
+                            };
 
+              let userSessionStatus = await SystemUtilities.getUserSessionStatus( userSessionPresenceList[ intIndex ].UserSessionStatusToken,
+                                                                                  null,
+                                                                                  false,
+                                                                                  false,
+                                                                                  currentTransaction,
+                                                                                  logger );
+
+              request.context.UserSessionStatus = userSessionStatus;
+
+              ( request as any ).returnResult = 1; //Force to return the result
+
+              //Check for valid session token
+              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request as any,
+                                                                                      null, //Not write response back
+                                                                                      null );
+
+              if ( resultData &&
+                  resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+
+                InstantMessageServer.socketIO.in( userSessionPresenceList[ intIndex ].PresenceId ).emit( "NewMessage", message );
+
+              }
+
+              //TODO Implent a log of message sended
+
+            }
+            catch ( error ) {
+
+
+            }
 
           }
 
         }
 
       }
+      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" ) {
@@ -198,10 +240,10 @@ export default class InstantMessageServer {
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
 
-      if ( LoggerManager.mainLoggerInstance &&
-           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+      if ( logger &&
+           typeof logger.error === "function" ) {
 
-        LoggerManager.mainLoggerInstance.error( error );
+        logger.error( error );
 
       }
 
@@ -225,33 +267,36 @@ export default class InstantMessageServer {
 
   }
 
-  static async handlerFunction( strTopic: string, message: any ): Promise<void> {
+  static async handlerFunction( strTopic: string, strMessage: string ): Promise<void> {
 
     try {
 
       if ( strTopic &&
-           message ) {
+           strMessage ) {
+
+        const jsonMessage = CommonUtilities.parseJSON( strMessage,
+                                                       LoggerManager.mainLoggerInstance );
 
         if ( strTopic === "ServerAlive" ) {
 
-          if ( message.Name === "Pong" &&
-               message.Server &&
-               message.Mark ) {
+          if ( jsonMessage.Name === "Pong" &&
+               jsonMessage.Server &&
+               jsonMessage.Mark ) {
 
-            InstantMessageServer.peerServersLastReport[ message.Server ] = message.Mark;
+            InstantMessageServer.peerServersLastReport[ jsonMessage.Server ] = jsonMessage.Mark;
 
           }
 
         }
         else if ( strTopic === InstantMessageServer.strTopicServer ) {
 
-          if ( message.Name === "Ping" ) {
+          if ( jsonMessage.Name === "Ping" ) {
 
             //Publish
-            NotificationManager.publishOnTopic( message.Topic,
+            NotificationManager.publishOnTopic( jsonMessage.Topic,
                                                 {
                                                   Name: "Pong",
-                                                  Server: this.strTopicServer,
+                                                  Server: InstantMessageServer.strTopicServer,
                                                   Mark: SystemUtilities.getCurrentDateAndTime().format()
                                                 },
                                                 LoggerManager.mainLoggerInstance );
@@ -261,22 +306,22 @@ export default class InstantMessageServer {
         }
         else if ( strTopic === "InstantMessage" ) {
 
-          if ( message.Name === "Disconnect" ) {
+          if ( jsonMessage.Name === "Disconnect" ) {
 
-            if ( message.PresenceId !== "@error" &&
-                 message.Server === this.strTopicServer ) {
+            if ( jsonMessage.PresenceId !== "@error" &&
+                 jsonMessage.Server === InstantMessageServer.strTopicServer ) {
 
-              await InstantMessageServer.disconnect( this.strTopicServer,
-                                                     message,
+              await InstantMessageServer.disconnect( InstantMessageServer.strTopicServer,
+                                                     jsonMessage,
                                                      LoggerManager.mainLoggerInstance );
 
             }
 
           }
-          else if ( message.Name === "Send" ) {
+          else if ( jsonMessage.Name === "Send" ) {
 
-            await InstantMessageServer.send( this.strTopicServer,
-                                             message,
+            await InstantMessageServer.send( InstantMessageServer.strTopicServer,
+                                             jsonMessage,
                                              LoggerManager.mainLoggerInstance );
 
           }
@@ -285,7 +330,7 @@ export default class InstantMessageServer {
 
         let debugMark = debug.extend( "43C94E85E6B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-        debugMark( `Received message "%s", in topic "%s"`, message, strTopic );
+        debugMark( `Received message "%s", in topic "%s"`, jsonMessage, strTopic );
 
       }
 
@@ -335,7 +380,7 @@ export default class InstantMessageServer {
       }
 
       //Select Distinct A.Server From sysUserSessionPresence As A
-      const serverList = await SYSUserSessionPresenceService.getUserSessionPresenceServerList( this.strTopicServer,
+      const serverList = await SYSUserSessionPresenceService.getUserSessionPresenceServerList( InstantMessageServer.strTopicServer,
                                                                                                currentTransaction,
                                                                                                LoggerManager.mainLoggerInstance );
 
@@ -542,6 +587,8 @@ export default class InstantMessageServer {
   }
 
   static async checkValidAuthToken( strAuth: string,
+                                    socket: any,
+                                    strServer: string,
                                     logger: any ): Promise<boolean> {
 
     let bResult = false;
@@ -549,6 +596,8 @@ export default class InstantMessageServer {
     let currentTransaction = null;
 
     try {
+
+      let debugMark = debug.extend( "D48995C9F278" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
@@ -573,35 +622,90 @@ export default class InstantMessageServer {
 
       if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
-        const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( strAuthorization,
-                                                                                       null,
-                                                                                       currentTransaction,
-                                                                                       logger );
+        let sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( strAuthorization,
+                                                                                     null,
+                                                                                     currentTransaction,
+                                                                                     logger );
 
-        if ( sysUserSessionPresence ) {
+        if ( !sysUserSessionPresence ) {
 
           let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
                                                                               null,
-                                                                              true,
+                                                                              false,
                                                                               false,
                                                                               currentTransaction,
                                                                               logger );
 
           request.context.UserSessionStatus = userSessionStatus;
 
+          ( request as any ).returnResult = 1; //Force to return the result
+
+          //Check for valid session token
+          let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request as any,
+                                                                                   null, //Not write response back
+                                                                                   null );
+
+          if ( resultData &&
+               resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+
+            sysUserSessionPresence = await SYSUserSessionPresenceService.createOrUpdate(
+                                                                                         {
+                                                                                           UserSessionStatusToken: strAuthorization,
+                                                                                           PresenceId: socket.id,
+                                                                                           Server: strServer,
+                                                                                           Room: `#${userSessionStatus.UserName}#`,
+                                                                                           CreatedBy: userSessionStatus.UserName,
+                                                                                           CreatedAt: null
+                                                                                         },
+                                                                                         false,
+                                                                                         currentTransaction,
+                                                                                         logger
+                                                                                       );
+
+            if ( sysUserSessionPresence instanceof Error ) {
+
+              if ( logger &&
+                  typeof logger.error === "function" ) {
+
+                logger.error( sysUserSessionPresence as Error );
+
+              }
+
+              debugMark( "Error to create the user session presence %O", sysUserSessionPresence as Error );
+
+            }
+            else if ( !sysUserSessionPresence ) {
+
+              if ( logger &&
+                   typeof logger.error === "function" ) {
+
+                logger.error( "Error to create user session presence is null" );
+
+              }
+
+              debugMark( "Error to create user session presence is null" );
+
+            }
+            else {
+
+              debugMark( "The user session presence is created %O", ( sysUserSessionPresence as any ).dataValues );
+              bResult = true;
+
+            }
+
+          }
+
         }
+        else {
 
-        ( request as any ).returnResult = 1; //Force to return the result
+          if ( logger &&
+               typeof logger.error === "function" ) {
 
-        //Check for valid session token
-        let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request as any,
-                                                                                 null, //Not write response back
-                                                                                 null );
+            logger.error( "The user session already had presence" );
 
-        if ( resultData &&
-             resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+          }
 
-          bResult = true;
+          debugMark( "The user session already had presence" );
 
         }
 
@@ -632,10 +736,10 @@ export default class InstantMessageServer {
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
 
-      if ( LoggerManager.mainLoggerInstance &&
-           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+      if ( logger &&
+           typeof logger.error === "function" ) {
 
-        LoggerManager.mainLoggerInstance.error( error );
+        logger.error( error );
 
       }
 
@@ -758,17 +862,22 @@ export default class InstantMessageServer {
 
       });
 
+      //Middleware before of connect
       InstantMessageServer.socketIO.use( async ( socket: any, next: Function ) => {
 
         if ( await InstantMessageServer.checkValidAuthToken( socket.handshake.query.auth,
+                                                             socket,
+                                                             InstantMessageServer.strTopicServer,
                                                              LoggerManager.mainLoggerInstance ) ) {
+
+          debugMark( "Auth %s is VALID", socket.handshake.query.auth );
 
           return next();
 
         }
         else {
 
-          debugMark( "Auth %s is invalid", socket.handshake.query.auth );
+          debugMark( "Auth %s is INVALID", socket.handshake.query.auth );
 
           next( new Error( 'Authentication token error' ) );
 
@@ -778,19 +887,31 @@ export default class InstantMessageServer {
 
       InstantMessageServer.socketIO.on( "connect", ( socket: any ) => {
 
-        debugMark( "Connected client on port %s.", intPort );
+        debugMark( "Connected client with id %s on port %s.", socket.id, intPort );
 
-        socket.on( "NewMessage", ( message: any ) => {
+        socket.on( "newMessage", ( message: any ) => {
 
           //debugMark( "[server](message): %s", JSON.stringify( message ), socketId );
 
-          InstantMessageServer.socketIO.in( socket.id ).emit( "NewMessage", message );
+          debugMark( "New message sended from client with id %s. Making echo to message", socket.id, intPort );
+
+          InstantMessageServer.socketIO.in( socket.id ).emit( "newMessage", message );
 
         });
 
-        socket.on( "disconnect", () => {
+        socket.on( "disconnect", async ( strReason: string ) => {
 
-          debugMark( "Client disconnected" );
+          await InstantMessageServer.disconnect(
+                                                 InstantMessageServer.strTopicServer,
+                                                 {
+                                                   PresenceId: socket.id,
+                                                   Server: InstantMessageServer.strTopicServer,
+                                                   Disconnected: true
+                                                 },
+                                                 LoggerManager.mainLoggerInstance
+                                               );
+
+          debugMark( "Client with id %s disconnected", socket.id );
 
         });
 

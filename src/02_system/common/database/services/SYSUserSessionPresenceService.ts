@@ -467,18 +467,14 @@ export default class SYSUserSessionPresenceService extends BaseService {
 
       }
 
-      const rows = await dbConnection.query( strSQL,
-                                             {
-                                               raw: true,
-                                               type: QueryTypes.DELETE,
-                                               transaction: currentTransaction
-                                             } );
+      await dbConnection.query( strSQL,
+                                {
+                                  raw: true,
+                                  type: QueryTypes.DELETE,
+                                  transaction: currentTransaction
+                                } );
 
-      if ( rows ) {
-
-        result = true;
-
-      }
+      result = true;
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -574,7 +570,8 @@ export default class SYSUserSessionPresenceService extends BaseService {
                                                transaction: currentTransaction
                                              } );
 
-      if ( rows ) {
+      if ( rows &&
+           rows.length > 0 ) {
 
         result = rows;
 

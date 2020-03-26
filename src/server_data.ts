@@ -24,6 +24,7 @@ import ModelServiceManager from "./02_system/common/managers/ModelServiceManager
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
+import InstantMenssageManager from './02_system/common/managers/InstantMessageManager';
 //import NotificationManager from './02_system/common/managers/NotificationManager';
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
@@ -396,6 +397,8 @@ export default async function main() {
 
     await I18NManager.create( {},
                               LoggerManager.createMainLogger );
+
+    await InstantMenssageManager.loadRules( LoggerManager.mainLoggerInstance );
 
     if ( cluster.isMaster ) {
 

@@ -1695,7 +1695,7 @@ export default class SystemConstants {
 
   static readonly _CONFIG_ENTRY_UserGroup_Settings = {
                                                        Id: "92417fa1-c477-4df0-868c-e970619c47f9",
-                                                       Scope: "usergroup",
+                                                       Scope: "user_group",
                                                        Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                        Category: "User Group",
                                                        Name: "system.user.group.settings",
@@ -1744,6 +1744,56 @@ export default class SystemConstants {
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
                                                       };
+
+  /*
+  static readonly _CONFIG_ENTRY_IM_Rules_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_IM_Rules = {
+                                             Id: "",
+                                             Scope: "system",
+                                             Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                             Category: "Instant Message",
+                                             Name: "system.instant.message.rules",
+                                             Default: JSON.stringify(
+                                                                      {
+                                                                        "@__default__@":{
+
+                                                                          "users": "*",
+                                                                          "rooms": "*"
+
+                                                                        }
+                                                                      }
+                                                                    ),
+                                             Label: "Configuration for database log tables",
+                                             Description: "Configuration for database log tables",
+                                             AllowTagAccessR: "#Administrator#",
+                                             AllowTagAccessW: "#Administrator#",
+                                             Example: JSON.stringify(
+                                                                      {
+                                                                        "group01":{
+
+                                                                          "users": "users02",
+                                                                          "rooms": "*"
+
+                                                                        },
+                                                                        "user01":{
+
+                                                                          "users": "users02",
+                                                                          "rooms": "*"
+
+                                                                        },
+                                                                        "@__default__@":{
+
+                                                                          "users": "*",
+                                                                          "rooms": "*"
+
+                                                                        }
+                                                                      }
+                                                                    ),
+                                             CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
+                                           };
+  */
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,

@@ -22,7 +22,7 @@ export default class TransportRedis {
 
       bResult = await RedisConnectionManager.publish( messageOptions.Connection || "default",
                                                       messageOptions.Topic,
-                                                      messageOptions.Message );
+                                                      messageOptions.dataToPublish );
 
     }
     catch ( error ) {

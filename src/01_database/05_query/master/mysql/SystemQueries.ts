@@ -95,7 +95,7 @@ export default class SystemQueries {
       }
       else if ( strName === "getUserSessionPresenceServerList" ) {
 
-        strResult = SqlString.format( `Select Distinct Server From sysUserSessionPresence Where Server = ?`, params.Server );
+        strResult = SqlString.format( `Select Distinct Server From sysUserSessionPresence Where Server != ?`, params.Server );
 
       }
       else if ( strName === "getUserSessionPresenceIdByUserName" ) {
