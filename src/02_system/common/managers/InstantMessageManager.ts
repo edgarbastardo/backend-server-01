@@ -150,10 +150,17 @@ export default class InstantMenssageManager {
                                                IsError: boolean,
                                                StatusCode: number,
                                                Code: string,
-                                               Message: string
+                                               Message: string,
+                                               Details: any
                                              }> {
 
-    let result = { IsError: false, StatusCode: 200, Code: "", Message: "" };
+    let result = {
+                   IsError: false,
+                   StatusCode: 200,
+                   Code: "",
+                   Message: "",
+                   Details: null
+                 };
 
     try {
 
@@ -208,7 +215,8 @@ export default class InstantMenssageManager {
                  IsError: true,
                  StatusCode: 500,
                  Code: "ERROR_UNEXPECTED",
-                 Message: await I18NManager.translate( options.Language, 'Unexpected error. Please read the server log for more details.' )
+                 Message: await I18NManager.translate( options.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Details: await SystemUtilities.processErrorDetails( error ) //error
                };
 
     }

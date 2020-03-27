@@ -13,6 +13,7 @@ import DBConnectionManager from "../../managers/DBConnectionManager";
 import BaseService from "./BaseService";
 
 import { SYSUserSessionPresence } from "../models/SYSUserSessionPresence";
+import SYSConfigValueDataService from './SYSConfigValueDataService';
 
 const debug = require( 'debug' )( 'SYSUserSessionPresenceService' );
 
@@ -691,9 +692,9 @@ export default class SYSUserSessionPresenceService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.deleteByModel.name;
+      sourcePosition.method = this.name + "." + this.getUserSessionPresenceIdByUserName.name;
 
-      const strMark = "AF1D233B29D6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "E90A940BEF18" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -731,6 +732,165 @@ export default class SYSUserSessionPresenceService extends BaseService {
     }
 
     return result;
+
+  }
+
+  static async getUserSessionPresenceIdByUserNameLite( strUserName: string,
+                                                       transaction: any,
+                                                       logger: any ): Promise<any[]|Error> {
+
+    let result = [];
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getUserSessionPresenceIdByUserNameLite",
+                                                     {
+                                                       UserName: strUserName,
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( rows &&
+           rows.length > 0 ) {
+
+        result = rows;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserSessionPresenceIdByUserNameLite.name;
+
+      const strMark = "38F224A0F71B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigDefaultRooms( userSessionStatus: any,
+                                      transaction: any,
+                                      logger: any ): Promise<string> {
+
+    let strResult = "";
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueDataFromSessionSimple( userSessionStatus,
+                                                                                              SystemConstants._CONFIG_ENTRY_IM_Rooms.Id,
+                                                                                              SystemConstants._CONFIG_ENTRY_IM_Rooms.Owner,
+                                                                                              transaction,
+                                                                                              logger );
+
+      if ( configData &&
+           configData.rooms ) {
+
+        strResult = configData.rooms;
+
+        strResult = strResult.replace( new RegExp( "#@@UserGroupId@@#", "gi" ), "#" + userSessionStatus.UserGroupId + "#" );
+
+        strResult = strResult.replace( new RegExp( "#@@UserGroupName@@#", "gi" ), "#" + userSessionStatus.UserGroupName + "#" );
+
+        strResult = strResult.replace( new RegExp( "#@@UserId@@#", "gi" ), "#" + userSessionStatus.UserId + "#" );
+
+        strResult = strResult.replace( new RegExp( "#@@UserName@@#", "gi" ), "#" + userSessionStatus.UserName + "#" );
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigDefaultRooms.name;
+
+      const strMark = "2D5C972A0793" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
 
   }
 

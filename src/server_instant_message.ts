@@ -152,11 +152,38 @@ export default class InstantMessageServer {
 
       }
 
-      /*
       for ( let intToIndex = 0; intToIndex < message.To.length; intToIndex++ ) {
 
+        const strToPresence = message.ToPresence[ intToIndex ];
         const strTo = message.To[ intToIndex ];
 
+        try {
+
+          const messageToSend = {
+                                  From: message.From,
+                                  To: strTo,
+                                  Body: message.Body
+                                }
+
+          if ( strToPresence.startsWith( "room://" ) ) {
+
+            InstantMessageServer.socketIO.to( strToPresence.replace( "room://", "" ) ).emit( 'newMessage', messageToSend );
+
+          }
+          else {
+
+            InstantMessageServer.socketIO.in( strToPresence ).emit( "newMessage", messageToSend );
+
+          }
+
+        }
+        catch ( error ) {
+
+          //
+
+        }
+
+        /*
         const userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( strServer,
                                                                                                                 strTo,
                                                                                                                 currentTransaction,
@@ -202,6 +229,8 @@ export default class InstantMessageServer {
 
               //TODO Implent a log of message sended
 
+              //io.to('some room').emit('some event');
+
             }
             catch ( error ) {
 
@@ -211,9 +240,9 @@ export default class InstantMessageServer {
           }
 
         }
+        */
 
       }
-      */
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" ) {
@@ -648,12 +677,16 @@ export default class InstantMessageServer {
           if ( resultData &&
                resultData.StatusCode === 200 ) { //Ok the authorization token is valid
 
+            const strRooms = await SYSUserSessionPresenceService.getConfigDefaultRooms( userSessionStatus,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
             sysUserSessionPresence = await SYSUserSessionPresenceService.createOrUpdate(
                                                                                          {
                                                                                            UserSessionStatusToken: strAuthorization,
                                                                                            PresenceId: socket.id,
                                                                                            Server: strServer,
-                                                                                           Room: `#${userSessionStatus.UserName}#`,
+                                                                                           Room: strRooms || "",
                                                                                            CreatedBy: userSessionStatus.UserName,
                                                                                            CreatedAt: null
                                                                                          },
@@ -687,6 +720,8 @@ export default class InstantMessageServer {
 
             }
             else {
+
+              socket.roomList = strRooms.split( "," );
 
               debugMark( "The user session presence is created %O", ( sysUserSessionPresence as any ).dataValues );
               bResult = true;
@@ -893,7 +928,7 @@ export default class InstantMessageServer {
 
           //debugMark( "[server](message): %s", JSON.stringify( message ), socketId );
 
-          debugMark( "New message sended from client with id %s. Making echo to message", socket.id, intPort );
+          debugMark( "New message sended from client with id %s. Making echo to message", socket.id, message );
 
           InstantMessageServer.socketIO.in( socket.id ).emit( "newMessage", message );
 
@@ -914,6 +949,20 @@ export default class InstantMessageServer {
           debugMark( "Client with id %s disconnected", socket.id );
 
         });
+
+        if ( socket.roomList ) {
+
+          const roomList = socket.roomList;
+
+          for ( let intRoomIndex = 0; intRoomIndex < roomList.length; intRoomIndex++ ) {
+
+            socket.join( roomList[ intRoomIndex ] );
+
+          }
+
+        }
+
+        //debugMark( "%O", socket.adapter.rooms );
 
       });
 

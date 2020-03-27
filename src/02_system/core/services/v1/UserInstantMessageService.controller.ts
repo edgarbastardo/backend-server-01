@@ -66,7 +66,7 @@ export default class UserInstantMessageServiceController {
 
       let strSocketToken = null;
 
-      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ||
+      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.SocketToken ) ||
            ( request.query.Force === "1" /*&&
              userSessionStatus.Token.startsWith( "p:" ) === false*/ ) ) {
 
@@ -99,7 +99,7 @@ export default class UserInstantMessageServiceController {
                                     userSessionStatus.Token,
                                     logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
 
-        strSocketToken = userSessionStatus.BinaryDataToken;
+        strSocketToken = userSessionStatus.SocketToken;
 
       }
 
@@ -556,12 +556,11 @@ export default class UserInstantMessageServiceController {
 
               if ( bodyToList[ intToIndex ] ) {
 
-                if ( bodyToList[ intToIndex ].starsWith( "room://" ) === false ) {
+                if ( bodyToList[ intToIndex ].startsWith( "room://" ) === false ) {
 
-                  let userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( "@all@",
-                                                                                                                        bodyToList[ intToIndex ],
-                                                                                                                        currentTransaction,
-                                                                                                                        logger );
+                  let userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserNameLite( bodyToList[ intToIndex ],
+                                                                                                                            currentTransaction,
+                                                                                                                            logger );
 
                   if ( userSessionPresenceList instanceof Error === false ) {
 
@@ -611,7 +610,7 @@ export default class UserInstantMessageServiceController {
                       toWarningList.push(
                                           {
                                             Code: "WARNING_CANNOT_GET_PRESENCE_ID_FROM_USER",
-                                            Message: await I18NManager.translate( strLanguage, "Cannot get the presence id from the user %s", toList[ intToIndex ] ),
+                                            Message: await I18NManager.translate( strLanguage, "Cannot get the presence id from the user %s", bodyToList[ intToIndex ] ),
                                             Details: null
                                           }
                                         );
@@ -626,7 +625,7 @@ export default class UserInstantMessageServiceController {
                     toErrorList.push(
                                       {
                                         Code: "ERROR_CANNOT_GET_PRESENCE_ID_FROM_USER",
-                                        Message: await I18NManager.translate( strLanguage, "Cannot get the presence id from the user %s", toList[ intToIndex ] ),
+                                        Message: await I18NManager.translate( strLanguage, "Cannot get the presence id from the user %s", bodyToList[ intToIndex ] ),
                                         Details: await SystemUtilities.processErrorDetails( error ) //error
                                       }
                                     );
@@ -710,9 +709,7 @@ export default class UserInstantMessageServiceController {
                          Errors: toErrorList,
                          Warnings: toWarningList,
                          Count: toList.length,
-                         Data: [
-                                 toList
-                               ]
+                         Data: toList
                        };
 
             }
@@ -743,17 +740,17 @@ export default class UserInstantMessageServiceController {
           else {
 
             result = {
-                       StatusCode: result.StatusCode,
-                       Code: result.Code,
-                       Message: result.Message,
+                       StatusCode: checkResult.StatusCode,
+                       Code: checkResult.Code,
+                       Message: checkResult.Message,
                        Mark: '888C716A0C2D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: result.Code,
-                                   Message: result.Message,
-                                   Details: result.Details
+                                   Code: checkResult.Code,
+                                   Message: checkResult.Message,
+                                   Details: checkResult.Details
                                  }
                                ],
                        Warnings: [],

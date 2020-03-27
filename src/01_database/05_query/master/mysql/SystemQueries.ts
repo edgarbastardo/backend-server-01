@@ -116,9 +116,9 @@ export default class SystemQueries {
                                           )
                                           And
                                           (
-                                            ( A.ExpireKind = 0 Or TIMESTAMP( A.UpdatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) And
-                                            ( A.ExpireKind = 1 Or TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) And
-                                            ( A.ExpireKind = 2 Or A.ExpireKind = 3 Or TIMESTAMP( A.ExpireOn ) >= NOW() )
+                                            ( A.ExpireKind = 0 Or TIMESTAMP( A.UpdatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) Or
+                                            ( A.ExpireKind = 1 Or TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) Or
+                                            ( ( A.ExpireKind = 2 Or A.ExpireKind = 3 ) And TIMESTAMP( A.ExpireOn ) >= NOW() )
                                           )
                                           And
                                           (
@@ -128,6 +128,37 @@ export default class SystemQueries {
                                           And
                                           B.Server = ? And
                                           A.UserName = ?`, [ params.Server, params.UserName ] );
+
+      }
+      else if ( strName === "getUserSessionPresenceIdByUserNameLite" ) {
+
+        strResult = SqlString.format( `Select B.* From
+                                        sysUserSessionStatus As A Inner Join
+                                        sysUserSessionPresence As B On A.Token = B.UserSessionStatusToken Where
+                                          A.LoggedOutBy Is Null And
+                                          A.LoggedOutAt Is Null And
+                                          (
+                                            A.Tag Is Null Or
+                                            (
+                                              A.Tag Not Like '%#USER_GROUP_DISABLED#%' And
+                                              A.Tag Not Like '%#USER_GROUP_EXPIRED#%' And
+                                              A.Tag Not Like '%#USER_DISABLED#%' And
+                                              A.Tag Not Like '%#USER_EXPIRED#%'
+                                            )
+                                          )
+                                          And
+                                          (
+                                            ( A.ExpireKind = 0 Or TIMESTAMP( A.UpdatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) Or
+                                            ( A.ExpireKind = 1 Or TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL A.ExpireOn MINUTE ) ) Or
+                                            ( ( A.ExpireKind = 2 Or A.ExpireKind = 3 ) And TIMESTAMP( A.ExpireOn ) >= NOW() )
+                                          )
+                                          And
+                                          (
+                                            A.HardLimit Is Null Or
+                                            TIMESTAMP( A.HardLimit ) >= NOW()
+                                          )
+                                          And
+                                          A.UserName = ?`, params.UserName );
 
       }
 

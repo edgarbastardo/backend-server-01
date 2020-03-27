@@ -548,7 +548,36 @@ export default class Always {
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
-                                ]
+                                   {
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Rooms.Id,
+                                     Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                     Value: JSON.stringify(
+                                                            {
+                                                              "#Drivers#":{
+
+                                                                "rooms": "#Drivers#,#Support#"
+
+                                                              },
+                                                              "#System_Administrators#":{
+
+                                                                "rooms": "#System_Administrators#,#CommonAdmin#"
+
+                                                              },
+                                                              "#admin01@system.net#":{
+
+                                                                "rooms": "#@@UserName@@#,#System_Administrators#,#CommonAdmin#,#Admin01#"
+
+                                                              },
+                                                              "@__default__@":{
+
+                                                                "rooms": "#@@UserName@@#"
+
+                                                              }
+                                                            }
+                                                          ),
+                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   },
+                               ]
 
       const loopConfigValueEntriesAsync = async () => {
 
