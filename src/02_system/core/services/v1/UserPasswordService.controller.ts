@@ -343,11 +343,16 @@ export default class UserPasswordServiceController {
 
                       NotificationManager.publishOnTopic( "SystemEvent",
                                                           {
-                                                            Name: "UserPasswordChangeRequestEMailSuccess",
-                                                            UserId: sysUserInDB.Id,
-                                                            UserName: sysUserInDB.Name,
-                                                            UserGroupId: sysUserInDB.sysUserGroup.Id,
-                                                            UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                            SystemId: SystemUtilities.getSystemId(),
+                                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                            SubSystem: "Security",
+                                                            Token: context.UserSessionStatus.Token,
+                                                            UserId: context.UserSessionStatus.UserId,
+                                                            UserName: context.UserSessionStatus.UserName,
+                                                            UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                            Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
+                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                            Data: {}
                                                           },
                                                           logger );
 
@@ -416,11 +421,16 @@ export default class UserPasswordServiceController {
 
                       NotificationManager.publishOnTopic( "SystemEvent",
                                                           {
-                                                            Name: "UserPasswordChangeRequestSMSSuccess",
-                                                            UserId: sysUserInDB.Id,
-                                                            UserName: sysUserInDB.Name,
-                                                            UserGroupId: sysUserInDB.sysUserGroup.Id,
-                                                            UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                            SystemId: SystemUtilities.getSystemId(),
+                                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                            SubSystem: "Security",
+                                                            Token: context.UserSessionStatus.Token,
+                                                            UserId: context.UserSessionStatus.UserId,
+                                                            UserName: context.UserSessionStatus.UserName,
+                                                            UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                            Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
+                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                            Data: {}
                                                           },
                                                           logger );
 
@@ -948,11 +958,16 @@ export default class UserPasswordServiceController {
 
                     NotificationManager.publishOnTopic( "SystemEvent",
                                                         {
-                                                          Name: "UserPasswordChangeSuccess",
-                                                          UserId: sysUserInDB.Id,
-                                                          UserName: sysUserInDB.Name,
-                                                          UserGroupId: sysUserInDB.sysUserGroup.Id,
-                                                          UserGroupName: sysUserInDB.sysUserGroup.Name,
+                                                          SystemId: SystemUtilities.getSystemId(),
+                                                          SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                          SubSystem: "Security",
+                                                          Token: context.UserSessionStatus.Token,
+                                                          UserId: context.UserSessionStatus.UserId,
+                                                          UserName: context.UserSessionStatus.UserName,
+                                                          UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                          Code: "SUCCESS_PASSWORD_CHANGE",
+                                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                          Data: {}
                                                         },
                                                         logger );
 

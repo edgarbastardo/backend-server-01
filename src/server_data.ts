@@ -24,9 +24,12 @@ import ModelServiceManager from "./02_system/common/managers/ModelServiceManager
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
+import NotificationManager from './02_system/common/managers/NotificationManager';
 import InstantMenssageManager from './02_system/common/managers/InstantMessageManager';
 //import NotificationManager from './02_system/common/managers/NotificationManager';
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
+
+import SYSSystemEventLogService from './02_system/common/database/services/SYSSystemEventLogService';
 
 let debug = null; //require( 'debug' )( 'server' );
 
@@ -203,6 +206,77 @@ function jobProcessWorkerExit( jobProcessWorker: any,
         logger.info( 'Worker process with id: %s success!', jobProcessWorker.id );
 
       }
+
+    }
+
+  }
+
+}
+
+async function handlerListenOnTopic( strTopic: string,
+                                     strMessage: string ): Promise<void> {
+
+  const strMark = "DE270DD9C1FA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+  const debugMark = debug.extend( strMark );
+
+  try {
+
+    if ( strTopic &&
+         strMessage ) {
+
+      const jsonMessage = CommonUtilities.parseJSON( strMessage,
+                                                     LoggerManager.mainLoggerInstance );
+
+      if ( strTopic === "SystemEvent" ) {
+
+        jsonMessage.CreatedBy = jsonMessage.UserName;
+
+        const sysSystemEventLogService = await SYSSystemEventLogService.create( jsonMessage,
+                                                                                null,
+                                                                                LoggerManager.mainLoggerInstance );
+
+
+        if ( !sysSystemEventLogService ) {
+
+          debugMark( "Fail to save the instant message log. sysSystemEventLogService is null" );
+
+        }
+        else if ( sysSystemEventLogService instanceof Error ) {
+
+          debugMark( "Fail to save the instant message log. With the next error %O", sysSystemEventLogService );
+
+        }
+        /*
+        else {
+
+          debugMark( "Success save the instant message log with Id %s", ( sysSystemEventLogService as any ).Id );
+
+        }
+        */
+
+      }
+
+    }
+
+  }
+  catch ( error ) {
+
+    const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+    sourcePosition.method = "server_data." + handlerListenOnTopic.name;
+
+    debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+    debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+    debugMark( "Catched on: %O", sourcePosition );
+
+    error.mark = strMark;
+    error.logId = SystemUtilities.getUUIDv4();
+
+    if ( LoggerManager.mainLoggerInstance &&
+         typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+      LoggerManager.mainLoggerInstance.error( error );
 
     }
 
@@ -606,6 +680,12 @@ export default async function main() {
         );
 
       }
+
+      //Listen on
+      await NotificationManager.listenOnTopic( "connectionListenOnTopicSystemEvent",
+                                               "SystemEvent",
+                                               handlerListenOnTopic,
+                                               LoggerManager.mainLoggerInstance );
 
     }
     else if ( process.env.WORKER_KIND === "http_worker_process" ) {

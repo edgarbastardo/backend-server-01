@@ -19,6 +19,7 @@ import I18NManager from "./02_system/common/managers/I18Manager";
 
 import SYSUserSessionPresenceService from "./02_system/common/database/services/SYSUserSessionPresenceService";
 import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
+import SYSInstantMessageLogService from './02_system/common/database/services/SYSInstantMessageLogService';
 
 let debug = require( 'debug' )( 'server_intant_message@main_process' );
 
@@ -152,95 +153,80 @@ export default class InstantMessageServer {
 
       }
 
-      for ( let intToIndex = 0; intToIndex < message.To.length; intToIndex++ ) {
+      const strMark = "43B1AECAA7E1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-        const strToPresence = message.ToPresence[ intToIndex ];
-        const strTo = message.To[ intToIndex ];
+      const debugMark = debug.extend( strMark );
+
+      for ( let intToIndex = 0; intToIndex < message.ToId.length; intToIndex++ ) {
+
+        const strToId = message.ToId[ intToIndex ];
+        const strToName = message.ToName[ intToIndex ];
+        const strToPresenceId = message.ToPresenceId[ intToIndex ].replace( "room://", "" );
 
         try {
 
           const messageToSend = {
                                   From: message.From,
-                                  To: strTo,
+                                  To: strToName,
                                   Body: message.Body
                                 }
 
-          if ( strToPresence.startsWith( "room://" ) ) {
+          InstantMessageServer.socketIO.to( strToPresenceId ).emit( 'newMessage', messageToSend );
 
-            InstantMessageServer.socketIO.to( strToPresence.replace( "room://", "" ) ).emit( 'newMessage', messageToSend );
+          //Log the message sended
+          const sysInstantMessageLog = await SYSInstantMessageLogService.create(
+                                                                                 {
+                                                                                   FromId: message.FromId,
+                                                                                   FromName: message.FromName,
+                                                                                   ToId: strToId,
+                                                                                   ToName: strToName,
+                                                                                   ToPresenceId: strToPresenceId,
+                                                                                   Data: message.Body,
+                                                                                   CreatedBy: message.FromNamel,
+                                                                                   CreatedAt: null,
+                                                                                 },
+                                                                                 currentTransaction,
+                                                                                 logger
+                                                                               );
+
+          if ( !sysInstantMessageLog ) {
+
+            debugMark( "Fail to save the instant message log. sysInstanceMessageLog is null" );
+
+          }
+          else if ( sysInstantMessageLog instanceof Error ) {
+
+            debugMark( "Fail to save the instant message log. With the next error %O", sysInstantMessageLog );
 
           }
           else {
 
-            InstantMessageServer.socketIO.in( strToPresence ).emit( "newMessage", messageToSend );
+            debugMark( "Success save the instant message log with Id %s", ( sysInstantMessageLog as any ).Id );
 
           }
 
         }
         catch ( error ) {
 
-          //
+          const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-        }
+          sourcePosition.method = this.name + "." + this.send.name;
 
-        /*
-        const userSessionPresenceList = await SYSUserSessionPresenceService.getUserSessionPresenceIdByUserName( strServer,
-                                                                                                                strTo,
-                                                                                                                currentTransaction,
-                                                                                                                logger );
+          debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+          debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( "Catched on: %O", sourcePosition );
 
-        if ( userSessionPresenceList instanceof Error === false &&
-            ( userSessionPresenceList as any ).length > 0  ) {
+          error.mark = strMark;
+          error.logId = SystemUtilities.getUUIDv4();
 
-          for ( let intIndex = 0; intIndex < ( userSessionPresenceList as any ).length; intIndex++ ) {
+          if ( logger &&
+               typeof logger.error === "function" ) {
 
-            try {
-
-              let request = {
-                              context: {
-                                        Logger: LoggerManager.mainLoggerInstance,
-                                        UserSessionStatus: null,
-                                        Languaje: null
-                                      },
-                            };
-
-              let userSessionStatus = await SystemUtilities.getUserSessionStatus( userSessionPresenceList[ intIndex ].UserSessionStatusToken,
-                                                                                  null,
-                                                                                  false,
-                                                                                  false,
-                                                                                  currentTransaction,
-                                                                                  logger );
-
-              request.context.UserSessionStatus = userSessionStatus;
-
-              ( request as any ).returnResult = 1; //Force to return the result
-
-              //Check for valid session token
-              let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( request as any,
-                                                                                      null, //Not write response back
-                                                                                      null );
-
-              if ( resultData &&
-                  resultData.StatusCode === 200 ) { //Ok the authorization token is valid
-
-                InstantMessageServer.socketIO.in( userSessionPresenceList[ intIndex ].PresenceId ).emit( "NewMessage", message );
-
-              }
-
-              //TODO Implent a log of message sended
-
-              //io.to('some room').emit('some event');
-
-            }
-            catch ( error ) {
-
-
-            }
+            logger.error( error );
 
           }
 
         }
-        */
 
       }
 
@@ -250,6 +236,8 @@ export default class InstantMessageServer {
         await currentTransaction.commit();
 
       }
+
+      bResult = true;
 
     }
     catch ( error ) {
@@ -296,7 +284,8 @@ export default class InstantMessageServer {
 
   }
 
-  static async handlerFunction( strTopic: string, strMessage: string ): Promise<void> {
+  static async handlerListenOnTopic( strTopic: string,
+                                     strMessage: string ): Promise<void> {
 
     try {
 
@@ -368,7 +357,7 @@ export default class InstantMessageServer {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.handlerFunction.name;
+      sourcePosition.method = this.name + "." + this.handlerListenOnTopic.name;
 
       const strMark = "E5D24EF6854B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -516,9 +505,9 @@ export default class InstantMessageServer {
       if ( SystemUtilities.bIsNetworkLeader ) {
 
         //Listen on
-        await NotificationManager.listenOnTopic( "connectionListenServerAlive",
+        await NotificationManager.listenOnTopic( "connectionListenOnTopicServerAlive",
                                                  "ServerAlive",
-                                                 InstantMessageServer.handlerFunction,
+                                                 InstantMessageServer.handlerListenOnTopic,
                                                  LoggerManager.mainLoggerInstance );
 
         const intCountResult = NetworkLeaderManager.countNodes();
@@ -582,7 +571,7 @@ export default class InstantMessageServer {
       clearInterval( InstantMessageServer.checkIntervalHandler );
 
       //Unlisten on
-      await NotificationManager.unlistenOnTopic( "connectionListenServerAlive",
+      await NotificationManager.unlistenOnTopic( "connectionListenOnTopicServerAlive",
                                                  "ServerAlive",
                                                  LoggerManager.mainLoggerInstance );
 
@@ -850,9 +839,9 @@ export default class InstantMessageServer {
                                                                                 LoggerManager.mainLoggerInstance
                                                                               );
 
-      await NotificationManager.listenOnTopic( "connectionListenIM",
+      await NotificationManager.listenOnTopic( "connectionListenOnTopicInstantMessage",
                                                "InstantMessage",
-                                               InstantMessageServer.handlerFunction,
+                                               InstantMessageServer.handlerListenOnTopic,
                                                LoggerManager.mainLoggerInstance );
 
       /*

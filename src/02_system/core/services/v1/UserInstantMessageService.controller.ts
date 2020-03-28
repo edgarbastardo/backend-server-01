@@ -547,7 +547,8 @@ export default class UserInstantMessageServiceController {
 
           if ( checkResult.IsError === false ) {
 
-            let toList = [];
+            let toIdList = [];
+            let toNameList = [];
             let toPresenceIdList = [];
             let toWarningList = [];
             let toErrorList = [];
@@ -597,7 +598,8 @@ export default class UserInstantMessageServiceController {
                         if ( resultData &&
                              resultData.StatusCode === 200 ) { //Ok the authorization token is valid
 
-                          toList.push( bodyToList[ intToIndex ] );
+                          toIdList.push( checkUserSessionStatus.UserId );
+                          toNameList.push( bodyToList[ intToIndex ] );
                           toPresenceIdList.push( userSessionPresenceList[ intIndex ].PresenceId );
 
                         }
@@ -635,7 +637,8 @@ export default class UserInstantMessageServiceController {
                 }
                 else {
 
-                  toList.push( bodyToList[ intToIndex ] );
+                  toIdList.push( bodyToList[ intToIndex ] );
+                  toNameList.push( bodyToList[ intToIndex ] );
                   toPresenceIdList.push( bodyToList[ intToIndex ] );
 
                 }
@@ -660,11 +663,12 @@ export default class UserInstantMessageServiceController {
             if ( await NotificationManager.publishOnTopic( "InstantMessage",
                                                            {
                                                              Name: "Send",
-                                                             FromId: userSessionStatus.UserNameId,
-                                                             From: userSessionStatus.UserName,
+                                                             FromId: userSessionStatus.UserId,
+                                                             FromName: userSessionStatus.UserName,
                                                              Kind: request.body.Kind,
-                                                             To: toList,
-                                                             ToPresence: toPresenceIdList,
+                                                             ToId: toIdList,
+                                                             ToName: toNameList,
+                                                             ToPresenceId: toPresenceIdList,
                                                              Body: request.body.Body
                                                            },
                                                            logger ) === true ) {
@@ -708,8 +712,8 @@ export default class UserInstantMessageServiceController {
                          IsError: false,
                          Errors: toErrorList,
                          Warnings: toWarningList,
-                         Count: toList.length,
-                         Data: toList
+                         Count: toNameList.length,
+                         Data: toNameList
                        };
 
             }

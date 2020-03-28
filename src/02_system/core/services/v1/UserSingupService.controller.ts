@@ -336,8 +336,16 @@ export default class UserSingupServiceController {
 
                         NotificationManager.publishOnTopic( "SystemEvent",
                                                             {
-                                                              Name: "UserSignupRequestSuccess",
+                                                              SystemId: SystemUtilities.getSystemId(),
+                                                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                              SubSystem: "UserSignup",
+                                                              Token: "Not apply",
+                                                              UserId: "Not apply",
                                                               UserName: request.body.Name,
+                                                              UserGroupId: "Not apply",
+                                                              Code: "SUCCESS_USER_SIGNUP",
+                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              Data: {}
                                                             },
                                                             logger );
 
@@ -361,8 +369,16 @@ export default class UserSingupServiceController {
 
                         NotificationManager.publishOnTopic( "SystemEvent",
                                                             {
-                                                              Name: "UserSignupRequestFailed",
+                                                              SystemId: SystemUtilities.getSystemId(),
+                                                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                              SubSystem: "UserSignup",
+                                                              Token: "Not apply",
+                                                              UserId: "Not apply",
                                                               UserName: request.body.Name,
+                                                              UserGroupId: "Not apply",
+                                                              Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
+                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              Data: {}
                                                             },
                                                             logger );
 
@@ -999,11 +1015,16 @@ export default class UserSingupServiceController {
 
                         NotificationManager.publishOnTopic( "SystemEvent",
                                                             {
-                                                              Name: "UserSignupActivateSuccess",
+                                                              SystemId: SystemUtilities.getSystemId(),
+                                                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                              SubSystem: "UserSignup",
+                                                              Token: "Not apply",
                                                               UserId: sysUserSignupInDB.Id,
                                                               UserName: sysUserSignupInDB.Name,
                                                               UserGroupId: sysUserGroup.Id,
-                                                              UserGroupName: sysUserGroup.Name
+                                                              Code: "SUCCESS_USER_ACTIVATION",
+                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              Data: {}
                                                             },
                                                             logger );
 

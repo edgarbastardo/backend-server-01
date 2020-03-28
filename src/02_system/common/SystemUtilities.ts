@@ -3241,4 +3241,24 @@ export default class SystemUtilities {
 
   }
 
+  static getSystemId(): string {
+
+    let strResult = "";
+
+    if ( process.env.USE_NETWORK_ID_AS_SERVER_NAME === "1" &&
+         SystemUtilities.strNetworkId ) {
+
+      strResult = SystemUtilities.strNetworkId;
+
+    }
+    else {
+
+      strResult = SystemUtilities.getHostName();
+
+    }
+
+    return strResult;
+
+  }
+
 }

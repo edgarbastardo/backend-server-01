@@ -27,7 +27,7 @@ export default class SYSRoleHasRouteService extends BaseService {
   static async create( strRoleId: string,
                        strRouteId: string,
                        transaction: any,
-                       logger: any ): Promise<SYSRoleHasRoute> {
+                       logger: any ): Promise<SYSRoleHasRoute | Error> {
 
     let result = null;
 
@@ -57,7 +57,7 @@ export default class SYSRoleHasRouteService extends BaseService {
 
       let sysRoleHasRoute = await SYSRoleHasRoute.findOne( options );
 
-      if ( CommonUtilities.isNullOrEmpty( sysRoleHasRoute ) ) {
+      if ( !sysRoleHasRoute ) {
 
         sysRoleHasRoute = await SYSRoleHasRoute.create(
                                                         {
@@ -119,6 +119,8 @@ export default class SYSRoleHasRouteService extends BaseService {
         }
 
       }
+
+      result = error;
 
     }
 

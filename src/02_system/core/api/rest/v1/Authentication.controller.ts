@@ -6,6 +6,7 @@ import {
   Response,
   //NextFunction
 } from 'express';
+
 import {
   controller,
   //httpGet,
@@ -161,10 +162,12 @@ export default class AuthenticationController {
 
     const context = ( request as any ).context;
 
-    const result = await SecurityServiceController.tokenCheck( context.Language,
-                                                               context.Authorization,
+    //context.Language,
+    //context.Authorization,
+
+    const result = await SecurityServiceController.tokenCheck( request,
                                                                null,
-                                                               context.Logger );
+                                                               this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
 

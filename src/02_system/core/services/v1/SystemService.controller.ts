@@ -132,7 +132,7 @@ export default class SystemServiceController {
                      isNetworkLeaderFrom: SystemUtilities.bIsNetworkLeaderFrom ? SystemUtilities.bIsNetworkLeaderFrom.format() : "",
                      networkId: SystemUtilities.strNetworkId,
                      host: SystemUtilities.getHostName(),
-                     server: process.env.USE_NETWORK_ID_AS_SERVER_NAME === "1" && SystemUtilities.strNetworkId ? SystemUtilities.strNetworkId: SystemUtilities.getHostName(),
+                     server: SystemUtilities.getSystemId(),
                      rootPath: SystemUtilities.strBaseRootPath,
                      runPath: SystemUtilities.strBaseRunPath,
                      worker: cluster.worker && cluster.worker.id ? cluster.worker.id : "master",

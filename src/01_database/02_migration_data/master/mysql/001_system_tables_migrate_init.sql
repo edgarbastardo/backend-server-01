@@ -441,7 +441,7 @@ CREATE TABLE IF NOT EXISTS `sysConfigValueData` (
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`ConfigMetaDataId`,`Owner`),
   CONSTRAINT `FK_sysConfigVData_ConfigMetaDataId_From_sysConfigMData_Id` FOREIGN KEY (`ConfigMetaDataId`) REFERENCES `sysConfigMetaData` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store information about config value data related to config meta data entry.';
 
 CREATE TABLE IF NOT EXISTS `sysDatabaseLog` (
   `Id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'The event is an increasing self-generated , Why not a GUID ? to detect rows elimination of sequences should always be continuous.',
@@ -456,4 +456,42 @@ CREATE TABLE IF NOT EXISTS `sysDatabaseLog` (
   KEY `sysDatabaseLog_Operation_idx` (`Operation`),
   KEY `sysDatabaseLog_Table_idx` (`Table`),
   KEY `sysDatabaseLog_CreatedAt_idx` (`CreatedAt`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs of CREATE/UPDATE/DELETE in the database, but only for configured tables.';
+
+CREATE TABLE IF NOT EXISTS `sysSystemEventLog` (
+  `Id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'The event is an increasing self-generated , Why not a GUID ? to detect rows elimination of sequences should always be continuous.',
+  `SystemId` varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'System id. Example: hostname, networkleader.id',
+  `SystemName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of system was created the event example: backend-server-01\nweb-reactjs-frontend\nionic4-mobile-frontend',
+  `SubSystem` varchar(120) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'The subsystem name Example: notification, security',
+  `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUserSessionStatus field Token',
+  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUser field Id',
+  `UserName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the Name from table sysUser field Name',
+  `Code` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'An event code Example: ERROR_USER_GROUP_DISABLED',
+  `EventAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the event not the same of the creation of the row.',
+  `Data` json NOT NULL COMMENT 'Event data information',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`Id`),
+  KEY `sysSystemEventLog_UserId_idx` (`UserId`),
+  KEY `sysSystemEventLog_UserName_idx` (`UserName`)
+) ENGINE=InnoDB AUTO_INCREMENT=3941 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs and importat information.';
+
+CREATE TABLE IF NOT EXISTS `sysInstantMessageLog` (
+  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID',
+  `FromId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUser field Id',
+  `FromName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the user name from table sysUser field Name',
+  `ToId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUser field Id or room://',
+  `ToName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the user name from table sysUser field Name or room://',
+  `ToPresenceId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the id (socket io) from table sysUserSessionPresence field PresenceId or room://',
+  `Data` json NOT NULL COMMENT 'All information from the body field',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`Id`),
+  KEY `sysInstantMessageLog_FromId_idx` (`FromId`),
+  KEY `sysInstantMessageLog_FromName_idx` (`FromName`),
+  KEY `sysInstantMessageLog_ToId_idx` (`ToId`),
+  KEY `sysInstantMessageLog_ToName_idx` (`ToName`),
+  KEY `sysInstantMessageLog_CreatedAt_idx` (`CreatedAt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs of instant message.';

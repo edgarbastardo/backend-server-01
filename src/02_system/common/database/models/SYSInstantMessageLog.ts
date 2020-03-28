@@ -9,25 +9,25 @@ import {
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
-         AutoIncrement,
+         //AutoIncrement,
          //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
-
+import SystemUtilities from "../../SystemUtilities";
 
 //import uuidv4 from 'uuid/v4';
 //import Hashes from 'jshashes';
 //import moment from "moment-timezone";
 
 //import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+//import SystemUtilities from "../../SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "sysDatabaseLog",
-  modelName: "sysDatabaseLog"
+  tableName: "sysInstantMessageLog",
+  modelName: "sysInstantMessageLog"
 } )
-export class SYSDatabaseLog extends Model<SYSDatabaseLog> {
+export class SYSInstantMessageLog extends Model<SYSInstantMessageLog> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -35,19 +35,24 @@ export class SYSDatabaseLog extends Model<SYSDatabaseLog> {
 
   }
 
-  @AutoIncrement
   @PrimaryKey
-  @Column( { type: DataType.BIGINT } )
-  Id: number;
+  @Column( { type: DataType.STRING( 40 ) } )
+  Id: string;
 
-  @Column( { type: DataType.STRING( 10 ), allowNull: false } )
-  Operation: string;
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  FromId: string;
 
-  @Column( { type: DataType.STRING( 120 ), allowNull: false } )
-  Database: string;
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  FromName: string;
 
-  @Column( { type: DataType.STRING( 120 ), allowNull: false } )
-  Table: string;
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  ToId: string;
+
+  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  ToName: string;
+
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  ToPresenceId: string;
 
   @Column( { type: DataType.JSON, allowNull: false } )
   Data: string;
@@ -62,38 +67,38 @@ export class SYSDatabaseLog extends Model<SYSDatabaseLog> {
   ExtraData: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: SYSDatabaseLog, options: any ): void {
+  static beforeValidateHook( instance: SYSInstantMessageLog, options: any ): void {
 
-    //SystemUtilities.commonBeforeValidateHook( instance, options );
+    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-    //Never log this table!!. About recursion issue!!!
+    //Never log this table!!. Because this table is a log by self
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSDatabaseLog, options: any ): void {
+  static beforeCreateHook( instance: SYSInstantMessageLog, options: any ): void {
 
     //SystemUtilities.commonBeforeCreateHook( instance, options );
 
-    //Never log this table!!. About recursion issue!!!
+    //Never log this table!!. Because this table is a log by self
 
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSDatabaseLog, options: any ): void {
+  static beforeUpdateHook( instance: SYSInstantMessageLog, options: any ): void {
 
     //SystemUtilities.commonBeforeUpdateHook( instance, options );
 
-    //Never log this table!!. About recursion issue!!!
+    //Never log this table!!. Because this table is a log by self
 
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSDatabaseLog, options: any ): void {
+  static beforeDestroyHook( instance: SYSInstantMessageLog, options: any ): void {
 
     //SystemUtilities.commonBeforeDestroyHook( instance, options );
 
-    //Never log this table!!. About recursion issue!!!
+    //Never log this table!!. Because this table is a log by self
 
   }
 

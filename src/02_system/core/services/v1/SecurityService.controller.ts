@@ -1,5 +1,12 @@
 import cluster from 'cluster';
 
+import {
+  //Router,
+  Request,
+  //Response,
+  //NextFunction
+} from 'express';
+
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
@@ -23,12 +30,12 @@ import SYSUserService from "../../../common/database/services/SYSUserService";
 import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import { SYSUser } from '../../../common/database/models/SYSUser';
 import NotificationManager from '../../../common/managers/NotificationManager';
 import SYSUserSessionPresenceService from '../../../common/database/services/SYSUserSessionPresenceService';
 
-const debug = require( 'debug' )( 'SecurityServiceController' );
+import { SYSUser } from '../../../common/database/models/SYSUser';
 
+const debug = require( 'debug' )( 'SecurityServiceController' );
 
 export interface PasswordParameters {
 
@@ -1045,11 +1052,19 @@ export default class SecurityServiceController {
 
           NotificationManager.publishOnTopic( "SystemEvent",
                                               {
-                                                Name: processOptions.operation + "Success",
+                                                SystemId: SystemUtilities.getSystemId(),
+                                                SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                SubSystem: "Security",
                                                 Token: userSessionStatusData.Token,
                                                 UserId: userSessionStatusData.UserId,
                                                 UserName: userSessionStatusData.UserName,
                                                 UserGroupId: userSessionStatusData.UserGroupId,
+                                                Code: !processOptions.useCustomResponse ||
+                                                       processOptions.useCustomResponse === false ?
+                                                       "SUCCESS_LOGIN":
+                                                       processOptions.Code,
+                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                Data: {}
                                               },
                                               logger );
 
@@ -1233,8 +1248,16 @@ export default class SecurityServiceController {
 
         NotificationManager.publishOnTopic( "SystemEvent",
                                             {
-                                              Name: "UserLoginFailed",
-                                              UserName: strUserName
+                                              SystemId: SystemUtilities.getSystemId(),
+                                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                                              SubSystem: "Security",
+                                              Token: "Not apply",
+                                              UserId: "Not apply",
+                                              UserName: "Not apply",
+                                              UserGroupId: "Not apply",
+                                              Code: "ERROR_LOGIN_FAILED",
+                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                              Data: {}
                                             },
                                             logger );
 
@@ -1580,11 +1603,16 @@ export default class SecurityServiceController {
 
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
-                                                  Name: "UserLogoutSuccess",
+                                                  SystemId: SystemUtilities.getSystemId(),
+                                                  SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                  SubSystem: "Security",
                                                   Token: userSessionStatus.Token,
                                                   UserId: userSessionStatus.UserId,
                                                   UserName: userSessionStatus.UserName,
-                                                  UserGroupId: userSessionStatus.UserGroupId
+                                                  UserGroupId: userSessionStatus.UserGroupId,
+                                                  Code: "SUCCESS_LOGOUT",
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  Data: {}
                                                 },
                                                 logger );
 
@@ -1820,15 +1848,28 @@ export default class SecurityServiceController {
 
   }
 
-  static async tokenCheck( strLanguage: string,
-                           strToken: string,
+  static async tokenCheck( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
 
+    const context = ( request as any ).context;
+
+    const strLanguage = context.Language;
+
+    const userSessionStatus = context.UserSessionStatus;
+
     NotificationManager.publishOnTopic( "SystemEvent",
                                         {
-                                          Name: "UserTokenCheckSuccess",
-                                          Token: strToken
+                                          SystemId: SystemUtilities.getSystemId(),
+                                          SystemName: process.env.APP_SERVER_DATA_NAME,
+                                          SubSystem: "Security",
+                                          Token: userSessionStatus.Token,
+                                          UserId: userSessionStatus.UserId,
+                                          UserName: userSessionStatus.UserName,
+                                          UserGroupId: userSessionStatus.UserGroupId,
+                                          Code: "SUCCESS_TOKEN_IS_VALID",
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          Data: {}
                                         },
                                         logger );
 

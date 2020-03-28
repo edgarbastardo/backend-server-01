@@ -31,8 +31,7 @@ export const resolvers = {
 
     tokenCheckV1: async ( obj: any, args: any, context: any, info: any ) => {
 
-      return await SecurityServiceController.tokenCheck( context.Language,
-                                                         context.Autorization,
+      return await SecurityServiceController.tokenCheck( { context } as any,
                                                          null,
                                                          context.Logger );
 
