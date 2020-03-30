@@ -46,8 +46,8 @@ export default class SystemRuleOnlyWorkingTag {
 
         const userPresence = userPresenceList[ intIndex ];
 
-        if ( ( userPresence.sysUser.Role && userPresence.sysUser.Role.includes( "#PresenceWorking#" ) ||
-               userPresence.sysUserGroup.Role && userPresence.sysUserGroup.Role.includes( "#PresenceWorking#" )  ) ) {
+        if ( ( userPresence.sysUser.Role && userPresence.sysUser.Role.includes( "#PresenceWorking#" ) ) ||
+             ( userPresence.sysUserGroup.Role && userPresence.sysUserGroup.Role.includes( "#PresenceWorking#" ) ) ) {
 
           if ( userPresence.sysUserSessionStatus.Tag.includes( "#Working#" ) ) {
 
