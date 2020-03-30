@@ -16,16 +16,16 @@ import { BuildOptions } from "sequelize/types";
 
 import SystemUtilities from "../../SystemUtilities";
 
-import { SYSUserSessionStatus } from "./SYSUserSessionStatus";
-
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
+import { SYSUserSessionPresence } from "./SYSUserSessionPresence";
+import { SYSPresenceRoom } from "./SYSPresenceRoom";
 
 @Table( {
   timestamps: false,
-  tableName: "sysUserSessionPresence",
-  modelName: "sysUserSessionPresence"
+  tableName: "sysUserSessionPresenceInRoom",
+  modelName: "sysUserSessionPresenceInRoom"
 } )
-export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
+export class SYSUserSessionPresenceInRoom extends Model<SYSUserSessionPresenceInRoom> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -33,16 +33,14 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   }
 
-  @ForeignKey( () => SYSUserSessionStatus )
+  @ForeignKey( () => SYSUserSessionPresence )
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
-  UserSessionStatusToken: string;
+  UserSessionPresenceId: string;
 
-  @Column( { type: DataType.STRING( 75 ) } )
-  PresenceId: string;
-
-  @Column( { type: DataType.STRING( 120 ) } )
-  Server: string;
+  @ForeignKey( () => SYSPresenceRoom )
+  @Column( { type: DataType.STRING( 40 ) } )
+  RoomId: string;
 
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
@@ -50,29 +48,20 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   @Column( { type: DataType.STRING( 30 ) } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  UpdatedBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  UpdatedAt: string;
-
-  @Column( { type: DataType.JSON, allowNull: true } )
-  ExtraData: string;
-
   @BeforeValidate
-  static beforeValidateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeValidateHook( instance: SYSUserSessionPresenceInRoom, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeCreateHook( instance: SYSUserSessionPresenceInRoom, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysUserSessionPresenceInRoom",
                                              "create",
                                              instance,
                                              null );
@@ -80,14 +69,14 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeUpdateHook( instance: SYSUserSessionPresenceInRoom, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValuess };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysUserSessionPresenceInRoom",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -95,12 +84,12 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeDestroyHook( instance: SYSUserSessionPresenceInRoom, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysUserSessionPresenceInRoom",
                                              "delete",
                                              instance,
                                              null );
@@ -109,7 +98,7 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   public getPrimaryKey(): string[] {
 
-    return [ "UserSessionStatusToken" ];
+    return [ "UserSessionPresenceId", "RoomId" ];
 
   }
 

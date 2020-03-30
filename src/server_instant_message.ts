@@ -20,6 +20,7 @@ import I18NManager from "./02_system/common/managers/I18Manager";
 import SYSUserSessionPresenceService from "./02_system/common/database/services/SYSUserSessionPresenceService";
 import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
 import SYSInstantMessageLogService from './02_system/common/database/services/SYSInstantMessageLogService';
+import SYSUserSessionPresenceInRoomService from './02_system/common/database/services/SYSUserSessionPresenceInRoomService';
 
 let debug = require( 'debug' )( 'server_intant_message@main_process' );
 
@@ -161,6 +162,7 @@ export default class InstantMessageServer {
 
         const strToId = message.ToId[ intToIndex ];
         const strToName = message.ToName[ intToIndex ];
+        //const bIsRoom = message.ToPresenceId[ intToIndex ].startsWith( "room://" );
         const strToPresenceId = message.ToPresenceId[ intToIndex ].replace( "room://", "" );
 
         try {
@@ -172,6 +174,14 @@ export default class InstantMessageServer {
                                 }
 
           InstantMessageServer.socketIO.to( strToPresenceId ).emit( 'newMessage', messageToSend );
+
+          /*
+          //Update the field UpdatedBy in table sysUserSessionPresence
+
+          if ( bIsRoom === false ) {
+
+          }
+          */
 
           //Log the message sended
           const sysInstantMessageLog = await SYSInstantMessageLogService.create(
@@ -675,7 +685,7 @@ export default class InstantMessageServer {
                                                                                            UserSessionStatusToken: strAuthorization,
                                                                                            PresenceId: socket.id,
                                                                                            Server: strServer,
-                                                                                           Room: strRooms || "",
+                                                                                           //Room: strRooms || "",
                                                                                            CreatedBy: userSessionStatus.UserName,
                                                                                            CreatedAt: null
                                                                                          },
@@ -710,7 +720,23 @@ export default class InstantMessageServer {
             }
             else {
 
-              socket.roomList = strRooms.split( "," );
+              const roomList = strRooms.split( "," );
+
+              for ( let intIndexRoom = 0; intIndexRoom < roomList.length; intIndexRoom++ ) {
+
+                await SYSUserSessionPresenceInRoomService.create(
+                                                                  {
+                                                                    Name: roomList[ intIndexRoom ],
+                                                                    PresenceId: socket.id,
+                                                                    CreatedBy: userSessionStatus.UserName,
+                                                                  },
+                                                                  currentTransaction,
+                                                                  logger
+                                                                );
+
+              }
+
+              socket.roomList = roomList; //strRooms.split( "," );
 
               debugMark( "The user session presence is created %O", ( sysUserSessionPresence as any ).dataValues );
               bResult = true;

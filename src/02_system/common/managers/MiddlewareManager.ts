@@ -12,6 +12,9 @@ import SystemUtilities from '../SystemUtilities';
 
 import LoggerManager from './LoggerManager';
 import I18NManager from './I18Manager';
+import NotificationManager from './NotificationManager';
+import SYSUserSessionPresenceService from "../database/services/SYSUserSessionPresenceService";
+import { SYSUserSessionPresenceInRoom } from "../database/models/SYSUserSessionPresenceInRoom";
 
 const debug = require( 'debug' )( 'MiddlewareManager' );
 
@@ -535,6 +538,17 @@ export default class MiddlewareManager {
                  }
 
       }
+      else {
+
+        //Send to instant message server a message to disconnect this user
+        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                userSessionStatus.SocketToken,
+                                                                                strLanguage,
+                                                                                null, //No warnings
+                                                                                null, //No transaction
+                                                                                logger );
+
+      }
 
       return result;
 
@@ -562,12 +576,28 @@ export default class MiddlewareManager {
       }
       else if ( response ) {
 
+        //Send to instant message server a message to disconnect this user
+        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                userSessionStatus.SocketToken,
+                                                                                strLanguage,
+                                                                                null, //No warnings
+                                                                                null, //No transaction
+                                                                                logger );
+
         response.status( result.StatusCode ).send( result );
 
       }
 
     }
     else if ( response ) {
+
+      //Send to instant message server a message to disconnect this user
+      await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                              userSessionStatus.SocketToken,
+                                                                              strLanguage,
+                                                                              null, //No warnings
+                                                                              null, //No transaction
+                                                                              logger );
 
       response.status( result.StatusCode ).send( result );
 

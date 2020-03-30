@@ -40,10 +40,10 @@ import CommonConstants from "../../../common/CommonConstants";
 //import CipherManager from "../../common/managers/CipherManager";
 //import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../../common/managers/I18Manager";
-import { fetchAsyncQuestionPropertyQuestionProperty } from 'inquirer/lib/utils/utils';
-import { SYSUserSessionDevice } from '../../../common/database/models/SYSUserSessionDevice';
 import SYSUserSessionDeviceService from '../../../common/database/services/SYSUserSessionDeviceService';
 import SystemConstants from '../../../common/SystemContants';
+
+import { SYSUserSessionDevice } from '../../../common/database/models/SYSUserSessionDevice';
 //import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
 //import CacheManager from '../../../common/managers/CacheManager';
 //import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
@@ -58,6 +58,7 @@ import SystemConstants from '../../../common/SystemContants';
 //import dbConnection from "../../../common/managers/DBConnectionManager";
 //import { error } from 'winston';
 //import NotificationManager from "../../../common/managers/NotificationManager";
+
 
 const debug = require( 'debug' )( 'UserDeviceServiceController' );
 
@@ -146,10 +147,13 @@ export default class UserDeviceServiceController {
 
           if ( sysUserSessionDeviceInDB === null ) {
 
+            const deviceInfoParsed =  SystemUtilities.getParseDeviceInfo( request.body.Device );
+
             userSessionDeviceData = {
                                       UserSessionStatusToken: userSessionStatus.Token,
                                       PushToken: request.body.PushToken ? request.body.PushToken: null,
-                                      Device: request.body.Device,
+                                      DeviceInfoRaw: request.body.Device,
+                                      DeviceInfoParsed: CommonUtilities.jsonToString( deviceInfoParsed, logger ),
                                       CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       CreatedAt: null,
                                     };
@@ -157,9 +161,12 @@ export default class UserDeviceServiceController {
           }
           else {
 
+            const deviceInfoParsed =  SystemUtilities.getParseDeviceInfo( request.body.Device );
+
             userSessionDeviceData = ( sysUserSessionDeviceInDB as any ).dataValues;
             userSessionDeviceData.PushToken = request.body.PushToken ? request.body.PushToken: null;
-            userSessionDeviceData.Device = request.body.Device;
+            userSessionDeviceData.DeviceInfoRaw = request.body.Device;
+            userSessionDeviceData.DeviceInfoParsed = CommonUtilities.jsonToString( deviceInfoParsed, logger );
             userSessionDeviceData.UpdateBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userSessionDeviceData.UpdateBy = null;
 

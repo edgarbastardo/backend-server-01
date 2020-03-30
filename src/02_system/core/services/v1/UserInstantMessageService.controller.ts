@@ -1,5 +1,7 @@
 import cluster from 'cluster';
 
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 import {
   Request,
   //json,
@@ -14,9 +16,17 @@ import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from '../../../common/managers/CacheManager';
 import NotificationManager from "../../../common/managers/NotificationManager";
-import SYSUserSessionPresenceService from '../../../common/database/services/SYSUserSessionPresenceService';
+import SYSUserSessionPresenceService from "../../../common/database/services/SYSUserSessionPresenceService";
 import InstantMenssageManager from '../../../common/managers/InstantMessageManager';
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import { SYSUserSessionPresence } from '../../../common/database/models/SYSUserSessionPresence';
+import { SYSUser } from '../../../common/database/models/SYSUser';
+import { SYSPerson } from '../../../common/database/models/SYSPerson';
+import { SYSUserSessionStatus } from '../../../common/database/models/SYSUserSessionStatus';
+import PresenceManager from "../../../common/managers/PresenceManager";
+import { SYSUserSessionPresenceInRoom } from '../../../common/database/models/SYSUserSessionPresenceInRoom';
+import { SYSUserSessionDevice } from "../../../common/database/models/SYSUserSessionDevice";
+import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
 
 /*
 import NotificationManager from '../../../common/managers/NotificationManager';
@@ -24,6 +34,8 @@ import SYSUserSessionDeviceService from '../../../common/database/services/SYSUs
 import { SYSUserSessionDevice } from "../../../common/database/models/SYSUserSessionDevice";
 import { SYSUserSessionPresence } from "../../../common/database/models/SYSUserSessionPresence";
 import InstantMenssageManager from "../../../common/managers/InstantMessageManager";
+import PresenceManager from "../../../common/managers/PresenceManager";
+import { SYSUserSessionPresenceInRoom } from "../../../common/database/models/SYSUserSessionPresenceInRoom";
 */
 
 const debug = require( 'debug' )( 'UserInstantMessageServiceController' );
@@ -257,52 +269,15 @@ export default class UserInstantMessageServiceController {
                                                                currentTransaction,
                                                                logger );
 
-        const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
-                                                                                       null,
-                                                                                       currentTransaction,
-                                                                                       logger );
-
         const warnings = [];
 
-        if ( sysUserSessionPresence ) {
-
-          if ( sysUserSessionPresence instanceof Error ) {
-
-            NotificationManager.publishOnTopic( "InstantMessage",
-                                                {
-                                                  Name: "Disconnect",
-                                                  Token: userSessionStatus.Token,
-                                                  SocketToken: strSavedSocketToken,
-                                                  PresenceId: "@error",
-                                                  Server: "@error"
-                                                },
-                                                logger );
-
-            const error = sysUserSessionPresence as any;
-
-            warnings.push(
-                           {
-                             Code: 'WARNING_PRESENCE_DATA',
-                             Message: await I18NManager.translate( strLanguage, 'Error to try to get the data presence' ),
-                             Details: await SystemUtilities.processErrorDetails( error ) //error
-                           }
-                         );
-          }
-          else {
-
-            NotificationManager.publishOnTopic( "InstantMessage",
-                                                {
-                                                  Name: "Disconnect",
-                                                  Token: userSessionStatus.Token,
-                                                  SocketToken: strSavedSocketToken,
-                                                  PresenceId: sysUserSessionPresence.PresenceId,
-                                                  Server: sysUserSessionPresence.Server
-                                                },
-                                                logger );
-
-          }
-
-        }
+        //Send to instant message server a message to disconnect this user
+        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                strSavedSocketToken,
+                                                                                strLanguage,
+                                                                                warnings,
+                                                                                currentTransaction,
+                                                                                logger );
 
         result = {
                    StatusCode: 200, //Ok
@@ -333,6 +308,7 @@ export default class UserInstantMessageServiceController {
                               {
                                 Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
                                 Message: await I18NManager.translate( strLanguage, 'The instant message authorization token not found.' ),
+                                Details: null
                               }
                             ],
                     Warnings: [],
@@ -871,5 +847,922 @@ export default class UserInstantMessageServiceController {
     return result;
 
   }
+
+  static async presenceRoom( request: Request,
+                             transaction: any,
+                             logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                     null,
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+      if ( !sysUserSessionPresence ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                   Mark: 'B83DDA0FED39' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysUserSessionPresence instanceof Error ) {
+
+        const error = sysUserSessionPresence as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '0A27B82BF359' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        const roomDataList = await SYSUserSessionPresenceService.getUserSessionPresenceRoomList( sysUserSessionPresence.PresenceId,
+                                                                                                 currentTransaction,
+                                                                                                 logger );
+
+        if ( roomDataList instanceof Error ) {
+
+          const error = roomDataList as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: '72E62FB65722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else {
+
+          const roomInfoList = [];
+
+          for ( const currentRoom of roomDataList ) {
+
+            const roomInfo = {
+                               Id: currentRoom.Id,
+                               Name: currentRoom.Name
+                             };
+
+            roomInfoList.push( roomInfo );
+
+          }
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_ROOM_LIST',
+                     Message: await I18NManager.translate( strLanguage, 'Success get presence room list.' ),
+                     Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: roomInfoList.length,
+                     Data: roomInfoList
+                   }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.presenceRoom.name;
+
+      const strMark = "640F892436D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async presenceRoomCount( request: Request,
+                                  transaction: any,
+                                  logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                     null,
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+      if ( !sysUserSessionPresence ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                   Mark: '0EA89FC0BAE3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysUserSessionPresence instanceof Error ) {
+
+        const error = sysUserSessionPresence as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: 'B9564173315E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        const roomCount = await SYSUserSessionPresenceService.getUserSessionPresenceRoomListCount( sysUserSessionPresence.PresenceId,
+                                                                                                   currentTransaction,
+                                                                                                   logger );
+
+        if ( roomCount instanceof Error ) {
+
+          const error = roomCount as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: 'ERROR_UNEXPECTED',
+                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Mark: '72E62FB65722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_ROOM_LIST_COUNT',
+                     Message: await I18NManager.translate( strLanguage, 'Success get presence room list count.' ),
+                     Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             {
+                               Count: roomCount.length > 0 ? roomCount[ 0 ].Count: 0
+                             }
+                           ]
+                   }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.presenceRoomCount.name;
+
+      const strMark = "325B5BE115D3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async presence( request: Request,
+                         transaction: any,
+                         logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const strTimeZoneId = context.TimeZoneId;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                     null,
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+      if ( !sysUserSessionPresence ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                   Mark: 'A80DD97E9086' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( sysUserSessionPresence instanceof Error ) {
+
+        const error = sysUserSessionPresence as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_UNEXPECTED',
+                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Mark: '0D9B7BEAB10F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        const strSelectField = SystemUtilities.createSelectAliasFromModels(
+                                                                            [
+                                                                              SYSUserSessionPresenceInRoom,
+                                                                              SYSUserSessionPresence,
+                                                                              SYSUserSessionStatus,
+                                                                              SYSUser,
+                                                                              SYSUserGroup,
+                                                                              SYSPerson,
+                                                                              SYSUserSessionDevice
+                                                                            ],
+                                                                            [
+                                                                              "A",
+                                                                              "B",
+                                                                              "C",
+                                                                              "D",
+                                                                              "E",
+                                                                              "F",
+                                                                              "G"
+                                                                            ]
+                                                                          );
+
+        let strSQL = DBConnectionManager.getStatement( "master",
+                                                       "getUserSessionPresenceList",
+                                                       {
+                                                         SelectFields: strSelectField,
+                                                       },
+                                                       logger );
+
+        strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
+
+        strSQL = strSQL + " And ( A.RoomId = '" + ( request.query.roomId ? request.query.roomId: "@-Not_Exists_Id-@" ) + "' ) "; // And C.Token != '" + userSessionStatus.Token + "' ) ";
+
+        /*
+        const roomList = sysUserSessionPresence.Room.split( "," ).sort();
+
+        for ( let intRoomIndex = 0; intRoomIndex < roomList.length; intRoomIndex++ ) {
+
+          if ( intRoomIndex == 0 ) {
+
+            strSQL = strSQL + ` A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+
+          }
+          else {
+
+            strSQL = strSQL + ` Or A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+
+          }
+
+        }
+
+        strSQL = strSQL + " ) ";
+        */
+
+        strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
+
+        let intLimit = 200;
+
+        const warnings = [];
+
+        if ( request.query.limit &&
+             isNaN( request.query.limit ) === false &&
+             parseInt( request.query.limit ) <= intLimit ) {
+
+          intLimit = parseInt( request.query.limit );
+
+        }
+        else {
+
+          warnings.push(
+                         {
+                           Code: 'WARNING_DATA_LIMITED_TO_MAX',
+                           Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
+                           Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                         }
+                       );
+
+        }
+
+        strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+
+        //ANCHOR dbConnection.query
+        const rows = await dbConnection.query(
+                                               strSQL,
+                                               {
+                                                 raw: true,
+                                                 type: QueryTypes.SELECT,
+                                                 transaction: currentTransaction
+                                               }
+                                             );
+
+        const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject(
+                                                                                            rows,
+                                                                                            [
+                                                                                              SYSUserSessionPresenceInRoom,
+                                                                                              SYSUserSessionPresence,
+                                                                                              SYSUserSessionStatus,
+                                                                                              SYSUser,
+                                                                                              SYSUserGroup,
+                                                                                              SYSPerson,
+                                                                                              SYSUserSessionDevice
+                                                                                            ],
+                                                                                            [
+                                                                                              "A",
+                                                                                              "B",
+                                                                                              "C",
+                                                                                              "D",
+                                                                                              "E",
+                                                                                              "F",
+                                                                                              "G"
+                                                                                            ]
+                                                                                          );
+
+        const filteredRows = await PresenceManager.filterList( userSessionStatus,
+                                                               transformedRows,
+                                                               currentTransaction,
+                                                               {},
+                                                               logger );
+
+        //const filteredRows = PresenceManager.filter();
+        const convertedRows = [];
+
+        for ( const currentRow of filteredRows ) {
+
+          const strDeviceInfoParsed = currentRow.sysUserSessionDevice ? currentRow.sysUserSessionDevice.DeviceInfoParsed: "{}";
+
+          const jsonDeviceInfoParsed = CommonUtilities.parseJSON( strDeviceInfoParsed,
+                                                                  logger );
+
+          const jsonPresenceInfo = {
+                                     Id: currentRow.sysUser.Id,
+                                     Name: currentRow.sysUser.Name,
+                                     FirstName: currentRow.sysPerson ? currentRow.sysPerson.FirstName: null,
+                                     LastName: currentRow.sysPerson ? currentRow.sysPerson.LastName: null,
+                                     Device: jsonDeviceInfoParsed ? jsonDeviceInfoParsed: "",
+                                     UpdatedAt: SystemUtilities.transformToTimeZone( currentRow.sysUserSessionStatus.UpdatedAt,
+                                                                                     strTimeZoneId,
+                                                                                     null,
+                                                                                     logger ),
+                                   };
+
+          convertedRows.push( jsonPresenceInfo );
+          /*
+          const tempModelData = await SYSUserGroup.convertFieldValues(
+                                                                       {
+                                                                         Data: currentRow,
+                                                                         FilterFields: 1, //Force to remove fields like password and value
+                                                                         TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                         Include: null,
+                                                                         Logger: logger,
+                                                                         ExtraInfo: {
+                                                                                      Request: request
+                                                                                    }
+                                                                       }
+                                                                     );
+          if ( tempModelData ) {
+
+            convertedRows.push( tempModelData );
+
+          }
+          else {
+
+            convertedRows.push( currentRow );
+
+          }
+          */
+
+        }
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_PRESENCE_LIST',
+                   Message: await I18NManager.translate( strLanguage, 'Success get presence list.' ),
+                   Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: warnings,
+                   Count: convertedRows.length,
+                   Data: convertedRows
+                 }
+
+        bApplyTransaction = true;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.presence.name;
+
+      const strMark = "CE4BA31CB8FD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  /*
+  static async presenceCount( request: Request,
+                              transaction: any,
+                              logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      //
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.presenceCount.name;
+
+      const strMark = "9F4A1B17D45B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+  */
 
 }

@@ -46,8 +46,8 @@ export default class Always {
                                  {
                                    Id: "d7648ed4-1914-4fe4-9902-072a21db1f00",
                                    Name: "Drivers",
-                                   Role: "#Drivers#",
-                                   Tag: "#Drivers#",
+                                   Role: "#Drivers#,#PresenceWorking#",
+                                   Tag: "#Drivers#,#PresenceWorking#",
                                    Comment: "Created from backend startup. Group of users for testing.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,

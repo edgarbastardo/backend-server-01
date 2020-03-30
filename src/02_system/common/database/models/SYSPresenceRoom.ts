@@ -16,16 +16,14 @@ import { BuildOptions } from "sequelize/types";
 
 import SystemUtilities from "../../SystemUtilities";
 
-import { SYSUserSessionStatus } from "./SYSUserSessionStatus";
-
 import SYSDatabaseLogService from "../services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
-  tableName: "sysUserSessionPresence",
-  modelName: "sysUserSessionPresence"
+  tableName: "sysPresenceRoom",
+  modelName: "sysPresenceRoom"
 } )
-export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
+export class SYSPresenceRoom extends Model<SYSPresenceRoom> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -33,16 +31,12 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   }
 
-  @ForeignKey( () => SYSUserSessionStatus )
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
-  UserSessionStatusToken: string;
-
-  @Column( { type: DataType.STRING( 75 ) } )
-  PresenceId: string;
+  Id: string;
 
   @Column( { type: DataType.STRING( 120 ) } )
-  Server: string;
+  Name: string;
 
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
@@ -50,29 +44,20 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   @Column( { type: DataType.STRING( 30 ) } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  UpdatedBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  UpdatedAt: string;
-
-  @Column( { type: DataType.JSON, allowNull: true } )
-  ExtraData: string;
-
   @BeforeValidate
-  static beforeValidateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeValidateHook( instance: SYSPresenceRoom, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeCreateHook( instance: SYSPresenceRoom, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysPresenceRoom",
                                              "create",
                                              instance,
                                              null );
@@ -80,14 +65,14 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeUpdateHook( instance: SYSPresenceRoom, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValuess };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysPresenceRoom",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -95,12 +80,12 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSUserSessionPresence, options: any ): void {
+  static beforeDestroyHook( instance: SYSPresenceRoom, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysUserSessionPresence",
+                                             "sysPresenceRoom",
                                              "delete",
                                              instance,
                                              null );
@@ -109,7 +94,7 @@ export class SYSUserSessionPresence extends Model<SYSUserSessionPresence> {
 
   public getPrimaryKey(): string[] {
 
-    return [ "UserSessionStatusToken" ];
+    return [ "Id" ];
 
   }
 

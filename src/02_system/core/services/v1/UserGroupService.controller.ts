@@ -2926,18 +2926,20 @@ export default class UserGroupServiceController {
       strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
 
       //ANCHOR dbConnection.query
-      const rows = await dbConnection.query( strSQL, {
-                                                       raw: true,
-                                                       type: QueryTypes.SELECT,
-                                                       transaction: currentTransaction
-                                                     } );
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
 
-      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows, [
-                                                                                                  SYSUserGroup,
-                                                                                                ],
-                                                                                                [
-                                                                                                  "A",
-                                                                                                ] );
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                          [
+                                                                                            SYSUserGroup,
+                                                                                          ],
+                                                                                          [
+                                                                                            "A",
+                                                                                          ] );
 
       const convertedRows = [];
 

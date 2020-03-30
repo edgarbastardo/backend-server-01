@@ -202,20 +202,6 @@ CREATE TABLE IF NOT EXISTS `sysUserSignup` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the user auto signup table information';
 
-CREATE TABLE IF NOT EXISTS `sysUserDevice` (
-  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of User table.',
-  `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Registration token from extenal services like one signal push',
-  `Device` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Generic device info',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user updated the row.',
-  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`UserId`,`Token`),
-  KEY `FK_SessionStatus_Token_idx` (`Token`),
-  CONSTRAINT `FK_sysUserDevice_UserId_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the device register by the user.';
-
 CREATE TABLE IF NOT EXISTS `sysUserSessionStatus` (
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign Key to the Id field of sysUser table.',
   `Token` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Authentication token',
@@ -272,7 +258,8 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionPersistent` (
 CREATE TABLE IF NOT EXISTS `sysUserSessionDevice` (
   `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID. And foreign key from Token field value in table sysUserSessionStatus',
   `PushToken` varchar(175) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Token provided by push provider.',
-  `Device` varchar(250) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Device information.',
+  `DeviceInfoRaw` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Device information.',
+  `DeviceInfoParsed` varchar(250) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Parsed device information.',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
@@ -286,15 +273,34 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionPresence` (
   `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID. And foreign key from Token field value in table sysUserSessionStatus',
   `PresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Socket Id',
   `Server` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name host name or server where the user is connected right now',
-  `Room` varchar(2048) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the rooms where the user has right to write. Example: #Support#,#Drivers#',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserSessionStatusToken`),
+  UNIQUE KEY `UNQ_sysUserSessionPresence_PresenceId_idx` (`PresenceId`),
   CONSTRAINT `FK_sysUserSessionPresence_Token_From_sysUserSessionStatus_Token` FOREIGN KEY (`UserSessionStatusToken`) REFERENCES `sysUserSessionStatus` (`Token`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence information associated to the session';
+
+CREATE TABLE IF NOT EXISTS `sysUserSessionPresenceInRoom` (
+  `UserSessionPresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the PresenceId field of sysUserSessionPresence table.',
+  `RoomId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of sysPresenceRoom table.',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  PRIMARY KEY (`UserSessionPresenceId`,`RoomId`),
+  CONSTRAINT `FK_sysUserSPInRoom_PresenceId_From_sysUserSP_PresenceId` FOREIGN KEY (`UserSessionPresenceId`) REFERENCES `sysUserSessionPresence` (`PresenceId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_sysUserSPInRoom_RoomId_From_sysPresenceRoom_RoomId` FOREIGN KEY (`RoomId`) REFERENCES `sysPresenceRoom` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence information relation between sysUserSessionPresence and sysPresenceRoom tables';
+
+CREATE TABLE IF NOT EXISTS `sysPresenceRoom` (
+  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
+  `Name` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the room',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UNQ_sysPresenceRoom_Name_idx` (`Name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence room information';
 
 CREATE TABLE IF NOT EXISTS `sysRoute` (
   `Id` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Id from path, generated with xxhash',

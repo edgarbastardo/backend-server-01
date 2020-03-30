@@ -48,8 +48,11 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
   @Column( { type: DataType.STRING( 175 ), allowNull: true } )
   PushToken: string;
 
+  @Column( { type: DataType.STRING( 512 ), allowNull: false } )
+  DeviceInfoRaw: string;
+
   @Column( { type: DataType.STRING( 250 ), allowNull: false } )
-  Device: string;
+  DeviceInfoParsed: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -136,11 +139,6 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
                                                             strTimeZoneId,
                                                             params.Logger );
 
-        result.PasswordSetAt = SystemUtilities.transformToTimeZone( result.PassswordSetAt,
-                                                                    strTimeZoneId,
-                                                                    undefined,
-                                                                    params.logger );
-
         if ( Array.isArray( params.Include ) ) {
 
           for ( const modelIncluded of params.Include ) {
@@ -159,6 +157,13 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
           }
 
         }
+
+      }
+
+      if ( result.DeviceInfoParsed ) {
+
+        result.DeviceInfoParsed = CommonUtilities.parseJSON( result.DeviceInfoParsed,
+                                                             params.logger );
 
       }
 

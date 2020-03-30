@@ -14,6 +14,8 @@ import BaseService from "./BaseService";
 
 import { SYSUserSessionPresence } from "../models/SYSUserSessionPresence";
 import SYSConfigValueDataService from './SYSConfigValueDataService';
+import NotificationManager from '../../managers/NotificationManager';
+import I18NManager from '../../managers/I18Manager';
 
 const debug = require( 'debug' )( 'SYSUserSessionPresenceService' );
 
@@ -893,5 +895,508 @@ export default class SYSUserSessionPresenceService extends BaseService {
     return strResult;
 
   }
+
+  static async getUserSessionPresenceRoomList( strPresenceId: string,
+                                               transaction: any,
+                                               logger: any ): Promise<any|Error> {
+
+    let result = [];
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getUserSessionPresenceRoomList",
+                                                     {
+                                                        PresenceId: strPresenceId,
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( rows &&
+           rows.length > 0 ) {
+
+        result = rows;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserSessionPresenceRoomList.name;
+
+      const strMark = "50C8005B26D2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getUserSessionPresenceRoomListCount( strPresenceId: string,
+                                                    transaction: any,
+                                                    logger: any ): Promise<any|Error> {
+
+    let result = [];
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getUserSessionPresenceRoomListCount",
+                                                     {
+                                                        PresenceId: strPresenceId,
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( rows &&
+           rows.length > 0 ) {
+
+        result = rows;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserSessionPresenceRoomList.name;
+
+      const strMark = "50C8005B26D2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async disconnectFromInstantMessageServer( userSessionStatus: any,
+                                                   strSavedSocketToken: string,
+                                                   strLanguage: string,
+                                                   warnings: any[],
+                                                   transaction: any,
+                                                   logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      if ( strSavedSocketToken ) {
+
+        const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
+                                                                                       null,
+                                                                                       currentTransaction,
+                                                                                       logger );
+
+        if ( sysUserSessionPresence ) {
+
+          if ( sysUserSessionPresence instanceof Error ) {
+
+            NotificationManager.publishOnTopic( "InstantMessage",
+                                                {
+                                                  Name: "Disconnect",
+                                                  Token: userSessionStatus.Token,
+                                                  SocketToken: strSavedSocketToken,
+                                                  PresenceId: "@error",
+                                                  Server: "@error"
+                                                },
+                                                logger );
+
+            const error = sysUserSessionPresence as any;
+
+            if ( warnings ) {
+
+              warnings.push(
+                            {
+                              Code: 'WARNING_PRESENCE_DATA',
+                              Message: await I18NManager.translate( strLanguage, 'Error to try to get the data presence' ),
+                              Details: await SystemUtilities.processErrorDetails( error ) //error
+                            }
+                          );
+
+            }
+
+          }
+          else {
+
+            NotificationManager.publishOnTopic( "InstantMessage",
+                                                {
+                                                  Name: "Disconnect",
+                                                  Token: userSessionStatus.Token,
+                                                  SocketToken: strSavedSocketToken,
+                                                  PresenceId: sysUserSessionPresence.PresenceId,
+                                                  Server: sysUserSessionPresence.Server
+                                                },
+                                                logger );
+
+          }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.disconnectFromInstantMessageServer.name;
+
+      const strMark = "0F336DF22F35" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  /*
+  static async getUserPresenceInRoomList( request: any,
+                                          roomList: string[],
+                                          transaction: any,
+                                          logger: any ): Promise<any> {
+
+    let result = [];
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strSelectField = SystemUtilities.createSelectAliasFromModels(
+                                                                          [
+                                                                            SYSUserSessionPresence,
+                                                                            SYSUser,
+                                                                          ],
+                                                                          [
+                                                                            "A",
+                                                                            "C",
+                                                                          ]
+                                                                        );
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getUserSessionPresenceInRoomList",
+                                                     {
+                                                       SelectFields: strSelectField,
+                                                     },
+                                                     logger );
+
+      for ( let intRoomIndex = 0; intRoomIndex < roomList.length; intRoomIndex++ ) {
+
+        if ( intRoomIndex == 0 ) {
+
+          strSQL = strSQL + ` A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+
+        }
+        else {
+
+          strSQL = strSQL + ` And A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+
+        }
+
+      }
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               logging: console.log,
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction,
+                                             } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                          [
+                                                                                            SYSUserSessionPresence,
+                                                                                            SYSUser
+                                                                                          ],
+                                                                                          [
+                                                                                            "A",
+                                                                                            "C"
+                                                                                          ] );
+
+      result = transformedRows;
+
+      /*
+      const convertedRows = [];
+
+      for ( const currentRow of transformedRows ) {
+
+        const tempModelData = await SYSUserGroup.convertFieldValues(
+                                                                     {
+                                                                       Data: currentRow,
+                                                                       FilterFields: 1, //Force to remove fields like password and value
+                                                                       TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                       Include: null,
+                                                                       Logger: logger,
+                                                                       ExtraInfo: {
+                                                                                    Request: request
+                                                                                  }
+                                                                     }
+                                                                   );
+        if ( tempModelData ) {
+
+          convertedRows.push( tempModelData );
+
+        }
+        else {
+
+          convertedRows.push( currentRow );
+
+        }
+
+      }
+      */
+
+      /*
+      if ( rows &&
+           rows.length > 0 ) {
+
+        result = rows;
+
+      }
+      * /
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getUserPresenceInRoomList.name;
+
+      const strMark = "1C05D067A415" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+  */
 
 }

@@ -98,6 +98,40 @@ export default class SystemQueries {
         strResult = SqlString.format( `Select Distinct Server From sysUserSessionPresence Where Server != ?`, params.Server );
 
       }
+      else if ( strName === 'getUserSessionPresenceRoomList' ) {
+
+        strResult = SqlString.format( `Select A.* From sysPresenceRoom As A Inner Join sysUserSessionPresenceInRoom As B On B.RoomId = A.Id Where B.UserSessionPresenceId = ? Order By A.Name Desc`, params.PresenceId );
+
+      }
+      else if ( strName === 'getUserSessionPresenceRoomListCount' ) {
+
+        strResult = SqlString.format( `Select Count( A.Id ) As Count From sysPresenceRoom As A Inner Join sysUserSessionPresenceInRoom As B On B.RoomId = A.Id Where B.UserSessionPresenceId = ? Order By A.Name Desc`, params.PresenceId );
+
+      }
+      else if ( strName === "getUserSessionPresenceList" ) {
+
+        strResult = `Select ${params.SelectFields} From
+                       sysUserSessionPresenceInRoom As A Inner Join
+                       sysUserSessionPresence As B On B.PresenceId = A.UserSessionPresenceId Inner Join
+                       sysUserSessionStatus As C On C.Token = B.UserSessionStatusToken Inner Join
+                       sysUser As D On D.Id = C.UserId Inner Join
+                       sysUserGroup As E On E.Id = D.GroupId Left Outer Join
+                       sysPerson As F On F.Id = D.PersonId Left Outer join
+                       sysUserSessionDevice As G On G.UserSessionStatusToken = C.Token Where `;
+
+      }
+      else if ( strName === "getUserSessionPresenceListCount" ) {
+
+        strResult = `Select Count( A.RoomId ) As Count From
+                       sysUserSessionPresenceInRoom As A Inner Join
+                       sysUserSessionPresence As B On B.PresenceId = A.UserSessionPresenceId Inner Join
+                       sysUserSessionStatus As C On C.Token = B.UserSessionStatusToken Inner Join
+                       sysUser As D On D.Id = C.UserId Inner Join
+                       sysUserGroup As E On E.Id = D.GroupId Left Outer Join
+                       sysPerson As F On F.Id = D.PersonId Left Outer Join
+                       sysUserSessionDevice As G On G.UserSessionStatusToken = C.Token Where `;
+
+      }
       else if ( strName === "getUserSessionPresenceIdByUserName" ) {
 
         strResult = SqlString.format( `Select B.* From

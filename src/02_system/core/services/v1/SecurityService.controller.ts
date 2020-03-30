@@ -1551,55 +1551,13 @@ export default class SecurityServiceController {
 
             const warnings = [];
 
-            if ( strSavedSocketToken ) {
-
-              const sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( userSessionStatus.Token,
-                                                                                             null,
-                                                                                             currentTransaction,
-                                                                                             logger );
-
-              if ( sysUserSessionPresence ) {
-
-                if ( sysUserSessionPresence instanceof Error ) {
-
-                  NotificationManager.publishOnTopic( "InstantMessage",
-                                                      {
-                                                        Name: "Disconnect",
-                                                        Token: userSessionStatus.Token,
-                                                        SocketToken: strSavedSocketToken,
-                                                        PresenceId: "@error",
-                                                        Server: "@error"
-                                                      },
-                                                      logger );
-
-                  const error = sysUserSessionPresence as any;
-
-                  warnings.push(
-                                 {
-                                   Code: 'WARNING_PRESENCE_DATA',
-                                   Message: await I18NManager.translate( strLanguage, 'Error to try to get the data presence' ),
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               );
-
-                }
-                else {
-
-                  NotificationManager.publishOnTopic( "InstantMessage",
-                                                      {
-                                                        Name: "Disconnect",
-                                                        Token: userSessionStatus.Token,
-                                                        SocketToken: strSavedSocketToken,
-                                                        PresenceId: sysUserSessionPresence.PresenceId,
-                                                        Server: sysUserSessionPresence.Server
-                                                      },
-                                                      logger );
-
-                }
-
-              }
-
-            }
+            //Send to instant message server a message to disconnect this user
+            await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                    userSessionStatus.SocketToken,
+                                                                                    strLanguage,
+                                                                                    warnings,
+                                                                                    currentTransaction,
+                                                                                    logger );
 
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {

@@ -30,6 +30,7 @@ import InstantMenssageManager from './02_system/common/managers/InstantMessageMa
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
 import SYSSystemEventLogService from './02_system/common/database/services/SYSSystemEventLogService';
+import PresenceManager from './02_system/common/managers/PresenceManager';
 
 let debug = null; //require( 'debug' )( 'server' );
 
@@ -473,6 +474,8 @@ export default async function main() {
                               LoggerManager.createMainLogger );
 
     await InstantMenssageManager.loadRules( LoggerManager.mainLoggerInstance );
+
+    await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
 
     if ( cluster.isMaster ) {
 

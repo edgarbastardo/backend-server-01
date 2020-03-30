@@ -346,7 +346,7 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#MasterL01#",  //No need the #UploadBinary#,#DeleteBinary#,#UpdateBinary# because #MasterL01# allow that
+                                                                "userRole":"#MasterL01#,#Establishment#,#PresenceWorking#",  //No need the #UploadBinary#,#DeleteBinary#,#UpdateBinary# because #MasterL01# allow that
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":"#Establishments#"
@@ -373,6 +373,12 @@ export default class Always {
                                                                 "#MasterL03#": {
                                                                   "@__default__@": "#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
                                                                 },
+                                                                "#Driver#": {
+                                                                  "@__default__@": "#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                },
+                                                                "#Establishment#": {
+                                                                  "@__default__@": "#PresenceWorking#,#SearchBinary#,#UploadBinary#,#UpdateBinary#,#DeleteBinary#"
+                                                                }
                                                               },
                                                               "update": {
                                                                 "@__default__@":{

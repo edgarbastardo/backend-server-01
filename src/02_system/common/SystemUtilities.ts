@@ -17,6 +17,8 @@ import readChunk from 'read-chunk';
 import fileType from 'file-type';
 //import { loggers } from "winston";
 
+import { UAParser } from 'ua-parser-js';
+
 import archiver, { ArchiverError } from 'archiver';
 
 import NodeRSA from 'node-rsa';
@@ -352,7 +354,7 @@ export default class SystemUtilities {
   static transformToTimeZone( at: any,
                               strTimeZoneId: string,
                               strDateFormat: string,
-                              logger: any ) {
+                              logger: any ): any {
 
     let result = null;
 
@@ -3258,6 +3260,64 @@ export default class SystemUtilities {
     }
 
     return strResult;
+
+  }
+
+  static getParseDeviceInfo( strParseDeviceInfo: string ): any {
+
+    let result = null;
+
+    try {
+
+      result = new UAParser( strParseDeviceInfo ).getResult();
+
+      delete result.ua;
+
+    }
+    catch ( error ) {
+
+      result = {
+
+                 browser: {
+
+                   name: "Unknown",
+                   version: "Unknown"
+
+                 },
+
+                 engine: {
+
+                   name: "Unknown",
+                   version: "Unknown"
+
+                 },
+
+                 os: {
+
+                   name: "Unknown",
+                   version: "Unknown"
+
+                 },
+
+                 device: {
+
+                   model: "Unknown",
+                   type: "Unknown",
+                   vendor: "Unknown"
+
+                 },
+
+                 cpu: {
+
+                   architecture: "Unknown"
+
+                 }
+
+               };
+
+    }
+
+    return result;
 
   }
 

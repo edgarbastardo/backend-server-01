@@ -101,6 +101,10 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant message to another live connected user" },
+                                  { Path: UserController._BASE_PATH + "/presence/room", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list of cusrrom user session" },
+                                  { Path: UserController._BASE_PATH + "/presence/room/count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list count of current user session" },
+                                  { Path: UserController._BASE_PATH + "/presence", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list of user connected" },
+                                  //{ Path: UserController._BASE_PATH + "/presence/count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list count of user connected" },
                                   //{ Path: UserController._BASE_PATH + "/routes1", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
                                 ]
 
@@ -792,5 +796,75 @@ export default class UserController {
     response.status( result.StatusCode ).send( result );
 
   }
+
+  @httpGet(
+            "/presence/room",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async presenceRoom( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.presenceRoom( request,
+                                                                           null,
+                                                                           this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/presence/room/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async presenceRoomCount( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.presenceRoomCount( request,
+                                                                                null,
+                                                                                this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/presence",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async presence( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.presence( request,
+                                                                       null,
+                                                                       this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  /*
+  @httpGet(
+            "/presence/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async presenceCount( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.presenceCount( request,
+                                                                            null,
+                                                                            this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+  */
 
 }
