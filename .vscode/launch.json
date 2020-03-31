@@ -68,6 +68,20 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug Backend Server Task Process (Main)",
+      "program": "${workspaceFolder}/src/server_task.ts",
+      "args": [],
+      "outputCapture": "std",
+      "preLaunchTask": "build-task-server",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Program Test 01 REST API",
       "program": "${workspaceFolder}/src/04_test/standalone/Test01_v1.ts",
       "args": [

@@ -28,6 +28,12 @@
       "problemMatcher": []
     },
     {
+      "label": "build-task-server",
+      "type": "npm",
+      "script": "build-task-server",
+      "problemMatcher": []
+    },
+    {
       "label": "deploy",
       "type": "npm",
       "script": "deploy",

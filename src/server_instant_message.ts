@@ -24,7 +24,7 @@ import SYSUserSessionPresenceInRoomService from './02_system/common/database/ser
 
 let debug = require( 'debug' )( 'server_intant_message@main_process' );
 
-export default class InstantMessageServer {
+export default class ServerInstantMessage {
 
   static serverHTTP = null;
   static socketIO = null;
@@ -73,7 +73,7 @@ export default class InstantMessageServer {
 
         if ( !message.Disconnected ) {
 
-          InstantMessageServer.socketIO.in( message.PresenceId ).disconnect();
+          ServerInstantMessage.socketIO.in( message.PresenceId ).disconnect();
 
         }
 
@@ -173,7 +173,7 @@ export default class InstantMessageServer {
                                   Body: message.Body
                                 }
 
-          InstantMessageServer.socketIO.to( strToPresenceId ).emit( 'newMessage', messageToSend );
+          ServerInstantMessage.socketIO.to( strToPresenceId ).emit( 'newMessage', messageToSend );
 
           /*
           //Update the field UpdatedBy in table sysUserSessionPresence
@@ -311,12 +311,12 @@ export default class InstantMessageServer {
                jsonMessage.Server &&
                jsonMessage.Mark ) {
 
-            InstantMessageServer.peerServersLastReport[ jsonMessage.Server ] = jsonMessage.Mark;
+            ServerInstantMessage.peerServersLastReport[ jsonMessage.Server ] = jsonMessage.Mark;
 
           }
 
         }
-        else if ( strTopic === InstantMessageServer.strTopicServer ) {
+        else if ( strTopic === ServerInstantMessage.strTopicServer ) {
 
           if ( jsonMessage.Name === "Ping" ) {
 
@@ -324,7 +324,7 @@ export default class InstantMessageServer {
             NotificationManager.publishOnTopic( jsonMessage.Topic,
                                                 {
                                                   Name: "Pong",
-                                                  Server: InstantMessageServer.strTopicServer,
+                                                  Server: ServerInstantMessage.strTopicServer,
                                                   Mark: SystemUtilities.getCurrentDateAndTime().format()
                                                 },
                                                 LoggerManager.mainLoggerInstance );
@@ -337,9 +337,9 @@ export default class InstantMessageServer {
           if ( jsonMessage.Name === "Disconnect" ) {
 
             if ( jsonMessage.PresenceId !== "@error" &&
-                 jsonMessage.Server === InstantMessageServer.strTopicServer ) {
+                 jsonMessage.Server === ServerInstantMessage.strTopicServer ) {
 
-              await InstantMessageServer.disconnect( InstantMessageServer.strTopicServer,
+              await ServerInstantMessage.disconnect( ServerInstantMessage.strTopicServer,
                                                      jsonMessage,
                                                      LoggerManager.mainLoggerInstance );
 
@@ -348,7 +348,7 @@ export default class InstantMessageServer {
           }
           else if ( jsonMessage.Name === "Send" ) {
 
-            await InstantMessageServer.send( InstantMessageServer.strTopicServer,
+            await ServerInstantMessage.send( ServerInstantMessage.strTopicServer,
                                              jsonMessage,
                                              LoggerManager.mainLoggerInstance );
 
@@ -408,7 +408,7 @@ export default class InstantMessageServer {
       }
 
       //Select Distinct A.Server From sysUserSessionPresence As A
-      const serverList = await SYSUserSessionPresenceService.getUserSessionPresenceServerList( InstantMessageServer.strTopicServer,
+      const serverList = await SYSUserSessionPresenceService.getUserSessionPresenceServerList( ServerInstantMessage.strTopicServer,
                                                                                                currentTransaction,
                                                                                                LoggerManager.mainLoggerInstance );
 
@@ -517,7 +517,7 @@ export default class InstantMessageServer {
         //Listen on
         await NotificationManager.listenOnTopic( "connectionListenOnTopicServerAlive",
                                                  "ServerAlive",
-                                                 InstantMessageServer.handlerListenOnTopic,
+                                                 ServerInstantMessage.handlerListenOnTopic,
                                                  LoggerManager.mainLoggerInstance );
 
         const intCountResult = NetworkLeaderManager.countNodes();
@@ -525,7 +525,7 @@ export default class InstantMessageServer {
         if ( intCountResult > 0 ) {
 
           //Clear the table Delete From sysUserSessionPresence As A Where A.Server = strServer
-          await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( InstantMessageServer.strTopicServer,
+          await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( ServerInstantMessage.strTopicServer,
                                                                                  null,
                                                                                  LoggerManager.mainLoggerInstance );
 
@@ -539,7 +539,7 @@ export default class InstantMessageServer {
 
         }
 
-        InstantMessageServer.checkIntervalHandler = setInterval( InstantMessageServer.checkServersAlive,
+        ServerInstantMessage.checkIntervalHandler = setInterval( ServerInstantMessage.checkServersAlive,
                                                                  15000 ); //Every 15 seconds
 
       }
@@ -578,7 +578,7 @@ export default class InstantMessageServer {
 
     try {
 
-      clearInterval( InstantMessageServer.checkIntervalHandler );
+      clearInterval( ServerInstantMessage.checkIntervalHandler );
 
       //Unlisten on
       await NotificationManager.unlistenOnTopic( "connectionListenOnTopicServerAlive",
@@ -813,6 +813,36 @@ export default class InstantMessageServer {
 
   }
 
+  static async handlerCleanExit() {
+
+    await NotificationManager.publishOnTopic( "SystemEvent",
+                                              {
+                                                SystemId: ServerInstantMessage.strTopicServer,
+                                                SystemName: process.env.APP_SERVER_IM_NAME,
+                                                SubSystem: "Server",
+                                                Token: "No apply",
+                                                UserId: "No apply",
+                                                UserName: "No apply",
+                                                UserGroupId: "No apply",
+                                                Code: "SERVER_IM_SHUTDOWN",
+                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                Data: {}
+                                              },
+                                              LoggerManager.mainLoggerInstance );
+
+    if ( process.env.ENV !== "deV" ) {
+
+      //Clear the table Delete From sysUserSessionPresence As A Where A.Server = strServer
+      await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( ServerInstantMessage.strTopicServer,
+                                                                             null,
+                                                                             LoggerManager.mainLoggerInstance );
+
+    }
+
+    process.exit( 0 ); //Finish the process
+
+  }
+
   static async main() {
 
     SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
@@ -823,12 +853,12 @@ export default class InstantMessageServer {
 
     try {
 
-      InstantMessageServer.strTopicServer = SystemUtilities.getHostName();
+      ServerInstantMessage.strTopicServer = SystemUtilities.getHostName();
 
       if ( process.env.USE_NETWORK_ID_AS_SERVER_NAME === "1" &&
            SystemUtilities.strNetworkId ) {
 
-        InstantMessageServer.strTopicServer = SystemUtilities.strNetworkId;
+        ServerInstantMessage.strTopicServer = SystemUtilities.strNetworkId;
 
       }
 
@@ -837,7 +867,7 @@ export default class InstantMessageServer {
       debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( "Main process started" );
       debugMark( "Running from: [%s]", SystemUtilities.strBaseRunPath );
-      debugMark( "Topic server: [%s]", InstantMessageServer.strTopicServer );
+      debugMark( "Topic server: [%s]", ServerInstantMessage.strTopicServer );
 
       LoggerManager.mainLoggerInstance = await LoggerManager.createMainLogger(); //Create the main logger
 
@@ -856,8 +886,8 @@ export default class InstantMessageServer {
                                                                                   Discover: {
                                                                                               port: parseInt( process.env.APP_SERVER_IM_INSTANCES_DISCOVER_PORT )
                                                                                             },
-                                                                                  OnPromotion: InstantMessageServer.nodeIsNetworkLeader,
-                                                                                  OnDemotion: InstantMessageServer.nodeIsNotNetworkLeader,
+                                                                                  OnPromotion: ServerInstantMessage.nodeIsNetworkLeader,
+                                                                                  OnDemotion: ServerInstantMessage.nodeIsNotNetworkLeader,
                                                                                   OnNewNetworkLeader: null,
                                                                                   OnAdded: null,
                                                                                   OnRemoved: null
@@ -867,7 +897,7 @@ export default class InstantMessageServer {
 
       await NotificationManager.listenOnTopic( "connectionListenOnTopicInstantMessage",
                                                "InstantMessage",
-                                               InstantMessageServer.handlerListenOnTopic,
+                                               ServerInstantMessage.handlerListenOnTopic,
                                                LoggerManager.mainLoggerInstance );
 
       /*
@@ -894,10 +924,10 @@ export default class InstantMessageServer {
 
       //new ChatServer();
 
-      InstantMessageServer.serverHTTP = http.createServer(); // this.app );
+      ServerInstantMessage.serverHTTP = http.createServer(); // this.app );
 
-      InstantMessageServer.socketIO = require( "socket.io" ).listen(
-                                                                     InstantMessageServer.serverHTTP,
+      ServerInstantMessage.socketIO = require( "socket.io" ).listen(
+                                                                     ServerInstantMessage.serverHTTP,
                                                                      {
                                                                        resource: process.env.SERVER_ROOT_PATH + '/server/instant/message', //Very important
                                                                        origins: '*:*'
@@ -906,18 +936,18 @@ export default class InstantMessageServer {
 
       const intPort = process.env.APP_SERVER_IM_PORT; //APP_SERVER_IM_PORT
 
-      InstantMessageServer.serverHTTP.listen( intPort, () => {
+      ServerInstantMessage.serverHTTP.listen( intPort, () => {
 
         debugMark( `Running server on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH + '/server/instant/message' );
 
       });
 
       //Middleware before of connect
-      InstantMessageServer.socketIO.use( async ( socket: any, next: Function ) => {
+      ServerInstantMessage.socketIO.use( async ( socket: any, next: Function ) => {
 
-        if ( await InstantMessageServer.checkValidAuthToken( socket.handshake.query.auth,
+        if ( await ServerInstantMessage.checkValidAuthToken( socket.handshake.query.auth,
                                                              socket,
-                                                             InstantMessageServer.strTopicServer,
+                                                             ServerInstantMessage.strTopicServer,
                                                              LoggerManager.mainLoggerInstance ) ) {
 
           debugMark( "Auth %s is VALID", socket.handshake.query.auth );
@@ -935,7 +965,7 @@ export default class InstantMessageServer {
 
       });
 
-      InstantMessageServer.socketIO.on( "connect", ( socket: any ) => {
+      ServerInstantMessage.socketIO.on( "connect", ( socket: any ) => {
 
         debugMark( "Connected client with id %s on port %s.", socket.id, intPort );
 
@@ -945,17 +975,17 @@ export default class InstantMessageServer {
 
           debugMark( "New message sended from client with id %s. Making echo to message", socket.id, message );
 
-          InstantMessageServer.socketIO.in( socket.id ).emit( "newMessage", message );
+          ServerInstantMessage.socketIO.in( socket.id ).emit( "newMessage", message );
 
         });
 
         socket.on( "disconnect", async ( strReason: string ) => {
 
-          await InstantMessageServer.disconnect(
-                                                 InstantMessageServer.strTopicServer,
+          await ServerInstantMessage.disconnect(
+                                                 ServerInstantMessage.strTopicServer,
                                                  {
                                                    PresenceId: socket.id,
-                                                   Server: InstantMessageServer.strTopicServer,
+                                                   Server: ServerInstantMessage.strTopicServer,
                                                    Disconnected: true
                                                  },
                                                  LoggerManager.mainLoggerInstance
@@ -978,6 +1008,24 @@ export default class InstantMessageServer {
         }
 
         //debugMark( "%O", socket.adapter.rooms );
+
+      });
+
+      process.on( 'SIGTERM', async () => {
+
+        //console.info('SIGTERM signal received.');
+        debugMark( "SIGTERM signal received." );
+
+        ServerInstantMessage.handlerCleanExit();
+
+      });
+
+      process.on( 'SIGINT', () => {
+
+        //console.info('SIGTERM signal received.');
+        debugMark( "SIGINT signal received." );
+
+        ServerInstantMessage.handlerCleanExit();
 
       });
 
@@ -1012,4 +1060,4 @@ export default class InstantMessageServer {
 
 }
 
-InstantMessageServer.main();
+ServerInstantMessage.main();

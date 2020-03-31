@@ -85,7 +85,7 @@ export default class SystemQueries {
       }
       else if ( strName === "deleteUserSessionPresenceByServer" ) {
 
-        strResult = SqlString.format( `Delete From sysUserSessionPresence As A Where A.Server = ?`, params.Server );
+        strResult = SqlString.format( `Delete From sysUserSessionPresence Where Server = ?`, params.Server );
 
       }
       else if ( strName === "deleteUserSessionPresenceAll" ) {
