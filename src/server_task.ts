@@ -13,6 +13,7 @@ import LoggerManager from "./02_system/common/managers/LoggerManager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
+import MigrateImagesTask from "./03_business/dev007/common/task/MigrateImagesTask";
 
 let debug = require( 'debug' )( 'server_task@main_process' );
 
@@ -20,32 +21,11 @@ export default class ServerTask {
 
   static bRunningTask = false;
 
-  static fibo( n: number ): number {
-
-    if ( n < 2 ) {
-
-      return 1;
-
-    }
-    else {
-
-      return ServerTask.fibo( n - 2 ) + ServerTask.fibo( n - 1 );
-
-    }
-
-  }
-
   static async handlerRunRask(): Promise<boolean> {
 
     let bResult = false;
 
     let currentTransaction = null;
-
-    const strMark = "B6BF8BB0C7C6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-    const debugMark = debug.extend( strMark );
-
-    debugMark( "handlerRunRask - start" );
 
     try {
 
@@ -61,7 +41,8 @@ export default class ServerTask {
 
         }
 
-        //ServerTask.fibo( 9999 );
+        await MigrateImagesTask.runTask( currentTransaction,
+                                         LoggerManager.mainLoggerInstance );
 
         if ( currentTransaction !== null &&
             currentTransaction.finished !== "rollback" ) {
@@ -80,6 +61,10 @@ export default class ServerTask {
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = ServerTask.name + "." + ServerTask.handlerRunRask.name;
+
+      const strMark = "B6BF8BB0C7C6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
 
       debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
       debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
@@ -110,8 +95,6 @@ export default class ServerTask {
       }
 
     }
-
-    debugMark( "handlerRunRask - finish" );
 
     return bResult;
 
