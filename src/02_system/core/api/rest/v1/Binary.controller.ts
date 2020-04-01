@@ -29,8 +29,7 @@ import CommonConstants from '../../../../common/CommonConstants';
 import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";
 
-//import SecurityService from '../../../common/database/services/SecurityService';
-import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
 import BinaryServiceController from "../../../services/v1/BinaryService.controller";
 import I18NManager from "../../../../common/managers/I18Manager";
 import MiddlewareManager from '../../../../common/managers/MiddlewareManager';

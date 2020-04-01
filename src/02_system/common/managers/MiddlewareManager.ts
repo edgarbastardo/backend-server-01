@@ -13,8 +13,8 @@ import SystemUtilities from '../SystemUtilities';
 import LoggerManager from './LoggerManager';
 import I18NManager from './I18Manager';
 import NotificationManager from './NotificationManager';
-import SYSUserSessionPresenceService from "../database/services/SYSUserSessionPresenceService";
-import { SYSUserSessionPresenceInRoom } from "../database/models/SYSUserSessionPresenceInRoom";
+import SYSUserSessionPresenceService from "../database/master/services/SYSUserSessionPresenceService";
+import { SYSUserSessionPresenceInRoom } from "../database/master/models/SYSUserSessionPresenceInRoom";
 
 const debug = require( 'debug' )( 'MiddlewareManager' );
 
@@ -538,7 +538,8 @@ export default class MiddlewareManager {
                  }
 
       }
-      else {
+      else if ( userSessionStatus &&
+                userSessionStatus.SocketToken ) {
 
         //Send to instant message server a message to disconnect this user
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
@@ -576,13 +577,18 @@ export default class MiddlewareManager {
       }
       else if ( response ) {
 
-        //Send to instant message server a message to disconnect this user
-        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
-                                                                                userSessionStatus.SocketToken,
-                                                                                strLanguage,
-                                                                                null, //No warnings
-                                                                                null, //No transaction
-                                                                                logger );
+        if ( userSessionStatus &&
+             userSessionStatus.SocketToken ) {
+
+          //Send to instant message server a message to disconnect this user
+          await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                  userSessionStatus.SocketToken,
+                                                                                  strLanguage,
+                                                                                  null, //No warnings
+                                                                                  null, //No transaction
+                                                                                  logger );
+
+        }
 
         response.status( result.StatusCode ).send( result );
 
@@ -591,13 +597,18 @@ export default class MiddlewareManager {
     }
     else if ( response ) {
 
-      //Send to instant message server a message to disconnect this user
-      await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
-                                                                              userSessionStatus.SocketToken,
-                                                                              strLanguage,
-                                                                              null, //No warnings
-                                                                              null, //No transaction
-                                                                              logger );
+      if ( userSessionStatus &&
+           userSessionStatus.SocketToken ) {
+
+        //Send to instant message server a message to disconnect this user
+        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                userSessionStatus.SocketToken,
+                                                                                strLanguage,
+                                                                                null, //No warnings
+                                                                                null, //No transaction
+                                                                                logger );
+
+      }
 
       response.status( result.StatusCode ).send( result );
 

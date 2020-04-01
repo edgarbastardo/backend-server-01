@@ -27,17 +27,16 @@ import GeoMapManager from "../../../common/managers/GeoMapManager";
 
 import SecurityServiceController from "./SecurityService.controller";
 
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSPersonService from "../../../common/database/services/SYSPersonService";
-//import SYSActionTokenService from "../../../common/database/services/SYSActionTokenService";
-import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
-import SYSRoleHasRouteService from '../../../common/database/services/SYSRoleHasRouteService';
-import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
-import SYSUserService from "../../../common/database/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
+import SYSUserSessionStatusService from '../../../common/database/master/services/SYSUserSessionStatusService';
+import SYSRoleHasRouteService from '../../../common/database/master/services/SYSRoleHasRouteService';
+import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
 
-import { SYSUser } from "../../../common/database/models/SYSUser";
-import { SYSPerson } from '../../../common/database/models/SYSPerson';
-import { SYSUserGroup } from "../../../common/database/models/SYSUserGroup";
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
 const debug = require( 'debug' )( 'UserOthersServiceController' );
 

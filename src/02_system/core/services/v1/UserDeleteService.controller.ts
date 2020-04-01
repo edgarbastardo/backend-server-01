@@ -15,8 +15,8 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
 import UserOthersServiceController from "./UserOthersService.controller";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
 
 const debug = require( 'debug' )( 'UserDeleteServiceController' );
 

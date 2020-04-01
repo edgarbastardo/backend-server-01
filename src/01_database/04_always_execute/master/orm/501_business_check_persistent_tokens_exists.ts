@@ -6,7 +6,7 @@ import SystemConstants from "../../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSUserSessionPersistent } from "../../../../02_system/common/database/models/SYSUserSessionPersistent";
+import { SYSUserSessionPersistent } from "../../../../02_system/common/database/master/models/SYSUserSessionPersistent";
 
 const debug = require( 'debug' )( '501_business_check_persistent_tokens_exists' );
 

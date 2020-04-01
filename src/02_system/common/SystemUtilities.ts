@@ -30,17 +30,15 @@ import SystemConstants from "./SystemContants";
 
 import CommonUtilities from "./CommonUtilities";
 
-//import SYSPersonService from "./database/services/SYSPersonService";
-//import SYSUserGroupService from "./database/services/SYSUserGroupService";
-import SYSUserService from "./database/services/SYSUserService";
-import SYSUserSessionStatusService from "./database/services/SYSUserSessionStatusService";
-import SYSUserSessionPersistentService from "./database/services/SYSUserSessionPersistentService";
-import SYSRoleService from "./database/services/SYSRoleService";
+import SYSUserService from "./database/master/services/SYSUserService";
+import SYSUserSessionStatusService from "./database/master/services/SYSUserSessionStatusService";
+import SYSUserSessionPersistentService from "./database/master/services/SYSUserSessionPersistentService";
+import SYSRoleService from "./database/master/services/SYSRoleService";
 
 import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
-import { SYSUserSessionStatus } from "./database/models/SYSUserSessionStatus";
+import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
 
 const debug = require( 'debug' )( 'SystemUtilities' );
 

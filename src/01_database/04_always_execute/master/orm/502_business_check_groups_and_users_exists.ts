@@ -1,10 +1,12 @@
+import cluster from 'cluster';
+
 /*
+import os from 'os';
+
 import uuidv4 from 'uuid/v4';
 import moment from 'moment-timezone';
-import os from 'os';
 import bcrypt from 'bcrypt';
 */
-import cluster from 'cluster';
 
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 import SystemConstants from "../../../../02_system/common/SystemContants";
@@ -12,8 +14,7 @@ import SystemConstants from "../../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-//import { User } from '../../../02_system/common/database/models/User';
-import { SYSUserGroup } from '../../../../02_system/common/database/models/SYSUserGroup';
+import { SYSUserGroup } from '../../../../02_system/common/database/master/models/SYSUserGroup';
 
 const debug = require( 'debug' )( '502_check_business_groups_and_users_exists' );
 

@@ -7,7 +7,7 @@ import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
-import SYSConfigValueDataService from "../database/services/SYSConfigValueDataService";
+import SYSConfigValueDataService from "../database/master/services/SYSConfigValueDataService";
 
 import TransportSMTP from "../implementations/notifications/TransportSMTP";
 import TransportSendGrid from "../implementations/notifications/TransportSendGrid";

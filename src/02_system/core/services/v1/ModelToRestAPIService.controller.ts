@@ -6,7 +6,8 @@ import {
   Model,
   FindOptions,
   Includeable,
-  FindAttributeOptions
+  FindAttributeOptions,
+  Sequelize as OriginSequelize
 } from 'sequelize';
 
 import CommonConstants from '../../../common/CommonConstants';
@@ -14,7 +15,7 @@ import CommonConstants from '../../../common/CommonConstants';
 import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from '../../../common/SystemUtilities';
 
-import BaseService from '../../../common/database/services/BaseService';
+import BaseService from '../../../common/database/master/services/BaseService';
 import I18NManager from '../../../common/managers/I18Manager';
 
 const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
@@ -368,6 +369,27 @@ export class ModelToRestAPIServiceController extends BaseService {
         logger
 
       );
+
+      /*
+      whereFnResult.Result = {
+                               "$or": [
+                                        {
+                                          "ExtraData": {
+                                                         "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\"'`
+                                                       }
+                                        },
+                                        {
+                                          "ExtraData": {
+                                                         "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
+                                                       }
+                                        }
+                                      ],
+                               "$literals": [
+                                 "$or->@__index__@:0->ExtraData->@__value__@:$regexp",
+                                 "$or->@__index__@:1->ExtraData->@__value__@:$regexp"
+                               ]
+                             };
+      */
 
       if ( whereFnResult.IsError ) {
 
@@ -2198,13 +2220,103 @@ export class ModelToRestAPIServiceController extends BaseService {
 
   }
 
-  private static formatWhereStr( whereObject: any, logger: any = null ) : { Result: object, IsError: boolean, Errors: any[] } {
+  private static formatWhereStr( whereObject: any,
+                                 logger: any = null ): {
+                                                         Result: object,
+                                                         IsError: boolean,
+                                                         Errors: any[]
+                                                       } {
 
-    let result = { Result: null, IsError: true, Errors: [] };
+    let result = {
+                   Result: null,
+                   IsError: true,
+                   Errors: []
+                 };
+
+    /*
+    whereFnResult.Result = {
+                              "$or": [
+                                      {
+                                        "ExtraData": {
+                                                        "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\"'`
+                                                      }
+                                      },
+                                      {
+                                        "ExtraData": {
+                                                        "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
+                                                      }
+                                      }
+                                    ],
+                              "$literals": [
+                                "$or->@__index__@:0->ExtraData->@__value__@:$regexp",
+                                "$or->@__index__@:1->ExtraData->@__value__@:$regexp"
+                              ]
+                            };
+    */
 
     try {
 
       const data = typeof( whereObject ) === "string" ? JSON.parse( whereObject ) : whereObject;
+
+      if ( data[ "$literals" ] ) {
+
+        const dataLiterals = data[ "$literals" ];
+
+        delete data[ "$literals" ];
+
+        for ( let intIndexLiteral = 0; intIndexLiteral < dataLiterals.length; intIndexLiteral++ ) {
+
+          const literalPath = dataLiterals[ intIndexLiteral ].split( "->" );
+
+          let currentData  = null;
+
+          for ( let intIndexLiteralPath = 0; intIndexLiteralPath < literalPath.length; intIndexLiteralPath++ ) {
+
+            let strSegment = literalPath[ intIndexLiteralPath ];
+
+            if ( strSegment.startsWith( "@__index__@:" ) ) {
+
+              const intIndexPath = strSegment.replace( "@__index__@:", "" );
+
+              if ( intIndexLiteralPath === 0 ) {
+
+                currentData = data[ intIndexPath ];
+
+              }
+              else {
+
+                currentData = currentData[ intIndexPath ];
+
+              }
+
+            }
+            else if ( strSegment.startsWith( "@__value__@:" ) ) {
+
+              strSegment = strSegment.replace( "@__value__@:", "" );
+
+              currentData[ strSegment ] = OriginSequelize.literal( currentData[ strSegment ] );
+
+            }
+            else {
+
+              if ( intIndexLiteralPath === 0 ) {
+
+                currentData = data[ strSegment ];
+
+              }
+              else {
+
+                currentData = currentData[ strSegment ];
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
 
       result = { Result: data, IsError: false, Errors: [] };
 

@@ -9,7 +9,7 @@
 
 //import DBConnectionManager from '../../../02_system/common/managers/DBConnectionManager';
 
-import BaseService from "../../../02_system/common/database/services/BaseService";
+import BaseService from "../../../02_system/common/database/master/services/BaseService";
 
 const debug = require( 'debug' )( 'CommonBusinessServices' );
 

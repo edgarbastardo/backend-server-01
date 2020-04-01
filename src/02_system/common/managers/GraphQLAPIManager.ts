@@ -12,7 +12,7 @@ import CommonConstants from '../CommonConstants';
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from "../SystemUtilities";
 
-import SYSRouteService from '../database/services/SYSRouteService';
+import SYSRouteService from '../database/master/services/SYSRouteService';
 
 const debug = require( 'debug' )( 'GraphQLAPIManager' );
 

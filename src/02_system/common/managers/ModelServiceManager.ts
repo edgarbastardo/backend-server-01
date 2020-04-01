@@ -13,7 +13,7 @@ const debug = require( 'debug' )( 'ModelServiceManager' );
 export default class ModelServiceManager {
 
   static readonly _PATH_TO_SCAN = [
-                                    "/02_system/common/database/services",
+                                    "/02_system/common/database/@__database__@/services",
                                     "/03_business/common/database/@__database__@/services",
                                   ]
 

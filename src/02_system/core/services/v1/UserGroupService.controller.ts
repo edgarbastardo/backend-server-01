@@ -21,12 +21,12 @@ import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import DBConnectionManager from '../../../common/managers/DBConnectionManager';
-
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
 import I18NManager from "../../../common/managers/I18Manager";
-import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
-import SYSConfigValueDataService from '../../../common/database/services/SYSConfigValueDataService';
-//import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
+
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSConfigValueDataService from '../../../common/database/master/services/SYSConfigValueDataService';
+
+import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
 
 const debug = require( 'debug' )( 'UserGroupServiceController' );
 

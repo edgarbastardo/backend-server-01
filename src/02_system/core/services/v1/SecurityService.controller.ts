@@ -18,22 +18,17 @@ import SystemConstants from "../../../common/SystemContants";
 import SystemUtilities from "../../../common/SystemUtilities";
 import CommonUtilities from "../../../common/CommonUtilities";
 
-//import { SYSRole } from "../models/Role";
-//import { SYSUserSessionStatus } from "../models/UserSessionStatus";
-//import { SYSUser } from "../../common/database/models/SYSUser";
-//import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
-//import { SYSPerson } from "../../common/database/models/SYSPerson";
-import SYSConfigValueDataService from "../../../common/database/services/SYSConfigValueDataService";
-import SYSUserSessionStatusService from "../../../common/database/services/SYSUserSessionStatusService";
-import SYSUserService from "../../../common/database/services/SYSUserService";
+import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
+import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
 
 import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from '../../../common/managers/NotificationManager';
-import SYSUserSessionPresenceService from '../../../common/database/services/SYSUserSessionPresenceService';
+import SYSUserSessionPresenceService from '../../../common/database/master/services/SYSUserSessionPresenceService';
 
-import { SYSUser } from '../../../common/database/models/SYSUser';
+import { SYSUser } from '../../../common/database/master/models/SYSUser';
 
 const debug = require( 'debug' )( 'SecurityServiceController' );
 

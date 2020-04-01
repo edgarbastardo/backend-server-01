@@ -19,12 +19,12 @@ import GeoMapManager from '../../../common/managers/GeoMapManager';
 import SecurityServiceController from './SecurityService.controller';
 import UserOthersServiceController from "./UserOthersService.controller";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
 
-import { SYSUser } from "../../../common/database/models/SYSUser";
-import { SYSUserGroup } from "../../../common/database/models/SYSUserGroup";
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
 const debug = require( 'debug' )( 'UserUpdateServiceController' );
 

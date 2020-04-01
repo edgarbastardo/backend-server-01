@@ -14,51 +14,18 @@ import {
 //import uuidv4 from 'uuid/v4';
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-//import SystemConstants from "../../common/SystemContants";
+import CommonConstants from "../../../common/CommonConstants";
+import SystemConstants from '../../../common/SystemContants';
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
-//import { Role } from "../models/Role";
-//import { User } from "../../common/database/models/User";
-//import { UserSessionStatus } from "../models/UserSessionStatus";
-//import { UserGroup } from "../../common/database/models/UserGroup";
-//import { Person } from "../../common/database/models/Person";
-//import UserSessionStatusService from "../../common/database/services/UserSessionStatusService";
-//import CacheManager from "../../common/managers/CacheManager";
-//import { PasswordParameters } from "./SecurityService.controller";
-//import { UserSignup } from "../../common/database/models/UserSignup";
-//import { UserSessionStatus } from "../../common/database/models/UserSessionStatus";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-//import SYSConfigValueDataService from "../../common/database/services/SYSConfigValueDataService";
-//import SYSUserService from "../../common/database/services/SYSUserService";
-import CommonConstants from "../../../common/CommonConstants";
-//import SecurityServiceController from "./SecurityService.controller";
-//import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-//import NotificationManager from "../../common/managers/NotificationManager";
-//import SYSUserSignupService from "../../common/database/services/SYSUserSignupService";
-//import CipherManager from "../../common/managers/CipherManager";
-//import SYSPersonService from "../../common/database/services/SYSPersonService";
 import I18NManager from "../../../common/managers/I18Manager";
-import SYSUserSessionDeviceService from '../../../common/database/services/SYSUserSessionDeviceService';
-import SystemConstants from '../../../common/SystemContants';
 
-import { SYSUserSessionDevice } from '../../../common/database/models/SYSUserSessionDevice';
-//import SYSUserSessionStatusService from '../../../common/database/services/SYSUserSessionStatusService';
-//import CacheManager from '../../../common/managers/CacheManager';
-//import SYSActionTokenService from "../../common/database/services/SYSActionTokenService";
-//import JobQueueManager from "../../common/managers/JobQueueManager";
-//import SYSUserSessionStatusService from '../../common/database/services/SYSUserSessionStatusService';
-//import GeoMapGoogle from "../../common/implementations/geomaps/GeoMapGoogle";
-//import GeoMapManager from "../../common/managers/GeoMapManager";
-//import { SYSUser } from "../../common/database/models/SYSUser";
-//import { ModelToRestAPIServiceController } from './ModelToRestAPIService.controller';
-//import { SYSPerson } from '../../common/database/models/SYSPerson';
-//import { SYSUserGroup } from "../../common/database/models/SYSUserGroup";
-//import dbConnection from "../../../common/managers/DBConnectionManager";
-//import { error } from 'winston';
-//import NotificationManager from "../../../common/managers/NotificationManager";
+import SYSUserSessionDeviceService from '../../../common/database/master/services/SYSUserSessionDeviceService';
 
+import { SYSUserSessionDevice } from '../../../common/database/master/models/SYSUserSessionDevice';
 
 const debug = require( 'debug' )( 'UserDeviceServiceController' );
 

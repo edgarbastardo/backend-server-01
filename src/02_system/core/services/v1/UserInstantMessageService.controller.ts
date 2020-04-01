@@ -16,27 +16,17 @@ import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from '../../../common/managers/CacheManager';
 import NotificationManager from "../../../common/managers/NotificationManager";
-import SYSUserSessionPresenceService from "../../../common/database/services/SYSUserSessionPresenceService";
+import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 import InstantMenssageManager from '../../../common/managers/InstantMessageManager';
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
-import { SYSUserSessionPresence } from '../../../common/database/models/SYSUserSessionPresence';
-import { SYSUser } from '../../../common/database/models/SYSUser';
-import { SYSPerson } from '../../../common/database/models/SYSPerson';
-import { SYSUserSessionStatus } from '../../../common/database/models/SYSUserSessionStatus';
+import { SYSUserSessionPresence } from '../../../common/database/master/models/SYSUserSessionPresence';
+import { SYSUser } from '../../../common/database/master/models/SYSUser';
+import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
+import { SYSUserSessionStatus } from '../../../common/database/master/models/SYSUserSessionStatus';
 import PresenceManager from "../../../common/managers/PresenceManager";
-import { SYSUserSessionPresenceInRoom } from '../../../common/database/models/SYSUserSessionPresenceInRoom';
-import { SYSUserSessionDevice } from "../../../common/database/models/SYSUserSessionDevice";
-import { SYSUserGroup } from '../../../common/database/models/SYSUserGroup';
-
-/*
-import NotificationManager from '../../../common/managers/NotificationManager';
-import SYSUserSessionDeviceService from '../../../common/database/services/SYSUserSessionDeviceService';
-import { SYSUserSessionDevice } from "../../../common/database/models/SYSUserSessionDevice";
-import { SYSUserSessionPresence } from "../../../common/database/models/SYSUserSessionPresence";
-import InstantMenssageManager from "../../../common/managers/InstantMessageManager";
-import PresenceManager from "../../../common/managers/PresenceManager";
-import { SYSUserSessionPresenceInRoom } from "../../../common/database/models/SYSUserSessionPresenceInRoom";
-*/
+import { SYSUserSessionPresenceInRoom } from '../../../common/database/master/models/SYSUserSessionPresenceInRoom';
+import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
+import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
 
 const debug = require( 'debug' )( 'UserInstantMessageServiceController' );
 
