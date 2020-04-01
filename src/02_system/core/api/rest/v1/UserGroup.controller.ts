@@ -12,7 +12,7 @@ import CommonConstants from '../../../../common/CommonConstants';
 import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";
 
-import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -30,10 +30,11 @@ import {
   //injectable,
   inject
 } from 'inversify';
+
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
+
 //import SecurityServiceController from '../../services/SecurityService.controller';
 import UserGroupServiceController from '../../../services/v1/UserGroupService.controller';
-import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
-//import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 
 const debug = require( 'debug' )( 'UserGroup.controller' );
 

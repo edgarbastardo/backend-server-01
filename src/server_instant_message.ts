@@ -17,10 +17,10 @@ import CacheManager from './02_system/common/managers/CacheManager';
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
 
-import SYSUserSessionPresenceService from "./02_system/common/database/services/SYSUserSessionPresenceService";
+import SYSUserSessionPresenceService from "./02_system/common/database/master/services/SYSUserSessionPresenceService";
 import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
-import SYSInstantMessageLogService from './02_system/common/database/services/SYSInstantMessageLogService';
-import SYSUserSessionPresenceInRoomService from './02_system/common/database/services/SYSUserSessionPresenceInRoomService';
+import SYSInstantMessageLogService from './02_system/common/database/master/services/SYSInstantMessageLogService';
+import SYSUserSessionPresenceInRoomService from './02_system/common/database/master/services/SYSUserSessionPresenceInRoomService';
 
 let debug = require( 'debug' )( 'server_intant_message@main_process' );
 

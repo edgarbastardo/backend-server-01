@@ -16,10 +16,10 @@ import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
-import SYSActionTokenService from '../../../common/database/services/SYSActionTokenService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
+import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
 
 const debug = require( 'debug' )( 'UserPhoneServiceController' );
 

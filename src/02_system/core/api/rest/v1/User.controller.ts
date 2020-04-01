@@ -13,7 +13,7 @@ import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";
 
 import { ApolloError } from 'apollo-server-express';
-import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -34,8 +34,8 @@ import {
 //import SecurityServiceController from '../../services/SecurityService.controller';
 import UserOthersServiceController from '../../../services/v1/UserOthersService.controller';
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
-//import { UserSessionStatus } from "../../../common/database/models/UserSessionStatus";
 import I18NManager from '../../../../common/managers/I18Manager';
+
 import UserCreateServiceController from '../../../services/v1/UserCreateService.controller';
 import UserUpdateServiceController from '../../../services/v1/UserUpdateService.controller';
 import UserDeleteServiceController from '../../../services/v1/UserDeleteService.controller';

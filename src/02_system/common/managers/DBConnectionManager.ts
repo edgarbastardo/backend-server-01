@@ -154,7 +154,7 @@ export default class DBConnectionManager {
 
           if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
 
-            dbConfig.models.push( __dirname + `/../database/models/` );
+            dbConfig.models.push( __dirname + `/../database/${strCurrentDatabase}/models/` );
 
           }
 
@@ -180,7 +180,9 @@ export default class DBConnectionManager {
 
           }
 
-          dbConfig.logging = ( param01: any, param02: any ) => {
+          dbConfig.logging = dbConfigData[ strCurrentDatabase ].logStatement === true;
+          /*
+          ( param01: any, param02: any ) => {
 
             //let debugMark = debug.extend( "960C40D97F5F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
@@ -188,6 +190,7 @@ export default class DBConnectionManager {
             //debugMark( param02 );
 
           }
+          */
 
           dbConfig.isolationLevel = Transaction.ISOLATION_LEVELS.READ_COMMITTED;
 

@@ -17,11 +17,11 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
 import SecurityServiceController from './SecurityService.controller';
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
 import UserOthersServiceController from './UserOthersService.controller';
-import SYSUserSignupService from '../../../common/database/services/SYSUserSignupService';
+import SYSUserSignupService from '../../../common/database/master/services/SYSUserSignupService';
 import CipherManager from '../../../common/managers/CipherManager';
 
 const debug = require( 'debug' )( 'UserSingupServiceController' );

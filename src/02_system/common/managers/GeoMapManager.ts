@@ -7,7 +7,7 @@ import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
-import SYSConfigValueDataService from "../database/services/SYSConfigValueDataService";
+import SYSConfigValueDataService from "../database/master/services/SYSConfigValueDataService";
 import GeoMapGoogle from '../implementations/geomaps/GeoMapGoogle';
 
 const debug = require( 'debug' )( 'GeoMapManager' );

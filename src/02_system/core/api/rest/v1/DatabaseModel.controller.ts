@@ -7,15 +7,13 @@ import SystemUtilities from "../../../../common/SystemUtilities";
 
 import { Router, Request, Response, NextFunction } from 'express';
 
-//import { Route } from '../../../common/database/models/Route';
 import DBConnectionManager from "../../../../common/managers/DBConnectionManager";
-import SYSRouteService from '../../../../common/database/services/SYSRouteService';
-//import ModelServiceLoader from "../../../common/database/ModelServiceLoader";
-import { ModelToRestAPIServiceController } from '../../../services/v1/ModelToRestAPIService.controller';
-//import dbConnection from "../../../common/managers/DBConnectionManager";
+import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
 import ModelServiceManager from "../../../../common/managers/ModelServiceManager";
 import I18NManager from "../../../../common/managers/I18Manager";
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
+
+import { ModelToRestAPIServiceController } from '../../../services/v1/ModelToRestAPIService.controller';
 
 const debug = require( 'debug' )( 'DatabaseModel.controller' );
 

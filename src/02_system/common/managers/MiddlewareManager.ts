@@ -13,8 +13,8 @@ import SystemUtilities from '../SystemUtilities';
 import LoggerManager from './LoggerManager';
 import I18NManager from './I18Manager';
 import NotificationManager from './NotificationManager';
-import SYSUserSessionPresenceService from "../database/services/SYSUserSessionPresenceService";
-import { SYSUserSessionPresenceInRoom } from "../database/models/SYSUserSessionPresenceInRoom";
+import SYSUserSessionPresenceService from "../database/master/services/SYSUserSessionPresenceService";
+import { SYSUserSessionPresenceInRoom } from "../database/master/models/SYSUserSessionPresenceInRoom";
 
 const debug = require( 'debug' )( 'MiddlewareManager' );
 

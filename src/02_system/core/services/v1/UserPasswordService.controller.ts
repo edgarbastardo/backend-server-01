@@ -18,9 +18,9 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import SecurityServiceController from './SecurityService.controller';
 import UserOthersServiceController from "./UserOthersService.controller";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSActionTokenService from '../../../common/database/services/SYSActionTokenService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
 
 const debug = require( 'debug' )( 'UserPasswordServiceController' );
 

@@ -27,7 +27,7 @@ import CommonUtilities from '../../../../common/CommonUtilities';
 import SystemUtilities from "../../../../common/SystemUtilities";
 
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
-import SYSRouteService from '../../../../common/database/services/SYSRouteService';
+import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
 import SecurityServiceController from '../../../services/v1/SecurityService.controller';
 import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
 

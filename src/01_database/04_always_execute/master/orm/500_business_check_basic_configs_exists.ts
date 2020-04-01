@@ -15,8 +15,8 @@ import BusinessConstants from '../../../../03_business/common/BusinessConstants'
 import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSConfigMetaData } from "../../../../02_system/common/database/models/SYSConfigMetaData";
-import { SYSConfigValueData } from '../../../../02_system/common/database/models/SYSConfigValueData';
+import { SYSConfigMetaData } from "../../../../02_system/common/database/master/models/SYSConfigMetaData";
+import { SYSConfigValueData } from '../../../../02_system/common/database/master/models/SYSConfigValueData';
 
 const debug = require( 'debug' )( '500_business_check_basic_configs_exists' );
 

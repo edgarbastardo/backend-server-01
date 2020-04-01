@@ -7,7 +7,6 @@ import cluster from 'cluster';
 import appRoot from 'app-root-path';
 //import moment = require('moment-timezone');
 //import { createServer } from 'http';
-//import { Route } from './system/database/models/Route';
 
 import CommonConstants from './02_system/common/CommonConstants';
 import SystemConstants from "./02_system/common/SystemContants";
@@ -29,7 +28,7 @@ import InstantMenssageManager from './02_system/common/managers/InstantMessageMa
 //import NotificationManager from './02_system/common/managers/NotificationManager';
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
-import SYSSystemEventLogService from './02_system/common/database/services/SYSSystemEventLogService';
+import SYSSystemEventLogService from './02_system/common/database/master/services/SYSSystemEventLogService';
 import PresenceManager from './02_system/common/managers/PresenceManager';
 
 let debug = null; //require( 'debug' )( 'server' );

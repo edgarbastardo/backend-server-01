@@ -18,10 +18,10 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
 import UserOthersServiceController from "./UserOthersService.controller";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
-import SYSActionTokenService from '../../../common/database/services/SYSActionTokenService';
-import SYSUserGroupService from '../../../common/database/services/SYSUserGroupService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
+import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
+import SYSUserGroupService from '../../../common/database/master/services/SYSUserGroupService';
 
 const debug = require( 'debug' )( 'UserEMailServiceController' );
 

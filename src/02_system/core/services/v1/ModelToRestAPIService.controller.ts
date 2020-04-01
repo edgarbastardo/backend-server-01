@@ -14,7 +14,7 @@ import CommonConstants from '../../../common/CommonConstants';
 import CommonUtilities from '../../../common/CommonUtilities';
 import SystemUtilities from '../../../common/SystemUtilities';
 
-import BaseService from '../../../common/database/services/BaseService';
+import BaseService from '../../../common/database/master/services/BaseService';
 import I18NManager from '../../../common/managers/I18Manager';
 
 const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );

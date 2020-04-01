@@ -13,9 +13,9 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
-import SYSUserService from "../../../common/database/services/SYSUserService";
-import SYSUserGroupService from "../../../common/database/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/services/SYSPersonService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
 import UserOthersServiceController from './UserOthersService.controller';
 
 const debug = require( 'debug' )( 'UserBulkServiceController' );

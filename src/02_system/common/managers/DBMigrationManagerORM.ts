@@ -16,8 +16,8 @@ import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
 
 //import config from "../database/00_config/config.json"
-import { SYSDBMigratedData } from '../database/models/SYSDBMigratedData';
-import { SYSDBImportedData } from '../database/models/SYSDBImportedData';
+import { SYSDBMigratedData } from '../database/master/models/SYSDBMigratedData';
+import { SYSDBImportedData } from '../database/master/models/SYSDBImportedData';
 
 const debug = require( 'debug' )( 'DBMigrationManagerORM' );
 

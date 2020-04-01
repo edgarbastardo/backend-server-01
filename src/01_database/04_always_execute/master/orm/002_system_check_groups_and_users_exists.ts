@@ -13,8 +13,8 @@ import SystemConstants from "../../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSUserGroup } from '../../../../02_system/common/database/models/SYSUserGroup';
-import { SYSUser } from '../../../../02_system/common/database/models/SYSUser';
+import { SYSUserGroup } from '../../../../02_system/common/database/master/models/SYSUserGroup';
+import { SYSUser } from '../../../../02_system/common/database/master/models/SYSUser';
 
 const debug = require( 'debug' )( '001_system_check_groups_and_users_exists' );
 

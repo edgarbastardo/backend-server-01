@@ -15,8 +15,8 @@ import SystemConstants from "../../../../02_system/common/SystemContants";
 import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
-import { SYSConfigMetaData } from "../../../../02_system/common/database/models/SYSConfigMetaData";
-import { SYSConfigValueData } from '../../../../02_system/common/database/models/SYSConfigValueData';
+import { SYSConfigMetaData } from "../../../../02_system/common/database/master/models/SYSConfigMetaData";
+import { SYSConfigValueData } from '../../../../02_system/common/database/master/models/SYSConfigValueData';
 
 const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
 
