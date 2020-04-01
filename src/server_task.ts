@@ -1,8 +1,11 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
 import cluster from 'cluster';
+import os from 'os';
 
 import appRoot from 'app-root-path';
+
+import rimraf from "rimraf";
 
 import CommonConstants from './02_system/common/CommonConstants';
 
@@ -137,6 +140,10 @@ export default class ServerTask {
 
     try {
 
+      const strTempPath = appRoot.path + "/temp/" + os.hostname + "/";
+
+      rimraf.sync( strTempPath );
+
       let debugMark = debug.extend( "FC96A92FD2FF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "%s", SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
@@ -170,6 +177,8 @@ export default class ServerTask {
       });
 
       setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
+
+      ServerTask.handlerRunRask();
 
     }
     catch ( error ) {

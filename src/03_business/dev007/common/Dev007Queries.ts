@@ -1,6 +1,6 @@
 const debug = require( 'debug' )( 'Dev000Queries' );
 
-export default class Dev000Queries {
+export default class Dev007Queries {
 
   static getStatement( strName: string, params: any, logger: any ): string {
 
