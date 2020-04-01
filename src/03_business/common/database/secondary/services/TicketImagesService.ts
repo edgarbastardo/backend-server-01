@@ -2,7 +2,7 @@ import cluster from 'cluster';
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import BaseService from '../../../../../02_system/common/database/services/BaseService';
+import BaseService from '../../../../../02_system/common/database/master/services/BaseService';
 
 import CommonConstants from '../../../../../02_system/common/CommonConstants';
 
@@ -10,6 +10,8 @@ import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
 import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
+
+//import { TicketImages } from "../models/TicketImages";
 
 const debug = require( 'debug' )( 'TicketImageService' );
 

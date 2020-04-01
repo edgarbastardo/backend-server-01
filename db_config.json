@@ -3,7 +3,7 @@
     "system": 1,
     "connect": true,
     "migrate": true,
-    "logStatement": true,
+    "logStatement": false,
     "dev": {
       "username": "root",
       "password": "dsistemas",

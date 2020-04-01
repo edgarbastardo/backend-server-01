@@ -12,7 +12,7 @@ import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 
 import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
 import LoggerManager from '../../../../02_system/common/managers/LoggerManager';
-import TicketImagesService from "../../../common/database/master/services/TicketImagesService";
+import TicketImagesService from "../../../common/database/secondary/services/TicketImagesService";
 
 let debug = require( 'debug' )( 'MigrateImagesTask' );
 
