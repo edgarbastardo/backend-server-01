@@ -171,9 +171,9 @@ export class SYSUserSessionDevice extends Model<SYSUserSessionDevice> {
 
         let extraData = result.ExtraData;
 
-        if ( extraData instanceof String ) {
+        if ( typeof extraData === "string" ) {
 
-          extraData = CommonUtilities.parseJSON( result.ExtraData,
+          extraData = CommonUtilities.parseJSON( extraData,
                                                  params.logger );
 
         }

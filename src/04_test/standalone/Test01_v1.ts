@@ -38,6 +38,8 @@ import DatabaseTestV1 from './DatabaseTestV1';
 
 async function test_phase_clean() {
 
+  //const strCondition = OriginSequelize.literal( '\\"Tag\\":\\".*#UserGroupTestV1#.*\\"' );
+
   CommonTest.myAssert( await DatabaseTestV1.test_search_sysUserGroups( CommonTest.headers_adminXX_at_system_net,
                                                                        "SUCCESS_SEARCH",
                                                                        "test_search_sysUserGroup_" + CommonTest.strStartUser.replace( ".", "_" ) + "_success",
@@ -48,15 +50,19 @@ async function test_phase_clean() {
                                                                                                              "$or": [
                                                                                                                       {
                                                                                                                         "ExtraData": {
-                                                                                                                                       "$regexp":  OriginSequelize.literal( '\"Tag\":\".*#UserGroupTestV1#.*\"' )
+                                                                                                                                       "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\"'`
                                                                                                                                      }
                                                                                                                       },
                                                                                                                       {
                                                                                                                         "ExtraData": {
-                                                                                                                                       "$regexp": OriginSequelize.literal( '\"Tag\":\".*#UserTestV1#.*\"' )
+                                                                                                                                       "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
                                                                                                                                      }
                                                                                                                       }
-                                                                                                                    ]
+                                                                                                                    ],
+                                                                                                             "$literals": [
+                                                                                                                "$or->@__index__@:0->ExtraData->@__value__@:$regexp",
+                                                                                                                "$or->@__index__@:1->ExtraData->@__value__@:$regexp"
+                                                                                                             ]
                                                                                                            }
                                                                                                          )
                                                                                          ),
@@ -73,8 +79,11 @@ async function test_phase_clean() {
                                                                                        JSON.stringify(
                                                                                                        {
                                                                                                          "ExtraData": {
-                                                                                                                        "$regexp": '\\"Tag\\":\\".*#UserTestV1#.*\\"'
-                                                                                                                      }
+                                                                                                                        "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
+                                                                                                                      },
+                                                                                                         "$literals": [
+                                                                                                           "ExtraData->@__value__@:$regexp",
+                                                                                                         ]
                                                                                                        }
                                                                                                      )
                                                                                      ),

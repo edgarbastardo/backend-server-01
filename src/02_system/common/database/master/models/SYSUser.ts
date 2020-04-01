@@ -266,9 +266,9 @@ export class SYSUser extends Model<SYSUser> {
 
         let extraData = result.ExtraData;
 
-        if ( extraData instanceof String ) {
+        if ( typeof extraData === "string" ) {
 
-          extraData = CommonUtilities.parseJSON( result.ExtraData,
+          extraData = CommonUtilities.parseJSON( extraData,
                                                  params.logger );
 
         }

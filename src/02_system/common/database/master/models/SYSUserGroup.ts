@@ -169,9 +169,9 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
 
         let extraData = result.ExtraData;
 
-        if ( extraData instanceof String ) {
+        if ( typeof extraData === "string" ) {
 
-          extraData = CommonUtilities.parseJSON( result.ExtraData,
+          extraData = CommonUtilities.parseJSON( extraData,
                                                  params.logger );
 
         }
