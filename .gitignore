@@ -1,6 +1,7 @@
 node_modules/
 build/
 temp/tmp-*
+temp/dsistemas01/
 ./logs/
 binary_data/temporal/
 binary_data/persistent/
