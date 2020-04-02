@@ -36,10 +36,10 @@ export class TicketImages extends Model<TicketImages> {
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   order_id: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
+  @Column( { type: DataType.TEXT( { length: 'medium' } ), allowNull: true } )
   image: string;
 
-  @Column( { type: DataType.NOW, allowNull: true } )
+  @Column( { type: "TIMESTAMP", allowNull: true } )
   created_at: string;
 
   @Column( { type: DataType.TINYINT, allowNull: true } )
