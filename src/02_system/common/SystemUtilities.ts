@@ -717,20 +717,12 @@ export default class SystemUtilities {
           strUserRole = sysUserInDB.Role;
 
           const sysUserGroupInDB = sysUserInDB.sysUserGroup;
-          // const sysGroupInDB = await SYSUserGroupService.getById( sysUserInDB.GroupId,
-          //                                                         null,
-          //                                                         null,
-          //                                                         logger );
 
           strUserGroupRole = sysUserGroupInDB.Role;
 
           if ( sysUserInDB.sysPerson ) {
 
             const sysPerson = sysUserInDB.sysPerson;
-            // const sysPerson = await SYSPersonService.getById( sysUserInDB.PersonId,
-            //                                                   null,
-            //                                                   null,
-            //                                                   logger );
 
             sysUserSessionPersistentData[ "PersonId" ] = sysPerson.Id;
             sysUserSessionPersistentData[ "Title" ] = sysPerson.Title;
@@ -751,7 +743,7 @@ export default class SystemUtilities {
 
           }
 
-          //sessionPersistent[ "UserName" ] = UserInfo.Name;
+          sysUserSessionPersistentData[ "UserName" ] = sysUserInDB.Name;
           sysUserSessionPersistentData[ "UserTag" ] = sysUserInDB.Tag;
           sysUserSessionPersistentData[ "UserGroupId" ] = sysUserGroupInDB.Id;
           sysUserSessionPersistentData[ "UserGroupName" ] = sysUserGroupInDB.Name;
@@ -760,7 +752,7 @@ export default class SystemUtilities {
           const jsonExtraData = CommonUtilities.parseJSON( sysUserSessionPersistentData[ "ExtraData" ],
                                                            logger );
 
-          delete result[ "ExtraData" ];
+          delete sysUserSessionPersistentData[ "ExtraData" ];
 
           if ( jsonExtraData ) {
 
@@ -797,9 +789,9 @@ export default class SystemUtilities {
              SystemUtilities.checkUserSessionStatusExpired( sysUserSessionPersistentData, logger ).Expired === false &&
              bUpdateAt ) {
 
-          result = SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                            null,
-                                                                            logger );
+          result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                  null,
+                                                                                  logger );
 
           const strRolesMerged = SystemUtilities.mergeTokens( strUserGroupRole,
                                                               strUserRole,
@@ -814,6 +806,8 @@ export default class SystemUtilities {
             //Insert new entry in the session status table
             result = {
                        UserId: sysUserSessionPersistentData.UserId,
+                       //UserName: sysUserSessionPersistentData.UserName,
+                       UserName: sysUserSessionPersistentData[ "UserName" ],
                        UserGroupId: sysUserSessionPersistentData[ "UserGroupId" ],
                        Token: strToken,
                        BinaryDataToken: sysUserSessionPersistentData[ "BinaryDataToken" ],
@@ -821,13 +815,12 @@ export default class SystemUtilities {
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
                        Role: strRolesMerged,
-                       UserName: sysUserSessionPersistentData[ "User" ],
                        ExpireKind: 3,
                        ExpireOn: expireAt,
                        HardLimit: null,
                        Tag: sysUserSessionPersistentData[ "Tag" ],
-                       CreatedBy: sysUserSessionPersistentData[ "User" ],
-                       UpdatedBy: sysUserSessionPersistentData[ "User" ],
+                       CreatedBy: sysUserSessionPersistentData[ "UserName" ],
+                       UpdatedBy: sysUserSessionPersistentData[ "UserName" ],
                      };
 
           }
@@ -851,7 +844,9 @@ export default class SystemUtilities {
           result[ "EMail" ] = sysUserSessionPersistentData[ "EMail" ];
           result[ "Phone" ] = sysUserSessionPersistentData[ "Phone" ];
 
-          result[ "Group" ] = sysUserSessionPersistentData[ "Group" ];
+          result[ "UserTag" ] = sysUserSessionPersistentData[ "UserTag" ];
+          result[ "UserGroupName" ] =  sysUserSessionPersistentData[ "UserGroupName" ];
+          result[ "UserGroupTag" ] =  sysUserSessionPersistentData[ "UserGroupTag" ];
 
         }
 
