@@ -196,16 +196,6 @@ export default class MigrateImagesTask {
                               }
                             );
 
-            /*
-            await BinaryTestV1.test_uploadImageTiger( CommonTest.headers_user02_at_TestL02,
-                                                                            "SUCCESS_BINARY_DATA_UPLOAD",
-                                                                            "test_uploadImageTiger_user02@TestL02_success",
-                                                                            "user02@TestL02_tiger",
-                                                                            {
-                                                                              Mark: "3E0415B6F023"
-                                                                            } )
-            */
-
             let bUploadSuccess = false;
 
             const requestHeaders = {

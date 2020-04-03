@@ -35,15 +35,13 @@ export default class Always {
 
       }
 
-      //Migration code here
-
       const userSessionPersistentEntries = [
                                              {
                                                Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
                                                UserId: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
-                                               Token: "p:5e187e17-ec3c-4536-bac7-593bffcba0c8",
-                                               BinaryDataToken: "593bffcba0c8",
-                                               SocketToken: null,
+                                               Token: process.env.FOREIGN_SYSTEM_01_TOKEN || "1",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_01_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_01_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#ForeignSystem01#,#UploadBinary#,#UpdateBinary#,#SearchBinary#,#BinaryDataAllowToDefineId#,#BinaryDataAllowToDefineDate#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -52,9 +50,9 @@ export default class Always {
                                              {
                                                Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
                                                UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                                               Token: "p:30dd38f1-64f3-4d4f-9359-bbeb7d9750b7",
-                                               BinaryDataToken: "bbeb7d9750b7",
-                                               SocketToken: null,
+                                               Token: process.env.FOREIGN_SYSTEM_02_TOKEN || "2",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_02_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_02_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#ForeignSystem02#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -63,9 +61,9 @@ export default class Always {
                                              {
                                                Id: "2bc74668-bdca-49de-bc99-058f7f3a5e10",
                                                UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
-                                               Token: "p:13293244-277f-46fd-8f61-22a38b6fc81e",
-                                               BinaryDataToken: "22a38b6fc81e",
-                                               SocketToken: null,
+                                               Token: process.env.FOREIGN_SYSTEM_03_TOKEN || "3",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_03_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_03_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#ForeignSystem03#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,

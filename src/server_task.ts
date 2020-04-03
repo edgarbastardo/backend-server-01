@@ -1,5 +1,7 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
+require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
+
 import cluster from 'cluster';
 import os from 'os';
 
