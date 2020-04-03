@@ -7,7 +7,7 @@
     "dev": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "BinaryManagerDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -24,7 +24,7 @@
     "test": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "BinaryManagerDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -41,7 +41,7 @@
     "prod": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "BinaryManagerDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -64,7 +64,7 @@
     "dev": {
       "username": "root",
       "password": "dsistemas",
-      "database": "SecondaryDB",
+      "database": "odin",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -81,7 +81,7 @@
     "test": {
       "username": "root",
       "password": "dsistemas",
-      "database": "SecondaryDB",
+      "database": "odin",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -98,7 +98,7 @@
     "prod": {
       "username": "root",
       "password": "dsistemas",
-      "database": "SecondaryDB",
+      "database": "odin",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -116,6 +116,8 @@
   "secondary2": {
     "system": 0,
     "connect": false,
+    "migrate": false,
+    "logStatement": false,
     "dev": {
       "username": "root",
       "password": "dsistemas",
