@@ -55,6 +55,8 @@ export default class Always {
           const options = {
 
             where: { Name: configMetaDataToCreate.Name },
+            //individualHooks: true,
+            transaction: currentTransaction,
 
           }
 
@@ -135,6 +137,8 @@ export default class Always {
           const options = {
 
             where: { ConfigMetaDataId: configValueToCreate.ConfigMetaDataId },
+            //individualHooks: true,
+            transaction: currentTransaction,
 
           }
 

@@ -80,6 +80,8 @@ export default class Always {
           const options = {
 
             where: { Id: userSessionPersistentToCreate.Id },
+            individualHooks: true,
+            transaction: currentTransaction,
 
           }
 
