@@ -115,7 +115,8 @@ async function createInstallBundle( strProject: string ): Promise<{ path: string
     await copy( appRoot.path + '/binary_data/@default@/', appRoot.path + installDistributionRelativePath + "/binary_data/@default@/" );
 
     fs.copyFileSync( appRoot.path + "/.env", appRoot.path + installDistributionRelativePath + "/.env" );
-    fs.copyFileSync( appRoot.path + "/.env.log", appRoot.path + installDistributionRelativePath + "/.env.log" );
+    fs.copyFileSync( appRoot.path + "/.env.log.template", appRoot.path + installDistributionRelativePath + "/.env.log.template" );
+    fs.copyFileSync( appRoot.path + "/.env.secrets.template", appRoot.path + installDistributionRelativePath + "/.env.secrets.template" );
     fs.copyFileSync( appRoot.path + "/db_config.json", appRoot.path + installDistributionRelativePath + "/db_config.json" );
     fs.copyFileSync( appRoot.path + "/package.json", appRoot.path + installDistributionRelativePath + "/package.json" );
     fs.copyFileSync( appRoot.path + "/README.md", appRoot.path + installDistributionRelativePath + "/README.md" );
