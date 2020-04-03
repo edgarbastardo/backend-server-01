@@ -52,7 +52,7 @@ export default class Always {
                                              {
                                                Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
                                                UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                                               Token: process.env.FOREIGN_SYSTEM_02_TOKEN || "1",
+                                               Token: process.env.FOREIGN_SYSTEM_02_TOKEN || "2",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_02_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_02_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#ForeignSystem02#",
@@ -63,7 +63,7 @@ export default class Always {
                                              {
                                                Id: "2bc74668-bdca-49de-bc99-058f7f3a5e10",
                                                UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
-                                               Token: process.env.FOREIGN_SYSTEM_03_TOKEN || "1",
+                                               Token: process.env.FOREIGN_SYSTEM_03_TOKEN || "3",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_03_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_03_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#ForeignSystem03#",
