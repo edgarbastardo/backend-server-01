@@ -2,7 +2,7 @@ node_modules/
 build/
 temp/tmp-*
 temp/dsistemas01/
-./logs/
+logs/
 binary_data/temporal/
 binary_data/persistent/
 install_distribution/
