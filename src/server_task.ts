@@ -1,11 +1,11 @@
 require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
 
-require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
-
 import cluster from 'cluster';
 import os from 'os';
 
 import appRoot from 'app-root-path';
+
+require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
 
 import rimraf from "rimraf";
 
@@ -178,9 +178,11 @@ export default class ServerTask {
 
       });
 
-      setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
+      const intCheckInterval = isNaN( process.env.BINARY_MANAGER_CHECK_INTERVAL as any ) ? 15000: parseInt( process.env.BINARY_MANAGER_CHECK_INTERVAL ); //Every 15 seconds by default
 
-      ServerTask.handlerRunRask();
+      setInterval( ServerTask.handlerRunRask, intCheckInterval );
+
+      ServerTask.handlerRunRask(); //Run
 
     }
     catch ( error ) {

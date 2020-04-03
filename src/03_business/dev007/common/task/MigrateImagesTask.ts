@@ -17,6 +17,7 @@ import DBConnectionManager from '../../../../02_system/common/managers/DBConnect
 import TicketImagesService from "../../../common/database/secondary/services/TicketImagesService";
 import BinaryRequestServiceV1 from '../../../common/services/BinaryRequestServiceV1';
 import CommonRequestService from "../../../common/services/CommonRequestService";
+import SystemConstants from '../../../../02_system/common/SystemContants';
 
 let debug = require( 'debug' )( 'MigrateImagesTask' );
 
@@ -45,6 +46,8 @@ export default class MigrateImagesTask {
       const binaryRequest = new FormData();
 
       binaryRequest.append( "File", fs.createReadStream( strFullPath ) );
+      binaryRequest.append( "Id", requestOptions.id || null );
+      binaryRequest.append( "Date", requestOptions.date || null );
       binaryRequest.append( "AccessKind", requestOptions.accessKind || "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", requestOptions.storageKind || "0" ); //0 = Persistent 1 = Temporal
       binaryRequest.append( "Category", requestOptions.category || "default" ); //"Ticket_Image_From_Odin"
@@ -60,42 +63,42 @@ export default class MigrateImagesTask {
 
       delete headersMultipart[ "Content-Type" ];
 
-      const result = await BinaryRequestServiceV1.callUploadBinaryData( headersMultipart,
-                                                                        requestOptions.requestBasePath,
-                                                                        binaryRequest ); //This request must be fail
+      const uploadResult = await BinaryRequestServiceV1.callUploadBinaryData( headersMultipart,
+                                                                              requestOptions.requestBasePath,
+                                                                              binaryRequest ); //This request must be fail
 
       if ( requestOptions.saveUploadResult === "1" ) {
 
         CommonRequestService.saveInput( requestOptions.fileName,
-                                        result.input,
+                                        uploadResult.input,
                                         logger );
 
-        if ( result && result.output ) {
+        if ( uploadResult && uploadResult.output ) {
 
-          result.output.expected = {
+          uploadResult.output.expected = {
                                      Code: requestOptions.responseCode
                                    };
 
         }
         else {
 
-          result.output.expected = null;
+          uploadResult.output.expected = null;
 
         }
 
         CommonRequestService.saveOutput( requestOptions.fileName,
-                                         result.output,
+                                         uploadResult.output,
                                          logger );
 
       }
 
-      if ( result &&
-           result.output &&
-           result.output.body &&
-           result.output.body.Code === requestOptions.responseCode ) {
+      if ( uploadResult &&
+           uploadResult.output &&
+           uploadResult.output.body &&
+           uploadResult.output.body.Code === requestOptions.responseCode ) {
 
-        result.data = result.output.body.Data[ 0 ];
-        result.result = result.output.body.Data[ 0 ].FileCheckSum === "md5://" + strFileCheckSum; //Staty really sure the file upload is ok
+        result.data = uploadResult.output.body.Data[ 0 ];
+        result.result = uploadResult.output.body.Data[ 0 ].Hash === "md5://" + strFileCheckSum; //Staty really sure the file upload is ok
 
       }
 
@@ -209,6 +212,8 @@ export default class MigrateImagesTask {
             const requestOptions = {
                                      path: strPath,
                                      fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
+                                     id: ticketImageList[ intIndex ].id,
+                                     date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
                                      category: "Ticket_Image_From_Odin",
                                      label: "Ticket Image From Odin",
                                      Tag: "#Ticket#,#Image#,#Odin#",
@@ -230,9 +235,54 @@ export default class MigrateImagesTask {
 
             if ( uploadResult.result ) {
 
-              bUploadSuccess = true;
+              if ( process.env.BINARY_MANAGER_SET_NULL_TO_IMAGE === "1" ) {
 
-              //
+                ticketImageList[ intIndex ].image = null;
+
+              }
+
+              ticketImageList[ intIndex ].migrated = 1; //Mark how migrated
+              ticketImageList[ intIndex ].url = `@__baseurl__@?id=${uploadResult.data.Id}&auth=@__auth__@&thumbnail=0`;
+
+              const ticketImageInDB = await TicketImagesService.createOrUpdate( ticketImageList[ intIndex ],
+                                                                                true,
+                                                                                currentTransaction,
+                                                                                logger );
+
+              if ( ticketImageInDB instanceof Error ) {
+
+                const error = ticketImageInDB as any;
+
+                const strMark = "AED3535958E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+                const debugMark = debug.extend( strMark );
+
+                debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+                debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+                //debugMark( "Catched on: %O", sourcePosition );
+
+                error.mark = strMark;
+                error.logId = SystemUtilities.getUUIDv4();
+
+                if ( logger &&
+                     logger.error === "function" ) {
+
+                  logger.error( error );
+
+                }
+
+              }
+              else {
+
+                bUploadSuccess = true;
+
+                const strMark = "0707BC6C22AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+                const debugMark = debug.extend( strMark );
+
+                debugMark( "Success migrated image with id %s", ticketImageInDB.id );
+
+              }
 
             }
 
