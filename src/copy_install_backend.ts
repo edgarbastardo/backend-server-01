@@ -20,11 +20,11 @@ import SFTP2Promise = require( 'ssh2-sftp-client' );
 
 const SSHClient = require( 'ssh2' ).Client;
 
-import SystemUtilities from "./02_system/common/SystemUtilities";
+import SystemUtilities from './02_system/common/SystemUtilities';
 
 //import DeployTarget from "./deploy_target.json";
 
-import CommonUtilities from "./02_system/common/CommonUtilities";
+import CommonUtilities from './02_system/common/CommonUtilities';
 import CommonConstants from './02_system/common/CommonConstants';
 
 const debug = require( 'debug' )( 'copy_install_backend' );
@@ -116,6 +116,7 @@ async function createInstallBundle( strProject: string ): Promise<{ path: string
 
     fs.copyFileSync( appRoot.path + "/.env", appRoot.path + installDistributionRelativePath + "/.env" );
     fs.copyFileSync( appRoot.path + "/.env.log", appRoot.path + installDistributionRelativePath + "/.env.log" );
+    fs.copyFileSync( appRoot.path + "/.env.secrets.template", appRoot.path + installDistributionRelativePath + "/.env.secrets.template" );
     fs.copyFileSync( appRoot.path + "/db_config.json", appRoot.path + installDistributionRelativePath + "/db_config.json" );
     fs.copyFileSync( appRoot.path + "/package.json", appRoot.path + installDistributionRelativePath + "/package.json" );
     fs.copyFileSync( appRoot.path + "/README.md", appRoot.path + installDistributionRelativePath + "/README.md" );
