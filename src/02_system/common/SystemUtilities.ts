@@ -717,20 +717,12 @@ export default class SystemUtilities {
           strUserRole = sysUserInDB.Role;
 
           const sysUserGroupInDB = sysUserInDB.sysUserGroup;
-          // const sysGroupInDB = await SYSUserGroupService.getById( sysUserInDB.GroupId,
-          //                                                         null,
-          //                                                         null,
-          //                                                         logger );
 
           strUserGroupRole = sysUserGroupInDB.Role;
 
           if ( sysUserInDB.sysPerson ) {
 
             const sysPerson = sysUserInDB.sysPerson;
-            // const sysPerson = await SYSPersonService.getById( sysUserInDB.PersonId,
-            //                                                   null,
-            //                                                   null,
-            //                                                   logger );
 
             sysUserSessionPersistentData[ "PersonId" ] = sysPerson.Id;
             sysUserSessionPersistentData[ "Title" ] = sysPerson.Title;

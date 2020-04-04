@@ -18,12 +18,13 @@ import LoggerManager from "./02_system/common/managers/LoggerManager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
-import MigrateImagesTask from "./03_business/dev007/common/task/MigrateImagesTask";
+import TaskManager from "./02_system/common/managers/TaskManager";
 
 let debug = require( 'debug' )( 'server_task@main_process' );
 
 export default class ServerTask {
 
+  /*
   static bRunningTask = false;
 
   static async handlerRunRask(): Promise<boolean> {
@@ -104,6 +105,7 @@ export default class ServerTask {
     return bResult;
 
   }
+  */
 
   static async handlerCleanExit() {
 
@@ -178,11 +180,13 @@ export default class ServerTask {
 
       });
 
-      const intCheckInterval = isNaN( process.env.BINARY_MANAGER_CHECK_INTERVAL as any ) ? 15000: parseInt( process.env.BINARY_MANAGER_CHECK_INTERVAL ); //Every 15 seconds by default
+      await TaskManager.create( {},
+                                LoggerManager.mainLoggerInstance );
 
-      setInterval( ServerTask.handlerRunRask, intCheckInterval );
+      await TaskManager.runTasks( {},
+                                  LoggerManager.mainLoggerInstance );
 
-      ServerTask.handlerRunRask(); //Run
+      //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
 
     }
     catch ( error ) {

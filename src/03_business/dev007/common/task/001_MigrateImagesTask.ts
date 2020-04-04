@@ -19,9 +19,11 @@ import BinaryRequestServiceV1 from '../../../common/services/BinaryRequestServic
 import CommonRequestService from "../../../common/services/CommonRequestService";
 import SystemConstants from '../../../../02_system/common/SystemContants';
 
-let debug = require( 'debug' )( 'MigrateImagesTask' );
+let debug = require( 'debug' )( '001_MigrateImagesTask' );
 
-export default class MigrateImagesTask {
+export default class MigrateImagesTask_001 {
+
+  public readonly Name = "MigrateImagesTask_001";
 
   static async uploadImage( headers: any,
                             requestOptions: any,
@@ -107,7 +109,7 @@ export default class MigrateImagesTask {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = MigrateImagesTask.name + "." + MigrateImagesTask.uploadImage.name;
+      sourcePosition.method = MigrateImagesTask_001.name + "." + MigrateImagesTask_001.uploadImage.name;
 
       const strMark = "D112D266F97F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -133,12 +135,51 @@ export default class MigrateImagesTask {
 
   }
 
-  static async runTask( transaction: any,
+  public async init( params: any, logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+        bResult = true;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = MigrateImagesTask_001.name + "." + this.init.name;
+
+      const strMark = "9D972DC3EFED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  static async runTask( params: any,
                         logger: any ): Promise<boolean> {
 
     let bResult = false;
 
-    let currentTransaction = transaction;
+    let currentTransaction = null;
 
     let bIsLocalTransaction = false;
 
@@ -229,7 +270,7 @@ export default class MigrateImagesTask {
                                      responseCode: "SUCCESS_BINARY_DATA_UPLOAD"
                                    }
 
-            const uploadResult = await MigrateImagesTask.uploadImage( requestHeaders,
+            const uploadResult = await MigrateImagesTask_001.uploadImage( requestHeaders,
                                                                       requestOptions,
                                                                       logger );
 
@@ -341,7 +382,7 @@ export default class MigrateImagesTask {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = MigrateImagesTask.name + "." + MigrateImagesTask.runTask.name;
+      sourcePosition.method = MigrateImagesTask_001.name + "." + MigrateImagesTask_001.runTask.name;
 
       const strMark = "AED3535958E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

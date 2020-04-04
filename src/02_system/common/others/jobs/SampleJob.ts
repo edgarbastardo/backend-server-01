@@ -26,7 +26,7 @@ export default class SampleJob {
 
   //public static completedJobs = [];
 
-  public async init( logger: any ):Promise<boolean> {
+  public async init( params: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -39,58 +39,58 @@ export default class SampleJob {
         //await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
         //await RedisConnectionManager.connect( "bullQueueDefault", logger );
 
-        const opt = {
+        const options = {
 
-                      createClient: function ( type: string ) {
+                          createClient: function ( type: string ) {
 
-                        let result = null;
+                            let result = null;
 
-                        const strConnectionId = Math.floor( Math.random() * 10000 ) + 1000;
+                            const strConnectionId = Math.floor( Math.random() * 10000 ) + 1000;
 
-                        switch ( type ) {
+                            switch ( type ) {
 
-                          case 'client': {
+                              case 'client': {
 
-                            result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
+                                result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
+
+                              }
+                              case 'subscriber': {
+
+                                result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
+
+                              }
+                              default: {
+
+                                result = RedisConnectionManager.connectSync( "bullQueueDefault-" + strConnectionId, logger );
+
+                              }
+
+                            }
+
+                            return result;
+
+                          },
+                          /*
+                          redis: {
+
+                            host: process.env.REDIS_SERVER_IP,
+                            port: parseInt( process.env.REDIS_SERVER_PORT ),
+                            password: process.env.REDIS_SERVER_PASSWORD
+
+                          },
+                          */
+                          settings: {
+
+                            stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
 
                           }
-                          case 'subscriber': {
 
-                            result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
-
-                          }
-                          default: {
-
-                            result = RedisConnectionManager.connectSync( "bullQueueDefault-" + strConnectionId, logger );
-
-                          }
-
-                        }
-
-                        return result;
-
-                      },
-                      /*
-                      redis: {
-
-                        host: process.env.REDIS_SERVER_IP,
-                        port: parseInt( process.env.REDIS_SERVER_PORT ),
-                        password: process.env.REDIS_SERVER_PASSWORD
-
-                      },
-                      */
-                      settings: {
-
-                        stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
-
-                      }
-
-                    };
+                        };
 
         //Here your code of init
         this.sampleJobQueue = new Queue(
                                          this.Name,
-                                         opt
+                                         options
                                        );
 
         if ( process.env.WORKER_KIND === "job_worker_process" ) {
