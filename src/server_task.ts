@@ -134,7 +134,7 @@ export default class ServerTask {
                                               },
                                               LoggerManager.mainLoggerInstance );
 
-    if ( process.env.ENV !== "DEV" ) {
+    if ( process.env.ENV !== "dev" ) {
 
       //
 
