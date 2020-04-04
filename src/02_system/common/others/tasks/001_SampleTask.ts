@@ -60,7 +60,8 @@ export default class SampleTask_001 {
 
   }
 
-  public async runTask( params: any, logger: any ): Promise<boolean> {
+  public async runTask( params: any,
+                        logger: any ): Promise<boolean> {
 
     let bResult = false;
 
