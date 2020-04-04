@@ -13,11 +13,13 @@ import LoggerManager from "./02_system/common/managers/LoggerManager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
+import TaskManager from "./02_system/common/managers/TaskManager";
 
 let debug = require( 'debug' )( 'server_task@main_process' );
 
 export default class ServerTask {
 
+  /*
   static bRunningTask = false;
 
   static fibo( n: number ): number {
@@ -116,6 +118,7 @@ export default class ServerTask {
     return bResult;
 
   }
+  */
 
   static async handlerCleanExit() {
 
@@ -186,7 +189,13 @@ export default class ServerTask {
 
       });
 
-      setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
+      await TaskManager.create( {},
+                                LoggerManager.mainLoggerInstance );
+
+      await TaskManager.runTasks( {},
+                                  LoggerManager.mainLoggerInstance );
+
+      //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
 
     }
     catch ( error ) {

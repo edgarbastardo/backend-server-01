@@ -46,11 +46,11 @@ export default class JobQueueManager {
           if ( CommonUtilities.isNotNullOrEmpty( importModule ) &&
                CommonUtilities.isNotNullOrEmpty( importModule.default ) ) {
 
-            const jobQueue = new importModule.default( logger );
+            const jobQueue = new importModule.default();
 
             if ( jobQueue.Name ) {
 
-              if ( await jobQueue.init( logger ) ) {
+              if ( await jobQueue.init( params, logger ) ) {
 
                 const debugMark = debug.extend( "F7F2BB72585D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 

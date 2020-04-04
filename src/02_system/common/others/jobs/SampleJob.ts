@@ -26,7 +26,7 @@ export default class SampleJob {
 
   //public static completedJobs = [];
 
-  public async init( logger: any ):Promise<boolean> {
+  public async init( params: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -90,7 +90,7 @@ export default class SampleJob {
         //Here your code of init
         this.sampleJobQueue = new Queue(
                                          this.Name,
-                                         options as any
+                                         options
                                        );
 
         if ( this.sampleJobQueue &&
