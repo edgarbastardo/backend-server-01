@@ -17,7 +17,7 @@ export default class BusinessQueries {
 
       if ( strName === "getLastTicketImages" ) {
 
-        strResult = `Select * From ticket_images Where migrated = 0 Order By created_at Desc Limit 3`;
+        strResult = `Select * From ticket_images As A Where A.migrated = 0 And ( A.lock Is Null Or TIMESTAMP( A.lock ) >= DATE_SUB( NOW(), INTERVAL 5 MINUTE ) ) Order By A.created_at Desc Limit 3`;
 
       }
       /*

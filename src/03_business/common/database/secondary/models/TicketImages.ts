@@ -48,6 +48,9 @@ export class TicketImages extends Model<TicketImages> {
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   url: string;
 
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  lock: string;
+
   @BeforeValidate
   static beforeValidateHook( instance: TicketImages, options: any ): void {
 

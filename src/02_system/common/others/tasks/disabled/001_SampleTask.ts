@@ -7,12 +7,12 @@ import cluster from 'cluster';
 
 //import util from 'util';
 
-import CommonConstants from '../../CommonConstants';
+import CommonConstants from '../../../CommonConstants';
 
-import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../SystemUtilities";
+import CommonUtilities from "../../../CommonUtilities";
+import SystemUtilities from "../../../SystemUtilities";
 
-import DBConnectionManager from '../../managers/DBConnectionManager';
+import DBConnectionManager from '../../../managers/DBConnectionManager';
 //import { Redis, Cluster } from 'ioredis';
 
 const debug = require( 'debug' )( '001_SampleTask' );
@@ -60,7 +60,8 @@ export default class SampleTask_001 {
 
   }
 
-  public async runTask( params: any, logger: any ): Promise<boolean> {
+  public async runTask( params: any,
+                        logger: any ): Promise<boolean> {
 
     let bResult = false;
 
@@ -98,7 +99,7 @@ export default class SampleTask_001 {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = SampleTask_001.name + "." + this.init.name;
+      sourcePosition.method = SampleTask_001.name + "." + this.runTask.name;
 
       const strMark = "B0F11596DB70" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

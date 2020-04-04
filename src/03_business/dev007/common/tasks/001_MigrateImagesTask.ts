@@ -174,7 +174,7 @@ export default class MigrateImagesTask_001 {
 
   }
 
-  static async runTask( params: any,
+  public async runTask( params: any,
                         logger: any ): Promise<boolean> {
 
     let bResult = false;
@@ -200,163 +200,172 @@ export default class MigrateImagesTask_001 {
       let ticketImageList = await TicketImagesService.getLastTicketImages( currentTransaction,
                                                                            logger );
 
+      let lockResult = null;
+
       if ( ticketImageList instanceof Error === false ) {
 
-        ticketImageList = ticketImageList as any[];
+        lockResult = await TicketImagesService.markLocked( ticketImageList as any,
+                                                           logger );
 
-        const debugMark = debug.extend( "1DD5480BD154" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        if ( lockResult instanceof Error === false ) {
 
-        for ( let intIndex = 0; intIndex < ticketImageList.length; intIndex++ ) {
+          ticketImageList = ticketImageList as any[];
 
-          const strPath = appRoot.path +
-                          "/temp/" +
-                          os.hostname + "/" +
-                          SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_07 ) + "/";
+          const debugMark = debug.extend( "1DD5480BD154" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-          fs.mkdirSync(
-                        strPath,
-                        {
-                          recursive: true
-                        }
-                      );
+          for ( let intIndex = 0; intIndex < ticketImageList.length; intIndex++ ) {
 
-          if ( ticketImageList[ intIndex ].image ) {
+            const strPath = appRoot.path +
+                            "/temp/" +
+                            os.hostname + "/" +
+                            SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_07 ) + "/";
 
-            const base64File = ticketImageList[ intIndex ].image.split( ';base64,' );
+            fs.mkdirSync(
+                          strPath,
+                          {
+                            recursive: true
+                          }
+                        );
 
-            const fileExtension = base64File[ 0 ].split( "/" );
+            if ( ticketImageList[ intIndex ].image ) {
 
-            debugMark(
-                       "Writing to temporal file %s in the path %s",
-                       ticketImageList[ intIndex ].id,
-                       strPath
-                     );
+              const base64File = ticketImageList[ intIndex ].image.split( ';base64,' );
 
-            fs.writeFileSync(
-                              strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
-                              base64File[ 1 ],
-                              {
-                                encoding: 'base64'
-                              }
-                            );
+              const fileExtension = base64File[ 0 ].split( "/" );
 
-            let bUploadSuccess = false;
+              debugMark(
+                         "Writing to temporal file %s in the path %s",
+                         ticketImageList[ intIndex ].id,
+                         strPath
+                       );
 
-            const requestHeaders = {
-                                     "Authorization": process.env.BINARY_MANAGER_AUTH_TOKEN,
-                                     //"Content-Type": "application/json",
-                                     "FrontendId": "UploadTaskProcess",
-                                     "TimeZoneId": CommonUtilities.getCurrentTimeZoneId(),
-                                     "Language": "en_US"
-                                   }
+              fs.writeFileSync(
+                                strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
+                                base64File[ 1 ],
+                                {
+                                  encoding: 'base64'
+                                }
+                              );
 
-            const requestOptions = {
-                                     path: strPath,
-                                     fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
-                                     id: ticketImageList[ intIndex ].id,
-                                     date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
-                                     category: "Ticket_Image_From_Odin",
-                                     label: "Ticket Image From Odin",
-                                     Tag: "#Ticket#,#Image#,#Odin#",
-                                     contextData: {
-                                                    "Authorization": process.env.BINARY_MANAGER_AUTH_TOKEN,
-                                                    "id": ticketImageList[ intIndex ].id,
-                                                    "created_at": ticketImageList[ intIndex ].created_at,
-                                                    "order_id": ticketImageList[ intIndex ].order_id
-                                                  },
-                                     comment: "A ticket image auto uploaded from odin database. Table ticket_images",
-                                     requestBasePath: process.env.BINARY_MANAGER_URL,
-                                     saveUploadResult: process.env.BINARY_MANAGER_SAVE_UPLOAD_RESULT || "1",
-                                     responseCode: "SUCCESS_BINARY_DATA_UPLOAD"
-                                   }
+              let bUploadSuccess = false;
 
-            const uploadResult = await MigrateImagesTask_001.uploadImage( requestHeaders,
-                                                                      requestOptions,
-                                                                      logger );
+              const requestHeaders = {
+                                       "Authorization": process.env.BINARY_MANAGER_AUTH_TOKEN,
+                                       //"Content-Type": "application/json",
+                                       "FrontendId": "UploadTaskProcess",
+                                       "TimeZoneId": CommonUtilities.getCurrentTimeZoneId(),
+                                       "Language": "en_US"
+                                     }
 
-            if ( uploadResult.result ) {
+              const requestOptions = {
+                                       path: strPath,
+                                       fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
+                                       id: ticketImageList[ intIndex ].id,
+                                       date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
+                                       category: "Ticket_Image_From_Odin",
+                                       label: "Ticket Image From Odin",
+                                       Tag: "#Ticket#,#Image#,#Odin#",
+                                       contextData: {
+                                                      "Authorization": process.env.BINARY_MANAGER_AUTH_TOKEN,
+                                                      "id": ticketImageList[ intIndex ].id,
+                                                      "created_at": ticketImageList[ intIndex ].created_at,
+                                                      "order_id": ticketImageList[ intIndex ].order_id
+                                                    },
+                                       comment: "A ticket image auto uploaded from odin database. Table ticket_images",
+                                       requestBasePath: process.env.BINARY_MANAGER_URL,
+                                       saveUploadResult: process.env.BINARY_MANAGER_SAVE_UPLOAD_RESULT || "1",
+                                       responseCode: "SUCCESS_BINARY_DATA_UPLOAD"
+                                     }
 
-              if ( process.env.BINARY_MANAGER_SET_NULL_TO_IMAGE === "1" ) {
+              const uploadResult = await MigrateImagesTask_001.uploadImage( requestHeaders,
+                                                                            requestOptions,
+                                                                            logger );
 
-                ticketImageList[ intIndex ].image = null;
+              if ( uploadResult.result ) {
 
-              }
+                if ( process.env.BINARY_MANAGER_SET_NULL_TO_IMAGE === "1" ) {
 
-              ticketImageList[ intIndex ].migrated = 1; //Mark how migrated
-              ticketImageList[ intIndex ].url = `@__baseurl__@?id=${uploadResult.data.Id}&auth=@__auth__@&thumbnail=0`;
+                  ticketImageList[ intIndex ].image = null;
 
-              const ticketImageInDB = await TicketImagesService.createOrUpdate( ticketImageList[ intIndex ],
-                                                                                true,
-                                                                                currentTransaction,
-                                                                                logger );
+                }
 
-              if ( ticketImageInDB instanceof Error ) {
+                ticketImageList[ intIndex ].migrated = 1; //Mark how migrated
+                ticketImageList[ intIndex ].url = `@__baseurl__@?id=${uploadResult.data.Id}&auth=@__auth__@&thumbnail=0`;
 
-                const error = ticketImageInDB as any;
+                const ticketImageInDB = await TicketImagesService.createOrUpdate( ticketImageList[ intIndex ],
+                                                                                  true,
+                                                                                  currentTransaction,
+                                                                                  logger );
 
-                const strMark = "AED3535958E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+                if ( ticketImageInDB instanceof Error ) {
 
-                const debugMark = debug.extend( strMark );
+                  const error = ticketImageInDB as any;
 
-                debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-                debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-                //debugMark( "Catched on: %O", sourcePosition );
+                  const strMark = "AED3535958E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-                error.mark = strMark;
-                error.logId = SystemUtilities.getUUIDv4();
+                  const debugMark = debug.extend( strMark );
 
-                if ( logger &&
-                     logger.error === "function" ) {
+                  debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+                  debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+                  //debugMark( "Catched on: %O", sourcePosition );
 
-                  logger.error( error );
+                  error.mark = strMark;
+                  error.logId = SystemUtilities.getUUIDv4();
+
+                  if ( logger &&
+                       logger.error === "function" ) {
+
+                    logger.error( error );
+
+                  }
+
+                }
+                else {
+
+                  bUploadSuccess = true;
+
+                  const strMark = "0707BC6C22AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+                  const debugMark = debug.extend( strMark );
+
+                  debugMark( "Success migrated image with id %s", ticketImageInDB.id );
 
                 }
 
               }
-              else {
 
-                bUploadSuccess = true;
+              fs.unlinkSync( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
 
-                const strMark = "0707BC6C22AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+              if ( !bUploadSuccess ) {
 
-                const debugMark = debug.extend( strMark );
+                break; //Not continue to another image, suppend the work
 
-                debugMark( "Success migrated image with id %s", ticketImageInDB.id );
+              }
+
+            }
+            else {
+
+              const strMark = "F0F3C5B113B5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+              const debugMark = debug.extend( strMark );
+
+              debugMark( "The entry with id %s had field image is null", ticketImageList[ intIndex ].id );
+
+              if ( logger &&
+                   logger.warning === "function" ) {
+
+                logger.warning( "The entry with id %s had field image is null", ticketImageList[ intIndex ].id );
 
               }
 
             }
 
-            fs.unlinkSync( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
-
-            if ( !bUploadSuccess ) {
-
-              break; //Not continue to another image, suppend the work
-
-            }
-
           }
-          else {
 
-            const strMark = "F0F3C5B113B5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-            const debugMark = debug.extend( strMark );
-
-            debugMark( "The entry with id %s had field image is null", ticketImageList[ intIndex ].id );
-
-            if ( logger &&
-                 logger.warning === "function" ) {
-
-              logger.warning( "The entry with id %s had field image is null", ticketImageList[ intIndex ].id );
-
-            }
-
-          }
+          //If everything is ok, turn on the flag and apply the transaction
+          bApplyTransaction = true;
 
         }
-
-        //If everything is ok, turn on the flag and apply the transaction
-        bApplyTransaction = true;
 
       }
 
@@ -382,7 +391,7 @@ export default class MigrateImagesTask_001 {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = MigrateImagesTask_001.name + "." + MigrateImagesTask_001.runTask.name;
+      sourcePosition.method = MigrateImagesTask_001.name + "." + this.runTask.name;
 
       const strMark = "AED3535958E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
