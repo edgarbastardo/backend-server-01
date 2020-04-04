@@ -142,7 +142,6 @@ export default class RedisConnectionManager {
 
   }
 
-
   static connectSync( strConnection: string, logger: any ): any {
 
     let result: any = {};
