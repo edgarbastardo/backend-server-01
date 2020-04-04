@@ -58,7 +58,7 @@
   },
   "secondary": {
     "system": 0,
-    "connect": true,
+    "connect": false,
     "migrate": false,
     "logStatement": false,
     "dev": {

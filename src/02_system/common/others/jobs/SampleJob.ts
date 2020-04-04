@@ -35,65 +35,68 @@ export default class SampleJob {
       if ( RedisConnectionManager.useRedis() ) {
 
         //SampleJob.completedJobs = []; //Only work if one worker
-        await RedisConnectionManager.connect( "bullQueueClient", logger );
-        await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
-        await RedisConnectionManager.connect( "bullQueueDefault", logger );
+        //await RedisConnectionManager.connect( "bullQueueClient", logger );
+        //await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
+        //await RedisConnectionManager.connect( "bullQueueDefault", logger );
 
-        const opt = {
+        const options = {
 
-                      createClient: function ( type: string ) {
+                          createClient: function ( type: string ) {
 
-                        let result = null;
+                            let result = null;
 
-                        switch ( type ) {
+                            const strConnectionId = Math.floor( Math.random() * 10000 ) + 1000;
 
-                          case 'client': {
+                            switch ( type ) {
 
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueClient" );
+                              case 'client': {
+
+                                result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
+
+                              }
+                              case 'subscriber': {
+
+                                result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
+
+                              }
+                              default: {
+
+                                result = RedisConnectionManager.connectSync( "bullQueueDefault-" + strConnectionId, logger );
+
+                              }
+
+                            }
+
+                            return result;
+
+                          },
+                          /*
+                          redis: {
+
+                            host: process.env.REDIS_SERVER_IP,
+                            port: parseInt( process.env.REDIS_SERVER_PORT ),
+                            password: process.env.REDIS_SERVER_PASSWORD
+
+                          },
+                          */
+                          settings: {
+
+                            stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
 
                           }
-                          case 'subscriber': {
 
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueSubscriber" );
-
-                          }
-                          default: {
-
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueDefault" );
-
-                          }
-
-                        }
-
-                        return result;
-
-                      },
-                      /*
-                      redis: {
-
-                        host: process.env.REDIS_SERVER_IP,
-                        port: parseInt( process.env.REDIS_SERVER_PORT ),
-                        password: process.env.REDIS_SERVER_PASSWORD
-
-                      },
-                      */
-                      settings: {
-
-                        stalledInterval: 0, //Very important to long task not launnch task repeated 2 times
-
-                      }
-
-                    };
+                        };
 
         //Here your code of init
         this.sampleJobQueue = new Queue(
                                          this.Name,
-                                         opt
+                                         options as any
                                        );
 
-        if ( process.env.WORKER_KIND === "job_worker_process" ) {
+        if ( this.sampleJobQueue &&
+             process.env.WORKER_KIND === "job_worker_process" ) {
 
-          this.sampleJobQueue.process( ( jobData: any, done: any ) => {
+          this.sampleJobQueue.process( async ( jobData: any, done: any ) => {
 
             //if ( SampleJob.completedJobs.includes( jobData.id ) === false ) {
 

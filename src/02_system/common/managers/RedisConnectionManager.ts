@@ -5,6 +5,8 @@ import CommonConstants from '../CommonConstants';
 import CommonUtilities from '../CommonUtilities';
 import SystemUtilities from '../SystemUtilities';
 
+import Redis from "ioredis";
+
 const debug = require( 'debug' )( 'RedisConnectionManager' );
 
 export default class RedisConnectionManager {
@@ -53,6 +55,7 @@ export default class RedisConnectionManager {
         RedisConnectionManager.redisConnection = {};
         RedisConnectionManager.redisConnectionOn = {};
 
+        /*
         let defaultClient = await require( "ioredis" ).createClient(
                                                                      {
                                                                        port: process.env.REDIS_SERVER_PORT,
@@ -60,6 +63,15 @@ export default class RedisConnectionManager {
                                                                        password: process.env.REDIS_SERVER_PASSWORD
                                                                      }
                                                                    );
+                                                                   */
+
+        let defaultClient = new Redis(
+                                       {
+                                         port: parseInt( process.env.REDIS_SERVER_PORT ),
+                                         host: process.env.REDIS_SERVER_IP,
+                                         password: process.env.REDIS_SERVER_PASSWORD
+                                       }
+                                    );
 
         RedisConnectionManager.redisConnection[ "default" ] = defaultClient;
         RedisConnectionManager.redisConnectionOn[ "default" ] = false;
@@ -68,6 +80,7 @@ export default class RedisConnectionManager {
 
       if ( !RedisConnectionManager.redisConnection[ strConnection ] ) {
 
+        /*
         let redisClient = await require( "ioredis" ).createClient(
                                                                    {
                                                                      port: process.env.REDIS_SERVER_PORT,
@@ -75,6 +88,15 @@ export default class RedisConnectionManager {
                                                                      password: process.env.REDIS_SERVER_PASSWORD
                                                                    }
                                                                  );
+                                                                 */
+
+        let redisClient = new Redis(
+                                      {
+                                        port: parseInt( process.env.REDIS_SERVER_PORT ),
+                                        host: process.env.REDIS_SERVER_IP,
+                                        password: process.env.REDIS_SERVER_PASSWORD
+                                      }
+                                   );
 
         RedisConnectionManager.redisConnection[ strConnection ] = redisClient;
         RedisConnectionManager.redisConnectionOn[ strConnection ] = false;
@@ -96,6 +118,105 @@ export default class RedisConnectionManager {
       sourcePosition.method = this.name + "." + this.connect.name;
 
       const strMark = "644B99BF7204" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  static connectSync( strConnection: string, logger: any ): any {
+
+    let result: any = {};
+
+    try {
+
+      if ( !RedisConnectionManager.redisConnection ) {
+
+        RedisConnectionManager.redisConnection = {};
+        RedisConnectionManager.redisConnectionOn = {};
+
+        /*
+        let defaultClient = await require( "ioredis" ).createClient(
+                                                                     {
+                                                                       port: process.env.REDIS_SERVER_PORT,
+                                                                       host: process.env.REDIS_SERVER_IP,
+                                                                       password: process.env.REDIS_SERVER_PASSWORD
+                                                                     }
+                                                                   );
+                                                                   */
+
+        let defaultClient = new Redis(
+                                       {
+                                         port: parseInt( process.env.REDIS_SERVER_PORT ),
+                                         host: process.env.REDIS_SERVER_IP,
+                                         password: process.env.REDIS_SERVER_PASSWORD
+                                       }
+                                    );
+
+        RedisConnectionManager.redisConnection[ "default" ] = defaultClient;
+        RedisConnectionManager.redisConnectionOn[ "default" ] = false;
+
+      }
+
+      if ( !RedisConnectionManager.redisConnection[ strConnection ] ) {
+
+        /*
+        let redisClient = await require( "ioredis" ).createClient(
+                                                                   {
+                                                                     port: process.env.REDIS_SERVER_PORT,
+                                                                     host: process.env.REDIS_SERVER_IP,
+                                                                     password: process.env.REDIS_SERVER_PASSWORD
+                                                                   }
+                                                                 );
+                                                                 */
+
+        let redisClient = new Redis(
+                                      {
+                                        port: parseInt( process.env.REDIS_SERVER_PORT ),
+                                        host: process.env.REDIS_SERVER_IP,
+                                        password: process.env.REDIS_SERVER_PASSWORD
+                                      }
+                                   );
+
+        RedisConnectionManager.redisConnection[ strConnection ] = redisClient;
+        RedisConnectionManager.redisConnectionOn[ strConnection ] = false;
+
+        result = redisClient;
+
+      }
+      else {
+
+        result = this.redisConnection[ strConnection ];
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.connectSync.name;
+
+      const strMark = "5C7827ACEDC5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
