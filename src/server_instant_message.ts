@@ -830,7 +830,7 @@ export default class ServerInstantMessage {
                                               },
                                               LoggerManager.mainLoggerInstance );
 
-    if ( process.env.ENV !== "deV" ) {
+    if ( process.env.ENV !== "dev" ) {
 
       //Clear the table Delete From sysUserSessionPresence As A Where A.Server = strServer
       await SYSUserSessionPresenceService.deleteUserSessionPresenceByServer( ServerInstantMessage.strTopicServer,

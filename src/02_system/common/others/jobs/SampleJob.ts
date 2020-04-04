@@ -35,9 +35,9 @@ export default class SampleJob {
       if ( RedisConnectionManager.useRedis() ) {
 
         //SampleJob.completedJobs = []; //Only work if one worker
-        await RedisConnectionManager.connect( "bullQueueClient", logger );
-        await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
-        await RedisConnectionManager.connect( "bullQueueDefault", logger );
+        //await RedisConnectionManager.connect( "bullQueueClient", logger );
+        //await RedisConnectionManager.connect( "bullQueueSubscriber", logger );
+        //await RedisConnectionManager.connect( "bullQueueDefault", logger );
 
         const opt = {
 
@@ -45,21 +45,23 @@ export default class SampleJob {
 
                         let result = null;
 
+                        const strConnectionId = Math.floor( Math.random() * 10000 ) + 1000;
+
                         switch ( type ) {
 
                           case 'client': {
 
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueClient" );
+                            result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
 
                           }
                           case 'subscriber': {
 
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueSubscriber" );
+                            result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
 
                           }
                           default: {
 
-                            result = RedisConnectionManager.getRedisConnection( "bullQueueDefault" );
+                            result = RedisConnectionManager.connectSync( "bullQueueDefault-" + strConnectionId, logger );
 
                           }
 
