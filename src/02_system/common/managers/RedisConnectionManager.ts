@@ -54,6 +54,7 @@ export default class RedisConnectionManager {
 
         RedisConnectionManager.redisConnection = {};
         RedisConnectionManager.redisConnectionOn = {};
+
         /*
         let defaultClient = await require( "ioredis" ).createClient(
                                                                      {
