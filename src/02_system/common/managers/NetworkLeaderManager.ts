@@ -23,6 +23,8 @@ export default class NetworkLeaderManager {
 
       let debugMark = debug.extend( "AA21700D550C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
+      let discover = null;
+
       await new Promise<any>( function( resolve, reject ) {
 
         /*
@@ -33,11 +35,11 @@ export default class NetworkLeaderManager {
                      }
                      */
 
-        result = new Discover( options.Discover );
+        discover = new Discover( options.Discover );
 
         let bResolvePending = true;
 
-        result.on( "promotion", function ( obj: any ) {
+        discover.on( "promotion", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
@@ -67,14 +69,14 @@ export default class NetworkLeaderManager {
 
         });
 
-        result.on( "demotion", function ( obj: any ) {
+        discover.on( "demotion", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
           SystemUtilities.bIsNetworkLeader = false;
           SystemUtilities.bIsNetworkLeaderFrom = null;
-          SystemUtilities.strNetworkId = null;
-          process.env.IS_NETWORK_LEADER = "1";
+          //SystemUtilities.strNetworkId = null;
+          process.env.IS_NETWORK_LEADER = "0";
 
           if ( logger &&
                typeof logger.info === "function" ) {
@@ -97,14 +99,20 @@ export default class NetworkLeaderManager {
 
         });
 
-        result.on( "added", function ( obj: any ) {
+        discover.on( "added", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
+
+          if ( !SystemUtilities.strNetworkId ) {
+
+            SystemUtilities.strNetworkId = discover.id;
+
+          }
 
           if ( logger &&
                typeof logger.info === "function" ) {
 
-            logger.info( "A new node has been added." );
+            logger.info( "A new node has been added." );  //Stay sure we had the network discover id
 
           }
 
@@ -122,9 +130,15 @@ export default class NetworkLeaderManager {
 
         });
 
-        result.on( "removed", function ( obj: any ) {
+        discover.on( "removed", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
+
+          if ( !SystemUtilities.strNetworkId ) {
+
+            SystemUtilities.strNetworkId = discover.id;  //Stay sure we had the network discover id
+
+          }
 
           if ( logger &&
                typeof logger.info === "function" ) {
@@ -147,9 +161,15 @@ export default class NetworkLeaderManager {
 
         });
 
-        result.on( "master", function ( obj: any ) {
+        discover.on( "master", function ( obj: any ) {
 
           const dateTime = SystemUtilities.getCurrentDateAndTime();
+
+          if ( !SystemUtilities.strNetworkId ) {
+
+            SystemUtilities.strNetworkId = discover.id; //Stay sure we had the network discover id
+
+          }
 
           if ( logger &&
                typeof logger.info === "function" ) {
@@ -174,7 +194,7 @@ export default class NetworkLeaderManager {
 
       });
 
-      if ( result ) {
+      if ( discover ) {
 
         await new Promise<any>( function( resolve, reject ) {
 
@@ -182,7 +202,7 @@ export default class NetworkLeaderManager {
 
           let bSuccessJoinNetworkLeader = false;
 
-          bSuccessJoinNetworkLeader = result.join( "networkLeader", function ( data: any ) {
+          bSuccessJoinNetworkLeader = discover.join( "networkLeader", function ( data: any ) {
 
             const dateTime = SystemUtilities.getCurrentDateAndTime();
 
@@ -195,7 +215,7 @@ export default class NetworkLeaderManager {
 
                 debugMark( "Sending network leader current info %O", SystemUtilities.info );
 
-                result.send( "networkLeader", {
+                discover.send( "networkLeader", {
                                                 command: "currentInfo",
                                                 info: SystemUtilities.info
                                               } );
@@ -211,7 +231,7 @@ export default class NetworkLeaderManager {
 
               if ( SystemUtilities.isDateAndTimeBeforeAt( data.info.release, SystemUtilities.info.release ) ) {
 
-                result.promote();
+                discover.promote();
 
                 //Wait for 5 seconds to promoted
                 setTimeout(
@@ -250,7 +270,7 @@ export default class NetworkLeaderManager {
             if ( SystemUtilities.bIsNetworkLeader === false &&
                  process.env.REPLACE_NETWORK_LEADER_BY_NEW_RELEASE === "1" ) {
 
-              result.send( "networkLeader", { command: "getCurrentInfo" } );
+              discover.send( "networkLeader", { command: "getCurrentInfo" } );
 
               //Wait for 7 seconds to promoted
               setTimeout(
@@ -283,6 +303,8 @@ export default class NetworkLeaderManager {
         });
 
       }
+
+      result = discover;
 
     }
     catch ( error ) {
