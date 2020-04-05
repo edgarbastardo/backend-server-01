@@ -2891,8 +2891,8 @@ export default class UserGroupServiceController {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( request.query.limit ) === false &&
-           parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit ) ) === false &&
+           Number.parseInt( request.query.limit ) <= intLimit ) {
 
         intLimit = parseInt( request.query.limit );
 
@@ -2923,7 +2923,7 @@ export default class UserGroupServiceController {
 
       }
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? request.query.offset : "0" );
 
       //ANCHOR dbConnection.query
       const rows = await dbConnection.query( strSQL,
