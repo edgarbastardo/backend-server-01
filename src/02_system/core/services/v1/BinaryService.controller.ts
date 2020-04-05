@@ -22,6 +22,7 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from '../../../common/managers/I18Manager';
+import NotificationManager from '../../../common/managers/NotificationManager';
 
 import BaseService from "../../../common/database/master/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
@@ -32,7 +33,6 @@ import SYSUserGroupService from '../../../common/database/master/services/SYSUse
 import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
 import { SYSUser } from '../../../common/database/master/models/SYSUser';
 import { SYSBinaryIndex } from '../../../common/database/master/models/SYSBinaryIndex';
-import NotificationManager from '../../../common/managers/NotificationManager';
 //import { AccessKind } from "../../../common/CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
