@@ -25,6 +25,8 @@ import NodeRSA from 'node-rsa';
 
 import Validator from 'validatorjs';
 
+import { Random } from "random-js";
+
 import CommonConstants from "./CommonConstants";
 import SystemConstants from "./SystemContants";
 
@@ -3311,6 +3313,74 @@ export default class SystemUtilities {
     }
 
     return result;
+
+  }
+
+  static getRandomIntegerRange( intMin: number,
+                                intMax: number ): number {
+
+    let intResult = 0;
+
+    try {
+
+      const random = new Random(); // uses the nativeMath engine
+
+      intResult = random.integer( intMin, intMax );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+
+  }
+
+  static getRandomIntegerStringRange( strRange: string | "random:0:1000" ): number {
+
+    let intResult = 0;
+
+    try {
+
+      let rangeList = strRange ? strRange.split( ":" ): [ "random" , "0", "1000" ];
+
+      if ( rangeList[ 0 ].toLocaleLowerCase() === "random" ) {
+
+        rangeList.splice( 0, 1 );
+
+      }
+
+      let intMin = 0;
+      let intMax = 1000;
+
+      if ( rangeList.length >= 1 &&
+           isNaN( parseInt( rangeList[ 0 ] ) ) === false ) {
+
+        intMin = Number.parseInt( rangeList[ 0 ] );
+
+      }
+
+      if ( rangeList.length >= 2 &&
+           isNaN( parseInt( rangeList[ 1 ] ) ) === false ) {
+
+        intMax = Number.parseInt( rangeList[ 1 ] );
+
+      }
+
+      const random = new Random();
+
+      intResult = random.integer( intMin, intMax );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
 
   }
 

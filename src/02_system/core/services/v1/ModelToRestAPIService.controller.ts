@@ -522,10 +522,10 @@ export class ModelToRestAPIServiceController extends BaseService {
         const warnings = [];
 
         if ( request.query.limit &&
-             isNaN( request.query.limit ) === false &&
-             parseInt( request.query.limit ) <= intDefaultMaxRows ) {
+             isNaN( parseInt( request.query.limit ) ) === false &&
+             Number.parseInt( request.query.limit ) <= intDefaultMaxRows ) {
 
-          intLimit = parseInt( request.query.limit );
+          intLimit = Number.parseInt( request.query.limit );
 
         }
         else {
@@ -543,7 +543,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         let filter: FindOptions = {
 
           where: whereFnResult.Result,
-          offset: request.query.offset && !isNaN( request.query.offset ) ? parseInt( request.query.offset ) : 0,
+          offset: request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? Number.parseInt( request.query.offset ) : 0,
           limit:  intLimit,
           order: orderFnResult.Result,
           include: includeFnResult.Result,

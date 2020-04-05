@@ -2925,8 +2925,8 @@ export default class UserOthersServiceController {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( request.query.limit ) === false &&
-           parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit ) ) === false &&
+           Number.parseInt( request.query.limit ) <= intLimit ) {
 
         intLimit = parseInt( request.query.limit );
 
