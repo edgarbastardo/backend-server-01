@@ -3,11 +3,14 @@ import cluster from 'cluster';
 import fs from 'fs';
 import os from 'os';
 
+import rimraf from "rimraf";
+
 import FormData from 'form-data';
 
 import appRoot from 'app-root-path';
 
 import CommonConstants from '../../../../02_system/common/CommonConstants';
+//import SystemConstants from '../../../../02_system/common/SystemContants';
 
 import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
@@ -17,7 +20,6 @@ import DBConnectionManager from '../../../../02_system/common/managers/DBConnect
 import TicketImagesService from "../../../common/database/secondary/services/TicketImagesService";
 import BinaryRequestServiceV1 from '../../../common/services/BinaryRequestServiceV1';
 import CommonRequestService from "../../../common/services/CommonRequestService";
-import SystemConstants from '../../../../02_system/common/SystemContants';
 
 let debug = require( 'debug' )( '001_MigrateImagesTask' );
 
@@ -197,6 +199,27 @@ export default class MigrateImagesTask_001 {
 
       }
 
+      //const startRun = SystemUtilities.startRun;
+
+      const strPath = appRoot.path +
+                      "/temp/" +
+                      os.hostname +
+                      "/001_migrate_images_task/" +
+                      SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_07 ) + "/";
+
+      if ( fs.existsSync( strPath ) ) {
+
+        rimraf.sync( strPath ); //Clean for old temporal files from crashed process
+
+      }
+
+      fs.mkdirSync(
+                    strPath,
+                    {
+                      recursive: true
+                    }
+                  );
+
       let ticketImageList = await TicketImagesService.getLastTicketImages( currentTransaction,
                                                                            logger );
 
@@ -214,18 +237,6 @@ export default class MigrateImagesTask_001 {
           const debugMark = debug.extend( "1DD5480BD154" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
           for ( let intIndex = 0; intIndex < ticketImageList.length; intIndex++ ) {
-
-            const strPath = appRoot.path +
-                            "/temp/" +
-                            os.hostname + "/" +
-                            SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_07 ) + "/";
-
-            fs.mkdirSync(
-                          strPath,
-                          {
-                            recursive: true
-                          }
-                        );
 
             if ( ticketImageList[ intIndex ].image ) {
 
@@ -260,7 +271,7 @@ export default class MigrateImagesTask_001 {
               const requestOptions = {
                                        path: strPath,
                                        fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
-                                       id: ticketImageList[ intIndex ].id,
+                                       //id: ticketImageList[ intIndex ].id,
                                        date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
                                        category: "Ticket_Image_From_Odin",
                                        label: "Ticket Image From Odin",

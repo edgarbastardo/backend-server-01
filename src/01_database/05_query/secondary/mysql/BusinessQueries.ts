@@ -2,6 +2,10 @@ const debug = require( 'debug' )( 'BusinessQueries' );
 
 import SqlString from 'sqlstring';
 
+import CommonConstants from '../../../../02_system/common/CommonConstants';
+
+import SystemUtilities from '../../../../02_system/common/SystemUtilities';
+
 export default class BusinessQueries {
 
   static getStatement( strDialect: string,
@@ -17,7 +21,9 @@ export default class BusinessQueries {
 
       if ( strName === "getLastTicketImages" ) {
 
-        strResult = `Select * From ticket_images As A Where A.migrated = 0 And ( A.lock Is Null Or TIMESTAMP( A.lock ) >= DATE_SUB( NOW(), INTERVAL 5 MINUTE ) ) Order By A.created_at Desc Limit 3`;
+        const strNow = !params.Now ? SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ) : params.Now;
+
+        strResult = SqlString.format( `Select * From ticket_images As A Where A.migrated = 0 And ( A.lock Is Null Or TIMESTAMP( A.lock ) <= DATE_SUB( ?, INTERVAL 5 MINUTE ) ) Order By A.created_at Desc Limit 3`, strNow );
 
       }
       /*
