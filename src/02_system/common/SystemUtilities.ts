@@ -3338,7 +3338,7 @@ export default class SystemUtilities {
 
   }
 
-  static getRandomIntegerStringRange( strRange: string | "random:0:1000" ): number {
+  static getRandomIntegerRangeFromString( strRange: string | "random:0:1000" ): number {
 
     let intResult = 0;
 

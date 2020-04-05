@@ -164,12 +164,12 @@ export default class TaskManager {
         }
 
         setTimeout( runTasksCallback,
-                    parseInt( process.env.TASK_CHECK_INTERVAL ) || 10000 );
+                    SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_REPEAT_INTERVAL || "random:8000:15000" ) );
 
       }
 
       setTimeout( runTasksCallback,
-                  parseInt( process.env.TASK_INIT_DELAY ) || 3000 );
+                  SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_INIT_DELAY || "random:2000:5000" ) );
 
       //runTasksCallback();
 
