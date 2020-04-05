@@ -22,6 +22,7 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from '../../../common/managers/I18Manager';
+import NotificationManager from '../../../common/managers/NotificationManager';
 
 import BaseService from "../../../common/database/master/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
@@ -3699,16 +3700,36 @@ export default class BinaryServiceController extends BaseService {
 
                     debugMark( "Writing info to database" );
 
-                    const sysBinaryIndex = await SYSBinaryIndexService.createOrUpdate( strId,
-                                                                                       binaryIndexData,
-                                                                                       true,
-                                                                                       currentTransaction,
-                                                                                       logger );
+                    const sysBinaryIndexInDB = await SYSBinaryIndexService.createOrUpdate( strId,
+                                                                                           binaryIndexData,
+                                                                                           true,
+                                                                                           currentTransaction,
+                                                                                           logger );
 
-                    if ( sysBinaryIndex &&
-                         sysBinaryIndex instanceof Error === false ) {
+                    if ( sysBinaryIndexInDB &&
+                         sysBinaryIndexInDB instanceof Error === false ) {
 
-                      const metaData = ( sysBinaryIndex as any ).dataValues;
+                      NotificationManager.publishOnTopic( "SystemEvent",
+                                                          {
+                                                            SystemId: SystemUtilities.getSystemId(),
+                                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                            SubSystem: "BinaryService",
+                                                            Token: context.UserSessionStatus.Token,
+                                                            UserId: context.UserSessionStatus.UserId,
+                                                            UserName: context.UserSessionStatus.UserName,
+                                                            UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                            Code: "SUCCESS_BINARY_DATA_UPLOAD",
+                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                            Data: {
+                                                                    Id: sysBinaryIndexInDB.Id,
+                                                                    FilePath: sysBinaryIndexInDB.FilePath,
+                                                                    FileName: sysBinaryIndexInDB.FileName,
+                                                                    Hash: sysBinaryIndexInDB.Hash
+                                                                  }
+                                                          },
+                                                          logger );
+
+                      const metaData = ( sysBinaryIndexInDB as any ).dataValues;
 
                       metaData.ExtraData = extraData; //JSON.parse( metaData.ExtraData );
 
@@ -3729,7 +3750,7 @@ export default class BinaryServiceController extends BaseService {
                                  Warnings: [],
                                  Count: 1,
                                  Data: [
-                                         ( sysBinaryIndex as any ).dataValues
+                                         ( sysBinaryIndexInDB as any ).dataValues
                                        ]
                                };
 
@@ -3738,7 +3759,7 @@ export default class BinaryServiceController extends BaseService {
                     }
                     else {
 
-                      const error = sysBinaryIndex as any;
+                      const error = sysBinaryIndexInDB as any;
 
                       debugMark( "Failed" );
 
@@ -5650,6 +5671,26 @@ export default class BinaryServiceController extends BaseService {
 
           }
           else if ( deleteResult === true ) {
+
+            NotificationManager.publishOnTopic( "SystemEvent",
+                                                {
+                                                  SystemId: SystemUtilities.getSystemId(),
+                                                  SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                  SubSystem: "BinaryService",
+                                                  Token: context.UserSessionStatus.Token,
+                                                  UserId: context.UserSessionStatus.UserId,
+                                                  UserName: context.UserSessionStatus.UserName,
+                                                  UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                  Code: "SUCCESS_BINARY_DATA_DELETE",
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  Data: {
+                                                          Id: sysBinaryIndexInDB.Id,
+                                                          FilePath: sysBinaryIndexInDB.FilePath,
+                                                          FileName: sysBinaryIndexInDB.FileName,
+                                                          Hash: sysBinaryIndexInDB.Hash
+                                                        }
+                                                },
+                                                logger );
 
             result = {
                        StatusCode: 200, //Ok
