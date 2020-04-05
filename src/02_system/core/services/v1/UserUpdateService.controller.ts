@@ -32,7 +32,6 @@ export default class UserUpdateServiceController {
 
   static readonly _ID = "UserUpdateServiceController";
 
-
   static async updateUser( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
