@@ -107,6 +107,69 @@ test( `isDateAndTimeBeforeAt 007`, async () => {
 
 })
 
+test( `getRandomIntegerStringRange 001`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random:100:1000" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 99 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerStringRange 002`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random::1500" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 99 );
+  expect( intRandomNumber ).toBeLessThan( 1501 );
+
+})
+
+test( `getRandomIntegerStringRange 003`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random::" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerStringRange 004`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "::" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerStringRange 005`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( ":" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerStringRange 006`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "" );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerStringRange 007`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( null );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
     /*
     if ( cluster.isMaster && SystemUtilities.isNetworkLeader ) {
 

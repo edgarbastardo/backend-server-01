@@ -53,12 +53,12 @@ export default class BinaryServiceController extends BaseService {
                                                                              transaction,
                                                                              logger );
 
-      if ( configData.Value && isNaN( configData.Value ) === false ) {
+      if ( configData.Value && isNaN( parseInt( configData.Value ) ) === false ) {
 
         intResult = Number.parseInt( configData.Value, 10 ) * 1024; //Value in kilobytes transform to bytes
 
       }
-      else if ( configData.Default && isNaN( configData.Default ) === false ) {
+      else if ( configData.Default && isNaN( parseInt( configData.Default ) ) === false ) {
 
         intResult = Number.parseInt( configData.Default, 10 ) * 1024; //Value in kilobytes transform to bytes
 
@@ -2039,10 +2039,10 @@ export default class BinaryServiceController extends BaseService {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( request.query.limit ) === false &&
-           parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit ) ) === false &&
+           Number.parseInt( request.query.limit ) <= intLimit ) {
 
-        intLimit = parseInt( request.query.limit );
+        intLimit = Number.parseInt( request.query.limit );
 
       }
       else {
@@ -2073,7 +2073,7 @@ export default class BinaryServiceController extends BaseService {
 
       //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? request.query.offset : "0" );
 
       //}
 
