@@ -37,6 +37,8 @@ export default class NetworkLeaderManager {
 
         discover = new Discover( options.Discover );
 
+        SystemUtilities.strNetworkId = discover.broadcast.instanceUuid;
+
         let bResolvePending = true;
 
         discover.on( "promotion", function ( obj: any ) {
