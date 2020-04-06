@@ -10,9 +10,9 @@ import CommonConstants from "../CommonConstants";
 import SystemUtilities from "../SystemUtilities";
 import CommonUtilities from "../CommonUtilities";
 
-const debug = require( 'debug' )( 'TaskManager' );
+const debug = require( 'debug' )( 'ApplicationServerTaskManager' );
 
-export default class TaskManager {
+export default class ApplicationServerTaskManager {
 
   private static _taskList: {};
 
@@ -119,11 +119,11 @@ export default class TaskManager {
 
       const runTasksCallback = async function () {
 
-        const taskNameList = Object.keys( TaskManager._taskList );
+        const taskNameList = Object.keys( ApplicationServerTaskManager._taskList );
 
         for ( let intTaskIndex = 0; intTaskIndex < taskNameList.length; intTaskIndex++ ) {
 
-          const task = TaskManager._taskList[ taskNameList[ intTaskIndex ] ];
+          const task = ApplicationServerTaskManager._taskList[ taskNameList[ intTaskIndex ] ];
 
           if ( task ) {
 
@@ -136,7 +136,7 @@ export default class TaskManager {
 
               const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-              sourcePosition.method = TaskManager.name + "." + TaskManager.runTasks.name;
+              sourcePosition.method = ApplicationServerTaskManager.name + "." + ApplicationServerTaskManager.runTasks.name;
 
               const strMark = "633CA1A8F43E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -219,7 +219,7 @@ export default class TaskManager {
 
           if ( fs.existsSync( strPath ) ) {
 
-            await TaskManager._scan( strPath,
+            await ApplicationServerTaskManager._scan( strPath,
                                      params,
                                      logger );
 

@@ -13,7 +13,7 @@ import LoggerManager from "./02_system/common/managers/LoggerManager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
-import TaskManager from "./02_system/common/managers/TaskManager";
+import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
 
 let debug = require( 'debug' )( 'server_task@main_process' );
 
@@ -189,10 +189,10 @@ export default class ServerTask {
 
       });
 
-      await TaskManager.create( {},
+      await ApplicationServerTaskManager.create( {},
                                 LoggerManager.mainLoggerInstance );
 
-      await TaskManager.runTasks( {},
+      await ApplicationServerTaskManager.runTasks( {},
                                   LoggerManager.mainLoggerInstance );
 
       //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
