@@ -51,7 +51,7 @@ export default class SystemUtilities {
   static strBaseRunPath: string = null;
   static strBaseRootPath: string = null;
   static bIsNetworkLeader: boolean = false;
-  static bIsNetworkLeaderFrom: Moment = null;
+  static NetworkLeaderFrom: Moment = null;
   static strNetworkId = null;
 
   static info = {
@@ -2946,9 +2946,29 @@ export default class SystemUtilities {
 
     let intResult = 0;
 
-    for ( const intId in workers ) {
+    for ( const strWorkerId in workers ) {
 
-      intResult += 1;
+      intResult += ( cluster.workers[ strWorkerId ] ? 1 : 0 );
+
+    }
+
+    return intResult;
+
+  }
+
+  static broadcastMessageToWorkers( message: any ): number {
+
+    let intResult = 0;
+
+    for ( const strWorkerId in cluster.workers ) {
+
+      const worker = cluster.workers[ strWorkerId ];
+
+      if ( worker ) {
+
+        worker.send( message );
+
+      }
 
     }
 
