@@ -29,7 +29,21 @@ export default class SYSUserService extends BaseService {
 
     if ( by.Id ) {
 
-      result = await this.getById( by.Id,
+      let strId = by.Id;
+
+      if ( strId.startsWith( "#UId:" ) ) {
+
+        strId = strId.replace( "#UId:", "" );
+
+      }
+
+      if ( strId.includes( "#" ) ) {
+
+        strId = strId.replace( "#", "" );
+
+      }
+
+      result = await this.getById( strId,
                                    strTimeZoneId,
                                    transaction,
                                    logger );
@@ -39,7 +53,21 @@ export default class SYSUserService extends BaseService {
     if ( result === null &&
          by.ShortId ) {
 
-      result = await this.getByShortId( by.ShortId,
+      let strShortId = by.ShortId;
+
+      if ( strShortId.startsWith( "#USId:" ) ) {
+
+        strShortId = strShortId.replace( "#USId:", "" );
+
+      }
+
+      if ( strShortId.includes( "#" ) ) {
+
+        strShortId = strShortId.replace( "#", "" );
+
+      }
+
+      result = await this.getByShortId( strShortId,
                                         strTimeZoneId,
                                         transaction,
                                         logger );
@@ -49,7 +77,21 @@ export default class SYSUserService extends BaseService {
     if ( result === null &&
          by.Name ) {
 
-      result = await this.getByName( by.Name,
+      let strName = by.Name;
+
+      if ( strName.startsWith( "#UName:" ) ) {
+
+        strName = strName.replace( "#UName:", "" );
+
+      }
+
+      if ( strName.includes( "#" ) ) {
+
+        strName = strName.replace( "#", "" );
+
+      }
+
+      result = await this.getByName( strName,
                                      strTimeZoneId,
                                      transaction,
                                      logger );

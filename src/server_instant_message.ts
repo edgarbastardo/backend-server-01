@@ -21,6 +21,7 @@ import SYSUserSessionPresenceService from "./02_system/common/database/master/se
 import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
 import SYSInstantMessageLogService from './02_system/common/database/master/services/SYSInstantMessageLogService';
 import SYSUserSessionPresenceInRoomService from './02_system/common/database/master/services/SYSUserSessionPresenceInRoomService';
+import SYSUserSessionPersistentService from './02_system/common/database/master/services/SYSUserSessionPersistentService';
 
 let debug = require( 'debug' )( 'server_intant_message@main_process' );
 
@@ -648,6 +649,21 @@ export default class ServerInstantMessage {
       strAuthorization = await CacheManager.getData( strAuth,
                                                      logger ); //get from cache the real authorization token
 
+      let bPutInCache = false;
+
+      if ( !strAuthorization &&
+           strAuth.startsWith( "p:" ) ) {
+
+        const sysUserSessionPersistent = await SYSUserSessionPersistentService.getUserSessionPersistentBySocketToken( strAuth,
+                                                                                                                      currentTransaction,
+                                                                                                                      logger );
+
+        strAuthorization = sysUserSessionPersistent ? sysUserSessionPersistent.Token: null;
+
+        bPutInCache = true;
+
+      }
+
       if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
         let sysUserSessionPresence = await SYSUserSessionPresenceService.getByToken( strAuthorization,
@@ -675,6 +691,14 @@ export default class ServerInstantMessage {
 
           if ( resultData &&
                resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+
+            if ( bPutInCache ) {
+
+              await CacheManager.setData( strAuth,
+                                          strAuthorization,
+                                          logger );
+
+            }
 
             const strRooms = await SYSUserSessionPresenceService.getConfigDefaultRooms( userSessionStatus,
                                                                                         currentTransaction,

@@ -69,7 +69,18 @@ export default class Always {
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
-                                           ]
+                                             {
+                                              Id: "1fe99cc1-4cee-4f36-a933-1b692991581c",
+                                              UserId: "cb8a5168-d052-4bf2-8d0c-cf8661265f5a",
+                                              Token: process.env.FOREIGN_SYSTEM_999_TOKEN || "999",
+                                              BinaryDataToken: process.env.FOREIGN_SYSTEM_999_BINARY_DATA_TOKEN || null,
+                                              SocketToken: process.env.FOREIGN_SYSTEM_999_SOCKET_TOKEN || null,
+                                              Tag: "#ForeignSystem#,#ForeignSystem999#",
+                                              Comment: "Generic authorization token (API KEY)",
+                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                              DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                            },
+                                          ]
 
       const loopUserSessionPersistentEntriesAsync = async () => {
 
@@ -96,10 +107,12 @@ export default class Always {
           else if ( !sysUserSessionPersistentInDB.Tag ||
                     sysUserSessionPersistentInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
 
-            userSessionPersistentToCreate.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userSessionPersistentToCreate.UpdatedAt = null;
+            //sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
             //await sysUserSessionPersistentInDB.save( { transaction: currentTransaction } );
+
+            userSessionPersistentToCreate.UpdateBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            userSessionPersistentToCreate.UpdateAt = null;
 
             await sysUserSessionPersistentInDB.update( userSessionPersistentToCreate,
                                                        options );
