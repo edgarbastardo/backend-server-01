@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+//import { Socket } from "net";
 
 import {
   //Router,
@@ -1548,7 +1549,7 @@ export default class SecurityServiceController {
 
             //Send to instant message server a message to disconnect this user
             await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
-                                                                                    userSessionStatus.SocketToken,
+                                                                                    strSavedSocketToken,
                                                                                     strLanguage,
                                                                                     warnings,
                                                                                     currentTransaction,
@@ -1804,6 +1805,16 @@ export default class SecurityServiceController {
   static async tokenCheck( request: Request,
                            transaction: any,
                            logger: any ): Promise<any> {
+
+    /*
+    const bIsSocket = ( request.socket instanceof Socket );
+
+    if ( bIsSocket ) {
+
+      debug( "Socket" );
+
+    }
+    */
 
     const context = ( request as any ).context;
 

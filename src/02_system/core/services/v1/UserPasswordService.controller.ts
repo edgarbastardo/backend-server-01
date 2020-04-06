@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+import { Socket } from "net";
 
 import {
   Request,
@@ -14,6 +15,7 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
+import ApplicationServerDataManager from '../../../common/managers/ApplicationServerDataManager';
 
 import SecurityServiceController from './SecurityService.controller';
 import UserOthersServiceController from "./UserOthersService.controller";
@@ -44,7 +46,9 @@ export default class UserPasswordServiceController {
 
     try {
 
-      if ( process.env.DISABLE_USER_PASSWORD_RECOVER_CODE_SEND === "0" ) {
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_PASSWORD_RECOVER_CODE_SEND" ) ) {
 
         const context = ( request as any ).context;
 
@@ -720,7 +724,9 @@ export default class UserPasswordServiceController {
 
     try {
 
-      if ( process.env.DISABLE_USER_PASSWORD_RECOVER === "0" ) {
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_PASSWORD_RECOVER" ) ) {
 
         const context = ( request as any ).context;
 
@@ -1185,7 +1191,7 @@ export default class UserPasswordServiceController {
                    StatusCode: 400, //Bad request
                    Code: 'ERROR_PATH_DISABLED',
                    Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: '#6829189D28C1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: '6829189D28C1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
