@@ -45,7 +45,7 @@ export default class NetworkLeaderManager {
 
           SystemUtilities.bIsNetworkLeader = true;
           SystemUtilities.bIsNetworkLeaderFrom = dateTime;
-          SystemUtilities.strNetworkId = obj.id ? obj.id : "@";
+          SystemUtilities.strNetworkId = discover.broadcast.instanceUuid;
           process.env.IS_NETWORK_LEADER = "1";
 
           if ( logger &&
@@ -105,7 +105,7 @@ export default class NetworkLeaderManager {
 
           if ( !SystemUtilities.strNetworkId ) {
 
-            SystemUtilities.strNetworkId = discover.id;
+            SystemUtilities.strNetworkId = discover.broadcast.instanceUuid;
 
           }
 
@@ -136,7 +136,7 @@ export default class NetworkLeaderManager {
 
           if ( !SystemUtilities.strNetworkId ) {
 
-            SystemUtilities.strNetworkId = discover.id;  //Stay sure we had the network discover id
+            SystemUtilities.strNetworkId = discover.broadcast.instanceUuid;  //Stay sure we had the network discover id
 
           }
 
@@ -167,7 +167,7 @@ export default class NetworkLeaderManager {
 
           if ( !SystemUtilities.strNetworkId ) {
 
-            SystemUtilities.strNetworkId = discover.id; //Stay sure we had the network discover id
+            SystemUtilities.strNetworkId = discover.broadcast.instanceUuid; //Stay sure we had the network discover id
 
           }
 
