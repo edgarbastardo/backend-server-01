@@ -547,7 +547,8 @@ export default class UserOthersServiceController {
     try {
 
       result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#" + strActionRole + "L99#" ): false;
 
       if ( result.isAuthorizedAdmin === false ) {
 
