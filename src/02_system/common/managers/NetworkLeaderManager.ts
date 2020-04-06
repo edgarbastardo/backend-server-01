@@ -44,7 +44,7 @@ export default class NetworkLeaderManager {
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
           SystemUtilities.bIsNetworkLeader = true;
-          SystemUtilities.bIsNetworkLeaderFrom = dateTime;
+          SystemUtilities.NetworkLeaderFrom = dateTime;
           SystemUtilities.strNetworkId = discover.broadcast.instanceUuid;
           process.env.IS_NETWORK_LEADER = "1";
 
@@ -58,14 +58,25 @@ export default class NetworkLeaderManager {
           debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
           debugMark( "I was promoted to network leader." );
 
-          bResolvePending ? resolve() : null;
-          bResolvePending = false;
+          SystemUtilities.broadcastMessageToWorkers(
+                                                     {
+                                                       command: "network_leader_info",
+                                                       networkLeader: {
+                                                                        Id: SystemUtilities.strNetworkId,
+                                                                        IsLeader: SystemUtilities.bIsNetworkLeader,
+                                                                        From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                      }
+                                                     }
+                                                   );
 
           if ( options.OnPromotion ) {
 
             options.OnPromotion( obj );
 
           }
+
+          bResolvePending ? resolve() : null;
+          bResolvePending = false;
 
         });
 
@@ -74,7 +85,7 @@ export default class NetworkLeaderManager {
           const dateTime = SystemUtilities.getCurrentDateAndTime();
 
           SystemUtilities.bIsNetworkLeader = false;
-          SystemUtilities.bIsNetworkLeaderFrom = null;
+          SystemUtilities.NetworkLeaderFrom = null;
           //SystemUtilities.strNetworkId = null;
           process.env.IS_NETWORK_LEADER = "0";
 
@@ -88,14 +99,25 @@ export default class NetworkLeaderManager {
           debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
           debugMark( "I was demoted from being a network leader." );
 
-          bResolvePending ? resolve() : null;
-          bResolvePending = false;
+          SystemUtilities.broadcastMessageToWorkers(
+                                                     {
+                                                       command: "network_leader_info",
+                                                       networkLeader: {
+                                                                        Id: SystemUtilities.strNetworkId,
+                                                                        IsLeader: SystemUtilities.bIsNetworkLeader,
+                                                                        From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                      }
+                                                     }
+                                                   );
 
           if ( options.OnDemotion ) {
 
             options.OnDemotion( obj );
 
           }
+
+          bResolvePending ? resolve() : null;
+          bResolvePending = false;
 
         });
 
