@@ -43,6 +43,8 @@ const debug = require( 'debug' )( 'ApplicationManager' );
 
 export default class ApplicationServerDataManager {
 
+  private static disableServiceList = [];
+
   static currentInstance: any = null;
 
   static async create( dbConnection: any, logger: any ): Promise<any> {
@@ -52,6 +54,8 @@ export default class ApplicationServerDataManager {
     try {
 
       //await new ModelServiceLoader().loadModelServices( logger );
+
+      this.disableServiceList = process.env.DISABLE_SERVICES ? process.env.DISABLE_SERVICES.split( "," ): [];
 
       let app = express();
 
@@ -456,6 +460,24 @@ export default class ApplicationServerDataManager {
     //app.use( sentry.Handlers.requestHandler() );
 
     return result;
+
+  }
+
+  public static checkServiceEnabled( strService: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      bResult = !this.disableServiceList.includes( strService );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
 
   }
 

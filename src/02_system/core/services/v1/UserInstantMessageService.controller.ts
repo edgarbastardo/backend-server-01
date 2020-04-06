@@ -16,14 +16,16 @@ import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from '../../../common/managers/CacheManager';
 import NotificationManager from "../../../common/managers/NotificationManager";
-import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 import InstantMenssageManager from '../../../common/managers/InstantMessageManager';
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import PresenceManager from "../../../common/managers/PresenceManager";
+
+import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
+
 import { SYSUserSessionPresence } from '../../../common/database/master/models/SYSUserSessionPresence';
 import { SYSUser } from '../../../common/database/master/models/SYSUser';
 import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
 import { SYSUserSessionStatus } from '../../../common/database/master/models/SYSUserSessionStatus';
-import PresenceManager from "../../../common/managers/PresenceManager";
 import { SYSUserSessionPresenceInRoom } from '../../../common/database/master/models/SYSUserSessionPresenceInRoom';
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';

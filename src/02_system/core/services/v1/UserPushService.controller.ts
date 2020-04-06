@@ -14,7 +14,7 @@ import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import NotificationManager from '../../../common/managers/NotificationManager';
 import SYSUserSessionDeviceService from '../../../common/database/master/services/SYSUserSessionDeviceService';
-import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
+//import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 
 const debug = require( 'debug' )( 'UserPushServiceController' );
 

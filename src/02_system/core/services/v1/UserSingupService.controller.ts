@@ -1,4 +1,5 @@
 import cluster from 'cluster';
+import { Socket } from "net";
 
 import {
   Request,
@@ -14,15 +15,16 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
+import CipherManager from '../../../common/managers/CipherManager';
+import ApplicationServerDataManager from "../../../common/managers/ApplicationServerDataManager";
 
 import SecurityServiceController from './SecurityService.controller';
+import UserOthersServiceController from './UserOthersService.controller';
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
 import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
-import UserOthersServiceController from './UserOthersService.controller';
 import SYSUserSignupService from '../../../common/database/master/services/SYSUserSignupService';
-import CipherManager from '../../../common/managers/CipherManager';
 
 const debug = require( 'debug' )( 'UserSingupServiceController' );
 
@@ -46,7 +48,9 @@ export default class UserSingupServiceController {
 
     try {
 
-      if ( process.env.DISABLE_USER_SIGNUP === "0" ) {
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_SIGNUP" ) ) {
 
         const context = ( request as any ).context;
 
@@ -696,7 +700,9 @@ export default class UserSingupServiceController {
 
     try {
 
-      if ( process.env.DISABLE_USER_ACTIVATE === "0" ) {
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_ACTIVATE" ) ) {
 
         const context = ( request as any ).context;
 
