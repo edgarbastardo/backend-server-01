@@ -50,15 +50,15 @@ export default class MigrateImagesTask_001 {
       const binaryRequest = new FormData();
 
       binaryRequest.append( "File", fs.createReadStream( strFullPath ) );
-      binaryRequest.append( "Id", requestOptions.id || null );
-      binaryRequest.append( "Date", requestOptions.date || null );
+      binaryRequest.append( "Id", requestOptions.id || "" );
+      binaryRequest.append( "Date", requestOptions.date || "" );
       binaryRequest.append( "AccessKind", requestOptions.accessKind || "2" );  //1 = Public, 2 = Authenticated, 3 = Role
       binaryRequest.append( "StorageKind", requestOptions.storageKind || "0" ); //0 = Persistent 1 = Temporal
       binaryRequest.append( "Category", requestOptions.category || "default" ); //"Ticket_Image_From_Odin"
       binaryRequest.append( "Label", requestOptions.label || "default" ); //"Ticket Image From Odin"
       binaryRequest.append( "Tag", requestOptions.tag || "#default#" ); //"#Ticket#,#Image#,#Odin#"
       binaryRequest.append( "Context", requestOptions.contextData ? JSON.stringify( {  ...requestOptions.contextData } ) : null );
-      binaryRequest.append( "Comment", requestOptions.comment || null ); //"A ticket image auto uploaded from odin database"
+      binaryRequest.append( "Comment", requestOptions.comment || "" ); //"A ticket image auto uploaded from odin database"
 
       let headersMultipart = {
                                ...headers,
