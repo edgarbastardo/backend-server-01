@@ -98,7 +98,7 @@ export default class SystemServiceController {
                      date: SystemUtilities.getCurrentDateAndTime().format(),
                      startedAt: SystemUtilities.startRun.format(),
                      isNetworkLeader: SystemUtilities.bIsNetworkLeader,
-                     isNetworkLeaderFrom: SystemUtilities.bIsNetworkLeaderFrom ? SystemUtilities.bIsNetworkLeaderFrom.format() : "",
+                     isNetworkLeaderFrom: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format() : "",
                      networkId: SystemUtilities.strNetworkId,
                      host: SystemUtilities.getHostName(),
                      server: SystemUtilities.getSystemId(),

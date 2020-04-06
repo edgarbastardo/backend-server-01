@@ -534,6 +534,31 @@ export default async function main() {
 
                 debugMark( "HTTP worker process with id %d now started and listen.", httpWorker.id );
                 intWorkerCount += 1;
+
+                /*
+                SystemUtilities.broadcastMessageToWorkers(
+                                                           {
+                                                             command: "network_leader_info",
+                                                             networkLeader: {
+                                                                              Id: SystemUtilities.strNetworkId,
+                                                                              IsLeader: SystemUtilities.bIsNetworkLeader,
+                                                                              From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                            }
+                                                           }
+                                                         );
+                */
+
+                httpWorker.send(
+                                 {
+                                   command: "network_leader_info",
+                                   networkLeader: {
+                                                    Id: SystemUtilities.strNetworkId,
+                                                    IsLeader: SystemUtilities.bIsNetworkLeader,
+                                                    From: SystemUtilities.NetworkLeaderFrom.format()
+                                                  }
+                                 }
+                               );
+
                 resolve( true );
 
               }
@@ -621,9 +646,9 @@ export default async function main() {
 
             }
 
-            jobWorker.on( "message", async ( msg: any ) => {
+            jobWorker.on( "message", async ( message: any ) => {
 
-              if ( msg.command === "start_done" ) { //VERY IMPORTANT listen for this custom message. To resolve the promise
+              if ( message.command === "start_done" ) { //VERY IMPORTANT listen for this custom message. To resolve the promise
 
                 debugMark( "JOB worker process with id [%d] now started.", jobWorker.id );
                 intWorkerCount += 1;
@@ -709,6 +734,18 @@ export default async function main() {
 
           await JobQueueManager.create( null,
                                         ApplicationServerDataManager.currentInstance );
+
+          process.on( "message", ( message: any ) => {
+
+            if ( message.command === "network_leader_info" ) {
+
+              SystemUtilities.strNetworkId = message.networkLeader.Id;
+              SystemUtilities.bIsNetworkLeader = message.networkLeader.IsLeader;
+              SystemUtilities.NetworkLeaderFrom = SystemUtilities.getCurrentDateAndTimeFrom( message.networkLeader.From );
+
+            }
+
+          } );
 
           process.send( { command: "start_done" } ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
