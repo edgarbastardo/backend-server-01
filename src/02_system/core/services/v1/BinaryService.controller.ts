@@ -3715,7 +3715,18 @@ export default class BinaryServiceController extends BaseService {
 
                     const strCurrentFileExtension = CommonUtilities.getFileExtension( uploadedFile.name );
 
-                    const strFinalFileName = strCurrentFileExtension === "." + fileDetectedType.ext ? uploadedFile.name: uploadedFile.name + "." + fileDetectedType.ext;
+                    let strFinalFileName = request.body.Name ? request.body.Name: uploadedFile.name;
+
+                    if ( strCurrentFileExtension !== "." + fileDetectedType.ext ) {
+
+                      strFinalFileName = strFinalFileName + "." + fileDetectedType.ext;
+
+                    }
+                    else if ( request.body.Name ) {
+
+                      strFinalFileName = strFinalFileName + strCurrentFileExtension;
+
+                    }
 
                     const extraData = {
                                         Thumbnail: thumbnailData && thumbnailData.thumbnail ? thumbnailData.thumbnail : [],
