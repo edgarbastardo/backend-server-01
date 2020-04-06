@@ -50,6 +50,7 @@ export default class MigrateImagesTask_001 {
       const binaryRequest = new FormData();
 
       binaryRequest.append( "File", fs.createReadStream( strFullPath ) );
+      binaryRequest.append( "Name", requestOptions.name || "" );
       binaryRequest.append( "Id", requestOptions.id || "" );
       binaryRequest.append( "Date", requestOptions.date || "" );
       binaryRequest.append( "AccessKind", requestOptions.accessKind || "2" );  //1 = Public, 2 = Authenticated, 3 = Role
@@ -270,6 +271,7 @@ export default class MigrateImagesTask_001 {
 
               const requestOptions = {
                                        path: strPath,
+                                       name: ticketImageList[ intIndex ].id,
                                        fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
                                        //id: ticketImageList[ intIndex ].id,
                                        date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
