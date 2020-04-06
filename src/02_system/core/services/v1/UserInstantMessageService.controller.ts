@@ -78,7 +78,7 @@ export default class UserInstantMessageServiceController {
 
         strSocketToken = SystemUtilities.hashString( strId, 1, logger ); //xx hash
 
-        userSessionStatus.SocketToken = strSocketToken;
+        userSessionStatus.SocketToken = userSessionStatus.Token.startsWith( "p:" ) ? "p:" + strSocketToken: strSocketToken;
 
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,

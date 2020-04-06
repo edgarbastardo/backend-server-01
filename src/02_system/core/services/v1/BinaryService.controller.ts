@@ -33,6 +33,7 @@ import SYSUserGroupService from '../../../common/database/master/services/SYSUse
 import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
 import { SYSUser } from '../../../common/database/master/models/SYSUser';
 import { SYSBinaryIndex } from '../../../common/database/master/models/SYSBinaryIndex';
+import SYSUserSessionPersistentService from '../../../common/database/master/services/SYSUserSessionPersistentService';
 //import { AccessKind } from "../../../common/CommonConstants";
 
 const debug = require( 'debug' )( 'BinaryServiceController' );
@@ -1096,23 +1097,50 @@ export default class BinaryServiceController extends BaseService {
     try {
 
       result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#" + strActionRole + "L99#" ): false;
 
       if ( result.isAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
 
         if ( !roleSubTag ||
-             roleSubTag.length === 0 &&
-             strActionRole ) {
+              roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#ChangeUserPasswordL03#" );
 
         }
 
-        result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
-                                                            roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
-                                                            roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ) : false;
+        if ( !roleSubTag ) {
+
+          roleSubTag = [];
+
+        }
+
+        result.isAuthorizedL03 = userSessionStatus.Role && sysUserInDB ? ( roleSubTag.includes( "#GName:" +  sysUserInDB.sysUserGroup.Name + "#" ) ||
+                                                                           roleSubTag.includes( "#GName:*#" ) ||
+                                                                           roleSubTag.includes( "#GId:" +  sysUserInDB.sysUserGroup.Id + "#" ) ||
+                                                                           roleSubTag.includes( "#GId:*#" ) ||
+                                                                           roleSubTag.includes( "#GSId:" +  sysUserInDB.sysUserGroup.ShortId + "#" ) ||
+                                                                           roleSubTag.includes( "#GSId:*#" ) ): false;
+
+        if ( result.isAuthorizedL03 === false ) {
+
+          let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+
+          if ( !roleSubTag ||
+              roleSubTag.length === 0 &&
+              strActionRole ) {
+
+            roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L02#" );
+
+          }
+
+          result.isAuthorizedL02 = userSessionStatus.Role ? ( roleSubTag.includes( "#UName:" +  sysUserInDB.Name + "#" ) ||
+                                                              roleSubTag.includes( "#UId:" +  sysUserInDB.Id + "#" ) ||
+                                                              roleSubTag.includes( "#USId:" +  sysUserInDB.ShortId + "#" ) ) : false;
+
+        }
 
       }
 
@@ -1486,13 +1514,14 @@ export default class BinaryServiceController extends BaseService {
       let strBinaryDataToken = null;
 
       if ( CommonUtilities.isNullOrEmpty( userSessionStatus.BinaryDataToken ) ||
-           ( request.query.Force === "1" && userSessionStatus.Token.startsWith( "p:" ) === false ) ) {
+           ( request.query.Force === "1" /*&&
+           userSessionStatus.Token.startsWith( "p:" ) === false*/ ) ) {
 
         const strId = SystemUtilities.getUUIDv4();
 
         strBinaryDataToken = SystemUtilities.hashString( strId, 1, logger ); //xx hash
 
-        userSessionStatus.BinaryDataToken = strBinaryDataToken;
+        userSessionStatus.BinaryDataToken = userSessionStatus.Token.startsWith( "p:" ) ? "p:" + strBinaryDataToken: strBinaryDataToken;
 
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
@@ -1892,7 +1921,8 @@ export default class BinaryServiceController extends BaseService {
       }
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#SearchBinaryL99#" ) : false;
 
       let bIsAuthorizedL03 = false;
       let strWhereL03 = "";
@@ -2243,7 +2273,8 @@ export default class BinaryServiceController extends BaseService {
       }
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#SearchBinaryL99#" ): false;
 
       let bIsAuthorizedL03 = false;
       let strWhereL03 = "";
@@ -2649,6 +2680,17 @@ export default class BinaryServiceController extends BaseService {
                   strAuthorization = await CacheManager.getData( strAuth,
                                                                  logger ); //get from cache the real authorization token
 
+                  if ( !strAuthorization &&
+                       strAuth.startsWith( "p:" ) ) {
+
+                    const sysUserSessionPersistent = await SYSUserSessionPersistentService.getUserSessionPersistentByBinaryDataToken( strAuth,
+                                                                                                                                      currentTransaction,
+                                                                                                                                      logger );
+
+                    strAuthorization = sysUserSessionPersistent ? sysUserSessionPersistent.Token: null;
+
+                  }
+
                   if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
                     let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
@@ -2661,6 +2703,10 @@ export default class BinaryServiceController extends BaseService {
                     if ( userSessionStatus ) {
 
                       context.UserSessionStatus = userSessionStatus; //Inject the user session status to context
+
+                      await CacheManager.setData( strAuth,
+                                                  strAuthorization,
+                                                  logger );
 
                     }
 
@@ -2680,7 +2726,8 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( sysBinaryIndexInDB.AccessKind === 2 ||
                          userSessionStatus.Role.includes( "#Administrator#" ) ||
-                         userSessionStatus.Role.includes( "#ManagerL99#" ) ) { //Authenticated
+                         userSessionStatus.Role.includes( "#ManagerL99#" ) ||
+                         userSessionStatus.Role.includes( "#GetBinaryL99#" ) ) { //Authenticated
 
                       result = {
                                  StatusCode: 200, //Ok
@@ -2739,7 +2786,8 @@ export default class BinaryServiceController extends BaseService {
                                                                                        logger );
 
                           if ( checkUserRoles.isAuthorizedAdmin ||
-                               checkUserRoles.isAuthorizedL02 ) {
+                               checkUserRoles.isAuthorizedL02 ||
+                               checkUserRoles.isAuthorizedL03 ) {
 
                             break;
 
@@ -2748,7 +2796,8 @@ export default class BinaryServiceController extends BaseService {
                         }
 
                         if ( checkUserRoles.isAuthorizedAdmin === false &&
-                             checkUserRoles.isAuthorizedL02 === false ) {
+                             checkUserRoles.isAuthorizedL02 === false &&
+                             checkUserRoles.isAuthorizedL03 === false ) {
 
                           ownerList = BinaryServiceController.getUserGroupOwner( sysBinaryIndexInDB.Owner, logger );
 
@@ -2765,7 +2814,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                               logger );
 
                             if ( checkUserRoles.isAuthorizedL01 ||
-                                checkUserRoles.isAuthorizedL03 ) {
+                                 checkUserRoles.isAuthorizedL03 ) {
 
                               break;
 
@@ -5617,6 +5666,7 @@ export default class BinaryServiceController extends BaseService {
           if ( userSessionStatus.Role &&
                ( userSessionStatus.Role.includes( "#Administrator#" ) ||
                  userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                 userSessionStatus.Role.includes( "#DeleteBinaryL99#" ) ||
                  userSessionStatus.Role.includes( "#DeleteBinaryFile#" ) ) ) {
 
             const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( currentTransaction,
