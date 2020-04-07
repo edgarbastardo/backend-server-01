@@ -66,7 +66,7 @@ export default class NetworkLeaderManager {
                                                        networkLeader: {
                                                                         Id: SystemUtilities.strNetworkId,
                                                                         IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                                        From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                        From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
                                                                       }
                                                      }
                                                    );
@@ -107,7 +107,7 @@ export default class NetworkLeaderManager {
                                                        networkLeader: {
                                                                         Id: SystemUtilities.strNetworkId,
                                                                         IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                                        From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                        From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
                                                                       }
                                                      }
                                                    );
