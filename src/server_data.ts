@@ -542,7 +542,7 @@ export default async function main() {
                                                              networkLeader: {
                                                                               Id: SystemUtilities.strNetworkId,
                                                                               IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                                              From: SystemUtilities.NetworkLeaderFrom.format()
+                                                                              From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
                                                                             }
                                                            }
                                                          );
@@ -554,7 +554,7 @@ export default async function main() {
                                    networkLeader: {
                                                     Id: SystemUtilities.strNetworkId,
                                                     IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                    From: SystemUtilities.NetworkLeaderFrom.format()
+                                                    From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
                                                   }
                                  }
                                );
@@ -741,7 +741,7 @@ export default async function main() {
 
               SystemUtilities.strNetworkId = message.networkLeader.Id;
               SystemUtilities.bIsNetworkLeader = message.networkLeader.IsLeader;
-              SystemUtilities.NetworkLeaderFrom = SystemUtilities.getCurrentDateAndTimeFrom( message.networkLeader.From );
+              SystemUtilities.NetworkLeaderFrom = message.networkLeader.From ? SystemUtilities.getCurrentDateAndTimeFrom( message.networkLeader.From ): null;
 
             }
 
