@@ -129,7 +129,12 @@ export default class ApplicationServerTaskManager {
 
             try {
 
-              await task.runTask( params, logger );
+              if ( !task.canRunTask ||
+                   await task.canRunTask( params, logger ) ) {
+
+                await task.runTask( params, logger );
+
+              }
 
             }
             catch ( error ) {

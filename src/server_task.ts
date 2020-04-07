@@ -190,10 +190,10 @@ export default class ServerTask {
       });
 
       await ApplicationServerTaskManager.create( {},
-                                LoggerManager.mainLoggerInstance );
+                                                 LoggerManager.mainLoggerInstance );
 
       await ApplicationServerTaskManager.runTasks( {},
-                                  LoggerManager.mainLoggerInstance );
+                                                   LoggerManager.mainLoggerInstance );
 
       //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
 
