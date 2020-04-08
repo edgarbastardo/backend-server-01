@@ -52,6 +52,7 @@ export default class MigrateImagesTask_001 {
       const binaryRequest = new FormData();
 
       binaryRequest.append( "File", fs.createReadStream( strFullPath ) );
+      binaryRequest.append( "ContextPath", requestOptions.contextPath || "" );
       binaryRequest.append( "Name", requestOptions.name || "" );
       binaryRequest.append( "Id", requestOptions.id || "" );
       binaryRequest.append( "Date", requestOptions.date || "" );
@@ -193,7 +194,7 @@ export default class MigrateImagesTask_001 {
       const strNextRunDateTime = interval.next().toISOString();
 
       if ( currentDateTime.isSame( strNextRunDateTime ) ||
-           currentDateTime.isAfter( strNextRunDateTime ) ) {
+           currentDateTime.isBefore( strNextRunDateTime ) ) {
 
         bResult = true;
 
@@ -325,8 +326,9 @@ export default class MigrateImagesTask_001 {
               const requestOptions = {
                                        path: strPath,
                                        name: ticketImageList[ intIndex ].id,
+                                       contextPath: ticketImageList[ intIndex ].order_id,
                                        fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
-                                       //id: ticketImageList[ intIndex ].id,
+                                       id: ticketImageList[ intIndex ].id,
                                        date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
                                        category: "Ticket_Image_From_Odin",
                                        label: "Ticket Image From Odin",

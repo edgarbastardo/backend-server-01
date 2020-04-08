@@ -117,7 +117,11 @@ export default class ApplicationServerTaskManager {
 
     try {
 
+      const debugMark = debug.extend( "B67A7EEF31A1" );
+
       const runTasksCallback = async function () {
+
+        debugMark( "Running tasks..." );
 
         const taskNameList = Object.keys( ApplicationServerTaskManager._taskList );
 
@@ -132,9 +136,14 @@ export default class ApplicationServerTaskManager {
               if ( !task.canRunTask ||
                    await task.canRunTask( params, logger ) ) {
 
+                debugMark( "Init of run task %s", task.name );
+
                 await task.runTask( params, logger );
 
+                debugMark( "Finish of run task %s", task.name );
+
               }
+
 
             }
             catch ( error ) {
@@ -168,15 +177,20 @@ export default class ApplicationServerTaskManager {
 
         }
 
+        const initNextLoop = SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_REPEAT_INTERVAL || "random:8000:15000" );
+
+        debugMark( "Next tasks running in %s seconds", initNextLoop / 1000 );
+
         setTimeout( runTasksCallback,
-                    SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_REPEAT_INTERVAL || "random:8000:15000" ) );
+                    initNextLoop );
 
       }
 
-      setTimeout( runTasksCallback,
-                  SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_INIT_DELAY || "random:2000:5000" ) );
+      const initDelay = SystemUtilities.getRandomIntegerRangeFromString( process.env.TASK_INIT_DELAY || "random:2000:5000" );
 
-      //runTasksCallback();
+      debugMark( "First tasks running in %s seconds", initDelay / 1000 );
+
+      setTimeout( runTasksCallback, initDelay );
 
     }
     catch ( error ) {
