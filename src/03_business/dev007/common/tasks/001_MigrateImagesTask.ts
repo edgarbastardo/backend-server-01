@@ -329,7 +329,7 @@ export default class MigrateImagesTask_001 {
                                        contextPath: ticketImageList[ intIndex ].order_id,
                                        fileName: ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
                                        id: ticketImageList[ intIndex ].id,
-                                       date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
+                                       date: SystemUtilities.getCurrentDateAndTimeFrom( ticketImageList[ intIndex ].orders.created_at ).format( CommonConstants._DATE_TIME_LONG_FORMAT_04 ),
                                        category: "Ticket_Image_From_Odin",
                                        label: "Ticket Image From Odin",
                                        Tag: "#Ticket#,#Image#,#Odin#",

@@ -42,10 +42,21 @@ export default class TicketImagesService extends BaseService {
 
       }
 
+      let strSelectField = SystemUtilities.createSelectAliasFromModels(
+                                                                        [
+                                                                          TicketImages,
+                                                                        ],
+                                                                        [
+                                                                          "A",
+                                                                        ]
+                                                                      );
+
+      strSelectField = strSelectField + ",B.created_at As B_created_at";
+
       let strSQL = DBConnectionManager.getStatement( "secondary",
                                                      "getLastTicketImages",
                                                      {
-                                                       //
+                                                       SelectFields: strSelectField,
                                                      },
                                                      logger );
 
@@ -59,7 +70,26 @@ export default class TicketImagesService extends BaseService {
       if ( rows &&
            rows.length > 0 ) {
 
-        result = rows;
+        const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                            [
+                                                                                              TicketImages,
+                                                                                              {
+                                                                                                name: "orders",
+                                                                                                rawAttributes : {
+                                                                                                                  created_at: {
+                                                                                                                                field:"created_at",
+                                                                                                                                //fieldName:"created_at",
+                                                                                                                                //type:"TIMESTAMP"
+                                                                                                                              }
+                                                                                                                }
+                                                                                              }
+                                                                                            ],
+                                                                                            [
+                                                                                              "A",
+                                                                                              "B"
+                                                                                            ] );
+
+        result = transformedRows;
 
       }
 
