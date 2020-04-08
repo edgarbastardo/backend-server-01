@@ -9,6 +9,8 @@ import FormData from 'form-data';
 
 import appRoot from 'app-root-path';
 
+import parser from 'cron-parser';
+
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 //import SystemConstants from '../../../../02_system/common/SystemContants';
 
@@ -154,6 +156,57 @@ export default class MigrateImagesTask_001 {
       sourcePosition.method = MigrateImagesTask_001.name + "." + this.init.name;
 
       const strMark = "9D972DC3EFED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  public async canRunTask( params: any,
+                           logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const interval = parser.parseExpression( process.env.TASK_MIGRATE_IMAGES_CRON );
+
+      const currentDateTime = SystemUtilities.getCurrentDateAndTime();
+
+      const strNextRunDateTime = interval.next().toISOString();
+
+      if ( currentDateTime.isSame( strNextRunDateTime ) ||
+           currentDateTime.isAfter( strNextRunDateTime ) ) {
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = MigrateImagesTask_001.name + "." + this.canRunTask.name;
+
+      const strMark = "2B3063AC8DAC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
