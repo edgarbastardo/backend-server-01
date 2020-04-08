@@ -3632,16 +3632,32 @@ export default class BinaryServiceController extends BaseService {
                     const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( currentTransaction,
                                                                                                    logger );
 
+                    let strContextPath = CommonUtilities.clearSpecialChars( request.body.ContextPath,
+                                                                            `!@#$^&%*()+=[]\\{}|:<>?,."'\`` );
+
+                    strContextPath = CommonUtilities.unaccent( strContextPath );
+
+                    if ( !strContextPath ) {
+
+                      strContextPath = "/";
+
+                    }
+                    else if ( strContextPath[ 0 ] !== "/" ) {
+
+                      strContextPath = "/" + strContextPath;
+
+                    }
+
                     if ( request.body.StorageKind === "0" ) { //Persistent
 
-                      strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + "/";
+                      strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + strContextPath;
 
                       expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : null;
 
                     }
                     else if ( request.body.Storagekind === "1" ) { //Temporal
 
-                      strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + "/";
+                      strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + strContextPath;
 
                       expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format();
 
