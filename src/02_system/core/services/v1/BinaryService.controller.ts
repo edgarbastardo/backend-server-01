@@ -187,6 +187,84 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
+  static async checkThumbnailNeeded( userSessionStatus: any,
+                                     strCategory: string,
+                                     strMimeType: string,
+                                     transaction: any,
+                                     logger: any ): Promise<any> {
+
+    let result: boolean = false;
+
+    try {
+
+      let configData = await SYSConfigValueDataService.getConfigValueDataFromSession( userSessionStatus,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
+                                                                                      SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
+                                                                                      strCategory,
+                                                                                      false,
+                                                                                      transaction,
+                                                                                      logger );
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData ) ) {
+
+        for ( let intIndex = 0; intIndex < configData.length; intIndex++ ) {
+
+          const item = configData[ intIndex ];
+
+          if ( item.mime && item.factor ) {
+
+            if ( item.mime.indexOf( "#" + strMimeType + "#" ) !== -1 ) {
+
+              result = true;
+              break;
+
+            }
+
+          }
+
+        }
+
+      }
+
+      if ( strMimeType === "image/png" ||
+           strMimeType === "image/jpeg" ) {
+
+        result = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkThumbnailNeeded.name;
+
+      const strMark = "487B8739ED6A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+
+    }
+
+    return result;
+
+  }
+
   static async getConfigBinaryDataThumbnail( userSessionStatus: any,
                                              strCategory: string,
                                              strMimeType: string,
@@ -903,7 +981,8 @@ export default class BinaryServiceController extends BaseService {
                    FileName: "",
                    MimeType: "",
                    FileSize: 0,
-                   Hash: ""
+                   Hash: "",
+                   MimeThumbnail: false,
                  };
 
     try {
@@ -919,6 +998,7 @@ export default class BinaryServiceController extends BaseService {
         result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
                                                                     undefined,
                                                                     logger );
+        result.MimeThumbnail = false;
 
       }
       else {
@@ -943,6 +1023,7 @@ export default class BinaryServiceController extends BaseService {
           result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
                                                                       undefined,
                                                                       logger );
+          result.MimeThumbnail = false;
 
         }
         else if ( fs.existsSync( path.join( strBasePath,
@@ -961,6 +1042,7 @@ export default class BinaryServiceController extends BaseService {
           result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
                                                                       undefined,
                                                                       logger );
+          result.MimeThumbnail = true;
 
         }
         else {
@@ -976,6 +1058,7 @@ export default class BinaryServiceController extends BaseService {
           result.Hash = "md5://" + await SystemUtilities.getFileHash( result.File,
                                                                       undefined,
                                                                       logger );
+          result.MimeThumbnail = true;
 
         }
 
@@ -2606,21 +2689,24 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
-  static async processFallbackData( strAuth: string,
+  static async processFallbackData( //strAuth: string,
                                     strThumbnail: string,
-                                    sysBinaryIndexInDB: SYSBinaryIndex,
+                                    //sysBinaryIndexInDB: SYSBinaryIndex,
                                     strId: string,
                                     strFullSavePath: string,
+                                    strFileToGet: string,
                                     logger: any ):Promise<boolean> {
 
     let bResult = false;
 
     try {
 
+      fs.mkdirSync( strFullSavePath, { recursive: true } );
+
       let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URL;
 
       strRequestPath = strRequestPath.replace( "@__id__@", strId );
-      strRequestPath = strRequestPath.replace( "@__auth__@", strAuth );
+      strRequestPath = strRequestPath.replace( "@__auth__@", process.env.BINARY_DATA_SERVICE_FALLBACK_AUTH );
       strRequestPath = strRequestPath.replace( "@__thumbnail__@", strThumbnail );
 
       const downloadResult = await BinaryServiceController.callDownloadBinaryData( {},
@@ -2632,9 +2718,11 @@ export default class BinaryServiceController extends BaseService {
       if ( downloadResult.output &&
            downloadResult.output.status === 200 ) {
 
-        if ( strThumbnail ) {
+        const originExists = fs.existsSync( strFullSavePath + downloadResult.output.body.Name );
 
+        if ( originExists ) {
 
+          fs.renameSync( strFullSavePath + downloadResult.output.body.Name, strFileToGet );
 
         }
 
@@ -2748,7 +2836,8 @@ export default class BinaryServiceController extends BaseService {
                              FileName: "",
                              MimeType: "",
                              FileSize: 0,
-                             Hash: ""
+                             Hash: "",
+                             MimeThumbnail: false
                            };
 
           if ( !strThumbnail ||
@@ -2776,6 +2865,8 @@ export default class BinaryServiceController extends BaseService {
                                                                         logger );
 
           }
+
+          let userSessionStatus = null;
 
           if ( await SYSBinaryIndexService.checkDisabledById( sysBinaryIndexInDB.Id,
                                                               currentTransaction,
@@ -2828,12 +2919,12 @@ export default class BinaryServiceController extends BaseService {
 
                 if ( CommonUtilities.isNotNullOrEmpty( strAuthorization ) ) {
 
-                  let userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
-                                                                                      context,
-                                                                                      true,
-                                                                                      false,
-                                                                                      currentTransaction,
-                                                                                      logger );
+                  userSessionStatus = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                                  context,
+                                                                                  true,
+                                                                                  false,
+                                                                                  currentTransaction,
+                                                                                  logger );
 
                   if ( userSessionStatus ) {
 
@@ -3067,20 +3158,111 @@ export default class BinaryServiceController extends BaseService {
               //}
               //else {
 
-              if ( result.File &&
-                   fs.existsSync( result.File ) === false ) {
+              let bThumbnailNeeded = false;
+
+              if ( userSessionStatus &&
+                   sysBinaryIndexInDB &&
+                   strThumbnail &&
+                   strThumbnail !== "0" ) {
+
+                bThumbnailNeeded = await this.checkThumbnailNeeded( userSessionStatus,
+                                                                    sysBinaryIndexInDB.Category,
+                                                                    sysBinaryIndexInDB.MimeType,
+                                                                    currentTransaction,
+                                                                    logger );
+
+              }
+
+              let defaultThumbnail = null;
+
+              if ( ( result.File &&
+                     fs.existsSync( result.File ) === false ) ||
+                   ( bThumbnailNeeded &&
+                     binaryData.MimeThumbnail ) ) {
+
+                let strFileToGet = null;
+
+                if ( bThumbnailNeeded ) {
+
+                  let extraData = null;
+
+                  if ( sysBinaryIndexInDB.ExtraData as any instanceof String ) {
+
+                    extraData = CommonUtilities.parseJSON( sysBinaryIndexInDB.ExtraData, logger );
+
+                  }
+                  else {
+
+                    extraData = sysBinaryIndexInDB.ExtraData;
+
+                  }
+
+                  if ( extraData.Thumbnail &&
+                       extraData.Thumbnail.length > 0 ) {
+
+                    defaultThumbnail = extraData.Thumbnail[ 0 ]
+                    strFileToGet = strFullPath + sysBinaryIndexInDB.FilePath + extraData.Thumbnail[ 0 ].file;
+
+                    for ( let intIndexThumbnail = 0; intIndexThumbnail < extraData.Thumbnail.length; intIndexThumbnail++ ) {
+
+                      if ( extraData.Thumbnail[ intIndexThumbnail ].factor.toString() === strThumbnail ) {
+
+                        defaultThumbnail = extraData.Thumbnail[ intIndexThumbnail ];
+                        strFileToGet = strFullPath + sysBinaryIndexInDB.FilePath + extraData.Thumbnail[ intIndexThumbnail ].file;
+                        break;
+
+                      }
+
+                    }
+
+                  }
+
+                }
+                else {
+
+                  strFileToGet = result.File;
+
+                }
 
                 if ( result.StatusCode === 200 &&
                      process.env.BINARY_DATA_SERVICE_FALLBACK_MODE === "1" &&
                      process.env.BINARY_DATA_SERVICE_FALLBACK_URL ) {
 
-                  await BinaryServiceController.processFallbackData( strAuth,
-                                                                     strThumbnail,
-                                                                     sysBinaryIndexInDB,
+                  await BinaryServiceController.processFallbackData( strThumbnail,
                                                                      strId,
                                                                      path.join( strFullPath,
                                                                                 sysBinaryIndexInDB.FilePath ),
+                                                                     strFileToGet,
                                                                      logger );
+
+                  if ( bThumbnailNeeded ) {
+
+                    binaryData = await BinaryServiceController.selectThumbnail( strFullPath,
+                                                                                path.join( strFullPath, sysBinaryIndexInDB.FilePath ),
+                                                                                strId + "." + sysBinaryIndexInDB.FileExtension + ".thumbnail",
+                                                                                sysBinaryIndexInDB.FileName,
+                                                                                sysBinaryIndexInDB.FileExtension,
+                                                                                sysBinaryIndexInDB.MimeType,
+                                                                                sysBinaryIndexInDB.FileSize,
+                                                                                strThumbnail,
+                                                                                logger );
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               File: binaryData.File,
+                               Name: binaryData.FileName,
+                               Mime: binaryData.MimeType,
+                               Size: binaryData.FileSize,
+                               "X-Body-Response": {
+                                                    Code: "SUCCESS_BINARY_DATA_DOWNLOAD",
+                                                    Name: binaryData.FileName,
+                                                    Mime: binaryData.MimeType,
+                                                    Size: binaryData.FileSize,
+                                                    Hash: binaryData.Hash,
+                                                  }
+                             }
+
+                  }
 
                 }
 
