@@ -69,11 +69,7 @@ export default class Always {
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
-<<<<<<< HEAD
-                                          ]
-=======
                                            ]
->>>>>>> master
 
       const loopUserSessionPersistentEntriesAsync = async () => {
 
