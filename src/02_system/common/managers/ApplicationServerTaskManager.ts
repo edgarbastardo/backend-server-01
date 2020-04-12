@@ -136,11 +136,11 @@ export default class ApplicationServerTaskManager {
               if ( !task.canRunTask ||
                    await task.canRunTask( params, logger ) ) {
 
-                debugMark( "Init of run task %s", task.name );
+                debugMark( "Init of run task %s", task.Name );
 
                 await task.runTask( params, logger );
 
-                debugMark( "Finish of run task %s", task.name );
+                debugMark( "Finish of run task %s", task.Name );
 
               }
 

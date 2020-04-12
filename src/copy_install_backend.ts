@@ -246,6 +246,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
                                                 strUser: string,
                                                 strPassword: string,
                                                 strProject: string,
+                                                strContextPath: string,
                                                 strInstallBundlePath: string,
                                                 strInstallBundleName: string ): Promise<boolean> {
 
@@ -257,7 +258,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
 
   try {
 
-    const strRemoteDirPath = `nodejs/deploy/${strProject}`;
+    const strRemoteDirPath = `nodejs/deploy/${strProject}/${strContextPath}`;
 
     sshConnection = new SSH2Promise(
                                      {
@@ -272,7 +273,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
 
     //const strHomePath = await sshConnection.exec( `pwd` );
 
-    const strCommandResult = await sshConnection.exec( `mkdir -p ./${strRemoteDirPath}/backend/${strCurrentDate}` );
+    const strCommandResult = await sshConnection.exec( `mkdir -p ./${strRemoteDirPath}/${strCurrentDate}` );
 
     if ( !strCommandResult ) {
 
@@ -288,7 +289,7 @@ async function copyInstallBundleToRemoteServer( strProtocol: string,
                                   );
 
       await sftpConnection.put( strInstallBundlePath + strInstallBundleName,
-                                `./${strRemoteDirPath}/backend/${strCurrentDate}/` + strInstallBundleName );
+                                `./${strRemoteDirPath}/${strCurrentDate}/${strInstallBundleName}` );
 
       bResult = true;
 
@@ -378,6 +379,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
                                                    strUser: string,
                                                    strPassword: string,
                                                    strSUDOPassword: string,
+                                                   strRemoteScript: string,
                                                    strProject: string ): Promise<boolean> {
 
   let bResult = await new Promise<boolean>( function( resolve, reject ) {
@@ -392,7 +394,7 @@ async function executeInstallScriptInRemoteServer( strProtocol: string,
 
       const strRemoteDirPath = `nodejs/deploy/${strProject}`;
 
-      const strCommand = `sudo "/home/${strUser}/${strRemoteDirPath}/install.backend.sh" "${strCurrentDate}"`;
+      const strCommand = `sudo "/home/${strUser}/${strRemoteDirPath}/${strRemoteScript}" "${strCurrentDate}"`;
 
       sshConnection.exec( strCommand, { pty: true }, function( err: any, stream: any ) {
 
@@ -643,6 +645,7 @@ export default async function main() {
                                                              target.user,
                                                              target.password,
                                                              process.env.APP_PROJECT_NAME,
+                                                             target.contextPath,
                                                              resultData.path,
                                                              resultData.name );
 
@@ -656,6 +659,7 @@ export default async function main() {
                                                     target.user,
                                                     target.password,
                                                     target.password,
+                                                    target.remoteScript,
                                                     process.env.APP_PROJECT_NAME );
 
                                                               /*
