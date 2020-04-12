@@ -4,23 +4,23 @@
   "comment03": "Change the host, user and password fields to right config values.",
   "backend-server-data-01": {
 
-    "test": {
+    "test01": {
       "protocol": "ssh",
       "host": "192.168.2.207",
       "port": 22,
       "user": "",
       "password": "!",
-      "contextPath": "backend",
-      "remoteScript": "install.backend.sh"
+      "contextPath": "backend/test01",
+      "remoteScript": "install.backend.test01.sh"
     },
-    "prod": {
+    "prod01": {
       "protocol": "ssh",
       "host": "remoteserver.domain.com",
       "port": 22,
       "user": "",
       "password": "!",
-      "contextPath": "backend",
-      "remoteScript": "install.backend.sh"
+      "contextPath": "backend/prod01",
+      "remoteScript": "install.backend.prod01.sh"
     }
 
   }
