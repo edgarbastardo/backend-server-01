@@ -3980,9 +3980,16 @@ export default class BinaryServiceController extends BaseService {
                       strContextPath = "/";
 
                     }
-                    else if ( strContextPath[ 0 ] !== "/" ) {
+
+                    if ( strContextPath.startsWith( "/" ) === false ) {
 
                       strContextPath = "/" + strContextPath;
+
+                    }
+
+                    if ( strContextPath.endsWith( "/" ) === false ) {
+
+                      strContextPath = strContextPath + "/";
 
                     }
 
