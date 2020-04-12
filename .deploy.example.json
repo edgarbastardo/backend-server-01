@@ -10,8 +10,8 @@
       "port": 22,
       "user": "",
       "password": "!",
-      "contextPath": "backend",
-      "remoteScript": "install.backend.sh"
+      "contextPath": "backend/tes01",
+      "remoteScript": "install.backend.test01.sh"
     },
     "prod": {
       "protocol": "ssh",
@@ -19,8 +19,8 @@
       "port": 22,
       "user": "",
       "password": "!",
-      "contextPath": "backend",
-      "remoteScript": "install.backend.sh"
+      "contextPath": "backend/prod01",
+      "remoteScript": "install.backend.prod01.sh"
     }
 
   }
