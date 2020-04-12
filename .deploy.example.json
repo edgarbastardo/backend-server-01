@@ -9,14 +9,18 @@
       "host": "192.168.2.207",
       "port": 22,
       "user": "",
-      "password": "!"
+      "password": "!",
+      "contextPath": "backend",
+      "remoteScript": "install.backend.sh"
     },
     "prod": {
       "protocol": "ssh",
       "host": "remoteserver.domain.com",
       "port": 22,
       "user": "",
-      "password": "!"
+      "password": "!",
+      "contextPath": "backend",
+      "remoteScript": "install.backend.sh"
     }
 
   }
