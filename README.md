@@ -1,5 +1,5 @@
 # Backend server 01
 
-## Master
+## master
 
-### Base implementation of backend in 100% of nodejs
+### Base implementation of backend in 100% of nodejs and typescript
