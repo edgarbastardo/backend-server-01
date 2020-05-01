@@ -49,6 +49,8 @@ else {
 
 }
 
+let intCountHTTPWorkerKilled = 0;
+
 function httpWorkerProcessExit( httpWorkerProcess: any,
                                 strCode: any,
                                 strSignal: any,
@@ -58,6 +60,16 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
        cluster.isMaster ) {
 
     let debugMark = debug.extend( "1BF1A2E6B008" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+    intCountHTTPWorkerKilled += 1;
+
+    if ( intCountHTTPWorkerKilled >= parseInt( process.env.MAX_KILLED_HTTP_WORKER_COUNT ) ) {
+
+      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( `To much HTTP worker killed. Aborting main process execution.` );
+      process.abort();
+
+    }
 
     if ( strSignal ) {
 
@@ -131,6 +143,8 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
 }
 
+let intCountProcessWorkerKilled = 0;
+
 function jobProcessWorkerExit( jobProcessWorker: any,
                                strCode: any,
                                strSignal: any,
@@ -140,6 +154,16 @@ function jobProcessWorkerExit( jobProcessWorker: any,
        cluster.isMaster ) {
 
     let debugMark = debug.extend( "7CF8309CAA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+    intCountProcessWorkerKilled += 1;
+
+    if ( intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_PROCESS_WORKER_COUNT ) ) {
+
+      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( `To much Process worker killed. Aborting main process execution.` );
+      process.abort();
+
+    }
 
     if ( strSignal ) {
 
