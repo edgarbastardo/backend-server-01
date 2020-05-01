@@ -280,10 +280,23 @@ export default class BinaryRequestServiceV1 {
       const callResult = await fetch( strRequestPath,
                                       options as any );
 
+
+      let jsonResult = null;
+
+      try {
+
+        jsonResult = await callResult.json();
+
+      }
+      catch ( error ) {
+
+
+      }
+
       result.output = callResult ? {
                                      status: callResult.status,
                                      statusText: callResult.statusText,
-                                     body: await callResult.json()
+                                     body: jsonResult
                                    }:
                                    {
                                     status: null,
