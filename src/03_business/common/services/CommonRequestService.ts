@@ -113,7 +113,19 @@ export default class CommonRequestService {
 
       fs.mkdirSync( strPath, { recursive: true } );
 
-      fs.writeFileSync( strPath + CommonRequestService.formatSequence( CommonRequestService.intSequence ) + "_" + strFileName + "_output.json", JSON.stringify( result, null, 2 ) );
+      const strFullFilePath = strPath + CommonRequestService.formatSequence( CommonRequestService.intSequence ) + "_" + strFileName + "_output.json";
+
+      fs.writeFileSync( strFullFilePath, JSON.stringify( result, null, 2 ) );
+
+      if ( result.error ) {
+
+        const strMark = "A06AA430767A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "Error data present. Log saved to file: [%s]", strFullFilePath );
+
+      }
 
     }
     catch ( error ) {

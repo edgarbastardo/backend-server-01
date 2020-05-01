@@ -33,12 +33,14 @@ export default class MigrateImagesTask_001 {
                             requestOptions: any,
                             logger: any ): Promise<{
                                                      result: boolean,
-                                                     data: any
+                                                     data: any,
+                                                     error: any
                                                    }> {
 
     let result = {
                    result: false,
-                   data: null
+                   data: null,
+                   error: null,
                  };
 
     try {
@@ -75,7 +77,9 @@ export default class MigrateImagesTask_001 {
                                                                               requestOptions.requestBasePath,
                                                                               binaryRequest ); //This request must be fail
 
-      if ( requestOptions.saveUploadResult === "1" ) {
+      result.error = uploadResult.error;
+
+      if ( result.error || requestOptions.saveUploadResult === "1" ) {
 
         CommonRequestService.saveInput( requestOptions.fileName,
                                         uploadResult.input,
@@ -84,13 +88,19 @@ export default class MigrateImagesTask_001 {
         if ( uploadResult && uploadResult.output ) {
 
           uploadResult.output.expected = {
-                                     Code: requestOptions.responseCode
-                                   };
+                                           Code: requestOptions.responseCode,
+                                         };
+          uploadResult.output.error = uploadResult.error;
 
         }
         else {
 
-          uploadResult.output.expected = null;
+          uploadResult.output = {
+                                  expected: {
+                                              Code: requestOptions.responseCode,
+                                            },
+                                  error: uploadResult && uploadResult.error ? uploadResult.error: null
+                                };
 
         }
 
@@ -402,7 +412,37 @@ export default class MigrateImagesTask_001 {
 
               }
 
-              fs.unlinkSync( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
+              if ( uploadResult.error === null ) {
+
+                fs.unlink( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
+                           ( error: any ) => {
+
+                                               const strMark = "DF4A41CBAEAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+                                               if ( error ) {
+
+                                                 const debugMark = debug.extend( strMark );
+
+                                                 debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+                                                 debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+
+                                                 if ( logger &&
+                                                      logger.error === "function" ) {
+
+                                                   logger.error( error );
+
+                                                 }
+
+                                               }
+                                               else {
+
+                                                 debugMark( "Success delete the file", strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
+
+                                               }
+
+                                             } );
+
+              }
 
               if ( !bUploadSuccess ) {
 

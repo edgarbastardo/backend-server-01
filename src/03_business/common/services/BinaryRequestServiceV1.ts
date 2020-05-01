@@ -25,7 +25,7 @@ export default class BinaryRequestServiceV1 {
   static async callCreateAuth( headers: any,
                                strRequestBasePath: string ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -56,6 +56,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -67,7 +68,7 @@ export default class BinaryRequestServiceV1 {
   static async callDeleteAuth( headers: any,
                                strRequestBasePath: string ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -98,6 +99,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -110,7 +112,7 @@ export default class BinaryRequestServiceV1 {
                                  strRequestBasePath: string,
                                  params: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -196,6 +198,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -208,7 +211,7 @@ export default class BinaryRequestServiceV1 {
                                       strRequestBasePath: string,
                                       params: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -249,6 +252,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -261,15 +265,15 @@ export default class BinaryRequestServiceV1 {
                                      strRequestBasePath: string,
                                      body: FormData ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
+
+    const options = {
+                      method: 'POST',
+                      body: body, //JSON.stringify( body ),
+                      headers: headers,
+                    };
 
     try {
-
-      const options = {
-                        method: 'POST',
-                        body: body, //JSON.stringify( body ),
-                        headers: headers,
-                      };
 
       let strRequestPath = strRequestBasePath;
 
@@ -289,14 +293,15 @@ export default class BinaryRequestServiceV1 {
 
       ( options as any ).body = body;
 
-      result.input = options;
-
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
+
+    result.input = options;
 
     return result;
 
@@ -306,7 +311,7 @@ export default class BinaryRequestServiceV1 {
                                        strRequestBasePath: string,
                                        query: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -355,6 +360,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -367,7 +373,7 @@ export default class BinaryRequestServiceV1 {
                                      strRequestBasePath: string,
                                      query: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -400,6 +406,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -412,7 +419,7 @@ export default class BinaryRequestServiceV1 {
                                          strRequestBasePath: string,
                                          query: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -443,6 +450,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -455,7 +463,7 @@ export default class BinaryRequestServiceV1 {
                                       strRequestBasePath: string,
                                       body: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -488,6 +496,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -500,7 +509,7 @@ export default class BinaryRequestServiceV1 {
                                      strRequestBasePath: string,
                                      body: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -533,6 +542,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
@@ -545,7 +555,7 @@ export default class BinaryRequestServiceV1 {
                                      strRequestBasePath: string,
                                      body: any ): Promise<any> {
 
-    let result = { input: null, output: null };
+    let result = { input: null, output: null, error: null };
 
     try {
 
@@ -578,6 +588,7 @@ export default class BinaryRequestServiceV1 {
     }
     catch ( error ) {
 
+      result.error = error;
       console.log( error );
 
     }
