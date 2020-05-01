@@ -60,20 +60,28 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
        cluster.isMaster ) {
 
     let debugMark = debug.extend( "1BF1A2E6B008" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+    debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
     intCountHTTPWorkerKilled += 1;
 
     if ( intCountHTTPWorkerKilled >= parseInt( process.env.MAX_KILLED_HTTP_WORKER_COUNT ) ) {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `To much HTTP worker killed. Aborting main process execution.` );
+      debugMark( `Max HTTP worker process killed count: $s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
+      debugMark( `HTTP worker process killed count: $s`, intCountHTTPWorkerKilled );
+
+      debugMark( `To much HTTP worker process killed. Aborting main process execution.` );
       process.abort();
+
+    }
+    else {
+
+      debugMark( `Max HTTP worker process killed count: $s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
+      debugMark( `HTTP worker process killed count: $s`, intCountHTTPWorkerKilled );
 
     }
 
     if ( strSignal ) {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorkerProcess.id, strSignal );
 
       if ( logger && typeof logger.warning === "function" ) {
@@ -128,7 +136,7 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
     }
     else {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( 'HTTP worker process with id: %s success!', httpWorkerProcess.id );
 
       if ( logger && typeof logger.warning === "function" ) {
@@ -145,7 +153,7 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
 let intCountProcessWorkerKilled = 0;
 
-function jobProcessWorkerExit( jobProcessWorker: any,
+function jobWorkerProcessExit( jobProcessWorker: any,
                                strCode: any,
                                strSignal: any,
                                logger: any ) {
@@ -154,20 +162,29 @@ function jobProcessWorkerExit( jobProcessWorker: any,
        cluster.isMaster ) {
 
     let debugMark = debug.extend( "7CF8309CAA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+    debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
     intCountProcessWorkerKilled += 1;
 
-    if ( intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_PROCESS_WORKER_COUNT ) ) {
+    if ( intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_JOB_WORKER_COUNT ) ) {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( `To much Process worker killed. Aborting main process execution.` );
+      debugMark( `Max JOB worker process killed count: $s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
+      debugMark( `JOB worker process killed count: $s`, intCountProcessWorkerKilled );
+
+      debugMark( `To much JOB worker process killed. Aborting main process execution.` );
       process.abort();
+
+    }
+    else {
+
+      debugMark( `Max JOB worker process killed count: $s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
+      debugMark( `JOB worker process killed count: $s`, intCountProcessWorkerKilled );
 
     }
 
     if ( strSignal ) {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobProcessWorker.id, strSignal );
 
       if ( logger && typeof logger.warning === "function" ) {
@@ -180,7 +197,7 @@ function jobProcessWorkerExit( jobProcessWorker: any,
 
       jobProcessWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
 
-        jobProcessWorkerExit( jobProcessWorker, strCode, strSignal, logger );
+        jobWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
 
       });
 
@@ -222,7 +239,7 @@ function jobProcessWorkerExit( jobProcessWorker: any,
     }
     else {
 
-      debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( 'Worker process with id: %s success!', jobProcessWorker.id );
 
       if ( logger && typeof logger.warning === "function" ) {
@@ -684,7 +701,7 @@ export default async function main() {
 
             jobWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
 
-              jobProcessWorkerExit( jobWorker,
+              jobWorkerProcessExit( jobWorker,
                                     strCode,
                                     strSignal,
                                     logger );
