@@ -29,6 +29,8 @@ export default class MigrateImagesTask_001 {
 
   public readonly Name = "MigrateImagesTask_001";
 
+  public static minutesOfLastCleanPath: any = null;
+
   static async uploadImage( headers: any,
                             requestOptions: any,
                             logger: any ): Promise<{
@@ -274,7 +276,49 @@ export default class MigrateImagesTask_001 {
 
       if ( fs.existsSync( strPath ) ) {
 
-        rimraf.sync( strPath ); //Clean for old temporal files from crashed process
+        const debugMark = debug.extend( "04623C568D7E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+        if ( MigrateImagesTask_001.minutesOfLastCleanPath === null ||
+             SystemUtilities.getCurrentDateAndTime().diff( MigrateImagesTask_001.minutesOfLastCleanPath, "minutes" ) >= parseInt( process.env.MINUTES_OF_LAST_CLEAN_PATH ) ) {
+
+          try {
+
+            debugMark( "Cleanup path of old temporary files: [%s]", strPath );
+
+            rimraf.sync( strPath ); //Clean for old temporal files from crashed process
+
+          }
+          catch ( error ) {
+
+            debugMark( "Error code: [%s]", error.code ? error.code : "No error code available" );
+            debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+
+            if ( logger &&
+                logger.error === "function" ) {
+
+              logger.error( error );
+
+            }
+
+            if ( error.code === "EBUSY" ) {
+
+              debugMark( "Aborting main process execution." );
+              process.abort();
+
+            }
+
+          }
+
+          MigrateImagesTask_001.minutesOfLastCleanPath = SystemUtilities.getCurrentDateAndTime();
+
+        }
+        else {
+
+          const intMinutesOfLastCleanPath = SystemUtilities.getCurrentDateAndTime().diff( MigrateImagesTask_001.minutesOfLastCleanPath, "minutes" );
+          debugMark( "Last cleanup path of old temporary files was [%s] minutes ago", intMinutesOfLastCleanPath );
+
+        }
 
       }
 
@@ -414,33 +458,58 @@ export default class MigrateImagesTask_001 {
 
               if ( uploadResult.error === null ) {
 
-                fs.unlink( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
-                           ( error: any ) => {
+                const strMark = "DF4A41CBAEAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-                                               const strMark = "DF4A41CBAEAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+                try {
 
-                                               if ( error ) {
+                  fs.unlink( strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ],
+                            ( error: any ) => {
 
-                                                 const debugMark = debug.extend( strMark );
+                                                if ( error ) {
 
-                                                 debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-                                                 debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+                                                  const debugMark = debug.extend( strMark );
 
-                                                 if ( logger &&
-                                                      logger.error === "function" ) {
+                                                  debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+                                                  debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
-                                                   logger.error( error );
+                                                  if ( logger &&
+                                                        logger.error === "function" ) {
 
-                                                 }
+                                                    logger.error( error );
 
-                                               }
-                                               else {
+                                                  }
 
-                                                 debugMark( "Success delete the file", strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
+                                                }
+                                                else {
 
-                                               }
+                                                  debugMark( "Success delete the file", strPath + ticketImageList[ intIndex ].id + "." + fileExtension[ 1 ] );
 
-                                             } );
+                                                }
+
+                                              } );
+
+                }
+                catch ( error ) {
+
+                  debugMark( "Error code: [%s]", error.code ? error.code : "No error name available" );
+                  debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+                  debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+
+                  if ( logger &&
+                       logger.error === "function" ) {
+
+                    logger.error( error );
+
+                  }
+
+                  if ( error.code === "EBUSY" ) {
+
+                    debugMark( "Aborting main process execution." );
+                    process.abort();
+
+                  }
+
+                }
 
               }
 
