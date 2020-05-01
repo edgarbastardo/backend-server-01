@@ -66,8 +66,8 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
     if ( intCountHTTPWorkerKilled >= parseInt( process.env.MAX_KILLED_HTTP_WORKER_COUNT ) ) {
 
-      debugMark( `Max HTTP worker process killed count: $s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
-      debugMark( `HTTP worker process killed count: $s`, intCountHTTPWorkerKilled );
+      debugMark( `Max HTTP worker process killed count: %s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
+      debugMark( `HTTP worker process killed count: %s`, intCountHTTPWorkerKilled );
 
       debugMark( `To much HTTP worker process killed. Aborting main process execution.` );
       process.abort();
@@ -75,8 +75,8 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
     }
     else {
 
-      debugMark( `Max HTTP worker process killed count: $s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
-      debugMark( `HTTP worker process killed count: $s`, intCountHTTPWorkerKilled );
+      debugMark( `Max HTTP worker process killed count: %s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
+      debugMark( `HTTP worker process killed count: %s`, intCountHTTPWorkerKilled );
 
     }
 
