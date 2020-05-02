@@ -2881,6 +2881,9 @@ export default class BinaryServiceController extends BaseService {
               if ( sysBinaryIndexInDB.AccessKind === 1 ||        //Public
                    sysBinaryIndexInDB.ShareCode === strAuth ) { //Auth code match with the share code, in this case allow to access to the data
 
+                const debugMark = debug.extend( "1E5FFD458AF3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+                debugMark( "Success get the resource with id [%s]", strId );
+
                 result = {
                            StatusCode: 200, //Ok
                            File: binaryData.File,
@@ -2954,6 +2957,9 @@ export default class BinaryServiceController extends BaseService {
                        userSessionStatus.Role.includes( "#Administrator#" ) ||
                        userSessionStatus.Role.includes( "#ManagerL99#" ) ||
                        userSessionStatus.Role.includes( "#GetBinaryL99#" ) ) { //Authenticated
+
+                    const debugMark = debug.extend( "8D5B10C3A61C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+                    debugMark( "Success get the resource with id [%s]", strId );
 
                     result = {
                                StatusCode: 200, //Ok
@@ -3058,6 +3064,9 @@ export default class BinaryServiceController extends BaseService {
                          checkUserRoles.isAuthorizedL02 ||
                          checkUserRoles.isAuthorizedL01 ) { //} || ( bDenyTagAccess === false && bAllowTagAccess ) ) {
 
+                      const debugMark = debug.extend( "D7654B20FADE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+                      debugMark( "Success get the resource with id [%s]", strId );
+
                       result = {
                                  StatusCode: 200, //Ok
                                  File: binaryData.File,
@@ -3077,6 +3086,10 @@ export default class BinaryServiceController extends BaseService {
 
                     }
                     else {
+
+                      const debugMark = debug.extend( "35384331CEF2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+                      debugMark( "Forbidden access to resource with id [%s]", strId );
 
                       resultData = {
                                      StatusCode: 403, //Forbidden
@@ -3114,6 +3127,9 @@ export default class BinaryServiceController extends BaseService {
                 }
                 else {
 
+                  const debugMark = debug.extend( "203763C284E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+                  debugMark( "Unauthorized access to resource with id [%s]", strId );
+
                   //ANCHOR binary data download Unauthorized
                   result = {
                              StatusCode: resultData.StatusCode, //Unauthorized
@@ -3128,6 +3144,10 @@ export default class BinaryServiceController extends BaseService {
 
               }
               else {
+
+                const debugMark = debug.extend( "E6F9268B1B43" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+                debugMark( "Bad request" );
 
                 const resultHeaders = {
                                         StatusCode: 400, //Bad request
