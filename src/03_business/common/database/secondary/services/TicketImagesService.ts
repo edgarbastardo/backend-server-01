@@ -57,6 +57,7 @@ export default class TicketImagesService extends BaseService {
                                                      "getLastTicketImages",
                                                      {
                                                        SelectFields: strSelectField,
+                                                       MaxRows: parseInt( process.env.MIGRATE_IMAGES_TASK_MAX_ROWS )
                                                      },
                                                      logger );
 

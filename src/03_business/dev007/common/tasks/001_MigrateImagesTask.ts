@@ -199,7 +199,7 @@ export default class MigrateImagesTask_001 {
 
     try {
 
-      const interval = parser.parseExpression( process.env.TASK_MIGRATE_IMAGES_CRON );
+      const interval = parser.parseExpression( process.env.MIGRATE_IMAGES_TASK_CRON );
 
       const currentDateTime = SystemUtilities.getCurrentDateAndTime();
 
@@ -279,7 +279,7 @@ export default class MigrateImagesTask_001 {
         const debugMark = debug.extend( "04623C568D7E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         if ( MigrateImagesTask_001.minutesOfLastCleanPath === null ||
-             SystemUtilities.getCurrentDateAndTime().diff( MigrateImagesTask_001.minutesOfLastCleanPath, "minutes" ) >= parseInt( process.env.MINUTES_OF_LAST_CLEAN_PATH ) ) {
+             SystemUtilities.getCurrentDateAndTime().diff( MigrateImagesTask_001.minutesOfLastCleanPath, "minutes" ) >= parseInt( process.env.MIGRATE_IMAGES_TASK_MINUTES_OF_LAST_CLEAN_PATH ) ) {
 
           try {
 
@@ -329,6 +329,10 @@ export default class MigrateImagesTask_001 {
                     }
                   );
 
+      const debugMark1 = debug.extend( "FB11AC25F2C3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+      debugMark1( "Checking for rows to migrate from the database" );
+
       let ticketImageList = await TicketImagesService.getLastTicketImages( currentTransaction,
                                                                            logger );
 
@@ -336,14 +340,20 @@ export default class MigrateImagesTask_001 {
 
       if ( ticketImageList instanceof Error === false ) {
 
+        debugMark1( "Found [%s] rows to migrate from the database", ( ticketImageList as [] ).length );
+
+        debugMark1( "Marking [%s] rows as lock in the database", ( ticketImageList as [] ).length );
+
         lockResult = await TicketImagesService.markLocked( ticketImageList as any,
                                                            logger );
 
         if ( lockResult instanceof Error === false ) {
 
-          ticketImageList = ticketImageList as any[];
+          debugMark1( "Marked [%s] rows as lock in the database", ( ticketImageList as [] ).length );
 
           const debugMark = debug.extend( "1DD5480BD154" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+          ticketImageList = ticketImageList as any[];
 
           for ( let intIndex = 0; intIndex < ticketImageList.length; intIndex++ ) {
 
