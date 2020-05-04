@@ -79,7 +79,7 @@ async function httpWorkerProcessExit( httpWorkerProcess: any,
                                                              fields: [
                                                                        {
                                                                          title: "Date",
-                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
                                                                          short: false
                                                                        },
                                                                        {
@@ -216,7 +216,7 @@ async function jobWorkerProcessExit( jobProcessWorker: any,
                                                              fields: [
                                                                        {
                                                                          title: "Date",
-                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
                                                                          short: false
                                                                        },
                                                                        {
