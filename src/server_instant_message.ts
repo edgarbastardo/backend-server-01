@@ -960,9 +960,42 @@ export default class ServerInstantMessage {
 
       const intPort = process.env.APP_SERVER_IM_PORT; //APP_SERVER_IM_PORT
 
-      ServerInstantMessage.serverHTTP.listen( intPort, () => {
+      ServerInstantMessage.serverHTTP.listen( intPort, async () => {
 
         debugMark( `Running server on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH + '/server/instant/message' );
+
+        await NotificationManager.publishToExternal(
+                                                     {
+                                                       body: {
+                                                               kind: "notification",
+                                                               text: "Start running",
+                                                               fields: [
+                                                                         {
+                                                                           title: "Date",
+                                                                           value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                           short: false
+                                                                         },
+                                                                         {
+                                                                           title: "Host",
+                                                                           value: SystemUtilities.getHostName(),
+                                                                           short: false
+                                                                         },
+                                                                         {
+                                                                           title: "Application",
+                                                                           value: process.env.APP_SERVER_IM_NAME,
+                                                                           short: false
+                                                                         },
+                                                                         {
+                                                                           title: "Running from",
+                                                                           value: SystemUtilities.strBaseRunPath,
+                                                                           short: false
+                                                                         }
+                                                                       ],
+                                                               footer: "BB38437F5AE3",
+                                                             }
+                                                     },
+                                                     LoggerManager.mainLoggerInstance
+                                                   );
 
       });
 

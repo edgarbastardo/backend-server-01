@@ -15,6 +15,13 @@ const debug = require( 'debug' )( 'TransportEMail' );
 
 export default class TransportEMail {
 
+  static async init( transportOptions: any,
+                     logger: any ): Promise<boolean> {
+
+    return true;
+
+  }
+
   static async processMessageFromTemplate( body: any,
                                            logger: any ): Promise<any> {
 

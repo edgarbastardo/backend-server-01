@@ -13,6 +13,13 @@ const debug = require( 'debug' )( 'TransportSMTP' );
 
 export default class TransportSMTP extends TransportEMail {
 
+  static async init( transportOptions: any,
+                     logger: any ): Promise<boolean> {
+
+    return true;
+
+  }
+
   static async send( transportOptions: any,
                      messageOptions: any,
                      logger: any ): Promise<boolean> {

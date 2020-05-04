@@ -390,7 +390,7 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "c0b016a3-3fda-4c5b-be78-fa8e96398196", //system.notification.email.service
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_EMAIL_Service.Id, //system.notification.email.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
@@ -418,7 +418,7 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "71199a26-8a8a-4015-989c-4a911b18c68e", //system.notification.sms.service
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_SMS_Service.Id, //system.notification.sms.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
@@ -439,7 +439,7 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "56e70807-9f65-4679-b9e6-9327df438e1e", //system.notification.push.service
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_PUSH_Service.Id, //system.notification.push.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
@@ -458,6 +458,44 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
+                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_DISCORD_Service.Id, //system.notification.discord.service
+                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                      Value: JSON.stringify(
+                                                            {
+                                                              "service":"#discord#",
+                                                              "#discord#":{
+                                                                "type":"discord",
+                                                                "target":{
+                                                                  "web_hooks":[
+                                                                                process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK_01 || "",
+                                                                                process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK_02 || "",
+                                                                              ]
+                                                                }
+                                                              }
+                                                            }
+                                                          ),
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                  },
+                                  {
+                                    ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_SLACK_Service.Id, //system.notification.slack.service
+                                    Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                    Value: JSON.stringify(
+                                                           {
+                                                             "service":"#slack#",
+                                                             "#slack#":{
+                                                               "type":"slack",
+                                                               "target":{
+                                                                 "web_hooks":[
+                                                                               process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK_01 || "",
+                                                                               process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK_02 || "",
+                                                                             ]
+                                                               }
+                                                             }
+                                                           }
+                                                         ),
+                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                  },
+                                  {
                                      ConfigMetaDataId: "70835d21-afdd-4f5b-9a56-61762ba55013", //system.frontend.rules
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(

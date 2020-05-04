@@ -14,11 +14,274 @@ import TransportSendGrid from "../implementations/notifications/TransportSendGri
 import TransportSMSGateway from "../implementations/notifications/TransportSMSGateway";
 import TransportOneSignal from "../implementations/notifications/TransportOneSignal";
 import TransportRedis from '../implementations/notifications/TransportRedis';
-import dbConnection from "./RedisConnectionManager";
+import TransportDiscord from '../implementations/notifications/TransportDiscord';
+import TransportSlack from '../implementations/notifications/TransportSlack';
 
 const debug = require( 'debug' )( 'NotificationManager' );
 
 export default class NotificationManager {
+
+  static async init( logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    let currentTransaction = null;
+
+    try {
+
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+
+      let transportServiceConfig = await NotificationManager.getConfigDiscordService( currentTransaction,
+                                                                                      logger );
+
+      if ( NotificationManager.handleConfigWarning( "discord",
+                                                    transportServiceConfig,
+                                                    logger ) === false ) {
+
+        if ( CommonUtilities.toLowerCase( transportServiceConfig.type ) === "discord" ) {
+
+          await TransportDiscord.init( transportServiceConfig,
+                                       logger );
+
+        }
+        else {
+
+          NotificationManager.handleConfigWarning( "discord",
+                                                    "config_not_found",
+                                                    logger );
+
+        }
+
+      }
+
+      bResult = true;
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.init.name;
+
+      const strMark = "3E7BE5F9FDCA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  static async getConfigService( strTransport: string,
+                                 logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = null;
+
+    //ANCHOR getConfigService
+    try {
+
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+
+      if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
+
+        result = await NotificationManager.getConfigEMailService( currentTransaction,
+                                                                  logger );
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "sms" ) {
+
+        result = await NotificationManager.getConfigSMSService( currentTransaction,
+                                                                logger );
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "push" ) {
+
+        result = await NotificationManager.getConfigPushService( currentTransaction,
+                                                                 logger );
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "discord" ) {
+
+        result = await NotificationManager.getConfigDiscordService( currentTransaction,
+                                                                    logger );
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "slack" ) {
+
+        result = await NotificationManager.getConfigSlackService( currentTransaction,
+                                                                  logger );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigService.name;
+
+      const strMark = "E3CA9C5E7A1B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigServiceType( strTransport: string,
+                                     logger: any ): Promise<string> {
+
+    let strResult = null;
+
+    //let currentTransaction = null;
+
+    try {
+
+      //currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+
+      let serviceConfig = await this.getConfigService( strTransport, logger );
+
+      if ( serviceConfig !== null &&
+           serviceConfig.type ) {
+
+        strResult = CommonUtilities.toLowerCase( serviceConfig.type );
+
+      }
+      else {
+
+        strResult= "@__transport_not_found__@"
+
+      }
+
+      /*
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+      */
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigServiceType.name;
+
+      const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      /*
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+      */
+
+    }
+
+    return strResult;
+
+  }
 
   static async getConfigEMailService( transaction: any,
                                       logger: any ): Promise<any> {
@@ -27,7 +290,7 @@ export default class NotificationManager {
 
     try {
 
-      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_EMail_Service.Id,
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_EMAIL_Service.Id,
                                                                              SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                                              transaction,
                                                                              logger );
@@ -107,106 +370,6 @@ export default class NotificationManager {
     }
 
     return result;
-
-  }
-
-  static async getConfigServiceType( strTransport: string,
-                                     logger: any ): Promise<string> {
-
-    let strResult = null;
-
-    let currentTransaction = null;
-
-    //ANCHOR getConfigServiceType
-    try {
-
-      //if ( currentTransaction === null ) {
-
-      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
-
-      //}
-
-      let serviceConfig = null;
-
-      if ( CommonUtilities.toLowerCase( strTransport ) === "email" ) {
-
-        serviceConfig = await NotificationManager.getConfigEMailService( currentTransaction,
-                                                                         logger );
-
-      }
-      else if ( CommonUtilities.toLowerCase( strTransport ) === "sms" ) {
-
-        serviceConfig = await NotificationManager.getConfigSMSService( currentTransaction,
-                                                                       logger );
-
-      }
-      else if ( CommonUtilities.toLowerCase( strTransport ) === "push" ) {
-
-        serviceConfig = await NotificationManager.getConfigPushService( currentTransaction,
-                                                                        logger );
-
-      }
-      else {
-
-        strResult= "@__transport_not_found__@"
-
-      }
-
-      if ( serviceConfig !== null ) {
-
-        strResult = CommonUtilities.toLowerCase( serviceConfig.type );
-
-      }
-
-      if ( currentTransaction !== null ) {
-
-        await currentTransaction.commit();
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.getConfigServiceType.name;
-
-      const strMark = "13F8EAE54A0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger &&
-           typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-      if ( currentTransaction !== null ) {
-
-        try {
-
-          await currentTransaction.rollback();
-
-        }
-        catch ( error1 ) {
-
-
-        }
-
-      }
-
-    }
-
-    return strResult;
 
   }
 
@@ -307,7 +470,7 @@ export default class NotificationManager {
 
     try {
 
-      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Push_Service.Id,
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_PUSH_Service.Id,
                                                                              SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                                                              transaction,
                                                                              logger );
@@ -367,6 +530,186 @@ export default class NotificationManager {
       sourcePosition.method = this.name + "." + this.getConfigPushService.name;
 
       const strMark = "5A34CC07602A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigDiscordService( transaction: any,
+                                        logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_DISCORD_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
+                                                           logger );
+
+        const strService = jsonConfigValue.service
+
+        if ( strService !== "@__none__@" &&
+             jsonConfigValue[ strService ] ) {
+
+          result = jsonConfigValue[ strService ];
+          bSet = true;
+
+        }
+        else {
+
+          result = strService;
+          bSet = true;
+
+        }
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
+                                                           logger );
+
+        const strService = jsonConfigValue.service
+
+        if ( strService !== "@__none__@" &&
+             jsonConfigValue[ strService ] ) {
+
+          result = jsonConfigValue[ strService ];
+
+        }
+        else {
+
+          result = strService;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigDiscordService.name;
+
+      const strMark = "66EA1AEBE81D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigSlackService( transaction: any,
+                                      logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_SLACK_Service.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
+                                                           logger );
+
+        const strService = jsonConfigValue.service
+
+        if ( strService !== "@__none__@" &&
+             jsonConfigValue[ strService ] ) {
+
+          result = jsonConfigValue[ strService ];
+          bSet = true;
+
+        }
+        else {
+
+          result = strService;
+          bSet = true;
+
+        }
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
+                                                           logger );
+
+        const strService = jsonConfigValue.service
+
+        if ( strService !== "@__none__@" &&
+             jsonConfigValue[ strService ] ) {
+
+          result = jsonConfigValue[ strService ];
+
+        }
+        else {
+
+          result = strService;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigSlackService.name;
+
+      const strMark = "48D9C1643438" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -603,6 +946,60 @@ export default class NotificationManager {
                                              logger );
 
       }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "discord" ) {
+
+        const discordServiceConfig = await NotificationManager.getConfigDiscordService( currentTransaction,
+                                                                                        logger );
+
+        if ( NotificationManager.handleConfigWarning( "discord",
+                                                      discordServiceConfig,
+                                                      logger ) === false ) {
+
+          if ( CommonUtilities.toLowerCase( discordServiceConfig.type ) === "discord" ) {
+
+            bResult = await TransportDiscord.send( discordServiceConfig,
+                                                   messageOptions,
+                                                   logger );
+
+          }
+          else {
+
+            NotificationManager.handleConfigWarning( "discord",
+                                                     "config_not_found",
+                                                     logger );
+
+          }
+
+        }
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "slack" ) {
+
+        const slackServiceConfig = await NotificationManager.getConfigSlackService( currentTransaction,
+                                                                                    logger );
+
+        if ( NotificationManager.handleConfigWarning( "slack",
+                                                      slackServiceConfig,
+                                                      logger ) === false ) {
+
+          if ( CommonUtilities.toLowerCase( slackServiceConfig.type ) === "slack" ) {
+
+            bResult = await TransportSlack.send( slackServiceConfig,
+                                                 messageOptions,
+                                                 logger );
+
+          }
+          else {
+
+            NotificationManager.handleConfigWarning( "slack",
+                                                     "config_not_found",
+                                                     logger );
+
+          }
+
+        }
+
+      }
 
       if ( currentTransaction !== null ) {
 
@@ -693,6 +1090,16 @@ export default class NotificationManager {
 
         bResult = await TransportRedis.listen( listenOptions,
                                                logger );
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "discord" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "slack" ) {
+
+        //
 
       }
 
@@ -788,6 +1195,16 @@ export default class NotificationManager {
                                                  logger );
 
       }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "discord" ) {
+
+        //
+
+      }
+      else if ( CommonUtilities.toLowerCase( strTransport ) === "slack" ) {
+
+        //
+
+      }
 
       if ( currentTransaction !== null ) {
 
@@ -875,6 +1292,27 @@ export default class NotificationManager {
                                                   },
                                                   logger );
                                                   */
+
+    return bResult;
+
+  }
+
+  static async publishToExternal( dataToPublish: any,
+                                  logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    const transportExternal = CommonUtilities.trimArrayFromString( process.env.NOTIFICATION_TRANSPORT_EXTERNAL );
+
+    for ( const strTransportExternal of transportExternal ) {
+
+      if ( await this.send( strTransportExternal, dataToPublish, logger ) ) {
+
+        bResult = true;
+
+      }
+
+    }
 
     return bResult;
 
