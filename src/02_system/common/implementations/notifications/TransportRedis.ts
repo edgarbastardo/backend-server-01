@@ -12,6 +12,13 @@ const debug = require( 'debug' )( 'TransportRedis' );
 
 export default class TransportRedis {
 
+  static async init( transportOptions: any,
+                     logger: any ): Promise<boolean> {
+
+    return true;
+
+  }
+
   static async send( transportOptions: any,
                      messageOptions: any,
                      logger: any ): Promise<boolean> {

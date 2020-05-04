@@ -183,6 +183,39 @@ export default class ServerTask {
       await ApplicationServerTaskManager.create( {},
                                                  LoggerManager.mainLoggerInstance );
 
+      await NotificationManager.publishToExternal(
+                                                   {
+                                                     body: {
+                                                             kind: "notification",
+                                                             text: "Start running",
+                                                             fields: [
+                                                                       {
+                                                                         title: "Date",
+                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Host",
+                                                                         value: SystemUtilities.getHostName(),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Application",
+                                                                         value: process.env.APP_SERVER_TASK_NAME,
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Running from",
+                                                                         value: SystemUtilities.strBaseRunPath,
+                                                                         short: false
+                                                                       }
+                                                                     ],
+                                                             footer: "BB38437F5AE3",
+                                                           }
+                                                   },
+                                                   LoggerManager.mainLoggerInstance
+                                                 );
+
       await ApplicationServerTaskManager.runTasks( {},
                                                    LoggerManager.mainLoggerInstance );
 

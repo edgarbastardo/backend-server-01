@@ -12,6 +12,13 @@ const debug = require( 'debug' )( 'TransportSMSGateway' );
 
 export default class TransportSMSGateway {
 
+  static async init( transportOptions: any,
+                     logger: any ): Promise<boolean> {
+
+    return true;
+
+  }
+
   static async send( transportOptions: any,
                      messageOptions: any,
                      logger: any ): Promise<boolean> {

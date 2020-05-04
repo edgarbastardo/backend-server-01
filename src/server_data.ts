@@ -51,10 +51,10 @@ else {
 
 let intCountHTTPWorkerKilled = 0;
 
-function httpWorkerProcessExit( httpWorkerProcess: any,
-                                strCode: any,
-                                strSignal: any,
-                                logger: any ) {
+async function httpWorkerProcessExit( httpWorkerProcess: any,
+                                      strCode: any,
+                                      strSignal: any,
+                                      logger: any ) {
 
   if ( httpWorkerProcess &&
        cluster.isMaster ) {
@@ -70,6 +70,41 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
       debugMark( `HTTP worker process killed count: %s`, intCountHTTPWorkerKilled );
 
       debugMark( `To much HTTP worker process killed. Aborting main process execution.` );
+
+      await NotificationManager.publishToExternal(
+                                                   {
+                                                     body: {
+                                                             kind: "error",
+                                                             text: "To much HTTP worker process killed. Aborting main process execution.",
+                                                             fields: [
+                                                                       {
+                                                                         title: "Date",
+                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Host",
+                                                                         value: SystemUtilities.getHostName(),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Application",
+                                                                         value: process.env.APP_SERVER_DATA_NAME,
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                        title: "Running from",
+                                                                        value: SystemUtilities.strBaseRunPath,
+                                                                        short: false
+                                                                       }
+                                                                    ],
+                                                              footer: "482371B72B14",
+                                                              // `Date: ${SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 )}\nHost: ${SystemUtilities.getHostName()}\nApplication: ${process.env.APP_SERVER_DATA_NAME}\nRunning from: ${SystemUtilities.strBaseRunPath}`
+                                                           }
+                                                   },
+                                                   LoggerManager.mainLoggerInstance
+                                                 );
+
       process.abort();
 
     }
@@ -92,9 +127,9 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
       httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
 
-      httpWorkerProcess.on( 'exit', ( strCode: any, strSignal: any ) => {
+      httpWorkerProcess.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-        httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
+        await httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
 
       });
 
@@ -120,9 +155,9 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
       httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
 
-      httpWorkerProcess.on( 'exit', ( strCode: any, strSignal: any ) => {
+      httpWorkerProcess.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-        httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
+        await httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
 
       });
 
@@ -153,10 +188,10 @@ function httpWorkerProcessExit( httpWorkerProcess: any,
 
 let intCountProcessWorkerKilled = 0;
 
-function jobWorkerProcessExit( jobProcessWorker: any,
-                               strCode: any,
-                               strSignal: any,
-                               logger: any ) {
+async function jobWorkerProcessExit( jobProcessWorker: any,
+                                     strCode: any,
+                                     strSignal: any,
+                                     logger: any ) {
 
   if ( jobProcessWorker &&
        cluster.isMaster ) {
@@ -168,10 +203,44 @@ function jobWorkerProcessExit( jobProcessWorker: any,
 
     if ( intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_JOB_WORKER_COUNT ) ) {
 
-      debugMark( `Max JOB worker process killed count: $s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
-      debugMark( `JOB worker process killed count: $s`, intCountProcessWorkerKilled );
+      debugMark( `Max JOB worker process killed count: %s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
+      debugMark( `JOB worker process killed count: %s`, intCountProcessWorkerKilled );
 
       debugMark( `To much JOB worker process killed. Aborting main process execution.` );
+
+      await NotificationManager.publishToExternal(
+                                                   {
+                                                     body: {
+                                                             kind: "error",
+                                                             text: "To much JOB worker process killed. Aborting main process execution.",
+                                                             fields: [
+                                                                       {
+                                                                         title: "Date",
+                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Host",
+                                                                         value: SystemUtilities.getHostName(),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Application",
+                                                                         value: process.env.APP_SERVER_DATA_NAME,
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                        title: "Running from",
+                                                                        value: SystemUtilities.strBaseRunPath,
+                                                                        short: false
+                                                                       }
+                                                                    ],
+                                                              footer: "4B6CC1C6B04B",
+                                                           }
+                                                   },
+                                                   LoggerManager.mainLoggerInstance
+                                                 );
+
       process.abort();
 
     }
@@ -195,9 +264,9 @@ function jobWorkerProcessExit( jobProcessWorker: any,
 
       jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
 
-      jobProcessWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
+      jobProcessWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-        jobWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
+        await jobWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
 
       });
 
@@ -223,9 +292,9 @@ function jobWorkerProcessExit( jobProcessWorker: any,
 
       jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
 
-      jobProcessWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
+      jobProcessWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-        httpWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
+        await httpWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
 
       });
 
@@ -519,7 +588,38 @@ export default async function main() {
 
     if ( cluster.isMaster ) {
 
-      const logger = DBConnectionManager.getDBConnection( "master" );
+      await NotificationManager.publishToExternal(
+                                                   {
+                                                     body: {
+                                                             kind: "notification",
+                                                             text: "Start running",
+                                                             fields: [
+                                                                       {
+                                                                         title: "Date",
+                                                                         value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Host",
+                                                                         value: SystemUtilities.getHostName(),
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                         title: "Application",
+                                                                         value: process.env.APP_SERVER_DATA_NAME,
+                                                                         short: false
+                                                                       },
+                                                                       {
+                                                                        title: "Running from",
+                                                                        value: SystemUtilities.strBaseRunPath,
+                                                                        short: false
+                                                                       }
+                                                                     ],
+                                                             footer: "CCDAB718266A",
+                                                           }
+                                                   },
+                                                   LoggerManager.mainLoggerInstance
+                                                 );
 
       if ( !cluster.settings.execArgv ) {
 
@@ -606,12 +706,12 @@ export default async function main() {
 
             });
 
-            httpWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
+            httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-              httpWorkerProcessExit( httpWorker,
-                                     strCode,
-                                     strSignal,
-                                     logger );
+              await httpWorkerProcessExit( httpWorker,
+                                           strCode,
+                                           strSignal,
+                                           LoggerManager.mainLoggerInstance );
 
             });
 
@@ -699,12 +799,12 @@ export default async function main() {
 
             });
 
-            jobWorker.on( 'exit', ( strCode: any, strSignal: any ) => {
+            jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
 
-              jobWorkerProcessExit( jobWorker,
-                                    strCode,
-                                    strSignal,
-                                    logger );
+              await jobWorkerProcessExit( jobWorker,
+                                          strCode,
+                                          strSignal,
+                                          LoggerManager.mainLoggerInstance );
 
             });
 

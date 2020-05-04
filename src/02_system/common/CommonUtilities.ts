@@ -1350,6 +1350,31 @@ export default class CommonUtilities {
 
   }
 
+  public static trimArrayFromString( strArray: string ): string[] {
+
+    let result = [];
+
+    try {
+
+      const temp = strArray.split( "," );
+
+      for ( const strItem of temp ) {
+
+        result.push( strItem.trim() );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return result;
+
+  }
+
   public static addTag( strCurrentTagList: string, strTag: string ): string {
 
     let strResult = strCurrentTagList;
