@@ -314,7 +314,7 @@ export default class MigrateImagesTask_001 {
                                                                      fields: [
                                                                                {
                                                                                  title: "Date",
-                                                                                 value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                                 value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
                                                                                  short: false
                                                                                },
                                                                                {
@@ -550,6 +550,41 @@ export default class MigrateImagesTask_001 {
                   if ( error.code === "EBUSY" ) {
 
                     debugMark( "Aborting main process execution." );
+
+
+              await NotificationManager.publishToExternal(
+                                                           {
+                                                             body: {
+                                                                     kind: "error",
+                                                                     text: "Aborting main process execution.",
+                                                                     fields: [
+                                                                               {
+                                                                                 title: "Date",
+                                                                                 value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                                 short: false
+                                                                               },
+                                                                               {
+                                                                                 title: "Host",
+                                                                                 value: SystemUtilities.getHostName(),
+                                                                                 short: false
+                                                                               },
+                                                                               {
+                                                                                 title: "Application",
+                                                                                 value: process.env.APP_SERVER_TASK_NAME,
+                                                                                 short: false
+                                                                               },
+                                                                               {
+                                                                                 title: "Running from",
+                                                                                 value: SystemUtilities.strBaseRunPath,
+                                                                                 short: false
+                                                                               }
+                                                                             ],
+                                                                       footer: "50B3255D83D4",
+                                                                   }
+                                                           },
+                                                           logger
+                                                         );
+
                     process.abort();
 
                   }
