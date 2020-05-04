@@ -1180,9 +1180,9 @@ export default class SystemConstants {
                                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA }
                                                           };
 
-  static readonly _CONFIG_ENTRY_EMail_Service_SCHEMA = "";
+  static readonly _CONFIG_ENTRY_EMAIL_Service_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_EMail_Service = {
+  static readonly _CONFIG_ENTRY_EMAIL_Service = {
                                                   Id: "c0b016a3-3fda-4c5b-be78-fa8e96398196",
                                                   Scope: "system",
                                                   Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
@@ -1231,7 +1231,7 @@ export default class SystemConstants {
                                                                            }
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA }
+                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMAIL_Service_SCHEMA }
                                                 };
 
   static readonly _CONFIG_ENTRY_SMS_Service_SCHEMA = "";
@@ -1277,12 +1277,12 @@ export default class SystemConstants {
                                                                          }
                                                                        ),
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMail_Service_SCHEMA }
+                                                ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMAIL_Service_SCHEMA }
                                               };
 
   static readonly _CONFIG_ENTRY_PUSH_Service_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_Push_Service = {
+  static readonly _CONFIG_ENTRY_PUSH_Service = {
                                                  Id: "56e70807-9f65-4679-b9e6-9327df438e1e",
                                                  Scope: "system",
                                                  Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
@@ -1323,6 +1323,88 @@ export default class SystemConstants {
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_PUSH_Service_SCHEMA }
                                                };
+
+  static readonly _CONFIG_ENTRY_DISCORD_Service_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_DISCORD_Service = {
+                                                    Id: "a11fe6f0-dcc5-44cd-8c26-8f1a1ed5f963",
+                                                    Scope: "system",
+                                                    Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                    Category: "Notification",
+                                                    Name: "system.notification.discord.service",
+                                                    Default: JSON.stringify(
+                                                                             {
+                                                                               "service":"@__none__@",
+                                                                               "#discord#":{
+                                                                                 "type":"discord",
+                                                                                 "target":{
+                                                                                   "web_hooks": []
+                                                                                 }
+                                                                               }
+                                                                             }
+                                                                           ),
+                                                    Label: "Configuration for the notifications discord transport",
+                                                    Description: "Configuration for the notification discord transport",
+                                                    AllowTagAccessR: "#Administrator#",
+                                                    AllowTagAccessW: "#Administrator#",
+                                                    Example: JSON.stringify(
+                                                                             {
+                                                                               "service":"#discord#",
+                                                                               "#discord#":{
+                                                                                 "type":"discord",
+                                                                                 "target":{
+                                                                                   "web_hooks": [
+                                                                                                  "url1",
+                                                                                                  "url2"
+                                                                                                ]
+                                                                                 }
+                                                                               }
+                                                                             }
+                                                                           ),
+                                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                    ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_DISCORD_Service_SCHEMA }
+                                                  };
+
+  static readonly _CONFIG_ENTRY_SLACK_Service_SCHEMA = "";
+
+  static readonly _CONFIG_ENTRY_SLACK_Service = {
+                                                  Id: "85f09ecb-356c-4f1f-b355-a4f004007b48",
+                                                  Scope: "system",
+                                                  Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                  Category: "Notification",
+                                                  Name: "system.notification.slack.service",
+                                                  Default: JSON.stringify(
+                                                                           {
+                                                                             "service":"@__none__@",
+                                                                             "#slack#":{
+                                                                               "type":"slack",
+                                                                               "target":{
+                                                                                 "web_hooks": []
+                                                                               }
+                                                                             }
+                                                                           }
+                                                                         ),
+                                                  Label: "Configuration for the notifications slack transport",
+                                                  Description: "Configuration for the notification slack transport",
+                                                  AllowTagAccessR: "#Administrator#",
+                                                  AllowTagAccessW: "#Administrator#",
+                                                  Example: JSON.stringify(
+                                                                           {
+                                                                             "service":"#slack#",
+                                                                             "#slack#":{
+                                                                               "type":"slack",
+                                                                               "target":{
+                                                                                 "web_hooks": [
+                                                                                                "url1",
+                                                                                                "url2"
+                                                                                              ]
+                                                                               }
+                                                                             }
+                                                                           }
+                                                                         ),
+                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_SLACK_Service_SCHEMA }
+                                                };
 
   static readonly _CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA = "";
 
@@ -1811,9 +1893,11 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_BinaryDataProcess,
                                                SystemConstants._CONFIG_ENTRY_UserSignupProcess,
                                                SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign,
-                                               SystemConstants._CONFIG_ENTRY_EMail_Service,
+                                               SystemConstants._CONFIG_ENTRY_EMAIL_Service,
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
-                                               SystemConstants._CONFIG_ENTRY_Push_Service,
+                                               SystemConstants._CONFIG_ENTRY_PUSH_Service,
+                                               SystemConstants._CONFIG_ENTRY_DISCORD_Service,
+                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_Frontend_Rules,
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,

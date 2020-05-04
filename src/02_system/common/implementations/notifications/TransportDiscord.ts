@@ -1,15 +1,16 @@
 import cluster from 'cluster';
 
-//import OneSignal from 'onesignal-node';
 
 import CommonConstants from "../../CommonConstants";
 
 import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 
-const debug = require( 'debug' )( 'TransportOneSignal' );
+const debug = require( 'debug' )( 'TransportDiscord' );
 
-export default class TransportOneSignal {
+export default class TransportDiscord {
+
+  static client = null;
 
   static async init( transportOptions: any,
                      logger: any ): Promise<boolean> {
@@ -26,6 +27,7 @@ export default class TransportOneSignal {
 
     try {
 
+      /*
       const OneSignal = require( 'onesignal-node' );
 
       const client = new OneSignal.Client( transportOptions.auth.app_id,
@@ -34,6 +36,7 @@ export default class TransportOneSignal {
       const response = await client.createNotification( messageOptions );
 
       bResult = response.body.id !== null;
+      */
 
     }
     catch ( error ) {
@@ -42,7 +45,7 @@ export default class TransportOneSignal {
 
       sourcePosition.method = this.name + "." + this.send.name;
 
-      const strMark = "38DEB864775D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "27CD67CCDEAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
