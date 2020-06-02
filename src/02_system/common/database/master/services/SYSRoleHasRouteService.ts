@@ -198,6 +198,39 @@ export default class SYSRoleHasRouteService extends BaseService {
 
   }
 
+  static checkIncluded( includes: string[], strToCheck: string ): boolean {
+
+    let bResult = false;
+
+    if ( !includes || includes.length === 0 || includes.includes( "*" ) ) {
+
+      bResult = true;
+
+    }
+    else if ( includes[ strToCheck ] ) {
+
+      bResult = true;
+
+    }
+
+    return bResult;
+
+  }
+
+  static checkExcluded( excludes: string[], strToCheck: string ): boolean {
+
+    let bResult = false;
+
+    if ( excludes && excludes.length > 0 && ( excludes.includes( "*" ) || excludes[ strToCheck ] ) ) {
+
+      bResult = true;
+
+    }
+
+    return bResult;
+
+  }
+
   static async listRoutesOfRoles( strRoles: string,
                                   strFrontendId: string,
                                   strFormat: string,
@@ -222,10 +255,9 @@ export default class SYSRoleHasRouteService extends BaseService {
 
       }
 
-      let cacheIndex = {};
+      let routes = [ {} ];
 
-      let routes = null;
-
+      /*
       if ( strFormat === "1" ) {
 
         routes = [];
@@ -236,6 +268,7 @@ export default class SYSRoleHasRouteService extends BaseService {
         routes = {};
 
       }
+      */
 
       const configRoute = await this.getRoutesFromFrontendIdConfig( strFrontendId,
                                                                     transaction,
@@ -243,6 +276,114 @@ export default class SYSRoleHasRouteService extends BaseService {
 
       const roleList = strRoles.split( "," );
 
+      for ( let intRoleIndex = 0; intRoleIndex < roleList.length; intRoleIndex++ ) {
+
+        const strRole = roleList[ intRoleIndex ];
+
+        let strSQL = DBConnectionManager.getStatement( "master",
+                                                       "getRoutesOfRole",
+                                                       {
+                                                         Role: strRole.replace( "#", "" ).replace( "#", "" )
+                                                       },
+                                                       logger );
+
+        let rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+        for ( let intRouteIndex = 0; intRouteIndex < rows.length; intRouteIndex++ ) {
+
+          const strRequestKind = CommonUtilities.getRequestKindFromNumber( rows[  intRouteIndex ].RequestKind ).toUpperCase();
+
+          if ( SYSRoleHasRouteService.checkIncluded( configRoute.include, strRequestKind + ":" + rows[ intRouteIndex ].Path ) &&
+               SYSRoleHasRouteService.checkExcluded( configRoute.exclude, strRequestKind + ":" + rows[ intRouteIndex ].Path ) === false ) {
+
+            if ( !routes[ 0 ][ strRole ] ) {
+
+              routes[ 0 ][ strRole ] = [];
+
+            }
+
+            if ( strFormat === "1" ) {
+
+              const strAccessKind = CommonUtilities.getAccessKindFromNumber( rows[ intRouteIndex ].AccessKind ).toUpperCase();
+
+              routes[ 0 ][ strRole ].push( {
+                                        Kind: rows[ intRouteIndex ].Path.startsWith( "/"  )? "REST_API": "GRAPHQL_API",
+                                        AccessKind: strAccessKind,
+                                        RequestKind: strRequestKind,
+                                        Path: rows[ intRouteIndex ].Path
+                                      } );
+
+            }
+            else {
+
+              routes[ 0 ][ strRole ].push( strRequestKind + ":" + rows[  intRouteIndex ].Path );
+
+            }
+
+          }
+
+        }
+
+        /*
+        if ( strFormat && strFormat === "1" ) {
+
+          routes[ strRole ].sort();
+
+        }
+        */
+
+      }
+
+      /*
+      for ( let intIncludeIndex = 0; intIncludeIndex < configRoute.include.length; intIncludeIndex++ ) {
+
+        const includeParts = configRoute.include[ intIncludeIndex ].split( ":" );
+
+        if ( includeParts.length >= 4 ) {
+
+          const strRole = "#" + includeParts[ 0 ] + "#";
+          const strAccessKind = CommonUtilities.formatTitle( includeParts[ 1 ] );
+          const strRequestKind = CommonUtilities.formatTitle( includeParts[ 2 ] );
+          const strPath = includeParts[ 3 ];
+
+          if ( configRoute.include.includes( "*" ) ||
+              routes.includes( strRequestKind + ":" + strPath ) ) {
+
+            if ( strFormat === "1" ) {
+
+              routes.push( strRequestKind + ":" + strPath );
+
+            }
+            else {
+
+              if ( !routes[ strRole ] ) {
+
+                routes[ strRole ] = [];
+
+              }
+
+              routes[ strRole ].push( {
+                                        Kind: strPath.startsWith( "/"  )? "REST_API": "GRAPHQL_API",
+                                        AccessKind: strAccessKind,
+                                        RequestKind: strRequestKind,
+                                        Path: strPath
+                                      } );
+
+            }
+
+          }
+
+        }
+
+      }
+      */
+
+      /*
       if ( !configRoute ||
            !configRoute.exclude ||
            configRoute.exclude.includes( "*" ) === false ) {
@@ -327,61 +468,8 @@ export default class SYSRoleHasRouteService extends BaseService {
 
         }
 
-        if ( strFormat === "1" ) {
-
-          routes.sort();
-
-        }
-
-        if ( configRoute &&
-             configRoute.include ) {
-
-          for ( let intIncludeIndex = 0; intIncludeIndex < configRoute.include.length; intIncludeIndex++ ) {
-
-            const includeParts = configRoute.include[ intIncludeIndex ].split( ":" );
-
-            if ( includeParts.length >= 4 ) {
-
-              const strRole = "#" + includeParts[ 0 ] + "#";
-              //const intAccessKind = CommonUtilities.getAccessKindFromString( includeParts[ 1 ] );
-              //const intRequestKind = CommonUtilities.getRequestKindFromString( includeParts[ 2 ] );
-              const strAccessKind = CommonUtilities.formatTitle( includeParts[ 1 ] );
-              const strRequestKind = CommonUtilities.formatTitle( includeParts[ 2 ] );
-              const strPath = includeParts[ 3 ];
-
-              if ( strFormat === "1" ) {
-
-                if ( routes.includes( strRequestKind + ":" + strPath ) === false ) {
-
-                  routes.push( strRequestKind + ":" + strPath );
-
-                }
-
-              }
-              else {
-
-                if ( !routes[ strRole ] ) {
-
-                  routes[ strRole ] = [];
-
-                }
-
-                routes[ strRole ].push( {
-                                          Kind: strPath.startsWith( "/"  )? "REST_API": "GRAPHQL_API",
-                                          AccessKind: strAccessKind,
-                                          RequestKind: strRequestKind,
-                                          Path: strPath
-                                        } );
-
-              }
-
-            }
-
-          }
-
-        }
-
       }
+      */
 
       result = routes;
 
@@ -399,6 +487,143 @@ export default class SYSRoleHasRouteService extends BaseService {
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = this.name + "." + this.listRoutesOfRoles.name;
+
+      const strMark = "157882FC3F95" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async listActionsOfRoles( strRoles: string,
+                                   strFrontendId: string,
+                                   strFormat: string,
+                                   transaction: any,
+                                   logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let routes = {};
+
+      const configRoute = await this.getRoutesFromFrontendIdConfig( strFrontendId,
+                                                                    transaction,
+                                                                    logger );
+
+      const roleList = strRoles.split( "," );
+
+      for ( let intRoleIndex = 0; intRoleIndex < roleList.length; intRoleIndex++ ) {
+
+        const strRole = roleList[ intRoleIndex ];
+
+        let strSQL = DBConnectionManager.getStatement( "master",
+                                                       "getRoutesOfRole",
+                                                       {
+                                                         Role: strRole.replace( "#", "" ).replace( "#", "" )
+                                                       },
+                                                       logger );
+
+        let rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+        for ( let intRouteIndex = 0; intRouteIndex < rows.length; intRouteIndex++ ) {
+
+          const strRequestKind = CommonUtilities.getRequestKindFromNumber( rows[  intRouteIndex ].RequestKind ).toUpperCase();
+
+          if ( SYSRoleHasRouteService.checkIncluded( configRoute.include, strRequestKind + ":" + rows[ intRouteIndex ].Path ) &&
+               SYSRoleHasRouteService.checkExcluded( configRoute.exclude, strRequestKind + ":" + rows[ intRouteIndex ].Path ) === false ) {
+
+            if ( strFormat === "1" ) {
+
+              const strAccessKind = CommonUtilities.getAccessKindFromNumber( rows[ intRouteIndex ].AccessKind ).toUpperCase();
+
+              routes[ rows[ intRouteIndex ].Action ] = {
+                                                         Kind: rows[  intRouteIndex ].Path.startsWith( "/"  )? "REST_API": "GRAPHQL_API",
+                                                         AccessKind: strAccessKind,
+                                                         RequestKind: strRequestKind,
+                                                         Path: rows[  intRouteIndex ].Path
+                                                       };
+
+            }
+            else {
+
+              routes[ rows[ intRouteIndex ].Action ] = rows[ intRouteIndex ].Path;
+
+            }
+
+          }
+
+        }
+
+        result = routes;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.listActionsOfRoles.name;
 
       const strMark = "157882FC3F95" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

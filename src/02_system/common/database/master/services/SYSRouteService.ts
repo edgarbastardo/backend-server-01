@@ -26,6 +26,7 @@ export default class SYSRouteService extends BaseService {
   static async createOrUpdate( intAccessKind: number,
                                intRequestKind: number,
                                strPath: string,
+                               strAction: string,
                                strAllowTagAccess: string,
                                strDescription: string,
                                bUpdate: boolean,
@@ -68,6 +69,7 @@ export default class SYSRouteService extends BaseService {
                                                 AccessKind: intAccessKind,
                                                 RequestKind: intRequestKind,
                                                 Path: strPath,
+                                                Action: strAction,
                                                 AllowTagAccess: strAllowTagAccess,
                                                 Description: strDescription,
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
@@ -81,6 +83,7 @@ export default class SYSRouteService extends BaseService {
         sysRouteInDB.AccessKind = intAccessKind;
         sysRouteInDB.RequestKind = intRequestKind;
         sysRouteInDB.Path = strPath;
+        sysRouteInDB.Action = strAction;
         sysRouteInDB.AllowTagAccess = SystemUtilities.mergeTokens( sysRouteInDB.AllowTagAccess,
                                                                    strAllowTagAccess,
                                                                    true,
@@ -156,6 +159,7 @@ export default class SYSRouteService extends BaseService {
   static async createOrUpdateRouteAndRoles( intAccessKind: number,
                                             intRequestKind: number,
                                             strPath: string,
+                                            strAction: string,
                                             strAllowTagAccess: string,
                                             roles: [],
                                             strDescription: string,
@@ -183,6 +187,7 @@ export default class SYSRouteService extends BaseService {
       const sysRoute = await this.createOrUpdate( intAccessKind,
                                                   intRequestKind,
                                                   strPath,
+                                                  strAction,
                                                   strAllowTagAccess,
                                                   strDescription,
                                                   true,

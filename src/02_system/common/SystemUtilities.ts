@@ -913,7 +913,7 @@ export default class SystemUtilities {
 
         }
 
-        bFromCache = true;
+        bFromCache = result !== null;
 
       }
 
@@ -1033,6 +1033,8 @@ export default class SystemUtilities {
            SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
            bUpdateAt ) {
 
+        result.IsValid = true;
+
         await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                                result,
                                                                bFromCache === false, //Set roles?
@@ -1043,6 +1045,11 @@ export default class SystemUtilities {
                                                                7 * 1000,             //Second
                                                                transaction,
                                                                logger );
+
+      }
+      else {
+
+        result.IsValid = false;
 
       }
 

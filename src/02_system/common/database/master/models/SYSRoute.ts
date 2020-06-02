@@ -70,6 +70,9 @@ export class SYSRoute extends Model<SYSRoute> {
   @Column( { type: DataType.STRING( 2048 ) } )
   Path: string;
 
+  @Column( { type: DataType.STRING( 75 ) } )
+  Action: string;
+
   @Column( { type: DataType.STRING( 1024 ), allowNull: true  } )
   AllowTagAccess: string;
 

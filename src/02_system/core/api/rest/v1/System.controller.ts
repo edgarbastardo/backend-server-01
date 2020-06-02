@@ -55,7 +55,7 @@ export default class SystemController {
   static readonly _BASE_PATH = "/v1/system";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: SystemController._BASE_PATH + "/status", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the current status of the backend" },
+                                  { Path: SystemController._BASE_PATH + "/status", Action: "v1.system.status.get", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the current status of the backend" },
                                 ]
 
   _controllerLogger = null;
@@ -75,6 +75,7 @@ export default class SystemController {
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
                                                            routeInfo.Path, //Path
+                                                           routeInfo.Action,
                                                            routeInfo.AllowTagAccess,
                                                            routeInfo.Roles as any,
                                                            routeInfo.Description,
