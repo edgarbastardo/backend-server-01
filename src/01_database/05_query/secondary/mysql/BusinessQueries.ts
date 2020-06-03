@@ -29,7 +29,7 @@ export default class BusinessQueries {
       /*
       else if ( strName === "getOldUserSessionStatus" ) {
 
-        strResult = SqlString.format( `Select * From UserSessionStatus As A Where ( A.UserId = ? ) And A.LoggedOutAt Is Null Order By A.UpdatedAt Asc`, params.UserId );
+        strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set Tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
 
       }
       */
