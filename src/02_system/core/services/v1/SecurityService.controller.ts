@@ -598,7 +598,7 @@ export default class SecurityServiceController {
 
       }
 
-      let sysUserInDB = await SYSUserService.getByName( strUserName,
+      let sysUserInDB = await SYSUserService.getByName( strUserName || "",
                                                         null,
                                                         currentTransaction,
                                                         logger ); // await User.findOne( options );
@@ -1128,6 +1128,28 @@ export default class SecurityServiceController {
           }
 
         }
+
+      }
+      else if ( !strUserName ) {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: 'ERROR_USERNAME_FIELD_MISSING',
+                   Message: await I18NManager.translate( context.Language, 'Login failed (Username field are missing)' ),
+                   Mark: 'C116D28F30EE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USERNAME_FIELD_MISSING',
+                               Message: await I18NManager.translate( context.Language, 'Login failed (Username field are missing)' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
 
       }
       else if ( bUserDisabled ) {

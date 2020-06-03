@@ -14,8 +14,8 @@ export default class SecurityAuthenticationTestV1 {
     try {
 
       const result = await CommonTest.systemSecurityAuthenticationServiceV1.callLogin( headers,
-                                                                                      userData.Name,
-                                                                                      userData.Password );
+                                                                                       userData.Name,
+                                                                                       userData.Password );
 
       CommonTest.saveInput( strFileName, result.input );
       result && result.output ? result.output.expected = { Code: strCode }: null;
@@ -25,7 +25,6 @@ export default class SecurityAuthenticationTestV1 {
            result.output &&
            result.output.body &&
            result.output.body.Code === strCode ) {
-
 
         if ( bIsFail === false ) {
 

@@ -323,6 +323,53 @@ export default class MiddlewareManager {
 
   }
 
+  public static async middlewareClearIsNotValidSession( request: Request,
+                                                        response: Response,
+                                                        next: NextFunction ) {
+
+    const logger = LoggerManager.mainLoggerInstance;
+
+    try {
+
+      if ( ( request as any ).context &&
+           ( request as any ).context.UserSessionStatus &&
+           ( request as any ).context.UserSessionStatus.IsValid === false ) {
+
+        ( request as any ).context.UserSessionStatus = null;
+
+      }
+
+      next(); //Continue to next middleware
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = MiddlewareManager.name + "." + MiddlewareManager.middlewareSetContext.name;
+
+      const strMark = "5F91B2074DFF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+  }
+
   // ANCHOR middlewareCheckIsAuthenticated
   public static async middlewareCheckIsAuthenticated( request: Request,
                                                       response: Response,

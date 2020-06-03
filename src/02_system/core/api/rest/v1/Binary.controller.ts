@@ -54,18 +54,18 @@ export default class BinaryController {
   static readonly _BASE_PATH = "/v1/system/binary";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create a new auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/auth", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete the auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search/count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search count by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data from backend server" }, //,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03#  , "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03"
-                                  { Path: BinaryController._BASE_PATH + "/details", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary meta data details from backend server" }, //,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03# , "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03"
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadBinary#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadBinary" ], Description: "Upload binary data to the backend server" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Update the information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH + "/disable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Disable existent information metadata binary data in bulk" },
-                                  { Path: BinaryController._BASE_PATH + "/enable/bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Enable existent information metadata binary data in bulk" },
-                                  { Path: BinaryController._BASE_PATH, AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH + "/bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data in bulk from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/auth", Action: "v1.system.binary.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create a new auth token for access to binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/auth", Action: "v1.system.binary.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete the auth token for access to binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search", Action: "v1.system.binary.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH + "/search/count", Action: "v1.system.binary.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#SearchBinary#,#SearchBinaryL01#,#SearchBinaryL02#,#SearchBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "SearchBinary", "SearchBinaryL01", "SearchBinaryL02", "SearchBinaryL03" ], Description: "Search count by meta of binary data" },
+                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.get", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data from backend server" }, //,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03#  , "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03"
+                                  { Path: BinaryController._BASE_PATH + "/details", Action: "v1.system.binary.get.details", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary meta data details from backend server" }, //,#MasterL01#,#MasterL02#,#MasterL03#,#GetBinaryL01#,#GetBinaryL02#,#GetBinaryL03# , "MasterL01", "MasterL02", "MasterL03", "GetBinaryL01", "GetBinaryL02", "GetBinaryL03"
+                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.upload", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UploadBinary#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UploadBinary" ], Description: "Upload binary data to the backend server" },
+                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Update the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/disable/bulk", Action: "v1.system.binary.disable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Disable existent information metadata binary data in bulk" },
+                                  { Path: BinaryController._BASE_PATH + "/enable/bulk", Action: "v1.system.binary.enable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#UpdateBinary#,#UpdateBinaryL01#,#UpdateBinaryL02#,#UpdateBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "UpdateBinary", "UpdateBinaryL01", "UpdateBinaryL02", "UpdateBinaryL03" ], Description: "Enable existent information metadata binary data in bulk" },
+                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data from backend server" },
+                                  { Path: BinaryController._BASE_PATH + "/bulk", Action: "v1.system.binary.delete.bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManagerL99#,#MasterL01#,#MasterL02#,#MasterL03#,#DeleteBinary#,#DeleteBinaryL01#,#DeleteBinaryL02#,#DeleteBinaryL03#", Roles: [ "Administrator", "BManagerL99", "MasterL01", "MasterL02", "MasterL03", "DeleteBinary", "DeleteBinaryL01", "DeleteBinaryL02", "DeleteBinaryL03" ], Description: "Delete the information metadata of binary data in bulk from backend server" },
                                 ]
 
   _controllerLogger = null;
@@ -85,6 +85,7 @@ export default class BinaryController {
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
                                                            routeInfo.Path, //Path
+                                                           routeInfo.Action,
                                                            routeInfo.AllowTagAccess,
                                                            routeInfo.Roles as any,
                                                            routeInfo.Description,
@@ -134,6 +135,7 @@ export default class BinaryController {
       result.get( process.env.SERVER_ROOT_PATH + BinaryController._ROUTE_INFO[ 4 ].Path, // + "/:id?/:auth?/:thumbnail?",
                   [
                     MiddlewareManager.middlewareSetContext,
+                    MiddlewareManager.middlewareClearIsNotValidSession
                   ], //Midddlewares
                   async ( request: Request, response: Response, next: NextFunction ) => {
 
@@ -310,11 +312,11 @@ export default class BinaryController {
   }
 
   @httpGet(
-             "/search/count",
-             MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated,
-             MiddlewareManager.middlewareCheckIsAuthorized
-           )
+            "/search/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized
+          )
   async searchCountBinaryData( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
@@ -329,7 +331,8 @@ export default class BinaryController {
 
   @httpGet(
              "/details",
-             MiddlewareManager.middlewareSetContext
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareClearIsNotValidSession
            )
   async detailsBinaryData( request: Request, response: Response ) {
 

@@ -20,7 +20,35 @@ export default class Migrate {
 
     try {
 
+      let strSQL = "Select Action From sysRoute limit 1, 1";
+
+      try {
+
+        //Check field Action exists
+        await dbConnection.execute( strSQL );
+
+      }
+      catch ( error ) {
+
+        //The field Action NOT exists. Must be created
+
+        strSQL = `ALTER TABLE \`sysRoute\` ADD COLUMN \`Action\` VARCHAR(75) NULL AFTER \`Path\``;
+
+        await dbConnection.execute( strSQL );
+
+        strSQL = `ALTER TABLE \`sysRoute\` ADD UNIQUE INDEX \`UNQ_sysRoute_Action_idx\` (\`Action\` ASC)`;
+
+        await dbConnection.execute( strSQL );
+
+      }
+
       /*
+      ALTER TABLE `BackendServer01DB`.`sysRoute`
+      ADD COLUMN `Action` VARCHAR(75) NULL AFTER `Path`;
+
+      ALTER TABLE `BackendServer01DB`.`sysRoute`
+      ADD UNIQUE INDEX `UNQ_sysRoute_Action_idx` (`Action` ASC);
+
       const strId = SystemUtilities.getUUIDv4();
 
       const strShortId = SystemUtilities.hashString( strId, 2, null );

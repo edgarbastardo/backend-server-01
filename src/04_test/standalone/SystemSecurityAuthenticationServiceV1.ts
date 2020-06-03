@@ -6,8 +6,8 @@ export class SystemSecurityAuthenticationServiceV1 {
   private strProtocol = "";
   private strHost = "";
 
-  constructor ( strProtocol : string,
-                strHost: string ) {
+  constructor( strProtocol : string,
+               strHost: string ) {
 
     this.strProtocol = strProtocol;
     this.strHost = strHost;
@@ -15,8 +15,8 @@ export class SystemSecurityAuthenticationServiceV1 {
   }
 
   async callLogin( headers: any,
-                    strUser: string,
-                    strPassword: string ): Promise<any> {
+                   strUser: string,
+                   strPassword: string ): Promise<any> {
 
     let result = { input: null, output: null };
 

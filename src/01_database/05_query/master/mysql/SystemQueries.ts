@@ -82,7 +82,7 @@ export default class SystemQueries {
       }
       else if ( strName === "getRoutesOfRole" ) {
 
-        strResult = SqlString.format( `Select B.Name, C.Path, C.AccessKind, C.RequestKind FROM sysRoleHasRoute As A Inner Join sysRole As B On A.RoleId = B.Id Inner Join sysRoute As C On C.Id = A.RouteId Where ( B.Name = ? ) Order By C.RequestKind, C.Path`, params.Role );
+        strResult = SqlString.format( `Select B.Name, C.Path, C.Action, C.AccessKind, C.RequestKind FROM sysRoleHasRoute As A Inner Join sysRole As B On A.RoleId = B.Id Inner Join sysRoute As C On C.Id = A.RouteId Where ( B.Name = ? ) Order By C.RequestKind, C.Path`, params.Role );
 
       }
       else if ( strName === "deleteUserSessionPresenceByServer" ) {
