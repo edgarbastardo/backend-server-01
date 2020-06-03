@@ -129,6 +129,7 @@ export default class JobQueueManager {
 
       this._jobQueueList = {};
 
+      /*
       await this._scan( __dirname + "/../others/jobs/",
                         params,
                         logger );
@@ -136,6 +137,54 @@ export default class JobQueueManager {
       await this._scan( __dirname + "/../../../03_business/common/others/jobs/",
                         params,
                         logger );
+                        */
+
+
+      const pathToScan : any[] = JSON.parse( process.env.JOBS_PATH_TO_SCAN );
+
+      for ( let intIndex = 0; intIndex < pathToScan.length; intIndex++ ) {
+
+        let strPath = SystemUtilities.strBaseRunPath + pathToScan[ intIndex ];
+
+        try {
+
+          if ( fs.existsSync( strPath ) ) {
+
+            await JobQueueManager._scan( strPath,
+                                         params,
+                                         logger );
+
+          }
+
+        }
+        catch ( error ) {
+
+          const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+          sourcePosition.method = this.name + "." + this.create.name;
+
+          const strMark = "B6B0D571794B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+          debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( "Catched on: %O", sourcePosition );
+
+          error.mark = strMark;
+          error.logId = SystemUtilities.getUUIDv4();
+
+          if ( logger && typeof logger.error === "function" ) {
+
+            error.catchedOn = sourcePosition;
+            logger.error( error );
+
+          }
+
+        }
+
+      }
+
 
     }
     catch ( error ) {
@@ -144,7 +193,7 @@ export default class JobQueueManager {
 
       sourcePosition.method = this.name + "." + this.create.name;
 
-      const strMark = "5B41B4AB9161" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "50359D84152E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
