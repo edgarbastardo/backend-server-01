@@ -3852,9 +3852,9 @@ export default class BinaryServiceController extends BaseService {
 
   }
 
-  static async uploadBinaryData( request: Request,
-                                 transaction: any,
-                                 logger: any ):Promise<any> {
+  static async uploadRegularBinaryData( request: Request,
+                                        transaction: any,
+                                        logger: any ): Promise<any> {
 
     let result = null;
 
@@ -3876,7 +3876,7 @@ export default class BinaryServiceController extends BaseService {
 
       let debugMark = debug.extend( '9B7197376B5B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "uploadBinaryData" );
+      debugMark( "uploadRegularBinaryData" );
 
       const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
@@ -4367,7 +4367,7 @@ export default class BinaryServiceController extends BaseService {
         else {
 
           const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
-                                                                                               logger );
+                                                                                                         logger );
 
           result = {
                      StatusCode: 413, //Request Entity Too Large
@@ -4439,7 +4439,7 @@ export default class BinaryServiceController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.uploadBinaryData.name;
+      sourcePosition.method = this.name + "." + this.uploadRegularBinaryData.name;
 
       const strMark = "763DC880AD6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -4492,6 +4492,279 @@ export default class BinaryServiceController extends BaseService {
         }
 
       }
+
+    }
+
+    return result;
+
+  }
+
+  static async uploadOtherBinaryData( request: Request,
+                                      transaction: any,
+                                      logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      //const userSessionStatus = context.UserSessionStatus;
+
+      strLanguage = context.Language;
+
+      let debugMark = debug.extend( "E1E3CA5B40A6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "uploadOtherBinaryData" );
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      if ( request.files &&
+           Object.keys( request.files ).length > 0 ) {
+
+        let uploadedFile = null;
+
+        uploadedFile = request.files.File;
+
+        if ( uploadedFile.truncated === false ) {
+
+          //ANCHOR BinaryData BasePath
+          let strRelativePath = "";
+
+          let strBasePath = "temp/";
+
+          let strPrefix = "temp-";
+
+          if ( request.body.UploadTo === "job" ) {
+
+            strBasePath = "jobs/data/";
+
+            strPrefix = "job-";
+
+          }
+          else if ( request.body.UploadTo === "task" ) {
+
+            strBasePath = "tasks/data/";
+
+            strPrefix = "task-";
+
+          }
+
+          const strFullPath = path.join( SystemUtilities.strBaseRootPath,
+                                         strBasePath,
+                                         strRelativePath );
+
+          debugMark( "Put binary data file in folder [%s]", strFullPath );
+
+          if ( logger &&
+               typeof logger.info === "function" ) {
+
+            logger.info( "Put binary data file in folder [%s]", strFullPath );
+
+          }
+
+          const fileDetectedType = SystemUtilities.getMimeType( uploadedFile.tempFilePath,
+                                                                uploadedFile.mimetype,
+                                                                logger );
+
+          let strId = request.body.Id || SystemUtilities.getUUIDv4();
+
+          debugMark( "Moving file" );
+
+          const strFinalPath = strFullPath + strPrefix + strId + "/";
+
+          fs.mkdirSync( strFinalPath, { recursive: true } );
+
+          await uploadedFile.mv( strFinalPath + strPrefix + strId + "." + fileDetectedType.ext + ".data" );
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_BINARY_DATA_UPLOAD',
+                     Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
+                     Mark: 'AF4FE8CB700E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             {
+                               Id: strPrefix + strId,
+                               Path: strFinalPath + strPrefix + strId + "." + fileDetectedType.ext + ".data"
+                             }
+                           ]
+                   };
+
+        }
+        else {
+
+          const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
+                                                                                                         logger );
+
+          result = {
+                     StatusCode: 413, //Request Entity Too Large
+                     Code: 'ERROR_FILE_TOO_BIG',
+                     Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
+                     Mark: '288FCEE65C27' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_FILE_TOO_BIG',
+                                 Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
+                                 Details: {
+                                            Maximum: intBinaryDataMaximumSize / 1024,
+                                            Unit: "kilobytes"
+                                          }
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_NOT_FILE_UPLOADED',
+                   Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
+                   Mark: '4ED8443CDF85' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_NOT_FILE_UPLOADED',
+                               Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.uploadOtherBinaryData.name;
+
+      const strMark = "8845B0594200" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async uploadBinaryData( request: Request,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
+
+    let result = null;
+
+    if ( !request.body.UploadTo || request.body.UploadTo === "regular" ) {
+
+      result = await BinaryServiceController.uploadRegularBinaryData( request,
+                                                                      transaction,
+                                                                      logger );
+
+    }
+    else {
+
+      result = await BinaryServiceController.uploadOtherBinaryData( request,
+                                                                    transaction,
+                                                                    logger );
 
     }
 

@@ -13,18 +13,17 @@ export default class BusinessQueries {
 
     //Here the common business queries
 
-    //Example
     /*
     if ( strDialect === "mysql" ) {
 
-      if ( strName === "getConfigValueData" ) {
+      if ( strName === "getEstablishments" ) {
 
-        strResult = SqlString.format( `Select A.Default, B.Value From ConfigMetaData As A Left Outer Join ConfigValueData As B On B.ConfigMetaDataId = A.Id Where ( A.Id = ? And ( B.Owner Is Null Or B.Owner = ? ) )`, [ params.ConfigMetaDataId, params.Owner ] );
+        strResult = `select b.id, first_name,phone, a.email as user, address, zone, b.email as email, b.email1 as additionalemail, driversfijos as onsite from users as a inner join establishments as b on a.id=b.user_id where a.deleted_at is null order by first_name;`;
 
       }
-      else if ( strName === "getOldUserSessionStatus" ) {
+      else if ( strName === "updateOrderTip" ) {
 
-        strResult = SqlString.format( `Select * From UserSessionStatus As A Where ( A.UserId = ? ) And A.LoggedOutAt Is Null Order By A.UpdatedAt Asc`, params.UserId );
+        strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set Tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
 
       }
 
