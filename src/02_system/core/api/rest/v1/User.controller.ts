@@ -69,7 +69,6 @@ export default class UserController {
   static readonly _BASE_PATH = "/v1/system/user";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: UserController._BASE_PATH + "/actions", Action: "v1.system.user.actions.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the actions allowed" },
                                   { Path: UserController._BASE_PATH + "/signup", Action: "v1.system.user.signup", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account" },
                                   { Path: UserController._BASE_PATH + "/signup/activate", Action: "v1.system.user.signup.activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
                                   { Path: UserController._BASE_PATH + "/password/recover/code/send", Action: "v1.system.user.password.recover.code.send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
@@ -94,6 +93,7 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/settings", Action: "v1.system.user.settings.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/settings", Action: "v1.system.user.settings.set", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set settings for the current user" },
                                   { Path: UserController._BASE_PATH + "/routes", Action: "v1.system.user.routes.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
+                                  { Path: UserController._BASE_PATH + "/actions", Action: "v1.system.user.actions.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the actions allowed" },
                                   { Path: UserController._BASE_PATH + "/device", Action: "v1.system.user.device.register", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
                                   { Path: UserController._BASE_PATH + "/device", Action: "v1.system.user.device.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
                                   { Path: UserController._BASE_PATH + "/push/message/test", Action: "v1.system.user.push.message.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send push test message" },

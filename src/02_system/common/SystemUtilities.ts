@@ -1047,7 +1047,7 @@ export default class SystemUtilities {
                                                                logger );
 
       }
-      else {
+      else if ( result ) {
 
         result.IsValid = false;
 
