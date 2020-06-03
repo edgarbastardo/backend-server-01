@@ -51,7 +51,7 @@ export default class Dev000Controller {
   static readonly _BASE_PATH = "/v1/business/dev000/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev000Controller._BASE_PATH + "/", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev000Controller._BASE_PATH + "/", Action: "v1.business.dev000.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -69,13 +69,14 @@ export default class Dev000Controller {
       for ( let routeInfo of Dev000Controller._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                        routeInfo.RequestKind,
-                                                        routeInfo.Path, //Path
-                                                        routeInfo.AllowTagAccess,
-                                                        routeInfo.Roles as any,
-                                                        routeInfo.Description,
-                                                        null,
-                                                        logger );
+                                                           routeInfo.RequestKind,
+                                                           routeInfo.Path, //Path
+                                                           routeInfo.Action,
+                                                           routeInfo.AllowTagAccess,
+                                                           routeInfo.Roles as any,
+                                                           routeInfo.Description,
+                                                           null,
+                                                           logger );
 
       }
 

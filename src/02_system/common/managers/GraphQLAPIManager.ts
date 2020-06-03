@@ -121,13 +121,14 @@ export default class GraphQLAPIManager {
               await CommonUtilities.asyncForEach( Object.keys( obj.roles ) as any, async ( strResolverName: string, intIndex: number ) => {
 
                 await SYSRouteService.createOrUpdateRouteAndRoles( obj.roles[ strResolverName ].AccessKind,
-                                                                2, //Post
-                                                                strResolverName, //Path
-                                                                obj.roles[ strResolverName ].AllowTagAccess,
-                                                                obj.roles[ strResolverName ].Roles,
-                                                                obj.roles[ strResolverName ].Description,
-                                                                null,
-                                                                logger );
+                                                                   2, //Post
+                                                                   strResolverName, //Path
+                                                                   obj.roles[ strResolverName ].Action,
+                                                                   obj.roles[ strResolverName ].AllowTagAccess,
+                                                                   obj.roles[ strResolverName ].Roles,
+                                                                   obj.roles[ strResolverName ].Description,
+                                                                   null,
+                                                                   logger );
 
               });
 

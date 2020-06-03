@@ -3910,12 +3910,12 @@ export default class UserOthersServiceController {
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bProfileOfAnotherUser = false;
-
       let strAuthorization = context.Authorization;
 
-      if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
-           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+      let bProfileOfAnotherUser = false;
+
+      if ( userSessionStatus.Role.includes( "#Administrator#" ) ||
+           userSessionStatus.Role.includes( "#BManagerL99#" ) ) {
 
         if ( request.query.shortToken ) {
 
@@ -4002,6 +4002,9 @@ export default class UserOthersServiceController {
 
         if ( routes ) {
 
+          intCount = Object.keys( routes ).length;
+
+          /*
           if ( request.query.format === "1" ) {
 
             intCount = routes.length;
@@ -4009,9 +4012,9 @@ export default class UserOthersServiceController {
           }
           else {
 
-            intCount = Object.keys( routes ).length;
 
           }
+          */
 
         }
 
@@ -4057,6 +4060,234 @@ export default class UserOthersServiceController {
       sourcePosition.method = this.name + "." + this.getRoutes.name;
 
       const strMark = "41C94BFA2E31" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getActions( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let strAuthorization = context.Authorization;
+
+      let bProfileOfAnotherUser = false;
+
+      if ( userSessionStatus &&
+           ( userSessionStatus.Role.includes( "#Administrator#" ) ||
+             userSessionStatus.Role.includes( "#BManagerL99#" ) ) ) {
+
+        if ( request.query.shortToken ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
+
+          strAuthorization = request.query.shortToken;
+
+        }
+        else if ( request.query.token ) {
+
+          bProfileOfAnotherUser = true;
+
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+                                                                                             currentTransaction,
+                                                                                             logger );
+
+          strAuthorization = request.query.token;
+
+        }
+
+      }
+
+      if ( bProfileOfAnotherUser &&
+           userSessionStatus === null ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: '67BBAF7CF958' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( bProfileOfAnotherUser &&
+                userSessionStatus instanceof Error ) {
+
+        const error = userSessionStatus;
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
+                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                   Mark: '8A28319A3F79' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        let routes = await SYSRoleHasRouteService.listActionsOfRoles( userSessionStatus ? userSessionStatus.Role: "#Public#",
+                                                                      context.FrontendId,
+                                                                      request.query.format,
+                                                                      currentTransaction,
+                                                                      logger );
+
+        let intCount = 0;
+
+        if ( routes ) {
+
+          intCount = Object.keys( routes ).length;
+
+        }
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_GET_ACTIONS',
+                   Message: await I18NManager.translate( strLanguage, 'Success get actions' ),
+                   Mark: '5F755F2C8169' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: intCount,
+                   Data: [ routes ]
+                 }
+
+        bApplyTransaction = true;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getActions.name;
+
+      const strMark = "2A8E754AB2A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

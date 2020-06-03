@@ -24,9 +24,9 @@ export const permissions = {
 
 export const roles = {
 
-  loginV1: { AccessKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },
-  logoutV1: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Made the authentication token invalid" },
-  tokenCheckV1: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Check if authentication token is valid" }
+  loginV1: { AccessKind: 1, AllowTagAccess: "#Public#", Action: "graphql.loginV1", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },
+  logoutV1: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Action: "graphql.logoutV1", Roles: [ "Authenticated" ], Description: "Made the authentication token invalid" },
+  tokenCheckV1: { AccessKind: 2, AllowTagAccess: "#Authenticated#", Action: "graphql.tokenCheckV1", Roles: [ "Authenticated" ], Description: "Check if authentication token is valid" }
 
 }
 

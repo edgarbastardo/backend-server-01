@@ -51,9 +51,11 @@ export default class AuthenticationController {
   static readonly _BASE_PATH = "/v1/system/security/authentication";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: AuthenticationController._BASE_PATH + "/login", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },
-                                  { Path: AuthenticationController._BASE_PATH + "/logout", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Made the authentication token invalid" },
-                                  { Path: AuthenticationController._BASE_PATH + "/token/check", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Check if authentication token is valid" }
+                                  { Path: AuthenticationController._BASE_PATH + "/login", Action: "v1.system.auth.login", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create a new authentication token using credentials" },
+                                  //{ Path: AuthenticationController._BASE_PATH + "/login/google", Action: "v1.system.auth.login.google", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using google account" },
+                                  //{ Path: AuthenticationController._BASE_PATH + "/login/facebook", Action: "v1.system.auth.login.facebook", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using facebook account" },
+                                  { Path: AuthenticationController._BASE_PATH + "/logout", Action: "v1.system.auth.logout", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Made the authentication token invalid" },
+                                  { Path: AuthenticationController._BASE_PATH + "/token/check", Action: "v1.system.auth.token.check", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Check if authentication token is valid" }
                                 ]
 
   _controllerLogger = null;
@@ -80,6 +82,7 @@ export default class AuthenticationController {
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
                                                            routeInfo.Path, //Path
+                                                           routeInfo.Action,
                                                            routeInfo.AllowTagAccess,
                                                            routeInfo.Roles as any,
                                                            routeInfo.Description,
@@ -119,7 +122,8 @@ export default class AuthenticationController {
 
   @httpPost(
              "/login",
-             MiddlewareManager.middlewareSetContext
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareClearIsNotValidSession
            )
   async login( request: Request, response: Response ) {
 

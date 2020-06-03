@@ -307,6 +307,7 @@ CREATE TABLE IF NOT EXISTS `sysRoute` (
   `AccessKind` tinyint(3) unsigned DEFAULT NULL COMMENT '1=Public, 2=Authenticated, 3=Role',
   `RequestKind` tinyint(3) unsigned DEFAULT NULL COMMENT '0=None, 1=Get, 2=Post, 3=Put, 4=Delete',
   `Path` varchar(2048) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Route path',
+  `Action` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Action shortcut',
   `AllowTagAccess` varchar(2048) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Default access tag list split by , and sourrounded by # to allow access this route\nExample:\n#Administrator#,#Asistant_2#',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
   `Description` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A description of the route and what supposed to do',
@@ -317,7 +318,8 @@ CREATE TABLE IF NOT EXISTS `sysRoute` (
   `DisabledBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user disabled the row.',
   `DisabledAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Disable Date and time of the row.',
   `ExtraData` json NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UNQ_sysRoute_Action_idx` (`Action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store all routes in the backend';
 
 CREATE TABLE IF NOT EXISTS `sysRole` (
