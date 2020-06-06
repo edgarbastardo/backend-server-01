@@ -10,7 +10,7 @@ install_distribution/
 .env.log
 .env.secrets
 test/standalone/result/dsistemas01/
-jobs/data/job-*
-jobs/result/job-*
-tasks/data/task-*
-tasks/result/task-*
+jobs/input/job-*
+jobs/output/job-*
+tasks/input/task-*
+tasks/output/task-*
