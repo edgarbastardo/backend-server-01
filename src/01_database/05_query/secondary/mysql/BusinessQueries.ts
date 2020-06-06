@@ -13,7 +13,6 @@ export default class BusinessQueries {
 
     //Here the common business queries
 
-    /*
     if ( strDialect === "mysql" ) {
 
       if ( strName === "getEstablishments" ) {
@@ -28,7 +27,6 @@ export default class BusinessQueries {
       }
 
     }
-    */
 
     return strResult;
 
