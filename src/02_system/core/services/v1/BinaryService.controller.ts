@@ -4553,14 +4553,14 @@ export default class BinaryServiceController extends BaseService {
 
           if ( request.body.UploadTo === "job" ) {
 
-            strBasePath = "jobs/data/";
+            strBasePath = "jobs/input/";
 
             strPrefix = "job-";
 
           }
           else if ( request.body.UploadTo === "task" ) {
 
-            strBasePath = "tasks/data/";
+            strBasePath = "tasks/input/";
 
             strPrefix = "task-";
 
