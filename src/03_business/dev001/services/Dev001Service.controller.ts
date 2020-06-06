@@ -2,6 +2,8 @@
 import cluster from 'cluster';
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
+import path from 'path';
+import fs from 'fs'; //Load the filesystem module
 
 import {
   Request,
@@ -282,6 +284,7 @@ export default class Dev001ServicesController extends BaseService {
                                                   EstablishmentId: request.body.EstablishmentId,
                                                   Date: request.body.Date,
                                                   Path: request.body.Path,
+                                                  Language: strLanguage
                                                 },
                                                 {
                                                   jobId: request.body.Id
@@ -434,7 +437,7 @@ export default class Dev001ServicesController extends BaseService {
                  Warnings: [],
                  Count: 0,
                  Data: []
-                };
+               };
 
       /*
       if ( currentTransaction !== null &&
@@ -472,7 +475,80 @@ export default class Dev001ServicesController extends BaseService {
 
       strLanguage = context.Language;
 
-      //
+      if ( request.body.Id ) {
+
+        const strResultJobPath = path.join( SystemUtilities.strBaseRootPath, "jobs/result/" + request.body.Id + "/" );
+
+        const strResultJobFile = strResultJobPath + request.body.Id + ".result";
+
+        if ( fs.existsSync( strResultJobFile ) ) {
+
+          const resultContent = fs.readFileSync( strResultJobFile );
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: 'SUCCESS_GET_JOB_RESULT',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess get job result' ),
+                     Mark: 'F9C63B69C3FF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             {
+                               Result: resultContent
+                             }
+                           ]
+                   };
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Bad request
+                     Code: 'ERROR_JOB_ID_NOT_FOUND',
+                     Message: await I18NManager.translate( strLanguage, 'The job with id not found' ),
+                     Mark: '555DD8D4C4B8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_JOB_ID_NOT_FOUND',
+                                 Message: await I18NManager.translate( strLanguage, 'The job with id not found' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_FIELD_ID_MISSING',
+                   Message: await I18NManager.translate( strLanguage, 'The field id is missing' ),
+                   Mark: '5AA705EE0690' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_FIELD_ID_MISSING',
+                               Message: await I18NManager.translate( strLanguage, 'The field is is missing' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
 
     }
     catch ( error ) {
