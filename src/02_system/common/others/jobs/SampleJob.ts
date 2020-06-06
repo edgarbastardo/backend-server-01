@@ -95,7 +95,7 @@ export default class SampleJob {
 
         if ( process.env.WORKER_KIND === "job_worker_process" ) {
 
-          this.sampleJobQueue.process( ( jobData: any, done: any ) => {
+          this.sampleJobQueue.process( ( job: any, done: any ) => {
 
             //if ( SampleJob.completedJobs.includes( jobData.id ) === false ) {
 
@@ -103,8 +103,8 @@ export default class SampleJob {
 
               debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
               //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
-              debugMark( "JOB token: [%s]", jobData.queue.token );
-              debugMark( "JOB id: [%s]", jobData.id );
+              debugMark( "JOB token: [%s]", job.queue.token );
+              debugMark( "JOB id: [%s]", job.id );
 
               // n iterations before giving someone else a turn
               for ( let i = 1; i <= 35; i++ ) {
@@ -116,8 +116,8 @@ export default class SampleJob {
               }
 
               debugMark( "Finish time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-              debugMark( "%O", jobData.data );
-              jobData.data[ "completed" ] = true;
+              debugMark( "%O", job.data );
+              job.data[ "completed" ] = true;
 
               //await this.sampleJobQueue.removeRepeatable( this.Name, jobData.opts );
               //SampleJob.completedJobs.push( jobData.id );

@@ -255,6 +255,8 @@ export default class JobQueueManager {
 
         }
 
+        bResult = true;
+
       }
       else {
 
