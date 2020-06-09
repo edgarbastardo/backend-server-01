@@ -22,7 +22,7 @@ export default class BusinessQueries {
       }
       else if ( strName === "updateOrderTip" ) {
 
-        strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set Tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
+        strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
 
       }
 

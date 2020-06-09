@@ -475,20 +475,49 @@ export default class Dev001ServicesController extends BaseService {
 
       strLanguage = context.Language;
 
-      if ( request.body.Id ) {
+      if ( request.query.Id ) {
 
-        const strResultJobPath = path.join( SystemUtilities.strBaseRootPath, "jobs/result/" + request.body.Id + "/" );
+        const strOutputJobPath = path.join( SystemUtilities.strBaseRootPath, "jobs/output/" + request.query.Id + "/" );
 
-        const strResultJobFile = strResultJobPath + request.body.Id + ".result";
+        let strOutputJobFile = "";
 
-        if ( fs.existsSync( strResultJobFile ) ) {
+        if ( request.query.Output === "result" ) {
 
-          const resultContent = fs.readFileSync( strResultJobFile );
+          strOutputJobFile = strOutputJobPath + request.query.Id + ".result";
+
+        }
+        else {
+
+          strOutputJobFile = strOutputJobPath + request.query.Id + ".status";
+
+        }
+
+        if ( fs.existsSync( strOutputJobFile ) ) {
+
+          const outputContent = fs.readFileSync( strOutputJobFile, "utf8" );
+
+          const debugMark = debug.extend( '6BD49AF2E6BE' );
+
+          debugMark( "Result: [%s]", outputContent );
+
+          let jsonStatusJob = CommonUtilities.parseJSON( outputContent, logger );
+
+          if ( !jsonStatusJob ||
+               Object.keys( jsonStatusJob ).length === 0 ) {
+
+            jsonStatusJob = {
+                              Progress: 0,
+                              Total: -1,
+                              Kind: "",
+                              Status: ""
+                            };
+
+          }
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_GET_JOB_RESULT',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess get job result' ),
+                     Code: 'SUCCESS_GET_JOB_OUTPUT',
+                     Message: await I18NManager.translate( strLanguage, 'Sucess get job output' ),
                      Mark: 'F9C63B69C3FF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -496,9 +525,7 @@ export default class Dev001ServicesController extends BaseService {
                      Warnings: [],
                      Count: 1,
                      Data: [
-                             {
-                               Result: resultContent
-                             }
+                             jsonStatusJob
                            ]
                    };
 

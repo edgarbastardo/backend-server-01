@@ -53,7 +53,7 @@ export default class Dev001Controller {
   static readonly _ROUTE_INFO = [
                                   { Path: Dev001Controller._BASE_PATH + "/establishment", Action: "v1.business.dev001.odin.establishment", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment list" },
                                   { Path: Dev001Controller._BASE_PATH + "/order/tip", Action: "v1.business.dev001.odin.order.tip.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Start the job to update order tip" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip", Action: "v1.business.dev001.odin.order.tip.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get status of the job order tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip", Action: "v1.business.dev001.odin.order.tip.output", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get status of the job order tip" },
                                 ]
 
   _controllerLogger = null;
