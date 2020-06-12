@@ -69,6 +69,7 @@ export default class ApplicationServerDataManager {
       app.use( express.json() );
       app.use( express.urlencoded( { extended: false } ) );
       app.use( cors() );
+      app.options( '*', cors() );
       app.use( compression() );
       app.use( helmet() );
       app.use( fileUpload(
