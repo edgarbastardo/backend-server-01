@@ -289,6 +289,12 @@ export default class I18NManager {
 
       strResult = this._translations[ strLanguage ] ? this._translations[ strLanguage ][ strSentence ] : strSentence;
 
+      if ( !strResult ) {
+
+        strResult = strSentence;
+
+      }
+
       if ( param &&
            param.length > 0 ) {
 
