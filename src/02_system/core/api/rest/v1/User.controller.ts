@@ -41,7 +41,7 @@ import UserUpdateServiceController from '../../../services/v1/UserUpdateService.
 import UserDeleteServiceController from '../../../services/v1/UserDeleteService.controller';
 import UserBulkServiceController from '../../../services/v1/UserBulkService.controller';
 import UserPasswordServiceController from '../../../services/v1/UserPasswordService.controller';
-import UserSignupServiceController from '../../../services/v1/UserSingupService.controller';
+import UserSignupServiceController from '../../../services/v1/UserSignupService.controller';
 import UserEMailServiceController from '../../../services/v1/UserEMailService.controller';
 import UserPhoneServiceController from '../../../services/v1/UserPhoneService.controller';
 import UserDeviceServiceController from '../../../services/v1/UserDeviceService.controller';
@@ -70,6 +70,9 @@ export default class UserController {
 
   static readonly _ROUTE_INFO = [
                                   { Path: UserController._BASE_PATH + "/signup", Action: "v1.system.user.signup", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account" },
+                                  { Path: UserController._BASE_PATH + "/signup/google", Action: "v1.system.user.signup.google", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using google account" },
+                                  { Path: UserController._BASE_PATH + "/signup/facebook", Action: "v1.system.user.signup.facebook", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using facebook account" },
+                                  { Path: UserController._BASE_PATH + "/signup/instagram", Action: "v1.system.user.signup.instagram", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using instagram account" },
                                   { Path: UserController._BASE_PATH + "/signup/activate", Action: "v1.system.user.signup.activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
                                   { Path: UserController._BASE_PATH + "/password/recover/code/send", Action: "v1.system.user.password.recover.code.send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
                                   { Path: UserController._BASE_PATH + "/password/recover", Action: "v1.system.user.password.recover", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the password recover code" },
@@ -292,6 +295,57 @@ export default class UserController {
     const result = await UserSignupServiceController.signup( request,
                                                              null,
                                                              this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/signup/google",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareClearIsNotValidSession
+           )
+  async signupGoogle( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserSignupServiceController.signupGoogle( request,
+                                                                   null,
+                                                                   this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/signup/facebook",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareClearIsNotValidSession
+           )
+  async signupFacebook( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserSignupServiceController.signupFacebook( request,
+                                                                     null,
+                                                                     this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/signup/instagram",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareClearIsNotValidSession
+           )
+  async signupInstagram( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserSignupServiceController.signupInstagram( request,
+                                                                      null,
+                                                                      this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 

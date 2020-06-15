@@ -10,6 +10,7 @@ import {
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
+         Unique
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
@@ -38,6 +39,7 @@ export class SYSPerson extends Model<SYSPerson> {
 
   }
 
+  @Unique
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
