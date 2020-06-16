@@ -19,6 +19,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": "Select Id From sysUser Limit 1"
       }
     },
     "test": {
@@ -36,6 +39,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": "Select Id From sysUser Limit 1"
       }
     },
     "prod": {
@@ -53,6 +59,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": "Select Id From sysUser Limit 1"
       }
     }
   },
@@ -76,6 +85,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     },
     "test": {
@@ -93,6 +105,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     },
     "prod": {
@@ -110,6 +125,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     }
   },
@@ -133,6 +151,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     },
     "test": {
@@ -150,6 +171,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     },
     "prod": {
@@ -167,6 +191,9 @@
       },
       "migration": {
         "createDatabase": "CREATE SCHEMA IF NOT EXISTS `@__database__@` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+      },
+      "health": {
+        "check": ""
       }
     }
   }

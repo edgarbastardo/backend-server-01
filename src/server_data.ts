@@ -17,7 +17,7 @@ import SystemUtilities from "./02_system/common/SystemUtilities";
 import LoggerManager from "./02_system/common/managers/LoggerManager";
 import ApplicationServerDataManager from './02_system/common/managers/ApplicationServerDataManager';
 import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
-import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
+import DBConnectionManager from "./02_system/common/managers/DBConnectionManager";
 import CacheManager from './02_system/common/managers/CacheManager';
 import ModelServiceManager from "./02_system/common/managers/ModelServiceManager";
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
@@ -854,6 +854,70 @@ export default async function main() {
                                                "SystemEvent",
                                                handlerListenOnTopic,
                                                LoggerManager.mainLoggerInstance );
+
+      //Check the health of database connections
+      let intCheckHealthDBConnectionsInterval = parseInt( process.env.CHECK_HEALTH_DB_CONNECTIONS_INTERVAL );
+
+      if ( intCheckHealthDBConnectionsInterval > 0 ) {
+
+        let debugMark = debug.extend( "2D9ECE8898D9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+        debugMark( `Checking health of database connections every %s seconds`, intCheckHealthDBConnectionsInterval / 1000 );
+
+        setInterval( async () => {
+
+          debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+          debugMark( `Checking health of database connections` );
+
+          if ( await DBConnectionManager.checkHealthOfConnections( "*", LoggerManager.mainLoggerInstance ) === false ) {
+
+            debugMark( `Check of health of database connections failed. Aborting main process execution.` );
+
+            await NotificationManager.publishToExternal(
+                                                        {
+                                                          body: {
+                                                                  kind: "error",
+                                                                  text: "Check of health of database connections failed. Aborting main process execution.",
+                                                                  fields: [
+                                                                            {
+                                                                              title: "Date",
+                                                                              value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                              short: false
+                                                                            },
+                                                                            {
+                                                                              title: "Host",
+                                                                              value: SystemUtilities.getHostName(),
+                                                                              short: false
+                                                                            },
+                                                                            {
+                                                                              title: "Application",
+                                                                              value: process.env.APP_SERVER_DATA_NAME,
+                                                                              short: false
+                                                                            },
+                                                                            {
+                                                                              title: "Running from",
+                                                                              value: SystemUtilities.strBaseRunPath,
+                                                                              short: false
+                                                                            }
+                                                                          ],
+                                                                    footer: "2D9ECE8898D9",
+                                                                }
+                                                        },
+                                                        LoggerManager.mainLoggerInstance
+                                                      );
+
+            process.abort();
+
+          }
+          else {
+
+            debugMark( `Checking health of database connections success.` );
+
+          }
+
+        }, intCheckHealthDBConnectionsInterval );
+
+      }
 
     }
     else if ( process.env.WORKER_KIND === "http_worker_process" ) {
