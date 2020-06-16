@@ -157,7 +157,7 @@ export default class UserCreateServiceController {
                  !request.body.sysUserGroup.Name ) {
 
               if ( userSessionStatus.Role &&
-                   userSessionStatus.Role.includes( "#MasterL01#" ) &&
+                   userSessionStatus.Role.includes( "#Master_L01#" ) &&
                    request.body.sysUserGroup.Create === false ) {
 
                 request.body.sysUserGroup.Name = userSessionStatus.UserGroupName; //Create the user in the same group

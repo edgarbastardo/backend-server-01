@@ -53,7 +53,7 @@ export default class SystemRuleCheckKindMessage {
       }
 
       if ( !userSessionStatus.Role.includes( "#Administrator#" ) &&
-           !userSessionStatus.Role.includes( "#BManagerL99#" ) &&
+           !userSessionStatus.Role.includes( "#BManager_L99#" ) &&
            jsonMessage.Kind !== "simpleMessage" ) {
 
         result.IsError = true;

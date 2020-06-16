@@ -775,13 +775,21 @@ export default class CommonUtilities {
 
   }
 
-  static clearSpecialChars( data: string, strSpecialChars = `!@#$^&%*()+=-[]\/\\{}|:<>?,."'_` ):string {
+  static clearSpecialChars( data: string, strSpecialChars = `!@#$^&%*()+=-[]\/\\{}|:<>?,."'_` ): string {
 
     let result = data;
 
-    for ( let i = 0; i < strSpecialChars.length; i++ ) {
+    try {
 
-      result = result.replace( new RegExp( "\\" + strSpecialChars[ i ], "gi" ), "" );
+      for ( let i = 0; i < strSpecialChars.length; i++ ) {
+
+        result = result.replace( new RegExp( "\\" + strSpecialChars[ i ], "gi" ), "" );
+
+      }
+
+    }
+    catch ( error ) {
+
 
     }
 
@@ -793,17 +801,25 @@ export default class CommonUtilities {
 
     let s: string = src; //"À,Á,Â,Ä,È,É,Ê,Ë,Ì,Í,Î,Ï,Ò,Ó,Ô,Ö,Ù,Ú,Û,Ü,à,á,â,ä,è,é,ê,ë,ì,í,î,ï,ò,ó,ô,ö,ù,ú,û,ü";
 
-    s = s.replace( new RegExp( "[àáâä]", "g" ), "a" );
-    s = s.replace( new RegExp( "[èéêë]", "g" ), "e" );
-    s = s.replace( new RegExp( "[ìíîï]", "g" ), "i" );
-    s = s.replace( new RegExp( "[òóôö]", "g" ), "o" );
-    s = s.replace( new RegExp( "[ùúûü]", "g" ), "u" );
+    try {
 
-    s = s.replace( new RegExp( "[ÀÁÂÄ]", "g" ), "A" );
-    s = s.replace( new RegExp( "[ÈÉÊË]", "g" ), "E" );
-    s = s.replace( new RegExp( "[ÌÍÎÏ]", "g" ), "I" );
-    s = s.replace( new RegExp( "[ÒÓÔÖ]", "g" ), "O" );
-    s = s.replace( new RegExp( "[ÙÚÛÜ]", "g" ), "U" );
+      s = s.replace( new RegExp( "[àáâä]", "g" ), "a" );
+      s = s.replace( new RegExp( "[èéêë]", "g" ), "e" );
+      s = s.replace( new RegExp( "[ìíîï]", "g" ), "i" );
+      s = s.replace( new RegExp( "[òóôö]", "g" ), "o" );
+      s = s.replace( new RegExp( "[ùúûü]", "g" ), "u" );
+
+      s = s.replace( new RegExp( "[ÀÁÂÄ]", "g" ), "A" );
+      s = s.replace( new RegExp( "[ÈÉÊË]", "g" ), "E" );
+      s = s.replace( new RegExp( "[ÌÍÎÏ]", "g" ), "I" );
+      s = s.replace( new RegExp( "[ÒÓÔÖ]", "g" ), "O" );
+      s = s.replace( new RegExp( "[ÙÚÛÜ]", "g" ), "U" );
+
+    }
+    catch ( error ) {
+
+
+    }
 
     return s;
 
