@@ -1,6 +1,8 @@
 import cluster from 'cluster';
 import { Socket } from "net";
 
+import fetch from 'node-fetch';
+
 import {
   Request,
   //json,
@@ -32,9 +34,11 @@ export default class UserSingupServiceController {
 
   static readonly _ID = "UserSingupServiceController";
 
-  static async signup( request: Request,
-                       transaction: any,
-                       logger: any ): Promise<any> {
+  static async genericSignup( request: Request,
+                              signupOptions: any,
+                              signupData: any,
+                              transaction: any,
+                              logger: any ): Promise<any> {
 
     let result = null;
 
@@ -67,20 +71,20 @@ export default class UserSingupServiceController {
         }
 
         const bFrontendIdIsAllowed = await UserOthersServiceController.getFrontendIdIsAllowed( context.FrontendId,
-                                                                                               request.body.Kind,
+                                                                                               signupData.Kind,
                                                                                                currentTransaction,
                                                                                                logger ) >= 0;
 
         if ( bFrontendIdIsAllowed ) {
 
-          const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( request.body.Kind,
+          const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( signupData.Kind,
                                                                                               currentTransaction,
                                                                                               logger );
 
           if ( signupProcessData &&
-              signupProcessData.group &&
-              signupProcessData.group.trim() !== "" &&
-              signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+               signupProcessData.group &&
+               signupProcessData.group.trim() !== "" &&
+               signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
             let rules = {
                           Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
@@ -90,18 +94,19 @@ export default class UserSingupServiceController {
                           LastName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
                         };
 
-            const validator = SystemUtilities.createCustomValidatorSync( request.body,
+            const validator = SystemUtilities.createCustomValidatorSync( signupData,
                                                                          rules,
                                                                          null,
                                                                          logger );
 
-            if ( validator.passes() ) { //ANCHOR Validate request.body field values
+            if ( signupOptions.validateSignupData === false ||
+                 validator.passes() ) { //ANCHOR Validate request.body field values
 
               const checkFieldValueResults = {};
 
-              if ( request.body.Name.includes( "@system.net" ) ) {
+              if ( signupData.Name.includes( "@system.net" ) ) {
 
-                checkFieldValueResults[ "Name" ] = await I18NManager.translate( strLanguage, 'The user name %s is invalid', request.body.Name );
+                checkFieldValueResults[ "Name" ] = await I18NManager.translate( strLanguage, 'The user name %s is invalid', signupData.Name );
 
               }
 
@@ -116,7 +121,7 @@ export default class UserSingupServiceController {
                 }
                 else {
 
-                  strTag = !signupProcessData.passwordParameterTag ? "#" + request.body.Name + "#" : "";
+                  strTag = !signupProcessData.passwordParameterTag ? "#" + signupData.Name + "#" : "";
 
                 }
 
@@ -128,28 +133,29 @@ export default class UserSingupServiceController {
                                                                                                                         logger );
 
                 const checkPasswordStrengthResult = await SecurityServiceController.checkPasswordStrength( passwordStrengthParameters,
-                                                                                                           request.body.Password,
+                                                                                                           signupData.Password,
                                                                                                            logger );
-                if ( checkPasswordStrengthResult.code === 1 ) {
+                if ( signupOptions.checkPasswordStrength ||
+                     checkPasswordStrengthResult.code === 1 ) {
 
-                  const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                  const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : signupData.Name,
                                                                                         currentTransaction,
                                                                                         logger );
 
                   if ( signupProcessData.createGroup === false &&
-                      bUserGroupExists === false ) {
+                       bUserGroupExists === false ) {
 
                     result = {
                                StatusCode: 404, //Not found
                                Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, request.body.Kind ),
+                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, signupData.Kind ),
                                Mark: '49EEF768004F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, request.body.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -165,14 +171,14 @@ export default class UserSingupServiceController {
                     result = {
                                StatusCode: 400, //Bad request
                                Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
+                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, signupData.Kind ),
                                Mark: '3BAC1FA1D2A2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, request.body.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -183,21 +189,21 @@ export default class UserSingupServiceController {
 
                   }
                   else if ( bUserGroupExists &&
-                            await SYSUserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                            await SYSUserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : signupData.Name,
                                                                            currentTransaction,
                                                                            logger ) ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, signupData.Kind ),
                                Mark: '88C3AE24AB5E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_USER_GROUP_DISABLED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -208,21 +214,21 @@ export default class UserSingupServiceController {
 
                   }
                   else if ( bUserGroupExists &&
-                            await SYSUserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : request.body.Name,
+                            await SYSUserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : signupData.Name,
                                                                           currentTransaction,
                                                                           logger ) ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, signupData.Kind ),
                                Mark: '53EC3D039492' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_USER_GROUP_EXPIRED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, request.body.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -232,21 +238,21 @@ export default class UserSingupServiceController {
                              }
 
                   }
-                  else if ( await SYSUserService.checkExistsByName( request.body.Name,
+                  else if ( await SYSUserService.checkExistsByName( signupData.Name,
                                                                     currentTransaction,
                                                                     logger ) ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                               Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', signupData.Name ),
                                Mark: 'B43E4A5C0D8D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                           Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', signupData.Name ),
                                            Details: null
                                          }
                                        ],
@@ -271,17 +277,17 @@ export default class UserSingupServiceController {
                     const sysUserSignup = await SYSUserSignupService.createOrUpdate(
                                                                                      {
                                                                                        Id: strId,
-                                                                                       Kind: request.body.Kind,
+                                                                                       Kind: signupData.Kind,
                                                                                        FrontendId: context.FrontendId,
                                                                                        Token: strToken,
                                                                                        Status: signupProcessData.status,
-                                                                                       Name: request.body.Name,
-                                                                                       FirstName: request.body.FirstName,
-                                                                                       LastName: request.body.LastName,
-                                                                                       EMail: request.body.EMail,
-                                                                                       Phone: CommonUtilities.isNotNullOrEmpty( request.body.Phone ) ? request.body.Phone: null,
-                                                                                       Password: request.body.Password,
-                                                                                       Comment: CommonUtilities.isNotNullOrEmpty( request.body.Comment ) ? request.body.Comment : null,
+                                                                                       Name: signupData.Name,
+                                                                                       FirstName: signupData.FirstName,
+                                                                                       LastName: signupData.LastName,
+                                                                                       EMail: signupData.EMail,
+                                                                                       Phone: CommonUtilities.isNotNullOrEmpty( signupData.Phone ) ? signupData.Phone: null,
+                                                                                       Password: signupData.Password,
+                                                                                       Comment: CommonUtilities.isNotNullOrEmpty( signupData.Comment ) ? signupData.Comment : null,
                                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                        CreatedAt: null,
                                                                                        ExpireAt: expireAt ? expireAt.format(): null
@@ -314,18 +320,19 @@ export default class UserSingupServiceController {
                                                                                                       logger ): null;
 
                         //ANCHOR Send immediately the mail for auto activate the new user account
-                        if ( await NotificationManager.send(
+                        if ( signupOptions.sendEMailAccountSignup === false ||
+                             await NotificationManager.send(
                                                              "email",
                                                              {
                                                                from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                               to: request.body.EMail,
+                                                               to: signupData.EMail,
                                                                subject: await I18NManager.translate( strLanguage, "SIGNUP FOR NEW USER ACCOUNT" ),
                                                                body: {
                                                                        kind: "template",
                                                                        file: `email-user-signup-${strTemplateKind}.pug`,
                                                                        language: context.Language,
                                                                        variables: {
-                                                                                    user_name: request.body.Name,
+                                                                                    user_name: signupData.Name,
                                                                                     activation_code: strToken,
                                                                                     web_app_url: strWebAppURL,
                                                                                     expire_at: strExpireAtInTimeZone ? strExpireAtInTimeZone : null,
@@ -346,7 +353,7 @@ export default class UserSingupServiceController {
                                                                 SubSystem: "UserSignup",
                                                                 Token: "No apply",
                                                                 UserId: "No apply",
-                                                                UserName: request.body.Name,
+                                                                UserName: signupData.Name,
                                                                 UserGroupId: "No apply",
                                                                 Code: "SUCCESS_USER_SIGNUP",
                                                                 EventAt: SystemUtilities.getCurrentDateAndTime().format(),
@@ -367,6 +374,12 @@ export default class UserSingupServiceController {
                                      Data: []
                                    }
 
+                          if ( signupOptions.getActivationToken === true ) {
+
+                            result.Activation = strToken;
+
+                          }
+
                           bApplyTransaction = true;
 
                         }
@@ -379,7 +392,7 @@ export default class UserSingupServiceController {
                                                                 SubSystem: "UserSignup",
                                                                 Token: "No apply",
                                                                 UserId: "No apply",
-                                                                UserName: request.body.Name,
+                                                                UserName: signupData.Name,
                                                                 UserGroupId: "No apply",
                                                                 Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
                                                                 EventAt: SystemUtilities.getCurrentDateAndTime().format(),
@@ -399,7 +412,7 @@ export default class UserSingupServiceController {
                                                  Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
                                                  Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
                                                  Details: {
-                                                            EMail: request.body.EMail
+                                                            EMail: signupData.EMail
                                                           }
                                                }
                                              ],
@@ -536,14 +549,14 @@ export default class UserSingupServiceController {
             result = {
                        StatusCode: 400, //Bad request
                        Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', signupData.Kind ),
                        Mark: 'E0E3A7CC1A6A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', signupData.Kind ),
                                    Details: null
                                  }
                                ],
@@ -624,7 +637,7 @@ export default class UserSingupServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.signup.name;
+      sourcePosition.method = this.name + "." + this.genericSignup.name;
 
       const strMark = "309DBDE7EEAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -684,9 +697,946 @@ export default class UserSingupServiceController {
 
   }
 
-  static async signupActivate( request: Request,
+  static async signup( request: Request,
+                       transaction: any,
+                       logger: any ): Promise<any> {
+
+    const signupOptions = {
+
+      id: "",
+      validateSignupData: true,
+      checkPasswordStrength: true,
+      sendEMailAccountSignup: true,
+      getActivationToken: false
+
+    };
+
+    const signupData = request.body;
+
+    const result = this.genericSignup( request,
+                                       signupOptions,
+                                       signupData,
+                                       transaction,
+                                       logger );
+
+    return result;
+
+  }
+
+  static async signupGoogle( request: Request,
+                             transaction: any,
+                             logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_SIGNUP" ) ) {
+
+        const context = ( request as any ).context;
+
+        strLanguage = context.Language;
+
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        if ( currentTransaction === null ) {
+
+          currentTransaction = await dbConnection.transaction();
+
+          bIsLocalTransaction = true;
+
+        }
+
+        const bFrontendIdIsAllowed = await UserOthersServiceController.getFrontendIdIsAllowed( context.FrontendId,
+                                                                                               request.body.Kind,
+                                                                                               currentTransaction,
+                                                                                               logger ) >= 0;
+
+        if ( bFrontendIdIsAllowed ) {
+
+          const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( request.body.Kind,
+                                                                                              currentTransaction,
+                                                                                              logger );
+
+          if ( signupProcessData &&
+               signupProcessData.group &&
+               signupProcessData.group.trim() !== "" &&
+               signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+
+            /*
+            {
+              "Ea": "10723303325????",
+              "wc": {
+                "token_type": "Bearer",
+                "access_token": "ya29.a0AfH6SMB8y2znvv5kVXs3Ogp-HH-a6tw....",
+                "scope": "email profile openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+                "login_hint": "AJDLj6JUa8yxXrhHdWRHIV0S13cAI7k....",
+                "expires_in": 3599,
+                "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6I...",
+                "session_state": {
+                  "extraQueryParams": {
+                    "authuser": "0"
+                  }
+                },
+                "first_issued_at": 1592269627668,
+                "expires_at": 1592273226668,
+                "idpId": "google"
+              },
+              "Ut": {
+                "bV": "107233033251981347489",
+                "Bd": "Tomás Rafael Moreno Poggio",
+                "GW": "Tomás Rafael",
+                "GU": "Moreno Poggio",
+                "iL": "https://lh3.googleusercontent.com/a-/AOh14GiJ0cB-2Ibzs5LZD3vghUoK5PjQNvopudLdkoeQ=s96-c",
+                "Eu": "sirlordt@gmail.com"
+              },
+              "googleId": "107233033251981347489",
+              "tokenObj": {
+                "token_type": "Bearer",
+                "access_token": "ya29.a0AfH6SMBBWlbbC07g9fnQ7......",
+                "scope": "email profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+                "login_hint": "AJDLj6JUa8yxXrhHdWRHI....",
+                "expires_in": 3599,
+                "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImI....",
+                "session_state": {
+                  "extraQueryParams": {
+                    "authuser": "0"
+                  }
+                },
+                "first_issued_at": 1592266328439,
+                "expires_at": 1592269927439,
+                "idpId": "google"
+              },
+              "tokenId": "eyJhbGciOiJSUzI1NiIsI....", //**** Send this to the service ****
+              "accessToken": "ya29.a0AfH6SMBBWlbbC07g9fn....",
+              "profileObj": {
+                "googleId": "107233033251981347489",
+                "imageUrl": "https://lh3.googleusercontent.com/a-/AOh14GiJ0cB-2Ibzs5LZD3vghUoK5PjQNvopudLdkoeQ=s96-c",
+                "email": "sirlordt@gmail.com",
+                "name": "Tomás Rafael Moreno Poggio",
+                "givenName": "Tomás Rafael",
+                "familyName": "Moreno Poggio"
+              }
+            }
+            */
+
+            //Call to check the token https://oauth2.googleapis.com/tokeninfo?id_token=request.body.TokenId
+            const options = {
+                              method: 'GET',
+                              //headers: {},
+                              body: null,
+                            };
+
+            //const strRequestPath = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${request.body.Token}`;
+            const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${request.body.Token}`;
+
+            const callResult = await fetch( strRequestPath, options );
+
+            if ( callResult.status === 200 ) {
+
+              const jsonResponse = await callResult.json();
+
+              const signupOptions = {
+
+                //id: "google://" + jsonResponse.sub,
+                validateSignupData: false,
+                checkPasswordStrength: false,
+                sendEMailAccountSignup: false,
+                getActivationToken: true
+
+              };
+
+              const signupData = {
+
+                Kind: request.body.Kind,
+                Name: jsonResponse.email,
+                FirstName: jsonResponse.given_name,
+                LastName: jsonResponse.family_name,
+                EMail: jsonResponse.email,
+                Phone: "",
+                Password: SystemUtilities.hashString( SystemUtilities.getUUIDv4(),
+                                                      2,
+                                                      logger ),
+                Comment: ""
+
+              }
+
+              const signupResult = await this.genericSignup( request,
+                                                             signupOptions,
+                                                             signupData,
+                                                             transaction,
+                                                             logger );
+
+              if ( signupResult.StatusCode === 200 ) {
+
+                const strActivationCode = signupResult.Activation;
+
+                const signupActivateOptions = {
+
+                  avatar: jsonResponse.picture,
+                  role: "#GoogleUser#",
+                  sendEMailAccountActivated: true,
+                  maskPassword: false
+
+                };
+
+                const signupActivateData = {
+
+                  Activation: strActivationCode,
+
+                };
+
+                result = this.genericSignupActivate( request,
+                                                     signupActivateOptions,
+                                                     signupActivateData,
+                                                     transaction,
+                                                     logger );
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_TOKEN_NOT_VALID',
+                         Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                         Mark: 'A709A312EC35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_TOKEN_NOT_VALID',
+                                     Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                       Mark: 'B40EF4F2157B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                     Mark: 'E47542BBCD1B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          if ( bApplyTransaction ) {
+
+            await currentTransaction.commit();
+
+          }
+          else {
+
+            await currentTransaction.rollback();
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_PATH_DISABLED',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                   Mark: '8726114482F0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_PATH_DISABLED',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.signup.name;
+
+      const strMark = "3BB205818A9D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async signupFacebook( request: Request,
                                transaction: any,
                                logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_SIGNUP" ) ) {
+
+        const context = ( request as any ).context;
+
+        strLanguage = context.Language;
+
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        if ( currentTransaction === null ) {
+
+          currentTransaction = await dbConnection.transaction();
+
+          bIsLocalTransaction = true;
+
+        }
+
+        const bFrontendIdIsAllowed = await UserOthersServiceController.getFrontendIdIsAllowed( context.FrontendId,
+                                                                                               request.body.Kind,
+                                                                                               currentTransaction,
+                                                                                               logger ) >= 0;
+
+        if ( bFrontendIdIsAllowed ) {
+
+          const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( request.body.Kind,
+                                                                                              currentTransaction,
+                                                                                              logger );
+
+          if ( signupProcessData &&
+               signupProcessData.group &&
+               signupProcessData.group.trim() !== "" &&
+               signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+
+            /*
+            {
+              "profile": {
+                "id": "10222168????????",
+                "first_name": "??????",
+                "last_name": "???????",
+                "name": "??????",
+                "name_format": "{first} {last}",
+                "picture": {
+                  "data": {
+                    "height": 50,
+                    "is_silhouette": false,
+                    "url": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=10222168????&height=50&width=50&ext=1594857413&hash=AeSk2EKIWIJoJu0E",
+                    "width": 50
+                  }
+                },
+                "short_name": "Tomás Rafael",
+                "email": "sirlordt@gmail.com"
+              },
+              "tokenDetail": {
+                "accessToken": "EAADtzJi....", //**** Send this to the service ****
+                "userID": "10222168???????",  //**** Send this to the service ****
+                "expiresIn": 3787,
+                "signedRequest": "YmKGQBPEDAPX1YJWcPGNe-Ird4dPE2Ng82leF9r_-uk.eyJ1c2VyX2lkIjoiMTAyMjIxNjg3ODQ3NT....",
+                "graphDomain": "facebook",
+                "data_access_expiration_time": 1600041413
+              }
+            }
+            */
+
+            const options = {
+                              method: 'GET',
+                              //headers: {},
+                              body: null,
+                            };
+
+            //https://graph.facebook.com/10222168784759387?fields=id,first_name,last_name,email,picture&access_token=EAADtzJi9SToBAE9kZAsFKFULpZB8sSFWZBD0Peu3yZC9ZCNnsLKZB2LZCekZCSFaRxqueZBla8Y5poKYhVEUIXlP3ZAekd3mpiFbSJF1Q5jw75KJ58J1i4UsbUsKZAR3MRXmALxoZAdYmYIbdg1UjZBgVwHCUroMuaXPbeediBVZAGKnR8at5vDMZBqWtntmD544iLg5ivMPr6lluZCgigZDZD
+            //https://graph.facebook.com/10222168784759387/picture?type=large
+            const strRequestPath = `https://graph.facebook.com/${request.body.UserId}?id,first_name,last_name,email,picture&access_token=${request.body.Token}`;
+
+            const callResult = await fetch( strRequestPath, options );
+
+            let jsonResponse = null;
+
+            if ( callResult.status === 200 ) {
+
+              jsonResponse = await callResult.json();
+
+              if ( jsonResponse.error ) {
+
+                jsonResponse = null;
+
+              }
+
+            }
+
+            if ( jsonResponse ) {
+
+              const signupOptions = {
+
+                //id: "google://" + jsonResponse.sub,
+                validateSignupData: false,
+                checkPasswordStrength: false,
+                sendEMailAccountSignup: false,
+                getActivationToken: true
+
+              };
+
+              const signupData = {
+
+                Kind: request.body.Kind,
+                Name: jsonResponse.email,
+                FirstName: jsonResponse.first_name,
+                LastName: jsonResponse.last_name,
+                EMail: jsonResponse.email,
+                Phone: "",
+                Password: SystemUtilities.hashString( SystemUtilities.getUUIDv4(),
+                                                      2,
+                                                      logger ),
+                Comment: ""
+
+              }
+
+              const signupResult = await this.genericSignup( request,
+                                                             signupOptions,
+                                                             signupData,
+                                                             transaction,
+                                                             logger );
+
+              if ( signupResult.StatusCode === 200 ) {
+
+                const strActivationCode = signupResult.Activation;
+
+                const signupActivateOptions = {
+
+                  avatar: "https://graph.facebook.com/10222168784759387/picture?type=large", //jsonResponse.picture,
+                  role: "#FacebookUser#",
+                  sendEMailAccountActivated: true,
+                  maskPassword: false
+
+                };
+
+                const signupActivateData = {
+
+                  Activation: strActivationCode,
+
+                };
+
+                result = this.genericSignupActivate( request,
+                                                     signupActivateOptions,
+                                                     signupActivateData,
+                                                     transaction,
+                                                     logger );
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 400, //Bad request
+                         Code: 'ERROR_TOKEN_NOT_VALID',
+                         Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                         Mark: 'A709A312EC35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: 'ERROR_TOKEN_NOT_VALID',
+                                     Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                       Mark: 'D979438E70E9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                     Mark: '796976F247D8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          if ( bApplyTransaction ) {
+
+            await currentTransaction.commit();
+
+          }
+          else {
+
+            await currentTransaction.rollback();
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_PATH_DISABLED',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                   Mark: 'DBA17A9E9FF7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_PATH_DISABLED',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.signup.name;
+
+      const strMark = "15F8CFDBED2D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async signupInstagram( request: Request,
+                                transaction: any,
+                                logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      if ( !request.socket ||
+           request.socket instanceof Socket === false ||
+           ApplicationServerDataManager.checkServiceEnabled( "USER_SIGNUP" ) ) {
+
+        const context = ( request as any ).context;
+
+        strLanguage = context.Language;
+
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        if ( currentTransaction === null ) {
+
+          currentTransaction = await dbConnection.transaction();
+
+          bIsLocalTransaction = true;
+
+        }
+
+        const bFrontendIdIsAllowed = await UserOthersServiceController.getFrontendIdIsAllowed( context.FrontendId,
+                                                                                               request.body.Kind,
+                                                                                               currentTransaction,
+                                                                                               logger ) >= 0;
+
+        if ( bFrontendIdIsAllowed ) {
+
+          const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( request.body.Kind,
+                                                                                              currentTransaction,
+                                                                                              logger );
+
+          if ( signupProcessData &&
+               signupProcessData.group &&
+               signupProcessData.group.trim() !== "" &&
+               signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+
+            //
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                       Mark: '7F545A613045' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
+                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                     Mark: '0907C966A4FC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
+                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          if ( bApplyTransaction ) {
+
+            await currentTransaction.commit();
+
+          }
+          else {
+
+            await currentTransaction.rollback();
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_PATH_DISABLED',
+                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                   Mark: 'BBF8C16023C0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_PATH_DISABLED',
+                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.signup.name;
+
+      const strMark = "B4412546F7A3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async genericSignupActivate( request: Request,
+                                      signupActivateOptions: any,
+                                      signupActivateData: any,
+                                      transaction: any,
+                                      logger: any ): Promise<any> {
 
     let result = null;
 
@@ -718,7 +1668,7 @@ export default class UserSingupServiceController {
 
         }
 
-        let sysUserSignupInDB = await SYSUserSignupService.getByToken( request.body.Activation,
+        let sysUserSignupInDB = await SYSUserSignupService.getByToken( signupActivateData.Activation, //request.body.Activation,
                                                                        context.TimeZoneId,
                                                                        currentTransaction,
                                                                        logger );
@@ -916,10 +1866,11 @@ export default class UserSingupServiceController {
                     }
 
                     if ( sysUserGroup &&
-                        sysUserGroup instanceof Error === false ) {
+                         sysUserGroup instanceof Error === false ) {
 
                       sysPerson = await SYSPersonService.createOrUpdate(
                                                                          {
+                                                                           //Id: signupActivateOptions.Id || null,
                                                                            FirstName: sysUserSignupInDB.FirstName,
                                                                            LastName: sysUserSignupInDB.LastName,
                                                                            Phone: sysUserSignupInDB.Phone ? sysUserSignupInDB.Phone : null,
@@ -939,9 +1890,27 @@ export default class UserSingupServiceController {
 
                         const expireAt = signupProcessData.userExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.userExpireAt ) : null;
 
-                        const strRole = signupProcessData.userRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                        let strRole = signupProcessData.userRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                        const strTag = signupProcessData.userTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                        let strTag = signupProcessData.userTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
+
+                        if ( signupActivateOptions.tag ) {
+
+                          strTag = SystemUtilities.mergeTokens( strTag,
+                                                                signupActivateOptions.tag,
+                                                                true,
+                                                                logger );
+
+                        }
+
+                        if ( signupActivateOptions.role ) {
+
+                          strRole = SystemUtilities.mergeTokens( strRole,
+                                                                 signupActivateOptions.role,
+                                                                 true,
+                                                                 logger );
+
+                        }
 
                         //ANCHOR Create new user
                         sysUser = await SYSUserService.createOrUpdate(
@@ -949,6 +1918,7 @@ export default class UserSingupServiceController {
                                                                          Id: sysPerson.Id,
                                                                          PersonId: sysPerson.Id,
                                                                          GroupId: sysUserGroup.Id,
+                                                                         Avatar: signupActivateOptions.avatar ? signupActivateOptions.avatar: null,
                                                                          Name: sysUserSignupInDB.Name,
                                                                          Password: strPassword,
                                                                          Role: strRole ? strRole : null,
@@ -1010,7 +1980,8 @@ export default class UserSingupServiceController {
                                                                                                          currentTransaction,
                                                                                                          logger );
 
-                          if ( await NotificationManager.send(
+                          if ( signupActivateOptions.sendEMailAccountActivated === false ||
+                               await NotificationManager.send(
                                                                "email",
                                                                {
                                                                  from: configData[ "no_response_email" ] || "no-response@no-response.com",
@@ -1022,7 +1993,7 @@ export default class UserSingupServiceController {
                                                                          language: context.Language,
                                                                          variables: {
                                                                                       user_name: sysUserSignupInDB.Name,
-                                                                                      user_password: CommonUtilities.maskPassword( strPassword ),
+                                                                                      user_password: signupActivateOptions.maskPassword ? CommonUtilities.maskPassword( strPassword ): strPassword,
                                                                                       web_app_url: strWebAppURL,
                                                                                       ... configData
                                                                                     }
@@ -1399,6 +2370,31 @@ export default class UserSingupServiceController {
       }
 
     }
+
+    return result;
+
+  }
+
+  static async signupActivate( request: Request,
+                               transaction: any,
+                               logger: any ): Promise<any> {
+
+    const signupActivateOptions = {
+
+      tag: null,
+      sendEMailAccountActivated: true,
+      maskPassword: true,
+      avatar: null
+
+    };
+
+    const signupActivateData = request.body;
+
+    const result = this.genericSignupActivate( request,
+                                               signupActivateOptions,
+                                               signupActivateData,
+                                               transaction,
+                                               logger );
 
     return result;
 

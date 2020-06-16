@@ -320,7 +320,7 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#Driver#,#UploadBinary,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                                                "userRole":"#Driver#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":""

@@ -1,4 +1,7 @@
 import cluster from 'cluster';
+
+import fetch from 'node-fetch';
+
 //import { Socket } from "net";
 
 import {
@@ -898,234 +901,279 @@ export default class SecurityServiceController {
 
         }
 
-        const strBusinessRolesMerged = SystemUtilities.mergeTokens( strUserGroupBusinessRoles,
-                                                                    strUserBusinessRoles,
-                                                                    true,
-                                                                    logger );
+        let bUserHasRequiredRole = true;
 
-        const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
-                                                                      userDataResponse,
+        if ( processOptions.requiredRole ) {
+
+          const requiredRoles = processOptions.requiredRole.split( "," );
+
+          for ( let intRoleIndex = 0; intRoleIndex < requiredRoles.length; intRoleIndex++ ) {
+
+            if ( strRolesMerged.includes( requiredRoles[ intRoleIndex ] ) === false ) {
+
+              bUserHasRequiredRole = false;
+              break;
+
+            }
+
+          }
+
+        }
+
+        if ( bUserHasRequiredRole ) {
+
+          const strBusinessRolesMerged = SystemUtilities.mergeTokens( strUserGroupBusinessRoles,
+                                                                      strUserBusinessRoles,
+                                                                      true,
                                                                       logger );
 
-        if ( processOptions.useSoftCheck === true ) {
+          const detectedWarnings = SystemUtilities.dectectUserWarnings( context.Language,
+                                                                        userDataResponse,
+                                                                        logger );
 
-          const bIsPersistent =  strAuthorization.startsWith( "p:" );
+          if ( processOptions.useSoftCheck === true ) {
 
-          if ( bUserDisabled &&
-               bIsPersistent === false ) {
+            const bIsPersistent =  strAuthorization.startsWith( "p:" );
 
-            detectedWarnings.warnings.push(
-                                            {
-                                              Code: "WARNING_USER_DISABLED",
-                                              Message: I18NManager.translateSync( context.Language, "The user is disabled" ),
-                                              Details: null,
-                                            }
-                                          );
+            if ( bUserDisabled &&
+                bIsPersistent === false ) {
 
-            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_DISABLED#" : "#USER_DISABLED#";
-
-          }
-
-          if ( bUserExpired &&
-               bIsPersistent === false ) {
-
-            detectedWarnings.warnings.push(
-                                            {
-                                              Code: "WARNING_USER_EXPIRED",
-                                              Message: I18NManager.translateSync( context.Language, "The user is expired" ),
-                                              Details: null,
-                                            }
-                                          );
-
-            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_EXPIRED#" : "#USER_EXPIRED#";
-
-          }
-
-          if ( bUserGroupDisabled &&
-               bIsPersistent === false  ) {
-
-            detectedWarnings.warnings.push(
-                                            {
-                                              Code: "WARNING_USER_GROUP_DISABLED",
-                                              Message: I18NManager.translateSync( context.Language, "The group is disabled" ),
-                                              Details: null,
-                                            }
-                                          );
-
-            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_DISABLED#" : "#USER_GROUP_DISABLED#";
-
-          }
-
-          if ( bUserGroupExpired &&
-               bIsPersistent === false  ) {
-
-            detectedWarnings.warnings.push(
-                                            {
-                                              Code: "WARNING_USER_GROUP_EXPIRED",
-                                              Message: I18NManager.translateSync( context.Language, "The group is expired" ),
-                                              Details: null,
-                                            }
-                                          );
-
-            detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_EXPIRED#" : "#USER_GROUP_EXPIRED#";
-
-          }
-
-        }
-
-        const userSessionStatusData = {
-                                        UserId: sysUserInDB.Id,
-                                        UserGroupId: sysUserInDB.GroupId,
-                                        Token: strAuthorization,
-                                        FrontendId: context.FrontendId,
-                                        SourceIPAddress: context.SourceIPAddress,
-                                        Role: strRolesMerged + strBasicRoles,
-                                        UserName: sysUserInDB.Name,
-                                        ExpireKind: configData.kind,
-                                        ExpireOn: configData.on,
-                                        HardLimit: configData.hardLimit,
-                                        Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
-                                        ExtraData: {
-                                                     Business: {
-                                                                 Role: strBusinessRolesMerged
-                                                               }
-                                                   },
-                                        Business: {
-                                                    Role: strBusinessRolesMerged
-                                                  },
-                                        CreatedBy: processOptions.useSecondaryUserToCreatedBy === true && strSecondaryUser ? strSecondaryUser : strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                        CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format(): null,
-                                        UpdatedBy: !strSecondaryUser ? strUserName : strSecondaryUser, //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
-                                        UpdatedAt: null
-                                      };
-
-        const userSessionStatus = await SYSUserSessionStatusService.createOrUpdate( sysUserInDB.Id, //UserId
-                                                                                    strAuthorization, //Token created
-                                                                                    userSessionStatusData, //The data
-                                                                                    true, //Force Only create
-                                                                                    currentTransaction, //Continue the current transaction
-                                                                                    logger );
-
-        if ( userPersonDataResponse !== null ) {
-
-          userSessionStatusData[ "PersonId" ] = userPersonDataResponse.PersonId;
-          userSessionStatusData[ "Title" ] = userPersonDataResponse.Title;
-          userSessionStatusData[ "FirstName" ] = userPersonDataResponse.FirstName;
-          userSessionStatusData[ "LastName" ] = userPersonDataResponse.LastName;
-          userSessionStatusData[ "EMail" ] = userPersonDataResponse.EMail;
-          userSessionStatusData[ "Phone" ] = userPersonDataResponse.Phone;
-
-        }
-        else {
-
-          userSessionStatusData[ "PersonId" ] = "";
-          userSessionStatusData[ "Title" ] = "";
-          userSessionStatusData[ "FirstName" ] = "";
-          userSessionStatusData[ "LastName" ] = "";
-          userSessionStatusData[ "EMail" ] = "";
-          userSessionStatusData[ "Phone" ] = "";
-
-        }
-
-        userSessionStatusData[ "UserTag" ] = strUserTags;
-        //userSessionStatusData[ "User" ] = user.Name;
-        userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
-        userSessionStatusData[ "UserGroupShortId" ] = userGroupDataResponse.ShortId;
-        userSessionStatusData[ "UserGroupName" ] = userGroupDataResponse.Name;
-        userSessionStatusData[ "CreatedAt" ] = userSessionStatus.CreatedAt;
-        userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
-        userSessionStatusData[ "LoggedOutBy" ] = null;
-        userSessionStatusData[ "LoggedOutAt" ] = null;
-
-        delete userSessionStatusData[ "ExtraData" ];
-
-        await CacheManager.setDataWithTTL( strAuthorization,
-                                           JSON.stringify( userSessionStatusData ),
-                                           300, //5 minutes in seconds
-                                           logger );
-
-        if ( userSessionStatus !== null ) {
-
-          NotificationManager.publishOnTopic( "SystemEvent",
+              detectedWarnings.warnings.push(
                                               {
-                                                SystemId: SystemUtilities.getSystemId(),
-                                                SystemName: process.env.APP_SERVER_DATA_NAME,
-                                                SubSystem: "Security",
-                                                Token: userSessionStatusData.Token,
-                                                UserId: userSessionStatusData.UserId,
-                                                UserName: userSessionStatusData.UserName,
-                                                UserGroupId: userSessionStatusData.UserGroupId,
-                                                Code: !processOptions.useCustomResponse ||
-                                                       processOptions.useCustomResponse === false ?
-                                                       "SUCCESS_LOGIN":
-                                                       processOptions.Code,
-                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
-                                                Data: {}
-                                              },
-                                              logger );
+                                                Code: "WARNING_USER_DISABLED",
+                                                Message: I18NManager.translateSync( context.Language, "The user is disabled" ),
+                                                Details: null,
+                                              }
+                                            );
 
-          //userDataResponse.sysUserGroup = userGroupDataResponse;
-          //userDataResponse.sysPerson = userPersonDataResponse;
+              detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_DISABLED#" : "#USER_DISABLED#";
 
-          if ( !processOptions.useCustomResponse ||
-               processOptions.useCustomResponse === false ) {
+            }
 
-            result = {
-                       StatusCode: 200, //Ok
-                       Code: 'SUCCESS_LOGIN',
-                       Message: await I18NManager.translate( context.Language, 'Success login' ),
-                       Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: false,
-                       Errors: [],
-                       Warnings: detectedWarnings.warnings,
-                       Count: 1,
-                       Data: [
-                               {
-                                 Authorization: strAuthorization,
-                                 ShortToken: userSessionStatus.ShortToken,
-                                 Role: strRolesMerged + strBasicRoles,
-                                 LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
-                                 Business: {
-                                             Role: strBusinessRolesMerged
-                                           },
-                                 sysUser: userDataResponse,
-                                 //sysUserGroup: userGroupDataResponse,
-                                 //sysPerson: userPersonDataResponse
-                               }
-                             ]
-                     };
+            if ( bUserExpired &&
+                bIsPersistent === false ) {
+
+              detectedWarnings.warnings.push(
+                                              {
+                                                Code: "WARNING_USER_EXPIRED",
+                                                Message: I18NManager.translateSync( context.Language, "The user is expired" ),
+                                                Details: null,
+                                              }
+                                            );
+
+              detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_EXPIRED#" : "#USER_EXPIRED#";
+
+            }
+
+            if ( bUserGroupDisabled &&
+                bIsPersistent === false  ) {
+
+              detectedWarnings.warnings.push(
+                                              {
+                                                Code: "WARNING_USER_GROUP_DISABLED",
+                                                Message: I18NManager.translateSync( context.Language, "The group is disabled" ),
+                                                Details: null,
+                                              }
+                                            );
+
+              detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_DISABLED#" : "#USER_GROUP_DISABLED#";
+
+            }
+
+            if ( bUserGroupExpired &&
+                bIsPersistent === false  ) {
+
+              detectedWarnings.warnings.push(
+                                              {
+                                                Code: "WARNING_USER_GROUP_EXPIRED",
+                                                Message: I18NManager.translateSync( context.Language, "The group is expired" ),
+                                                Details: null,
+                                              }
+                                            );
+
+              detectedWarnings.tag = detectedWarnings.tag ? detectedWarnings.tag + ",#USER_GROUP_EXPIRED#" : "#USER_GROUP_EXPIRED#";
+
+            }
+
+          }
+
+          const userSessionStatusData = {
+                                          UserId: sysUserInDB.Id,
+                                          UserGroupId: sysUserInDB.GroupId,
+                                          Token: strAuthorization,
+                                          FrontendId: context.FrontendId,
+                                          SourceIPAddress: context.SourceIPAddress,
+                                          Role: strRolesMerged + strBasicRoles,
+                                          UserName: sysUserInDB.Name,
+                                          ExpireKind: configData.kind,
+                                          ExpireOn: configData.on,
+                                          HardLimit: configData.hardLimit,
+                                          Tag: detectedWarnings.tag ? detectedWarnings.tag : null,
+                                          ExtraData: {
+                                                      Business: {
+                                                                  Role: strBusinessRolesMerged
+                                                                }
+                                                    },
+                                          Business: {
+                                                      Role: strBusinessRolesMerged
+                                                    },
+                                          CreatedBy: processOptions.useSecondaryUserToCreatedBy === true && strSecondaryUser ? strSecondaryUser : strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                          CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format(): null,
+                                          UpdatedBy: !strSecondaryUser ? strUserName : strSecondaryUser, //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+                                          UpdatedAt: null
+                                        };
+
+          const userSessionStatus = await SYSUserSessionStatusService.createOrUpdate( sysUserInDB.Id, //UserId
+                                                                                      strAuthorization, //Token created
+                                                                                      userSessionStatusData, //The data
+                                                                                      true, //Force Only create
+                                                                                      currentTransaction, //Continue the current transaction
+                                                                                      logger );
+
+          if ( userPersonDataResponse !== null ) {
+
+            userSessionStatusData[ "PersonId" ] = userPersonDataResponse.PersonId;
+            userSessionStatusData[ "Title" ] = userPersonDataResponse.Title;
+            userSessionStatusData[ "FirstName" ] = userPersonDataResponse.FirstName;
+            userSessionStatusData[ "LastName" ] = userPersonDataResponse.LastName;
+            userSessionStatusData[ "EMail" ] = userPersonDataResponse.EMail;
+            userSessionStatusData[ "Phone" ] = userPersonDataResponse.Phone;
 
           }
           else {
 
-            result = {
-                       StatusCode: 200, //Ok
-                       Code: processOptions.code,
-                       Message: I18NManager.translateSync( context.Language, processOptions.message ),
-                       Mark: processOptions.mark + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: false,
-                       Errors: [],
-                       Warnings: detectedWarnings.warnings,
-                       Count: 1,
-                       Data: [
-                               {
-                                 Authorization: strAuthorization,
-                                 SupportToken: userSessionStatus.ShortToken,
-                                 Role: strRolesMerged + strBasicRoles,
-                                 LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
-                                 Business: {
-                                             Role: strBusinessRolesMerged
-                                           },
-                                 sysUser: userDataResponse,
-                                 //Group: userGroupDataResponse,
-                                 //Person: userPersonDataResponse
-                               }
-                             ]
-                     };
+            userSessionStatusData[ "PersonId" ] = "";
+            userSessionStatusData[ "Title" ] = "";
+            userSessionStatusData[ "FirstName" ] = "";
+            userSessionStatusData[ "LastName" ] = "";
+            userSessionStatusData[ "EMail" ] = "";
+            userSessionStatusData[ "Phone" ] = "";
 
           }
+
+          userSessionStatusData[ "UserTag" ] = strUserTags;
+          //userSessionStatusData[ "User" ] = user.Name;
+          userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
+          userSessionStatusData[ "UserGroupShortId" ] = userGroupDataResponse.ShortId;
+          userSessionStatusData[ "UserGroupName" ] = userGroupDataResponse.Name;
+          userSessionStatusData[ "CreatedAt" ] = userSessionStatus.CreatedAt;
+          userSessionStatusData[ "UpdatedAt" ] = userSessionStatus.UpdatedAt;
+          userSessionStatusData[ "LoggedOutBy" ] = null;
+          userSessionStatusData[ "LoggedOutAt" ] = null;
+
+          delete userSessionStatusData[ "ExtraData" ];
+
+          await CacheManager.setDataWithTTL( strAuthorization,
+                                            JSON.stringify( userSessionStatusData ),
+                                            300, //5 minutes in seconds
+                                            logger );
+
+          if ( userSessionStatus !== null ) {
+
+            NotificationManager.publishOnTopic( "SystemEvent",
+                                                {
+                                                  SystemId: SystemUtilities.getSystemId(),
+                                                  SystemName: process.env.APP_SERVER_DATA_NAME,
+                                                  SubSystem: "Security",
+                                                  Token: userSessionStatusData.Token,
+                                                  UserId: userSessionStatusData.UserId,
+                                                  UserName: userSessionStatusData.UserName,
+                                                  UserGroupId: userSessionStatusData.UserGroupId,
+                                                  Code: !processOptions.useCustomResponse ||
+                                                        processOptions.useCustomResponse === false ?
+                                                        "SUCCESS_LOGIN":
+                                                        processOptions.Code,
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  Data: {}
+                                                },
+                                                logger );
+
+            //userDataResponse.sysUserGroup = userGroupDataResponse;
+            //userDataResponse.sysPerson = userPersonDataResponse;
+
+            if ( !processOptions.useCustomResponse ||
+                processOptions.useCustomResponse === false ) {
+
+              result = {
+                        StatusCode: 200, //Ok
+                        Code: 'SUCCESS_LOGIN',
+                        Message: await I18NManager.translate( context.Language, 'Success login' ),
+                        Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        LogId: null,
+                        IsError: false,
+                        Errors: [],
+                        Warnings: detectedWarnings.warnings,
+                        Count: 1,
+                        Data: [
+                                {
+                                  Authorization: strAuthorization,
+                                  ShortToken: userSessionStatus.ShortToken,
+                                  Role: strRolesMerged + strBasicRoles,
+                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                  Business: {
+                                              Role: strBusinessRolesMerged
+                                            },
+                                  sysUser: userDataResponse,
+                                  //sysUserGroup: userGroupDataResponse,
+                                  //sysPerson: userPersonDataResponse
+                                }
+                              ]
+                      };
+
+            }
+            else {
+
+              result = {
+                        StatusCode: 200, //Ok
+                        Code: processOptions.code,
+                        Message: I18NManager.translateSync( context.Language, processOptions.message ),
+                        Mark: processOptions.mark + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        LogId: null,
+                        IsError: false,
+                        Errors: [],
+                        Warnings: detectedWarnings.warnings,
+                        Count: 1,
+                        Data: [
+                                {
+                                  Authorization: strAuthorization,
+                                  SupportToken: userSessionStatus.ShortToken,
+                                  Role: strRolesMerged + strBasicRoles,
+                                  LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
+                                  Business: {
+                                              Role: strBusinessRolesMerged
+                                            },
+                                  sysUser: userDataResponse,
+                                  //Group: userGroupDataResponse,
+                                  //Person: userPersonDataResponse
+                                }
+                              ]
+                      };
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 401, //Unauthorized
+                     Code: 'ERROR_USER_HAS_NOT_REQUIRED_ROLE',
+                     Message: await I18NManager.translate( context.Language, 'Login failed (User has not required role)' ),
+                     Mark: '187A01C7C65A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: 'ERROR_USER_HAS_NOT_REQUIRED_ROLE',
+                                 Message: await I18NManager.translate( context.Language, 'Login failed (User has not required role)' ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
 
         }
 
@@ -1422,6 +1470,372 @@ export default class SecurityServiceController {
       sourcePosition.method = this.name + "." + this.login.name;
 
       const strMark = "B211BBDAF77B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
+  static async loginGoogle( context: any,
+                            strTokenId: string,
+                            transaction: any,
+                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strLanguage = context.Language;
+
+      const options = {
+                        method: 'GET',
+                        //headers: {},
+                        body: null,
+                      };
+
+      //const strRequestPath = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${strTokenId}`;
+      const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${strTokenId}`;
+
+      const callResult = await fetch( strRequestPath, options );
+
+      if ( callResult.status === 200 ) {
+
+        const jsonResponse = await callResult.json();
+
+        const strUserName = jsonResponse.email;
+
+        result = await SecurityServiceController.processSessionStatus( context,
+                                                                       {
+                                                                         operation: "UserLogin",
+                                                                         requiredRole: "#GoogleUser#",
+                                                                         checkPassword: false
+                                                                       },
+                                                                       strUserName,
+                                                                       "",
+                                                                       null,
+                                                                       currentTransaction,
+                                                                       logger );
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_TOKEN_NOT_VALID',
+                   Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                   Mark: '602D23CFC6ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_TOKEN_NOT_VALID',
+                               Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.loginGoogle.name;
+
+      const strMark = "23A0388E6D15" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
+  static async loginFacebook( context: any,
+                              strTokenId: string,
+                              transaction: any,
+                              logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      /*
+      result = await SecurityServiceController.processSessionStatus( context,
+                                                                     { operation: "UserLogin" },
+                                                                     strUserName,
+                                                                     strPassword,
+                                                                     null,
+                                                                     currentTransaction,
+                                                                     logger );
+                                                                     */
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.loginFacebook.name;
+
+      const strMark = "C134BFB2B0B3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
+  static async loginInstagram( context: any,
+                               strTokenId: string,
+                               transaction: any,
+                               logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      /*
+      result = await SecurityServiceController.processSessionStatus( context,
+                                                                     { operation: "UserLogin" },
+                                                                     strUserName,
+                                                                     strPassword,
+                                                                     null,
+                                                                     currentTransaction,
+                                                                     logger );
+                                                                     */
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.loginInstagram.name;
+
+      const strMark = "C5CD82545E08" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
