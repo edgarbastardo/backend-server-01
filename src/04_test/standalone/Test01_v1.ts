@@ -812,24 +812,24 @@ export async function test_v1_phase03() {
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user01_at_TestL01_Session1,
                                                                        [
-                                                                         "#MasterL01#"
+                                                                         "#Master_L01#"
                                                                        ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user01@TestL01_success",
                                                                        false ),
-                       'CDA84E5562F3: The user user01@TestL01 is OK have the role #MasterL01#',
-                       'CDA84E5562F3: The user user01@TestL01 NOT have the role #MasterL01# FAILED' );
+                       'CDA84E5562F3: The user user01@TestL01 is OK have the role #Master_L01#',
+                       'CDA84E5562F3: The user user01@TestL01 NOT have the role #Master_L01# FAILED' );
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user01_at_TestL01_Session1,
                                                                        [
                                                                          "#Administrator#",
-                                                                         "#BManagerL99#"
+                                                                         "#BManager_L99#"
                                                                        ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_fail",
                                                                        false ) === false,
-                       '0DB4C6D59098: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99#',
-                       '0DB4C6D59098: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# FAILED' );
+                       '0DB4C6D59098: The user user02@TestL01 is OK not have the roles #Administrator# or #BManager_L99#',
+                       '0DB4C6D59098: The user user02@TestL01 have the roles #Administrator# and/or #BManager_L99# FAILED' );
 
   CommonTest.myAssert( await BinaryTestV1.test_uploadImageTower( CommonTest.headers_user01_at_TestL01_Session1,
                                                                  "SUCCESS_BINARY_DATA_UPLOAD",
@@ -870,8 +870,8 @@ export async function test_v1_phase03() {
                        "E28E266351E5: Get image details tower user01@TestL01 is OK",
                        "E28E266351E5: Get image details tower user01@TestL01 is FAILED" );
 
-  //Old version: Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
-  //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
+  //Old version: Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #Master_L01#, and not allow to create new user group
+  //Success because the user01@TestL01 Role => #Master_L01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
   CommonTest.myAssert( await UserTestV1.test_createUser_user98_at_TestL98( CommonTest.headers_user01_at_TestL01_Session1,
                                                                            "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
                                                                            "test_createUser_user98_at_TestL98_success",
@@ -882,7 +882,7 @@ export async function test_v1_phase03() {
                        'CA07E27A0CC3: Creation of the user user98@TestL98 is OK',
                        'CA07E27A0CC3: Creation of the user user98@TestL98 is FAILED' );
 
-  //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
+  //Success because the user01@TestL01 Role => #Master_L01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
   CommonTest.myAssert( await UserTestV1.test_createUser_user97_at_TestL98( CommonTest.headers_user01_at_TestL01_Session1,
                                                                            "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
                                                                            "test_createUser_user97_at_TestL98_success",
@@ -893,7 +893,7 @@ export async function test_v1_phase03() {
                        '2F6CC68DF536: Creation of the user user97@TestL98 is OK',
                        '2F6CC68DF536: Creation of the user user97@TestL98 is FAILED' );
 
-  //Success because the user01@TestL01 Role => #MasterL01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
+  //Success because the user01@TestL01 Role => #Master_L01#, not create a new user group only add to own group TestL01, when th sysUserGroup.Id and sysUserGroup.ShortId and sysUserGroup.Name are empty, null or undefined
   CommonTest.myAssert( await UserTestV1.test_createUser_user96_at_TestL98( CommonTest.headers_user01_at_TestL01_Session1,
                                                                            "SUCCESS_USER_CREATE",  //"ERROR_CANNOT_CREATE_USER",
                                                                            "test_createUser_user96_at_TestL98_success",
@@ -1009,7 +1009,7 @@ export async function test_v1_phase03() {
                        '951404204AFC: Bulk delete of the user user9X@TestL98 is OK',
                        '951404204AFC: Bulk Delete of the user user9X@TestL98 is FAILED' );
 
-  //Fail because user01@TestL01 only has role MasterL01, cannot delete user of user group Administrator
+  //Fail because user01@TestL01 only has role Master_L01, cannot delete user of user group Administrator
   //*** Delete user ' + CommonTest.strStartUser + ' ***
   CommonTest.myAssert( await UserTestV1.test_deleteBulkUser( CommonTest.headers_user01_at_TestL01_Session1,
                                                              {
@@ -1022,7 +1022,7 @@ export async function test_v1_phase03() {
                        '54CEC84EB683: Bulk delete of the user ' + CommonTest.strStartUser + ' is OK with the fail',
                        '54CEC84EB683: Bulk Delete of the user ' + CommonTest.strStartUser + ' is FAILED' );
 
-  //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #MasterL01#, and not allow to create new user group
+  //Fail to create the user user98@TestL98 because the user user01@TestL01 Role => #Master_L01#, and not allow to create new user group
   CommonTest.myAssert( await UserTestV1.test_createUser_user98_at_TestL98( CommonTest.headers_user01_at_TestL01_Session1,
                                                                            "ERROR_CANNOT_CREATE_USER",
                                                                            "test_createUser_user98_at_TestL98_fail",
@@ -1046,12 +1046,12 @@ export async function test_v1_phase03() {
                        'CF7DFB54EDE0: Update of the user user01@TestL01 is OK with the fail',
                        'CF7DFB54EDE0: Update of the user user01@TestL01 is FAILED' );
 
-  //Fail because TestL02 is not in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #MasterL01#
+  //Fail because TestL02 is not in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #Master_L01#
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL02_fail( CommonTest.headers_user01_at_TestL01_Session1 ),
                        '675C61D31DDF: Creation of the user user02@TestL02 is OK with the fail',
                        '675C61D31DDF: Creation of the user user02@TestL02 is FAILED' );
 
-  //Success because TestL01 is in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #MasterL01#
+  //Success because TestL01 is in the group of user01@TestL01. Only can create users in the current group TestL01, Role => #Master_L01#
   //*** Create user user02@TestL01 ***
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL01_success( CommonTest.headers_user01_at_TestL01_Session1 ),
                        '95543470C81F: Creation of the user user02@TestL01 is OK',
@@ -1199,12 +1199,12 @@ export async function test_v1_phase04() {
                        '81A6B96C4E24: Login with user user02@TestL01 FAILED' );
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user02_at_TestL01,
-                                                                       [ "#MasterL01#", "#Administrator#", "#BManagerL99#" ],
+                                                                       [ "#Master_L01#", "#Administrator#", "#BManager_L99#" ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user02@TestL01_fail",
                                                                        false ) === false,
-                       'A9464CC0DE81: The user user02@TestL01 is OK not have the roles #MasterL01# or #Administrator# or #BManagerL99#',
-                       'A9464CC0DE81: The user user02@TestL01 have the roles #MasterL01# and/or #Administrator# and/or #BManagerL99# FAILED' );
+                       'A9464CC0DE81: The user user02@TestL01 is OK not have the roles #Master_L01# or #Administrator# or #BManager_L99#',
+                       'A9464CC0DE81: The user user02@TestL01 have the roles #Master_L01# and/or #Administrator# and/or #BManager_L99# FAILED' );
 
   CommonTest.myAssert( await BinaryTestV1.test_uploadImageRoad( CommonTest.headers_user02_at_TestL01,
                                                                 "SUCCESS_BINARY_DATA_UPLOAD",
@@ -1369,7 +1369,7 @@ export async function test_v1_phase05() {
                        "7D2AB0B58075: Delete image tower ' + CommonTest.strStartUser + ' is OK",
                        "7D2AB0B58075: Delete image tower ' + CommonTest.strStartUser + ' is FAILED" );
 
-  //Success because the user user02@TestL01 is in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
+  //Success because the user user02@TestL01 is in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #Master_L01#
   //*** Delete user user02@TestL01 ***
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL01_Session1,
                                                          { Id: CommonTest.user02_at_TestL01_data.Id },
@@ -1378,7 +1378,7 @@ export async function test_v1_phase05() {
                        '1AD5AD5583DD: Delete of the user user02@TestL01 is OK',
                        '1AD5AD5583DD: Delete of the user user02@TestL01 is FAILED' );
 
-  //Fail because the user bmanager02@system.net is not in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #MasterL01#
+  //Fail because the user bmanager02@system.net is not in the group of user01@TestL01. Only can delete users in the current group TestL01, Role => #Master_L01#
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL01_Session1,
                                                          { Name: "bmanager02@system.net" },
                                                          "ERROR_CANNOT_DELETE_USER",
@@ -1420,20 +1420,20 @@ export async function test_v1_phase06() {
                        '130FE0374778: Login with user user01@TestL02 FAILED' );
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user01_at_TestL02,
-                                                                       [ "#MasterL03#" ],
+                                                                       [ "#Master_L03#" ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user01@TestL02_success",
                                                                        false ),
-                       'DDC02D014233: The user user01@TestL02 is OK have the role #MasterL03#',
-                       'DDC02D014233: The user user01@TestL02 NOT have the role #MasterL03# FAILED' );
+                       'DDC02D014233: The user user01@TestL02 is OK have the role #Master_L03#',
+                       'DDC02D014233: The user user01@TestL02 NOT have the role #Master_L03# FAILED' );
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user01_at_TestL02,
-                                                                       [ "#Administrator#", "#BManagerL99#", "#MasterL01#" ],
+                                                                       [ "#Administrator#", "#BManager_L99#", "#Master_L01#" ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user01@TestL02_fail",
                                                                        false ) === false,
-                       'AD3CC7F54477: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01#',
-                       'AD3CC7F54477: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# FAILED' );
+                       'AD3CC7F54477: The user user02@TestL02 is OK not have the roles #Administrator# or #BManager_L99# or #Master_L01#',
+                       'AD3CC7F54477: The user user02@TestL02 have the roles #Administrator# and/or #BManager_L99# and/or #Master_L01# FAILED' );
 
   CommonTest.myAssert( await UserGroupTestV1.test_createUserGroup_TestL56( CommonTest.headers_user01_at_TestL02,
                                                                            "SUCCESS_USER_GROUP_CREATE",
@@ -1501,7 +1501,7 @@ export async function test_v1_phase06() {
                        '6E97A554929E: Delete of the user group TestL46 is OK',
                        '6E97A554929E: Delete of the user group TestL46 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //*** Create the user user02@TestL02 ***
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL02_success( CommonTest.headers_user01_at_TestL02 ),
                        '595AA97F14E3: Creation of the user user02@TestL02 is OK',
@@ -1509,14 +1509,14 @@ export async function test_v1_phase06() {
 
   //Change the user name from user02@TestL02 => user99@TestL01
   //Change the user group name from TestL02 => TestL01
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_updateUser_user02_at_TestL02_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL02_data ), //The user is another group
                        '5CE1E61F0840: Update of the user user02@TestL02 is OK',
                        '5CE1E61F0840: Update of the user user02@TestL02 is FAILED' );
 
   //Change the user name from user99@TestL01 => user02@TestL02
   //Change the user group name from TestL01 => TestL02
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //Set the field sysUser.ForceChangePassword = 1
   CommonTest.myAssert( await UserTestV1.test_updateUser_user99_at_TestL01_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL02_data ), //The user is another group
                        'F59085E6DF03: Update of the user user99@TestL01 is OK',
@@ -1529,13 +1529,13 @@ export async function test_v1_phase06() {
                        'F15260F5B6AD: Update of the user user02@TestL02 is OK with the fail',
                        'F15260F5B6AD: Update of the user user02@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   //*** Create the user user02@TestL01 ***
   CommonTest.myAssert( await UserTestV1.test_createUser_user02_at_TestL01_success( CommonTest.headers_user01_at_TestL02 ),
                        'F717131C21AA: Creation of the user user02@TestL01 is OK',
                        'F717131C21AA: Creation of the user user02@TestL01 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_updateUser_user02_at_TestL01_success( CommonTest.headers_user01_at_TestL02, CommonTest.user02_at_TestL01_data ), //The user is another group
                        '79736CBA890B: Creation of the user user02@TestL01 is OK',
                        '79736CBA890B: Creation of the user user02@TestL01 is FAILED' );
@@ -1699,7 +1699,7 @@ export async function test_v1_phase06() {
                        '8A95C404DA5D: Bulk enable of the user user0X@TestL0X is FAILED' );
 
   //*** Move user user02@TestL01 to the user group TestL02 ***
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_moveBulkUser( CommonTest.headers_user01_at_TestL02,
                                                            {
                                                              bulk: [
@@ -1712,7 +1712,7 @@ export async function test_v1_phase06() {
                        '6C86B6F735D4: Bulk move of the user user02@TestL01 is FAILED' );
 
   //*** Move user user02@TestL01 to the user group TestL01 ***
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_moveBulkUser( CommonTest.headers_user01_at_TestL02,
                                                            {
                                                              bulk: [
@@ -1805,7 +1805,7 @@ export async function test_v1_phase06() {
                        '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is OK',
                        '67CFE1F1D4F0: Search count of the binary data user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL01"
@@ -1828,7 +1828,7 @@ export async function test_v1_phase06() {
                        '6DA562F7B229: Set settings of the user group TestL01 using user user01@TestL02 is OK',
                        '6DA562F7B229: Set settings of the user group TestL01 using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL02"
@@ -1851,7 +1851,7 @@ export async function test_v1_phase06() {
                        '7E9555969A8A: Set settings of the user group TestL02 using user user01@TestL02 is OK',
                        '7E9555969A8A: Set settings of the user group TestL02 using user user01@TestL02 is FAILED' );
 
-  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
+  //Fail because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "System_Administrators"
@@ -1868,7 +1868,7 @@ export async function test_v1_phase06() {
                        '2AFD61979617: Set settings of the user group System_Administrators using user user01@TestL02 is OK with the fail',
                        '2AFD61979617: Set settings of the user group System_Administrators using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_getSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL01"
@@ -1886,7 +1886,7 @@ export async function test_v1_phase06() {
                        'EAEE8CDC1FB7: Get settings of the user group TestL01 using user user01@TestL02 is OK',
                        'EAEE8CDC1FB7: Get settings of the user group TestL01 using user user01@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserGroupTestV1.test_getSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "TestL02"
@@ -1904,7 +1904,7 @@ export async function test_v1_phase06() {
                        '5284AFC6F9C4: Get settings of the user group TestL02 using user user01@TestL02 is OK',
                        '5284AFC6F9C4: Get settings of the user group TestL02 using user user01@TestL02 is FAILED' );
 
-  //Fail because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
+  //Fail because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#, no allowed to write the settings of the user group System_Administrators
   CommonTest.myAssert( await UserGroupTestV1.test_setSettings( CommonTest.headers_user01_at_TestL02,
                                                                {
                                                                  Name: "System_Administrators"
@@ -1942,10 +1942,10 @@ export async function test_v1_phase07() {
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user02_at_TestL02,
                                                                        [
                                                                          "#Administrator#",
-                                                                         "#BManagerL99#",
-                                                                         "#MasterL01#",
-                                                                         "#MasterL02#",
-                                                                         "#MasterL03#"
+                                                                         "#BManager_L99#",
+                                                                         "#Master_L01#",
+                                                                         "#Master_L02#",
+                                                                         "#Master_L03#"
                                                                        ],
                                                                        "ERROR_USER_CHANGE_PASSWORD_REQUIRED",
                                                                        "test_profile_role_user02@TestL02_fail",
@@ -2001,16 +2001,16 @@ export async function test_v1_phase07() {
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user02_at_TestL02,
                                                                        [
                                                                          "#Administrator#",
-                                                                         "#BManagerL99#",
-                                                                         "#MasterL01#",
-                                                                         "#MasterL02#",
-                                                                         "#MasterL03#"
+                                                                         "#BManager_L99#",
+                                                                         "#Master_L01#",
+                                                                         "#Master_L02#",
+                                                                         "#Master_L03#"
                                                                        ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user02@TestL02_fail",
                                                                        false ) === false,
-                       'DEF3E36E35C4: The user user02@TestL02 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
-                       'DEF3E36E35C4: The user user02@TestL02 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
+                       'DEF3E36E35C4: The user user02@TestL02 is OK not have the roles #Administrator# or #BManager_L99# or #Master_L01# or #Master_L02# or #Master_L03#',
+                       'DEF3E36E35C4: The user user02@TestL02 have the roles #Administrator# and/or #BManager_L99# and/or #Master_L01# and/or #Master_L02# and/or #Master_L03# FAILED' );
 
   CommonTest.myAssert( await BinaryTestV1.test_uploadImageTiger( CommonTest.headers_user02_at_TestL02,
                                                                  "SUCCESS_BINARY_DATA_UPLOAD",
@@ -2190,12 +2190,12 @@ export async function test_v1_phase08() {
                        '9505C68A979F: Login with user user02@TestL01 FAILED' );
 
   CommonTest.myAssert( await UserTestV1.test_profile_at_less_one_role( CommonTest.headers_user02_at_TestL01,
-                                                                       [ "#Administrator#", "#BManagerL99#", "#MasterL01#", "#MasterL02#", "#MasterL03#" ],
+                                                                       [ "#Administrator#", "#BManager_L99#", "#Master_L01#", "#Master_L02#", "#Master_L03#" ],
                                                                        "SUCCESS_GET_SESSION_PROFILE",
                                                                        "test_profile_role_user02@TestL01_fail",
                                                                        false ) === false,
-                       'BE0D27084964: The user user02@TestL01 is OK not have the roles #Administrator# or #BManagerL99# or #MasterL01# or #MasterL02# or #MasterL03#',
-                       'BE0D27084964: The user user02@TestL01 have the roles #Administrator# and/or #BManagerL99# and/or #MasterL01# and/or #MasterL02# and/or #MasterL03# FAILED' );
+                       'BE0D27084964: The user user02@TestL01 is OK not have the roles #Administrator# or #BManager_L99# or #Master_L01# or #Master_L02# or #Master_L03#',
+                       'BE0D27084964: The user user02@TestL01 have the roles #Administrator# and/or #BManager_L99# and/or #Master_L01# and/or #Master_L02# and/or #Master_L03# FAILED' );
 
   CommonTest.myAssert( await BinaryTestV1.test_uploadImageCastle( CommonTest.headers_user02_at_TestL01,
                                                                   "SUCCESS_BINARY_DATA_UPLOAD",
@@ -2305,7 +2305,7 @@ export async function test_v1_phase09() {
                        "D02C1566D62C: Delete image road user01@TestL02 is OK",
                        "D02C1566D62C: Delete image road user01@TestL02 is FAILED" );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL02,
                                                          {
                                                            Id: CommonTest.user02_at_TestL02_data.Id
@@ -2315,7 +2315,7 @@ export async function test_v1_phase09() {
                        'B266409B2D82: Delete of the user user02@TestL02 is OK',
                        'B266409B2D82: Delete of the user user02@TestL02 is FAILED' );
 
-  //Success because user01@TestL02 has the Role => #MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
+  //Success because user01@TestL02 has the Role => #Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL45#+#GName:TestL55#
   CommonTest.myAssert( await UserTestV1.test_deleteUser( CommonTest.headers_user01_at_TestL02,
                                                          {
                                                            Id: CommonTest.user02_at_TestL01_data.Id
@@ -2504,6 +2504,8 @@ async function test01_v1() {
     }
 
     await test_v1_phase11();
+
+    CommonTest.consoleLog( "Separator.blue", "<******************** Finished ********************>", "none" );
 
   }
   catch ( error ) {
