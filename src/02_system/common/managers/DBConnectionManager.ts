@@ -392,10 +392,10 @@ export default class DBConnectionManager {
 
           }
 
-          if ( dbConfigData[ databaseList[ intDatabaseIndex ] ].health &&
-               dbConfigData[ databaseList[ intDatabaseIndex ] ].health.check ) {
+          if ( dbConfigData[ databaseList[ intDatabaseIndex ] ][ process.env.ENV ].health &&
+               dbConfigData[ databaseList[ intDatabaseIndex ] ][ process.env.ENV ].health.check ) {
 
-            const strSQL = dbConfigData[ databaseList[ intDatabaseIndex ] ].health.check;
+            const strSQL = dbConfigData[ databaseList[ intDatabaseIndex ] ][ process.env.ENV ].health.check;
 
             await dbConnection.query( strSQL,
                                       {
