@@ -1182,12 +1182,12 @@ export default class BinaryServiceController extends BaseService {
     try {
 
       result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ) ||
                                                           userSessionStatus.Role.includes( "#" + strActionRole + "L99#" ): false;
 
       if ( result.isAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
@@ -1211,7 +1211,7 @@ export default class BinaryServiceController extends BaseService {
 
         if ( result.isAuthorizedL03 === false ) {
 
-          let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+          let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
           if ( !roleSubTag ||
               roleSubTag.length === 0 &&
@@ -1276,7 +1276,7 @@ export default class BinaryServiceController extends BaseService {
 
     try {
 
-      let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+      let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
       if ( !roleSubTag ||
            roleSubTag.length === 0 &&
@@ -1293,7 +1293,7 @@ export default class BinaryServiceController extends BaseService {
 
       if ( result.isAuthorizedL03 === false ) {
 
-        result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+        result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
                                                           userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
         if ( result.isAuthorizedL01 &&
@@ -2006,7 +2006,7 @@ export default class BinaryServiceController extends BaseService {
       }
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ) ||
                                                           userSessionStatus.Role.includes( "#SearchBinaryL99#" ) : false;
 
       let bIsAuthorizedL03 = false;
@@ -2019,12 +2019,12 @@ export default class BinaryServiceController extends BaseService {
 
       if ( bIsAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_Binary_L03#" );
 
         }
 
@@ -2037,12 +2037,12 @@ export default class BinaryServiceController extends BaseService {
 
         }
 
-        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_Binary_L02#" );
 
         }
 
@@ -2055,8 +2055,8 @@ export default class BinaryServiceController extends BaseService {
 
         }
 
-        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                    userSessionStatus.Role.includes( "#SearchBinaryL01#" ): false;
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
+                                                    userSessionStatus.Role.includes( "#Search_Binary_L01#" ): false;
 
         if ( bIsAuthorizedL01 ) {
 
@@ -2358,7 +2358,7 @@ export default class BinaryServiceController extends BaseService {
       }
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ) ||
                                                           userSessionStatus.Role.includes( "#SearchBinaryL99#" ): false;
 
       let bIsAuthorizedL03 = false;
@@ -2371,12 +2371,12 @@ export default class BinaryServiceController extends BaseService {
 
       if ( bIsAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_Binary_L03#" );
 
         }
 
@@ -2389,12 +2389,12 @@ export default class BinaryServiceController extends BaseService {
 
         }
 
-        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchBinaryL02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_Binary_L02#" );
 
         }
 
@@ -2407,8 +2407,8 @@ export default class BinaryServiceController extends BaseService {
 
         }
 
-        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                    userSessionStatus.Role.includes( "#SearchBinaryL01#" ): false;
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
+                                                    userSessionStatus.Role.includes( "#Search_Binary_L01#" ): false;
 
         if ( bIsAuthorizedL01 ) {
 
@@ -4958,7 +4958,7 @@ export default class BinaryServiceController extends BaseService {
 
             checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
                                                                          sysUserInDB,
-                                                                         "UpdateBinary",
+                                                                         "Update_Binary",
                                                                          logger );
 
             if ( checkUserRoles.isAuthorizedAdmin ||
@@ -4984,7 +4984,7 @@ export default class BinaryServiceController extends BaseService {
 
               checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
                                                                                 sysUserGroupInDB,
-                                                                                "UpdateBinary",
+                                                                                "Update_Binary",
                                                                                 logger );
 
               if ( checkUserRoles.isAuthorizedL01 ||
@@ -5619,7 +5619,7 @@ export default class BinaryServiceController extends BaseService {
 
                 checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
                                                                              sysUserInDB,
-                                                                             strBulkOperation === "deleteBinaryData" ? "DeleteBinaryData": "UpdateBinary",
+                                                                             strBulkOperation === "deleteBinaryData" ? "DeleteBinaryData": "Update_Binary",
                                                                              logger );
 
                 if ( checkUserRoles.isAuthorizedAdmin ||
@@ -5645,7 +5645,7 @@ export default class BinaryServiceController extends BaseService {
 
                   checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
                                                                                     sysUserGroupInDB,
-                                                                                    strBulkOperation === "deleteBinary" ? "DeleteBinary": "UpdateBinary",
+                                                                                    strBulkOperation === "deleteBinary" ? "Delete_Binary": "Update_Binary",
                                                                                     logger );
 
                   if ( checkUserRoles.isAuthorizedL01 ||
@@ -6280,7 +6280,7 @@ export default class BinaryServiceController extends BaseService {
 
             checkUserRoles = BinaryServiceController.checkUserRoleLevel( userSessionStatus,
                                                                          sysUserInDB,
-                                                                         "DeleteBinary",
+                                                                         "Delete_Binary",
                                                                          logger );
 
             if ( checkUserRoles.isAuthorizedAdmin ||
@@ -6306,7 +6306,7 @@ export default class BinaryServiceController extends BaseService {
 
               checkUserRoles = BinaryServiceController.checkUserGroupRoleLevel( userSessionStatus,
                                                                                 sysUserGroupInDB,
-                                                                                "DeleteBinary",
+                                                                                "Delete_Binary",
                                                                                 logger );
 
               if ( checkUserRoles.isAuthorizedL01 ||
@@ -6330,7 +6330,7 @@ export default class BinaryServiceController extends BaseService {
 
           if ( userSessionStatus.Role &&
                ( userSessionStatus.Role.includes( "#Administrator#" ) ||
-                 userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                 userSessionStatus.Role.includes( "#BManager_L99#" ) ||
                  userSessionStatus.Role.includes( "#DeleteBinaryL99#" ) ||
                  userSessionStatus.Role.includes( "#DeleteBinaryFile#" ) ) ) {
 
