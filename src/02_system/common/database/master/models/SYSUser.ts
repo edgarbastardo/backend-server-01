@@ -50,7 +50,6 @@ export class SYSUser extends Model<SYSUser> {
 
   }
 
-  @IsUUID(4)
   @Unique
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )

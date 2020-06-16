@@ -1029,7 +1029,7 @@ export default class SystemConstants {
                                                                                    "groupTag":"",
                                                                                    "groupExpireAt":-1,
                                                                                    "status":0,
-                                                                                   "userRole":"#Driver#,#UploadBinary,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                                                                   "userRole":"#Driver#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
                                                                                    "userTag":"",
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
