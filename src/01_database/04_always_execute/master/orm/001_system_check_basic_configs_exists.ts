@@ -320,7 +320,7 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#Driver#,#UploadBinary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":""
@@ -333,7 +333,7 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#FinalCustomer#,#FinalCustomer01#,#UploadBinary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":""
