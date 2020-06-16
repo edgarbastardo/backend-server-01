@@ -525,7 +525,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#";
+      userRequest.Role = "#Master_L01#";
       userRequest.Business.Tag = "#UserTestV1#";
       userRequest.sysUserGroup.Create = false;    //No request create
       userRequest.sysUserGroup.Name = "TestL01";  //This group not exists
@@ -574,7 +574,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user98@TestL98";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
@@ -582,7 +582,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
-      userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.sysUserGroup.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Business.Tag = "#Tag11#,#Tag12#,#UserTestV1#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -605,10 +605,10 @@ export default class UserTestV1 {
           if ( bMustBeEmptyRoleAndTag ) {
 
             if ( //!CommonTest.user98_at_TestL98_data.Role &&
-                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user98_at_TestL98_data.Tag &&
                 //!CommonTest.user98_at_TestL98_data.sysUserGroup.Role &&
-                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user98_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
@@ -624,11 +624,11 @@ export default class UserTestV1 {
 
             //const local = CommonTest.user98_at_TestL98_data;
 
-            if ( //CommonTest.user98_at_TestL98_data.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#MasterL01#" ) &&
+            if ( //CommonTest.user98_at_TestL98_data.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.Role, "#Master_L01#" ) &&
                 CommonTest.user98_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
-                //CommonTest.user98_at_TestL98_data.sysUserGroup.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+                //CommonTest.user98_at_TestL98_data.sysUserGroup.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user98_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) &&
                 CommonTest.user98_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
                 CommonTest.user98_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user98_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
@@ -677,7 +677,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user97@TestL98";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
@@ -685,7 +685,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
-      userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.sysUserGroup.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -708,10 +708,10 @@ export default class UserTestV1 {
           if ( bMustBeEmptyRoleAndTag ) {
 
             if ( //!CommonTest.user97_at_TestL98_data.Role &&
-                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user97_at_TestL98_data.Tag &&
                 //!CommonTest.user97_at_TestL98_data.sysUserGroup.Role &&
-                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user97_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user97_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
@@ -725,11 +725,11 @@ export default class UserTestV1 {
           }
           else {
 
-            if ( //user97_at_TestL97_data.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.Role, "#MasterL01#" ) &&
+            if ( //user97_at_TestL97_data.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.Role, "#Master_L01#" ) &&
                 CommonTest.user97_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
-                //user97_at_TestL97_data.sysUserGroup.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+                //user97_at_TestL97_data.sysUserGroup.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user97_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) &&
                 CommonTest.user97_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
                 CommonTest.user97_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user97_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
@@ -778,7 +778,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user96@TestL98";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Tag = "#Tag01#,#Tag02#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
@@ -786,7 +786,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.ShortId = null; //Create a group with name of user98@TestL98
       userRequest.sysUserGroup.Name = null; //Create a group with name of user98@TestL98
-      userRequest.sysUserGroup.Role = "#MasterL01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
+      userRequest.sysUserGroup.Role = "#Master_L01#"; //This role can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Tag = "#Tag11#,#Tag12#"; //This tag can be ignored if bMustBeEmptyRoleAndTag === true
       userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -809,10 +809,10 @@ export default class UserTestV1 {
           if ( bMustBeEmptyRoleAndTag ) {
 
             if ( //!CommonTest.user96_at_TestL98_data.Role &&
-                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user96_at_TestL98_data.Tag &&
                 //!CommonTest.user96_at_TestL98_data.sysUserGroup.Role &&
-                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) === false &&
                 !CommonTest.user96_at_TestL98_data.sysUserGroup.Tag &&
                 CommonTest.user96_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
@@ -826,11 +826,11 @@ export default class UserTestV1 {
           }
           else {
 
-            if ( //user96_at_TestL97_data.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.Role, "#MasterL01#" ) &&
+            if ( //user96_at_TestL97_data.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.Role, "#Master_L01#" ) &&
                 CommonTest.user96_at_TestL98_data.Tag === "#Tag01#,#Tag02#" &&
-                //user96_at_TestL97_data.sysUserGroup.Role === "#MasterL01#" &&
-                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.sysUserGroup.Role, "#MasterL01#" ) &&
+                //user96_at_TestL97_data.sysUserGroup.Role === "#Master_L01#" &&
+                CommonTest.checkTokens( CommonTest.user96_at_TestL98_data.sysUserGroup.Role, "#Master_L01#" ) &&
                 CommonTest.user96_at_TestL98_data.sysUserGroup.Tag === "#Tag11#,#Tag12#" &&
                 CommonTest.user96_at_TestL98_data.Business.Role === "#Role01#,#Role02#" &&
                 CommonTest.user96_at_TestL98_data.Business.Tag === "#Tag01#,#Tag02#" &&
@@ -873,7 +873,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#"; //This roles must be NOT ignored
+      userRequest.Role = "#Master_L01#"; //This roles must be NOT ignored
       userRequest.Tag = "#Tag11#,#Tag12#"; //This tags must be NOT ignored
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
@@ -897,11 +897,11 @@ export default class UserTestV1 {
 
         CommonTest.user01_at_TestL01_data = result.output.body.Data[ 0 ];
 
-        if ( //CommonTest.user01_at_TestL01_data.Role === "#MasterL01#" &&
-            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.Role, "#MasterL01#" ) &&
+        if ( //CommonTest.user01_at_TestL01_data.Role === "#Master_L01#" &&
+            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.Role, "#Master_L01#" ) &&
             CommonTest.user01_at_TestL01_data.Tag === "#Tag11#,#Tag12#" &&
             //!CommonTest.user01_at_TestL01_data.sysUserGroup.Role &&
-            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.sysUserGroup.Role, "#MasterL01#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.sysUserGroup.Role, "#Master_L01#" ) === false &&
             !CommonTest.user01_at_TestL01_data.sysUserGroup.Tag &&
             CommonTest.user01_at_TestL01_data.Business.Role === "#Role01#,#Role02#" &&
             CommonTest.user01_at_TestL01_data.Business.Tag === "#Tag01#,#Tag02#,#UserTestV1#" &&
@@ -936,7 +936,7 @@ export default class UserTestV1 {
       userRequest.Id = null;
       userRequest.Name = "user01@TestL02";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL56#+#GName:TestL46#";
+      userRequest.Role = "#Master_L03#+#GName:TestL01#+#GName:TestL02#+#GName:TestL56#+#GName:TestL46#";
       userRequest.Business.Role = "#Role10#,#Role11#";
       userRequest.Business.Tag = "#Tag10#,#Tag11#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;         //Ask to create
@@ -983,13 +983,13 @@ export default class UserTestV1 {
       userRequest.Id = null;
       userRequest.Name = "user02@TestL02";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL03#+#GName:TestL01#+#GName:TestL02#"; //<---- This roles must be ignored
+      userRequest.Role = "#Master_L03#+#GName:TestL01#+#GName:TestL02#"; //<---- This roles must be ignored
       userRequest.Tag = "#Tag01#"; //<---- This tag must be ignored
       userRequest.Business.Role = "#Role20#,#Role21#"; //<---- This roles must be ignored
       userRequest.Business.Tag = "#Tag20#,#Tag21#,#UserTestV1#"; //<---- This roles must be ignored
       userRequest.sysUserGroup.Create = false;         //Ask to create
       userRequest.sysUserGroup.Name = "TestL02";       //This group must exists
-      userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#"; //<---- This roles must be ignored
+      userRequest.sysUserGroup.Role = "#Administrator#,#BManager_L99#"; //<---- This roles must be ignored
       userRequest.sysUserGroup.Tag = "#Tag02#"; //<---- This tag must be ignored
       userRequest.sysUserGroup.Business.Tag = "#UserTestV1#"; //<---- This roles must be ignored
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1010,10 +1010,10 @@ export default class UserTestV1 {
         if ( CommonTest.user02_at_TestL02_data.Name === "user02@TestL02" &&
             CommonTest.user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
             //!CommonTest.user02_at_TestL02_data.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#MasterL03#+#GName:TestL01#+#GName:TestL02#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#Master_L03#+#GName:TestL01#+#GName:TestL02#" ) === false &&
             !CommonTest.user02_at_TestL02_data.Tag &&
             //!CommonTest.user02_at_TestL02_data.sysUserGroup.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL02_data.sysUserGroup.Tag ) {
 
           CommonTest.user02_at_TestL02_data.Password = userRequest.Password;
@@ -1044,13 +1044,13 @@ export default class UserTestV1 {
 
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#";
+      userRequest.Role = "#Master_L01#";
       userRequest.Tag = "#Tag11#,#Tag12#";
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;    //Ask to create
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-      userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
+      userRequest.sysUserGroup.Role = "#Administrator#,#BManager_L99#";
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
       userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1091,13 +1091,13 @@ export default class UserTestV1 {
 
       userRequest.Name = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, null );
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#";
+      userRequest.Role = "#Master_L01#";
       userRequest.Tag = "#Tag11#,#Tag12#";
       userRequest.Business.Role = "#Role01#,#Role02#";
       userRequest.Business.Tag = "#Tag01#,#Tag02#,#UserTestV1#";
       userRequest.sysUserGroup.Create = true;    //Ask to create
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-      userRequest.sysUserGroup.Role = "#Administrator#,#BManagerL99#";
+      userRequest.sysUserGroup.Role = "#Administrator#,#BManager_L99#";
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#";
       userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1139,7 +1139,7 @@ export default class UserTestV1 {
       //userRequestFull.Id = null;
       userRequest.Name = "user02@TestL02";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManarageL01#"; //<--- This roles ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManarageL01#"; //<--- This roles ignored
       userRequest.sysUserGroup.Create = false;      //No request to create, This request must be fail
       userRequest.sysUserGroup.Name = "TestL02";    //This group not exists
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1180,13 +1180,13 @@ export default class UserTestV1 {
 
       userRequest.Name = "user02@TestL01";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role is ignored
       userRequest.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
       userRequest.Business.Role = "#Role03#,#Role04#";
       userRequest.Business.Tag = "#Tag03#,#Tag04#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;
       userRequest.sysUserGroup.Name = "TestL01";    //This group not exists
-      userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+      userRequest.sysUserGroup.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role is ignored
       userRequest.sysUserGroup.Tag = "#Tag01#,#Tag02#"; //<-- This tag is ignored
       userRequest.sysUserGroup.Business.Tag = "#UserTestV1#";
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1205,10 +1205,10 @@ export default class UserTestV1 {
         CommonTest.user02_at_TestL01_data = result.output.body.Data[ 0 ];
 
         if ( //!CommonTest.user02_at_TestL01_data.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL01_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL01_data.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL01_data.Tag &&
             //!CommonTest.user02_at_TestL01_data.sysUserGroup.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL01_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL01_data.sysUserGroup.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL01_data.sysUserGroup.Tag &&
             userRequest.Business.Role === "#Role03#,#Role04#" &&
             userRequest.Business.Tag === "#Tag03#,#Tag04#,#UserTestV1#" ) {
@@ -1241,7 +1241,7 @@ export default class UserTestV1 {
 
       userRequest.Name = "user03@TestL01";
       userRequest.Password = "12345678";
-      userRequest.Role = "#MasterL01#";
+      userRequest.Role = "#Master_L01#";
       userRequest.Business.Role = "#Role03#,#Role04#";
       userRequest.Business.Tag = "#Tag03#,#Tag04#,#UserTestV1#";
       userRequest.sysUserGroup.Create = false;
@@ -1290,7 +1290,7 @@ export default class UserTestV1 {
       userRequest.ExpireAt = "";
       userRequest.Name = "user99@TestL01";
       userRequest.Password = "123456789";
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role must be ignored
       userRequest.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Comment = "Update success";
       userRequest.sysPerson = userData.sysPerson;
@@ -1302,7 +1302,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = "";
       userRequest.sysUserGroup.ShortId = "";
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-      userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+      userRequest.sysUserGroup.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role must be ignored
       userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Business = userData.Business;
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1323,10 +1323,10 @@ export default class UserTestV1 {
         if ( CommonTest.user02_at_TestL02_data.Name === "user99@TestL01" &&
             CommonTest.user02_at_TestL02_data.sysUserGroup.Name === "TestL01" &&
             //!CommonTest.user02_at_TestL02_data.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL02_data.Tag &&
             //!CommonTest.user02_at_TestL02_data.sysUserGroup.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL02_data.sysUserGroup.Tag ) {
 
             CommonTest.user02_at_TestL02_data.Password = userRequest.Password;
@@ -1362,7 +1362,7 @@ export default class UserTestV1 {
       userRequest.ExpireAt = "";
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "123456789";
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role is ignored
       userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
       userRequest.Comment = "Update success";
       userRequest.sysPerson = userData.sysPerson;
@@ -1374,7 +1374,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = "";
       userRequest.sysUserGroup.ShortId = "";
       userRequest.sysUserGroup.Name = "TestL01";    //This group already exists
-      userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+      userRequest.sysUserGroup.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role is ignored
       userRequest.sysUserGroup.Tag = "#Tag11#";  //<-- This tag is ignored
       userRequest.Business = userData.Business;
 
@@ -1420,7 +1420,7 @@ export default class UserTestV1 {
       userRequest.Name = "user02@TestL02";
       userRequest.Password = "123456789";
       userRequest.ForceChangePassword = 1;
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role must be ignored
       userRequest.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Comment = "Update success";
       userRequest.sysPerson = userData.sysPerson;
@@ -1432,7 +1432,7 @@ export default class UserTestV1 {
       userRequest.sysUserGroup.Id = "";
       userRequest.sysUserGroup.ShortId = "";
       userRequest.sysUserGroup.Name = "TestL02";    //This group already exists
-      userRequest.sysUserGroup.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role must be ignored
+      userRequest.sysUserGroup.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role must be ignored
       userRequest.sysUserGroup.Tag = "#Tag01#";  //<-- This tag must be ignored
       userRequest.Business = userData.Business;
       userRequest.sysPerson.Business.Tag = "#UserTestV1#";
@@ -1453,10 +1453,10 @@ export default class UserTestV1 {
         if ( CommonTest.user02_at_TestL02_data.Name === "user02@TestL02" &&
             CommonTest.user02_at_TestL02_data.sysUserGroup.Name === "TestL02" &&
             //!CommonTest.user02_at_TestL02_data.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL02_data.Tag &&
             //!CommonTest.user02_at_TestL02_data.sysUserGroup.Role &&
-            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#MasterL01#,#Administrator#,#BManagerL99#" ) === false &&
+            CommonTest.checkTokens( CommonTest.user02_at_TestL02_data.sysUserGroup.Role, "#Master_L01#,#Administrator#,#BManager_L99#" ) === false &&
             !CommonTest.user02_at_TestL02_data.sysUserGroup.Tag ) {
 
           CommonTest.user02_at_TestL02_data.Password = userRequest.Password;
@@ -1674,7 +1674,7 @@ export default class UserTestV1 {
       userRequest.ExpireAt = "";
       userRequest.Name = "user01@TestL01";
       userRequest.Password = "123456789";
-      userRequest.Role = "#MasterL01#"; //This role must be NOT ignored
+      userRequest.Role = "#Master_L01#"; //This role must be NOT ignored
       userRequest.Tag = "#Tag01#"; //This tag must be NOT ignored
       userRequest.SessionsLimit = 1;
       userRequest.Comment = "Update success";
@@ -1707,7 +1707,7 @@ export default class UserTestV1 {
 
         if ( CommonTest.user01_at_TestL01_data.Name === "user01@TestL01" &&
             CommonTest.user01_at_TestL01_data.sysUserGroup.Name === "TestL01" &&
-            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.Role, "#MasterL01#" ) &&
+            CommonTest.checkTokens( CommonTest.user01_at_TestL01_data.Role, "#Master_L01#" ) &&
             //!CommonTest.user01_at_TestL01_data.Role &&
             !CommonTest.user01_at_TestL01_data.sysUserGroup.Role &&
             !CommonTest.user01_at_TestL01_data.sysUserGroup.Tag ) {
@@ -1745,7 +1745,7 @@ export default class UserTestV1 {
       userRequest.ExpireAt = "";
       userRequest.Name = "user02@TestL01";
       userRequest.Password = "123456789";
-      userRequest.Role = "#MasterL01#,#Administrator#,#BManagerL99#"; //<-- This role is ignored
+      userRequest.Role = "#Master_L01#,#Administrator#,#BManager_L99#"; //<-- This role is ignored
       userRequest.Tag = "#Tag01#";  //<-- This tag is ignored
       userRequest.Comment = "Update success";
       userRequest.sysPerson = userData.sysPerson;

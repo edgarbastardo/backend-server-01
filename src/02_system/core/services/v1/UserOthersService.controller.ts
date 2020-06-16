@@ -547,12 +547,12 @@ export default class UserOthersServiceController {
     try {
 
       result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ) ||
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ) ||
                                                           userSessionStatus.Role.includes( "#" + strActionRole + "L99#" ): false;
 
       if ( result.isAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
@@ -576,7 +576,7 @@ export default class UserOthersServiceController {
 
         if ( result.isAuthorizedL03 === false ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
           if ( !roleSubTag ||
                 roleSubTag.length === 0 ) {
@@ -600,7 +600,7 @@ export default class UserOthersServiceController {
 
           if ( result.isAuthorizedL02 === false ) {
 
-            result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+            result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
                                                               userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
             if ( result.isAuthorizedL01 &&
@@ -1282,7 +1282,7 @@ export default class UserOthersServiceController {
       let bProfileOfAnotherUser = false;
 
       if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
-           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+           context.UserSessionStatus.Role.includes( "#BManager_L99#" ) ) {
 
         if ( request.query.shortToken ) {
 
@@ -2278,16 +2278,16 @@ export default class UserOthersServiceController {
     try {
 
       result.isAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ): false;
 
       if ( result.isAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#CreateUserL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#" + strActionRole + "L03#" ); // "#Create_User_L03#" );
 
         }
 
@@ -2306,7 +2306,7 @@ export default class UserOthersServiceController {
 
         if ( result.isAuthorizedL03 === false ) {
 
-          result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
+          result.isAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
                                                             userSessionStatus.Role.includes( "#" + strActionRole + "L01#" ): false;
 
           if ( result.isAuthorizedL01 &&
@@ -2587,7 +2587,7 @@ export default class UserOthersServiceController {
     }
 
     strResult = CommonUtilities.removeTag( strResult, "#Administrator#" );
-    strResult = CommonUtilities.removeTag( strResult, "#BManagerL99#" );
+    strResult = CommonUtilities.removeTag( strResult, "#BManager_L99#" );
 
     return strResult;
 
@@ -2690,7 +2690,7 @@ export default class UserOthersServiceController {
     }
 
     strResult = CommonUtilities.removeTag( strResult, "#Administrator#" );
-    strResult = CommonUtilities.removeTag( strResult, "#BManagerL99#" );
+    strResult = CommonUtilities.removeTag( strResult, "#BManager_L99#" );
 
     return strResult;
 
@@ -2708,13 +2708,13 @@ export default class UserOthersServiceController {
       const sysUserGroupRole = sysUserInDB.sysUserGroup.Role ? sysUserInDB.sysUserGroup.Role.split( "," ): [];
 
       if ( sysUserRole.includes( "#Administrator#" ) ||
-           sysUserRole.includes( "#BManagerL99#" ) ||
+           sysUserRole.includes( "#BManager_L99#" ) ||
            sysUserGroupRole.includes( "#Administrator#" ) ||
-           sysUserGroupRole.includes( "#BManagerL99#" ) ) {
+           sysUserGroupRole.includes( "#BManager_L99#" ) ) {
 
         //The user to check is administrator
         bResult = userSessionStatus.Role.includes( "#Administrator#" ) ||
-                  userSessionStatus.Role.includes( "#BManagerL99#" ); //Check the current user session is administrator too
+                  userSessionStatus.Role.includes( "#BManager_L99#" ); //Check the current user session is administrator too
 
       }
       else { //The user is not administrator
@@ -2787,7 +2787,7 @@ export default class UserOthersServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ): false;
 
       let bIsAuthorizedL03 = false;
       let strWhereL03 = "";
@@ -2798,12 +2798,12 @@ export default class UserOthersServiceController {
 
       if ( bIsAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_User_L03#" );
 
         }
 
@@ -2816,12 +2816,12 @@ export default class UserOthersServiceController {
 
         }
 
-        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_User_L02#" );
 
         }
 
@@ -2834,8 +2834,8 @@ export default class UserOthersServiceController {
 
         }
 
-        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                    userSessionStatus.Role.includes( "#SearchUserL01#" ): false;
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
+                                                    userSessionStatus.Role.includes( "#Search_User_L01#" ): false;
 
         if ( bIsAuthorizedL01 ) {
 
@@ -3141,7 +3141,7 @@ export default class UserOthersServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       const bIsAuthorizedAdmin = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Administrator#" ) ||
-                                                          userSessionStatus.Role.includes( "#BManagerL99#" ): false;
+                                                          userSessionStatus.Role.includes( "#BManager_L99#" ): false;
 
       let bIsAuthorizedL03 = false;
       let strWhereL03 = "";
@@ -3152,12 +3152,12 @@ export default class UserOthersServiceController {
 
       if ( bIsAuthorizedAdmin === false ) {
 
-        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL03#" );
+        let roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L03#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL03#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_User_L03#" );
 
         }
 
@@ -3170,12 +3170,12 @@ export default class UserOthersServiceController {
 
         }
 
-        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#MasterL02#" );
+        roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Master_L02#" );
 
         if ( !roleSubTag ||
               roleSubTag.length === 0 ) {
 
-          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#SearchUserL02#" );
+          roleSubTag = CommonUtilities.getSubTagFromComposeTag( userSessionStatus.Role, "#Search_User_L02#" );
 
         }
 
@@ -3188,8 +3188,8 @@ export default class UserOthersServiceController {
 
         }
 
-        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#MasterL01#" ) ||
-                                                    userSessionStatus.Role.includes( "#SearchUserL01#" ): false;
+        bIsAuthorizedL01 = userSessionStatus.Role ? userSessionStatus.Role.includes( "#Master_L01#" ) ||
+                                                    userSessionStatus.Role.includes( "#Search_User_L01#" ): false;
 
         if ( bIsAuthorizedL01 ) {
 
@@ -3420,7 +3420,7 @@ export default class UserOthersServiceController {
       let strAuthorization = context.Authorization;
 
       if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
-           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+           context.UserSessionStatus.Role.includes( "#BManager_L99#" ) ) {
 
         if ( request.query.shortToken ) {
 
@@ -3644,7 +3644,7 @@ export default class UserOthersServiceController {
       let bProfileOfAnotherUser = false;
 
       if ( context.UserSessionStatus.Role.includes( "#Administrator#" ) ||
-           context.UserSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+           context.UserSessionStatus.Role.includes( "#BManager_L99#" ) ) {
 
         if ( request.query.shortToken ) {
 
@@ -3915,7 +3915,7 @@ export default class UserOthersServiceController {
       let bProfileOfAnotherUser = false;
 
       if ( userSessionStatus.Role.includes( "#Administrator#" ) ||
-           userSessionStatus.Role.includes( "#BManagerL99#" ) ) {
+           userSessionStatus.Role.includes( "#BManager_L99#" ) ) {
 
         if ( request.query.shortToken ) {
 
@@ -4155,7 +4155,7 @@ export default class UserOthersServiceController {
 
       if ( userSessionStatus &&
            ( userSessionStatus.Role.includes( "#Administrator#" ) ||
-             userSessionStatus.Role.includes( "#BManagerL99#" ) ) ) {
+             userSessionStatus.Role.includes( "#BManager_L99#" ) ) ) {
 
         if ( request.query.shortToken ) {
 
