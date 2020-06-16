@@ -3,7 +3,11 @@ import path from 'path';
 import cluster from 'cluster';
 
 import { Transaction } from 'sequelize';
+
 import { Sequelize } from 'sequelize-typescript';
+
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 import appRoot from 'app-root-path';
 
 import CommonConstants from '../CommonConstants';
@@ -137,9 +141,9 @@ export default class DBConnectionManager {
 
       }
 
-      for ( let intDBIndex = 0; intDBIndex < databaseList.length; intDBIndex++ ) {
+      for ( let intDatabaseIndex = 0; intDatabaseIndex < databaseList.length; intDatabaseIndex++ ) {
 
-        const strCurrentDatabase = databaseList[ intDBIndex ];
+        const strCurrentDatabase = databaseList[ intDatabaseIndex ];
 
         try {
 
@@ -331,6 +335,138 @@ export default class DBConnectionManager {
     }
 
     return result;
+
+  }
+
+  static async checkHealthOfConnections( strDatabase: string, logger: any ): Promise<boolean> {
+
+    let bResult: boolean = false;
+
+    try {
+
+      const strConfigFile = appRoot.path + "/db_config.json";
+
+      fs.readFileSync( strConfigFile );
+
+      const dbConfigData = require( strConfigFile );
+
+      let databaseList = [];
+
+      if ( strDatabase === "*" ) {
+
+        const tempDatabaseList = Object.keys( dbConfigData );
+
+        for ( let intDBIndex = 0; intDBIndex < tempDatabaseList.length; intDBIndex++ ) {
+
+          const strCurrentDatabase = tempDatabaseList[ intDBIndex ];
+
+          if ( dbConfigData[ strCurrentDatabase ].connect ) {
+
+            databaseList.push( strCurrentDatabase );
+
+          }
+
+        }
+
+      }
+      else {
+
+        databaseList.push( strDatabase );
+
+      }
+
+      bResult = true;
+
+      for ( let intDatabaseIndex = 0; intDatabaseIndex < databaseList.length; intDatabaseIndex++ ) {
+
+        let currentTransaction = null;
+
+        const dbConnection = DBConnectionManager.getDBConnection( databaseList[ intDatabaseIndex ] );
+
+        try {
+
+          if ( currentTransaction === null ) {
+
+            currentTransaction = await dbConnection.transaction();
+
+
+          }
+
+          if ( dbConfigData[ databaseList[ intDatabaseIndex ] ].health &&
+               dbConfigData[ databaseList[ intDatabaseIndex ] ].health.check ) {
+
+            const strSQL = dbConfigData[ databaseList[ intDatabaseIndex ] ].health.check;
+
+            await dbConnection.query( strSQL,
+                                      {
+                                        raw: true,
+                                        type: QueryTypes.SELECT,
+                                        transaction: currentTransaction
+                                      } );
+
+          }
+
+          if ( currentTransaction !== null &&
+               currentTransaction.finished !== "rollback" ) {
+
+            await currentTransaction.commit();
+
+          }
+
+        }
+        catch ( error ) {
+
+          bResult = false;
+
+          if ( currentTransaction !== null ) {
+
+            try {
+
+              await currentTransaction.rollback();
+
+            }
+            catch ( error ) {
+
+
+            }
+
+          }
+
+          break;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.checkHealthOfConnections.name;
+
+      const strMark = "EA98B421BBFC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
 
   }
 

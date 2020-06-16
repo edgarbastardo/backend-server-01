@@ -1468,7 +1468,8 @@ export default class SystemUtilities {
 
             const roleSplitted = strRole.match( /#.*?#/gi ) //regularExpresion.exec( strRole ); //strRole.split( /#.*?#/gi );
 
-            if ( roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
+            if ( roleSplitted &&
+                 roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
                  mergedRoleSet.indexOf( roleSplitted[ 0 ] ) === -1 ) {
 
               mergedRoleSet.push( strRole );
@@ -1492,7 +1493,8 @@ export default class SystemUtilities {
 
             const roleSplitted = strRole.match( /#.*?#/gi ) //regularExpresion.exec( strRole ); //strRole.split( /#.*?#/gi );
 
-            if ( roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
+            if ( roleSplitted &&
+                 roleSetInBlackList.indexOf( roleSplitted[ 0 ] ) === -1 &&
                  mergedRoleSet.indexOf( roleSplitted[ 0 ] ) === -1 ) {
 
               mergedRoleSet.push( strRole );
