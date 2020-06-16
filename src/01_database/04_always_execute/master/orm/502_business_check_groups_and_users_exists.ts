@@ -47,13 +47,40 @@ export default class Always {
                                  {
                                    Id: "d7648ed4-1914-4fe4-9902-072a21db1f00",
                                    Name: "Drivers",
-                                   Role: "#Drivers#,#PresenceWorking#",
-                                   Tag: "#Drivers#,#PresenceWorking#",
-                                   Comment: "Created from backend startup. Group of users for testing.",
+                                   Role: "#Driver#,#Presence_Working#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                   Tag: "#Driver#,#Presence_Working#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                   Comment: "Created from backend startup. Group of users for drivers.",
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
-                               ]
+                                 {
+                                  Id: "12bcf955-a3d0-4a48-aa72-7986d79c73b2",
+                                  Name: "Administrative_Asistants",
+                                  Role: "#Adm_Asistant#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Tag: "#Adm_Asistant#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Comment: "Created from backend startup. Group of users Administrative Asistants.",
+                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                },
+                                {
+                                  Id: "9916bd73-093d-47c8-a549-65e7edd4f171",
+                                  Name: "Dispatchers",
+                                  Role: "#Dispatcher#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Tag: "#Dispatcher#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Comment: "Created from backend startup. Group of users Dispachers.",
+                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                },
+                                {
+                                  Id: "03e91fb3-6b70-4162-9af8-7219ce446e9f",
+                                  Name: "Final_Customers",
+                                  Role: "#Final_Customer#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Tag: "#Final_Customer#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                  Comment: "Created from backend startup. Group of users Final Customers.",
+                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                },
+                              ]
 
       const loopUserGroupEntriesAsync = async () => {
 

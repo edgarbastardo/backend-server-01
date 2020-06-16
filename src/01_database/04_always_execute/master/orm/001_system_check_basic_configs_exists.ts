@@ -164,9 +164,17 @@ export default class Always {
                                                                 "denied":"#image/png#,#image/jpeg#",
                                                                 "allowed":"*"
                                                               },
-                                                              "#System_Administrators#.test2":{
-                                                                "denied":"*",
-                                                                "allowed":""
+                                                              "#System_Administrators#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
+                                                              },
+                                                              "#Business_Managers#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
+                                                              },
+                                                              "#Administrative_Asistants#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
                                                               },
                                                               "#Documents_Allow_01#":{
                                                                 "denied":"",
@@ -252,6 +260,32 @@ export default class Always {
                                                                 "maxSymbol":0,
                                                                 "symbols":""
                                                               },
+                                                              "#Administrative_Asistants#": {
+                                                                "minLength":5,
+                                                                "maxLength":8,
+                                                                "minLowerCase":0,
+                                                                "maxLowerCase":0,
+                                                                "minUpperCase":0,
+                                                                "maxUpperCase":0,
+                                                                "minDigit":0,
+                                                                "maxDigit":0,
+                                                                "minSymbol":0,
+                                                                "maxSymbol":0,
+                                                                "symbols":""
+                                                              },
+                                                              "#Dispachers#": {
+                                                                "minLength":5,
+                                                                "maxLength":8,
+                                                                "minLowerCase":0,
+                                                                "maxLowerCase":0,
+                                                                "minUpperCase":0,
+                                                                "maxUpperCase":0,
+                                                                "minDigit":0,
+                                                                "maxDigit":0,
+                                                                "minSymbol":0,
+                                                                "maxSymbol":0,
+                                                                "symbols":""
+                                                              },
                                                               "#Drivers#":{
                                                                 "minLength":5,
                                                                 "maxLength":8,
@@ -320,12 +354,38 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#Driver#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                                                "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":""
                                                               },
-                                                              "#FinalCustomer01#":{
+                                                              "#Administrative_Asistant#":{
+                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "group":"Administrative_Asistants",
+                                                                "createGroup":false,
+                                                                "groupRole":"",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"",
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
+                                                                "passwordParameterTag":""
+                                                              },
+                                                              "#Dispatcher#":{
+                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "group":"Dispatchers",
+                                                                "createGroup":false,
+                                                                "groupRole":"",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"",
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
+                                                                "passwordParameterTag":""
+                                                              },
+                                                              "#Final_Customer#":{
                                                                 "expireAt":60,  //Token signup valid time in minutes
                                                                 "group":"Final_Customers",
                                                                 "createGroup":false,
@@ -333,20 +393,20 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#FinalCustomer#,#FinalCustomer01#,#UploadBinary#,#DeleteBinary#,#UpdateBinary#,#SearchBinary#",
+                                                                "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Establishment#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "expireAt":480,  //Token signup valid time in minutes
                                                                 "group":"@__FromName__@",
                                                                 "createGroup":true,
                                                                 "groupRole":"#@__FromName__@#,#Establishment#",
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#MasterL01#,#Establishment#,#PresenceWorking#",  //No need the #UploadBinary#,#DeleteBinary#,#UpdateBinary# because #MasterL01# allow that
+                                                                "userRole":"#MasterL01#,#Establishment#,#Presence_Working#",  //No need the #UploadBinary#,#DeleteBinary#,#UpdateBinary# because #MasterL01# allow that
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":"#Establishments#"

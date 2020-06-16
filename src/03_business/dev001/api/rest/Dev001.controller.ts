@@ -52,8 +52,8 @@ export default class Dev001Controller {
 
   static readonly _ROUTE_INFO = [
                                   { Path: Dev001Controller._BASE_PATH + "/establishment", Action: "v1.business.dev001.odin.establishment", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment list" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Start the job to update order tip" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.output", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get status of the job order tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#AdmAsistantL01#", Roles: [ "Administrator", "Business_Manager", "AdmAsistantL01" ], Description: "Start the job to update order tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.output", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#AdmAsistantL01#", Roles: [ "Administrator", "Business_Manager", "AdmAsistantL01" ], Description: "Get status of the job order tip" },
                                 ]
 
   _controllerLogger = null;
