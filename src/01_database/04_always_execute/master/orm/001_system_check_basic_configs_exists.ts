@@ -141,6 +141,18 @@ export default class Always {
                                                                 "denied":"",
                                                                 "allowed":"#document#"
                                                               },
+                                                              "#Business_Managers#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
+                                                              },
+                                                              "#Administrative_Asistants#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
+                                                              },
+                                                              "#Drivers#":{
+                                                                "denied":"",
+                                                                "allowed":"*"
+                                                              },
                                                               /*
                                                               "#admin01@system.net#":{
                                                                 "denied":"",
@@ -175,6 +187,10 @@ export default class Always {
                                                               "#Administrative_Asistants#":{
                                                                 "denied":"",
                                                                 "allowed":"*"
+                                                              },
+                                                              "#Drivers#":{
+                                                                "denied":"",
+                                                                "allowed":"#image/png#,#image/jpeg#,#image/jpg#"
                                                               },
                                                               "#Documents_Allow_01#":{
                                                                 "denied":"",
