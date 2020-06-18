@@ -49,11 +49,7 @@ export default class Always {
                                    Name: "Drivers",
                                    Role: "#Driver#,#Presence_Working#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                    Tag: "#Driver#,#Presence_Working#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-<<<<<<< HEAD
                                    Comment: "Created from backend startup. Group of users for drivers.",
-=======
-                                   Comment: "Created from backend startup. Group of users for testing.",
->>>>>>> master
                                    CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
