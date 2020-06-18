@@ -2,6 +2,7 @@ node_modules/
 build/
 temp/tmp-*
 temp/dsistemas01/
+data/dsistemas01/
 logs/
 binary_data/temporal/
 binary_data/persistent/
@@ -14,4 +15,3 @@ jobs/input/job-*
 jobs/output/job-*
 tasks/input/task-*
 tasks/output/task-*
-data/dsistemas01/
