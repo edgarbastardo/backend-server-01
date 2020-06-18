@@ -8,6 +8,7 @@
     "build-test01-rest-api": "tsc",
     "build-im-server": "tsc",
     "build-task-server": "tsc",
+    "build-generic-run": "tsc",
     "start:dev-old": "nodemon src/server_data.ts --exec ts-node",
     "start:dev": "nodemon",
     "start": "node --expose-gc build/server_data.js",

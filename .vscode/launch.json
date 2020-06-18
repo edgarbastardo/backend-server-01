@@ -82,6 +82,23 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug Generic Run Process (Main)",
+      "program": "${workspaceFolder}/src/generic_run.ts",
+      "args": [
+        "--file=ruta-sergios-702.xlsx",
+        "--server=http://test01.weknock-tech.com",
+      ],
+      "outputCapture": "std",
+      "preLaunchTask": "build-generic-run",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Program Test 01 REST API",
       "program": "${workspaceFolder}/src/04_test/standalone/Test01_v1.ts",
       "args": [

@@ -34,6 +34,12 @@
       "problemMatcher": []
     },
     {
+      "label": "build-generic-run",
+      "type": "npm",
+      "script": "build-generic-run",
+      "problemMatcher": []
+    },
+    {
       "label": "deploy",
       "type": "npm",
       "script": "deploy",
