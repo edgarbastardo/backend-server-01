@@ -80,6 +80,7 @@
     "pug": "^2.0.4",
     "random-js": "^2.1.0",
     "read-chunk": "^3.2.0",
+    "read-excel-file": "^4.0.6",
     "redlock": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",

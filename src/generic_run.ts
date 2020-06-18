@@ -5,6 +5,8 @@ import cluster from 'cluster';
 
 import appRoot from 'app-root-path';
 
+import xlsxFile from 'read-excel-file/node';
+
 import CommonConstants from './02_system/common/CommonConstants';
 
 import CommonUtilities from "./02_system/common/CommonUtilities";
@@ -14,9 +16,9 @@ import LoggerManager from "./02_system/common/managers/LoggerManager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
-import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
+//import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
 
-let debug = require( 'debug' )( 'server_task@main_process' );
+let debug = require( 'debug' )( 'generic_run@main_process' );
 
 const argv = require('yargs').argv;
 
@@ -169,7 +171,29 @@ export default class GeneriRun {
 
         if ( fs.existsSync( SystemUtilities.strBaseRootPath + "/temp/" + argv.file ) ) {
 
-          //
+          const strFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + argv.file;
+          const strFullFilePathResult = strFullFilePath + ".result";
+
+          if ( !fs.existsSync( strFullFilePathResult ) ) {
+
+            const excelRows = await xlsxFile( strFullFilePath );
+
+            let intRow = 1;
+
+            for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
+
+              let strTicket = excelRows[ intRow ][ 2 ];
+
+              //
+
+            }
+
+          }
+          else {
+
+            debugMark( 'The file in the path %s already processed. If you need process again delete the .result file', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
+
+          }
 
         }
         else {
@@ -234,7 +258,7 @@ export default class GeneriRun {
 
       LoggerManager.mainLoggerInstance = await LoggerManager.createMainLogger(); //Create the main logger
 
-      //CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
+      CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
 
       await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
 
