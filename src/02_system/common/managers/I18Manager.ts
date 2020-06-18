@@ -287,7 +287,7 @@ export default class I18NManager {
 
     try {
 
-      strResult = this._translations[ strLanguage ] ? this._translations[ strLanguage ][ strSentence ] : strSentence;
+      strResult = this._translations && this._translations[ strLanguage ] ? this._translations[ strLanguage ][ strSentence ] : strSentence;
 
       if ( !strResult ) {
 
@@ -351,7 +351,7 @@ export default class I18NManager {
 
     try {
 
-      strResult = this._translations[ strLanguage ] ? this._translations[ strLanguage ][ strSentence ] : strSentence;
+      strResult = this._translations && this._translations[ strLanguage ] ? this._translations[ strLanguage ][ strSentence ] : strSentence;
 
       if ( param &&
            param.length > 0 ) {
