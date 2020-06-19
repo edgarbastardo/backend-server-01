@@ -26,6 +26,7 @@ import VromoAPIRequestService from '../../../common/services/VromoAPIRequestServ
 
 //import CommonRequestService from "../../../common/services/CommonRequestService";
 import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
+import GeoMapManager from "../../../../02_system/common/managers/GeoMapManager"; //Google map api call manager. check en .env.secrets if not exist copy and rename .env.secrets.template to .env.secrets
 
 let debug = require( 'debug' )( '001_CheckOdinNewOrdersTask' );
 
@@ -218,9 +219,19 @@ export default class CheckOdinNewOrdersTask_001 {
 
         for ( let intNewOrderIndex = 0; intNewOrderIndex < newOrderList.length; intNewOrderIndex++ ) {
 
+          //Google map api call manager. check en .env.secrets if not exist copy and rename .env.secrets.template to .env.secrets
+          //Serach for entry MAP_GEOCODE_GOOGLE_API_KEY and MAP_DISTANCE_GOOGLE_API_KEY
+          const addressGeocoded = await GeoMapManager.geocodeServiceUsingAddress(
+                                                                                  [ newOrderList[ intNewOrderIndex ].address ],
+                                                                                  true,
+                                                                                  logger
+                                                                                );
+
           //vromo data to send to service
           const body = {
 
+            latitude: addressGeocoded[ 0 ].latitude,
+            longitude: addressGeocoded[ 0 ].longitude,
             address: newOrderList[ intNewOrderIndex ].address,
             //Other fields needed by the vromo api service
 
