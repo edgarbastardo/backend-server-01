@@ -11,11 +11,11 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
 import { TicketImages } from '../models/TicketImages';
-import SystemConstants from '../../../../../02_system/common/SystemContants';
+//import SystemConstants from '../../../../../02_system/common/SystemContants';
 
 //import { TicketImages } from "../models/TicketImages";
 
-const debug = require( 'debug' )( 'TicketImageService' );
+const debug = require( 'debug' )( 'TicketImagesService' );
 
 export default class TicketImagesService extends BaseService {
 

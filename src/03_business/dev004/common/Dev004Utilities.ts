@@ -1,7 +1,7 @@
 
 const debug = require( 'debug' )( 'Dev000Utilities' );
 
-export default class Dev007Utilities {
+export default class Dev004Utilities {
 
 
 }

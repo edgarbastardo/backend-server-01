@@ -11,18 +11,18 @@ import appRoot from 'app-root-path';
 
 import parser from 'cron-parser';
 
-import CommonConstants from '../../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../../02_system/common/CommonConstants';
 //import SystemConstants from '../../../../02_system/common/SystemContants';
 
-import CommonUtilities from "../../../../02_system/common/CommonUtilities";
-import SystemUtilities from "../../../../02_system/common/SystemUtilities";
+import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
-import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
+import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
 
-import TicketImagesService from "../../../common/database/secondary/services/TicketImagesService";
-import BinaryRequestServiceV1 from '../../../common/services/BinaryRequestServiceV1';
-import CommonRequestService from "../../../common/services/CommonRequestService";
-import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
+import TicketImagesService from "../../../../common/database/secondary/services/TicketImagesService";
+import BinaryRequestServiceV1 from '../../../../common/services/BinaryRequestServiceV1';
+import CommonRequestService from "../../../../common/services/CommonRequestService";
+import NotificationManager from '../../../../../02_system/common/managers/NotificationManager';
 
 let debug = require( 'debug' )( '001_MigrateImagesTask' );
 
