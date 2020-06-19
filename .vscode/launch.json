@@ -85,8 +85,8 @@
       "name": "Debug Generic Run Process (Main)",
       "program": "${workspaceFolder}/src/generic_run.ts",
       "args": [
-        "--file=ruta-sergios-702.xlsx",
-        "--server=http://test01.weknock-tech.com",
+        "--files=ruta-sergios-701-18-06-2020.xlsx,ruta-sergios-702-18-06-2020.xlsx",
+        "--server=http://weknock-tech.com",
       ],
       "outputCapture": "std",
       "preLaunchTask": "build-generic-run",

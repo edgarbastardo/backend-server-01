@@ -158,220 +158,243 @@ export default class GeneriRun {
 
     try {
 
-      //npm run start:run -- --file=ruta-sergios-702.xlsx --server=test01.weknock-tech.com --authorization=8f5f0014-062a-492f-aa65-14d0cd25becb
-      //npm run start:run -- --file=ruta-sergios-702.xlsx
+      //npm run start:run -- --files=ruta-sergios-702.xlsx,ruta-sergios-703.xlsx --server=test01.weknock-tech.com --authorization=8f5f0014-062a-492f-aa65-14d0cd25becb
+      //npm run start:run -- --files=ruta-sergios-702.xlsx,ruta-sergios-703.xlsx
 
       let debugMark = debug.extend( '9159DCAEB587' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( 'bulkCreateOrder' );
 
-      debugMark( 'Argument file: %s', argv.file );
+      debugMark( 'Argument files: %s', argv.files );
       debugMark( 'Argument server: %s', argv.server );
+      debugMark( SystemUtilities.strBaseRootPath );
 
-      if ( argv.file ) {
+      if ( argv.files ) {
 
-        debugMark( SystemUtilities.strBaseRootPath );
+        const files = argv.files.split( ',' );
 
-        const strFullFilePath = SystemUtilities.strBaseRootPath + '/data/' + SystemUtilities.getHostName() + "/" + argv.file;
+        for ( let intFileIndex = 0; intFileIndex < files.length; intFileIndex++ ) {
 
-        if ( fs.existsSync( strFullFilePath ) ) {
+          let debugMark = debug.extend( ( intFileIndex + 1 ) + '-9159DCAEB587' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-          const strFullFilePathResult = strFullFilePath + '.result';
-          const strFullFilePathInput = strFullFilePath + '.input';
-          const strFullFilePathOutput = strFullFilePath + '.output';
+          const strFullFilePath = SystemUtilities.strBaseRootPath + '/data/' + SystemUtilities.getHostName() + "/" + files[ intFileIndex ];
 
-          if ( !fs.existsSync( strFullFilePathResult ) ) {
+          if ( fs.existsSync( strFullFilePath ) ) {
 
-            let strMessage = I18NManager.translateSync( 'en_US', 'Reading the file %s', strFullFilePath );
+            const strFullFilePathResult = strFullFilePath + '.result';
+            const strFullFilePathInput = strFullFilePath + '.input';
+            const strFullFilePathOutput = strFullFilePath + '.output';
 
-            debugMark( strMessage );
-            fs.writeFileSync( strFullFilePathResult, strMessage + "\n" );
+            if ( !fs.existsSync( strFullFilePathResult ) ) {
 
-            const excelRows = await xlsxFile( strFullFilePath );
-
-            strMessage = I18NManager.translateSync( 'en_US', '%s Rows found', excelRows.length );
-
-            debugMark( strMessage );
-            fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
-
-            let intRow = 1;
-
-            let strDefaultAuthorization = argv.authorization ? argv.authorization: process.env.ODIN_API_KEY1;
-
-            if ( !argv.authorization ) {
-
-              strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --authorization=??? not defined using %s by default', strDefaultAuthorization );
+              let strMessage = I18NManager.translateSync( 'en_US', 'Reading the file %s', strFullFilePath );
 
               debugMark( strMessage );
+              fs.writeFileSync( strFullFilePathResult, strMessage + "\n" );
 
-              fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
+              const excelRows = await xlsxFile( strFullFilePath );
 
-            }
-            else {
-
-              strMessage = I18NManager.translateSync( 'en_US', 'Using authorization %s', strDefaultAuthorization );
+              strMessage = I18NManager.translateSync( 'en_US', '%s Rows found', excelRows.length );
 
               debugMark( strMessage );
-
               fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
-            }
+              let intRow = 1;
 
-            const headers = {
+              let strDefaultAuthorization = argv.authorization ? argv.authorization: process.env.ODIN_API_KEY1;
 
-              'Content-Type': 'application/json',
-              'Authorization': strDefaultAuthorization,
+              if ( !argv.authorization ) {
 
-            }
+                strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --authorization=??? not defined using %s by default', strDefaultAuthorization );
 
-            const strDefaultServer = argv.server ? argv.server : 'http://test01.weknock-tech.com';
+                debugMark( strMessage );
 
-            if ( !argv.server ) {
-
-              strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --server=??? not defined using %s by default', strDefaultServer );
-
-              debugMark( strMessage );
-
-              fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
-
-            }
-            else {
-
-              strMessage = I18NManager.translateSync( 'en_US', 'Using server %s', strDefaultServer );
-
-              debugMark( strMessage );
-
-              fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
-
-            }
-
-            const backend = {
-
-              url: [ strDefaultServer ]
-
-            }
-
-            let intProcesedRows = 0;
-
-            for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
-
-              const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ 6 ], "-() " ) );
-
-              const body = {
-
-                establishment_id: excelRows[ intRow ][ 0 ],
-                zip_code: excelRows[ intRow ][ 4 ],
-                phone: intPhone !== NaN ? intPhone: 7868062108,
-                address: excelRows[ intRow ][ 3 ],
-                city: excelRows[ intRow ][ 5 ],
-                address_type: 'residential',
-                payment_method: 'cash',
-                note: excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ],
-                driver_id: excelRows[ intRow ][ 8 ],
-
-              }
-
-              strMessage = I18NManager.translateSync( 'en_US', 'Processing the row number %s', intRow );
-
-              debugMark( strMessage );
-
-              fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
-
-              const result = await OdinRequestServiceV1.callCreateOrder( backend,
-                                                                         headers,
-                                                                         body ) as any;
-
-              if ( result ) {
-
-                if ( result.input ) {
-
-                  fs.appendFileSync( strFullFilePathInput, JSON.stringify( result.input, null, 2 ) + '\n' );
-
-                }
-
-                if ( result.output ) {
-
-                  fs.appendFileSync( strFullFilePathOutput, JSON.stringify( result.output, null, 2 ) + '\n' );
-
-                  if  ( result.output.status >= 200 &&
-                        result.output.status < 300 ) {
-
-                    strMessage = I18NManager.translateSync( 'en_US', 'ok:%s:%s', intRow, result.output.body.data.id );
-
-                    debugMark( strMessage );
-
-                    fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
-
-                    intProcesedRows += 1;
-
-                  }
-                  else {
-
-                    strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s:%s', intRow, result.output.status, result.output.statusText );
-
-                    debugMark( strMessage );
-
-                    fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
-
-                  }
-
-                }
-                else if ( result.error ) {
-
-                  strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s', intRow, result.error.message );
-
-                  debugMark( strMessage );
-
-                  fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
-
-                }
-                else {
-
-                  strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_result', intRow );
-
-                  debugMark( strMessage );
-
-                  fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
-
-                }
+                fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
               }
               else {
 
-                strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_response', intRow );
+                strMessage = I18NManager.translateSync( 'en_US', 'Using authorization %s', strDefaultAuthorization );
 
                 debugMark( strMessage );
 
-                fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
               }
 
+              const headers = {
+
+                'Content-Type': 'application/json',
+                'Authorization': strDefaultAuthorization,
+
+              }
+
+              const strDefaultServer = argv.server ? argv.server : 'http://test01.weknock-tech.com';
+
+              if ( !argv.server ) {
+
+                strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --server=??? not defined using %s by default', strDefaultServer );
+
+                debugMark( strMessage );
+
+                fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
+
+              }
+              else {
+
+                strMessage = I18NManager.translateSync( 'en_US', 'Using server %s', strDefaultServer );
+
+                debugMark( strMessage );
+
+                fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
+
+              }
+
+              const backend = {
+
+                url: [ strDefaultServer ]
+
+              }
+
+              let intProcesedRows = 0;
+
+              for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
+
+                if ( excelRows[ intRow ][ 0 ] &&
+                     excelRows[ intRow ][ 4 ] &&
+                     excelRows[ intRow ][ 3 ] &&
+                     excelRows[ intRow ][ 8 ] ) {
+
+                  const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ 6 ], "-() " ) );
+
+                  const body = {
+
+                    establishment_id: excelRows[ intRow ][ 0 ],
+                    zip_code: excelRows[ intRow ][ 4 ],
+                    phone: intPhone !== NaN ? intPhone: 7868062108,
+                    address: excelRows[ intRow ][ 3 ],
+                    city: excelRows[ intRow ][ 5 ],
+                    address_type: 'residential',
+                    payment_method: 'cash',
+                    note: excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ],
+                    driver_id: excelRows[ intRow ][ 8 ],
+
+                  }
+
+                  strMessage = I18NManager.translateSync( 'en_US', 'Processing the row number %s', intRow );
+
+                  debugMark( strMessage );
+
+                  fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
+
+                  const result = await OdinRequestServiceV1.callCreateOrder( backend,
+                                                                            headers,
+                                                                            body ) as any;
+
+                  if ( result ) {
+
+                    if ( result.input ) {
+
+                      fs.appendFileSync( strFullFilePathInput, JSON.stringify( result.input, null, 2 ) + '\n' );
+
+                    }
+
+                    if ( result.output ) {
+
+                      fs.appendFileSync( strFullFilePathOutput, JSON.stringify( result.output, null, 2 ) + '\n' );
+
+                      if  ( result.output.status >= 200 &&
+                            result.output.status < 300 ) {
+
+                        strMessage = I18NManager.translateSync( 'en_US', 'ok:%s:%s', intRow, result.output.body.data.id );
+
+                        debugMark( strMessage );
+
+                        fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
+                        intProcesedRows += 1;
+
+                      }
+                      else {
+
+                        strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s:%s', intRow, result.output.status, result.output.statusText );
+
+                        debugMark( strMessage );
+
+                        fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
+                      }
+
+                    }
+                    else if ( result.error ) {
+
+                      strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s', intRow, result.error.message );
+
+                      debugMark( strMessage );
+
+                      fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
+                    }
+                    else {
+
+                      strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_result', intRow );
+
+                      debugMark( strMessage );
+
+                      fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
+                    }
+
+                  }
+                  else {
+
+                    strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_response', intRow );
+
+                    debugMark( strMessage );
+
+                    fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
+                  }
+
+                }
+                else {
+
+                  strMessage = I18NManager.translateSync( 'en_US', 'error:%s:missing_information', intRow );
+
+                  debugMark( strMessage );
+
+                  fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
+
+                }
+
+              }
+
+              strMessage = I18NManager.translateSync( 'en_US', '**** Processed %s rows, Total: %s rows ****', intProcesedRows, excelRows.length );
+
+              debugMark( strMessage );
+
+              fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+
             }
+            else {
 
-            strMessage = I18NManager.translateSync( 'en_US', 'Processed %s rows, Total: %s rows', intProcesedRows, excelRows.length );
+              debugMark( 'The file in the path %s already processed. If you need process again delete the .result file', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
 
-            debugMark( strMessage );
-
-            fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+            }
 
           }
           else {
 
-            debugMark( 'The file in the path %s already processed. If you need process again delete the .result file', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
+            debugMark( 'The file in the path %s not exists', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
 
           }
-
-        }
-        else {
-
-          debugMark( 'The file in the path %s not exists', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
 
         }
 
       }
       else {
 
-        debugMark( 'No argument --file=??? defined. You must define using `npm run start:run --file=myfile.xlsx` with not quotes' );
+        debugMark( 'No argument --files=??? defined. You must define using `npm run start:run --files=myfile01.xlsx,myfile02.xlsx` with not quotes' );
 
       }
 
