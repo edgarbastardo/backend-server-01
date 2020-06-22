@@ -1529,7 +1529,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginGoogle( context: any,
-                            strTokenId: string,
+                            strToken: string,
                             transaction: any,
                             logger: any ): Promise<any> {
 
@@ -1560,7 +1560,7 @@ export default class SecurityServiceController {
                       };
 
       //const strRequestPath = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${strTokenId}`;
-      const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${strTokenId}`;
+      const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${strToken}`;
 
       const callResult = await fetch( strRequestPath, options );
 
@@ -1681,7 +1681,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginFacebook( context: any,
-                              strTokenId: string,
+                              strToken: string,
                               transaction: any,
                               logger: any ): Promise<any> {
 
@@ -1788,7 +1788,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginInstagram( context: any,
-                               strTokenId: string,
+                               strToken: string,
                                transaction: any,
                                logger: any ): Promise<any> {
 
