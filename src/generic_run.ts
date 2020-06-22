@@ -263,7 +263,8 @@ export default class GeneriRun {
                 if ( excelRows[ intRow ][ 0 ] &&
                      excelRows[ intRow ][ 4 ] &&
                      excelRows[ intRow ][ 3 ] &&
-                     excelRows[ intRow ][ 8 ] ) {
+                     excelRows[ intRow ][ 8 ] &&
+                     excelRows[ intRow ][ 9 ] ) {
 
                   const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ 6 ], "-() " ) );
 
@@ -273,11 +274,14 @@ export default class GeneriRun {
                     zip_code: excelRows[ intRow ][ 4 ],
                     phone: intPhone !== NaN ? intPhone: 7868062108,
                     address: excelRows[ intRow ][ 3 ],
-                    city: excelRows[ intRow ][ 5 ],
                     address_type: 'residential',
+                    city: excelRows[ intRow ][ 5 ],
                     payment_method: 'cash',
                     note: excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ],
                     driver_id: excelRows[ intRow ][ 8 ],
+                    created_at: excelRows[ intRow ][ 9 ],
+                    tip: 0,
+                    tip_method: 'cash'
 
                   }
 
@@ -385,7 +389,7 @@ export default class GeneriRun {
           }
           else {
 
-            debugMark( 'The file in the path %s not exists', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
+            debugMark( 'The file in the path %s not exists', strFullFilePath );
 
           }
 
