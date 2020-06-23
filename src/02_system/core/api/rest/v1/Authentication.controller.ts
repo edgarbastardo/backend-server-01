@@ -150,7 +150,7 @@ export default class AuthenticationController {
     const context = ( request as any ).context; //Context is injected by the middleware middlewareSetContext
 
     const result = await SecurityServiceController.loginGoogle( context,
-                                                                request.body.TokenId,
+                                                                request.body.Token,
                                                                 null,
                                                                 context.Logger );
 
@@ -168,7 +168,7 @@ export default class AuthenticationController {
     const context = ( request as any ).context; //Context is injected by the middleware middlewareSetContext
 
     const result = await SecurityServiceController.loginFacebook( context,
-                                                                  request.body.Username,
+                                                                  request.body.Token,
                                                                   null,
                                                                   context.Logger );
 
@@ -186,7 +186,7 @@ export default class AuthenticationController {
     const context = ( request as any ).context; //Context is injected by the middleware middlewareSetContext
 
     const result = await SecurityServiceController.loginInstagram( context,
-                                                                   request.body.Username,
+                                                                   request.body.Token,
                                                                    null,
                                                                    context.Logger );
 
