@@ -25,6 +25,11 @@ export default class BusinessQueries {
         strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
 
       }
+      else if ( strName === "getDrivers" ) {
+
+        strResult = `select b.id, first_name,phone, a.email as user, address, zone, b.email as email, b.email1 as additionalemail, driversfijos as onsite from users as a inner join establishments as b on a.id=b.user_id where a.deleted_at is null order by first_name;`;
+
+      }
 
     }
 

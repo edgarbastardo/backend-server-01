@@ -25,11 +25,11 @@ import DBConnectionManager from '../../../../02_system/common/managers/DBConnect
 import I18NManager from '../../../../02_system/common/managers/I18Manager';
 //import { Redis, Cluster } from 'ioredis';
 
-const debug = require( 'debug' )( 'UpdateOrderTipsJob' );
+const debug = require( 'debug' )( 'OrderTipUberUpdateJob' );
 
-export default class UpdateOrderTipJob {
+export default class OrderTipUberUpdateJob {
 
-  public readonly Name = "UpdateOrderTipsJob";
+  public readonly Name = "OrderTipUberUpdateJob";
 
   public updateTipJobQueue: any;
 
@@ -262,6 +262,7 @@ export default class UpdateOrderTipJob {
 
               }
 
+              jsonStatusJob.Kind = "done";
               jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Success. %s rows updated, %s rows in total.', intUpdatedRows, excelRows.length );
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
@@ -340,7 +341,7 @@ export default class UpdateOrderTipJob {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = UpdateOrderTipJob.name + "." + this.init.name;
+      sourcePosition.method = OrderTipUberUpdateJob.name + "." + this.init.name;
 
       const strMark = "78E5FC38F35D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

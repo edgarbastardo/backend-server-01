@@ -52,8 +52,11 @@ export default class Dev001Controller {
 
   static readonly _ROUTE_INFO = [
                                   { Path: Dev001Controller._BASE_PATH + "/establishment", Action: "v1.business.dev001.odin.establishment", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment list" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to update order tip" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.output", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job order tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to update order uber tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job update order uber tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/driver", Action: "v1.business.dev001.odin.driver", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get driver list" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to bulk create orders" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job bulk create order" },
                                 ]
 
   _controllerLogger = null;
@@ -122,17 +125,17 @@ export default class Dev001Controller {
 
     let strLanguage = context.Language;
     //await=espera x esta cosa.
-    const result = await Dev001ServicesController.getEstablishmentsList( request,
-                                                                         response,
-                                                                         null,
-                                                                         context.logger );
+    const result = await Dev001ServicesController.getEstablishmentList( request,
+                                                                        response,
+                                                                        null,
+                                                                        context.logger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
   @httpPut(
-            "/order/tip",
+            "/order/tip/uber",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated
           )
@@ -142,17 +145,16 @@ export default class Dev001Controller {
 
     let strLanguage = context.Language;
     //await=espera x esta cosa.
-    const result = await Dev001ServicesController.startUpdateOrderTipsJob( request,
-                                                                           response,
-                                                                           context.logger );
+    const result = await Dev001ServicesController.startOrderTipUberUpdateJob( request,
+                                                                              response,
+                                                                              context.logger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
-
   @httpGet(
-            "/order/tip",
+            "/order/tip/uber",
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated
           )
@@ -162,9 +164,67 @@ export default class Dev001Controller {
 
     let strLanguage = context.Language;
     //await=espera x esta cosa.
-    const result = await Dev001ServicesController.getUpdateOrderTipsJobStatus( request,
-                                                                               response,
-                                                                               context.logger );
+    const result = await Dev001ServicesController.getJobStatus( request,
+                                                                response,
+                                                                context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/driver",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async getDriverList( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    let strLanguage = context.Language;
+    //await=espera x esta cosa.
+    const result = await Dev001ServicesController.getDriverList( request,
+                                                                 response,
+                                                                 null,
+                                                                 context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/order/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async bulkCreateOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    let strLanguage = context.Language;
+    //await=espera x esta cosa.
+    const result = await Dev001ServicesController.startBulkOrderCreateJob( request,
+                                                                           response,
+                                                                           context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/order/bulk",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async getBulkOrderCreateStatus( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    let strLanguage = context.Language;
+    //await=espera x esta cosa.
+    const result = await Dev001ServicesController.getJobStatus( request,
+                                                                response,
+                                                                context.logger );
 
     response.status( result.StatusCode ).send( result );
 

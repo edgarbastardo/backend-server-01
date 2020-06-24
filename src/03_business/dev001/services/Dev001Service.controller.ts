@@ -28,103 +28,12 @@ const debug = require( 'debug' )( 'Dev001ServicesController' );
 
 export default class Dev001ServicesController extends BaseService {
 
-    //Common business services
+  //Common business services
 
-    /*
-  static async processDev000Example( request: Request,
+  static async getEstablishmentList( request: Request,
                                      response: Response,
                                      transaction: any,
                                      logger: any ):Promise<any> {
-
-    let result = null;
-
-    let currentTransaction = transaction;
-
-    let bIsLocalTransaction = false;
-
-    let strLanguage = "";
-
-    try {
-
-      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
-
-      strLanguage = context.Language;
-
-      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
-
-      if ( currentTransaction == null ) {
-
-        currentTransaction = await dbConnection.transaction();
-
-        bIsLocalTransaction = true;
-
-      }
-
-      //
-
-      if ( currentTransaction != null &&
-           currentTransaction.finished !== "rollback" &&
-           bIsLocalTransaction ) {
-
-        await currentTransaction.commit();
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = this.name + "." + this.processDev000Example.name;
-
-      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-      const debugMark = debug.extend( strMark );
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( logger && typeof logger.error === "function" ) {
-
-        error.catchedOn = sourcePosition;
-        logger.error( error );
-
-      }
-
-      const result = {
-                       StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       LogId: error.LogId,
-                       Mark: strMark,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: error.name,
-                                   Message: error.message,
-                                   Details: await SystemUtilities.processErrorDetails( error ) //error
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     };
-
-    }
-
-    return result;
-
-  }
-  */
-
-  static async getEstablishmentsList( request: Request,
-                                      response: Response,
-                                      transaction: any,
-                                      logger: any ):Promise<any> {
 
     let result = null;
 
@@ -197,7 +106,7 @@ export default class Dev001ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getEstablishmentsList.name;
+      sourcePosition.method = this.name + "." + this.getEstablishmentList.name;
 
       const strMark = "ED0D5D1FABC0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -256,19 +165,11 @@ export default class Dev001ServicesController extends BaseService {
 
   }
 
-  static async startUpdateOrderTipsJob( request: Request,
-                                        response: Response,
-                                        logger: any ):Promise<any> {
+  static async startOrderTipUberUpdateJob( request: Request,
+                                           response: Response,
+                                           logger: any ):Promise<any> {
 
     let result = null;
-
-    /*
-    let currentTransaction = transaction;
-
-    let bIsLocalTransaction = false;
-
-    let bApplyTransaction = false;
-    */
 
     let strLanguage = "";
 
@@ -278,7 +179,7 @@ export default class Dev001ServicesController extends BaseService {
 
       strLanguage = context.Language;
 
-      if ( await JobQueueManager.addJobToQueue( "UpdateOrderTipsJob",
+      if ( await JobQueueManager.addJobToQueue( "OrderTipUberUpdateJob",
                                                 {
                                                   Id: request.body.Id,
                                                   EstablishmentId: request.body.EstablishmentId,
@@ -294,7 +195,7 @@ export default class Dev001ServicesController extends BaseService {
         result = {
                    StatusCode: 200, //Ok
                    Code: 'SUCCESS_JOB_CREATION',
-                   Message: await I18NManager.translate( strLanguage, 'Sucess job creation for update order tip' ),
+                   Message: await I18NManager.translate( strLanguage, 'Sucess job creation for order tip uber update' ),
                    Mark: 'F307A51174EC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
@@ -314,14 +215,14 @@ export default class Dev001ServicesController extends BaseService {
         result = {
                    StatusCode: 500, //Internal server error
                    Code: 'ERROR_CANNOT_CREATE_THE_JOB',
-                   Message: await I18NManager.translate( strLanguage, 'Cannot create the job for update order tip' ),
+                   Message: await I18NManager.translate( strLanguage, 'Cannot create the job' ),
                    LogId: null,
                    Mark: 'C9C15674A81D',
                    IsError: true,
                    Errors: [
                              {
                                Code: 'ERROR_CANNOT_CREATE_THE_JOB',
-                               Message: await I18NManager.translate( strLanguage, 'Cannot create the job for update order tip' ),
+                               Message: await I18NManager.translate( strLanguage, 'Cannot create the job' ),
                                Details: 'JobQueueManager.addJobToQueue returned false'
                              }
                            ],
@@ -332,75 +233,12 @@ export default class Dev001ServicesController extends BaseService {
 
       }
 
-      /*
-      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
-
-      strLanguage = context.Language;
-
-      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
-
-      if ( currentTransaction === null ) {
-
-        currentTransaction = await dbConnection.transaction();
-
-        bIsLocalTransaction = true;
-
-      }
-
-      //const strId = request.body.Id;
-
-      const strSQL = DBConnectionManager.getStatement( "secondary",
-                                                       "updateOrderTip",
-                                                       request.body,
-                                                       context.logger );
-
-      const rows = await dbConnection.query( strSQL,{
-                                                      raw: true,
-                                                      type: QueryTypes.UPDATE,
-                                                      transaction: currentTransaction
-                                                    } );
-
-      result = {
-                 StatusCode: 200, //Ok
-                 Code: 'SUCCESS_UPDATE_ORDER_TIP',
-                 Message: await I18NManager.translate( strLanguage, 'Sucess update order tip' ),
-                 Mark: '8F6D8B8A63B4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                 LogId: null,
-                 IsError: false,
-                 Errors: [],
-                 Warnings: [],
-                 Count: 1,
-                 Data: [
-                         rows
-                       ]
-               };
-
-      bApplyTransaction = true;
-
-      if ( currentTransaction !== null &&
-           currentTransaction.finished !== "rollback" &&
-           bIsLocalTransaction ) {
-
-        if ( bApplyTransaction ) {
-
-          await currentTransaction.commit();
-
-        }
-        else {
-
-          await currentTransaction.rollback();
-
-        }
-
-      }
-      */
-
     }
     catch ( error ) {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.startUpdateOrderTipsJob.name;
+      sourcePosition.method = this.name + "." + this.startOrderTipUberUpdateJob.name;
 
       const strMark = "4E8745E32647" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -439,31 +277,15 @@ export default class Dev001ServicesController extends BaseService {
                  Data: []
                };
 
-      /*
-      if ( currentTransaction !== null &&
-           bIsLocalTransaction ) {
-
-        try {
-
-          await currentTransaction.rollback();
-
-        }
-        catch ( error ) {
-
-        }
-
-      }
-      */
-
     }
 
     return result;
 
   }
 
-  static async getUpdateOrderTipsJobStatus( request: Request,
-                                            response: Response,
-                                            logger: any ):Promise<any> {
+  static async getJobStatus( request: Request,
+                             response: Response,
+                             logger: any ):Promise<any> {
 
     let result = null;
 
@@ -494,23 +316,38 @@ export default class Dev001ServicesController extends BaseService {
 
         if ( fs.existsSync( strOutputJobFile ) ) {
 
-          const outputContent = fs.readFileSync( strOutputJobFile, "utf8" );
+          let outputContent = fs.readFileSync( strOutputJobFile, "utf8" ) as any;
 
           const debugMark = debug.extend( '6BD49AF2E6BE' );
 
-          debugMark( "Result: [%s]", outputContent );
+          //debugMark( "Result: [%s]", outputContent );
 
-          let jsonStatusJob = CommonUtilities.parseJSON( outputContent, logger );
+          if ( request.query.Output === "result" ) {
 
-          if ( !jsonStatusJob ||
-               Object.keys( jsonStatusJob ).length === 0 ) {
+            outputContent = {
 
-            jsonStatusJob = {
-                              Progress: 0,
-                              Total: -1,
-                              Kind: "",
-                              Status: ""
-                            };
+              result: outputContent
+
+            };
+
+          }
+          else {
+
+            let jsonStatusJob = CommonUtilities.parseJSON( outputContent, logger );
+
+            if ( !jsonStatusJob ||
+                Object.keys( jsonStatusJob ).length === 0 ) {
+
+              jsonStatusJob = {
+                                Progress: 0,
+                                Total: -1,
+                                Kind: "",
+                                Status: ""
+                              };
+
+            }
+
+            outputContent = jsonStatusJob;
 
           }
 
@@ -525,7 +362,7 @@ export default class Dev001ServicesController extends BaseService {
                      Warnings: [],
                      Count: 1,
                      Data: [
-                             jsonStatusJob
+                             outputContent
                            ]
                    };
 
@@ -582,9 +419,263 @@ export default class Dev001ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getUpdateOrderTipsJobStatus.name;
+      sourcePosition.method = this.name + "." + this.getJobStatus.name;
 
       const strMark = "67236D6C9E05" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 LogId: error.LogId,
+                 Mark: strMark,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+    }
+
+    return result;
+
+  }
+
+  static async getDriverList( request: Request,
+                              response: Response,
+                              transaction: any,
+                              logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strSQL = DBConnectionManager.getStatement( "secondary", "getDrivers", null, context.logger );
+
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      result = {
+                 StatusCode: 200, //Ok
+                 Code: 'SUCCESS_GET_DRIVERS_LIST',
+                 Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
+                 Mark: '47BB5F21C2B6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 LogId: null,
+                 IsError: false,
+                 Errors: [],
+                 Warnings: [],
+                 Count: 1,
+                 Data: rows
+               };
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDriverList.name;
+
+      const strMark = "CAF3637ADCE4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: 'ERROR_UNEXPECTED',
+                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 LogId: error.LogId,
+                 Mark: '3799619EDB99' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async startBulkOrderCreateJob( request: Request,
+                                        response: Response,
+                                        logger: any ):Promise<any> {
+
+    let result = null;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by the midleware MiddlewareManager.middlewareSetContext
+
+      strLanguage = context.Language;
+
+      if ( await JobQueueManager.addJobToQueue( "BulkOrderCreateJob",
+                                                {
+                                                  Id: request.body.Id,
+                                                  EstablishmentId: request.body.EstablishmentId,
+                                                  DriverId: request.body.EstablishmentId,
+                                                  Date: request.body.Date,
+                                                  Path: request.body.Path,
+                                                  Language: strLanguage
+                                                },
+                                                {
+                                                  jobId: request.body.Id
+                                                }, //{ jobId: SystemUtilities.getUUIDv4(), attempts: 0, timeout: 99999999, removeOnComplete: true, removeOnFail: true, backoff: 0 }, //{ repeat: { cron: '* * * * *' } },
+                                                logger ) ) {
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: 'SUCCESS_JOB_CREATION',
+                   Message: await I18NManager.translate( strLanguage, 'Sucess job creation for bulk order create' ),
+                   Mark: 'F13258318914' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           {
+                             Id: request.body.Id
+                           }
+                         ]
+                 };
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: 'ERROR_CANNOT_CREATE_THE_JOB',
+                   Message: await I18NManager.translate( strLanguage, 'Cannot create the job' ),
+                   LogId: null,
+                   Mark: 'C69FBC40C312',
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_CANNOT_CREATE_THE_JOB',
+                               Message: await I18NManager.translate( strLanguage, 'Cannot create the job' ),
+                               Details: 'JobQueueManager.addJobToQueue returned false'
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.startBulkOrderCreateJob.name;
+
+      const strMark = "28A7E540D0E4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
