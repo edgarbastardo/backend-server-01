@@ -1529,7 +1529,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginGoogle( context: any,
-                            strToken: string,
+                            request: any, //
                             transaction: any,
                             logger: any ): Promise<any> {
 
@@ -1560,7 +1560,7 @@ export default class SecurityServiceController {
                       };
 
       //const strRequestPath = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${strTokenId}`;
-      const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${strToken}`;
+      const strRequestPath = `https://oauth2.googleapis.com/tokeninfo?id_token=${request.body.Token}`;
 
       const callResult = await fetch( strRequestPath, options );
 
@@ -1681,7 +1681,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginFacebook( context: any,
-                              strToken: string,
+                              request: any,
                               transaction: any,
                               logger: any ): Promise<any> {
 
@@ -1703,15 +1703,72 @@ export default class SecurityServiceController {
 
       }
 
-      /*
-      result = await SecurityServiceController.processSessionStatus( context,
-                                                                     { operation: "UserLogin" },
-                                                                     strUserName,
-                                                                     strPassword,
-                                                                     null,
-                                                                     currentTransaction,
-                                                                     logger );
-                                                                     */
+      const strLanguage = context.Language;
+
+      const options = {
+                        method: 'GET',
+                        //headers: {},
+                        body: null,
+                      };
+
+      const strRequestPath = `https://graph.facebook.com/${request.body.UserId}?fields=email&access_token=${request.body.Token}`;
+
+      const callResult = await fetch( strRequestPath, options );
+
+      let jsonResponse = null;
+
+      if ( callResult.status === 200 ) {
+
+        jsonResponse = await callResult.json();
+
+        //GraphQL always reponse with http status code 200. We need check error field is present
+        if ( jsonResponse.error ) {
+
+          jsonResponse = null;
+
+        }
+
+      }
+
+      if ( jsonResponse ) {
+
+        const strUserName = jsonResponse.email;
+
+        result = await SecurityServiceController.processSessionStatus( context,
+                                                                       {
+                                                                         operation: "UserLogin",
+                                                                         requiredRole: "#FacebookUser#",
+                                                                         checkPassword: false
+                                                                       },
+                                                                       strUserName,
+                                                                       "",
+                                                                       null,
+                                                                       currentTransaction,
+                                                                       logger );
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: 'ERROR_TOKEN_NOT_VALID',
+                   Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
+                   Mark: 'AE88C13E3104' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: 'ERROR_TOKEN_NOT_VALID',
+                               Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -1788,7 +1845,7 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async loginInstagram( context: any,
-                               strToken: string,
+                               request: any,
                                transaction: any,
                                logger: any ): Promise<any> {
 
