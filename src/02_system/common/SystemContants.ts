@@ -1029,7 +1029,7 @@ export default class SystemConstants {
                                                                                    "groupTag":"",
                                                                                    "groupExpireAt":-1,
                                                                                    "status":0,
-                                                                                   "userRole":"#Driver#,#UploadBinary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                                   "userRole":"#Driver#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag":"",
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
@@ -1042,7 +1042,7 @@ export default class SystemConstants {
                                                                                    "groupTag":"",
                                                                                    "groupExpireAt":-1,
                                                                                    "status":0,
-                                                                                   "userRole":"#FinalCustomer#,#FinalCustomer01#,#UploadBinary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                                   "userRole":"#FinalCustomer#,#FinalCustomer01#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag":"",
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
@@ -1055,7 +1055,7 @@ export default class SystemConstants {
                                                                                    "groupTag":"",
                                                                                    "groupExpireAt":-1,
                                                                                    "status":0,
-                                                                                   "userRole":"#Master_L01#", //No need the #UploadBinary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                                   "userRole":"#Master_L01#", //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                                    "userTag":"",
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":"#Establishment#"
@@ -1099,13 +1099,13 @@ export default class SystemConstants {
                                                                                       "@__default__@": ""
                                                                                     },
                                                                                     "#Master_L01#": {
-                                                                                      "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                      "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                     },
                                                                                     "#Master_L02#": {
-                                                                                      "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                      "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                     },
                                                                                     "#Master_L03#": {
-                                                                                      "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                      "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                     },
                                                                                     "#RoleName01#": {
                                                                                       "#GroupName01#": "#RoleName02#,#RoleName03#",
@@ -1156,13 +1156,13 @@ export default class SystemConstants {
                                                                                            "@__default__@": ""
                                                                                          },
                                                                                          "#Master_L01#": {
-                                                                                           "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                           "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                          },
                                                                                          "#Master_L02#": {
-                                                                                           "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                           "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                          },
                                                                                          "#Master_L03#": {
-                                                                                           "@__default__@": "#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                                           "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                                          },
                                                                                          "#RoleName01#": {
                                                                                            "#GroupName01#": "#RoleName02#,#RoleName03#",

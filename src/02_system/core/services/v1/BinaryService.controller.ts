@@ -3936,15 +3936,15 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( !strId ||
                          !userSessionStatus.UserTag ||
-                         userSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                         userSessionStatus.UserTag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
 
                       if ( !strId ||
                            !userSessionStatus.UserGroupTag ||
-                           userSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                           userSessionStatus.UserGroupTag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
 
                         if ( !strId ||
                              !userSessionStatus.Tag ||
-                             userSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineId#" ) === -1 ) {
+                             userSessionStatus.Tag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
 
                            strId = SystemUtilities.getUUIDv4();
 
@@ -3965,15 +3965,15 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( !strDate ||
                          !userSessionStatus.UserTag ||
-                         userSessionStatus.UserTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                         userSessionStatus.UserTag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
 
                       if ( !strDate ||
                            !userSessionStatus.UserGroupTag ||
-                           userSessionStatus.UserGroupTag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                           userSessionStatus.UserGroupTag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
 
                         if ( !strDate ||
                              !userSessionStatus.Tag ||
-                             userSessionStatus.Tag.indexOf( "#BinaryDataAllowToDefineDate#" ) === -1 ) {
+                             userSessionStatus.Tag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
 
                           strDate = SystemUtilities.getCurrentDateAndTime().format( "YYYY-MM-DD-HH" );
 
