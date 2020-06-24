@@ -85,7 +85,7 @@
       "name": "Debug Generic Run Process (Main)",
       "program": "${workspaceFolder}/src/generic_run.ts",
       "args": [
-        "--files=ruta-Genuine-Hospitality-Group-800-22-06-2020.xlsx,ruta-Genuine-Hospitality-Group-801-22-06-2020.xlsx,ruta-Genuine-Hospitality-Group-802-22-06-2020.xlsx,ruta-latin-american-grill-600-22-06-2020.xlsx,ruta-latin-american-grill-601-22-06-2020.xlsx,ruta-latin-american-grill-602-22-06-2020.xlsx,ruta-sergios-700-18-06-2020.xlsx,ruta-sergios-701-18-06-2020.xlsx,ruta-sergios-702-18-06-2020.xlsx",
+        "--files=ruta-Genuine-Hospitality-Group-optima-800_24-06-2020.xlsx,ruta-Genuine-Hospitality-Group-optima-801_24-06-2020.xlsx,ruta-Genuine-Hospitality-Group-optima-802_24-06-2020.xlsx,ruta-latin-american-grill-optima-600_24-06-2020.xlsx,ruta-latin-american-grill-optima-601_24-06-2020.xlsx,ruta-latin-american-grill-optima-602_24-06-2020.xlsx,ruta-sergios-optima-700_24-06-2020.xlsx,ruta-sergios-optima-701_24-06-2020.xlsx,ruta-sergios-optima-702_24-06-2020.xlsx",
         "--server=http://weknock-tech.com",
       ],
       "outputCapture": "std",
