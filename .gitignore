@@ -2,6 +2,7 @@ node_modules/
 build/
 temp/tmp-*
 temp/dsistemas01/
+temp/undefined/
 data/dsistemas01/
 data/undefined/
 logs/
