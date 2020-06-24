@@ -346,7 +346,7 @@ export default class Always {
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #UploadBinary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                "userRole":"#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":"#Establishments#"
@@ -365,19 +365,19 @@ export default class Always {
                                                                   "@__default__@": ""
                                                                 },
                                                                 "#Master_L01#": {
-                                                                  "@__default__@": "#Search_Binary#,#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                  "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                 },
                                                                 "#Master_L02#": {
-                                                                  "@__default__@": "#Search_Binary#,#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                  "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                 },
                                                                 "#Master_L03#": {
-                                                                  "@__default__@": "#Search_Binary#,#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                  "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                 },
                                                                 "#Driver#": {
-                                                                  "@__default__@": "#Search_Binary#,#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                  "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                 },
                                                                 "#Establishment#": {
-                                                                  "@__default__@": "#Presence_Working#,#Search_Binary#,#UploadBinary#,#Update_Binary#,#Delete_Binary#"
+                                                                  "@__default__@": "#Presence_Working#,#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
                                                                 }
                                                               },
                                                               "update": {

@@ -44,7 +44,7 @@ export default class Always {
                                                Token: process.env.FOREIGN_SYSTEM_01_TOKEN || "1",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_01_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_01_SOCKET_TOKEN || null,
-                                               Tag: "#ForeignSystem#,#ForeignSystem01#,#UploadBinary#,#Update_Binary#,#Search_Binary#,#BinaryDataAllowToDefineId#,#BinaryDataAllowToDefineDate#",
+                                               Tag: "#ForeignSystem#,#ForeignSystem01#,#Upload_Binary#,#Update_Binary#,#Search_Binary#,#Binary_Data_Allow_To_Define_Id#,#Binary_Data_Allow_To_Define_Date#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
