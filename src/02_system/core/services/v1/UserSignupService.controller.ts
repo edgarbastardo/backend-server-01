@@ -903,6 +903,11 @@ export default class UserSingupServiceController {
                                                      logger );
 
               }
+              else {
+
+                result = signupResult;
+
+              }
 
             }
             else {
@@ -1170,7 +1175,8 @@ export default class UserSingupServiceController {
 
             //https://graph.facebook.com/10222168784759387?fields=id,first_name,last_name,email,picture&access_token=EAADtzJi9SToBAE9kZAsFKFULpZB8sSFWZBD0Peu3yZC9ZCNnsLKZB2LZCekZCSFaRxqueZBla8Y5poKYhVEUIXlP3ZAekd3mpiFbSJF1Q5jw75KJ58J1i4UsbUsKZAR3MRXmALxoZAdYmYIbdg1UjZBgVwHCUroMuaXPbeediBVZAGKnR8at5vDMZBqWtntmD544iLg5ivMPr6lluZCgigZDZD
             //https://graph.facebook.com/10222168784759387/picture?type=large
-            const strRequestPath = `https://graph.facebook.com/${request.body.UserId}?id,first_name,last_name,email,picture&access_token=${request.body.Token}`;
+            //?fields=first_name,last_name,id,email&
+            const strRequestPath = `https://graph.facebook.com/${request.body.UserId}?fields=id,first_name,last_name,email,picture&access_token=${request.body.Token}`;
 
             const callResult = await fetch( strRequestPath, options );
 
@@ -1180,6 +1186,7 @@ export default class UserSingupServiceController {
 
               jsonResponse = await callResult.json();
 
+              //GraphQL always reponse with http status code 200. We need check error field is present
               if ( jsonResponse.error ) {
 
                 jsonResponse = null;
@@ -1227,7 +1234,7 @@ export default class UserSingupServiceController {
 
                 const signupActivateOptions = {
 
-                  avatar: "https://graph.facebook.com/10222168784759387/picture?type=large", //jsonResponse.picture,
+                  avatar: `https://graph.facebook.com/${request.body.UserId}/picture?type=large`, //jsonResponse.picture,
                   role: "#FacebookUser#",
                   sendEMailAccountActivated: true,
                   maskPassword: false
@@ -1247,6 +1254,11 @@ export default class UserSingupServiceController {
                                                      logger );
 
               }
+              else {
+
+                result = signupResult;
+
+              }
 
             }
             else {
@@ -1254,14 +1266,14 @@ export default class UserSingupServiceController {
               result = {
                          StatusCode: 400, //Bad request
                          Code: 'ERROR_TOKEN_NOT_VALID',
-                         Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                         Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
                          Mark: 'A709A312EC35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
                                      Code: 'ERROR_TOKEN_NOT_VALID',
-                                     Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                                     Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
                                      Details: null
                                    }
                                  ],
