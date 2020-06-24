@@ -1,0 +1,3 @@
+Process started.
+Opening file.
+Error to process [The "path" argument must be of type string or an instance of Buffer or URL. Received undefined].

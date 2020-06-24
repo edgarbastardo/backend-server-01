@@ -98,7 +98,7 @@ export default class Always {
                               SessionsLimit: 0,
                               Name: "ForeignSystem01",
                               Password: "@",
-                              Role: "#UploadBinary#,#Update_Binary#,#Search_Binary#",
+                              Role: "#Upload_Binary#,#Update_Binary#,#Search_Binary#",
                               Tag: "#ForeignSystem#,#ForeignSystem01#",
                               Comment: "Created from backend startup.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
