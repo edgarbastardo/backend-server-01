@@ -3,6 +3,7 @@ build/
 temp/tmp-*
 temp/dsistemas01/
 data/dsistemas01/
+data/undefined/
 logs/
 binary_data/temporal/
 binary_data/persistent/
@@ -13,11 +14,12 @@ install_distribution/
 test/standalone/result/dsistemas01/
 jobs/input/job-*
 jobs/output/job-*
+jobs/undefined/
 tasks/input/task-*
 tasks/output/task-*
 jobs/input/undefined*
 jobs/output/undefined*
+jobs/undefined/
 tasks/input/undefined*
 tasks/output/undefined*
-jobs/undefined/
-jobs/undefined/
+tasks/undefined/
