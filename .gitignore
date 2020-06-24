@@ -2,6 +2,7 @@ node_modules/
 build/
 temp/tmp-*
 temp/dsistemas01/
+temp/undefined/
 data/dsistemas01/
 data/undefined/
 logs/
@@ -17,4 +18,9 @@ jobs/output/job-*
 jobs/undefined/
 tasks/input/task-*
 tasks/output/task-*
+jobs/input/undefined*
+jobs/output/undefined*
+jobs/undefined/
+tasks/input/undefined*
+tasks/output/undefined*
 tasks/undefined/
