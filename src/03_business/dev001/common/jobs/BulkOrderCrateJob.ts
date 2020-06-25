@@ -82,6 +82,188 @@ export default class BulkOrderCreateJob {
 
   }
 
+  public static detectColumnDataPositions( headers: string[], logger: any ): {} {
+
+    let result = {
+
+      Establishment: -1,
+      Ticket: -1,
+      Name: -1,
+      Address: -1,
+      ZipCode: -1,
+      City: -1,
+      Phone: -1,
+      Note: -1,
+      Driver: -1,
+      CreatedAt: -1
+
+    }
+
+    let intFieldsCount = Object.keys( result ).length;
+    let intFoundFieldsCount = 0;
+
+    try {
+
+      for ( let intIndexHeader = 0; intIndexHeader < headers.length; intIndexHeader++ ) {
+
+        if ( headers[ intIndexHeader ] ) {
+
+          const strHeader = headers[ intIndexHeader ].trim().toLowerCase();
+
+          if ( strHeader === "establishment" ) {
+
+            if ( result.Establishment === -1 ) {
+
+              result.Establishment = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader  === "#ticket" ||
+                    strHeader  === "ticket" ) {
+
+            if ( result.Ticket === -1 ) {
+
+              result.Ticket = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "name" ) {
+
+            if ( result.Name === -1 ) {
+
+              result.Name = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "address" ) {
+
+            if ( result.Address === -1 ) {
+
+              result.Address = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "zipcode" ||
+                    strHeader === "zip code" ||
+                    strHeader === "zip_code" ) {
+
+            if ( result.ZipCode === -1 ) {
+
+              result.ZipCode = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "city" ) {
+
+            if ( result.City === -1 ) {
+
+              result.City = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "phone" ) {
+
+            if ( result.Phone === -1 ) {
+
+              result.Phone = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "note" ) {
+
+            if ( result.Note === -1 ) {
+
+              result.Note = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "driver" ) {
+
+            if ( result.Driver === -1 ) {
+
+              result.Driver = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "created_at" ||
+                    strHeader === "created at" ||
+                    strHeader === "createdat" ) {
+
+            if ( result.CreatedAt === -1 ) {
+
+              result.CreatedAt = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = BulkOrderCreateJob.name + "." + this.detectColumnDataPositions.name;
+
+      const strMark = "45924FF5765D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    result[ "FieldsCount" ] = intFieldsCount;
+    result[ "FoundFieldsCount" ] = intFoundFieldsCount;
+
+    return result;
+
+  }
+
   public async init( params: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
@@ -194,7 +376,6 @@ export default class BulkOrderCreateJob {
                                     Errors: 0
                                   };
 
-
             const jsonDetailsProcess = {
 
               Row: intRow,
@@ -243,16 +424,22 @@ export default class BulkOrderCreateJob {
 
               let createdAt = null;
 
+              //Send the haders to detect the order
+              const columnDataPositions = BulkOrderCreateJob.detectColumnDataPositions( excelRows[ 0 ], logger ) as any;
+
               for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
 
+                /*
                 if ( excelRows[ intRow ][ 1 ] &&  //Ticket
                      excelRows[ intRow ][ 2 ] &&  //Customer Name
                      excelRows[ intRow ][ 3 ] &&  //Address
                      excelRows[ intRow ][ 4 ] &&  //Zip Code
                      excelRows[ intRow ][ 5 ] &&  //City
                      excelRows[ intRow ][ 7 ] ) { //Note
+                      */
+                if ( columnDataPositions.FoundFieldsCount === columnDataPositions.FieldsCount ) {
 
-                  const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ 6 ], "-() " ) ); //Phone
+                  const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ columnDataPositions.Phone ], "-() " ) );  //excelRows[ intRow ][ 6 ], "-() " ) ); //Phone
 
                   if ( createdAt === null ) {
 
@@ -268,16 +455,16 @@ export default class BulkOrderCreateJob {
 
                   const body = {
 
-                    ticket: excelRows[ intRow ][ 1 ], //Ticket
+                    ticket: excelRows[ intRow ][ columnDataPositions.Ticket ], //excelRows[ intRow ][ 1 ], //Ticket
                     establishment_id: job.data.EstablishmentId, //Establishment
-                    zip_code: excelRows[ intRow ][ 4 ], //Zip code
+                    zip_code: excelRows[ intRow ][ columnDataPositions.ZipCode ], //excelRows[ intRow ][ 4 ], //Zip code
                     phone: intPhone !== NaN ? intPhone: 7868062108,
-                    address: excelRows[ intRow ][ 3 ], //Address
+                    address: excelRows[ intRow ][ columnDataPositions.Address ], //excelRows[ intRow ][ 3 ], //Address
                     address_type: 'residential',
-                    city: excelRows[ intRow ][ 5 ], //City
+                    city: excelRows[ intRow ][ columnDataPositions.City ], //excelRows[ intRow ][ 5 ], //City
                     payment_method: 'cash',
-                    note: excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ], //Note + Customer Name
-                    client_name: excelRows[ intRow ][ 2 ], //Customer name
+                    note: excelRows[ intRow ][ columnDataPositions.Note ] + ", " + excelRows[ intRow ][ columnDataPositions.Name ], //excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ], //Note + Customer Name
+                    client_name: excelRows[ intRow ][ columnDataPositions.Name ], //excelRows[ intRow ][ 2 ], //Customer name
                     driver_id: job.data.DriverId,
                     created_at: createdAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_09 ),
                     tip: 0,

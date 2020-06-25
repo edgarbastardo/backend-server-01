@@ -61,7 +61,16 @@ export default class Dev001ServicesController extends BaseService {
 
       }
 
-      const strSQL = DBConnectionManager.getStatement( "secondary", "getEstablishments", null, context.logger );
+      const params = {
+
+        Kind: request.query.kind ? request.query.kind: null
+
+      }
+
+      const strSQL = DBConnectionManager.getStatement( "secondary",
+                                                       "getEstablishments",
+                                                       params,
+                                                       context.logger );
 
       const rows = await dbConnection.query( strSQL, {
                                                        raw: true,
@@ -78,8 +87,8 @@ export default class Dev001ServicesController extends BaseService {
                  IsError: false,
                  Errors: [],
                  Warnings: [],
-                 Count: 1,
-                 Data: rows
+                 Count: rows ? rows.length: 0,
+                 Data: rows ? rows: []
                };
 
       bApplyTransaction = true;
@@ -496,7 +505,10 @@ export default class Dev001ServicesController extends BaseService {
 
       }
 
-      const strSQL = DBConnectionManager.getStatement( "secondary", "getDrivers", null, context.logger );
+      const strSQL = DBConnectionManager.getStatement( "secondary",
+                                                       "getDrivers",
+                                                       null,
+                                                       context.logger );
 
       const rows = await dbConnection.query( strSQL, {
                                                        raw: true,
@@ -513,8 +525,8 @@ export default class Dev001ServicesController extends BaseService {
                  IsError: false,
                  Errors: [],
                  Warnings: [],
-                 Count: 1,
-                 Data: rows
+                 Count: rows ? rows.length: 0,
+                 Data: rows ? rows: []
                };
 
       bApplyTransaction = true;
