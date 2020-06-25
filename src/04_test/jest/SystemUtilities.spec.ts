@@ -1,5 +1,6 @@
 import SystemUtilities from "../../02_system/common/SystemUtilities";
 import appRoot from 'app-root-path';
+import CommonConstants from "../../02_system/common/CommonConstants";
 
 require( 'dotenv' );
 
@@ -107,76 +108,114 @@ test( `isDateAndTimeBeforeAt 007`, async () => {
 
 })
 
-test( `getRandomIntegerStringRange 001`, async () => {
+test( `getRandomIntegerRangeFromString 001`, async () => {
 
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random:100:1000" );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( "random:100:1000" );
 
   expect( intRandomNumber ).toBeGreaterThan( 99 );
   expect( intRandomNumber ).toBeLessThan( 1001 );
 
 })
 
-test( `getRandomIntegerStringRange 002`, async () => {
+test( `getRandomIntegerRangeFromString 002`, async () => {
 
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random::1500" );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( "random::1500" );
 
   expect( intRandomNumber ).toBeGreaterThan( 99 );
   expect( intRandomNumber ).toBeLessThan( 1501 );
 
 })
 
-test( `getRandomIntegerStringRange 003`, async () => {
+test( `getRandomIntegerRangeFromString 003`, async () => {
 
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "random::" );
-
-  expect( intRandomNumber ).toBeGreaterThan( 0 );
-  expect( intRandomNumber ).toBeLessThan( 1001 );
-
-})
-
-test( `getRandomIntegerStringRange 004`, async () => {
-
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "::" );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( "random::" );
 
   expect( intRandomNumber ).toBeGreaterThan( 0 );
   expect( intRandomNumber ).toBeLessThan( 1001 );
 
 })
 
-test( `getRandomIntegerStringRange 005`, async () => {
+test( `getRandomIntegerRangeFromString 004`, async () => {
 
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( ":" );
-
-  expect( intRandomNumber ).toBeGreaterThan( 0 );
-  expect( intRandomNumber ).toBeLessThan( 1001 );
-
-})
-
-test( `getRandomIntegerStringRange 006`, async () => {
-
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( "" );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( "::" );
 
   expect( intRandomNumber ).toBeGreaterThan( 0 );
   expect( intRandomNumber ).toBeLessThan( 1001 );
 
 })
 
-test( `getRandomIntegerStringRange 007`, async () => {
+test( `getRandomIntegerRangeFromString 005`, async () => {
 
-  const intRandomNumber = SystemUtilities.getRandomIntegerStringRange( null );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( ":" );
 
   expect( intRandomNumber ).toBeGreaterThan( 0 );
   expect( intRandomNumber ).toBeLessThan( 1001 );
 
 })
 
-    /*
-    if ( cluster.isMaster && SystemUtilities.isNetworkLeader ) {
+test( `getRandomIntegerRangeFromString 006`, async () => {
 
-      await JobQueueManager.addJobToQueue( "SampleJob",
-                                           { mydata: "my data" },
-                                           null, //{ repeat: { cron: '* * * * *' } },
-                                           ApplicationManager.currentInstance );
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( "" );
 
-    }
-    */
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerRangeFromString 007`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( null );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getRandomIntegerRangeFromString 007`, async () => {
+
+  const intRandomNumber = SystemUtilities.getRandomIntegerRangeFromString( null );
+
+  expect( intRandomNumber ).toBeGreaterThan( 0 );
+  expect( intRandomNumber ).toBeLessThan( 1001 );
+
+})
+
+test( `getCurrentDateAndTimeFromAndIncMinutes 001`, async () => {
+
+  const incrementedDateAndTime = SystemUtilities.getCurrentDateAndTimeFromAndIncMinutes( '2020-01-01 07:00:00', 1 );
+
+  const formattedDateAndTime = incrementedDateAndTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_05 );
+
+  expect( formattedDateAndTime ).toEqual( "2020-01-01T07:01:00" );
+
+})
+
+test( `getCurrentDateAndTimeFromAndIncMinutes 002`, async () => {
+
+  const incrementedDateAndTime = SystemUtilities.getCurrentDateAndTimeFromAndIncMinutes( '2020-01-01 07:10:00', 10 );
+
+  const formattedDateAndTime = incrementedDateAndTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_05 );
+
+  expect( formattedDateAndTime ).toEqual( "2020-01-01T07:20:00" );
+
+})
+
+test( `getCurrentDateAndTimeFromAndDecMinutes 001`, async () => {
+
+  const incrementedDateAndTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( '2020-01-01 07:00:00', 1 );
+
+  const formattedDateAndTime = incrementedDateAndTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_05 );
+
+  expect( formattedDateAndTime ).toEqual( "2020-01-01T06:59:00" );
+
+})
+
+test( `getCurrentDateAndTimeFromAndDecMinutes 002`, async () => {
+
+  const incrementedDateAndTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( '2020-01-01 07:10:00', 10 );
+
+  const formattedDateAndTime = incrementedDateAndTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_05 );
+
+  expect( formattedDateAndTime ).toEqual( "2020-01-01T07:00:00" );
+
+})
