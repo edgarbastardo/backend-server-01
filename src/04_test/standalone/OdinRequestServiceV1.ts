@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 let debug = require( 'debug' )( 'OdinRequestServiceV1' );
 
-export class OdinRequestServiceV1 {
+export default class OdinRequestServiceV1 {
 
   static async callCreateOrder( backend: any,
                                 headers: any,
