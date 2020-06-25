@@ -16,7 +16,8 @@ import {
   //requestBody,
   //request,
   httpGet,
-  httpPut
+  httpPut,
+  httpPost
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 
@@ -55,7 +56,7 @@ export default class Dev001Controller {
                                   { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to update order uber tip" },
                                   { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job update order uber tip" },
                                   { Path: Dev001Controller._BASE_PATH + "/driver", Action: "v1.business.dev001.odin.driver", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get driver list" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to bulk create orders" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.job", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to bulk create orders" },
                                   { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job bulk create order" },
                                 ]
 
@@ -192,11 +193,11 @@ export default class Dev001Controller {
 
   }
 
-  @httpPut(
-            "/order/bulk",
-            MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
-          )
+  @httpPost(
+             "/order/bulk",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
   async bulkCreateOrder( request: Request, response: Response ) {
 
     const context = ( request as any ).context;

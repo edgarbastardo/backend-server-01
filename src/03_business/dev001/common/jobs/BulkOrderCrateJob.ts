@@ -16,14 +16,19 @@ import fs from 'fs'; //Load the filesystem module
 
 import xlsxFile from 'read-excel-file/node';
 
-import CommonConstants from '../../../../02_system/common/CommonConstants';
+import CommonConstants from "../../../../02_system/common/CommonConstants";
 
 import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
+
 import RedisConnectionManager from "../../../../02_system/common/managers/RedisConnectionManager";
-import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
+import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
+import LoggerManager from '../../../../02_system/common/managers/LoggerManager';
+//import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
 import I18NManager from '../../../../02_system/common/managers/I18Manager';
+
 //import { Redis, Cluster } from 'ioredis';
+import { OdinRequestServiceV1 } from "../../../common/services/OdinRequestServiceV1";
 
 const debug = require( 'debug' )( 'BulkOrderCreateJob' );
 
@@ -34,6 +39,48 @@ export default class BulkOrderCreateJob {
   public updateTipJobQueue: any;
 
   //public static completedJobs = [];
+
+  public async notify( strKind: string,
+                       strJobId: string,
+                       strUserName: string,
+                       strFileName: string,
+                       strStatus: string ) {
+
+    await NotificationManager.publishToExternal(
+                                                 {
+                                                   body: {
+                                                           kind: strKind,
+                                                           text: "Bulk order create job.\nJob: " + strJobId + "\nUser: " + strUserName + "\nFile: " + strFileName + "\nStatus: " + strStatus,
+                                                           fields: [
+                                                                     {
+                                                                       title: "Date",
+                                                                       value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                                       short: false
+                                                                     },
+                                                                     {
+                                                                       title: "Host",
+                                                                       value: SystemUtilities.getHostName(),
+                                                                       short: false
+                                                                     },
+                                                                     {
+                                                                       title: "Application",
+                                                                       value: process.env.APP_SERVER_DATA_NAME,
+                                                                       short: false
+                                                                     },
+                                                                     {
+                                                                     title: "Running from",
+                                                                     value: SystemUtilities.strBaseRunPath,
+                                                                     short: false
+                                                                     }
+                                                                 ],
+                                                           footer: "787735A48D5F",
+                                                           // `Date: ${SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 )}\nHost: ${SystemUtilities.getHostName()}\nApplication: ${process.env.APP_SERVER_DATA_NAME}\nRunning from: ${SystemUtilities.strBaseRunPath}`
+                                                         }
+                                                 },
+                                                 LoggerManager.mainLoggerInstance
+                                               );
+
+  }
 
   public async init( params: any, logger: any ): Promise<boolean> {
 
@@ -113,9 +160,15 @@ export default class BulkOrderCreateJob {
             //debugMark( "JOB token: [%s]", jobData.queue.token );
             debugMark( "JOB Id: [%s]", job.data.Id );
             debugMark( "JOB Establishment Id: [%s]", job.data.EstablishmentId );
-            debugMark( "JOB Date: [%s]", job.data.Date );
+            debugMark( "JOB Date: [%s]", job.data.CreatedAt );
             debugMark( "JOB Path: [%s]", job.data.Path );
             debugMark( "JOB Language: [%s]", job.data.Language );
+
+            this.notify( "notification",
+                         job.data.Id,
+                         job.data.JobStartedBy,
+                         job.data.FileName,
+                         "Job start running" );
 
             const strLanguage = job.data.Language;
 
@@ -126,42 +179,40 @@ export default class BulkOrderCreateJob {
 
             const strResultJobFile = strOutputJobPath + job.data.Id + ".result";
             const strStatusJobFile = strOutputJobPath + job.data.Id + ".status";
+            const strDetailsJobFile = strOutputJobPath + job.data.Id + ".details";
 
-            let currentTransaction = null;
+            let intRow = 0;
 
-            let bIsLocalTransaction = false;
-
-            let bApplyTransaction = false;
-
-            let intRow = 1;
+            let intProcessedRows = 0;
 
             const jsonStatusJob = {
                                     Progress: 0,
                                     Total: 0,
                                     Kind: "regular",
-                                    Status: await I18NManager.translate( strLanguage, 'Process started...' )
+                                    Status: await I18NManager.translate( strLanguage, 'Process started...' ),
+                                    Warnings: 0,
+                                    Errors: 0
                                   };
+
+
+            const jsonDetailsProcess = {
+
+              Row: intRow,
+              Kind: "regular",
+              Status: "Default",
+              Result: null
+
+            };
+
+            fs.writeFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Job Id %s.\n', job.data.Id ) );
 
             try {
 
-              const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
-
-              if ( currentTransaction === null ) {
-
-                currentTransaction = await dbConnection.transaction();
-
-                bIsLocalTransaction = true;
-
-              }
-
-              let intUpdatedRows = 0;
-              let intProcessedRows = 0;
-
-              jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Process started.' );
+              jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Process started...' );
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
-              fs.writeFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+              fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
 
               fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Opening file.\n' ) );
 
@@ -172,112 +223,302 @@ export default class BulkOrderCreateJob {
               jsonStatusJob.Progress = 0;
               jsonStatusJob.Total = excelRows.length;
               jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Process started.' );
+              jsonStatusJob.Warnings = 0;
+              jsonStatusJob.Errors = 0;
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
-              for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
+              const headers = {
 
-                /*
-                let strTicket = excelRows[ intRow ][ 2 ];
-
-                if ( strTicket ) {
-
-                  if ( strTicket.startsWith( "#" ) ) {
-
-                    strTicket = strTicket.substring( 1 ); //Remove # in start string
-
-                  }
-
-                  jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Processing the row %s.', intRow + 1 );
-
-                  fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
-
-                  fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + '\n' );
-
-                  const dblTip = parseFloat( excelRows[ intRow ][ 14 ] );
-
-                  const strSQL = DBConnectionManager.getStatement( "secondary",
-                                                                   "updateOrderTip",
-                                                                   {
-                                                                     EstablishmentId: job.data.EstablishmentId,
-                                                                     Date: job.data.Date,
-                                                                     Ticket: strTicket,
-                                                                     Tip: dblTip
-                                                                   },
-                                                                   job.data.logger );
-
-                  const rows = await dbConnection.query( strSQL, {
-                                                                   raw: true,
-                                                                   type: QueryTypes.UPDATE,
-                                                                   transaction: currentTransaction
-                                                                 } );
-
-                  if ( rows &&
-                       rows.length > 1 &&
-                       rows[ 1 ] === 1 ) {
-
-                     intUpdatedRows += 1;
-
-                  }
-                  debugMark( "Ticket: %s, rows: %O", strTicket, rows );
-
-                  jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Row %s processed.', intRow + 1 );
-                  jsonStatusJob.Progress = intRow + 1;
-
-                  fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
-
-                  fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + '\n' );
-
-                  intProcessedRows += 1;
-
-                }
-                else {
-
-                  jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Skipping the row %s. Ticket cell value is blank.', intRow + 1 )
-                  jsonStatusJob.Progress = intRow + 1;
-
-                  fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
-
-                  fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + '\n' );
-
-                }
-                */
+                'Content-Type': 'application/json',
+                'Authorization': process.env.ODIN_API_KEY1
 
               }
 
-              bApplyTransaction = true;
+              const backend = {
 
-              if ( currentTransaction !== null &&
-                   currentTransaction.finished !== "rollback" &&
-                   bIsLocalTransaction ) {
+                url: [ job.data.Backend ]
 
-                if ( bApplyTransaction ) {
+              }
 
-                  await currentTransaction.commit();
+              let createdAt = null;
+
+              for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
+
+                if ( excelRows[ intRow ][ 1 ] &&  //Ticket
+                     excelRows[ intRow ][ 2 ] &&  //Customer Name
+                     excelRows[ intRow ][ 3 ] &&  //Address
+                     excelRows[ intRow ][ 4 ] &&  //Zip Code
+                     excelRows[ intRow ][ 5 ] &&  //City
+                     excelRows[ intRow ][ 7 ] ) { //Note
+
+                  const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ 6 ], "-() " ) ); //Phone
+
+                  if ( createdAt === null ) {
+
+                    createdAt = SystemUtilities.getCurrentDateAndTimeFrom( job.data.CreatedAt );
+
+                  }
+                  else {
+
+                    //Increment by 1 minute every delivery
+                    createdAt = SystemUtilities.getCurrentDateAndTimeFromAndIncMinutes( createdAt, 1 );
+
+                  }
+
+                  const body = {
+
+                    ticket: excelRows[ intRow ][ 1 ], //Ticket
+                    establishment_id: job.data.EstablishmentId, //Establishment
+                    zip_code: excelRows[ intRow ][ 4 ], //Zip code
+                    phone: intPhone !== NaN ? intPhone: 7868062108,
+                    address: excelRows[ intRow ][ 3 ], //Address
+                    address_type: 'residential',
+                    city: excelRows[ intRow ][ 5 ], //City
+                    payment_method: 'cash',
+                    note: excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ], //Note + Customer Name
+                    client_name: excelRows[ intRow ][ 2 ], //Customer name
+                    driver_id: job.data.DriverId,
+                    created_at: createdAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_09 ),
+                    tip: 0,
+                    tip_method: 'cash',
+
+                    simulate: job.data.Simulate,
+                    check_address_and_customer: job.data.CheckAddressAndCustomer
+
+                  }
+
+                  jsonStatusJob.Kind = "regular";
+                  jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Processing the row number %s', intRow );
+
+                  fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                  fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                  const result = await OdinRequestServiceV1.callCreateOrder( backend,
+                                                                             headers,
+                                                                             body ) as any;
+
+                  if ( result ) {
+
+                    if ( result.output ) {
+
+                      if  ( result.output.status >= 200 &&
+                            result.output.status < 300 ) {
+
+                        jsonStatusJob.Kind = "regular";
+                        jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'OK: row number %s. Order Id: %s', intRow, result.output.body.data.id );
+                        jsonStatusJob.Progress = intRow + 1;
+                        jsonStatusJob.Progress = intRow + 1;
+
+                        fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                        fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                        jsonDetailsProcess.Row = intRow;
+                        jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                        jsonDetailsProcess.Status = jsonStatusJob.Status;
+                        jsonDetailsProcess.Result = result; //Save the result to details
+
+                        debugMark( jsonStatusJob.Status );
+
+                        intProcessedRows += 1;
+
+                      }
+                      else {
+
+                        jsonStatusJob.Kind = "error_and_continue";
+                        jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Error: row number %s. Result %s %s', intRow, result.output.status, result.output.statusText );
+                        jsonStatusJob.Progress = intRow + 1;
+                        jsonStatusJob.Errors += 1;
+
+                        fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                        fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                        jsonDetailsProcess.Row = intRow;
+                        jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                        jsonDetailsProcess.Status = jsonStatusJob.Status;
+                        jsonDetailsProcess.Result = result; //Save the result to details
+
+                        debugMark( jsonStatusJob.Status );
+
+                        this.notify( "error",
+                                     job.data.Id,
+                                     job.data.JobStartedBy,
+                                     job.data.FileName,
+                                     jsonStatusJob.Status );
+
+                      }
+
+                    }
+                    else if ( result.error ) {
+
+                      jsonStatusJob.Kind = "error_and_continue";
+                      jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Error: row number %s. Message: %s', intRow, result.error.message );
+                      jsonStatusJob.Progress = intRow + 1;
+                      jsonStatusJob.Errors += 1;
+
+                      fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                      fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                      jsonDetailsProcess.Row = intRow;
+                      jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                      jsonDetailsProcess.Status = jsonStatusJob.Status;
+                      jsonDetailsProcess.Result = result; //Save the result to details
+
+                      debugMark( jsonStatusJob.Status );
+
+                      this.notify( "error",
+                                   job.data.Id,
+                                   job.data.JobStartedBy,
+                                   job.data.FileName,
+                                   jsonStatusJob.Status );
+
+                    }
+                    else {
+
+                      jsonStatusJob.Kind = "error_and_continue";
+                      jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Error: row number %s. No result', intRow );
+                      jsonStatusJob.Progress = intRow + 1;
+                      jsonStatusJob.Errors += 1;
+
+                      fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                      fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                      jsonDetailsProcess.Row = intRow;
+                      jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                      jsonDetailsProcess.Status = jsonStatusJob.Status;
+                      jsonDetailsProcess.Result = result; //Save the result to details
+
+                      debugMark( jsonStatusJob.Status );
+
+                      this.notify( "error",
+                                   job.data.Id,
+                                   job.data.JobStartedBy,
+                                   job.data.FileName,
+                                   jsonStatusJob.Status );
+
+                    }
+
+                  }
+                  else {
+
+                    jsonStatusJob.Kind = "error_and_continue";
+                    jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Error: row number %s. No response', intRow );
+                    jsonStatusJob.Progress = intRow + 1;
+                    jsonStatusJob.Errors += 1;
+
+                    fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                    fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + "\n" );
+
+                    jsonDetailsProcess.Row = intRow;
+                    jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                    jsonDetailsProcess.Status = jsonStatusJob.Status;
+                    jsonDetailsProcess.Result = result; //Save the result to details
+
+                    debugMark( jsonStatusJob.Status );
+
+                    this.notify( "error",
+                                 job.data.Id,
+                                 job.data.JobStartedBy,
+                                 job.data.FileName,
+                                 jsonStatusJob.Status );
+
+                  }
 
                 }
                 else {
 
-                  await currentTransaction.rollback();
+                  jsonStatusJob.Kind = "warning_and_continue";
+                  jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Warning: row number %s. One or more cell values are blank or missing data.', intRow + 1 )
+                  jsonStatusJob.Progress = intRow + 1;
+                  jsonStatusJob.Warnings += 1;
+
+                  fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
+
+                  fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + '\n' );
+
+                  jsonDetailsProcess.Row = intRow;
+                  jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+                  jsonDetailsProcess.Status = jsonStatusJob.Status;
+                  jsonDetailsProcess.Result = null; //Save the result to details
+
+                  debugMark( jsonStatusJob.Status );
+
+                  this.notify( "warning",
+                               job.data.Id,
+                               job.data.JobStartedBy,
+                               job.data.FileName,
+                               jsonStatusJob.Status );
 
                 }
+
+                //Save to result file
+                fs.appendFileSync( strDetailsJobFile, JSON.stringify( jsonDetailsProcess, null, 2 ) + ',\n' );
 
               }
 
               jsonStatusJob.Kind = "done";
-              jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Success. %s rows updated, %s rows in total.', intUpdatedRows, excelRows.length );
+              jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Success. %s rows processed, %s rows in total.', intProcessedRows, excelRows.length );
+
+              debugMark( jsonStatusJob.Status );
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
-              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, '%s rows processed.\n', intProcessedRows ) );
-              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, '%s rows updated.\n', intUpdatedRows ) );
-              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Total %s rows.\n', excelRows.length ) );
-              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Success completed process.\n' ) );
+              let strMessage = await I18NManager.translate( strLanguage, '%s rows processed.', intProcessedRows );
+
+              fs.appendFileSync( strResultJobFile, strMessage + "\n" );
+
+              debugMark( strMessage );
+
+              strMessage = await I18NManager.translate( strLanguage, 'Total %s rows.', excelRows.length );
+
+              fs.appendFileSync( strResultJobFile, strMessage + "\n" );
+
+              debugMark( strMessage );
+
+              if ( jsonStatusJob.Errors === 0 &&
+                   jsonStatusJob.Warnings === 0 ) {
+
+                strMessage = await I18NManager.translate( strLanguage, 'Success completed the job.' );
+
+                fs.appendFileSync( strResultJobFile, strMessage + "\n" );
+
+                this.notify( "notification",
+                             job.data.Id,
+                             job.data.JobStartedBy,
+                             job.data.FileName,
+                             strMessage );
+
+              }
+              else {
+
+                strMessage = await I18NManager.translate( strLanguage,
+                                                          '*** Job completed with %s errors and %s warnings. ***\n',
+                                                          jsonStatusJob.Errors,
+                                                          jsonStatusJob.Warnings );
+
+                fs.appendFileSync( strResultJobFile, strMessage );
+
+                this.notify( "warning",
+                             job.data.Id,
+                             job.data.JobStartedBy,
+                             job.data.FileName,
+                             strMessage );
+
+              }
+
+              debugMark( strMessage );
 
             }
             catch ( error ) {
 
-              jsonStatusJob.Kind = "error";
+              jsonStatusJob.Kind = "error_and_stop";
+              jsonStatusJob.Errors += 1;
 
               if ( intRow === 1 ) {
 
@@ -294,29 +535,25 @@ export default class BulkOrderCreateJob {
 
               fs.appendFileSync( strResultJobFile, jsonStatusJob.Status + '\n' );
 
+              jsonDetailsProcess.Row = intRow;
+              jsonDetailsProcess.Kind = jsonStatusJob.Kind;
+              jsonDetailsProcess.Status = jsonStatusJob.Status;
+              jsonDetailsProcess.Result = error;
+
+              fs.appendFileSync( strDetailsJobFile, JSON.stringify( jsonDetailsProcess, null, 2 ) + ',\n' );
+
               const strMark = "B6061DE6D6C9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
               const debugMark = debug.extend( strMark );
 
               debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
               debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-              //debugMark( "Catched on: %O", sourcePosition );
 
-              if ( currentTransaction !== null &&
-                   bIsLocalTransaction ) {
-
-                try {
-
-                  await currentTransaction.rollback();
-
-                }
-                catch ( error ) {
-
-                  //
-
-                }
-
-              }
+              this.notify( "error",
+                           job.data.Id,
+                           job.data.JobStartedBy,
+                           job.data.FileName,
+                           error.message ? error.message : "No error message available" );
 
             }
 

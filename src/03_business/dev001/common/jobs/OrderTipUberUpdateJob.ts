@@ -218,6 +218,7 @@ export default class OrderTipUberUpdateJob {
                      intUpdatedRows += 1;
 
                   }
+
                   debugMark( "Ticket: %s, rows: %O", strTicket, rows );
 
                   jsonStatusJob.Status = await I18NManager.translate( strLanguage, 'Row %s processed.', intRow + 1 );
@@ -270,12 +271,12 @@ export default class OrderTipUberUpdateJob {
               fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, '%s rows processed.\n', intProcessedRows ) );
               fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, '%s rows updated.\n', intUpdatedRows ) );
               fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Total %s rows.\n', excelRows.length ) );
-              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Success completed process.\n' ) );
+              fs.appendFileSync( strResultJobFile, await I18NManager.translate( strLanguage, 'Success completed the job.\n' ) );
 
             }
             catch ( error ) {
 
-              jsonStatusJob.Kind = "error";
+              jsonStatusJob.Kind = "error_and_stop";
 
               if ( intRow === 1 ) {
 

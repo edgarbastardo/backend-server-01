@@ -185,7 +185,8 @@ export default class Dev001ServicesController extends BaseService {
                                                   EstablishmentId: request.body.EstablishmentId,
                                                   Date: request.body.Date,
                                                   Path: request.body.Path,
-                                                  Language: strLanguage
+                                                  Language: strLanguage,
+                                                  JobStartedBy: context.UserSessionStatus.UserName
                                                 },
                                                 {
                                                   jobId: request.body.Id
@@ -615,15 +616,20 @@ export default class Dev001ServicesController extends BaseService {
 
       if ( await JobQueueManager.addJobToQueue( "BulkOrderCreateJob",
                                                 {
+                                                  Simulate: request.body.Simulate,
                                                   Id: request.body.Id,
                                                   EstablishmentId: request.body.EstablishmentId,
-                                                  DriverId: request.body.EstablishmentId,
-                                                  Date: request.body.Date,
+                                                  DriverId: request.body.DriverId,
+                                                  CreatedAt: request.body.CreatedAt,
+                                                  FileName: request.body.FileName,
                                                   Path: request.body.Path,
-                                                  Language: strLanguage
+                                                  Language: strLanguage,
+                                                  CheckAddressAndCustomer: request.body.CheckAddressAndCustomer,
+                                                  Backend: request.body.Backend,
+                                                  JobStartedBy: context.UserSessionStatus.UserName
                                                 },
                                                 {
-                                                  jobId: request.body.Id
+                                                  jobId: SystemUtilities.getUUIDv4(), //request.body.Id
                                                 }, //{ jobId: SystemUtilities.getUUIDv4(), attempts: 0, timeout: 99999999, removeOnComplete: true, removeOnFail: true, backoff: 0 }, //{ repeat: { cron: '* * * * *' } },
                                                 logger ) ) {
 
