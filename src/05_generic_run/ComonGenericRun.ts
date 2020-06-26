@@ -37,7 +37,8 @@ export default class CommonGenericRun {
 
           const strHeader = headers[ intIndexHeader ].trim().toLowerCase();
 
-          if ( strHeader === "establishment" ) {
+          if ( strHeader === "establishment" ||
+               strHeader === "id restaurant" ) {
 
             if ( result.Establishment === -1 ) {
 
@@ -128,7 +129,8 @@ export default class CommonGenericRun {
             }
 
           }
-          else if ( strHeader === "driver" ) {
+          else if ( strHeader === "driver" ||
+                    strHeader === "id driver"  ) {
 
             if ( result.Driver === -1 ) {
 

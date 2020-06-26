@@ -86,8 +86,8 @@
       "program": "${workspaceFolder}/src/generic_run.ts",
       "args": [
         "--simulate=0",
-        "--files=/01-01-2010/test01/",
-        "--server=http://test01.weknock-tech.com",
+        "--files=/26-06-2020/prod01/",
+        "--server=http://weknock-tech.com",
       ],
       "outputCapture": "std",
       "preLaunchTask": "build-generic-run",

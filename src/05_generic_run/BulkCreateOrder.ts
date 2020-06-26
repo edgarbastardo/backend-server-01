@@ -159,6 +159,7 @@ export default class BulkCreateOrder {
 
                   const intPhone = parseInt( CommonUtilities.clearSpecialChars( excelRows[ intRow ][ columnDataPositions.Phone ], "-() " ) ); //excelRows[ intRow ][ 6 ], "-() " ) );
 
+                  /*
                   if ( intRow === 1 || !createdAt ) {
 
                     createdAt = SystemUtilities.getCurrentDateAndTimeFrom( excelRows[ intRow ][ columnDataPositions.CreatedAt ] );
@@ -166,9 +167,10 @@ export default class BulkCreateOrder {
                   }
                   else {
 
-                    createdAt = SystemUtilities.getCurrentDateAndTimeFromAndIncMinutes( createdAt, 1 );
+                    createdAt = SystemUtilities.getCurrentDateAndTimeFromAndIncSeconds( createdAt, 1 );
 
                   }
+                  */
 
                   const body = {
 
@@ -181,14 +183,14 @@ export default class BulkCreateOrder {
                     payment_method: 'cash',
                     note: excelRows[ intRow ][ columnDataPositions.Name ] + "," + excelRows[ intRow ][ columnDataPositions.Note ], //excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ],
                     driver_id: excelRows[ intRow ][ columnDataPositions.Driver ], //excelRows[ intRow ][ 8 ],
-                    created_at: createdAt, //excelRows[ intRow ][ 9 ],
+                    created_at: excelRows[ intRow ][ columnDataPositions.CreatedAt ],
                     tip: 0,
                     tip_method: 'cash',
 
-                    simulate: argv.simulate,
-                    check_address_and_customer: 1,
-                    client_name: excelRows[ intRow ][ columnDataPositions.Name ],
-                    ticket: excelRows[ intRow ][ columnDataPositions.Ticket ],
+                    //simulate: argv.simulate,
+                    //check_address_and_customer: 1,
+                    //client_name: excelRows[ intRow ][ columnDataPositions.Name ],
+                    //ticket: "" //`${excelRows[ intRow ][ columnDataPositions.Ticket ]}`,
 
                   }
 
