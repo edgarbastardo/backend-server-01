@@ -80,7 +80,7 @@ export default class Dev001ServicesController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_GET_ESTABLISHMENTS_LIST',
+                 Code: 'SUCCESS_GET_ESTABLISHMENT_LIST',
                  Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
                  Mark: 'FF2D5A3F83E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
@@ -518,7 +518,7 @@ export default class Dev001ServicesController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_GET_DRIVERS_LIST',
+                 Code: 'SUCCESS_GET_DRIVER_LIST',
                  Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
                  Mark: '47BB5F21C2B6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,

@@ -49,15 +49,15 @@ export default class Dev001Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev001/odin";
+  static readonly _BASE_PATH = "/v1/business/dev001/odinv1";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev001Controller._BASE_PATH + "/establishment", Action: "v1.business.dev001.odin.establishment", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment list" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to update order uber tip" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odin.order.tip.uber.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job update order uber tip" },
-                                  { Path: Dev001Controller._BASE_PATH + "/driver", Action: "v1.business.dev001.odin.driver", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get driver list" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.job", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to bulk create orders" },
-                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odin.order.bulk.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job bulk create order" },
+                                  { Path: Dev001Controller._BASE_PATH + "/establishment", Action: "v1.business.dev001.odinv1.establishment", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment list" },
+                                  { Path: Dev001Controller._BASE_PATH + "/driver", Action: "v1.business.dev001.odinv1.driver", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get driver list" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odinv1.order.tip.uber.job", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to update order uber tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/tip/uber", Action: "v1.business.dev001.odinv1.order.tip.uber.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job update order uber tip" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odinv1.order.bulk.job", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Start the job to bulk create orders" },
+                                  { Path: Dev001Controller._BASE_PATH + "/order/bulk", Action: "v1.business.dev001.odinv1.order.bulk.status", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#Adm_Asistant#", Roles: [ "Administrator", "Business_Manager", "Adm_Asistant" ], Description: "Get status of the job bulk create order" },
                                 ]
 
   _controllerLogger = null;
