@@ -313,9 +313,16 @@ export default class Dev001ServicesController extends BaseService {
 
         let strOutputJobFile = "";
 
-        if ( request.query.Output === "result" ) {
+        const strKind = request.query.Kind;
 
-          strOutputJobFile = strOutputJobPath + request.query.Id + ".result";
+        if ( strKind === "output" ) {
+
+          strOutputJobFile = strOutputJobPath + request.query.Id + ".output";
+
+        }
+        else if ( strKind === "details" ) {
+
+          strOutputJobFile = strOutputJobPath + request.query.Id + ".output.details";
 
         }
         else {
@@ -332,13 +339,20 @@ export default class Dev001ServicesController extends BaseService {
 
           //debugMark( "Result: [%s]", outputContent );
 
-          if ( request.query.Output === "result" ) {
+          if ( strKind === "output"  ) {
 
-            outputContent = {
+            outputContent = outputContent.split( "\n" );
 
-              result: outputContent
+          }
+          else if ( strKind === "details" ) {
 
-            };
+            outputContent = outputContent.substring( 0, outputContent.length - 2 );
+
+            outputContent = "[" + outputContent + "]";
+
+            let jsonDetailsJob = CommonUtilities.parseJSON( outputContent, logger );
+
+            outputContent = jsonDetailsJob;
 
           }
           else {
@@ -371,9 +385,7 @@ export default class Dev001ServicesController extends BaseService {
                      Errors: [],
                      Warnings: [],
                      Count: 1,
-                     Data: [
-                             outputContent
-                           ]
+                     Data: outputContent.length >= 0 ? outputContent: [ outputContent ]
                    };
 
         }

@@ -47,7 +47,8 @@ export default class BusinessQueries {
       else if ( strName === "getDrivers" ) {
 
         //Pending
-        strResult = `select a.id, a.first_name, a.last_name, a.phone, a.email as user from users a where a.deleted_at is null and a.role = "driver" order by first_name, last_name;`;
+        strResult = `select b.id, a.first_name, a.last_name, a.phone, a.email as user from users a inner join drivers b on b.user_id = a.id where a.deleted_at is null and a.role = "driver" order by first_name, last_name;`;
+        //strResult = `select a.id, a.first_name, a.last_name, a.phone, a.email as user from users a where a.deleted_at is null and a.role = "driver" order by first_name, last_name;`;
 
       }
 
