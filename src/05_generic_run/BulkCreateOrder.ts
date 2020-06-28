@@ -187,10 +187,11 @@ export default class BulkCreateOrder {
                     tip: 0,
                     tip_method: 'cash',
 
-                    //simulate: argv.simulate,
-                    //check_address_and_customer: 1,
-                    //client_name: excelRows[ intRow ][ columnDataPositions.Name ],
-                    //ticket: "" //`${excelRows[ intRow ][ columnDataPositions.Ticket ]}`,
+                    simulate: argv.simulate,
+                    check_address_and_customer: 1,
+                    client_name: excelRows[ intRow ][ columnDataPositions.Name ],
+                    ticket: `${excelRows[ intRow ][ columnDataPositions.Ticket ]}`,
+                    qty_meals: 2
 
                   }
 
