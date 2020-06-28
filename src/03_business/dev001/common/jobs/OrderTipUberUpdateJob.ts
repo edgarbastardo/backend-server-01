@@ -34,6 +34,89 @@ export default class OrderTipUberUpdateJob {
   public updateTipJobQueue: any;
 
   //public static completedJobs = [];
+  public static detectColumnDataPositions( headers: string[], logger: any ): {} {
+
+    let result = {
+
+      Ticket: -1,
+      Gratuity: -1,
+
+    }
+
+    let intFieldsCount = Object.keys( result ).length;
+    let intFoundFieldsCount = 0;
+
+    try {
+
+      for ( let intIndexHeader = 0; intIndexHeader < headers.length; intIndexHeader++ ) {
+
+        if ( headers[ intIndexHeader ] ) {
+
+          const strHeader = headers[ intIndexHeader ].trim().toLowerCase();
+
+          if ( strHeader === "propina" ||
+               strHeader === "gratuity" ) {
+
+            if ( result.Gratuity === -1 ) {
+
+              result.Gratuity = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+          else if ( strHeader === "id. del pedido" ||
+                    strHeader === "id del pedido" ||
+                    strHeader === "ticket" ) {
+
+            if ( result.Ticket === -1 ) {
+
+              result.Ticket = intIndexHeader;
+
+              intFoundFieldsCount += 1;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = OrderTipUberUpdateJob.name + "." + this.detectColumnDataPositions.name;
+
+      const strMark = "908393C964F6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    result[ "FieldsCount" ] = intFieldsCount;
+    result[ "FoundFieldsCount" ] = intFoundFieldsCount;
+
+    return result;
+
+  }
 
   public async init( params: any, logger: any ): Promise<boolean> {
 
@@ -176,9 +259,12 @@ export default class OrderTipUberUpdateJob {
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
+              //Send the haders to detect the order
+              const columnDataPositions = OrderTipUberUpdateJob.detectColumnDataPositions( excelRows[ 0 ], logger ) as any;
+
               for ( intRow = 1; intRow < excelRows.length; intRow++ ) {
 
-                let strTicket = excelRows[ intRow ][ 2 ];
+                let strTicket = excelRows[ intRow ][ columnDataPositions.Ticket ]; //excelRows[ intRow ][ 2 ]; //Ticket, Id. del pedido
 
                 if ( strTicket ) {
 
@@ -194,7 +280,7 @@ export default class OrderTipUberUpdateJob {
 
                   fs.appendFileSync( strOutputJobFile, "Ok: " + jsonStatusJob.Message + "\n" );
 
-                  const dblTip = parseFloat( excelRows[ intRow ][ 14 ] );
+                  const dblTip = excelRows[ intRow ][ columnDataPositions.Gratuity ];  //parseFloat( excelRows[ intRow ][ 14 ] ); //Gratuity, Propina
 
                   const strSQL = DBConnectionManager.getStatement( "secondary",
                                                                    "updateOrderTip",
