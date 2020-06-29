@@ -4,6 +4,7 @@
     "connect": true,
     "migrate": true,
     "logStatement": false,
+    "timezone": "",
     "dev": {
       "username": "root",
       "password": "dsistemas",
@@ -70,6 +71,7 @@
     "connect": false,
     "migrate": false,
     "logStatement": false,
+    "timezone": "",
     "dev": {
       "username": "root",
       "password": "dsistemas",
@@ -136,6 +138,7 @@
     "connect": false,
     "migrate": false,
     "logStatement": false,
+    "timezone": "",
     "dev": {
       "username": "root",
       "password": "dsistemas",

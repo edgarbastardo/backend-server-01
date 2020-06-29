@@ -155,6 +155,7 @@ export default class DBConnectionManager {
           dbConfig.name = strCurrentDatabase;
           dbConfig.migrate = dbConfigData[ strCurrentDatabase ].migrate;
           dbConfig.system = dbConfigData[ strCurrentDatabase ].system;
+          dbConfig.timezone = dbConfigData[ strCurrentDatabase ].timezone ? dbConfigData[ strCurrentDatabase ].timezone: SystemUtilities.getCurrentDateAndTime().format( "Z" );
 
           if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
 
