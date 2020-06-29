@@ -31,6 +31,8 @@ import InstantMenssageManager from './02_system/common/managers/InstantMessageMa
 import SYSSystemEventLogService from './02_system/common/database/master/services/SYSSystemEventLogService';
 import PresenceManager from './02_system/common/managers/PresenceManager';
 
+//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 let debug = null; //require( 'debug' )( 'server' );
 
 if ( process.env.WORKER_KIND === "http_worker_process" ) {
@@ -585,6 +587,24 @@ export default async function main() {
     await InstantMenssageManager.loadRules( LoggerManager.mainLoggerInstance );
 
     await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
+
+    /*
+    const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+    //And DATE( b.created_at ) = '2020-06-22'
+    // const strSQL = "Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = 10.10 Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";  And DATE( b.created_at ) = ?
+    const strSQL = "Select a.tip, b.ticket, b.created_at From deliveries as a inner join orders as b on a.order_id=b.id Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";
+    //const strSQL = "Select NOW()";
+
+    const rows = await dbConnection.query( strSQL, {
+                                                     raw: true,
+                                                     type: QueryTypes.SELECT,
+                                                     transaction: null,
+                                                     //replacements: [ new Date( 2020, 6, 22 ) ]
+                                                   } );
+
+    debugMark( rows );
+    */
 
     if ( cluster.isMaster ) {
 

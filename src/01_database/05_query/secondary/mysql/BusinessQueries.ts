@@ -39,9 +39,7 @@ export default class BusinessQueries {
       */
       else if ( strName === "updateOrderTip" ) {
 
-        strResult = SqlString.format( `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ? Where b.establishment_id = ? And date(b.created_at) = ? And b.ticket = ?`, [ params.Tip, params.EstablishmentId, params.Date, params.Ticket ] );
-
-        //strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
+        strResult = SqlString.format( `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ?, a.tip_method='online' Where b.establishment_id = ? And date(b.created_at) = ? And b.ticket = ?`, [ params.Tip, params.EstablishmentId, params.Date, params.Ticket ] );
 
       }
       else if ( strName === "getDrivers" ) {

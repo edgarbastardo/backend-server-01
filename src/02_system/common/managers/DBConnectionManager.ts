@@ -12,7 +12,7 @@ import appRoot from 'app-root-path';
 
 import CommonConstants from '../CommonConstants';
 
-import CommonUtilities from '../CommonUtilities';
+import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from '../SystemUtilities';
 //import config from '../../../01_database/00_config/config.json';
 //import BusinessQueries from "../../../01_database/05_query/mysql/BusinessQueries";
@@ -155,6 +155,10 @@ export default class DBConnectionManager {
           dbConfig.name = strCurrentDatabase;
           dbConfig.migrate = dbConfigData[ strCurrentDatabase ].migrate;
           dbConfig.system = dbConfigData[ strCurrentDatabase ].system;
+          dbConfig.timezone = dbConfigData[ strCurrentDatabase ].timezone ? dbConfigData[ strCurrentDatabase ].timezone: SystemUtilities.getCurrentDateAndTime().format( "Z" );
+
+          //dbConfig.timezone = 'America/New_York';
+          //dbConfig.timezone = 'America/Los_Angeles';
 
           if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
 
