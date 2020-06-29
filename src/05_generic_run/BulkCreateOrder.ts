@@ -1,8 +1,11 @@
-import fs from 'fs'; //Load the filesystem module
-import path from 'path';
-import cluster from 'cluster';
+import fs from "fs"; //Load the filesystem module
+import path from "path";
+import cluster from "cluster";
 
-import xlsxFile from 'read-excel-file/node';
+import xlsxFile from "read-excel-file/node";
+
+import logSymbols = require( "log-symbols" );
+import chalk = require( "chalk" );
 
 import CommonConstants from "../02_system/common/CommonConstants";
 
@@ -13,11 +16,11 @@ import I18NManager from "../02_system/common/managers/I18Manager";
 import LoggerManager from "../02_system/common/managers/LoggerManager";
 
 import OdinRequestServiceV1 from "../04_test/standalone/OdinRequestServiceV1";
-import CommonGenericRun from './ComonGenericRun';
+import CommonGenericRun from "./ComonGenericRun";
 
-let debug = require( 'debug' )( 'BulkCreateOrder' );
+let debug = require( "debug" )( "BulkCreateOrder" );
 
-const argv = require('yargs').argv;
+const argv = require("yargs").argv;
 
 export default class BulkCreateOrder {
 
@@ -28,12 +31,12 @@ export default class BulkCreateOrder {
       //npm run start:run -- --files=ruta-sergios-702.xlsx,ruta-sergios-703.xlsx --server=test01.weknock-tech.com --authorization=8f5f0014-062a-492f-aa65-14d0cd25becb
       //npm run start:run -- --files=ruta-sergios-702.xlsx,ruta-sergios-703.xlsx
 
-      let debugMark = debug.extend( '9159DCAEB587' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      let debugMark = debug.extend( "9159DCAEB587" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-      debugMark( 'bulkCreateOrder' );
+      debugMark( "bulkCreateOrder" );
 
-      debugMark( 'Argument files: %s', argv.files );
-      debugMark( 'Argument server: %s', argv.server );
+      debugMark( "Argument files: %s", argv.files );
+      debugMark( "Argument server: %s", argv.server );
       debugMark( SystemUtilities.strBaseRootPath );
 
       if ( argv.files ) {
@@ -51,34 +54,34 @@ export default class BulkCreateOrder {
                         } )
                         .filter( ( file ) => {
 
-                          return file.indexOf( '.' ) !== 0 && ( file.slice( -5 ) === '.xlsx' || file.slice( -4 ) === '.xls' )
+                          return file.indexOf( "." ) !== 0 && ( file.slice( -5 ) === ".xlsx" || file.slice( -4 ) === ".xls" )
 
                         } );
 
-        //const files = argv.files.split( ',' );
+        //const files = argv.files.split( "," );
 
         for ( let intFileIndex = 0; intFileIndex < files.length; intFileIndex++ ) {
 
-          let debugMark = debug.extend( ( intFileIndex + 1 ) + '-9159DCAEB587' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+          let debugMark = debug.extend( ( intFileIndex + 1 ) + "-9159DCAEB587" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-          const strFullFilePath = path.join( strFullDataPath, files[ intFileIndex ] ); //SystemUtilities.strBaseRootPath + '/data/' + SystemUtilities.getHostName() + "/" + files[ intFileIndex ];
+          const strFullFilePath = path.join( strFullDataPath, files[ intFileIndex ] ); //SystemUtilities.strBaseRootPath + "/data/" + SystemUtilities.getHostName() + "/" + files[ intFileIndex ];
 
           if ( fs.existsSync( strFullFilePath ) ) {
 
-            const strFullFilePathResult = strFullFilePath + '.result';
-            const strFullFilePathInput = strFullFilePath + '.input';
-            const strFullFilePathOutput = strFullFilePath + '.output';
+            const strFullFilePathResult = path.join( strFullDataPath, argv.context, files[ intFileIndex ] ) + ".result";
+            const strFullFilePathInput = path.join( strFullDataPath, argv.context, files[ intFileIndex ] ) + ".input";
+            const strFullFilePathOutput = path.join( strFullDataPath, argv.context, files[ intFileIndex ] ) + ".output";
 
             if ( !fs.existsSync( strFullFilePathResult ) ) {
 
-              let strMessage = I18NManager.translateSync( 'en_US', 'Reading the file %s', strFullFilePath );
+              let strMessage = I18NManager.translateSync( "en_US", "Reading the file %s", strFullFilePath );
 
               debugMark( strMessage );
               fs.writeFileSync( strFullFilePathResult, strMessage + "\n" );
 
               const excelRows = await xlsxFile( strFullFilePath );
 
-              strMessage = I18NManager.translateSync( 'en_US', '%s Rows found', excelRows.length );
+              strMessage = I18NManager.translateSync( "en_US", "%s Rows found", excelRows.length );
 
               debugMark( strMessage );
               fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
@@ -89,7 +92,7 @@ export default class BulkCreateOrder {
 
               if ( !argv.authorization ) {
 
-                strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --authorization=??? not defined using %s by default', strDefaultAuthorization );
+                strMessage = I18NManager.translateSync( "en_US", "Warning the parameter --authorization=??? not defined using %s by default", strDefaultAuthorization );
 
                 debugMark( strMessage );
 
@@ -98,7 +101,7 @@ export default class BulkCreateOrder {
               }
               else {
 
-                strMessage = I18NManager.translateSync( 'en_US', 'Using authorization %s', strDefaultAuthorization );
+                strMessage = I18NManager.translateSync( "en_US", "Using authorization %s", strDefaultAuthorization );
 
                 debugMark( strMessage );
 
@@ -108,16 +111,16 @@ export default class BulkCreateOrder {
 
               const headers = {
 
-                'Content-Type': 'application/json',
-                'Authorization': strDefaultAuthorization,
+                "Content-Type": "application/json",
+                "Authorization": strDefaultAuthorization,
 
               }
 
-              const strDefaultServer = argv.server ? argv.server : 'http://test01.weknock-tech.com';
+              const strDefaultServer = argv.server ? argv.server : "http://test01.weknock-tech.com";
 
               if ( !argv.server ) {
 
-                strMessage = I18NManager.translateSync( 'en_US', 'Warning the parameter --server=??? not defined using %s by default', strDefaultServer );
+                strMessage = I18NManager.translateSync( "en_US", "Warning the parameter --server=??? not defined using %s by default", strDefaultServer );
 
                 debugMark( strMessage );
 
@@ -126,7 +129,7 @@ export default class BulkCreateOrder {
               }
               else {
 
-                strMessage = I18NManager.translateSync( 'en_US', 'Using server %s', strDefaultServer );
+                strMessage = I18NManager.translateSync( "en_US", "Using server %s", strDefaultServer );
 
                 debugMark( strMessage );
 
@@ -178,14 +181,14 @@ export default class BulkCreateOrder {
                     zip_code: excelRows[ intRow ][ columnDataPositions.ZipCode ], //excelRows[ intRow ][ 4 ], //Zip code
                     phone: intPhone !== NaN ? intPhone: 7868062108,
                     address: excelRows[ intRow ][ columnDataPositions.Address ], //excelRows[ intRow ][ 3 ],
-                    address_type: 'residential',
+                    address_type: "residential",
                     city: excelRows[ intRow ][ columnDataPositions.City ], //excelRows[ intRow ][ 5 ],
-                    payment_method: 'cash',
+                    payment_method: "cash",
                     note: excelRows[ intRow ][ columnDataPositions.Name ] + "," + excelRows[ intRow ][ columnDataPositions.Note ], //excelRows[ intRow ][ 7 ] + ", " + excelRows[ intRow ][ 2 ],
                     driver_id: excelRows[ intRow ][ columnDataPositions.Driver ], //excelRows[ intRow ][ 8 ],
                     created_at: excelRows[ intRow ][ columnDataPositions.CreatedAt ],
                     tip: 0,
-                    tip_method: 'cash',
+                    tip_method: "cash",
 
                     simulate: argv.simulate,
                     check_address_and_customer: 1,
@@ -195,7 +198,7 @@ export default class BulkCreateOrder {
 
                   }
 
-                  strMessage = I18NManager.translateSync( 'en_US', 'Processing the row number %s', intRow );
+                  strMessage = I18NManager.translateSync( "en_US", "Processing the row number %s", intRow );
 
                   debugMark( strMessage );
 
@@ -209,71 +212,71 @@ export default class BulkCreateOrder {
 
                     if ( result.input ) {
 
-                      fs.appendFileSync( strFullFilePathInput, JSON.stringify( result.input, null, 2 ) + '\n' );
+                      fs.appendFileSync( strFullFilePathInput, JSON.stringify( result.input, null, 2 ) + "\n" );
 
                     }
 
                     if ( result.output ) {
 
-                      fs.appendFileSync( strFullFilePathOutput, JSON.stringify( result.output, null, 2 ) + '\n' );
+                      fs.appendFileSync( strFullFilePathOutput, JSON.stringify( result.output, null, 2 ) + "\n" );
 
                       if  ( result.output.status >= 200 &&
                             result.output.status < 300 ) {
 
-                        strMessage = I18NManager.translateSync( 'en_US', 'ok:%s:%s', intRow, result.output.body.data.id );
+                        strMessage = I18NManager.translateSync( "en_US", chalk.green( logSymbols.success + " ok:%s:%s", intRow, result.output.body.data.id ) );
 
                         debugMark( strMessage );
 
-                        fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                        fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
                         intProcesedRows += 1;
 
                       }
                       else {
 
-                        strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s:%s', intRow, result.output.status, result.output.statusText );
+                        strMessage = I18NManager.translateSync( "en_US", logSymbols.error + " error:%s:%s:%s", intRow, result.output.status, result.output.statusText );
 
                         debugMark( strMessage );
 
-                        fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                        fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
                       }
 
                     }
                     else if ( result.error ) {
 
-                      strMessage = I18NManager.translateSync( 'en_US', 'error:%s:%s', intRow, result.error.message );
+                      strMessage = I18NManager.translateSync( "en_US", logSymbols.error + " error:%s:%s", intRow, result.error.message );
 
                       debugMark( strMessage );
 
-                      fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                      fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
                     }
                     else {
 
-                      strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_result', intRow );
+                      strMessage = I18NManager.translateSync( "en_US", logSymbols.error + " error:%s:error_no_result", intRow );
 
                       debugMark( strMessage );
 
-                      fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                      fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
                     }
 
                   }
                   else {
 
-                    strMessage = I18NManager.translateSync( 'en_US', 'error:%s:error_no_response', intRow );
+                    strMessage = I18NManager.translateSync( "en_US", logSymbols.error + " error:%s:error_no_response", intRow );
 
                     debugMark( strMessage );
 
-                    fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+                    fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
                   }
 
                 }
                 else {
 
-                  strMessage = I18NManager.translateSync( 'en_US', 'error:%s:missing_information', intRow );
+                  strMessage = I18NManager.translateSync( "en_US", logSymbols.error + " error:%s:missing_information", intRow );
 
                   debugMark( strMessage );
 
@@ -283,23 +286,23 @@ export default class BulkCreateOrder {
 
               }
 
-              strMessage = I18NManager.translateSync( 'en_US', '**** Processed %s rows, Total: %s rows ****', intProcesedRows, excelRows.length );
+              strMessage = I18NManager.translateSync( "en_US", "**** Processed %s rows, Total: %s rows ****", intProcesedRows, excelRows.length );
 
               debugMark( strMessage );
 
-              fs.appendFileSync( strFullFilePathResult, strMessage + '\n' );
+              fs.appendFileSync( strFullFilePathResult, strMessage + "\n" );
 
             }
             else {
 
-              debugMark( 'The file in the path %s already processed. If you need process again delete the .result file', SystemUtilities.strBaseRootPath + "/temp/" + argv.file );
+              debugMark( "The file in the path %s already processed. If you need process again delete the .result file", strFullFilePathResult );
 
             }
 
           }
           else {
 
-            debugMark( 'The file in the path %s not exists', strFullFilePath );
+            debugMark( "The file in the path %s not exists", strFullFilePath );
 
           }
 
@@ -308,7 +311,7 @@ export default class BulkCreateOrder {
       }
       else {
 
-        debugMark( 'No argument --files=??? defined. You must define using `npm run start:run --files=myfile01.xlsx,myfile02.xlsx` with not quotes' );
+        debugMark( "No argument --files=??? defined. You must define using `npm run start:run --files=myfile01.xlsx,myfile02.xlsx` with not quotes" );
 
       }
 

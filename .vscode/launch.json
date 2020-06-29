@@ -85,8 +85,9 @@
       "name": "Debug Generic Run Process (Main)",
       "program": "${workspaceFolder}/src/generic_run.ts",
       "args": [
-        "--simulate=0",
-        "--files=/27-06-2020/test01/",
+        "--simulate=1",
+        "--context=test01",
+        "--files=/29-06-2020/",
         "--server=http://test01.weknock-tech.com",
       ],
       "outputCapture": "std",
