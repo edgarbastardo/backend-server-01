@@ -479,7 +479,8 @@ export default class BulkOrderCreateJob {
 
                     simulate: job.data.Simulate,
                     check_address_and_customer: job.data.CheckAddressAndCustomer,
-                    ticket: excelRows[ intRow ][ columnDataPositions.Ticket ], //excelRows[ intRow ][ 1 ], //Ticket
+                    ticket: `${excelRows[ intRow ][ columnDataPositions.Ticket ]}`, //excelRows[ intRow ][ 1 ], //Ticket
+                    qty_meals: 2,
 
                   }
 
