@@ -157,9 +157,6 @@ export default class DBConnectionManager {
           dbConfig.system = dbConfigData[ strCurrentDatabase ].system;
           dbConfig.timezone = dbConfigData[ strCurrentDatabase ].timezone ? dbConfigData[ strCurrentDatabase ].timezone: SystemUtilities.getCurrentDateAndTime().format( "Z" );
 
-          //dbConfig.timezone = 'America/New_York';
-          //dbConfig.timezone = 'America/Los_Angeles';
-
           if ( dbConfigData[ strCurrentDatabase ].system === 1 ) {
 
             dbConfig.models.push( __dirname + `/../database/${strCurrentDatabase}/models/` );
