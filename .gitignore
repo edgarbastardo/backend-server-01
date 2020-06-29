@@ -3,6 +3,7 @@ build/
 binary_data/temporal/
 binary_data/persistent/
 install_distribution/
+deploy/
 .deploy.json
 .env.log
 .env.secrets
