@@ -18,8 +18,8 @@
     "build:clean": "rimraf build/*",
     "copy:resources": "copyfiles -u 1 src/**/*.sql src/**/*.graphql src/**/*.pug src/**/*.css src/**/*.scss src/**/*.json src/**/.dont_delete build/",
     "copy:resources-v": "copyfiles -V -u 1 src/**/*.sql src/**/*.graphql src/**/*.pug src/**/*.css src/**/*.scss src/**/*.json src/**/.dont_delete build/",
-    "deploy": "npm run build && node build/copy_install_backend.js",
-    "deploy:dev": "nodemon src/copy_install_backend.ts --exec ts-node",
+    "deploy": "npm run build && node build/deploy.js",
+    "deploy:dev": "nodemon src/deploy.ts --exec ts-node",
     "deploy:clean": "rimraf install_distribution/*",
     "count:source-lines": "cloc src/"
   },

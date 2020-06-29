@@ -102,7 +102,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program Deploy",
-      "program": "${workspaceFolder}/src/copy_install_backend.ts",
+      "program": "${workspaceFolder}/src/deploy.ts",
       "outputCapture": "std",
       "preLaunchTask": "build",
       "outFiles": [
