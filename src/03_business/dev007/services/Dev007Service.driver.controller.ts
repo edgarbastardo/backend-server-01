@@ -223,6 +223,215 @@ export default class Dev007DriverServicesController extends BaseService {
 
   }
 
+  static async getDriverStatus( request: Request,
+                                response: Response,
+                                transaction: any,
+                                logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bizDriverStatusInDB = await BIZDriverStatusService.getByUserId(
+                                                                          userSessionStatus.UserId,
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        );
+
+      if ( !bizDriverStatusInDB ) { //If not status found in db create default with 0 = Not working
+
+        bizDriverStatusInDB = await BIZDriverStatusService.createOrUpdate(
+                                                                           {
+
+                                                                             UserId: userSessionStatus.UserId,
+                                                                             Status: 0, //1 = Working, 0 = Not working
+                                                                             Description: "Not working",
+                                                                             CreatedBy: userSessionStatus.UserName,
+                                                                             UpdatedBy: userSessionStatus.UserName,
+
+                                                                           },
+                                                                           true,
+                                                                           currentTransaction,
+                                                                           logger
+                                                                         );
+
+      }
+
+      if ( bizDriverStatusInDB &&
+           bizDriverStatusInDB instanceof Error === false ) {
+
+        let modelData = ( bizDriverStatusInDB as any ).dataValues;
+
+        const tempModelData = await BIZDriverStatus.convertFieldValues(
+                                                                        {
+                                                                          Data: modelData,
+                                                                          FilterFields: 1, //Force to remove fields like password and value
+                                                                          TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                          Include: null, //[ { model: SYSUser } ],
+                                                                          Exclude: [ { model: SYSUser } ],
+                                                                          Logger: logger,
+                                                                          ExtraInfo: {
+                                                                                        Request: request,
+                                                                                        FilterFields: 1
+                                                                                     }
+                                                                        }
+                                                                      );
+
+        if ( tempModelData ) {
+
+          modelData = tempModelData;
+
+        }
+
+        //ANCHOR success user update
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: "SUCCESS_GET_DRIVER_STATUS",
+                   Message: await I18NManager.translate( strLanguage, "Success get driver status." ),
+                   Mark: "43E7ED8C9CD2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           modelData
+                         ]
+                 }
+
+        bApplyTransaction = true;
+
+      }
+      else {
+
+        const error = bizDriverStatusInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "F5A795D3BD76" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDriverStatus.name;
+
+      const strMark = "A6C6F6EA7618" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: "D90BA45EF1C5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static async setPosition( request: Request,
                             response: Response,
                             transaction: any,

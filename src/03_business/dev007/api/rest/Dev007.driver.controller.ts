@@ -52,8 +52,9 @@ export default class Dev007DriverController {
   static readonly _BASE_PATH = "/v1/business/dev007/odinv2/driver";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007DriverController._BASE_PATH + "/work/start", Action: "v1.business.dev007.odinv2.driver.work.start", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Start to work" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/work/stop", Action: "v1.business.dev007.odinv2.driver.work.stop", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Stop of working" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/start", Action: "v1.business.dev007.odinv2.driver.status.work.start", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 1=Working" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/stop", Action: "v1.business.dev007.odinv2.driver.status.work.stop", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 0=Not working" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status", Action: "v1.business.dev007.odinv2.driver.work.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get current driver status" },
                                   { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.odinv2.driver.position.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the position of the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.odinv2.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "Get the drivers position" },
                                 ]
@@ -114,11 +115,12 @@ export default class Dev007DriverController {
   }
 
   @httpPost(
-             "/work/start",
+             "/status/work/start",
              MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
            )
-  async setWorkStart( request: Request, response: Response ) {
+  async setStatusToWorking( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
@@ -149,11 +151,12 @@ export default class Dev007DriverController {
   }
 
   @httpPost(
-             "/work/stop",
+             "/status/work/stop",
              MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
            )
-  async setDriverWorkStop( request: Request, response: Response ) {
+  async setStatusToNotWorking( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
@@ -183,10 +186,30 @@ export default class Dev007DriverController {
 
   }
 
+  @httpGet(
+            "/status",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getStatus( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DriverServicesController.getDriverStatus( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpPost(
              "/position",
              MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
            )
   async setPosition( request: Request, response: Response ) {
 
@@ -204,7 +227,8 @@ export default class Dev007DriverController {
   @httpGet(
             "/position",
             MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
           )
   async getDriverPosition( request: Request, response: Response ) {
 

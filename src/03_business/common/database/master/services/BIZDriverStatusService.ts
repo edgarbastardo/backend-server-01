@@ -54,11 +54,11 @@ export default class BIZDriverStatusService extends BaseService {
 
       }
 
-      let sysDriverStatusInDB = await BIZDriverStatus.findOne( options );
+      let bizDriverStatusInDB = await BIZDriverStatus.findOne( options );
 
-      if ( sysDriverStatusInDB === null ) {
+      if ( bizDriverStatusInDB === null ) {
 
-        sysDriverStatusInDB = await BIZDriverStatus.create(
+        bizDriverStatusInDB = await BIZDriverStatus.create(
                                                             createOrUpdateData,
                                                             { transaction: currentTransaction }
                                                           );
@@ -72,10 +72,10 @@ export default class BIZDriverStatusService extends BaseService {
 
         }
 
-        await sysDriverStatusInDB.update( createOrUpdateData,
+        await bizDriverStatusInDB.update( createOrUpdateData,
                                           options );
 
-        sysDriverStatusInDB = await BIZDriverStatus.findOne( options );
+        bizDriverStatusInDB = await BIZDriverStatus.findOne( options );
 
       }
 
@@ -87,7 +87,7 @@ export default class BIZDriverStatusService extends BaseService {
 
       }
 
-      result = sysDriverStatusInDB;
+      result = bizDriverStatusInDB;
 
     }
     catch ( error ) {
@@ -97,6 +97,101 @@ export default class BIZDriverStatusService extends BaseService {
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
       const strMark = "1B6271404A43" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+
+  static async getByUserId( strUserId: string,
+                            transaction: any,
+                            logger: any ): Promise<BIZDriverStatus> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "UserId": strUserId ? strUserId : "" },
+        transaction: currentTransaction,
+        include: [
+                   {
+                     model: SYSUser,
+                   },
+                 ]
+
+      }
+
+      let bizDriverStatusInDB = await BIZDriverStatus.findOne( options );
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+      result = bizDriverStatusInDB;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getByUserId.name;
+
+      const strMark = "B645226E1541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

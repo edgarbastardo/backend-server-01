@@ -138,7 +138,8 @@ export default class Dev001Controller {
   @httpPut(
             "/order/tip/uber",
             MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
           )
   async updateOrderTip( request: Request, response: Response ) {
 
@@ -157,7 +158,8 @@ export default class Dev001Controller {
   @httpGet(
             "/order/tip/uber",
             MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
           )
   async getOrderTipStatus( request: Request, response: Response ) {
 
@@ -196,7 +198,8 @@ export default class Dev001Controller {
   @httpPost(
              "/order/bulk",
              MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
            )
   async bulkCreateOrder( request: Request, response: Response ) {
 
@@ -215,8 +218,9 @@ export default class Dev001Controller {
   @httpGet(
             "/order/bulk",
             MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
-          )
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+            )
   async getBulkOrderCreateStatus( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
