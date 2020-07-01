@@ -57,6 +57,9 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
   @Column( { type: DataType.SMALLINT, allowNull: false } )
   Status: number;
 
+  @Column( { type: DataType.STRING( 50 ), allowNull: false } )
+  Description: string;
+
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
@@ -143,14 +146,35 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
           for ( const modelIncluded of params.Include ) {
 
-            if ( modelIncluded.model &&
-                 result[ modelIncluded.model.name ] ) {
+            if ( modelIncluded &&
+                 result[ modelIncluded.name ] ) {
 
-              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
-                                                                                              result[ modelIncluded.model.name ].dataValues:
-                                                                                              result[ modelIncluded.model.name ],
-                                                                                              strTimeZoneId,
-                                                                                              params.Logger );
+              result[ modelIncluded.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.name ].dataValues ?
+                                                                                        result[ modelIncluded.name ].dataValues:
+                                                                                        result[ modelIncluded.name ],
+                                                                                        strTimeZoneId,
+                                                                                        params.Logger );
+
+              if ( params.FilterFields === 1 ) {
+
+                delete result[ modelIncluded.name ].Password; //Delete fields password
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if ( Array.isArray( params.Exclude ) ) {
+
+          for ( const modelToExcluded of params.Exclude ) {
+
+            if ( modelToExcluded &&
+                 result[ modelToExcluded.name ] ) {
+
+              delete result[ modelToExcluded.name ];
 
             }
 
@@ -178,8 +202,8 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
         }
 
-        if ( !params.KeepGroupExtraData ||
-             params.KeepGroupExtraData === 0 ) {
+        if ( !params.KeepExtraData ||
+             params.KeepExtraData === 0 ) {
 
           if ( extraData.Business ) {
 

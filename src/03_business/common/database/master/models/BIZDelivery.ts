@@ -69,7 +69,6 @@ export class BIZDelivery extends Model<BIZDelivery> {
   @ForeignKey( () => BIZDestination )
   DestinationId: string;
 
-  @NotNull
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )

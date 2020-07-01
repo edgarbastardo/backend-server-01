@@ -53,14 +53,12 @@ export class BIZDestination extends Model<BIZDestination> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @NotNull
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   @ForeignKey( () => SYSUser )
   UserId: string;
 
-  @NotNull
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: true } )

@@ -122,10 +122,27 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.setWorkStart( request,
-                                                                      response,
-                                                                      null,
-                                                                      context.logger );
+    if ( request.body ) {
+
+      request.body.Status = 1;
+      request.body.Description = "Working";
+
+    }
+    else {
+
+      request.body = {
+
+                       Status: 1,
+                       Description: "Working"
+
+                     }
+
+    }
+
+    const result = await Dev007DriverServicesController.setDriverStatus( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -140,10 +157,27 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.setWorkStop( request,
-                                                                     response,
-                                                                     null,
-                                                                     context.logger );
+    if ( request.body ) {
+
+      request.body.Status = 0;
+      request.body.Description = "Not working";
+
+    }
+    else {
+
+      request.body = {
+
+                       Status: 1,
+                       Description: "Not working"
+
+                     }
+
+    }
+
+    const result = await Dev007DriverServicesController.setDriverStatus( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
 
     response.status( result.StatusCode ).send( result );
 

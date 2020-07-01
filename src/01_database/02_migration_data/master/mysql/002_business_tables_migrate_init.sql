@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `bizDriverInDeliveryZone` (
 CREATE TABLE IF NOT EXISTS `bizDriverStatus` (
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',
   `Status` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Status id of the driver',
-  `Description` varchar(150) NOT NULL COMMENT 'Status text of the driver',
+  `Description` varchar(50) NOT NULL COMMENT 'Status text of the driver',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',

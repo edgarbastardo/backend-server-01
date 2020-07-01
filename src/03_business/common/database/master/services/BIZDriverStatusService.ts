@@ -44,7 +44,7 @@ export default class BIZDriverStatusService extends BaseService {
 
       const options = {
 
-        where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
+        where: { "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId : "" },
         transaction: currentTransaction,
         include: [
                    {

@@ -40,7 +40,6 @@ export class BIZDeliveryZone extends Model<BIZDeliveryZone> {
 
   }
 
-  @AutoIncrement
   @PrimaryKey
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;

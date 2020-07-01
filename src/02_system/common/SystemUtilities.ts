@@ -2146,6 +2146,9 @@ export default class SystemUtilities {
 
         }
 
+        instance.UpdatedBy = null;
+        instance.UpdatedAt = null;
+
       }
       /*
       else {
