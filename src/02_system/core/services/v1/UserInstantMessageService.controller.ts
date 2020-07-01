@@ -20,13 +20,13 @@ import InstantMenssageManager from '../../../common/managers/InstantMessageManag
 import MiddlewareManager from '../../../common/managers/MiddlewareManager';
 import PresenceManager from "../../../common/managers/PresenceManager";
 
-import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
+//import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
-import { SYSUserSessionPresence } from '../../../common/database/master/models/SYSUserSessionPresence';
+//import { SYSUserSessionPresence } from '../../../common/database/master/models/SYSUserSessionPresence';
 import { SYSUser } from '../../../common/database/master/models/SYSUser';
 import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
 import { SYSUserSessionStatus } from '../../../common/database/master/models/SYSUserSessionStatus';
-import { SYSUserSessionPresenceInRoom } from '../../../common/database/master/models/SYSUserSessionPresenceInRoom';
+//import { SYSUserSessionPresenceInRoom } from '../../../common/database/master/models/SYSUserSessionPresenceInRoom';
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
 
@@ -263,13 +263,16 @@ export default class UserInstantMessageServiceController {
 
         const warnings = [];
 
+        //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
+        /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                 strSavedSocketToken,
                                                                                 strLanguage,
                                                                                 warnings,
                                                                                 currentTransaction,
                                                                                 logger );
+        */
 
         result = {
                    StatusCode: 200, //Ok
@@ -392,6 +395,7 @@ export default class UserInstantMessageServiceController {
 
   }
 
+  /*
   static async createInstantMessage( request: Request,
                                      transaction: any,
                                      logger: any ): Promise<any> {
@@ -1404,7 +1408,7 @@ export default class UserInstantMessageServiceController {
 
         strSQL = strSQL + " And ( A.RoomId = '" + ( request.query.roomId ? request.query.roomId: "@-Not_Exists_Id-@" ) + "' ) "; // And C.Token != '" + userSessionStatus.Token + "' ) ";
 
-        /*
+        / *
         const roomList = sysUserSessionPresence.Room.split( "," ).sort();
 
         for ( let intRoomIndex = 0; intRoomIndex < roomList.length; intRoomIndex++ ) {
@@ -1423,7 +1427,7 @@ export default class UserInstantMessageServiceController {
         }
 
         strSQL = strSQL + " ) ";
-        */
+        * /
 
         strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
 
@@ -1513,7 +1517,7 @@ export default class UserInstantMessageServiceController {
                                    };
 
           convertedRows.push( jsonPresenceInfo );
-          /*
+          / *
           const tempModelData = await SYSUserGroup.convertFieldValues(
                                                                        {
                                                                          Data: currentRow,
@@ -1537,7 +1541,7 @@ export default class UserInstantMessageServiceController {
             convertedRows.push( currentRow );
 
           }
-          */
+          * /
 
         }
 
@@ -1639,6 +1643,7 @@ export default class UserInstantMessageServiceController {
     return result;
 
   }
+  */
 
   /*
   static async presenceCount( request: Request,

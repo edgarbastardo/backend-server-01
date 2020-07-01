@@ -12,9 +12,7 @@ import SystemUtilities from '../SystemUtilities';
 
 import LoggerManager from './LoggerManager';
 import I18NManager from './I18Manager';
-import NotificationManager from './NotificationManager';
-import SYSUserSessionPresenceService from "../database/master/services/SYSUserSessionPresenceService";
-import { SYSUserSessionPresenceInRoom } from "../database/master/models/SYSUserSessionPresenceInRoom";
+//import NotificationManager from './NotificationManager';
 
 const debug = require( 'debug' )( 'MiddlewareManager' );
 
@@ -588,13 +586,16 @@ export default class MiddlewareManager {
       else if ( userSessionStatus &&
                 userSessionStatus.SocketToken ) {
 
+        //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
+        /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                 userSessionStatus.SocketToken,
                                                                                 strLanguage,
                                                                                 null, //No warnings
                                                                                 null, //No transaction
                                                                                 logger );
+        */
 
       }
 
@@ -627,13 +628,16 @@ export default class MiddlewareManager {
         if ( userSessionStatus &&
              userSessionStatus.SocketToken ) {
 
+          //FIXME 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
+          /*
           await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                   userSessionStatus.SocketToken,
                                                                                   strLanguage,
                                                                                   null, //No warnings
                                                                                   null, //No transaction
                                                                                   logger );
+          */
 
         }
 
@@ -647,13 +651,16 @@ export default class MiddlewareManager {
       if ( userSessionStatus &&
            userSessionStatus.SocketToken ) {
 
+        //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
+        /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                 userSessionStatus.SocketToken,
                                                                                 strLanguage,
                                                                                 null, //No warnings
                                                                                 null, //No transaction
                                                                                 logger );
+        */
 
       }
 

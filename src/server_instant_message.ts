@@ -17,6 +17,7 @@ import CacheManager from './02_system/common/managers/CacheManager';
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
 
+/*
 import SYSUserSessionPresenceService from "./02_system/common/database/master/services/SYSUserSessionPresenceService";
 import MiddlewareManager from './02_system/common/managers/MiddlewareManager';
 import SYSInstantMessageLogService from './02_system/common/database/master/services/SYSInstantMessageLogService';
@@ -176,13 +177,13 @@ export default class ServerInstantMessage {
 
           ServerInstantMessage.socketIO.to( strToPresenceId ).emit( 'newMessage', messageToSend );
 
-          /*
+          / *
           //Update the field UpdatedBy in table sysUserSessionPresence
 
           if ( bIsRoom === false ) {
 
           }
-          */
+          * /
 
           //Log the message sended
           const sysInstantMessageLog = await SYSInstantMessageLogService.create(
@@ -924,7 +925,7 @@ export default class ServerInstantMessage {
                                                ServerInstantMessage.handlerListenOnTopic,
                                                LoggerManager.mainLoggerInstance );
 
-      /*
+      / *
       await NotificationManager.listen(
                                         "redis",
                                         {
@@ -944,7 +945,7 @@ export default class ServerInstantMessage {
                                         },
                                         LoggerManager.mainLoggerInstance
                                       );
-                                      */
+                                      * /
 
       //new ChatServer();
 
@@ -1118,3 +1119,4 @@ export default class ServerInstantMessage {
 }
 
 ServerInstantMessage.main();
+*/

@@ -102,10 +102,10 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/push/message/test", Action: "v1.system.user.push.message.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send push test message" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
-                                  { Path: UserController._BASE_PATH + "/instant/message", Action: "v1.system.user.instant.message.send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant message to another live connected user" },
-                                  { Path: UserController._BASE_PATH + "/presence/room", Action: "v1.system.user.presence.room.get", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list of room user session" },
-                                  { Path: UserController._BASE_PATH + "/presence/room/count", Action: "v1.system.user.presence.room.get.count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list count of current user session" },
-                                  { Path: UserController._BASE_PATH + "/presence", Action: "v1.system.user.presence.list", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list of user connected" },
+                                  //{ Path: UserController._BASE_PATH + "/instant/message", Action: "v1.system.user.instant.message.send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant message to another live connected user" },
+                                  //{ Path: UserController._BASE_PATH + "/presence/room", Action: "v1.system.user.presence.room.get", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list of room user session" },
+                                  //{ Path: UserController._BASE_PATH + "/presence/room/count", Action: "v1.system.user.presence.room.get.count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list count of current user session" },
+                                  //{ Path: UserController._BASE_PATH + "/presence", Action: "v1.system.user.presence.list", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list of user connected" },
                                   //{ Path: UserController._BASE_PATH + "/presence/count", Action: "v1.system.user.presence.list.count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list count of user connected" },
                                 ]
 
@@ -854,6 +854,7 @@ export default class UserController {
 
   }
 
+  /*
   @httpPost(
              "/instant/message",
              MiddlewareManager.middlewareSetContext,
@@ -921,6 +922,7 @@ export default class UserController {
     response.status( result.StatusCode ).send( result );
 
   }
+  */
 
   /*
   @httpGet(

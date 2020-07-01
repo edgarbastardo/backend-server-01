@@ -30,7 +30,7 @@ import DBConnectionManager from '../../../common/managers/DBConnectionManager';
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from '../../../common/managers/NotificationManager';
-import SYSUserSessionPresenceService from '../../../common/database/master/services/SYSUserSessionPresenceService';
+//import SYSUserSessionPresenceService from '../../../common/database/master/services/SYSUserSessionPresenceService';
 
 import { SYSUser } from '../../../common/database/master/models/SYSUser';
 
@@ -2041,13 +2041,16 @@ export default class SecurityServiceController {
 
             const warnings = [];
 
+            //FIXME 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
+            /*
             await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                     strSavedSocketToken,
                                                                                     strLanguage,
                                                                                     warnings,
                                                                                     currentTransaction,
                                                                                     logger );
+            */
 
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
