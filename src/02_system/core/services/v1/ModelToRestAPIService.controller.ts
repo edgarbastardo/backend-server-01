@@ -244,6 +244,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                                    FilterFields: 1, //Force to remove fields like password and value
                                                                                    TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                    Include: includeFnResult.Result,
+                                                                                   Exclude: null, //[ { model: SYSUser } ],
                                                                                    Logger: logger,
                                                                                    ExtraInfo: {
                                                                                                 Request: request
@@ -606,6 +607,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                                  FilterFields: 1, //Force to remove fields like password and value
                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                  Include: includeFnResult.Result,
+                                                                                 Exclude: null, //[ { model: SYSUser } ],
                                                                                  Logger: logger,
                                                                                  ExtraInfo: {
                                                                                               Request: request
