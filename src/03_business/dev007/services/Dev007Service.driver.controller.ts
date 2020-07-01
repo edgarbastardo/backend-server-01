@@ -82,8 +82,8 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                           Data: modelData,
                                                                           FilterFields: 1, //Force to remove fields like password and value
                                                                           TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                          Include: null, //[ { Model: SYSUser } ],
-                                                                          Exclude: [ { Model: SYSUser } ],
+                                                                          Include: null, //[ { model: SYSUser } ],
+                                                                          Exclude: [ { model: SYSUser } ],
                                                                           Logger: logger,
                                                                           ExtraInfo: {
                                                                                         Request: request,
