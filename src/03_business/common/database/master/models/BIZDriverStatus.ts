@@ -146,18 +146,18 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
           for ( const modelIncluded of params.Include ) {
 
-            if ( modelIncluded &&
-                 result[ modelIncluded.name ] ) {
+            if ( modelIncluded.model &&
+                 result[ modelIncluded.model.name ] ) {
 
-              result[ modelIncluded.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.name ].dataValues ?
-                                                                                        result[ modelIncluded.name ].dataValues:
-                                                                                        result[ modelIncluded.name ],
+              result[ modelIncluded.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
+                                                                                        result[ modelIncluded.model.name ].dataValues:
+                                                                                        result[ modelIncluded.model.name ],
                                                                                         strTimeZoneId,
                                                                                         params.Logger );
 
               if ( params.FilterFields === 1 ) {
 
-                delete result[ modelIncluded.name ].Password; //Delete fields password
+                delete result[ modelIncluded.model.name ].Password; //Delete fields password
 
               }
 
@@ -171,10 +171,10 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
           for ( const modelToExcluded of params.Exclude ) {
 
-            if ( modelToExcluded &&
-                 result[ modelToExcluded.name ] ) {
+            if ( modelToExcluded.model &&
+                 result[ modelToExcluded.model.name ] ) {
 
-              delete result[ modelToExcluded.name ];
+              delete result[ modelToExcluded.model.name ];
 
             }
 
