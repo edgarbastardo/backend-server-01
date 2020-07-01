@@ -1,20 +1,20 @@
-//import fs from 'fs';
-//import { promises as fsPromises } from 'fs';
+//import fs from "fs";
+//import { promises as fsPromises } from "fs";
 //import os from "os";
-//import path from 'path';
-//import appRoot from 'app-root-path';
-import cluster from 'cluster';
+//import path from "path";
+//import appRoot from "app-root-path";
+import cluster from "cluster";
 
-//import util from 'util';
+//import util from "util";
 
-import Queue from 'bull';
+import Queue from "bull";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import path from 'path';
-import fs from 'fs'; //Load the filesystem module
+import path from "path";
+import fs from "fs"; //Load the filesystem module
 
-import xlsxFile from 'read-excel-file/node';
+import xlsxFile from "read-excel-file/node";
 
 import CommonConstants from "../../../../02_system/common/CommonConstants";
 
@@ -22,15 +22,15 @@ import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 
 import RedisConnectionManager from "../../../../02_system/common/managers/RedisConnectionManager";
-import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
-import LoggerManager from '../../../../02_system/common/managers/LoggerManager';
-//import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
-import I18NManager from '../../../../02_system/common/managers/I18Manager';
+import NotificationManager from "../../../../02_system/common/managers/NotificationManager";
+import LoggerManager from "../../../../02_system/common/managers/LoggerManager";
+//import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
+import I18NManager from "../../../../02_system/common/managers/I18Manager";
 
-//import { Redis, Cluster } from 'ioredis';
+//import { Redis, Cluster } from "ioredis";
 import { OdinRequestServiceV1 } from "../../../common/services/OdinRequestServiceV1";
 
-const debug = require( 'debug' )( 'BulkOrderCreateJob' );
+const debug = require( "debug" )( "BulkOrderCreateJob" );
 
 export default class BulkOrderCreateJob {
 
@@ -289,12 +289,12 @@ export default class BulkOrderCreateJob {
 
                             switch ( type ) {
 
-                              case 'client': {
+                              case "client": {
 
                                 result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
 
                               }
-                              case 'subscriber': {
+                              case "subscriber": {
 
                                 result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
 
@@ -337,7 +337,7 @@ export default class BulkOrderCreateJob {
 
           this.updateTipJobQueue.process( async ( job: any, done: any ) => {
 
-            let debugMark = debug.extend( 'CFF57391F709' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+            let debugMark = debug.extend( "CFF57391F709" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
             debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
@@ -417,8 +417,8 @@ export default class BulkOrderCreateJob {
 
               const headers = {
 
-                'Content-Type': 'application/json',
-                'Authorization': process.env.ODIN_API_KEY1
+                "Content-Type": "application/json",
+                "Authorization": process.env.ODIN_API_KEY1
 
               }
 
@@ -647,7 +647,7 @@ export default class BulkOrderCreateJob {
 
                   fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
-                  fs.appendFileSync( strOutputJobFile, "Warning: " + jsonStatusJob.Message + '\n' );
+                  fs.appendFileSync( strOutputJobFile, "Warning: " + jsonStatusJob.Message + "\n" );
 
                   jsonOutputDetails.Row = intRow;
                   jsonOutputDetails.Kind = jsonStatusJob.Kind;
@@ -665,7 +665,7 @@ export default class BulkOrderCreateJob {
                 }
 
                 //Save to result file
-                fs.appendFileSync( strOutputDetailsJobFile, JSON.stringify( jsonOutputDetails, null, 2 ) + ',\n' );
+                fs.appendFileSync( strOutputDetailsJobFile, JSON.stringify( jsonOutputDetails, null, 2 ) + ",\n" );
 
               }
 
@@ -766,7 +766,7 @@ export default class BulkOrderCreateJob {
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
-              fs.appendFileSync( strOutputJobFile, jsonStatusJob.Message + '\n' );
+              fs.appendFileSync( strOutputJobFile, jsonStatusJob.Message + "\n" );
 
               jsonOutputDetails.Row = intRow;
               jsonOutputDetails.Kind = jsonStatusJob.Kind;

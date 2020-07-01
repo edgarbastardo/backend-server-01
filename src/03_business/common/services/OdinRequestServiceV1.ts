@@ -1,7 +1,7 @@
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
-let debug = require( 'debug' )( 'OdinRequestServiceV1' );
+let debug = require( "debug" )( "OdinRequestServiceV1" );
 
 export class OdinRequestServiceV1 {
 

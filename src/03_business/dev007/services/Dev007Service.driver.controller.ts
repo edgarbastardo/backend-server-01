@@ -23,17 +23,19 @@ import DBConnectionManager from "../../../02_system/common/managers/DBConnection
 import BaseService from "../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../02_system/common/managers/I18Manager";
 import JobQueueManager from "../../../02_system/common/managers/JobQueueManager";
+import BIZDriverStatusService from "../../common/database/master/services/BIZDriverStatusService";
+import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 
-const debug = require( "debug" )( "Dev001ServicesController" );
+const debug = require( "debug" )( "Dev007DriverServicesController" );
 
-export default class Dev001ServicesController extends BaseService {
+export default class Dev007DriverServicesController extends BaseService {
 
   //Common business services
 
-  static async getEstablishmentList( request: Request,
-                                     response: Response,
-                                     transaction: any,
-                                     logger: any ):Promise<any> {
+  static async setWorkStart( request: Request,
+                             response: Response,
+                             transaction: any,
+                             logger: any ):Promise<any> {
 
     let result = null;
 
@@ -51,7 +53,7 @@ export default class Dev001ServicesController extends BaseService {
 
       strLanguage = context.Language;
 
-      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+      const dbConnection = DBConnectionManager.getDBConnection( "primary" );
 
       if ( currentTransaction === null ) {
 
@@ -61,37 +63,87 @@ export default class Dev001ServicesController extends BaseService {
 
       }
 
-      const params = {
+      let userSessionStatus = context.UserSessionStatus;
 
-        Kind: request.query.kind ? request.query.kind: null
+      let bizDriverStatusInDB = await BIZDriverStatusService.createOrUpdate(
+                                                                             {
+
+                                                                               Id: userSessionStatus.sysUser.Id,
+                                                                               Status: 1, //Working
+
+                                                                             },
+                                                                             true,
+                                                                             currentTransaction,
+                                                                             logger
+                                                                           );
+
+      if ( bizDriverStatusInDB &&
+           bizDriverStatusInDB instanceof Error === false ) {
+
+        let modelData = ( bizDriverStatusInDB as any ).dataValues;
+
+        const tempModelData = await BIZDriverStatus.convertFieldValues(
+                                                                        {
+                                                                          Data: modelData,
+                                                                          FilterFields: 1, //Force to remove fields like password and value
+                                                                          TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                          Include: null,
+                                                                          Logger: logger,
+                                                                          ExtraInfo: {
+                                                                                        Request: request
+                                                                                      }
+                                                                        }
+                                                                      );
+
+        if ( tempModelData ) {
+
+          modelData = tempModelData;
+
+        }
+
+        //ANCHOR success user update
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: "SUCCESS_DRIVER_START_WORK",
+                   Message: await I18NManager.translate( strLanguage, "Success driver start to work." ),
+                   Mark: "DF04A92ABA0D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           modelData
+                         ]
+                 }
+
+        bApplyTransaction = true;
 
       }
+      else {
 
-      const strSQL = DBConnectionManager.getStatement( "secondary",
-                                                       "getEstablishments",
-                                                       params,
-                                                       context.logger );
+        const error = bizDriverStatusInDB as any;
 
-      const rows = await dbConnection.query( strSQL, {
-                                                       raw: true,
-                                                       type: QueryTypes.SELECT,
-                                                       transaction: currentTransaction
-                                                     } );
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "B7175642027E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
 
-      result = {
-                 StatusCode: 200, //Ok
-                 Code: "SUCCESS_GET_ESTABLISHMENT_LIST",
-                 Message: await I18NManager.translate( strLanguage, "Sucess get the information" ),
-                 Mark: "FF2D5A3F83E6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                 LogId: null,
-                 IsError: false,
-                 Errors: [],
-                 Warnings: [],
-                 Count: rows ? rows.length: 0,
-                 Data: rows ? rows: []
-               };
-
-      bApplyTransaction = true;
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -115,9 +167,9 @@ export default class Dev001ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getEstablishmentList.name;
+      sourcePosition.method = this.name + "." + this.setWorkStart.name;
 
-      const strMark = "ED0D5D1FABC0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "59BE59B1DE0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -140,7 +192,7 @@ export default class Dev001ServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "A141D683118A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "8A8748A321B4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  IsError: true,
                  Errors: [
                            {
@@ -174,6 +226,356 @@ export default class Dev001ServicesController extends BaseService {
 
   }
 
+  static async setWorkStop( request: Request,
+                            response: Response,
+                            transaction: any,
+                            logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "primary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setWorkStop.name;
+
+      const strMark = "02996FAB8AE8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: "CE5D91BDE2A3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async setPosition( request: Request,
+                            response: Response,
+                            transaction: any,
+                            logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "primary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setPosition.name;
+
+      const strMark = "18E4A8B23AC6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: "E12BF6DB6F34" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getPosition( request: Request,
+                            response: Response,
+                            transaction: any,
+                            logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "primary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      //
+
+      bApplyTransaction = true;
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getPosition.name;
+
+      const strMark = "344AC034143A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: "78CA84E654B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  /*
   static async startOrderTipUberUpdateJob( request: Request,
                                            response: Response,
                                            logger: any ):Promise<any> {
@@ -747,5 +1149,6 @@ export default class Dev001ServicesController extends BaseService {
     return result;
 
   }
+  */
 
 }

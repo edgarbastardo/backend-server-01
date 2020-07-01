@@ -152,6 +152,8 @@ CREATE TABLE IF NOT EXISTS `bizDriverStatus` (
   `Description` varchar(150) NOT NULL COMMENT 'Status text of the driver',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`UserId`),
   CONSTRAINT `FK_bizDriverStatus_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE

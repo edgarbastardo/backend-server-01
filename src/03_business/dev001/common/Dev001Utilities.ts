@@ -1,5 +1,5 @@
 
-const debug = require( 'debug' )( 'Dev000Utilities' );
+const debug = require( "debug" )( "Dev000Utilities" );
 
 export default class Dev001Utilities {
 

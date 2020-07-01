@@ -1,31 +1,31 @@
-//import fs from 'fs';
-//import { promises as fsPromises } from 'fs';
+//import fs from "fs";
+//import { promises as fsPromises } from "fs";
 //import os from "os";
-//import path from 'path';
-//import appRoot from 'app-root-path';
-import cluster from 'cluster';
+//import path from "path";
+//import appRoot from "app-root-path";
+import cluster from "cluster";
 
-//import util from 'util';
+//import util from "util";
 
-import Queue from 'bull';
+import Queue from "bull";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import path from 'path';
-import fs from 'fs'; //Load the filesystem module
+import path from "path";
+import fs from "fs"; //Load the filesystem module
 
-import xlsxFile from 'read-excel-file/node';
+import xlsxFile from "read-excel-file/node";
 
-import CommonConstants from '../../../../02_system/common/CommonConstants';
+import CommonConstants from "../../../../02_system/common/CommonConstants";
 
 import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 import RedisConnectionManager from "../../../../02_system/common/managers/RedisConnectionManager";
-import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
-import I18NManager from '../../../../02_system/common/managers/I18Manager';
-//import { Redis, Cluster } from 'ioredis';
+import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
+import I18NManager from "../../../../02_system/common/managers/I18Manager";
+//import { Redis, Cluster } from "ioredis";
 
-const debug = require( 'debug' )( 'OrderTipUberUpdateJob' );
+const debug = require( "debug" )( "OrderTipUberUpdateJob" );
 
 export default class OrderTipUberUpdateJob {
 
@@ -141,12 +141,12 @@ export default class OrderTipUberUpdateJob {
 
                             switch ( type ) {
 
-                              case 'client': {
+                              case "client": {
 
                                 result = RedisConnectionManager.connectSync( "bullQueueClient-" + strConnectionId, logger );
 
                               }
-                              case 'subscriber': {
+                              case "subscriber": {
 
                                 result = RedisConnectionManager.connectSync( "bullQueueSubscriber-" + strConnectionId, logger );
 
@@ -189,7 +189,7 @@ export default class OrderTipUberUpdateJob {
 
           this.updateTipJobQueue.process( async ( job: any, done: any ) => {
 
-            let debugMark = debug.extend( 'AB00868E3AE5' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+            let debugMark = debug.extend( "AB00868E3AE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
             debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
             //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
@@ -223,7 +223,7 @@ export default class OrderTipUberUpdateJob {
                                     Progress: 0,
                                     Total: 0,
                                     Kind: "regular",
-                                    Message: await I18NManager.translate( strLanguage, 'JOB started...' )
+                                    Message: await I18NManager.translate( strLanguage, "JOB started..." )
                                   };
 
             try {
@@ -241,21 +241,21 @@ export default class OrderTipUberUpdateJob {
               let intUpdatedRows = 0;
               let intProcessedRows = 0;
 
-              jsonStatusJob.Message = await I18NManager.translate( strLanguage, 'JOB started.' );
+              jsonStatusJob.Message = await I18NManager.translate( strLanguage, "JOB started." );
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
               fs.writeFileSync( strOutputJobFile, "Ok: " + jsonStatusJob.Message + "\n" );
 
-              fs.appendFileSync( strOutputJobFile, "Ok: " + await I18NManager.translate( strLanguage, 'Opening file.\n' ) );
+              fs.appendFileSync( strOutputJobFile, "Ok: " + await I18NManager.translate( strLanguage, "Opening file.\n" ) );
 
               const excelRows = await xlsxFile( job.data.Path );
 
-              fs.appendFileSync( strOutputJobFile, "Ok: " + await I18NManager.translate( strLanguage, 'File opened. %s rows found.\n', excelRows.length ) );
+              fs.appendFileSync( strOutputJobFile, "Ok: " + await I18NManager.translate( strLanguage, "File opened. %s rows found.\n", excelRows.length ) );
 
               jsonStatusJob.Progress = 0;
               jsonStatusJob.Total = excelRows.length;
-              jsonStatusJob.Message = await I18NManager.translate( strLanguage, 'JOB started.' );
+              jsonStatusJob.Message = await I18NManager.translate( strLanguage, "JOB started." );
 
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 

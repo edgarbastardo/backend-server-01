@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
          Table,
@@ -26,15 +26,15 @@ import {
 import { BuildOptions } from "sequelize/types";
 
 import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
-import CommonConstants from '../../../../../02_system/common/CommonConstants';
+import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
-import { SYSUser } from '../../../../../02_system/common/database/master/models/SYSUser';
+import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
 import { BIZEstablishment } from "./BIZEstablishment";
 
-const debug = require( 'debug' )( 'BIZDestination' );
+const debug = require( "debug" )( "BIZDestination" );
 
 @Table( {
   timestamps: false,

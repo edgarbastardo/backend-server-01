@@ -124,8 +124,8 @@ export default class Dev001Controller {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-    //await=espera x esta cosa.
+    //let strLanguage = context.Language;
+
     const result = await Dev001ServicesController.getEstablishmentList( request,
                                                                         response,
                                                                         null,
@@ -163,8 +163,8 @@ export default class Dev001Controller {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-    //await=espera x esta cosa.
+    //let strLanguage = context.Language;
+
     const result = await Dev001ServicesController.getJobStatus( request,
                                                                 response,
                                                                 context.logger );
@@ -182,8 +182,8 @@ export default class Dev001Controller {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-    //await=espera x esta cosa.
+    //let strLanguage = context.Language;
+
     const result = await Dev001ServicesController.getDriverList( request,
                                                                  response,
                                                                  null,
@@ -202,8 +202,8 @@ export default class Dev001Controller {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-    //await=espera x esta cosa.
+    //let strLanguage = context.Language;
+
     const result = await Dev001ServicesController.startBulkOrderCreateJob( request,
                                                                            response,
                                                                            context.logger );
@@ -221,8 +221,8 @@ export default class Dev001Controller {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-    //await=espera x esta cosa.
+    //let strLanguage = context.Language;
+
     const result = await Dev001ServicesController.getJobStatus( request,
                                                                 response,
                                                                 context.logger );
