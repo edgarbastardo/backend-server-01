@@ -1,25 +1,25 @@
-//import mysql from 'mysql2/promise';
+//import mysql from "mysql2/promise";
 
-//import Hashes from 'jshashes';
-//import uuidv4 from 'uuid/v4';
-//import moment from 'moment-timezone';
-import fs from 'fs';
+//import Hashes from "jshashes";
+//import uuidv4 from "uuid/v4";
+//import moment from "moment-timezone";
+import fs from "fs";
 import cluster from "cluster";
-//import minify from 'pg-minify';
+//import minify from "pg-minify";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 import SystemConstants from "../SystemContants";
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
 //import config from "../database/00_config/config.json"
-import { SYSDBMigratedData } from '../database/master/models/SYSDBMigratedData';
-import { SYSDBImportedData } from '../database/master/models/SYSDBImportedData';
+import { SYSDBMigratedData } from "../database/master/models/SYSDBMigratedData";
+import { SYSDBImportedData } from "../database/master/models/SYSDBImportedData";
 
-const debug = require( 'debug' )( 'DBMigrationManagerORM' );
+const debug = require( "debug" )( "DBMigrationManagerORM" );
 
 export class DBMigrationManagerORM {
 
@@ -43,7 +43,7 @@ export class DBMigrationManagerORM {
       }
       else {
 
-        let debugMark = debug.extend( '2F866EBC3283' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        let debugMark = debug.extend( "2F866EBC3283" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -100,7 +100,7 @@ export class DBMigrationManagerORM {
       }
       else {
 
-        let debugMark = debug.extend( '3EFDDB863595' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        let debugMark = debug.extend( "3EFDDB863595" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `No database connection available!` );
@@ -152,8 +152,8 @@ export class DBMigrationManagerORM {
 
         for ( let row of tableContent ) {
 
-          if ( row[ 'FilePath' ] === strFilePath &&
-               row[ 'FileName' ] === strFileName ) {
+          if ( row[ "FilePath" ] === strFilePath &&
+               row[ "FileName" ] === strFileName ) {
 
             result = row;
             break;
@@ -165,11 +165,11 @@ export class DBMigrationManagerORM {
         /*
         tableContent[ 0 ].forEach( ( row: any, intIndex: number ) => {
 
-          let debugMark = debug.extend( '3F31461C084F' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          let debugMark = debug.extend( "3F31461C084F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "FilePath => ", strFilePath );
           debugMark( "FileName => ", strFileName );
-          debugMark( "Row FP => ", row[ 'FilePath' ] );
-          debugMark( "Row FN => ", row[ 'FileName' ] );
+          debugMark( "Row FP => ", row[ "FilePath" ] );
+          debugMark( "Row FN => ", row[ "FileName" ] );
 
         })
         */
@@ -217,10 +217,10 @@ export class DBMigrationManagerORM {
                                                              "sysDBMigratedData",
                                                              null ); //Force silent errors
 
-      const strRootPath = __dirname; //require( 'app-root-path' );
+      const strRootPath = __dirname; //require( "app-root-path" );
       const strMigrationsFolder = strRootPath + `/../../../01_database/02_migration_data/${strDatabase}/orm/`;
-      const path = require('path')
-      //const os = require( 'os' );
+      const path = require("path")
+      //const os = require( "os" );
 
       const dirs = fs.existsSync( strMigrationsFolder ) ? fs.readdirSync( strMigrationsFolder ): [];
 
@@ -255,7 +255,7 @@ export class DBMigrationManagerORM {
 
                 if ( bSuccess && bEmptyContent === false ) {
 
-                  const strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, 'utf8' );
+                  const strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, "utf8" );
 
                   strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
@@ -306,7 +306,7 @@ export class DBMigrationManagerORM {
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
                                              } );
                 /*
-                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strMigrationsFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
+                const strValues = """ + SystemUtilities.getUUIDv4() + "","" + os.hostname() + "","" + strMigrationsFolder + "","" + strFileName + "","" + strFullPathCheckSum + "","" + strContentCheckSum + ""," + ( bSuccess ? 1 : 0 ) + ",NULL,"backend@system.net","" + SystemUtilities.getCurrentDateAndTime().format() + """;
 
                 const strSQL = `Insert Into sysDBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
@@ -397,10 +397,10 @@ export class DBMigrationManagerORM {
                                                                 "sysDBImportedData",
                                                                 logger );
 
-      const strRootPath = __dirname; //require( 'app-root-path' );
+      const strRootPath = __dirname; //require( "app-root-path" );
       const strImportDataFolder = strRootPath + `/../../../01_database/03_import_data/${strDatabase}/orm/`;
-      const path = require('path')
-      //const os = require( 'os' );
+      const path = require("path")
+      //const os = require( "os" );
 
       const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
@@ -435,7 +435,7 @@ export class DBMigrationManagerORM {
 
                 if ( bSuccess && bEmptyContent === false ) {
 
-                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, 'utf8' );
+                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, "utf8" );
 
                   strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
@@ -489,7 +489,7 @@ export class DBMigrationManagerORM {
                                               );
 
                 /*
-                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strImportDataFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
+                const strValues = """ + SystemUtilities.getUUIDv4() + "","" + os.hostname() + "","" + strImportDataFolder + "","" + strFileName + "","" + strFullPathCheckSum + "","" + strContentCheckSum + ""," + ( bSuccess ? 1 : 0 ) + ",NULL,"backend@system.net","" + SystemUtilities.getCurrentDateAndTime().format() + """;
 
                 const strSQL = `Insert Into sysDBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
@@ -580,10 +580,10 @@ export class DBMigrationManagerORM {
                                                                 "sysDBImportedData",
                                                                 logger );
 
-      const strRootPath = __dirname; //require( 'app-root-path' );
+      const strRootPath = __dirname; //require( "app-root-path" );
       const strImportDataFolder = strRootPath + `/../../../01_database/04_always_execute/${strDatabase}/orm/`;
-      const path = require('path')
-      //const os = require( 'os' );
+      const path = require("path")
+      //const os = require( "os" );
 
       const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
@@ -621,7 +621,7 @@ export class DBMigrationManagerORM {
 
                 if ( bSuccess && bEmptyContent === false ) {
 
-                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, 'utf8' );
+                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, "utf8" );
 
                   strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 

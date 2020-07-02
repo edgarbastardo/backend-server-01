@@ -1,45 +1,45 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   ApolloServer,
   //ApolloError
-} from 'apollo-server-express';
+} from "apollo-server-express";
 
-import compression from 'compression';
-import cors from 'cors';
-import express from 'express';
-import depthLimit from 'graphql-depth-limit';
-import helmet from 'helmet';
-import morgan from 'morgan';
+import compression from "compression";
+import cors from "cors";
+import express from "express";
+import depthLimit from "graphql-depth-limit";
+import helmet from "helmet";
+import morgan from "morgan";
 
 import {
   Request,
   Response,
   NextFunction
-} from 'express';
+} from "express";
 
-import fileUpload from 'express-fileupload';
+import fileUpload from "express-fileupload";
 
-import { InversifyExpressServer } from 'inversify-express-utils';
-import { Container } from 'inversify';
+import { InversifyExpressServer } from "inversify-express-utils";
+import { Container } from "inversify";
 
-//import { GraphQLFormattedError } from 'graphql/error';
+//import { GraphQLFormattedError } from "graphql/error";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-//import CoreGraphQLApiLoader from '../../core/api/ModelToRestAPI/CoreGraphQLAPILoader';
-//import ModelServiceLoader from '../database/services/ModelServiceLoader';
+//import CoreGraphQLApiLoader from "../../core/api/ModelToRestAPI/CoreGraphQLAPILoader";
+//import ModelServiceLoader from "../database/services/ModelServiceLoader";
 import I18NManager from "./I18Manager";
 import BinaryServiceController from "../../core/services/v1/BinaryService.controller";
-import GraphQLAPIManager from './GraphQLAPIManager';
-import RestAPIManager from './RestAPIManager';
+import GraphQLAPIManager from "./GraphQLAPIManager";
+import RestAPIManager from "./RestAPIManager";
 
-const debug = require( 'debug' )( 'ApplicationManager' );
+const debug = require( "debug" )( "ApplicationManager" );
 
-//sentry.init( { dsn: 'https://f7af458c288e4b2193ef4b7e05686f04@sentry.io/1797264' } );
+//sentry.init( { dsn: "https://f7af458c288e4b2193ef4b7e05686f04@sentry.io/1797264" } );
 
 export default class ApplicationServerDataManager {
 
@@ -69,19 +69,19 @@ export default class ApplicationServerDataManager {
       app.use( express.json() );
       app.use( express.urlencoded( { extended: false } ) );
       app.use( cors() );
-      app.options( '*', cors() );
+      app.options( "*", cors() );
       app.use( compression() );
       app.use( helmet() );
       app.use( fileUpload(
                            {
                              useTempFiles: true,
-                             tempFileDir : SystemUtilities.strBaseRootPath + '/temp/',
+                             tempFileDir : SystemUtilities.strBaseRootPath + "/temp/",
                              limits: { fileSize: intBinaryDataMaximumSize },
                              createParentPath: true,
                            }
                          ) );
-      //result.use( morgan( ':method :url :status :res[content-length] - :response-time[1] ms', { stream: loggerStream } as any ) );
-      app.use( morgan( process.env.ENV !== 'prod' ? 'dev' : "combined", { stream: loggerStream } as any ) ); //MainLogger.stream
+      //result.use( morgan( ":method :url :status :res[content-length] - :response-time[1] ms", { stream: loggerStream } as any ) );
+      app.use( morgan( process.env.ENV !== "prod" ? "dev" : "combined", { stream: loggerStream } as any ) ); //MainLogger.stream
 
       let container = new Container();
 
@@ -213,7 +213,7 @@ export default class ApplicationServerDataManager {
                              StatusCode: intStatusCode, //Bad request
                              Code: ( error.originalError as any).extensions.code,
                              Message: ( error.originalError as any).message,
-                             Mark: 'E7609E411489' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "E7609E411489" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: ( error.originalError as any).extensions.LogId,
                              IsError: true,
                              Errors: errors,
@@ -233,7 +233,7 @@ export default class ApplicationServerDataManager {
                              StatusCode: 500, //Internal server error
                              Code: error.extensions.code,
                              Message: error.message,
-                             Mark: '27A869435085' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "27A869435085" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: strLogId,
                              IsError: true,
                              Errors: [
@@ -293,7 +293,7 @@ export default class ApplicationServerDataManager {
                                       app: serverInstance,
                                       path: process.env.SERVER_ROOT_PATH + "/graphql",
                                       bodyParserConfig: {
-                                                          limit: '25mb'
+                                                          limit: "25mb"
                                                         }
                                     }
                                   );
@@ -308,15 +308,15 @@ export default class ApplicationServerDataManager {
 
         const result = {
                          StatusCode: 404, //Not found
-                         Code: 'ERROR_PATH_NOT_FOUND',
-                         Message: I18NManager.translateSync( strLanguage, 'Requested path %s not found. Please read the server log for more details.', request.path ),
-                         Mark: '3D6CC5FD0B5D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_PATH_NOT_FOUND",
+                         Message: I18NManager.translateSync( strLanguage, "Requested path %s not found. Please read the server log for more details.", request.path ),
+                         Mark: "3D6CC5FD0B5D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_PATH_NOT_FOUND',
-                                     Message: I18NManager.translateSync( strLanguage, 'Requested path %s not found. Please read the server log for more details.', request.path ),
+                                     Code: "ERROR_PATH_NOT_FOUND",
+                                     Message: I18NManager.translateSync( strLanguage, "Requested path %s not found. Please read the server log for more details.", request.path ),
                                      Details: null
                                    }
                                  ],
@@ -344,8 +344,8 @@ export default class ApplicationServerDataManager {
 
         const result = {
                          StatusCode: 500, //Internal server error
-                         Code: 'ERROR_SOMETHING_WENT_WRONG',
-                         Message: I18NManager.translateSync( strLanguage, 'Something went wrong!!' ),
+                         Code: "ERROR_SOMETHING_WENT_WRONG",
+                         Message: I18NManager.translateSync( strLanguage, "Something went wrong!!" ),
                          Mark: strMark,
                          LogId: SystemUtilities.getUUIDv4(),
                          IsError: true,
@@ -375,9 +375,9 @@ export default class ApplicationServerDataManager {
 
       /*
       //Test
-      result.get( '/debug-sentry', function mainHandler( req, res ) {
+      result.get( "/debug-sentry", function mainHandler( req, res ) {
 
-        throw new Error( 'My first Sentry error!' );
+        throw new Error( "My first Sentry error!" );
 
       });
       */
@@ -385,17 +385,17 @@ export default class ApplicationServerDataManager {
       /*
       result.use( async ( request: Request, response: Response, next: NextFunction ) => {
 
-        let debugMark = debug.extend( '24AD820F26C5' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        let debugMark = debug.extend( "24AD820F26C5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
         debugMark( "Method => " + request.method );
         debugMark( "Url => " + request.url );
 
-        debugMark( 'Time:', Date.now() );
+        debugMark( "Time:", Date.now() );
         const roles = await RoleHasRouteDAO.getRolesWithRoutePath( DBConnectionManager.currentInstance,
                                                                    CommonUtilities.getHttpMethodCodeFromString( request.method ),
                                                                    request.url,
                                                                    logger );
 
-        let debugMark = debug.extend( '5CF923A81A94' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        let debugMark = debug.extend( "5CF923A81A94" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
         debugMark( "%O", roles );
         response.status( 200 ).json( roles );
 
@@ -403,7 +403,7 @@ export default class ApplicationServerDataManager {
 
       });
 
-      //let debugMark = debug.extend( '4826155137AA' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      //let debugMark = debug.extend( "4826155137AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       //debugMark( "Id => %O", SystemRoutes );
 
       for ( let systemRoute of SystemRoutes ) {
@@ -422,7 +422,7 @@ export default class ApplicationServerDataManager {
       /*
       result.use( errorhandler( {
 
-        debug: process.env.ENV !== 'prod',
+        debug: process.env.ENV !== "prod",
         log: true,
 
       }));

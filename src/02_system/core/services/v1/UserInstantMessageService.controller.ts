@@ -1,36 +1,37 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import CacheManager from '../../../common/managers/CacheManager';
+import CacheManager from "../../../common/managers/CacheManager";
 import NotificationManager from "../../../common/managers/NotificationManager";
-import InstantMenssageManager from '../../../common/managers/InstantMessageManager';
-import MiddlewareManager from '../../../common/managers/MiddlewareManager';
-import PresenceManager from "../../../common/managers/PresenceManager";
+//import InstantMenssageManager from "../../../common/managers/InstantMessageManager";
+import MiddlewareManager from "../../../common/managers/MiddlewareManager";
+//import PresenceManager from "../../../common/managers/PresenceManager";
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
-//import { SYSUserSessionPresence } from '../../../common/database/master/models/SYSUserSessionPresence';
-import { SYSUser } from '../../../common/database/master/models/SYSUser';
-import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
-import { SYSUserSessionStatus } from '../../../common/database/master/models/SYSUserSessionStatus';
-//import { SYSUserSessionPresenceInRoom } from '../../../common/database/master/models/SYSUserSessionPresenceInRoom';
+//import { SYSUserSessionPresence } from "../../../common/database/master/models/SYSUserSessionPresence";
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
+import { SYSUserSessionStatus } from "../../../common/database/master/models/SYSUserSessionStatus";
+//import { SYSUserSessionPresenceInRoom } from "../../../common/database/master/models/SYSUserSessionPresenceInRoom";
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
-import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
+import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
 
-const debug = require( 'debug' )( 'UserInstantMessageServiceController' );
+const debug = require( "debug" )( "UserInstantMessageServiceController" );
 
 export default class UserInstantMessageServiceController {
 
@@ -94,14 +95,14 @@ export default class UserInstantMessageServiceController {
 
         await CacheManager.setData( strSocketToken,
                                     userSessionStatus.Token,
-                                    logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
+                                    logger ); //Save to cache the association between generated socket Auth Token and the main Authorization Token
 
       }
       else {
 
         await CacheManager.setData( strSocketToken,
                                     userSessionStatus.Token,
-                                    logger ); //Save to cache the association between generated binary data Auth Token and the main Authorization Token
+                                    logger ); //Save to cache the association between generated socket Auth Token and the main Authorization Token
 
         strSocketToken = userSessionStatus.SocketToken;
 
@@ -109,9 +110,9 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_AUTH_TOKEN_CREATED',
-                 Message: await I18NManager.translate( strLanguage, 'The instant message authorization token has been success created.' ),
-                 Mark: '8508AF872A19' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_AUTHORIZATION_TOKEN_CREATED",
+                 Message: await I18NManager.translate( strLanguage, "The instant message authorization token has been success created." ),
+                 Mark: "8508AF872A19" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -119,7 +120,7 @@ export default class UserInstantMessageServiceController {
                  Count: 1,
                  Data: [
                          {
-                           Auth: strSocketToken,
+                           Authorization: strSocketToken,
                          }
                        ]
                };
@@ -170,8 +171,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -276,9 +277,9 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_AUTH_TOKEN_DELETED',
-                   Message: await I18NManager.translate( strLanguage, 'The instant message authorization token has been success deleted.' ),
-                   Mark: 'DE4E39A7EE92' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_AUTHORIZATION_TOKEN_DELETED",
+                   Message: await I18NManager.translate( strLanguage, "The instant message authorization token has been success deleted." ),
+                   Mark: "DE4E39A7EE92" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -294,15 +295,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                     StatusCode: 404, //Not found
-                    Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                    Message: await I18NManager.translate( strLanguage, 'The instant message authorization token not found.' ),
-                    Mark: '358DDC2ACD70' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                    Code: "ERROR_AUTHORIZATION_TOKEN_NOT_FOUND",
+                    Message: await I18NManager.translate( strLanguage, "The instant message authorization token not found." ),
+                    Mark: "358DDC2ACD70" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                     LogId: null,
                     IsError: true,
                     Errors: [
                               {
-                                Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                                Message: await I18NManager.translate( strLanguage, 'The instant message authorization token not found.' ),
+                                Code: "ERROR_AUTHORIZATION_TOKEN_NOT_FOUND",
+                                Message: await I18NManager.translate( strLanguage, "The instant message authorization token not found." ),
                                 Details: null
                               }
                             ],
@@ -357,8 +358,296 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.LogId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async instantMessageServerCallback( request: Request,
+                                             transaction: any,
+                                             logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let fakeRequest = {
+                          context: {
+                                     UserSessionStatus: null,
+                                     Logger: logger,
+                                     Languaje: null
+                                   },
+                        };
+
+      let strAuthorization = await CacheManager.getData( request.body.Authorization, //<-- Socket token
+                                                         logger ); //get from cache the real authorization token
+
+      if ( !strAuthorization ) { //No cache entry
+
+        //Not in cache search in database
+        const userSessionStatusInDB = await SYSUserSessionStatusService.getUserSessionStatusBySocketToken( request.body.Authorizarion, //<-- Socket token
+                                                                                                           currentTransaction,
+                                                                                                           logger );
+
+        if ( userSessionStatusInDB &&
+             userSessionStatusInDB instanceof Error === false ) {
+
+          strAuthorization = userSessionStatusInDB.Token; //Get the real main authorization token
+
+          //Save to cache the association between generated binary data Auth Token and the main Authorization Token
+          await CacheManager.setData( request.body.SocketToken,
+                                      strAuthorization,
+                                      logger );
+
+        }
+
+      }
+
+      if ( strAuthorization ) {
+
+        let userSessionStatusToCheck = await SystemUtilities.getUserSessionStatus( strAuthorization,
+                                                                                   null,
+                                                                                   false,
+                                                                                   false,
+                                                                                   currentTransaction,
+                                                                                   logger );
+
+        fakeRequest.context.UserSessionStatus = userSessionStatusToCheck;
+
+        ( fakeRequest as any ).returnResult = 1; //Force to return the result
+
+        let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( fakeRequest as any,
+                                                                                 null, //Not write response back
+                                                                                 null );
+
+        if ( resultData &&
+             resultData.StatusCode === 200 ) { //Ok the authorization token is valid
+
+          const strAction = request.body.Action.trim().toLowerCase();
+
+          if ( strAction === "connect" ) {
+
+            //Is allowed to connect to server
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_ALLOWED",
+                       Message: "Ok",
+                       Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: [
+                               {
+                                 Authorization: request.body.Authorization,
+                                 Id: userSessionStatusToCheck.UserId,
+                                 Name: userSessionStatusToCheck.UserName,
+                                 FirstName: userSessionStatusToCheck.FirstName,
+                                 LastName: userSessionStatusToCheck.LastName
+                               }
+                             ]
+                     };
+
+          }
+          else if ( strAction === "join" ) {
+
+            //Check user allowed to join to channel
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_ALLOWED",
+                       Message: "Ok",
+                       Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: [
+                        //
+                       ]
+                     };
+
+          }
+          else if ( strAction === "send" ) {
+
+            //Check user allowed to send message to channel
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_ALLOWED",
+                       Message: "Ok",
+                       Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: [
+                        //
+                       ]
+                     };
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_UNKNOWN_ACTION",
+                       Message: await I18NManager.translate( strLanguage, "Unknown action name [%s]", strAction ),
+                       Mark: "B8656012AEF4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_UNKNOWN_ACTION",
+                                   Message: await I18NManager.translate( strLanguage, "Unknown action name [%s]", strAction ),
+                                   Details: {
+                                              Action: strAction
+                                            }
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+
+        }
+        else {
+
+          result = resultData;
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 401, //Unauthorized
+                   Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                   Mark: "33FA07C2BDCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.instantMessageServerCallback.name;
+
+      const strMark = "CA2DF8B2E28D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -429,9 +718,9 @@ export default class UserInstantMessageServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       let messageRules = {
-                           To: [ 'required', 'array' ],
-                           Kind: [ 'required', 'min:5' ],
-                           Body: [ 'required' ],
+                           To: [ "required", "array" ],
+                           Kind: [ "required", "min:5" ],
+                           Body: [ "required" ],
                          };
 
       let validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -447,15 +736,15 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_TO_LIST_EMPTY',
-                     Message: await I18NManager.translate( strLanguage, 'The To list cannot be empty' ),
-                     Mark: '3861F18052F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_TO_LIST_EMPTY",
+                     Message: await I18NManager.translate( strLanguage, "The To list cannot be empty" ),
+                     Mark: "3861F18052F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_TO_LIST_EMPTY',
-                                 Message: await I18NManager.translate( strLanguage, 'The To list cannot be empty' ),
+                                 Code: "ERROR_TO_LIST_EMPTY",
+                                 Message: await I18NManager.translate( strLanguage, "The To list cannot be empty" ),
                                  Details: null
                                }
                              ],
@@ -469,15 +758,15 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_TO_LIST_IS_TOO_BIG',
-                     Message: await I18NManager.translate( strLanguage, 'The To list is too big. Cannot contains more than 15 elements' ),
-                     Mark: 'BDA9B2DBE31E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_TO_LIST_IS_TOO_BIG",
+                     Message: await I18NManager.translate( strLanguage, "The To list is too big. Cannot contains more than 15 elements" ),
+                     Mark: "BDA9B2DBE31E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_TO_LIST_EMPTY',
-                                 Message: await I18NManager.translate( strLanguage, 'The To list is too big. Cannot contains more than 15 elements' ),
+                                 Code: "ERROR_TO_LIST_EMPTY",
+                                 Message: await I18NManager.translate( strLanguage, "The To list is too big. Cannot contains more than 15 elements" ),
                                  Details: null
                                }
                              ],
@@ -491,15 +780,15 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_BODY_IS_EMPTY',
-                     Message: await I18NManager.translate( strLanguage, 'The body object cannot be empty' ),
-                     Mark: 'DE4C1C97566F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_BODY_IS_EMPTY",
+                     Message: await I18NManager.translate( strLanguage, "The body object cannot be empty" ),
+                     Mark: "DE4C1C97566F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_TO_LIST_EMPTY',
-                                 Message: await I18NManager.translate( strLanguage, 'The body object cannot be empty' ),
+                                 Code: "ERROR_TO_LIST_EMPTY",
+                                 Message: await I18NManager.translate( strLanguage, "The body object cannot be empty" ),
                                  Details: null
                                }
                              ],
@@ -654,23 +943,23 @@ export default class UserInstantMessageServiceController {
                    toWarningList.length === 0 ) {
 
                 intStatusCode = 200
-                strCode = 'SUCCESS_SEND_MESSAGE';
-                strMessage = await I18NManager.translate( strLanguage, 'Success message send to all users' );
+                strCode = "SUCCESS_SEND_MESSAGE";
+                strMessage = await I18NManager.translate( strLanguage, "Success message send to all users" );
 
               }
               else if ( toErrorList.length === bodyToList.length ) {
 
                 intStatusCode = 400
-                strCode = 'ERROR_SEND_MESSAGE';
-                strMessage = await I18NManager.translate( strLanguage, 'Cannot send the message to any users. Please check the errors and warnings section' );
+                strCode = "ERROR_SEND_MESSAGE";
+                strMessage = await I18NManager.translate( strLanguage, "Cannot send the message to any users. Please check the errors and warnings section" );
                 bIsError = true;
 
               }
               else {
 
                 intStatusCode = 202
-                strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-                strMessage = await I18NManager.translate( strLanguage, 'The message cannot delivered to ALL users. Please check the data and errors and warnings section' );
+                strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+                strMessage = await I18NManager.translate( strLanguage, "The message cannot delivered to ALL users. Please check the data and errors and warnings section" );
                 bIsError = toErrorList.length > 0;
 
               }
@@ -679,7 +968,7 @@ export default class UserInstantMessageServiceController {
                          StatusCode: intStatusCode, //Ok
                          Code: strCode,
                          Message: strMessage,
-                         Mark: 'B88547D5233C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Mark: "B88547D5233C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,
                          Errors: toErrorList,
@@ -693,15 +982,15 @@ export default class UserInstantMessageServiceController {
 
               result = {
                          StatusCode: 500, //Internal server error
-                         Code: 'ERROR_UNEXPECTED',
-                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                          Mark: "922C0DA98C93" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'FAIL_TO_PUBLISH_ON_TOPIC',
-                                     Message: 'Cannot publish on topic the method publishOnTopic return false',
+                                     Code: "FAIL_TO_PUBLISH_ON_TOPIC",
+                                     Message: "Cannot publish on topic the method publishOnTopic return false",
                                      Details: null
                                    }
                                  ],
@@ -719,7 +1008,7 @@ export default class UserInstantMessageServiceController {
                        StatusCode: checkResult.StatusCode,
                        Code: checkResult.Code,
                        Message: checkResult.Message,
-                       Mark: '888C716A0C2D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Mark: "888C716A0C2D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -743,15 +1032,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid.' ),
-                   Mark: 'D8FDD5B300C8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid." ),
+                   Mark: "D8FDD5B300C8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid.' ),
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid." ),
                                Details: validator.errors.all()
                              }
                            ],
@@ -806,8 +1095,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -885,15 +1174,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
-                   Mark: 'B83DDA0FED39' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
+                   Mark: "B83DDA0FED39" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
                                Details: null
                              }
                            ],
@@ -909,9 +1198,9 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '0A27B82BF359' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "0A27B82BF359" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -939,9 +1228,9 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '72E62FB65722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "72E62FB65722" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -974,9 +1263,9 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_ROOM_LIST',
-                     Message: await I18NManager.translate( strLanguage, 'Success get presence room list.' ),
-                     Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_ROOM_LIST",
+                     Message: await I18NManager.translate( strLanguage, "Success get presence room list." ),
+                     Mark: "A3F304A84376" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1033,8 +1322,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1112,15 +1401,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
-                   Mark: '0EA89FC0BAE3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
+                   Mark: "0EA89FC0BAE3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
                                Details: null
                              }
                            ],
@@ -1136,9 +1425,9 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'B9564173315E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "B9564173315E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1166,9 +1455,9 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '72E62FB65722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "72E62FB65722" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1188,9 +1477,9 @@ export default class UserInstantMessageServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_ROOM_LIST_COUNT',
-                     Message: await I18NManager.translate( strLanguage, 'Success get presence room list count.' ),
-                     Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_ROOM_LIST_COUNT",
+                     Message: await I18NManager.translate( strLanguage, "Success get presence room list count." ),
+                     Mark: "A3F304A84376" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1251,8 +1540,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1332,15 +1621,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
-                   Mark: 'A80DD97E9086' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
+                   Mark: "A80DD97E9086" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NO_PRESENCE_DATA_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The presence data not found for the current user session.' ),
+                               Code: "ERROR_NO_PRESENCE_DATA_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The presence data not found for the current user session." ),
                                Details: null
                              }
                            ],
@@ -1356,9 +1645,9 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '0D9B7BEAB10F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "0D9B7BEAB10F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1406,7 +1695,7 @@ export default class UserInstantMessageServiceController {
 
         strSQL = request.query.where ? strSQL + "( " + request.query.where + " )" : strSQL + "( 1 )";
 
-        strSQL = strSQL + " And ( A.RoomId = '" + ( request.query.roomId ? request.query.roomId: "@-Not_Exists_Id-@" ) + "' ) "; // And C.Token != '" + userSessionStatus.Token + "' ) ";
+        strSQL = strSQL + " And ( A.RoomId = "" + ( request.query.roomId ? request.query.roomId: "@-Not_Exists_Id-@" ) + "" ) "; // And C.Token != "" + userSessionStatus.Token + "" ) ";
 
         / *
         const roomList = sysUserSessionPresence.Room.split( "," ).sort();
@@ -1415,12 +1704,12 @@ export default class UserInstantMessageServiceController {
 
           if ( intRoomIndex == 0 ) {
 
-            strSQL = strSQL + ` A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+            strSQL = strSQL + ` A.Room Like "%${ roomList[ intRoomIndex ] }%"`;
 
           }
           else {
 
-            strSQL = strSQL + ` Or A.Room Like '%${ roomList[ intRoomIndex ] }%'`;
+            strSQL = strSQL + ` Or A.Room Like "%${ roomList[ intRoomIndex ] }%"`;
 
           }
 
@@ -1446,9 +1735,9 @@ export default class UserInstantMessageServiceController {
 
           warnings.push(
                          {
-                           Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                           Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                           Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                           Code: "WARNING_DATA_LIMITED_TO_MAX",
+                           Message: await I18NManager.translate( strLanguage, "Data limited to the maximun of %s rows", intLimit ),
+                           Details: await I18NManager.translate( strLanguage, "To protect to server and client of large result set of data, the default maximun rows is %s, you must use \"offset\" and \"limit\" query parameters to paginate large result set of data.", intLimit )
                          }
                        );
 
@@ -1547,9 +1836,9 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_PRESENCE_LIST',
-                   Message: await I18NManager.translate( strLanguage, 'Success get presence list.' ),
-                   Mark: 'A3F304A84376' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_PRESENCE_LIST",
+                   Message: await I18NManager.translate( strLanguage, "Success get presence list." ),
+                   Mark: "A3F304A84376" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -1606,8 +1895,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1724,8 +2013,8 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

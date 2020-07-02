@@ -1,20 +1,20 @@
-//import fs from 'fs';
-//import path from 'path';
-import cluster from 'cluster';
-import { Request, Response, NextFunction } from 'express';
+//import fs from "fs";
+//import path from "path";
+import cluster from "cluster";
+import { Request, Response, NextFunction } from "express";
 import { rule } from "graphql-shield";
 import { ApolloError } from "apollo-server-errors";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
-import LoggerManager from './LoggerManager';
-import I18NManager from './I18Manager';
-//import NotificationManager from './NotificationManager';
+import LoggerManager from "./LoggerManager";
+import I18NManager from "./I18Manager";
+//import NotificationManager from "./NotificationManager";
 
-const debug = require( 'debug' )( 'MiddlewareManager' );
+const debug = require( "debug" )( "MiddlewareManager" );
 
 export default class MiddlewareManager {
 
@@ -296,8 +296,8 @@ export default class MiddlewareManager {
 
       const result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                        Mark: strMark,
                        LogId: error.LogId,
                        IsError: true,
@@ -410,15 +410,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
-                 Mark: 'FAE37676EA49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                 Mark: "FAE37676EA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
+                             Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
                              Details: null
                            }
                          ],
@@ -432,15 +432,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is logged out' ),
-                 Mark: '0C28D66DFBC1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is logged out" ),
+                 Mark: "0C28D66DFBC1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is logged out' ),
+                             Code: "ERROR_LOGGED_OUT_AUTHORIZATION_TOKEN",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is logged out" ),
                              Details: null
                            }
                          ],
@@ -463,15 +463,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
-                 Mark: 'C6E335E5DC71' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is expired" ),
+                 Mark: "C6E335E5DC71" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_EXPIRED_AUTHORIZATION_TOKEN',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is expired' ),
+                             Code: "ERROR_EXPIRED_AUTHORIZATION_TOKEN",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is expired" ),
                              Details: timeAgo
                            }
                          ],
@@ -486,15 +486,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_USER_GROUP_DISABLED',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group disabled' ),
-                 Mark: '957309DC4730' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_USER_GROUP_DISABLED",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user group disabled" ),
+                 Mark: "957309DC4730" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_USER_GROUP_DISABLED',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group disabled' ),
+                             Code: "ERROR_USER_GROUP_DISABLED",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user group disabled" ),
                              Details: null
                            }
                          ],
@@ -509,15 +509,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_USER_GROUP_EXPIRED',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group expired' ),
-                 Mark: '6812FDB55733' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_USER_GROUP_EXPIRED",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user group expired" ),
+                 Mark: "6812FDB55733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_USER_GROUP_EXPIRED',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user group expired' ),
+                             Code: "ERROR_USER_GROUP_EXPIRED",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user group expired" ),
                              Details: null
                            }
                          ],
@@ -532,15 +532,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_USER_DISABLED',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user disabled' ),
-                 Mark: '3479CB7BE4BE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_USER_DISABLED",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user disabled" ),
+                 Mark: "3479CB7BE4BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_USER_DISABLED',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user disabled' ),
+                             Code: "ERROR_USER_DISABLED",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user disabled" ),
                              Details: null
                            }
                          ],
@@ -555,15 +555,15 @@ export default class MiddlewareManager {
 
       result = {
                  StatusCode: 401, //Unauthorized
-                 Code: 'ERROR_USER_EXPIRED',
-                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user expired' ),
-                 Mark: '757B13FB8742' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "ERROR_USER_EXPIRED",
+                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user expired" ),
+                 Mark: "757B13FB8742" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: true,
                  Errors: [
                            {
-                             Code: 'ERROR_USER_EXPIRED',
-                             Message: await I18NManager.translate( strLanguage, 'Authorization token provided is for a user expired' ),
+                             Code: "ERROR_USER_EXPIRED",
+                             Message: await I18NManager.translate( strLanguage, "Authorization token provided is for a user expired" ),
                              Details: null
                            }
                          ],
@@ -715,15 +715,15 @@ export default class MiddlewareManager {
 
       const result = {
                        StatusCode: 403, //Forbidden
-                       Code: 'ERROR_FORBIDDEN_ACCESS',
-                       Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
-                       Mark: '1ED45DB6E425' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_FORBIDDEN_ACCESS",
+                       Message: await I18NManager.translate( strLanguage, "Not authorized to access" ),
+                       Mark: "1ED45DB6E425" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_FORBIDDEN_ACCESS',
-                                   Message: await I18NManager.translate( strLanguage, 'Not authorized to access' ),
+                                   Code: "ERROR_FORBIDDEN_ACCESS",
+                                   Message: await I18NManager.translate( strLanguage, "Not authorized to access" ),
                                  }
                                ],
                        Warnings: [],
@@ -787,7 +787,7 @@ export default class MiddlewareManager {
 
         const extensions = {
                              StatusCode: 401, //Unauthorized
-                             Mark: '9751B88C389C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "9751B88C389C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: SystemUtilities.getUUIDv4()
                            };
 
@@ -802,7 +802,7 @@ export default class MiddlewareManager {
 
         const extensions = {
                              StatusCode: 401, //Unauthorized
-                             Mark: '3006DA613507' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "3006DA613507" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: SystemUtilities.getUUIDv4()
                            };
 
@@ -845,7 +845,7 @@ export default class MiddlewareManager {
 
         const extensions = {
                              StatusCode: 401, //Unauthorized
-                             Mark: '8B9F98C1AB76' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "8B9F98C1AB76" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: SystemUtilities.getUUIDv4(),
                              errors: errors
                            };
@@ -906,7 +906,7 @@ export default class MiddlewareManager {
 
         const extensions = {
                              StatusCode: 403, //Forbidden
-                             Mark: '74EC582F0760' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Mark: "74EC582F0760" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: SystemUtilities.getUUIDv4()
                            };
 

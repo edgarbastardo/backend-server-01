@@ -593,30 +593,48 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Rooms.Id,
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Server.Id,
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
-                                                              "#Drivers#":{
+                                                              "server": {
 
-                                                                "rooms": "#Drivers#,#Support#"
-
-                                                              },
-                                                              "#System_Administrators#":{
-
-                                                                "rooms": "#System_Administrators#,#CommonAdmin#"
+                                                                "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URL || "",
+                                                                "auth":{
+                                                                  "apiKey": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_KEY || ""
+                                                                }
 
                                                               },
-                                                              "#admin01@system.net#":{
 
-                                                                "rooms": "#@@UserName@@#,#System_Administrators#,#CommonAdmin#,#Admin01#"
+                                                              "channels": {
 
-                                                              },
-                                                              "@__default__@":{
+                                                                "#Business_Managers#":{
 
-                                                                "rooms": "#@@UserName@@#"
+                                                                  "denied": "",
+                                                                  "allowed": "#Business_Managers#,#Administrators#"
+
+                                                                },
+                                                                "#System_Administrators#":{
+
+                                                                  "denied": "",
+                                                                  "allowed": "#System_Administrators#,#Administrators#"
+
+                                                                },
+                                                                "#Drivers#": {
+
+                                                                 "denied": "",
+                                                                 "allowed": "#Drivers#,#Support#"
+
+                                                                },
+                                                                "@__default__@":{
+
+                                                                  "denied": "",
+                                                                  "allowed": "*"
+
+                                                                }
 
                                                               }
+
                                                             }
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,

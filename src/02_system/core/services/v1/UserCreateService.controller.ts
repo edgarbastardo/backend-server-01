@@ -1,11 +1,11 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
@@ -14,19 +14,19 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import GeoMapManager from '../../../common/managers/GeoMapManager';
+import GeoMapManager from "../../../common/managers/GeoMapManager";
 
-import SecurityServiceController from './SecurityService.controller';
+import SecurityServiceController from "./SecurityService.controller";
 import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
 
 import { SYSUser } from "../../../common/database/master/models/SYSUser";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
-const debug = require( 'debug' )( 'UserCreateServiceController' );
+const debug = require( "debug" )( "UserCreateServiceController" );
 
 export default class UserCreateServiceController {
 
@@ -71,26 +71,26 @@ export default class UserCreateServiceController {
       let sysUserInDB: SYSUser = null;
 
       let userRules = {
-                        Avatar: [ 'present', 'string', 'min:36' ],
-                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                        //UserGroupId: [ 'present', 'string', 'min:36' ],
-                        //UserGroupSId: [ 'present', 'string', 'min:8' ],
-                        //UserGroup: [ 'present', 'string', 'min:3' ],
-                        //CreateGroup: [ 'present', 'boolean' ],
-                        ExpireAt: [ 'present', 'date' ],
-                        Notify: [ 'present', 'min:3' ],
-                        ForceChangePassword: [ 'present', 'boolean' ],
-                        ChangePasswordEvery: [ 'present', 'integer', 'min:0' ],
-                        SessionsLimit: [ 'present', 'integer', 'min:0' ],
+                        Avatar: [ "present", "string", "min:36" ],
+                        Name: [ "required", "min:3", "regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g" ],
+                        //UserGroupId: [ "present", "string", "min:36" ],
+                        //UserGroupSId: [ "present", "string", "min:8" ],
+                        //UserGroup: [ "present", "string", "min:3" ],
+                        //CreateGroup: [ "present", "boolean" ],
+                        ExpireAt: [ "present", "date" ],
+                        Notify: [ "present", "min:3" ],
+                        ForceChangePassword: [ "present", "boolean" ],
+                        ChangePasswordEvery: [ "present", "integer", "min:0" ],
+                        SessionsLimit: [ "present", "integer", "min:0" ],
                         sysUserGroup: {
-                                        Create: [ 'required', 'boolean' ],
-                                        Id: [ 'present', 'string', 'min:36' ],
-                                        Name: [ 'present', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                                        Role: [ 'present', 'string' ],
-                                        Tag: [ 'present', 'string' ],
+                                        Create: [ "required", "boolean" ],
+                                        Id: [ "present", "string", "min:36" ],
+                                        Name: [ "present", "min:3", "regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g" ],
+                                        Role: [ "present", "string" ],
+                                        Tag: [ "present", "string" ],
                                       },
-                        sysPerson: [ 'present' ],
-                        Business: [ 'present' ],
+                        sysPerson: [ "present" ],
+                        Business: [ "present" ],
                       };
 
       let validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -208,15 +208,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 403, //Forbidden
-                         Code: 'ERROR_CANNOT_CREATE_USER',
-                         Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user' ),
-                         Mark: 'EDF5D29CE61C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_CANNOT_CREATE_USER",
+                         Message: await I18NManager.translate( strLanguage, "Not allowed to create the user" ),
+                         Mark: "EDF5D29CE61C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_CANNOT_CREATE_USER',
-                                     Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user' ),
+                                     Code: "ERROR_CANNOT_CREATE_USER",
+                                     Message: await I18NManager.translate( strLanguage, "Not allowed to create the user" ),
                                      Details: null,
                                    }
                                  ],
@@ -232,9 +232,9 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 500, //Internal server error
-                         Code: 'ERROR_UNEXPECTED',
-                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                         Mark: 'F82A2A732532' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                         Mark: "F82A2A732532" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -256,15 +256,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_DISABLED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
-                         Mark: 'A9FBA806248A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_DISABLED",
+                         Message: await I18NManager.translate( strLanguage, "The user group %s is disabled.", sysUserGroupInDB.Name ),
+                         Mark: "A9FBA806248A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_DISABLED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled.', sysUserGroupInDB.Name ),
+                                     Code: "ERROR_USER_GROUP_DISABLED",
+                                     Message: await I18NManager.translate( strLanguage, "The user group %s is disabled.", sysUserGroupInDB.Name ),
                                      Details: null
                                    }
                                  ],
@@ -280,15 +280,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_EXPIRED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
-                         Mark: 'C70A2903EC1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_EXPIRED",
+                         Message: await I18NManager.translate( strLanguage, "The user group %s is expired.", sysUserGroupInDB.Name ),
+                         Mark: "C70A2903EC1F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_EXPIRED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired.', sysUserGroupInDB.Name ),
+                                     Code: "ERROR_USER_GROUP_EXPIRED",
+                                     Message: await I18NManager.translate( strLanguage, "The user group %s is expired.", sysUserGroupInDB.Name ),
                                      Details: null
                                    }
                                  ],
@@ -303,15 +303,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
-                         Mark: '5C5B23E9219A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                         Message: await I18NManager.translate( strLanguage, "The user group %s already exists.", sysUserGroupInDB.Name ),
+                         Mark: "5C5B23E9219A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s already exists.', sysUserGroupInDB.Name ),
+                                     Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                                     Message: await I18NManager.translate( strLanguage, "The user group %s already exists.", sysUserGroupInDB.Name ),
                                      Details: null
                                    }
                                  ],
@@ -332,14 +332,14 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 404, //Not found
-                         Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                         Code: "ERROR_USER_GROUP_NOT_FOUND",
                          Message: strMessage,
-                         Mark: 'C0171BD3B328' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Mark: "C0171BD3B328" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                                     Code: "ERROR_USER_GROUP_NOT_FOUND",
                                      Message: strMessage,
                                      Details: null
                                    }
@@ -359,15 +359,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 403, //Forbidden
-                         Code: 'ERROR_USER_GROUP_INVALID',
-                         Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
-                         Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_INVALID",
+                         Message: await I18NManager.translate( strLanguage, "The user group is invalid." ),
+                         Mark: "5EBD3F13F67B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_INVALID',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group is invalid.' ),
+                                     Code: "ERROR_USER_GROUP_INVALID",
+                                     Message: await I18NManager.translate( strLanguage, "The user group is invalid." ),
                                      Details: null
                                    }
                                  ],
@@ -383,15 +383,15 @@ export default class UserCreateServiceController {
 
               result = {
                          StatusCode: 403, //Forbidden
-                         Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                         Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
-                         Mark: '5EBD3F13F67B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_CANNOT_CREATE_USER_GROUP",
+                         Message: await I18NManager.translate( strLanguage, "The creation of user group is forbidden." ),
+                         Mark: "5EBD3F13F67B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                                     Message: await I18NManager.translate( strLanguage, 'The creation of user group is forbidden.' ),
+                                     Code: "ERROR_CANNOT_CREATE_USER_GROUP",
+                                     Message: await I18NManager.translate( strLanguage, "The creation of user group is forbidden." ),
                                      Details: null
                                    }
                                  ],
@@ -442,9 +442,9 @@ export default class UserCreateServiceController {
 
                 result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                           Mark: '8DBA87D7ABE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "8DBA87D7ABE2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
@@ -471,16 +471,16 @@ export default class UserCreateServiceController {
               personData.CreatedAt = null;
 
               let rules = {
-                            Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            Gender: [ 'present', 'between:0,100' ],
-                            BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                            Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                            EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                            Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Title: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            FirstName: [ "required", "min:2", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            LastName: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            NickName: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            Abbreviation: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            Gender: [ "present", "between:0,100" ],
+                            BirthDate: "present|dateInFormat01", //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Address: [ "present", "min:10", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                            EMail: "required|emailList", //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                            Phone: "present|phoneUSList", //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
                           };
 
               validator = SystemUtilities.createCustomValidatorSync( request.body.sysPerson,
@@ -693,7 +693,7 @@ export default class UserCreateServiceController {
                                                                  //device_id: "*",
                                                                  body: {
                                                                          kind: "self",
-                                                                         text: await I18NManager.translate( strLanguage, 'User account creation success.\n%s\n%s', request.body.Name, request.body.Password )
+                                                                         text: await I18NManager.translate( strLanguage, "User account creation success.\n%s\n%s", request.body.Name, request.body.Password )
                                                                        }
                                                                },
                                                                logger
@@ -760,9 +760,9 @@ export default class UserCreateServiceController {
                     //ANCHOR success user create
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_USER_CREATE',
-                               Message: await I18NManager.translate( strLanguage, 'Success user create.' ),
-                               Mark: 'B9779ACDB9EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "SUCCESS_USER_CREATE",
+                               Message: await I18NManager.translate( strLanguage, "Success user create." ),
+                               Mark: "B9779ACDB9EB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
                                Errors: [],
@@ -782,9 +782,9 @@ export default class UserCreateServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: 'C4B8A26D4B57' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "C4B8A26D4B57" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -808,9 +808,9 @@ export default class UserCreateServiceController {
 
                   result = {
                              StatusCode: 500, //Internal server error
-                             Code: 'ERROR_UNEXPECTED',
-                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: '8E230246A1AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNEXPECTED",
+                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                             Mark: "8E230246A1AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -832,15 +832,15 @@ export default class UserCreateServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside of sysPerson' ),
-                           Mark: 'E905A810E2D0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                           Message: await I18NManager.translate( strLanguage, "One or more field values are invalid. Inside of sysPerson" ),
+                           Mark: "E905A810E2D0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid. Inside of sysPerson' ),
+                                       Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                                       Message: await I18NManager.translate( strLanguage, "One or more field values are invalid. Inside of sysPerson" ),
                                        Details: validator.errors.all()
                                      }
                                    ],
@@ -859,9 +859,9 @@ export default class UserCreateServiceController {
             //ANCHOR password not valid (createUser)
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_PASSWORD_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
-                       Mark: 'F9F02C3E2859' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_PASSWORD_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The password is not valid" ),
+                       Mark: "F9F02C3E2859" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -885,9 +885,9 @@ export default class UserCreateServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '726AB9ABEFE9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "726AB9ABEFE9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -907,15 +907,15 @@ export default class UserCreateServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                     Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
-                     Mark: '61B8AA67F498' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                     Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", request.body.Name ),
+                     Mark: "61B8AA67F498" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                 Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', request.body.Name ),
+                                 Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                                 Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", request.body.Name ),
                                  Details: validator.errors.all()
                                }
                              ],
@@ -931,15 +931,15 @@ export default class UserCreateServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                   Mark: '78706654C68B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "78706654C68B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                Details: validator.errors.all()
                              }
                            ],
@@ -994,8 +994,8 @@ export default class UserCreateServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

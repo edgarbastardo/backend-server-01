@@ -230,6 +230,20 @@ export default class Always {
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
+                            {
+                              Id: "75cc6129-ae0f-4f65-943a-ff6909317ff0",
+                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 0,
+                              Name: "InstantMessageServer01",
+                              Password: "@",
+                              Role: null,
+                              Tag: "#ForeignSystem#,#InstantMessageServer01#",
+                              Comment: "Created from backend startup.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            }
                           ]
 
       const loopUserEntriesAsync = async () => {

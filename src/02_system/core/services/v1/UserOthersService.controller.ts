@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import {
@@ -7,10 +7,10 @@ import {
   //json,
   //Response,
   //NextFunction
-} from 'express';
-import bcrypt from 'bcrypt';
+} from "express";
+import bcrypt from "bcrypt";
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import CommonConstants from "../../../common/CommonConstants";
@@ -20,7 +20,7 @@ import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import I18NManager from "../../../common/managers/I18Manager";
-import DBConnectionManager from '../../../common/managers/DBConnectionManager';
+import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import GeoMapManager from "../../../common/managers/GeoMapManager";
 //import JobQueueManager from "../../common/managers/JobQueueManager";
@@ -29,16 +29,16 @@ import SecurityServiceController from "./SecurityService.controller";
 
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
 import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
-import SYSUserSessionStatusService from '../../../common/database/master/services/SYSUserSessionStatusService';
-import SYSRoleHasRouteService from '../../../common/database/master/services/SYSRoleHasRouteService';
+import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
+import SYSRoleHasRouteService from "../../../common/database/master/services/SYSRoleHasRouteService";
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 
 import { SYSUser } from "../../../common/database/master/models/SYSUser";
-import { SYSPerson } from '../../../common/database/master/models/SYSPerson';
+import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
-const debug = require( 'debug' )( 'UserOthersServiceController' );
+const debug = require( "debug" )( "UserOthersServiceController" );
 
 export default class UserOthersServiceController {
 
@@ -757,15 +757,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to change the password to the user %s', sysUserInDB.Name ),
-                     Mark: 'CD5990E0CBD1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_CANNOT_CHANGE_PASSWORD",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to change the password to the user %s", sysUserInDB.Name ),
+                     Mark: "CD5990E0CBD1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CHANGE_PASSWORD',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to change the password to the user %s', sysUserInDB.Name ),
+                                 Code: "ERROR_CANNOT_CHANGE_PASSWORD",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to change the password to the user %s", sysUserInDB.Name ),
                                  Details: null,
                                }
                              ],
@@ -784,15 +784,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                       Mark: '34B74D7BDF33' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "34B74D7BDF33" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -808,15 +808,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                       Mark: '933C3B47067B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "933C3B47067B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -832,15 +832,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
-                       Mark: '57D0268A40C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
+                       Mark: "57D0268A40C3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -856,15 +856,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
-                       Mark: 'C90533CFEFF0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
+                       Mark: "C90533CFEFF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -878,15 +878,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The new password is invalid', sysUserInDB.Name ),
-                       Mark: '7E91B5B3AED1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_NEW_PASSWORD_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The new password is invalid", sysUserInDB.Name ),
+                       Mark: "7E91B5B3AED1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The new password is invalid', sysUserInDB.Name ),
+                                   Code: "ERROR_NEW_PASSWORD_NOT_VALID",
+                                   Message: await I18NManager.translate( strLanguage, "The new password is invalid", sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -983,9 +983,9 @@ export default class UserOthersServiceController {
 
                   result = {
                              StatusCode: 200, //Ok
-                             Code: 'SUCCESS_PASSWORD_CHANGE',
-                             Message: await I18NManager.translate( strLanguage, 'Success to change the password. Remember use it in the next login' ),
-                             Mark: 'EDCDE884CDA5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "SUCCESS_PASSWORD_CHANGE",
+                             Message: await I18NManager.translate( strLanguage, "Success to change the password. Remember use it in the next login" ),
+                             Mark: "EDCDE884CDA5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: false,
                              Errors: [],
@@ -1044,9 +1044,9 @@ export default class UserOthersServiceController {
 
                   result = {
                              StatusCode: 500, //Internal server error
-                             Code: 'ERROR_UNEXPECTED',
-                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: '9F94B6BFC8F5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNEXPECTED",
+                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                             Mark: "9F94B6BFC8F5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: error.logId,
                              IsError: true,
                              Errors: [
@@ -1068,9 +1068,9 @@ export default class UserOthersServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_NEW_PASSWORD_NOT_VALID',
-                           Message: await I18NManager.translate( strLanguage, 'The new password is not valid' ),
-                           Mark: 'A5DCC6ACADE4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_NEW_PASSWORD_NOT_VALID",
+                           Message: await I18NManager.translate( strLanguage, "The new password is not valid" ),
+                           Mark: "A5DCC6ACADE4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
@@ -1092,15 +1092,15 @@ export default class UserOthersServiceController {
 
               result = {
                          StatusCode: 401, //Unauthorized
-                         Code: 'ERROR_WRONG_PASSWORD',
-                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
-                         Mark: 'CD291726B853' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "CD291726B853" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_WRONG_PASSWORD',
-                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
                                      Details: null,
                                    }
                                  ],
@@ -1118,15 +1118,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', userSessionStatus.UserName ),
-                     Mark: '1533BE3C3918' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                     Mark: "1533BE3C3918" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', userSessionStatus.UserName ),
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
                                  Details: null,
                                }
                              ],
@@ -1142,15 +1142,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made change password' ),
-                   Mark: '43977750A573' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made change password" ),
+                   Mark: "43977750A573" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                               Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change password' ),
+                               Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change password" ),
                                Details: null
                              }
                            ],
@@ -1205,8 +1205,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1338,15 +1338,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '6AD438512BFA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "6AD438512BFA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -1363,9 +1363,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '578DFED7CD84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "578DFED7CD84" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -1409,14 +1409,14 @@ export default class UserOthersServiceController {
       /*
       await JobQueueManager.addJobToQueue( "SampleJob",
                                            { mydata: "my data" },
-                                           null, //{ jobId: SystemUtilities.getUUIDv4(), attempts: 0, timeout: 99999999, removeOnComplete: true, removeOnFail: true, backoff: 0 }, //{ repeat: { cron: '* * * * *' } },
+                                           null, //{ jobId: SystemUtilities.getUUIDv4(), attempts: 0, timeout: 99999999, removeOnComplete: true, removeOnFail: true, backoff: 0 }, //{ repeat: { cron: "* * * * *" } },
                                            logger );
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_ADD_JOB_TO_QUEUE',
-                 Message: await I18NManager.translate( strLanguage, 'Success to add the job to queue' ),
-                 Mark: '731042C8407C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_ADD_JOB_TO_QUEUE",
+                 Message: await I18NManager.translate( strLanguage, "Success to add the job to queue" ),
+                 Mark: "731042C8407C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -1470,8 +1470,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1554,15 +1554,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                     Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change your profile information' ),
-                     Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                     Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change your profile information" ),
+                     Mark: "4FB3974048ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                 Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change your profile information' ),
+                                 Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change your profile information" ),
                                  Details: null
                                }
                              ],
@@ -1578,15 +1578,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_GROUP_DISABLED',
-                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
-                     Mark: 'CA03218D26D4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_DISABLED",
+                     Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change your profile information", sysUserInDB.sysUserGroup.Name ),
+                     Mark: "CA03218D26D4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_DISABLED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
+                                 Code: "ERROR_USER_GROUP_DISABLED",
+                                 Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change your profile information", sysUserInDB.sysUserGroup.Name ),
                                  Details: null
                                }
                              ],
@@ -1602,15 +1602,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_GROUP_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change your profile information', sysUserInDB.sysUserGroup.Name ),
-                     Mark: '4F0F53813715' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_EXPIRED",
+                     Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change your profile information", sysUserInDB.sysUserGroup.Name ),
+                     Mark: "4F0F53813715" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change you profile information', sysUserInDB.sysUserGroup.Name ),
+                                 Code: "ERROR_USER_GROUP_EXPIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change you profile information", sysUserInDB.sysUserGroup.Name ),
                                  Details: null
                                }
                              ],
@@ -1626,15 +1626,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_DISABLED',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', sysUserInDB.Name ),
-                     Mark: '8362FE646A8D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_DISABLED",
+                     Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change your profile information", sysUserInDB.Name ),
+                     Mark: "8362FE646A8D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_DISABLED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change your profile information', sysUserInDB.Name ),
+                                 Code: "ERROR_USER_DISABLED",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change your profile information", sysUserInDB.Name ),
                                  Details: null
                                }
                              ],
@@ -1650,15 +1650,15 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', sysUserInDB.Name ),
-                     Mark: 'D9E15CB1BA2A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_EXPIRED",
+                     Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change your profile", sysUserInDB.Name ),
+                     Mark: "D9E15CB1BA2A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change your profile', sysUserInDB.Name ),
+                                 Code: "ERROR_USER_EXPIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change your profile", sysUserInDB.Name ),
                                  Details: null
                                }
                              ],
@@ -1689,15 +1689,15 @@ export default class UserOthersServiceController {
           }
 
           let rules = {
-                        Title: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        LastName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        NickName: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        Abbreviation: [ 'present', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        Gender: [ 'present', 'between:0,100' ],
-                        BirthDate: 'present|dateInFormat01', //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                        Address: [ 'present', 'min:10', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                        Avatar: [ 'present', 'min:36', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                        Title: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        FirstName: [ "required", "min:2", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        LastName: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        NickName: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        Abbreviation: [ "present", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        Gender: [ "present", "between:0,100" ],
+                        BirthDate: "present|dateInFormat01", //<-- dateInFormat01 is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                        Address: [ "present", "min:10", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:\,ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                        Avatar: [ "present", "min:36", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\s\:ñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
                       };
 
           const validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -1808,8 +1808,8 @@ export default class UserOthersServiceController {
 
                   warnings.push(
                                  {
-                                   Code: 'WARNING_CANNOT_UPDATE_USER_DATA',
-                                   Message: 'Cannot update the user information.',
+                                   Code: "WARNING_CANNOT_UPDATE_USER_DATA",
+                                   Message: "Cannot update the user information.",
                                    Details: {
                                               Avatar: "Avatar field cannot updated"
                                             }
@@ -1828,9 +1828,9 @@ export default class UserOthersServiceController {
 
               result = {
                          StatusCode: 200, //Ok
-                         Code: 'SUCCESS_PROFILE_INFORMATION_CHANGE',
-                         Message: await I18NManager.translate( strLanguage, 'Success to change the user profile information.' ),
-                         Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "SUCCESS_PROFILE_INFORMATION_CHANGE",
+                         Message: await I18NManager.translate( strLanguage, "Success to change the user profile information." ),
+                         Mark: "54CAE0BF0C38" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,
                          Errors: [],
@@ -1850,9 +1850,9 @@ export default class UserOthersServiceController {
 
               result = {
                          StatusCode: 500, //Internal server error
-                         Code: 'ERROR_UNEXPECTED',
-                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                         Mark: 'FEFFF7F8CFDC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                         Mark: "FEFFF7F8CFDC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -1874,15 +1874,15 @@ export default class UserOthersServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                       Mark: '35F2EDA66821' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                       Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                       Mark: "35F2EDA66821" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                    Details: validator.errors.all()
                                  }
                                ],
@@ -1900,15 +1900,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', strUserName ),
-                   Mark: 'C11A63D5568C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The user %s not found in database", strUserName ),
+                   Mark: "C11A63D5568C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', strUserName ),
+                               Code: "ERROR_USER_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The user %s not found in database", strUserName ),
                                Details: null,
                              }
                            ],
@@ -1963,8 +1963,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2061,15 +2061,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_GET_USER',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user information' ),
-                   Mark: '49BC23FE5772' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_GET_USER",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to get the user information" ),
+                   Mark: "49BC23FE5772" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_GET_USER',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user information' ),
+                               Code: "ERROR_CANNOT_GET_USER",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to get the user information" ),
                                Details: null,
                              }
                            ],
@@ -2092,14 +2092,14 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_NOT_FOUND',
+                   Code: "ERROR_USER_NOT_FOUND",
                    Message: strMessage,
-                   Mark: 'C0A0710239A6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "C0A0710239A6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_NOT_FOUND',
+                               Code: "ERROR_USER_NOT_FOUND",
                                Message: strMessage,
                                Details: null,
                              }
@@ -2116,9 +2116,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'FCB0F3218AD0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "FCB0F3218AD0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -2160,9 +2160,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_USER',
-                   Message: await I18NManager.translate( strLanguage, 'Success get the user information.' ),
-                   Mark: '54CAE0BF0C38' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_USER",
+                   Message: await I18NManager.translate( strLanguage, "Success get the user information." ),
+                   Mark: "54CAE0BF0C38" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -2221,8 +2221,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2367,17 +2367,17 @@ export default class UserOthersServiceController {
 
     if ( by.Name ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with name %s not found', by.Name );
+      strResult = await I18NManager.translate( strLanguage, "The user group with name %s not found", by.Name );
 
     }
     else if ( by.Id ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not found', by.Id );
+      strResult = await I18NManager.translate( strLanguage, "The user group with id %s not found", by.Id );
 
     }
     else if ( by.ShortId ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not found', by.ShortId );
+      strResult = await I18NManager.translate( strLanguage, "The user group with short id %s not found", by.ShortId );
 
     }
 
@@ -2396,17 +2396,17 @@ export default class UserOthersServiceController {
 
     if ( by.Name ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user with name %s not found', by.Name );
+      strResult = await I18NManager.translate( strLanguage, "The user with name %s not found", by.Name );
 
     }
     else if ( by.Id ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user with id %s not found', by.Id );
+      strResult = await I18NManager.translate( strLanguage, "The user with id %s not found", by.Id );
 
     }
     else if ( by.ShortId ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user with short id %s not found', by.ShortId );
+      strResult = await I18NManager.translate( strLanguage, "The user with short id %s not found", by.ShortId );
 
     }
 
@@ -2937,9 +2937,9 @@ export default class UserOthersServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                         Code: "WARNING_DATA_LIMITED_TO_MAX",
+                         Message: await I18NManager.translate( strLanguage, "Data limited to the maximun of %s rows", intLimit ),
+                         Details: await I18NManager.translate( strLanguage, "To protect to server and client of large result set of data, the default maximun rows is %s, you must use \"offset\" and \"limit\" query parameters to paginate large result set of data.", intLimit )
                        }
                      );
 
@@ -2949,8 +2949,8 @@ export default class UserOthersServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not shown due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -3015,9 +3015,9 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH',
-                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
-                 Mark: 'C89386280047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH",
+                 Message: await I18NManager.translate( strLanguage, "Success search." ),
+                 Mark: "C89386280047" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -3072,8 +3072,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3268,8 +3268,8 @@ export default class UserOthersServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not counted due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not counted due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -3286,9 +3286,9 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH_COUNT',
-                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
-                 Mark: 'C89386280047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH_COUNT",
+                 Message: await I18NManager.translate( strLanguage, "Success search count." ),
+                 Mark: "C89386280047" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -3347,8 +3347,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3454,15 +3454,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "A27B33E165F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -3479,9 +3479,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '3D8CA79D0E51' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "3D8CA79D0E51" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3510,9 +3510,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Success get settings' ),
-                   Mark: '63AD7918CB3E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Success get settings" ),
+                   Mark: "63AD7918CB3E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -3571,8 +3571,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3678,15 +3678,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "A27B33E165F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -3703,9 +3703,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '565583BCF8EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "565583BCF8EB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3735,8 +3735,8 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                      Mark: "BA37B863BC6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: error.LogId,
                      IsError: true,
@@ -3757,16 +3757,16 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
+                     Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
                      Mark: "7AF91E5F4B19" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
-                                 Details: 'Method setConfigValueData return null' //error
+                                 Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
+                                 Details: "Method setConfigValueData return null" //error
                                }
                              ],
                      Warnings: [],
@@ -3779,9 +3779,9 @@ export default class UserOthersServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_SET_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Success set settings' ),
-                     Mark: '286871B2895A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_SET_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Success set settings" ),
+                     Mark: "286871B2895A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -3842,8 +3842,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3949,15 +3949,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: 'A27B33E165F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "A27B33E165F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -3974,9 +3974,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '8EF2F7BCEADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "8EF2F7BCEADB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -4022,9 +4022,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_ROUTES',
-                   Message: await I18NManager.translate( strLanguage, 'Success get routes' ),
-                   Mark: '29DB5C3384E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_ROUTES",
+                   Message: await I18NManager.translate( strLanguage, "Success get routes" ),
+                   Mark: "29DB5C3384E6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -4081,8 +4081,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -4189,15 +4189,15 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '67BBAF7CF958' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "67BBAF7CF958" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -4214,9 +4214,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '8A28319A3F79' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "8A28319A3F79" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -4250,9 +4250,9 @@ export default class UserOthersServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_ACTIONS',
-                   Message: await I18NManager.translate( strLanguage, 'Success get actions' ),
-                   Mark: '5F755F2C8169' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_ACTIONS",
+                   Message: await I18NManager.translate( strLanguage, "Success get actions" ),
+                   Mark: "5F755F2C8169" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -4309,8 +4309,8 @@ export default class UserOthersServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

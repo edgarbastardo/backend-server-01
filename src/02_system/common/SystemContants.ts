@@ -1827,59 +1827,109 @@ export default class SystemConstants {
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
                                                       };
 
-  static readonly _CONFIG_ENTRY_IM_Rooms_SCHEMA = "";
+  static readonly _CONFIG_ENTRY_IM_Server_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_IM_Rooms = {
-                                             Id: "e52433ea-307b-46a3-a629-a724acab23a1",
-                                             Scope: "system",
-                                             Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                             Category: "Instant Message",
-                                             Name: "system.instant.message.rooms",
-                                             Default: JSON.stringify(
-                                                                      {
-                                                                        "@__default__@":{
+  static readonly _CONFIG_ENTRY_IM_Server = {
+                                              Id: "98bf2878-f94d-4119-b64d-a96eeee0d8bf",
+                                              Scope: "system",
+                                              Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                              Category: "Instant Message",
+                                              Name: "system.instant.message.server",
+                                              Default: JSON.stringify(
+                                                                       {
 
-                                                                          "rooms": "#@@UserName@@#"
+                                                                         "server": {
 
-                                                                        }
-                                                                      }
-                                                                    ),
-                                             Label: "Configuration for instant message rooms auto join",
-                                             Description: "Configuration for instant message rooms auto join, can be sysUser.Id, sysUser.Name, sysUserGroup.Id, sysUserGroup.Name in the same order of priority",
-                                             AllowTagAccessR: "#Administrator#",
-                                             AllowTagAccessW: "#Administrator#",
-                                             Example: JSON.stringify(
-                                                                      {
-                                                                        "#Business_Managers#":{
+                                                                           "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URL || "",
+                                                                           "auth":{
+                                                                             "apiKey": "my_key"
+                                                                           }
 
-                                                                          "rooms": "#Business_Managers#,#CommonAdmin#"
+                                                                         },
 
-                                                                        },
-                                                                        "#System_Administrators#":{
+                                                                         "channels": {
 
-                                                                          "rooms": "#System_Administrators#,#CommonAdmin#"
+                                                                           "@__default__@":{
 
-                                                                        },
-                                                                        "#userexample01#": {
+                                                                             "denied": "",
+                                                                             "allowed": "*"
 
-                                                                          "rooms": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+                                                                           }
 
-                                                                        },
-                                                                        "#admin01@system.net#":{
+                                                                         }
 
-                                                                          "rooms": "#System_Administrators#,#CommonAdmin#,#Admin01#"
+                                                                       }
+                                                                     ),
+                                              Label: "Configuration for instant message server settings",
+                                              Description: "Configuration for instant message settings",
+                                              AllowTagAccessR: "#Administrator#",
+                                              AllowTagAccessW: "#Administrator#",
+                                              Example: JSON.stringify(
+                                                                       {
 
-                                                                        },
-                                                                        "@__default__@":{
+                                                                         "server": {
 
-                                                                          "rooms": "#@@UserName@@#"
+                                                                           "host": "http://localhost:9191/instant/message/server/kk/api/v1/callback",
+                                                                           "auth":{
 
-                                                                        }
-                                                                      }
-                                                                    ),
-                                             CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
-                                           };
+                                                                             "apiKey": "178fa7c2-bcdc-4051-9773-26b86f49307d"
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "channels": {
+
+                                                                           "#Business_Managers#":{
+
+                                                                             "denied": "",
+                                                                             "allowed": "#Business_Managers#,#Administrators#"
+
+                                                                           },
+                                                                           "#System_Administrators#":{
+
+                                                                             "denied": "",
+                                                                             "allowed": "#System_Administrators#,#Administrators#"
+
+                                                                           },
+                                                                           "#userexample01#": {
+
+                                                                            "denied": "",
+                                                                            "allowed": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+
+                                                                           },
+                                                                           "#userexample02#": {
+
+                                                                            "denied": "*",
+                                                                            "allowed": ""
+
+                                                                           },
+                                                                           "#userexample03#": {
+
+                                                                            "denied": "#My_Denied_Channel01#,#My_Denied_Channel02#",
+                                                                            "allowed": "*"
+
+                                                                           },
+                                                                           "#admin01@system.net#":{
+
+                                                                             "denied": "",
+                                                                             "allowed": "*"
+
+                                                                           },
+                                                                           "@__default__@":{
+
+                                                                             "denied": "",
+                                                                             "allowed": "#@@UserName@@#"
+
+                                                                           }
+
+                                                                         }
+
+                                                                       }
+                                                                     ),
+                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                              ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
+                                            };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -1905,7 +1955,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_User_Settings,
                                                SystemConstants._CONFIG_ENTRY_UserGroup_Settings,
                                                SystemConstants._CONFIG_ENTRY_Database_Log_Tables,
-                                               SystemConstants._CONFIG_ENTRY_IM_Rooms
+                                               SystemConstants._CONFIG_ENTRY_IM_Server
                                              ];
 
 }

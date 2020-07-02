@@ -1,11 +1,11 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
@@ -16,9 +16,9 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
 
-const debug = require( 'debug' )( 'UserDeleteServiceController' );
+const debug = require( "debug" )( "UserDeleteServiceController" );
 
 export default class UserDeleteServiceController {
 
@@ -86,15 +86,15 @@ export default class UserDeleteServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_DELETE_USER',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
-                   Mark: 'BA7F0A12AD3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_DELETE_USER",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user" ),
+                   Mark: "BA7F0A12AD3C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_DELETE_USER',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
+                               Code: "ERROR_CANNOT_DELETE_USER",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user" ),
                                Details: null,
                              }
                            ],
@@ -117,14 +117,14 @@ export default class UserDeleteServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_NOT_FOUND',
+                   Code: "ERROR_USER_NOT_FOUND",
                    Message: strMessage,
-                   Mark: '58A44EA21984' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "58A44EA21984" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_NOT_FOUND',
+                               Code: "ERROR_USER_NOT_FOUND",
                                Message: strMessage,
                                Details: null
                              }
@@ -141,9 +141,9 @@ export default class UserDeleteServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'D8666345BB41' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "D8666345BB41" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -163,15 +163,15 @@ export default class UserDeleteServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_USER_NOT_VALID',
-                   Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
-                   Mark: '3576DA16A5CA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_NOT_VALID",
+                   Message: await I18NManager.translate( strLanguage, "The user to delete cannot be yourself." ),
+                   Mark: "3576DA16A5CA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_NOT_VALID',
-                               Message: await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' ),
+                               Code: "ERROR_USER_NOT_VALID",
+                               Message: await I18NManager.translate( strLanguage, "The user to delete cannot be yourself." ),
                                Details: null
                              }
                            ],
@@ -187,15 +187,15 @@ export default class UserDeleteServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_DELETE_USER',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' ),
-                   Mark: '883398A57F61' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_DELETE_USER",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user. The user has #Administrator# role, but you not had." ),
+                   Mark: "883398A57F61" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_DELETE_USER',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you not had.' ),
+                               Code: "ERROR_CANNOT_DELETE_USER",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user. The user has #Administrator# role, but you not had." ),
                                Details: null,
                              }
                            ],
@@ -230,9 +230,9 @@ export default class UserDeleteServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: 'CC964294E67E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "CC964294E67E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -252,9 +252,9 @@ export default class UserDeleteServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_USER_DELETE',
-                     Message: await I18NManager.translate( strLanguage, 'Success user %s deleted.', sysUserInDB.Name ),
-                     Mark: 'BEF1D6D336E2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_USER_DELETE",
+                     Message: await I18NManager.translate( strLanguage, "Success user %s deleted.", sysUserInDB.Name ),
+                     Mark: "BEF1D6D336E2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -270,15 +270,15 @@ export default class UserDeleteServiceController {
 
           result = {
                      StatusCode: 500, //Ok
-                     Code: 'ERROR_USER_DELETE',
-                     Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
-                     Mark: '34335D14522F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_DELETE",
+                     Message: await I18NManager.translate( strLanguage, "Error in user delete." ),
+                     Mark: "34335D14522F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [
                                {
-                                 Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                 Message: 'Method deleteByModel return false',
+                                 Code: "ERROR_METHOD_DELETE_RETURN_FALSE",
+                                 Message: "Method deleteByModel return false",
                                  Details: null
                                }
                              ],
@@ -335,8 +335,8 @@ export default class UserDeleteServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

@@ -24,12 +24,12 @@ import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManag
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
 import NotificationManager from './02_system/common/managers/NotificationManager';
-import InstantMenssageManager from './02_system/common/managers/InstantMessageManager';
+//import InstantMenssageManager from './02_system/common/managers/InstantMessageManager';
 //import NotificationManager from './02_system/common/managers/NotificationManager';
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
 import SYSSystemEventLogService from './02_system/common/database/master/services/SYSSystemEventLogService';
-import PresenceManager from './02_system/common/managers/PresenceManager';
+//import PresenceManager from './02_system/common/managers/PresenceManager';
 
 let debug = null; //require( 'debug' )( 'server' );
 
@@ -582,9 +582,9 @@ export default async function main() {
     await I18NManager.create( {},
                               LoggerManager.createMainLogger );
 
-    await InstantMenssageManager.loadRules( LoggerManager.mainLoggerInstance );
+    //await InstantMenssageManager.loadRules( LoggerManager.mainLoggerInstance );
 
-    await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
+    //await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
 
     if ( cluster.isMaster ) {
 

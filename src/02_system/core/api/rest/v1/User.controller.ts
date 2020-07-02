@@ -1,19 +1,19 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   //Router,
   Request,
   Response,
   //NextFunction
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../../common/CommonConstants';
+import CommonConstants from "../../../../common/CommonConstants";
 
-import CommonUtilities from '../../../../common/CommonUtilities';
+import CommonUtilities from "../../../../common/CommonUtilities";
 import SystemUtilities from "../../../../common/SystemUtilities";
 
-import { ApolloError } from 'apollo-server-express';
-import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
+import { ApolloError } from "apollo-server-express";
+import SYSRouteService from "../../../../common/database/master/services/SYSRouteService";
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -30,25 +30,25 @@ import {
 import {
   //injectable,
   inject
-} from 'inversify';
-//import SecurityServiceController from '../../services/SecurityService.controller';
-import UserOthersServiceController from '../../../services/v1/UserOthersService.controller';
+} from "inversify";
+//import SecurityServiceController from "../../services/SecurityService.controller";
+import UserOthersServiceController from "../../../services/v1/UserOthersService.controller";
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
-import I18NManager from '../../../../common/managers/I18Manager';
+import I18NManager from "../../../../common/managers/I18Manager";
 
-import UserCreateServiceController from '../../../services/v1/UserCreateService.controller';
-import UserUpdateServiceController from '../../../services/v1/UserUpdateService.controller';
-import UserDeleteServiceController from '../../../services/v1/UserDeleteService.controller';
-import UserBulkServiceController from '../../../services/v1/UserBulkService.controller';
-import UserPasswordServiceController from '../../../services/v1/UserPasswordService.controller';
-import UserSignupServiceController from '../../../services/v1/UserSignupService.controller';
-import UserEMailServiceController from '../../../services/v1/UserEMailService.controller';
-import UserPhoneServiceController from '../../../services/v1/UserPhoneService.controller';
-import UserDeviceServiceController from '../../../services/v1/UserDeviceService.controller';
-import UserPushServiceController from '../../../services/v1/UserPushService.controller';
-import UserInstantMessageServiceController from '../../../services/v1/UserInstantMessageService.controller';
+import UserCreateServiceController from "../../../services/v1/UserCreateService.controller";
+import UserUpdateServiceController from "../../../services/v1/UserUpdateService.controller";
+import UserDeleteServiceController from "../../../services/v1/UserDeleteService.controller";
+import UserBulkServiceController from "../../../services/v1/UserBulkService.controller";
+import UserPasswordServiceController from "../../../services/v1/UserPasswordService.controller";
+import UserSignupServiceController from "../../../services/v1/UserSignupService.controller";
+import UserEMailServiceController from "../../../services/v1/UserEMailService.controller";
+import UserPhoneServiceController from "../../../services/v1/UserPhoneService.controller";
+import UserDeviceServiceController from "../../../services/v1/UserDeviceService.controller";
+import UserPushServiceController from "../../../services/v1/UserPushService.controller";
+import UserInstantMessageServiceController from "../../../services/v1/UserInstantMessageService.controller";
 
-const debug = require( 'debug' )( 'User.controller' );
+const debug = require( "debug" )( "User.controller" );
 
 //@injectable()
 @controller( process.env.SERVER_ROOT_PATH + UserController._BASE_PATH )
@@ -102,11 +102,7 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/push/message/test", Action: "v1.system.user.push.message.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send push test message" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
-                                  //{ Path: UserController._BASE_PATH + "/instant/message", Action: "v1.system.user.instant.message.send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant message to another live connected user" },
-                                  //{ Path: UserController._BASE_PATH + "/presence/room", Action: "v1.system.user.presence.room.get", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list of room user session" },
-                                  //{ Path: UserController._BASE_PATH + "/presence/room/count", Action: "v1.system.user.presence.room.get.count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence room list count of current user session" },
-                                  //{ Path: UserController._BASE_PATH + "/presence", Action: "v1.system.user.presence.list", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list of user connected" },
-                                  //{ Path: UserController._BASE_PATH + "/presence/count", Action: "v1.system.user.presence.list.count", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get presence list count of user connected" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/server/callback", Action: "v1.system.user.instant.message.server.callback", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Callback from instant message server action: connect,disconnect,join,leave,send" },
                                 ]
 
   _controllerLogger = null;
@@ -144,15 +140,15 @@ export default class UserController {
 
           result = {
                      StatusCode: 401, //Unauthorized
-                     Code: 'ERROR_USER_CHANGE_PASSWORD_REQUIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user must be change the password before to continue' ),
-                     Mark: '829072DD0A36' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_CHANGE_PASSWORD_REQUIRED",
+                     Message: await I18NManager.translate( strLanguage, "The user must be change the password before to continue" ),
+                     Mark: "829072DD0A36" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_CHANGE_PASSWORD_REQUIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user must be change the password before to continue' ),
+                                 Code: "ERROR_USER_CHANGE_PASSWORD_REQUIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The user must be change the password before to continue" ),
                                  Details: null
                                }
                              ],
@@ -166,15 +162,15 @@ export default class UserController {
 
           result = {
                      StatusCode: 401, //Unauthorized
-                     Code: 'ERROR_USER_PASSWORD_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The user must be change the password to before continue' ),
-                     Mark: 'B5C138D68DF9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_PASSWORD_EXPIRED",
+                     Message: await I18NManager.translate( strLanguage, "The user must be change the password to before continue" ),
+                     Mark: "B5C138D68DF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_PASSWORD_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The user must be change the password to before continue' ),
+                                 Code: "ERROR_USER_PASSWORD_EXPIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The user must be change the password to before continue" ),
                                  Details: null
                                }
                              ],
@@ -201,7 +197,7 @@ export default class UserController {
 
           const extensions = {
                                StatusCode: 401, //Unauthorized
-                               Mark: 'BA10403FE3D1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Mark: "BA10403FE3D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: SystemUtilities.getUUIDv4()
                              };
 
@@ -216,7 +212,7 @@ export default class UserController {
 
           const extensions = {
                                StatusCode: 401, //Unauthorized
-                               Mark: 'B019A967D26A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Mark: "B019A967D26A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: SystemUtilities.getUUIDv4()
                              };
 
@@ -854,24 +850,24 @@ export default class UserController {
 
   }
 
-  /*
   @httpPost(
-             "/instant/message",
+             "/instant/message/server/callback",
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated
            )
-  async createInstantMessage( request: Request, response: Response ) {
+  async instantMessageServerCallback( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await UserInstantMessageServiceController.createInstantMessage( request,
-                                                                                   null,
-                                                                                   this._controllerLogger || ( context ? context.logger : null ) );
+    const result = await UserInstantMessageServiceController.instantMessageServerCallback( request,
+                                                                                           null,
+                                                                                           this._controllerLogger || ( context ? context.logger : null ) );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
+  /*
   @httpGet(
             "/presence/room",
             MiddlewareManager.middlewareSetContext,

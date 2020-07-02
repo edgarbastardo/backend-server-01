@@ -1,16 +1,16 @@
-import fs from 'fs';
-//import { promises as fsPromises } from 'fs';
+import fs from "fs";
+//import { promises as fsPromises } from "fs";
 //import os from "os";
-import path from 'path';
-//import appRoot from 'app-root-path';
-import cluster from 'cluster';
+import path from "path";
+//import appRoot from "app-root-path";
+import cluster from "cluster";
 
 import CommonConstants from "../CommonConstants";
 
 import SystemUtilities from "../SystemUtilities";
 import CommonUtilities from "../CommonUtilities";
 
-const debug = require( 'debug' )( 'ApplicationServerTaskManager' );
+const debug = require( "debug" )( "ApplicationServerTaskManager" );
 
 export default class ApplicationServerTaskManager {
 
@@ -24,7 +24,7 @@ export default class ApplicationServerTaskManager {
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
-                      .filter( file => file.indexOf( '.' ) !== 0 && ( file.slice( -3 ) === '.js' || file.slice( -3 ) === '.ts' ) );
+                      .filter( file => file.indexOf( "." ) !== 0 && ( file.slice( -3 ) === ".js" || file.slice( -3 ) === ".ts" ) );
 
       const dirs = fs.readdirSync( directory )
                      .filter( file => fs.lstatSync( path.join( directory, file ) ).isDirectory() );

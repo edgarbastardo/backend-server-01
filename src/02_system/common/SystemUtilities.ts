@@ -1,29 +1,29 @@
 import crypto from "crypto";
-import fs from 'fs'; //Load the filesystem module
-import path from 'path';
+import fs from "fs"; //Load the filesystem module
+import path from "path";
 import os from "os";
 import cluster from "cluster";
 
 import glob from "glob";
 
 import moment, { Moment } from "moment-timezone";
-import XXHash from 'xxhashjs';
+import XXHash from "xxhashjs";
 //import  from "moment-timezone";
-import uuidv4 from 'uuid/v4';
-//import Hashes from 'jshashes';
-import crc from 'node-crc';
-import { CRC32Stream } from 'crc32-stream';
-import readChunk from 'read-chunk';
-import fileType from 'file-type';
+import uuidv4 from "uuid/v4";
+//import Hashes from "jshashes";
+import crc from "node-crc";
+import { CRC32Stream } from "crc32-stream";
+import readChunk from "read-chunk";
+import fileType from "file-type";
 //import { loggers } from "winston";
 
-import { UAParser } from 'ua-parser-js';
+import { UAParser } from "ua-parser-js";
 
-import archiver, { ArchiverError } from 'archiver';
+import archiver, { ArchiverError } from "archiver";
 
-import NodeRSA from 'node-rsa';
+import NodeRSA from "node-rsa";
 
-import Validator from 'validatorjs';
+import Validator from "validatorjs";
 
 import { Random } from "random-js";
 
@@ -42,7 +42,7 @@ import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
 
-const debug = require( 'debug' )( 'SystemUtilities' );
+const debug = require( "debug" )( "SystemUtilities" );
 
 export default class SystemUtilities {
 
@@ -478,7 +478,7 @@ export default class SystemUtilities {
       }
       else if ( intAlgorimts === 2 ) {
 
-        strResult = crc.crc32( Buffer.from( strToHash, 'utf8' ) ).toString( 'hex' ); //Hashes.CRC32( strToHash ).toString( 16 );
+        strResult = crc.crc32( Buffer.from( strToHash, "utf8" ) ).toString( "hex" ); //Hashes.CRC32( strToHash ).toString( 16 );
 
       }
       else {
@@ -978,7 +978,7 @@ export default class SystemUtilities {
         if ( result &&
              !result.UserGroupName ) {
 
-          let debugMark = debug.extend( 'AA5A6DE536DF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          let debugMark = debug.extend( "AA5A6DE536DF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
 
         }
@@ -1192,7 +1192,7 @@ export default class SystemUtilities {
 
           if ( !userSessionStatus.UserGroupName ) {
 
-            let debugMark = debug.extend( 'E9008B789BF0' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+            let debugMark = debug.extend( "E9008B789BF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
             debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
 
           }
@@ -1209,37 +1209,37 @@ export default class SystemUtilities {
 
           if ( userSessionStatus.BinaryDataToken !== undefined ) {
 
-            dataToWriteToDB[ 'BinaryDataToken' ] = userSessionStatus.BinaryDataToken;
+            dataToWriteToDB[ "BinaryDataToken" ] = userSessionStatus.BinaryDataToken;
 
           }
 
           if ( userSessionStatus.SocketToken !== undefined ) {
 
-            dataToWriteToDB[ 'SocketToken' ] = userSessionStatus.SocketToken;
+            dataToWriteToDB[ "SocketToken" ] = userSessionStatus.SocketToken;
 
           }
 
           if ( userSessionStatus.Tag !== undefined ) {
 
-            dataToWriteToDB[ 'Tag' ] = userSessionStatus.Tag;
+            dataToWriteToDB[ "Tag" ] = userSessionStatus.Tag;
 
           }
 
           if ( userSessionStatus.ExtraData !== undefined ) {
 
-            dataToWriteToDB[ 'ExtraData' ] = userSessionStatus.ExtraData;
+            dataToWriteToDB[ "ExtraData" ] = userSessionStatus.ExtraData;
 
           }
 
           if ( userSessionStatus.LoggedOutBy !== undefined ) {
 
-            dataToWriteToDB[ 'LoggedOutBy' ] = userSessionStatus.LoggedOutBy;
+            dataToWriteToDB[ "LoggedOutBy" ] = userSessionStatus.LoggedOutBy;
 
           }
 
           if ( userSessionStatus.LoggedOutAt !== undefined ) {
 
-            dataToWriteToDB[ 'LoggedOutAt' ] = userSessionStatus.LoggedOutAt;
+            dataToWriteToDB[ "LoggedOutAt" ] = userSessionStatus.LoggedOutAt;
 
           }
 
@@ -1708,7 +1708,7 @@ export default class SystemUtilities {
                                "markdown": "md",
                              };
 
-        const mime = require( 'mime' );
+        const mime = require( "mime" );
 
         let strExtension = mime.extension( strDefaultMimeType );
 
@@ -1719,8 +1719,8 @@ export default class SystemUtilities {
         }
 
         result = {
-                   ext: strExtension ? strExtension : 'unknown',
-                   mime: strDefaultMimeType ? strDefaultMimeType : 'unknown'
+                   ext: strExtension ? strExtension : "unknown",
+                   mime: strDefaultMimeType ? strDefaultMimeType : "unknown"
                  };
 
       }
@@ -1769,7 +1769,7 @@ export default class SystemUtilities {
                        logger: any ): Promise<boolean> {
 
     const archive = archiver(
-                              'zip',
+                              "zip",
                               {
                                 zlib: {
                                         level: 9
@@ -1782,7 +1782,7 @@ export default class SystemUtilities {
 
       const strPath = path.basename( strSource );
 
-      archive.directory( strSource, strPath ).on( 'error',
+      archive.directory( strSource, strPath ).on( "error",
                                                   ( error: ArchiverError ) => {
 
                                                     const strMark = "C0709DD4C024" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
@@ -1804,7 +1804,7 @@ export default class SystemUtilities {
                                                 )
                                               .pipe( stream );
 
-      stream.on( 'close', () => resolve( true ) );
+      stream.on( "close", () => resolve( true ) );
 
       archive.finalize();
 
@@ -2102,7 +2102,7 @@ export default class SystemUtilities {
       if ( instance.rawAttributes[ "ShortId" ] &&
            instance.rawAttributes[ "Id" ] &&
            ( !instance.ShortId ||
-             instance.ShortId === '0' ) ) {
+             instance.ShortId === "0" ) ) {
 
         instance.ShortId = SystemUtilities.hashString( instance.Id,
                                                        2,
@@ -2696,7 +2696,7 @@ export default class SystemUtilities {
     try {
 
       Validator.register(
-                          'emailList',
+                          "emailList",
                           function( value: any, requirement, attribute ) {
 
                             let bResult: boolean;
@@ -2720,21 +2720,21 @@ export default class SystemUtilities {
                             return bResult;
 
                           },
-                          'The :attribute is not in the format of list user1@domain.com, user2@domain.com or user1@domain.com.'
+                          "The :attribute is not in the format of list user1@domain.com, user2@domain.com or user1@domain.com."
                         );
 
       Validator.register(
-                          'phoneUS',
+                          "phoneUS",
                           function( value: any, requirement, attribute ) {
 
                             return value.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); //  /^\d{1-3}-\d{3}-\d{3}-\d{4}$/ );
 
                           },
-                          'The :attribute phone number is not in the format X-XXX-XXX-XXXX.'
+                          "The :attribute phone number is not in the format X-XXX-XXX-XXXX."
                         );
 
       Validator.register(
-                          'phoneUSList',
+                          "phoneUSList",
                           function( value: any, requirement, attribute ) {
 
                             let bResult: boolean;
@@ -2758,17 +2758,17 @@ export default class SystemUtilities {
                             return bResult;
 
                           },
-                          'The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX.'
+                          "The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX."
                         );
 
       Validator.register(
-                          'dateInFormat01',
+                          "dateInFormat01",
                           function( value: any, requirement, attribute ) {
 
                             return CommonUtilities.isValidDateInFormat01( value );
 
                           },
-                          'The :attribute is not in the format YYYY-MM-DD and valid date value.'
+                          "The :attribute is not in the format YYYY-MM-DD and valid date value."
                         );
 
       if ( registerCallback ) {
@@ -3111,7 +3111,7 @@ export default class SystemUtilities {
       strResult = await new Promise<string>( ( resolve, reject ) => {
 
         // Algorithm depends on availability of OpenSSL on platform
-        // Another algorithms: 'sha1', 'md5', 'sha256', 'sha512' ...
+        // Another algorithms: "sha1", "md5", "sha256", "sha512" ...
         let checkSum = strAlgorithm !== "crc32" ? crypto.createHash( strAlgorithm ): new CRC32Stream();
 
         try {
@@ -3120,7 +3120,7 @@ export default class SystemUtilities {
 
           if ( strAlgorithm !== "crc32" ) {
 
-            readStream.on( 'data', function ( data: any ) {
+            readStream.on( "data", function ( data: any ) {
 
               checkSum.update( data )
 
@@ -3134,9 +3134,9 @@ export default class SystemUtilities {
           }
 
           // making digest
-          readStream.on( 'end', function () {
+          readStream.on( "end", function () {
 
-            const strHash = checkSum.digest( 'hex' );
+            const strHash = checkSum.digest( "hex" );
 
             if ( strAlgorithm === "crc32" ) {
 

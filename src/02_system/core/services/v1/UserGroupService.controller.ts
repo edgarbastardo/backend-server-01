@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 import {
@@ -6,29 +6,29 @@ import {
   Request,
   //Response,
   //NextFunction
-} from 'express';
+} from "express";
 
-//import bcrypt from 'bcrypt';
+//import bcrypt from "bcrypt";
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../common/SystemContants";
-import SystemConstants, { ICheckUserGroupRoles } from '../../../common/SystemContants';
+import SystemConstants, { ICheckUserGroupRoles } from "../../../common/SystemContants";
 import CommonConstants from "../../../common/CommonConstants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
-import DBConnectionManager from '../../../common/managers/DBConnectionManager';
+import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import I18NManager from "../../../common/managers/I18Manager";
 
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSConfigValueDataService from '../../../common/database/master/services/SYSConfigValueDataService';
+import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
 
-import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
-const debug = require( 'debug' )( 'UserGroupServiceController' );
+const debug = require( "debug" )( "UserGroupServiceController" );
 
 export default class UserGroupServiceController {
 
@@ -94,15 +94,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_GET_USER_GROUP',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group information' ),
-                   Mark: '5A30D29E0DB5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_GET_USER_GROUP",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to get the user group information" ),
+                   Mark: "5A30D29E0DB5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_GET_USER_GROUP',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group information' ),
+                               Code: "ERROR_CANNOT_GET_USER_GROUP",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to get the user group information" ),
                                Details: null,
                              }
                            ],
@@ -125,14 +125,14 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                   Code: "ERROR_USER_GROUP_NOT_FOUND",
                    Message: strMessage,
-                   Mark: '5A30D29E0DB5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "5A30D29E0DB5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                               Code: "ERROR_USER_GROUP_NOT_FOUND",
                                Message: strMessage,
                                Details: null,
                              }
@@ -149,9 +149,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '4C083EAC0B54' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "4C083EAC0B54" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -193,9 +193,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_USER_GROUP',
-                   Message: await I18NManager.translate( strLanguage, 'Success get the user group information.' ),
-                   Mark: '0A7F78304087' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_USER_GROUP",
+                   Message: await I18NManager.translate( strLanguage, "Success get the user group information." ),
+                   Mark: "0A7F78304087" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -254,8 +254,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -303,17 +303,17 @@ export default class UserGroupServiceController {
 
     if ( by.Name ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with name %s not found', by.Name );
+      strResult = await I18NManager.translate( strLanguage, "The user group with name %s not found", by.Name );
 
     }
     else if ( by.Id ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with id %s not found', by.Id );
+      strResult = await I18NManager.translate( strLanguage, "The user group with id %s not found", by.Id );
 
     }
     else if ( by.ShortId ) {
 
-      strResult = await I18NManager.translate( strLanguage, 'The user group with short id %s not found', by.ShortId );
+      strResult = await I18NManager.translate( strLanguage, "The user group with short id %s not found", by.ShortId );
 
     }
 
@@ -538,9 +538,9 @@ export default class UserGroupServiceController {
       let sysUserGroupInDB: SYSUserGroup = null;
 
       let userRules = {
-                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                        ExpireAt: [ 'present', 'date' ],
-                        Business: [ 'present' ],
+                        Name: [ "required", "min:3", "regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g" ],
+                        ExpireAt: [ "present", "date" ],
+                        Business: [ "present" ],
                       };
 
       let validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -595,15 +595,15 @@ export default class UserGroupServiceController {
 
             result = {
                        StatusCode: 403, //Forbidden
-                       Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                       Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user group' ),
-                       Mark: '547980753A97' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_CANNOT_CREATE_USER_GROUP",
+                       Message: await I18NManager.translate( strLanguage, "Not allowed to create the user group" ),
+                       Mark: "547980753A97" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_CANNOT_CREATE_USER_GROUP',
-                                   Message: await I18NManager.translate( strLanguage, 'Not allowed to create the user group' ),
+                                   Code: "ERROR_CANNOT_CREATE_USER_GROUP",
+                                   Message: await I18NManager.translate( strLanguage, "Not allowed to create the user group" ),
                                    Details: null,
                                  }
                                ],
@@ -655,9 +655,9 @@ export default class UserGroupServiceController {
 
               result = {
                          StatusCode: 500, //Internal server error
-                         Code: 'ERROR_UNEXPECTED',
-                         Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                         Mark: '70055D82C74F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                         Mark: "70055D82C74F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -700,9 +700,9 @@ export default class UserGroupServiceController {
               //ANCHOR success user create
               result = {
                          StatusCode: 200, //Ok
-                         Code: 'SUCCESS_USER_GROUP_CREATE',
-                         Message: await I18NManager.translate( strLanguage, 'Success user group create.' ),
-                         Mark: 'E557D1EF4D99' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "SUCCESS_USER_GROUP_CREATE",
+                         Message: await I18NManager.translate( strLanguage, "Success user group create." ),
+                         Mark: "E557D1EF4D99" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,
                          Errors: [],
@@ -726,9 +726,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: 'FB0C5D59650D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "FB0C5D59650D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -748,15 +748,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_GROUP_NAME_ALREADY_EXISTS',
-                     Message: await I18NManager.translate( strLanguage, 'The user group name %s already exists.', request.body.Name ),
-                     Mark: '7F177E2096F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
+                     Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
+                     Mark: "7F177E2096F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_NAME_ALREADY_EXISTS',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group name %s already exists.', request.body.Name ),
+                                 Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
+                                 Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
                                  Details: validator.errors.all()
                                }
                              ],
@@ -772,15 +772,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                   Mark: '7FF89F88B764' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "7FF89F88B764" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                Details: validator.errors.all()
                              }
                            ],
@@ -835,8 +835,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -967,11 +967,11 @@ export default class UserGroupServiceController {
       let sysUserGroupInDB: SYSUserGroup = null;
 
       let userRules = {
-                        Id: [ 'required', 'string', 'min:36' ],
-                        ShortId: [ 'present', 'string', 'min:8' ],
-                        Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                        ExpireAt: [ 'present', 'date' ],
-                        Business: [ 'present' ],
+                        Id: [ "required", "string", "min:36" ],
+                        ShortId: [ "present", "string", "min:8" ],
+                        Name: [ "required", "min:3", "regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g" ],
+                        ExpireAt: [ "present", "date" ],
+                        Business: [ "present" ],
                       };
 
       const validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -1025,15 +1025,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group' ),
-                     Mark: '1331F50D4BEB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to update the user group" ),
+                     Mark: "1331F50D4BEB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group' ),
+                                 Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to update the user group" ),
                                  Details: null,
                                }
                              ],
@@ -1056,14 +1056,14 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                     Code: "ERROR_USER_GROUP_NOT_FOUND",
                      Message: strMessage,
-                     Mark: '6BAEBBAF4ADB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "6BAEBBAF4ADB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                                 Code: "ERROR_USER_GROUP_NOT_FOUND",
                                  Message: strMessage,
                                  Details: null
                                }
@@ -1080,9 +1080,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '685C3CF8A9A6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "685C3CF8A9A6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1102,15 +1102,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_GROUP_NOT_VALID',
-                     Message: await I18NManager.translate( strLanguage, 'The user group to update cannot be your user group.' ),
-                     Mark: '823DBA64229F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_NOT_VALID",
+                     Message: await I18NManager.translate( strLanguage, "The user group to update cannot be your user group." ),
+                     Mark: "823DBA64229F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_NOT_VALID',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group to update cannot be your user group.' ),
+                                 Code: "ERROR_USER_GROUP_NOT_VALID",
+                                 Message: await I18NManager.translate( strLanguage, "The user group to update cannot be your user group." ),
                                  Details: null
                                }
                              ],
@@ -1128,15 +1128,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_USER_GROUP_NAME_ALREADY_EXISTS',
-                     Message: await I18NManager.translate( strLanguage, 'The user group name %s already exists.', request.body.Name ),
-                     Mark: '24091CE72346' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
+                     Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
+                     Mark: "24091CE72346" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_GROUP_NAME_ALREADY_EXISTS',
-                                 Message: await I18NManager.translate( strLanguage, 'The user group name %s already exists.', request.body.Name ),
+                                 Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
+                                 Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
                                  Details: validator.errors.all()
                                }
                              ],
@@ -1152,15 +1152,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 403, //Forbidden
-                     Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group. The user group has #Administrator# role, but you not had.' ),
-                     Mark: '8CD2C6F786E7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to update the user group. The user group has #Administrator# role, but you not had." ),
+                     Mark: "8CD2C6F786E7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group. The user group has #Administrator# role, but you not had.' ),
+                                 Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to update the user group. The user group has #Administrator# role, but you not had." ),
                                  Details: null,
                                }
                              ],
@@ -1239,9 +1239,9 @@ export default class UserGroupServiceController {
 
             result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: 'D1F138C94222' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                       Mark: "D1F138C94222" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -1284,9 +1284,9 @@ export default class UserGroupServiceController {
             //ANCHOR success user update
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_USER_GROUP_UPDATE',
-                       Message: await I18NManager.translate( strLanguage, 'Success user group update.' ),
-                       Mark: '8F44F8676883' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_USER_GROUP_UPDATE",
+                       Message: await I18NManager.translate( strLanguage, "Success user group update." ),
+                       Mark: "8F44F8676883" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -1308,15 +1308,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                   Mark: '7968E1B166AB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "7968E1B166AB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                Details: validator.errors.all()
                              }
                            ],
@@ -1371,8 +1371,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1465,8 +1465,8 @@ export default class UserGroupServiceController {
                                    Id: bulkUserData.Id,
                                    ShortId: bulkUserData.ShortId,
                                    Name: bulkUserData.Name,
-                                   Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                                   Mark: 'FB72EC2E1F34' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_USER_GROUP_NOT_FOUND",
+                                   Mark: "FB72EC2E1F34" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    Message: strMessage,
                                    Details: null,
                                  }
@@ -1483,7 +1483,7 @@ export default class UserGroupServiceController {
                                    ShortId: bulkUserData.ShortId,
                                    Name: bulkUserData.Name,
                                    Code: error.name,
-                                   Mark: 'ADC6F3D48555' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Mark: "ADC6F3D48555" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    Message: error.message,
                                    Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
@@ -1496,12 +1496,12 @@ export default class UserGroupServiceController {
 
             if ( strBulkOperation === "deleteUserGroup" ) {
 
-              strMessage = await I18NManager.translate( strLanguage, 'The user group to delete cannot be your user group.' );
+              strMessage = await I18NManager.translate( strLanguage, "The user group to delete cannot be your user group." );
 
             }
             else {
 
-              strMessage = await I18NManager.translate( strLanguage, 'The user group to update cannot be your user group.' );
+              strMessage = await I18NManager.translate( strLanguage, "The user group to update cannot be your user group." );
 
             }
 
@@ -1510,8 +1510,8 @@ export default class UserGroupServiceController {
                                   Id: sysUserGroupInDB.Id,
                                   ShortId: sysUserGroupInDB.ShortId,
                                   Name: sysUserGroupInDB.Name,
-                                  Code: 'ERROR_USER_GROUP_NOT_VALID',
-                                  Mark: '57BF4E4741A1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Code: "ERROR_USER_GROUP_NOT_VALID",
+                                  Mark: "57BF4E4741A1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                   Message: strMessage,
                                   Details: null
                                 }
@@ -1527,14 +1527,14 @@ export default class UserGroupServiceController {
 
             if ( strBulkOperation === "deleteUser" ) {
 
-              strCode = 'ERROR_CANNOT_DELETE_USER_GROUP';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to delete the user group. The user has #Administrator# role, but you NOT has.' );
+              strCode = "ERROR_CANNOT_DELETE_USER_GROUP";
+              strMessage = await I18NManager.translate( strLanguage, "Not allowed to delete the user group. The user has #Administrator# role, but you NOT has." );
 
             }
             else {
 
-              strCode = 'ERROR_CANNOT_UPDATE_USER_GROUP';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to update the user group. The user has #Administrator# role, but you NOT has.' );
+              strCode = "ERROR_CANNOT_UPDATE_USER_GROUP";
+              strMessage = await I18NManager.translate( strLanguage, "Not allowed to update the user group. The user has #Administrator# role, but you NOT has." );
 
             }
 
@@ -1545,7 +1545,7 @@ export default class UserGroupServiceController {
                                   Name: sysUserGroupInDB.Name,
                                   Code: strCode,
                                   Message: strMessage,
-                                  Mark: '55456312E9BD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Mark: "55456312E9BD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                   Details: null,
                                 }
                               );
@@ -1576,9 +1576,9 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_CANNOT_DELETE_USER_GROUP',
-                                      Mark: 'FA514C304D8C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group' ),
+                                      Code: "ERROR_CANNOT_DELETE_USER_GROUP",
+                                      Mark: "FA514C304D8C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user group" ),
                                       Details: null
                                     }
                                   );
@@ -1591,9 +1591,9 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                                      Mark: 'ED1C0AAB4ADE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user group' ),
+                                      Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                                      Mark: "ED1C0AAB4ADE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to update the user group" ),
                                       Details: null
                                     }
                                   );
@@ -1616,9 +1616,9 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_UNEXPECTED',
-                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                      Mark: '809FD855B3CB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_UNEXPECTED",
+                                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                      Mark: "809FD855B3CB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                     }
                                   );
@@ -1632,9 +1632,9 @@ export default class UserGroupServiceController {
                                     Id: sysUserGroupInDB.Id,
                                     ShortId: sysUserGroupInDB.ShortId,
                                     Name: sysUserGroupInDB.Name,
-                                    Code: 'SUCCESS_USER_GROUP_DELETE',
-                                    Message: await I18NManager.translate( strLanguage, 'Success user group delete.' ),
-                                    Mark: '2F1C3D99C896' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Code: "SUCCESS_USER_GROUP_DELETE",
+                                    Message: await I18NManager.translate( strLanguage, "Success user group delete." ),
+                                    Mark: "2F1C3D99C896" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     Details: null
                                   }
                                 );
@@ -1647,9 +1647,9 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_USER_GROUP_DELETE',
-                                      Message: await I18NManager.translate( strLanguage, 'Error in user group delete.' ),
-                                      Mark: 'BEE0EA50D757' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_USER_GROUP_DELETE",
+                                      Message: await I18NManager.translate( strLanguage, "Error in user group delete." ),
+                                      Mark: "BEE0EA50D757" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: "Method deleteByModel return false"
                                     }
                                   );
@@ -1687,9 +1687,9 @@ export default class UserGroupServiceController {
                                       Id: sysUserGroupInDB.Id,
                                       ShortId: sysUserGroupInDB.ShortId,
                                       Name: sysUserGroupInDB.Name,
-                                      Code: 'ERROR_UNEXPECTED',
-                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                      Mark: '1F3070410157' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_UNEXPECTED",
+                                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                      Mark: "1F3070410157" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                     }
                                   );
@@ -1702,9 +1702,9 @@ export default class UserGroupServiceController {
                                     Id: sysUserGroupInDB.Id,
                                     ShortId: sysUserGroupInDB.ShortId,
                                     Name: sysUserGroupInDB.Name,
-                                    Code: 'SUCCESS_USER_GROUP_UPDATE',
-                                    Message: await I18NManager.translate( strLanguage, 'Success user group update.' ),
-                                    Mark: '88A17CFE9558' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Code: "SUCCESS_USER_GROUP_UPDATE",
+                                    Message: await I18NManager.translate( strLanguage, "Success user group update." ),
+                                    Mark: "88A17CFE9558" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     Details: {
                                                DisabledBy: sysUserGroupInDB.DisabledBy,
                                                DisabledAt: sysUserGroupInDB.DisabledAt
@@ -1726,9 +1726,9 @@ export default class UserGroupServiceController {
                               Id: bulkUserData.Id,
                               ShortId: bulkUserData.ShortId,
                               Name: bulkUserData.Name,
-                              Code: 'ERROR_UNEXPECTED',
-                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                              Mark: '348D1629BE0B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                              Code: "ERROR_UNEXPECTED",
+                              Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                              Mark: "348D1629BE0B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                               Details: await SystemUtilities.processErrorDetails( error ) //error
                             }
                           );
@@ -1764,8 +1764,8 @@ export default class UserGroupServiceController {
 
       result.errors.push(
                           {
-                            Code: 'ERROR_UNEXPECTED',
-                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                            Code: "ERROR_UNEXPECTED",
+                            Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                             Mark: strMark,
                             Details: await SystemUtilities.processErrorDetails( error ) //error
                           }
@@ -1820,23 +1820,23 @@ export default class UserGroupServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_GROUP_DISABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL user groups' );
+        strCode = "SUCCESS_BULK_USER_GROUP_DISABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success disable ALL user groups" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_GROUP_DISABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the user groups. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_GROUP_DISABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot disable the user groups. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL user groups has been disabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL user groups has been disabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -1845,7 +1845,7 @@ export default class UserGroupServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: 'F085BD6A75DB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "F085BD6A75DB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -1900,8 +1900,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1981,23 +1981,23 @@ export default class UserGroupServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_GROUP_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL user groups' );
+        strCode = "SUCCESS_BULK_USER_GROUP_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success enable ALL user groups" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_GROUP_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the user groups. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_GROUP_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot enable the user groups. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL user groups has been enabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL user groups has been enabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -2006,7 +2006,7 @@ export default class UserGroupServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: '99DA730C8F5C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "99DA730C8F5C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -2061,8 +2061,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2326,15 +2326,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_DELETE_USER_GROUP',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group' ),
-                   Mark: '3E8140B91207' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_DELETE_USER_GROUP",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user group" ),
+                   Mark: "3E8140B91207" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_DELETE_USER_GROUP',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group' ),
+                               Code: "ERROR_CANNOT_DELETE_USER_GROUP",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user group" ),
                                Details: null,
                              }
                            ],
@@ -2354,14 +2354,14 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                   Code: "ERROR_USER_GROUP_NOT_FOUND",
                    Message: strMessage,
-                   Mark: '58A44EA21984' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "58A44EA21984" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_GROUP_NOT_FOUND',
+                               Code: "ERROR_USER_GROUP_NOT_FOUND",
                                Message: strMessage,
                                Details: null
                              }
@@ -2378,9 +2378,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'F82A2A732532' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "F82A2A732532" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -2402,15 +2402,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 400, //Bad Request
-                   Code: 'ERROR_USER_GROUP_IS_NOT_USER_EMPTY',
-                   Message: await I18NManager.translate( strLanguage, 'The user group have users assigned' ),
-                   Mark: 'DF7B8DF79E5B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_GROUP_IS_NOT_USER_EMPTY",
+                   Message: await I18NManager.translate( strLanguage, "The user group have users assigned" ),
+                   Mark: "DF7B8DF79E5B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_GROUP_IS_NOT_USER_EMPTY',
-                               Message: await I18NManager.translate( strLanguage, 'The user group have users assigned' ),
+                               Code: "ERROR_USER_GROUP_IS_NOT_USER_EMPTY",
+                               Message: await I18NManager.translate( strLanguage, "The user group have users assigned" ),
                                Details: null,
                              }
                            ],
@@ -2426,15 +2426,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_CANNOT_DELETE_USER_GROUP',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group. The user group has #Administrator# role, but you not had.' ),
-                   Mark: '28E5A0825F4E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_CANNOT_DELETE_USER_GROUP",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user group. The user group has #Administrator# role, but you not had." ),
+                   Mark: "28E5A0825F4E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_CANNOT_UPDATE_USER_GROUP',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user group. The user group has #Administrator# role, but you not had.' ),
+                               Code: "ERROR_CANNOT_UPDATE_USER_GROUP",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user group. The user group has #Administrator# role, but you not had." ),
                                Details: null,
                              }
                            ],
@@ -2456,9 +2456,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '75E23A0316B7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "75E23A0316B7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -2479,9 +2479,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_USER_GROUP_DELETE',
-                     Message: await I18NManager.translate( strLanguage, 'Success user group %s deleted.', sysUserGroupInDB.Name ),
-                     Mark: 'D39BA094555F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_USER_GROUP_DELETE",
+                     Message: await I18NManager.translate( strLanguage, "Success user group %s deleted.", sysUserGroupInDB.Name ),
+                     Mark: "D39BA094555F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -2497,15 +2497,15 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Ok
-                     Code: 'ERROR_USER_GROUP_DELETE',
-                     Message: await I18NManager.translate( strLanguage, 'Error in user group delete.' ),
-                     Mark: '5CF74478D0E9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_GROUP_DELETE",
+                     Message: await I18NManager.translate( strLanguage, "Error in user group delete." ),
+                     Mark: "5CF74478D0E9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [
                                {
-                                 Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                 Message: 'Method deleteByModel return false',
+                                 Code: "ERROR_METHOD_DELETE_RETURN_FALSE",
+                                 Message: "Method deleteByModel return false",
                                  Details: null
                                }
                              ],
@@ -2562,8 +2562,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2643,23 +2643,23 @@ export default class UserGroupServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_GROUP_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL user groups' );
+        strCode = "SUCCESS_BULK_USER_GROUP_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Success delete ALL user groups" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_GROUP_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot delete the user groups. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_GROUP_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot delete the user groups. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL user groups has been deleted. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL user groups has been deleted. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -2668,7 +2668,7 @@ export default class UserGroupServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: '316990A8DBC6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "316990A8DBC6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -2723,8 +2723,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2904,9 +2904,9 @@ export default class UserGroupServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                         Code: "WARNING_DATA_LIMITED_TO_MAX",
+                         Message: await I18NManager.translate( strLanguage, "Data limited to the maximun of %s rows", intLimit ),
+                         Details: await I18NManager.translate( strLanguage, "To protect to server and client of large result set of data, the default maximun rows is %s, you must use \"offset\" and \"limit\" query parameters to paginate large result set of data.", intLimit )
                        }
                      );
 
@@ -2916,8 +2916,8 @@ export default class UserGroupServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not shown due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -2976,9 +2976,9 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH',
-                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
-                 Mark: '7C478BDFA8F8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH",
+                 Message: await I18NManager.translate( strLanguage, "Success search." ),
+                 Mark: "7C478BDFA8F8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -3033,8 +3033,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3194,8 +3194,8 @@ export default class UserGroupServiceController {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not counted due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not counted due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -3212,9 +3212,9 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH_COUNT',
-                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
-                 Mark: '660DFC71AA33' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH_COUNT",
+                 Message: await I18NManager.translate( strLanguage, "Success search count." ),
+                 Mark: "660DFC71AA33" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -3273,8 +3273,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3375,15 +3375,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_GET_USER_GROUP_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group settings' ),
-                   Mark: '70E7C8CCE185' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_GET_USER_GROUP_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to get the user group settings" ),
+                   Mark: "70E7C8CCE185" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_GET_USER_GROUP_SETTINGS',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to get the user group settings' ),
+                               Code: "ERROR_GET_USER_GROUP_SETTINGS",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to get the user group settings" ),
                                Details: null,
                              }
                            ],
@@ -3406,9 +3406,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Success get settings' ),
-                   Mark: '6A6B0A77414D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Success get settings" ),
+                   Mark: "6A6B0A77414D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -3463,15 +3463,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: 'D477E56F3527' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "D477E56F3527" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -3488,9 +3488,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '1F0895C63110' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "1F0895C63110" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3519,9 +3519,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Success get settings' ),
-                   Mark: '6A6B0A77414D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Success get settings" ),
+                   Mark: "6A6B0A77414D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -3581,8 +3581,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3685,15 +3685,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_SET_USER_GROUP_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to set the user group settings' ),
-                   Mark: '70E7C8CCE185' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_SET_USER_GROUP_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to set the user group settings" ),
+                   Mark: "70E7C8CCE185" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_SET_USER_GROUP_SETTINGS',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to set the user group settings' ),
+                               Code: "ERROR_SET_USER_GROUP_SETTINGS",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to set the user group settings" ),
                                Details: null,
                              }
                            ],
@@ -3711,15 +3711,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 403, //Forbidden
-                   Code: 'ERROR_SET_USER_GROUP_SETTINGS',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had.' ),
-                   Mark: '366658DFEE18' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_SET_USER_GROUP_SETTINGS",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had." ),
+                   Mark: "366658DFEE18" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_SET_USER_GROUP_SETTINGS',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had.' ),
+                               Code: "ERROR_SET_USER_GROUP_SETTINGS",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to set settings to the user group. The user group has #Administrator# role, but you not had." ),
                                Details: null,
                              }
                            ],
@@ -3743,8 +3743,8 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                      Mark: "AFBF4AA7BE2C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: error.LogId,
                      IsError: true,
@@ -3765,16 +3765,16 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
+                     Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
                      Mark: "2BCD86F73CE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
-                                 Details: 'Method setConfigValueData return null' //error
+                                 Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
+                                 Details: "Method setConfigValueData return null" //error
                                }
                              ],
                      Warnings: [],
@@ -3787,9 +3787,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_SET_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Success set settings' ),
-                     Mark: 'B90F830F6786' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_SET_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Success set settings" ),
+                     Mark: "B90F830F6786" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -3844,15 +3844,15 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
-                   Mark: '40B9894F6BA4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
+                   Mark: "40B9894F6BA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The session for the token %s not found', strAuthorization ),
+                               Code: "ERROR_USER_SESSION_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The session for the token %s not found", strAuthorization ),
                                Details: null
                              }
                            ],
@@ -3869,9 +3869,9 @@ export default class UserGroupServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'D89E5E762C7B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "D89E5E762C7B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3901,8 +3901,8 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                      Mark: "AFBF4AA7BE2C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: error.LogId,
                      IsError: true,
@@ -3923,16 +3923,16 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
+                     Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
                      Mark: "2BCD86F73CE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_CANNOT_CREATE_SETTINGS',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot create or update the settings entry.' ),
-                                 Details: 'Method setConfigValueData return null' //error
+                                 Code: "ERROR_CANNOT_CREATE_SETTINGS",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot create or update the settings entry." ),
+                                 Details: "Method setConfigValueData return null" //error
                                }
                              ],
                      Warnings: [],
@@ -3945,9 +3945,9 @@ export default class UserGroupServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_SET_SETTINGS',
-                     Message: await I18NManager.translate( strLanguage, 'Success set settings' ),
-                     Mark: 'B90F830F6786' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_SET_SETTINGS",
+                     Message: await I18NManager.translate( strLanguage, "Success set settings" ),
+                     Mark: "B90F830F6786" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -4009,8 +4009,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -4127,8 +4127,8 @@ export default class UserGroupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

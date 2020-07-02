@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
@@ -7,15 +7,15 @@ import {
   Request,
   //Response,
   //NextFunction
-} from 'express';
+} from "express";
 
-//import bcrypt from 'bcrypt';
+//import bcrypt from "bcrypt";
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import CommonConstants from "../../../common/CommonConstants";
-import SystemConstants from '../../../common/SystemContants';
+import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
@@ -23,11 +23,11 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import I18NManager from "../../../common/managers/I18Manager";
 
-import SYSUserSessionDeviceService from '../../../common/database/master/services/SYSUserSessionDeviceService';
+import SYSUserSessionDeviceService from "../../../common/database/master/services/SYSUserSessionDeviceService";
 
-import { SYSUserSessionDevice } from '../../../common/database/master/models/SYSUserSessionDevice';
+import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 
-const debug = require( 'debug' )( 'UserDeviceServiceController' );
+const debug = require( "debug" )( "UserDeviceServiceController" );
 
 export default class UserDeviceServiceController {
 
@@ -66,8 +66,8 @@ export default class UserDeviceServiceController {
       let userSessionStatus = context.UserSessionStatus;
 
       let userSessionDeviceRules = {
-                                     PushToken: [ 'present', 'string', 'min:10' ],
-                                     Device: [ 'required', 'string', 'min:10' ],
+                                     PushToken: [ "present", "string", "min:10" ],
+                                     Device: [ "required", "string", "min:10" ],
                                    };
 
       let validator = SystemUtilities.createCustomValidatorSync( request.body,
@@ -90,9 +90,9 @@ export default class UserDeviceServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: 'ABA6B492E924' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "ABA6B492E924" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -152,9 +152,9 @@ export default class UserDeviceServiceController {
 
             result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: 'ABA6B492E924' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                       Mark: "ABA6B492E924" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -195,9 +195,9 @@ export default class UserDeviceServiceController {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_REGISTER_USER_SESSION_DEVICE',
-                       Message: await I18NManager.translate( strLanguage, 'Success user session register the device' ),
-                       Mark: 'FB1554689D98' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_REGISTER_USER_SESSION_DEVICE",
+                       Message: await I18NManager.translate( strLanguage, "Success user session register the device" ),
+                       Mark: "FB1554689D98" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -219,15 +219,15 @@ export default class UserDeviceServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                   Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                   Mark: '291F1CE8AC13' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "291F1CE8AC13" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                               Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                Details: validator.errors.all()
                              }
                            ],
@@ -301,8 +301,8 @@ export default class UserDeviceServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -380,15 +380,15 @@ export default class UserDeviceServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_USER_SESSION_DEVICE_NOT_FOUND',
-                   Message: I18NManager.translate( strLanguage, 'The user session device not found' ),
-                   Mark: '5DE544182042' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_SESSION_DEVICE_NOT_FOUND",
+                   Message: I18NManager.translate( strLanguage, "The user session device not found" ),
+                   Mark: "5DE544182042" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_SESSION_DEVICE_NOT_FOUND',
-                               Message: I18NManager.translate( strLanguage, 'The user session device not found' ),
+                               Code: "ERROR_USER_SESSION_DEVICE_NOT_FOUND",
+                               Message: I18NManager.translate( strLanguage, "The user session device not found" ),
                                Details: null
                              }
                            ],
@@ -404,9 +404,9 @@ export default class UserDeviceServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'DDEB6E862560' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "DDEB6E862560" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -436,9 +436,9 @@ export default class UserDeviceServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '582B8CBEC6EF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "582B8CBEC6EF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -458,9 +458,9 @@ export default class UserDeviceServiceController {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_DELETE_USER_SESSION_DEVICE',
-                     Message: await I18NManager.translate( strLanguage, 'Success user session device deleted.' ),
-                     Mark: '86029E2AF0C2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_DELETE_USER_SESSION_DEVICE",
+                     Message: await I18NManager.translate( strLanguage, "Success user session device deleted." ),
+                     Mark: "86029E2AF0C2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -476,15 +476,15 @@ export default class UserDeviceServiceController {
 
           result = {
                      StatusCode: 500, //Ok
-                     Code: 'ERROR_DELETE_USER_SESSION_DEVICE',
-                     Message: await I18NManager.translate( strLanguage, 'Error in user session device delete.' ),
-                     Mark: '75B021C3A78A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_DELETE_USER_SESSION_DEVICE",
+                     Message: await I18NManager.translate( strLanguage, "Error in user session device delete." ),
+                     Mark: "75B021C3A78A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [
                                {
-                                 Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                 Message: 'Method deleteByModel return false',
+                                 Code: "ERROR_METHOD_DELETE_RETURN_FALSE",
+                                 Message: "Method deleteByModel return false",
                                  Details: null
                                }
                              ],
@@ -541,8 +541,8 @@ export default class UserDeviceServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
