@@ -815,7 +815,7 @@ export class DBMigrationManagerMYSQL {
 
               bSuccess = resultCall.bSuccess;
               bEmptyContent = resultCall.bEmptyContent;
-              //strContentCheckSum = resultCall.strContentCheckSum;
+              strContentCheckSum = resultCall.strContentCheckSum;
 
             }
             else if ( strFileExt === ".js" ||
