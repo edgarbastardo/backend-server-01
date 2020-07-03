@@ -15,7 +15,7 @@ import SystemUtilities from "../02_system/common/SystemUtilities";
 import I18NManager from "../02_system/common/managers/I18Manager";
 import LoggerManager from "../02_system/common/managers/LoggerManager";
 
-import OdinRequestServiceV1 from "../04_test/standalone/OdinRequestServiceV1";
+import OdinRequestServiceV1 from "../03_business/common/services/OdinRequestServiceV1";
 import CommonGenericRun from "./ComonGenericRun";
 
 let debug = require( "debug" )( "BulkCreateOrder" );
