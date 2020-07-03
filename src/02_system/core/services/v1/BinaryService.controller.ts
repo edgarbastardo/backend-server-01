@@ -162,10 +162,12 @@ export default class BinaryServiceController extends BaseService {
                                                    transaction: any,
                                                    logger: any ): Promise<any> {
 
+    //ANCHOR getConfigValueDataObjectDeniedAllowed
     return await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                                   strCategory,
+                                                                                  null,
                                                                                   true,
                                                                                   transaction,
                                                                                   logger );
@@ -181,6 +183,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                                   strCategory,
+                                                                                  null,
                                                                                   true,
                                                                                   transaction,
                                                                                   logger );
@@ -201,6 +204,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -279,6 +283,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -358,6 +363,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -441,6 +447,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                     strCategory,
                                                                     "",
+                                                                    null,
                                                                     false,
                                                                     transaction,
                                                                     true,
@@ -472,6 +479,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                     strMimeType,
                                                                     strCategory,
+                                                                    null,
                                                                     true,
                                                                     transaction,
                                                                     true,
@@ -503,6 +511,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );

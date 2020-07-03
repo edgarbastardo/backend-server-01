@@ -739,6 +739,90 @@ export default class SystemUtilities {
 
   }
 
+  static async injectUserSessionData( currentSessionData: any,
+                                      logger: any ): Promise<any> {
+
+    let result = {
+                   Role: "",
+                   GroupRole: "",
+                   Data: currentSessionData
+                 };
+
+    const sysUserInDB = await SYSUserService.getById( result.Data.UserId,
+                                                      null,
+                                                      null,
+                                                      logger );
+
+    result.Role = sysUserInDB.Role;
+
+    const sysUserGroupInDB = sysUserInDB.sysUserGroup;
+
+    result.GroupRole = sysUserGroupInDB.Role;
+
+    if ( sysUserInDB.sysPerson ) {
+
+      const sysPerson = sysUserInDB.sysPerson;
+
+      result.Data[ "PersonId" ] = sysPerson.Id;
+      result.Data[ "Title" ] = sysPerson.Title;
+      result.Data[ "FirstName" ] = sysPerson.FirstName;
+      result.Data[ "LastName" ] = sysPerson.LastName;
+      result.Data[ "EMail" ] = sysPerson.EMail;
+      result.Data[ "Phone" ] = sysPerson.Phone;
+
+    }
+    else {
+
+      result.Data[ "PersonId" ] = "";
+      result.Data[ "Title" ] = "";
+      result.Data[ "FirstName" ] = "";
+      result.Data[ "LastName" ] = "";
+      result.Data[ "EMail" ] = "";
+      result.Data[ "Phone" ] = "";
+
+    }
+
+    result.Data[ "UserName" ] = sysUserInDB.Name;
+    result.Data[ "UserTag" ] = sysUserInDB.Tag;
+    result.Data[ "UserGroupId" ] = sysUserGroupInDB.Id;
+    result.Data[ "UserGroupName" ] = sysUserGroupInDB.Name;
+    result.Data[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
+
+    const jsonExtraData = CommonUtilities.parseJSON( result.Data[ "ExtraData" ],
+                                                     logger );
+
+    delete result.Data[ "ExtraData" ];
+
+    if ( jsonExtraData ) {
+
+      if ( jsonExtraData.Private ) {
+
+        delete jsonExtraData.Private;
+
+      }
+
+      if ( jsonExtraData.Business ) {
+
+        result.Data[ "Business" ] = jsonExtraData.Business;
+
+      }
+      else {
+
+        result.Data[ "Business" ] = {};
+
+      }
+
+    }
+    else {
+
+      result.Data[ "Business" ] = {};
+
+    }
+
+    return result;
+
+  }
+
   static async getUserSessionStatusPersistent( strToken: string,
                                                requestContext: any,
                                                bUpdateAt: boolean,
@@ -761,6 +845,14 @@ export default class SystemUtilities {
         result = CommonUtilities.parseJSON( strJSONUserSessionStatus,
                                             logger ); //Try to parse and transform to json object
 
+        if ( result &&
+             !result.UserGroupName ) {
+
+          let debugMark = debug.extend( "386299777D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+        }
+
         bFromCache = true;
 
       }
@@ -771,94 +863,30 @@ export default class SystemUtilities {
       if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionPersistentByToken
-        let sysUserSessionPersistent = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
-                                                                                                              null,
-                                                                                                              logger ); //Find in the database
+        let sysUserSessionPersistentInDB = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
+                                                                                                                  null,
+                                                                                                                  logger ); //Find in the database
 
-        let sysUserSessionPersistentData = null;
+        //let sysUserSessionPersistentData = null;
+        let userSession = null;
 
-        if ( sysUserSessionPersistent ) {
+        if ( sysUserSessionPersistentInDB ) {
 
-          sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionPersistentInDB as any ).dataValues,
+                                                                     logger );
 
-          const sysUserInDB = await SYSUserService.getById( sysUserSessionPersistentData.UserId,
-                                                            null,
-                                                            null,
-                                                            logger );
-
-          strUserRole = sysUserInDB.Role;
-
-          const sysUserGroupInDB = sysUserInDB.sysUserGroup;
-
-          strUserGroupRole = sysUserGroupInDB.Role;
-
-          if ( sysUserInDB.sysPerson ) {
-
-            const sysPerson = sysUserInDB.sysPerson;
-
-            sysUserSessionPersistentData[ "PersonId" ] = sysPerson.Id;
-            sysUserSessionPersistentData[ "Title" ] = sysPerson.Title;
-            sysUserSessionPersistentData[ "FirstName" ] = sysPerson.FirstName;
-            sysUserSessionPersistentData[ "LastName" ] = sysPerson.LastName;
-            sysUserSessionPersistentData[ "EMail" ] = sysPerson.EMail;
-            sysUserSessionPersistentData[ "Phone" ] = sysPerson.Phone;
-
-          }
-          else {
-
-            sysUserSessionPersistentData[ "PersonId" ] = "";
-            sysUserSessionPersistentData[ "Title" ] = "";
-            sysUserSessionPersistentData[ "FirstName" ] = "";
-            sysUserSessionPersistentData[ "LastName" ] = "";
-            sysUserSessionPersistentData[ "EMail" ] = "";
-            sysUserSessionPersistentData[ "Phone" ] = "";
-
-          }
-
-          sysUserSessionPersistentData[ "UserName" ] = sysUserInDB.Name;
-          sysUserSessionPersistentData[ "UserTag" ] = sysUserInDB.Tag;
-          sysUserSessionPersistentData[ "UserGroupId" ] = sysUserGroupInDB.Id;
-          sysUserSessionPersistentData[ "UserGroupName" ] = sysUserGroupInDB.Name;
-          sysUserSessionPersistentData[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
-
-          const jsonExtraData = CommonUtilities.parseJSON( sysUserSessionPersistentData[ "ExtraData" ],
-                                                           logger );
-
-          delete sysUserSessionPersistentData[ "ExtraData" ];
-
-          if ( jsonExtraData ) {
-
-            if ( jsonExtraData.Private ) {
-
-              delete jsonExtraData.Private;
-
-            }
-
-            if ( jsonExtraData.Business ) {
-
-              sysUserSessionPersistentData[ "Business" ] = jsonExtraData.Business;
-
-            }
-            else {
-
-              sysUserSessionPersistentData[ "Business" ] = {};
-
-            }
-
-          }
-          else {
-
-            sysUserSessionPersistentData[ "Business" ] = {};
-
-          }
+          strUserRole = userSession.Role;
+          strUserGroupRole = userSession.GroupRole;
+          ////result = userSession.Data;
 
           bFromCache = false;
 
         }
 
-        if ( sysUserSessionPersistentData &&
-             !sysUserSessionPersistentData.DisabledAt &&
-             SystemUtilities.checkUserSessionStatusExpired( sysUserSessionPersistentData, logger ).Expired === false &&
+        if ( userSession &&
+             !userSession.Data.DisabledAt &&
+             SystemUtilities.checkUserSessionStatusExpired( userSession.Data, logger ).Expired === false &&
              bUpdateAt ) {
 
           result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
@@ -870,29 +898,29 @@ export default class SystemUtilities {
                                                               true,
                                                               logger );
 
-          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sysUserSessionPersistentData.DisabledAt,
-                                                                          sysUserSessionPersistentData.ExpireAt );
+          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( userSession.Data.DisabledAt,
+                                                                          userSession.Data.ExpireAt );
 
           if ( !result ) {
 
             //Insert new entry in the session status table
             result = {
-                       UserId: sysUserSessionPersistentData.UserId,
+                       UserId: userSession.Data.UserId,
                        //UserName: sysUserSessionPersistentData.UserName,
-                       UserName: sysUserSessionPersistentData[ "UserName" ],
-                       UserGroupId: sysUserSessionPersistentData[ "UserGroupId" ],
+                       UserName: userSession.Data[ "UserName" ],
+                       UserGroupId: userSession.Data[ "UserGroupId" ],
                        Token: strToken,
-                       BinaryDataToken: sysUserSessionPersistentData[ "BinaryDataToken" ],
-                       SocketToken: sysUserSessionPersistentData[ "SocketToken" ],
+                       BinaryDataToken: userSession.Data[ "BinaryDataToken" ],
+                       SocketToken: userSession.Data[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
                        Role: strRolesMerged,
                        ExpireKind: 3,
                        ExpireOn: expireAt,
                        HardLimit: null,
-                       Tag: sysUserSessionPersistentData[ "Tag" ],
-                       CreatedBy: sysUserSessionPersistentData[ "UserName" ],
-                       UpdatedBy: sysUserSessionPersistentData[ "UserName" ],
+                       Tag: userSession.Data[ "Tag" ],
+                       CreatedBy: userSession.Data[ "UserName" ],
+                       UpdatedBy: userSession.Data[ "UserName" ],
                      };
 
           }
@@ -909,18 +937,29 @@ export default class SystemUtilities {
           }
 
           //Add additional info to memory cache struct
-          result[ "PersonId" ] = sysUserSessionPersistentData[ "PersonId" ];
-          result[ "Title" ] = sysUserSessionPersistentData[ "Title" ];
-          result[ "FirstName" ] = sysUserSessionPersistentData[ "FirstName" ];
-          result[ "LastName" ] = sysUserSessionPersistentData[ "LastName" ];
-          result[ "EMail" ] = sysUserSessionPersistentData[ "EMail" ];
-          result[ "Phone" ] = sysUserSessionPersistentData[ "Phone" ];
+          result[ "PersonId" ] = userSession.Data[ "PersonId" ];
+          result[ "Title" ] = userSession.Data[ "Title" ];
+          result[ "FirstName" ] = userSession.Data[ "FirstName" ];
+          result[ "LastName" ] = userSession.Data[ "LastName" ];
+          result[ "EMail" ] = userSession.Data[ "EMail" ];
+          result[ "Phone" ] = userSession.Data[ "Phone" ];
 
-          result[ "UserTag" ] = sysUserSessionPersistentData[ "UserTag" ];
-          result[ "UserGroupName" ] =  sysUserSessionPersistentData[ "UserGroupName" ];
-          result[ "UserGroupTag" ] =  sysUserSessionPersistentData[ "UserGroupTag" ];
+          result[ "UserTag" ] = userSession.Data[ "UserTag" ];
+          result[ "UserGroupName" ] =  userSession.Data[ "UserGroupName" ];
+          result[ "UserGroupTag" ] =  userSession.Data[ "UserGroupTag" ];
 
         }
+
+      }
+      else if ( !result.UserGroupName ) {
+
+        let debugMark = debug.extend( "01D5303CE42C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
+
+        const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         logger );
+
+        result = userSession.Data;
 
       }
 
@@ -993,14 +1032,27 @@ export default class SystemUtilities {
       if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionStatusByToken
-        result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                null,
-                                                                                logger ); //Find in the database
+        let sysUserSessionTemporalInDB = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                                        null,
+                                                                                                        logger ); //Find in the database
 
-        if ( result ) {
+        let userSession = null;
+
+        if ( sysUserSessionTemporalInDB ) {
 
           //result = ( result as any ).dataValues; //Get only the basic json struct object with field values from the orm model
 
+          //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionTemporalInDB as any ).dataValues,
+                                                                     logger );
+
+          strUserRole = userSession.Role;
+          strUserGroupRole = userSession.GroupRole;
+          result = userSession.Data;
+
+          bFromCache = false;
+
+          /*
           //Add additional info to memory cache struct
           const sysUserInDB = await SYSUserService.getById( result.UserId,
                                                             null,
@@ -1093,8 +1145,20 @@ export default class SystemUtilities {
           result.UpdatedBy = sysUserInDB.Name;
 
           bFromCache = false;
+          */
 
         }
+
+      }
+      else if ( !result.UserGroupName ) {
+
+        let debugMark = debug.extend( "EDC7699EA08B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
+
+        const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         logger );
+
+        result = userSession.Data;
 
       }
 

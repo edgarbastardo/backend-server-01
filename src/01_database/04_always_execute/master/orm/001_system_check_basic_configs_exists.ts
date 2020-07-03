@@ -553,12 +553,16 @@ export default class Always {
                                                             {
                                                               "service":"#google_maps#",
                                                               "#google_maps#":{
+
                                                                 "type":"google_maps",
                                                                 "host":"https://maps.googleapis.com/maps/api/geocode/json",
                                                                 "port":443,
                                                                 "auth":{
+
                                                                   "api_key":process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
+
                                                                 }
+
                                                               }
                                                             }
                                                           ),
@@ -571,12 +575,16 @@ export default class Always {
                                                             {
                                                               "service":"#google_maps#",
                                                               "#google_maps#":{
+
                                                                 "type":"google_maps",
                                                                 "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
                                                                 "port":443,
                                                                 "auth":{
+
                                                                   "api_key":process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
+
                                                                 }
+
                                                               }
                                                             }
                                                           ),
@@ -597,44 +605,60 @@ export default class Always {
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
-                                                              "server": {
+                                                              "service":"#remote_01#",
+                                                              "#remote_01#": {
 
                                                                 "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URL || "",
                                                                 "auth":{
+
                                                                   "apiKey": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_KEY || ""
+
                                                                 }
 
                                                               },
-
                                                               "channels": {
 
-                                                                "#Business_Managers#":{
+                                                                "join": {
 
-                                                                  "denied": "",
-                                                                  "allowed": "#Business_Managers#,#Administrators#"
+                                                                  "#Business_Managers#":{
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Business_Managers#,#Administrators#"
+
+                                                                  },
+                                                                  "#System_Administrators#":{
+
+                                                                    "denied": "",
+                                                                    "allowed": "#System_Administrators#,#Administrators#"
+
+                                                                  },
+                                                                  "#Drivers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Drivers#,#Support#"
+
+                                                                  },
+                                                                  "@__default__@":{
+
+                                                                    "denied": "",
+                                                                    "allowed": "*"
+
+                                                                  }
 
                                                                 },
-                                                                "#System_Administrators#":{
 
-                                                                  "denied": "",
-                                                                  "allowed": "#System_Administrators#,#Administrators#"
+                                                                "send": {
 
-                                                                },
-                                                                "#Drivers#": {
+                                                                  "@__default__@":{
 
-                                                                 "denied": "",
-                                                                 "allowed": "#Drivers#,#Support#"
+                                                                    "denied": "",
+                                                                    "allowed": "*"
 
-                                                                },
-                                                                "@__default__@":{
-
-                                                                  "denied": "",
-                                                                  "allowed": "*"
+                                                                  }
 
                                                                 }
 
                                                               }
-
                                                             }
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,

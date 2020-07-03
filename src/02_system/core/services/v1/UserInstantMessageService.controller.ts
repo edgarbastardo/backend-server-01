@@ -30,6 +30,7 @@ import { SYSUserSessionStatus } from "../../../common/database/master/models/SYS
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
+import InstantMenssageServerManager from "../../../common/managers/InstantMessageSeverManager";
 
 const debug = require( "debug" )( "UserInstantMessageServiceController" );
 
@@ -110,7 +111,7 @@ export default class UserInstantMessageServiceController {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: "SUCCESS_AUTHORIZATION_TOKEN_CREATED",
+                 Code: "SUCCESS_AUTH_TOKEN_CREATED",
                  Message: await I18NManager.translate( strLanguage, "The instant message authorization token has been success created." ),
                  Mark: "8508AF872A19" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
@@ -120,7 +121,7 @@ export default class UserInstantMessageServiceController {
                  Count: 1,
                  Data: [
                          {
-                           Authorization: strSocketToken,
+                           Auth: strSocketToken,
                          }
                        ]
                };
@@ -277,7 +278,7 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: "SUCCESS_AUTHORIZATION_TOKEN_DELETED",
+                   Code: "SUCCESS_AUTH_TOKEN_DELETED",
                    Message: await I18NManager.translate( strLanguage, "The instant message authorization token has been success deleted." ),
                    Mark: "DE4E39A7EE92" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
@@ -295,14 +296,14 @@ export default class UserInstantMessageServiceController {
 
         result = {
                     StatusCode: 404, //Not found
-                    Code: "ERROR_AUTHORIZATION_TOKEN_NOT_FOUND",
+                    Code: "ERROR_AUTH_TOKEN_NOT_FOUND",
                     Message: await I18NManager.translate( strLanguage, "The instant message authorization token not found." ),
                     Mark: "358DDC2ACD70" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                     LogId: null,
                     IsError: true,
                     Errors: [
                               {
-                                Code: "ERROR_AUTHORIZATION_TOKEN_NOT_FOUND",
+                                Code: "ERROR_AUTH_TOKEN_NOT_FOUND",
                                 Message: await I18NManager.translate( strLanguage, "The instant message authorization token not found." ),
                                 Details: null
                               }
@@ -434,13 +435,13 @@ export default class UserInstantMessageServiceController {
                                    },
                         };
 
-      let strAuthorization = await CacheManager.getData( request.body.Authorization, //<-- Socket token
+      let strAuthorization = await CacheManager.getData( request.body.Auth, //<-- Socket token
                                                          logger ); //get from cache the real authorization token
 
       if ( !strAuthorization ) { //No cache entry
 
         //Not in cache search in database
-        const userSessionStatusInDB = await SYSUserSessionStatusService.getUserSessionStatusBySocketToken( request.body.Authorizarion, //<-- Socket token
+        const userSessionStatusInDB = await SYSUserSessionStatusService.getUserSessionStatusBySocketToken( request.body.Auth, //<-- Socket token
                                                                                                            currentTransaction,
                                                                                                            logger );
 
@@ -450,7 +451,7 @@ export default class UserInstantMessageServiceController {
           strAuthorization = userSessionStatusInDB.Token; //Get the real main authorization token
 
           //Save to cache the association between generated binary data Auth Token and the main Authorization Token
-          await CacheManager.setData( request.body.SocketToken,
+          await CacheManager.setData( request.body.Auth,
                                       strAuthorization,
                                       logger );
 
@@ -480,14 +481,13 @@ export default class UserInstantMessageServiceController {
 
           const strAction = request.body.Action.trim().toLowerCase();
 
-          if ( strAction === "connect" ) {
+          if ( strAction === "connect" ) { //Connect to server
 
-            //Is allowed to connect to server
-
+            //Th user is allowed to connect to instant message server
             result = {
                        StatusCode: 200, //Ok
-                       Code: "SUCCESS_ALLOWED",
-                       Message: "Ok",
+                       Code: "SUCCESS_USER_ALLOWED_CONNECT",
+                       Message: await I18NManager.translate( strLanguage, "User allowed to connect" ),
                        Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
@@ -500,49 +500,140 @@ export default class UserInstantMessageServiceController {
                                  Id: userSessionStatusToCheck.UserId,
                                  Name: userSessionStatusToCheck.UserName,
                                  FirstName: userSessionStatusToCheck.FirstName,
-                                 LastName: userSessionStatusToCheck.LastName
+                                 LastName: userSessionStatusToCheck.LastName,
+                                 System: process.env.APP_SERVER_DATA_NAME
                                }
                              ]
                      };
 
           }
-          else if ( strAction === "join" ) {
+          else if ( strAction === "join" ) { //Join to channel
 
-            //Check user allowed to join to channel
+            //Check user allowed to join to channel to listen instant messages
+            const allowedCheck = await InstantMenssageServerManager.checkAllowedToJoin( request.body.Channel,
+                                                                                        userSessionStatusToCheck,
+                                                                                        currentTransaction,
+                                                                                        logger );
 
-            result = {
-                       StatusCode: 200, //Ok
-                       Code: "SUCCESS_ALLOWED",
-                       Message: "Ok",
-                       Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: false,
-                       Errors: [],
-                       Warnings: [],
-                       Count: 0,
-                       Data: [
-                        //
-                       ]
-                     };
+            if ( allowedCheck.value === 1 ) {
+
+              delete allowedCheck[ "value" ];
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: "SUCCESS_USER_ALLOWED_JOIN_CHANNEL",
+                         Message: await I18NManager.translate( strLanguage, "User allowed to join to channel" ),
+                         Mark: "30B5F5E024A3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 allowedCheck
+                               ]
+                       };
+
+            }
+            else {
+
+              delete allowedCheck[ "value" ];
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: "ERROR_USER_DENIED_JOIN_CHANNEL",
+                         Message: await I18NManager.translate( strLanguage, "User denied to join to channel" ),
+                         Mark: "C6CDF908D21E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_USER_DENIED_JOIN_CHANNEL",
+                                     Message: await I18NManager.translate( strLanguage, "User denied to join to channel" ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 allowedCheck
+                               ]
+                       };
+
+            }
 
           }
-          else if ( strAction === "send" ) {
+          else if ( strAction === "send" ) { //Send message to channel
 
             //Check user allowed to send message to channel
+            const allowedCheck = await InstantMenssageServerManager.checkAllowedToSend( request.body.Channel,
+                                                                                        request.body.Message,
+                                                                                        userSessionStatusToCheck,
+                                                                                        currentTransaction,
+                                                                                        logger );
+
+            if ( allowedCheck.value === 1 ) {
+
+              delete allowedCheck[ "value" ];
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: "SUCCESS_USER_ALLOWED_SEND_MESSAGE",
+                         Message: await I18NManager.translate( strLanguage, "User allowed to send message to channel" ),
+                         Mark: "A2F7F46E5A74" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 allowedCheck
+                               ]
+                       };
+
+            }
+            else {
+
+              delete allowedCheck[ "value" ];
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: "ERROR_USER_DENIED_SEND_MESSAGE",
+                         Message: await I18NManager.translate( strLanguage, "User denied to send message to channel" ),
+                         Mark: "9956751DE8D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_USER_DENIED_SEND_MESSAGE",
+                                     Message: await I18NManager.translate( strLanguage, "User denied to send message to channel" ),
+                                     Details: null
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 allowedCheck
+                               ]
+                       };
+
+            }
+
+          }
+          else if ( strAction === "disconnected" || //Disconnect from server
+                    strAction === "leave" ) {       //Leave channel
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: "SUCCESS_ALLOWED",
-                       Message: "Ok",
-                       Mark: "E3F5AF2A8FFE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_NOTIFIED",
+                       Message: await I18NManager.translate( strLanguage, "Notified" ),
+                       Mark: "B66FEF321B09" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
                        Warnings: [],
                        Count: 0,
-                       Data: [
-                        //
-                       ]
+                       Data: []
                      };
 
           }
@@ -583,15 +674,15 @@ export default class UserInstantMessageServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
-                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                   Code: "ERROR_INVALID_AUTH_TOKEN",
+                   Message: await I18NManager.translate( strLanguage, "Instant message authorization token provided is invalid" ),
                    Mark: "33FA07C2BDCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
-                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                               Code: "ERROR_INVALID_AUTH_TOKEN",
+                               Message: await I18NManager.translate( strLanguage, "Instant message authorization token provided is invalid" ),
                                Details: null
                              }
                            ],

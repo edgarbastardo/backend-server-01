@@ -1837,27 +1837,40 @@ export default class SystemConstants {
                                               Name: "system.instant.message.server",
                                               Default: JSON.stringify(
                                                                        {
+                                                                         "service": "#im_server_01#",
+                                                                         "#im_server_01#": {
 
-                                                                         "server": {
-
-                                                                           "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URL || "",
+                                                                           "host": "http://localhost:9191/instant/message/server/kk/api/v1/callback",
                                                                            "auth":{
                                                                              "apiKey": "my_key"
                                                                            }
 
                                                                          },
-
                                                                          "channels": {
 
-                                                                           "@__default__@":{
+                                                                           "join": {
 
-                                                                             "denied": "",
-                                                                             "allowed": "*"
+                                                                            "@__default__@":{
+
+                                                                              "denied": "",
+                                                                              "allowed": "*"
+
+                                                                            }
+
+                                                                           },
+
+                                                                           "send": {
+
+                                                                              "@__default__@":{
+
+                                                                                "denied": "",
+                                                                                "allowed": "*"
+
+                                                                              }
 
                                                                            }
 
                                                                          }
-
                                                                        }
                                                                      ),
                                               Label: "Configuration for instant message server settings",
@@ -1866,8 +1879,8 @@ export default class SystemConstants {
                                               AllowTagAccessW: "#Administrator#",
                                               Example: JSON.stringify(
                                                                        {
-
-                                                                         "server": {
+                                                                         "service": "#im_server_01#",
+                                                                         "#im_server_01#": {
 
                                                                            "host": "http://localhost:9191/instant/message/server/kk/api/v1/callback",
                                                                            "auth":{
@@ -1877,54 +1890,67 @@ export default class SystemConstants {
                                                                            }
 
                                                                          },
-
                                                                          "channels": {
 
-                                                                           "#Business_Managers#":{
+                                                                           "join": {
 
-                                                                             "denied": "",
-                                                                             "allowed": "#Business_Managers#,#Administrators#"
+                                                                             "#Business_Managers#":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "#Business_Managers#,#Administrators#"
+
+                                                                             },
+                                                                             "#System_Administrators#":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "#System_Administrators#,#Administrators#"
+
+                                                                             },
+                                                                             "#userexample01#": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+
+                                                                             },
+                                                                             "#userexample02#": {
+
+                                                                               "denied": "*",
+                                                                               "allowed": ""
+
+                                                                             },
+                                                                             "#userexample03#": {
+
+                                                                               "denied": "#My_Denied_Channel01#,#My_Denied_Channel02#",
+                                                                               "allowed": "*"
+
+                                                                             },
+                                                                             "#admin01@system.net#":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "*"
+
+                                                                             },
+                                                                             "@__default__@":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@UserName@@#"
+
+                                                                             }
 
                                                                            },
-                                                                           "#System_Administrators#":{
 
-                                                                             "denied": "",
-                                                                             "allowed": "#System_Administrators#,#Administrators#"
+                                                                           "send": {
 
-                                                                           },
-                                                                           "#userexample01#": {
+                                                                             "@__default__@":{
 
-                                                                            "denied": "",
-                                                                            "allowed": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+                                                                               "denied": "",
+                                                                               "allowed": "#@@UserName@@#"
 
-                                                                           },
-                                                                           "#userexample02#": {
-
-                                                                            "denied": "*",
-                                                                            "allowed": ""
-
-                                                                           },
-                                                                           "#userexample03#": {
-
-                                                                            "denied": "#My_Denied_Channel01#,#My_Denied_Channel02#",
-                                                                            "allowed": "*"
-
-                                                                           },
-                                                                           "#admin01@system.net#":{
-
-                                                                             "denied": "",
-                                                                             "allowed": "*"
-
-                                                                           },
-                                                                           "@__default__@":{
-
-                                                                             "denied": "",
-                                                                             "allowed": "#@@UserName@@#"
+                                                                             }
 
                                                                            }
 
                                                                          }
-
                                                                        }
                                                                      ),
                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
