@@ -12,7 +12,7 @@ import SystemUtilities from "../SystemUtilities";
 
 import LoggerManager from "./LoggerManager";
 import I18NManager from "./I18Manager";
-import InstantMenssageServerManager from "./InstantMessageSeverManager";
+import InstantMenssageServerManager from "./InstantMessageServerManager";
 //import NotificationManager from "./NotificationManager";
 
 const debug = require( "debug" )( "MiddlewareManager" );

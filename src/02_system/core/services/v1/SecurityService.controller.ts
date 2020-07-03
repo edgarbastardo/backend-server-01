@@ -30,7 +30,7 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
-import InstantMenssageServerManager from "../../../common/managers/InstantMessageSeverManager";
+import InstantMenssageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
