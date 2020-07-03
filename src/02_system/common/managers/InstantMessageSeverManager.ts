@@ -211,6 +211,46 @@ export default class InstantMenssageServerManager {
 
   }
 
+  static async disconnectFromInstantMessageServer( strSocketToken: string, logger: any ): Promise<boolean> {
+
+    let bResult = true;
+
+    try {
+
+      //
+
+    }
+    catch ( error ) {
+
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMenssageServerManager.name + "." + this.disconnectFromInstantMessageServer.name;
+
+      const strMark = "07104A113729" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
   /*
     let result = { result: 1, allowed: "*", denied: "" }; //Default allow all
 
