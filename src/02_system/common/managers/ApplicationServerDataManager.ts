@@ -37,7 +37,7 @@ import BinaryServiceController from "../../core/services/v1/BinaryService.contro
 import GraphQLAPIManager from "./GraphQLAPIManager";
 import RestAPIManager from "./RestAPIManager";
 
-const debug = require( "debug" )( "ApplicationManager" );
+const debug = require( "debug" )( "ApplicationServerDataManager" );
 
 //sentry.init( { dsn: "https://f7af458c288e4b2193ef4b7e05686f04@sentry.io/1797264" } );
 

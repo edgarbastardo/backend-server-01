@@ -20,7 +20,7 @@
     "copy:resources-v": "copyfiles -V -u 1 src/**/*.sql src/**/*.graphql src/**/*.pug src/**/*.css src/**/*.scss src/**/*.json src/**/.dont_delete build/",
     "deploy": "npm run build && node build/deploy.js",
     "deploy:dev": "nodemon src/deploy.ts --exec ts-node",
-    "deploy:clean": "rimraf install_distribution/*",
+    "deploy:clean": "rimraf deploy/*",
     "count:source-lines": "cloc src/"
   },
   "keywords": [],

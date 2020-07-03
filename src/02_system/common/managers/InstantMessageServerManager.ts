@@ -10,6 +10,7 @@ import DBConnectionManager from "./DBConnectionManager";
 import I18NManager from './I18Manager';
 import SYSConfigValueDataService from '../database/master/services/SYSConfigValueDataService';
 import SystemConstants from '../SystemContants';
+import IntantMessageServerRequestServiceV1 from '../others/services/IntantMessageServerRequestServiceV1';
 
 const debug = require( 'debug' )( 'IntantMessageServerManager' );
 
@@ -211,17 +212,32 @@ export default class InstantMenssageServerManager {
 
   }
 
-  static async disconnectFromInstantMessageServer( strSocketToken: string, logger: any ): Promise<boolean> {
+  static async disconnectFromInstantMessageServer( strSocketToken: string,
+                                                   transaction: any,
+                                                   logger: any ): Promise<boolean> {
 
     let bResult = true;
 
     try {
 
-      //
+      const jsonServiceConfig = await InstantMenssageServerManager.getConfigInstantMessageServerService( transaction,
+                                                                                                         logger );
+
+      const headers = {
+
+        "Content-Type": "application/json",
+        "Authorization": jsonServiceConfig.auth.apiKey
+
+      }
+
+      await IntantMessageServerRequestServiceV1.callDisconnectUser( jsonServiceConfig.host,
+                                                                    headers,
+                                                                    {
+                                                                      "Auth": strSocketToken
+                                                                    } );
 
     }
     catch ( error ) {
-
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 

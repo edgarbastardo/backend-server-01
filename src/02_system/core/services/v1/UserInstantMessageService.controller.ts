@@ -30,7 +30,7 @@ import { SYSUserSessionStatus } from "../../../common/database/master/models/SYS
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
-import InstantMenssageServerManager from "../../../common/managers/InstantMessageSeverManager";
+import InstantMenssageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 const debug = require( "debug" )( "UserInstantMessageServiceController" );
 
@@ -267,6 +267,10 @@ export default class UserInstantMessageServiceController {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
+        await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+                                                                               null,
+                                                                               logger );
+
         /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                 strSavedSocketToken,

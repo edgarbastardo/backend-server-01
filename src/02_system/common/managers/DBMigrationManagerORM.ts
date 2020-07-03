@@ -475,7 +475,11 @@ export class DBMigrationManagerORM {
 
               try {
 
-                const strFullPathCheckSum = strContentCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strImportDataFolder + "/" + strFileName ).toString( 16 );
+                const strFullPathCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strImportDataFolder + "/" + strFileName ).toString( 16 );
+
+                const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, "utf8" );
+
+                strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
                 await SYSDBImportedData.create(
                                                 {
@@ -663,7 +667,11 @@ export class DBMigrationManagerORM {
 
             try {
 
-              const strFullPathCheckSum = strContentCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null );
+              const strFullPathCheckSum = SystemUtilities.hashString( strImportDataFolder + "/" + strFileName, 2, null );
+
+              const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, "utf8" );
+
+              strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
               if ( importedDataRow === null ) {
 
