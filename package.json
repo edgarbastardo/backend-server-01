@@ -29,7 +29,7 @@
   "dependencies": {
     "@dashersw/node-discover": "^1.0.4",
     "@sendgrid/mail": "^6.5.1",
-    "apollo-server-express": "^2.9.7",
+    "apollo-server-express": "^2.14.2",
     "app-root-path": "^2.2.1",
     "archiver": "^3.1.1",
     "bcrypt": "github:kelektiv/node.bcrypt.js#v3.0.7",
