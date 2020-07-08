@@ -2713,7 +2713,7 @@ export default class BinaryServiceController extends BaseService {
 
       fs.mkdirSync( strFullSavePath, { recursive: true } );
 
-      let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URL;
+      let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URI;
 
       strRequestPath = strRequestPath.replace( "@__id__@", strId );
       strRequestPath = strRequestPath.replace( "@__auth__@", process.env.BINARY_DATA_SERVICE_FALLBACK_AUTH );

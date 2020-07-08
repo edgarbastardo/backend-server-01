@@ -1850,23 +1850,23 @@ export default class SystemConstants {
 
                                                                            "join": {
 
-                                                                            "@__default__@":{
+                                                                             "@__default__@":{
 
-                                                                              "denied": "",
-                                                                              "allowed": "*"
+                                                                               "denied": "",
+                                                                               "allowed": "*"
 
-                                                                            }
+                                                                             }
 
                                                                            },
 
                                                                            "send": {
 
-                                                                              "@__default__@":{
+                                                                             "@__default__@":{
 
-                                                                                "denied": "",
-                                                                                "allowed": "*"
+                                                                               "denied": "",
+                                                                               "allowed": "*"
 
-                                                                              }
+                                                                             }
 
                                                                            }
 

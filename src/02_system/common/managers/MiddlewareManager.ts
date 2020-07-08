@@ -12,7 +12,7 @@ import SystemUtilities from "../SystemUtilities";
 
 import LoggerManager from "./LoggerManager";
 import I18NManager from "./I18Manager";
-import InstantMenssageServerManager from "./InstantMessageServerManager";
+import InstantMessageServerManager from "./InstantMessageServerManager";
 //import NotificationManager from "./NotificationManager";
 
 const debug = require( "debug" )( "MiddlewareManager" );
@@ -589,7 +589,7 @@ export default class MiddlewareManager {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
-        await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
                                                                                null,
                                                                                logger );
 
@@ -635,7 +635,7 @@ export default class MiddlewareManager {
 
           //FIXME 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
-          await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+          await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
                                                                                  null,
                                                                                  logger );
 
@@ -662,7 +662,7 @@ export default class MiddlewareManager {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
-        await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
                                                                                null,
                                                                                logger );
 
@@ -932,4 +932,5 @@ export default class MiddlewareManager {
     }
 
   );
+
 }

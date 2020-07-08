@@ -18,7 +18,7 @@ import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 import { SYSConfigMetaData } from "../../../../02_system/common/database/master/models/SYSConfigMetaData";
 import { SYSConfigValueData } from '../../../../02_system/common/database/master/models/SYSConfigValueData';
 
-const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
+const debug = require( 'debug' )( '001_system_check_basic_configs_exists' );
 
 require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
 
@@ -608,7 +608,7 @@ export default class Always {
                                                               "service":"#remote_01#",
                                                               "#remote_01#": {
 
-                                                                "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URL || "",
+                                                                "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URI || "",
                                                                 "auth":{
 
                                                                   "apiKey": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_KEY || ""
@@ -623,19 +623,25 @@ export default class Always {
                                                                   "#Business_Managers#":{
 
                                                                     "denied": "",
-                                                                    "allowed": "#Business_Managers#,#Administrators#"
+                                                                    "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
 
                                                                   },
                                                                   "#System_Administrators#":{
 
                                                                     "denied": "",
-                                                                    "allowed": "#System_Administrators#,#Administrators#"
+                                                                    "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
 
                                                                   },
                                                                   "#Drivers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Drivers#,#Support#"
+
+                                                                  },
+                                                                  "#Dispachers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Drivers#,#DriversPosition#"
 
                                                                   },
                                                                   "@__default__@":{
@@ -651,7 +657,7 @@ export default class Always {
 
                                                                   "@__default__@":{
 
-                                                                    "denied": "",
+                                                                    "denied": "#DriversPosition#",
                                                                     "allowed": "*"
 
                                                                   }

@@ -30,7 +30,7 @@ import { SYSUserSessionStatus } from "../../../common/database/master/models/SYS
 import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
-import InstantMenssageServerManager from "../../../common/managers/InstantMessageServerManager";
+import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 const debug = require( "debug" )( "UserInstantMessageServiceController" );
 
@@ -73,7 +73,8 @@ export default class UserInstantMessageServiceController {
       let strSocketToken = null;
 
       if ( CommonUtilities.isNullOrEmpty( userSessionStatus.SocketToken ) ||
-           ( request.query.Force === "1" /*&&
+           ( request.query.Force === "1" ||
+             request.body.Force === "1" /*&&
              userSessionStatus.Token.startsWith( "p:" ) === false*/ ) ) {
 
         const strId = SystemUtilities.getUUIDv4();
@@ -267,7 +268,7 @@ export default class UserInstantMessageServiceController {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
-        await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
                                                                                null,
                                                                                logger );
 
@@ -485,7 +486,7 @@ export default class UserInstantMessageServiceController {
 
           const strAction = request.body.Action.trim().toLowerCase();
 
-          if ( strAction === "connect" ) { //Connect to server
+          if ( strAction === "connecttoserver" ) { //Connect to server
 
             //Th user is allowed to connect to instant message server
             result = {
@@ -502,26 +503,71 @@ export default class UserInstantMessageServiceController {
                                {
                                  Authorization: request.body.Authorization,
                                  Id: userSessionStatusToCheck.UserId,
+                                 Avatar: userSessionStatusToCheck.UserAvatar,
                                  Name: userSessionStatusToCheck.UserName,
                                  FirstName: userSessionStatusToCheck.FirstName,
                                  LastName: userSessionStatusToCheck.LastName,
+                                 Device: userSessionStatusToCheck.UserDevice,
                                  System: process.env.APP_SERVER_DATA_NAME
                                }
                              ]
                      };
 
           }
-          else if ( strAction === "join" ) { //Join to channel
+          else if ( strAction === "jointochannels" ) { //Join to channels
 
-            //Check user allowed to join to channel to listen instant messages
-            const allowedCheck = await InstantMenssageServerManager.checkAllowedToJoin( request.body.Channel,
-                                                                                        userSessionStatusToCheck,
-                                                                                        currentTransaction,
-                                                                                        logger );
+            const channelsToJoin = request.body.Channels.split( "," );
 
-            if ( allowedCheck.value === 1 ) {
+            const joinedChannels = {};
 
-              delete allowedCheck[ "value" ];
+            let intJoinedChannels = 0;
+
+            const errors = [];
+
+            const warnings = [];
+
+            for ( let intIndex = 0; intIndex < channelsToJoin.length; intIndex++ ) {
+
+              const strChannelToJoin = channelsToJoin[ intIndex ];
+
+              //Check user allowed to join to channel to listen instant messages
+              const allowedCheck = await InstantMessageServerManager.checkAllowedToJoin( strChannelToJoin,
+                                                                                         userSessionStatusToCheck,
+                                                                                         currentTransaction,
+                                                                                         logger );
+
+              if ( allowedCheck.value === 1 ) {
+
+                joinedChannels[ strChannelToJoin ] = true;
+
+                intJoinedChannels += 1;
+
+              }
+              else {
+
+                joinedChannels[ strChannelToJoin ] = false;
+
+                warnings.push(
+                               {
+                                 Code: "WARNING_NOT_ALLOWED_JOIN_CHANNEL",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to join to channel %s", strChannelToJoin ),
+                                 Details: strChannelToJoin
+                               }
+                             );
+
+                errors.push(
+                             {
+                               Code: "ERROR_NOT_ALLOWED_JOIN_CHANNEL",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to join to channel %s", strChannelToJoin ),
+                               Details: strChannelToJoin
+                             }
+                           );
+
+              }
+
+            }
+
+            if ( intJoinedChannels > 0 ) {
 
               result = {
                          StatusCode: 200, //Ok
@@ -531,50 +577,42 @@ export default class UserInstantMessageServiceController {
                          LogId: null,
                          IsError: false,
                          Errors: [],
-                         Warnings: [],
+                         Warnings: warnings,
                          Count: 1,
                          Data: [
-                                 allowedCheck
+                                 joinedChannels
                                ]
                        };
 
             }
             else {
 
-              delete allowedCheck[ "value" ];
-
               result = {
-                         StatusCode: 401, //Unauthorized
-                         Code: "ERROR_USER_DENIED_JOIN_CHANNEL",
+                         StatusCode: 403, //Forbidden
+                         Code: "ERROR_USER_NOT_ALLOWED_JOIN_CHANNEL",
                          Message: await I18NManager.translate( strLanguage, "User denied to join to channel" ),
                          Mark: "C6CDF908D21E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
-                         Errors: [
-                                   {
-                                     Code: "ERROR_USER_DENIED_JOIN_CHANNEL",
-                                     Message: await I18NManager.translate( strLanguage, "User denied to join to channel" ),
-                                     Details: null
-                                   }
-                                 ],
+                         Errors: errors,
                          Warnings: [],
                          Count: 1,
                          Data: [
-                                 allowedCheck
+                                 joinedChannels
                                ]
                        };
 
             }
 
           }
-          else if ( strAction === "send" ) { //Send message to channel
+          else if ( strAction === "sendmessage" ) { //Send message to channel
 
             //Check user allowed to send message to channel
-            const allowedCheck = await InstantMenssageServerManager.checkAllowedToSend( request.body.Channel,
-                                                                                        request.body.Message,
-                                                                                        userSessionStatusToCheck,
-                                                                                        currentTransaction,
-                                                                                        logger );
+            const allowedCheck = await InstantMessageServerManager.checkAllowedToSend( request.body.Channel,
+                                                                                       request.body.Message,
+                                                                                       userSessionStatusToCheck,
+                                                                                       currentTransaction,
+                                                                                       logger );
 
             if ( allowedCheck.value === 1 ) {
 
@@ -601,7 +639,7 @@ export default class UserInstantMessageServiceController {
               delete allowedCheck[ "value" ];
 
               result = {
-                         StatusCode: 401, //Unauthorized
+                         StatusCode: 403, //Forbidden
                          Code: "ERROR_USER_DENIED_SEND_MESSAGE",
                          Message: await I18NManager.translate( strLanguage, "User denied to send message to channel" ),
                          Mark: "9956751DE8D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
@@ -624,8 +662,37 @@ export default class UserInstantMessageServiceController {
             }
 
           }
-          else if ( strAction === "disconnected" || //Disconnect from server
-                    strAction === "leave" ) {       //Leave channel
+          else if ( strAction === "disconnectedfromserver" ) { //Disconnected from server
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_NOTIFIED",
+                       Message: await I18NManager.translate( strLanguage, "Notified" ),
+                       Mark: "612F89C5D1F7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+          else if ( strAction === "leavefromchannels" ) {     //Leave from channels
+
+            const channelsToLeave = request.body.Channels.split( "," );
+
+            const leavedChannels = {};
+
+            for ( let intIndex = 0; intIndex < channelsToLeave.length; intIndex++ ) {
+
+              const strChannelToLeave = channelsToLeave[ intIndex ];
+
+              //Meaybe in the future we can check if possible leave a channel
+
+              leavedChannels[ strChannelToLeave ] = true;
+
+            }
 
             result = {
                        StatusCode: 200, //Ok
@@ -637,7 +704,9 @@ export default class UserInstantMessageServiceController {
                        Errors: [],
                        Warnings: [],
                        Count: 0,
-                       Data: []
+                       Data: [
+                               leavedChannels
+                             ]
                      };
 
           }

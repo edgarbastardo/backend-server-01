@@ -14,7 +14,7 @@ import IntantMessageServerRequestServiceV1 from '../others/services/IntantMessag
 
 const debug = require( 'debug' )( 'IntantMessageServerManager' );
 
-export default class InstantMenssageServerManager {
+export default class InstantMessageServerManager {
 
   static async getConfigInstantMessageServerService( transaction: any,
                                                      logger: any ): Promise<any> {
@@ -79,7 +79,7 @@ export default class InstantMenssageServerManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = InstantMenssageServerManager.name + "." + this.getConfigInstantMessageServerService.name;
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.getConfigInstantMessageServerService.name;
 
       const strMark = "B63945EAEAE6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -132,7 +132,7 @@ export default class InstantMenssageServerManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = InstantMenssageServerManager.name + "." + this.checkAllowedToJoin.name;
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.checkAllowedToJoin.name;
 
       const strMark = "3CFE3FF1B959" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -186,7 +186,7 @@ export default class InstantMenssageServerManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = InstantMenssageServerManager.name + "." + this.checkAllowedToJoin.name;
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.checkAllowedToJoin.name;
 
       const strMark = "3CFE3FF1B959" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -220,7 +220,7 @@ export default class InstantMenssageServerManager {
 
     try {
 
-      const jsonServiceConfig = await InstantMenssageServerManager.getConfigInstantMessageServerService( transaction,
+      const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( transaction,
                                                                                                          logger );
 
       const headers = {
@@ -241,7 +241,7 @@ export default class InstantMenssageServerManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = InstantMenssageServerManager.name + "." + this.disconnectFromInstantMessageServer.name;
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.disconnectFromInstantMessageServer.name;
 
       const strMark = "07104A113729" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

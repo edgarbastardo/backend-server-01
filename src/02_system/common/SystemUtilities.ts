@@ -41,6 +41,8 @@ import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
+import { SYSUserSessionDevice } from "./database/master/models/SYSUserSessionDevice";
+import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
 
 const debug = require( "debug" )( "SystemUtilities" );
 
@@ -740,6 +742,7 @@ export default class SystemUtilities {
   }
 
   static async injectUserSessionData( currentSessionData: any,
+                                      transaction: any,
                                       logger: any ): Promise<any> {
 
     let result = {
@@ -750,8 +753,13 @@ export default class SystemUtilities {
 
     const sysUserInDB = await SYSUserService.getById( result.Data.UserId,
                                                       null,
-                                                      null,
+                                                      transaction,
                                                       logger );
+
+    const sysUserDeviceInDB = await SYSUserSessionDeviceService.getByToken( result.Data.UserId,
+                                                                            null,
+                                                                            transaction,
+                                                                            logger );
 
     result.Role = sysUserInDB.Role;
 
@@ -782,14 +790,27 @@ export default class SystemUtilities {
 
     }
 
+    result.Data[ "UserDevice" ] = sysUserDeviceInDB ? sysUserDeviceInDB.DeviceInfoParsed: "";
+    result.Data[ "UserAvatar" ] = sysUserInDB.Avatar ? sysUserInDB.Avatar: "";
     result.Data[ "UserName" ] = sysUserInDB.Name;
     result.Data[ "UserTag" ] = sysUserInDB.Tag;
     result.Data[ "UserGroupId" ] = sysUserGroupInDB.Id;
     result.Data[ "UserGroupName" ] = sysUserGroupInDB.Name;
     result.Data[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
 
-    const jsonExtraData = CommonUtilities.parseJSON( result.Data[ "ExtraData" ],
-                                                     logger );
+    let jsonExtraData = null;
+
+    if ( typeof result.Data[ "ExtraData" ] === "string"  ) {
+
+      jsonExtraData = CommonUtilities.parseJSON( result.Data[ "ExtraData" ],
+                                                 logger )
+
+    }
+    else {
+
+      jsonExtraData = result.Data[ "ExtraData" ];
+
+    }
 
     delete result.Data[ "ExtraData" ];
 
@@ -864,7 +885,7 @@ export default class SystemUtilities {
 
         // ANCHOR  getUserSessionPersistentByToken
         let sysUserSessionPersistentInDB = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
-                                                                                                                  null,
+                                                                                                                  transaction,
                                                                                                                   logger ); //Find in the database
 
         //let sysUserSessionPersistentData = null;
@@ -874,6 +895,7 @@ export default class SystemUtilities {
 
           //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
           userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionPersistentInDB as any ).dataValues,
+                                                                     transaction,
                                                                      logger );
 
           strUserRole = userSession.Role;
@@ -890,7 +912,7 @@ export default class SystemUtilities {
              bUpdateAt ) {
 
           result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                  null,
+                                                                                  transaction,
                                                                                   logger );
 
           const strRolesMerged = SystemUtilities.mergeTokens( strUserGroupRole,
@@ -957,6 +979,7 @@ export default class SystemUtilities {
         debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
 
         const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         transaction,
                                                                          logger );
 
         result = userSession.Data;
@@ -1044,6 +1067,7 @@ export default class SystemUtilities {
 
           //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
           userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionTemporalInDB as any ).dataValues,
+                                                                     transaction,
                                                                      logger );
 
           strUserRole = userSession.Role;
@@ -1156,6 +1180,7 @@ export default class SystemUtilities {
         debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
 
         const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         transaction,
                                                                          logger );
 
         result = userSession.Data;
@@ -2210,8 +2235,12 @@ export default class SystemUtilities {
 
         }
 
-        instance.UpdatedBy = null;
-        instance.UpdatedAt = null;
+        if ( !options.notClearUpdateField ) {
+
+          instance.UpdatedBy = null;
+          instance.UpdatedAt = null;
+
+        }
 
       }
       /*

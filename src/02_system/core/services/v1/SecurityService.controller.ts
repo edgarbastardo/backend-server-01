@@ -30,7 +30,7 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
-import InstantMenssageServerManager from "../../../common/managers/InstantMessageServerManager";
+import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
@@ -2045,7 +2045,7 @@ export default class SecurityServiceController {
 
             //FIXME 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
-            await InstantMenssageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
+            await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
                                                                                    null,
                                                                                    logger );
 
