@@ -484,9 +484,9 @@ export default class UserInstantMessageServiceController {
         if ( resultData &&
              resultData.StatusCode === 200 ) { //Ok the authorization token is valid
 
-          const strAction = request.body.Action.trim().toLowerCase();
+          const strCommand = request.body.Command.trim().toLowerCase();
 
-          if ( strAction === "connecttoserver" ) { //Connect to server
+          if ( strCommand === "connecttoserver" ) { //Connect to server
 
             //Th user is allowed to connect to instant message server
             result = {
@@ -514,7 +514,7 @@ export default class UserInstantMessageServiceController {
                      };
 
           }
-          else if ( strAction === "jointochannels" ) { //Join to channels
+          else if ( strCommand === "jointochannels" ) { //Join to channels
 
             const channelsToJoin = request.body.Channels.split( "," );
 
@@ -605,7 +605,7 @@ export default class UserInstantMessageServiceController {
             }
 
           }
-          else if ( strAction === "sendmessage" ) { //Send message to channel
+          else if ( strCommand === "sendmessage" ) { //Send message to channel
 
             //Check user allowed to send message to channel
             const allowedCheck = await InstantMessageServerManager.checkAllowedToSend( request.body.Channel,
@@ -662,7 +662,7 @@ export default class UserInstantMessageServiceController {
             }
 
           }
-          else if ( strAction === "disconnectedfromserver" ) { //Disconnected from server
+          else if ( strCommand === "disconnectedfromserver" ) { //Disconnected from server
 
             result = {
                        StatusCode: 200, //Ok
@@ -678,7 +678,7 @@ export default class UserInstantMessageServiceController {
                      };
 
           }
-          else if ( strAction === "leavefromchannels" ) {     //Leave from channels
+          else if ( strCommand === "leavefromchannels" ) {     //Leave from channels
 
             const channelsToLeave = request.body.Channels.split( "," );
 
@@ -714,17 +714,17 @@ export default class UserInstantMessageServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: "ERROR_UNKNOWN_ACTION",
-                       Message: await I18NManager.translate( strLanguage, "Unknown action name [%s]", strAction ),
+                       Code: "ERROR_UNKNOWN_COMMAND",
+                       Message: await I18NManager.translate( strLanguage, "Unknown command name [%s]", strCommand ),
                        Mark: "B8656012AEF4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: "ERROR_UNKNOWN_ACTION",
-                                   Message: await I18NManager.translate( strLanguage, "Unknown action name [%s]", strAction ),
+                                   Code: "ERROR_UNKNOWN_COMMAND",
+                                   Message: await I18NManager.translate( strLanguage, "Unknown command name [%s]", strCommand ),
                                    Details: {
-                                              Action: strAction
+                                              Action: strCommand
                                             }
                                  }
                                ],

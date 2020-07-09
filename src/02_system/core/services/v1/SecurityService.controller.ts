@@ -1067,9 +1067,9 @@ export default class SecurityServiceController {
           delete userSessionStatusData[ "ExtraData" ];
 
           await CacheManager.setDataWithTTL( strAuthorization,
-                                            JSON.stringify( userSessionStatusData ),
-                                            300, //5 minutes in seconds
-                                            logger );
+                                             JSON.stringify( userSessionStatusData ),
+                                             300, //5 minutes in seconds
+                                             logger );
 
           if ( userSessionStatus !== null ) {
 

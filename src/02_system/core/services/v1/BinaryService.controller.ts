@@ -2163,10 +2163,10 @@ export default class BinaryServiceController extends BaseService {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( parseInt( request.query.limit ) ) === false &&
-           Number.parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit as any ) ) === false &&
+           Number.parseInt( request.query.limit as any ) <= intLimit ) {
 
-        intLimit = Number.parseInt( request.query.limit );
+        intLimit = Number.parseInt( request.query.limit as any );
 
       }
       else {
@@ -2197,7 +2197,7 @@ export default class BinaryServiceController extends BaseService {
 
       //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset as any ) ) ? request.query.offset : "0" );
 
       //}
 
@@ -2802,9 +2802,9 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const strId = request.query.id;
-      const strAuth = request.query.auth;
-      const strThumbnail = request.query.thumbnail;
+      const strId = request.query.id as string;
+      const strAuth = request.query.auth as string;
+      const strThumbnail = request.query.thumbnail as string;
 
       if ( CommonUtilities.isNotNullOrEmpty( strId ) ) {
 
@@ -3584,7 +3584,7 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id as string,
                                                                       null,
                                                                       currentTransaction,
                                                                       logger );
@@ -6228,7 +6228,7 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id as string,
                                                                       null,
                                                                       currentTransaction,
                                                                       logger );

@@ -60,9 +60,9 @@ export default class UserDeleteServiceController {
       //let strUserName = context.UserSessionStatus.UserName;
 
       let sysUserInDB = await SYSUserService.getBy( {
-                                                      Id: request.query.id,
-                                                      ShortId: request.query.shortId,
-                                                      Name: request.query.name
+                                                      Id: request.query.id as string,
+                                                      ShortId: request.query.shortId as string,
+                                                      Name: request.query.name as string
                                                     },
                                                     null,
                                                     currentTransaction,

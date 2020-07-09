@@ -1288,7 +1288,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken as string,
                                                                                                   currentTransaction,
                                                                                                   logger );
 
@@ -1311,7 +1311,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token as string,
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -2035,9 +2035,9 @@ export default class UserOthersServiceController {
       let userSessionStatus = context.UserSessionStatus;
 
       let sysUserInDB = await SYSUserService.getBy( {
-                                                      Id: request.query.id,
-                                                      ShortId: request.query.shortId,
-                                                      Name: request.query.name
+                                                      Id: request.query.id as string,
+                                                      ShortId: request.query.shortId as string,
+                                                      Name: request.query.name as string
                                                     },
                                                     null,
                                                     currentTransaction,
@@ -2084,9 +2084,9 @@ export default class UserOthersServiceController {
         const strMessage = await this.getMessageUser(
                                                       strLanguage,
                                                       {
-                                                        Id: request.query.id,
-                                                        ShortId: request.query.shortId,
-                                                        Name: request.query.name
+                                                        Id: request.query.id as string,
+                                                        ShortId: request.query.shortId as string,
+                                                        Name: request.query.name as string
                                                       }
                                                     );
 
@@ -2927,10 +2927,10 @@ export default class UserOthersServiceController {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( parseInt( request.query.limit ) ) === false &&
-           Number.parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit as string ) ) === false &&
+           Number.parseInt( request.query.limit as string ) <= intLimit ) {
 
-        intLimit = parseInt( request.query.limit );
+        intLimit = parseInt( request.query.limit as string );
 
       }
       else {
@@ -2961,7 +2961,7 @@ export default class UserOthersServiceController {
 
       //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( request.query.offset as any ) ? request.query.offset : "0" );
 
       //}
 
@@ -3428,7 +3428,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken as string,
                                                                                                   currentTransaction,
                                                                                                   logger );
 
@@ -3439,7 +3439,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token as string,
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -3652,7 +3652,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken as string,
                                                                                                   currentTransaction,
                                                                                                   logger );
 
@@ -3663,7 +3663,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token as string,
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -3923,7 +3923,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken as string,
                                                                                                   currentTransaction,
                                                                                                   logger );
 
@@ -3934,7 +3934,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token as string,
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -3996,7 +3996,7 @@ export default class UserOthersServiceController {
 
         let routes = await SYSRoleHasRouteService.listRoutesOfRoles( userSessionStatus.Role,
                                                                      context.FrontendId,
-                                                                     request.query.format,
+                                                                     request.query.format as string,
                                                                      currentTransaction,
                                                                      logger );
 
@@ -4163,7 +4163,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByShortToken( request.query.shortToken as string,
                                                                                                   currentTransaction,
                                                                                                   logger );
 
@@ -4174,7 +4174,7 @@ export default class UserOthersServiceController {
 
           bProfileOfAnotherUser = true;
 
-          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token,
+          userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( request.query.token as string,
                                                                                              currentTransaction,
                                                                                              logger );
 
@@ -4236,7 +4236,7 @@ export default class UserOthersServiceController {
 
         let routes = await SYSRoleHasRouteService.listActionsOfRoles( userSessionStatus ? userSessionStatus.Role: "#Public#",
                                                                       context.FrontendId,
-                                                                      request.query.format,
+                                                                      request.query.format as string,
                                                                       currentTransaction,
                                                                       logger );
 

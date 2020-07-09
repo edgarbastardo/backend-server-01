@@ -68,9 +68,9 @@ export default class UserGroupServiceController {
 
       //ANCHOR getUserGroup
       let sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.query.id,
-                                                                ShortId: request.query.shortId,
-                                                                Name: request.query.name
+                                                                Id: request.query.id as string,
+                                                                ShortId: request.query.shortId as string,
+                                                                Name: request.query.name as string
                                                               },
                                                               null,
                                                               currentTransaction,
@@ -117,9 +117,9 @@ export default class UserGroupServiceController {
         const strMessage = await this.getMessageUserGroup(
                                                            strLanguage,
                                                            {
-                                                             Id: request.query.id,
-                                                             ShortId: request.query.shortId,
-                                                             Name: request.query.name
+                                                             Id: request.query.id as string,
+                                                             ShortId: request.query.shortId as string,
+                                                             Name: request.query.name as string
                                                            }
                                                          );
 
@@ -2297,9 +2297,9 @@ export default class UserGroupServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       let sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.query.id,
-                                                                ShortId: request.query.shortId,
-                                                                Name: request.query.name
+                                                                Id: request.query.id as string,
+                                                                ShortId: request.query.shortId as string,
+                                                                Name: request.query.name as string
                                                               },
                                                               null,
                                                               currentTransaction,
@@ -2894,10 +2894,10 @@ export default class UserGroupServiceController {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( parseInt( request.query.limit ) ) === false &&
-           Number.parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit as string ) ) === false &&
+           Number.parseInt( request.query.limit as string ) <= intLimit ) {
 
-        intLimit = parseInt( request.query.limit );
+        intLimit = parseInt( request.query.limit as string );
 
       }
       else {
@@ -2926,7 +2926,7 @@ export default class UserGroupServiceController {
 
       }
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset as string ) ) ? request.query.offset : "0" );
 
       //ANCHOR dbConnection.query
       const rows = await dbConnection.query( strSQL,
@@ -3345,9 +3345,9 @@ export default class UserGroupServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       let sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.query.id,
-                                                                ShortId: request.query.shortId,
-                                                                Name: request.query.name
+                                                                Id: request.query.id as string,
+                                                                ShortId: request.query.shortId as string,
+                                                                Name: request.query.name as string
                                                               },
                                                               null,
                                                               currentTransaction,
@@ -3655,9 +3655,9 @@ export default class UserGroupServiceController {
       const userSessionStatus = context.UserSessionStatus;
 
       let sysUserGroupInDB = await SYSUserGroupService.getBy( {
-                                                                Id: request.query.id,
-                                                                ShortId: request.query.shortId,
-                                                                Name: request.query.name
+                                                                Id: request.query.id as string,
+                                                                ShortId: request.query.shortId as string,
+                                                                Name: request.query.name as string
                                                               },
                                                               null,
                                                               currentTransaction,

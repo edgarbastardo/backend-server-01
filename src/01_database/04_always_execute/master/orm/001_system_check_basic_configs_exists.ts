@@ -608,10 +608,11 @@ export default class Always {
                                                               "service":"#remote_01#",
                                                               "#remote_01#": {
 
-                                                                "host": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_URI || "",
+                                                                "host": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_URI || "",
+
                                                                 "auth":{
 
-                                                                  "apiKey": process.env.OUTBOUND_INSTANT_MESSAGE_SERVER_API_KEY || ""
+                                                                  "apiKey": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_AUTH || ""
 
                                                                 }
 
@@ -659,6 +660,22 @@ export default class Always {
 
                                                                     "denied": "#DriversPosition#",
                                                                     "allowed": "*"
+
+                                                                  }
+
+                                                                },
+
+                                                                "config": {
+
+                                                                  "#Drivers#": {
+
+                                                                    "resume_messages": 10,
+
+                                                                  },
+
+                                                                  "@__default__@":{
+
+                                                                    "resume_messages": 0
 
                                                                   }
 
