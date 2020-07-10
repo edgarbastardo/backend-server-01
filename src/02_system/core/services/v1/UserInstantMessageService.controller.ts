@@ -528,7 +528,7 @@ export default class UserInstantMessageServiceController {
 
             for ( let intIndex = 0; intIndex < channelsToJoin.length; intIndex++ ) {
 
-              const strChannelToJoin = channelsToJoin[ intIndex ];
+              const strChannelToJoin = channelsToJoin[ intIndex ].trim();
 
               //Check user allowed to join to channel to listen instant messages
               const allowedCheck = await InstantMessageServerManager.checkAllowedToJoin( strChannelToJoin,
@@ -605,8 +605,253 @@ export default class UserInstantMessageServiceController {
             }
 
           }
+          else if ( strCommand === "listmembers" ) { //List members joined to channel
+
+            const channelsToJoin = request.body.Channels.split( "," );
+
+            const listChannels = {};
+
+            let intListChannels = 0;
+
+            const errors = [];
+
+            const warnings = [];
+
+            for ( let intIndex = 0; intIndex < channelsToJoin.length; intIndex++ ) {
+
+              const strChannelToList = channelsToJoin[ intIndex ].trim();
+
+              //Check user allowed to join to channel to listen instant messages
+              const allowedCheck = await InstantMessageServerManager.checkAllowedToJoin( strChannelToList,
+                                                                                         userSessionStatusToCheck,
+                                                                                         currentTransaction,
+                                                                                         logger );
+
+              if ( allowedCheck.value !== 1 ) {
+
+                if ( allowedCheck.allowed.includes( "@@AlreadyJoinedChannels@@" ) ) {
+
+                  if ( request.body.JoinedChannels.includes( strChannelToList ) ) {
+
+                    allowedCheck.value = 1;
+
+                  }
+
+                }
+
+              }
+
+              if ( allowedCheck.value === 1 ) {
+
+                listChannels[ strChannelToList ] = true;
+
+                intListChannels += 1;
+
+              }
+              else {
+
+                listChannels[ strChannelToList ] = false;
+
+                warnings.push(
+                               {
+                                 Code: "WARNING_NOT_ALLOWED_LIST_MEMBERS",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to list members in channel %s", strChannelToList ),
+                                 Details: strChannelToList
+                               }
+                             );
+
+                errors.push(
+                             {
+                               Code: "ERROR_NOT_ALLOWED_LIST_MEMBERS",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to list members in channel %s", strChannelToList ),
+                               Details: strChannelToList
+                             }
+                           );
+
+              }
+
+            }
+
+            if ( intListChannels > 0 ) {
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: "SUCCESS_USER_ALLOWED_LIST_MEMBERS",
+                         Message: await I18NManager.translate( strLanguage, "User allowed to list members" ),
+                         Mark: "4BDE803FAB49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: warnings,
+                         Count: 1,
+                         Data: [
+                                 listChannels
+                               ]
+                       };
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: "ERROR_USER_NOT_ALLOWED_LIST_MEMBERS",
+                         Message: await I18NManager.translate( strLanguage, "User denied to list members" ),
+                         Mark: "DF78E1E06D1F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: errors,
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 listChannels
+                               ]
+                       };
+
+            }
+
+          }
+          else if ( strCommand === "listchannels" ) { //List channels
+
+            const configDataAllowedToJoin = await InstantMessageServerManager.getConfigAllowedToJoin( userSessionStatusToCheck,
+                                                                                                      currentTransaction,
+                                                                                                      logger );
+
+            if ( configDataAllowedToJoin.allowed ) {
+
+              const channels = configDataAllowedToJoin.allowed.replace( new RegExp( "\\#", "gi" ), "" ).split( "," );
+
+              /*
+              const allowedToJoin = []
+
+              for ( let intIndexChannel = 0; intIndexChannel < channels.length; intIndexChannel++ ) {
+
+                allowedToJoin[ channels[ intIndexChannel ] ] = true;
+
+              }
+              */
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: "SUCCESS_GET_CHANNELS_ALLOWED_TO_JOIN",
+                         Message: await I18NManager.translate( strLanguage, "Success get channels list allowed to join" ),
+                         Mark: "A28B43ECF626" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: [],
+                         Count: 1,
+                         Data: channels
+                       };
+
+            }
+
+          }
           else if ( strCommand === "sendmessage" ) { //Send message to channel
 
+            const channelsToSend = request.body.Channels.split( "," );
+
+            const listChannels = {};
+
+            let intListChannels = 0;
+
+            const errors = [];
+
+            const warnings = [];
+
+            for ( let intIndex = 0; intIndex < channelsToSend.length; intIndex++ ) {
+
+              const strChannelToSend = channelsToSend[ intIndex ].trim();
+
+              //Check user allowed to join to channel to listen instant messages
+              const allowedCheck = await InstantMessageServerManager.checkAllowedToSend( strChannelToSend,
+                                                                                         request.body.Message,
+                                                                                         userSessionStatusToCheck,
+                                                                                         currentTransaction,
+                                                                                         logger );
+
+              if ( allowedCheck.value !== 1 ) {
+
+                if ( allowedCheck.allowed.includes( "@@AlreadyJoinedChannels@@" ) ) {
+
+                  if ( request.body.JoinedChannels.includes( strChannelToSend ) ) {
+
+                    allowedCheck.value = 1;
+
+                  }
+
+                }
+
+              }
+
+              if ( allowedCheck.value === 1 ) {
+
+                listChannels[ strChannelToSend ] = true;
+
+                intListChannels += 1;
+
+              }
+              else {
+
+                listChannels[ strChannelToSend ] = false;
+
+                warnings.push(
+                               {
+                                 Code: "WARNING_NOT_ALLOWED_SEND_MESSAGE",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to send message to channel %s", strChannelToSend ),
+                                 Details: strChannelToSend
+                               }
+                             );
+
+                errors.push(
+                             {
+                               Code: "ERROR_NOT_ALLOWED_SEND_MESSAGE",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed to send message to channel %s", strChannelToSend ),
+                               Details: strChannelToSend
+                             }
+                           );
+
+              }
+
+            }
+
+            if ( intListChannels > 0 ) {
+
+              result = {
+                         StatusCode: 200, //Ok
+                         Code: "SUCCESS_USER_ALLOWED_SEND_MESSAGE",
+                         Message: await I18NManager.translate( strLanguage, "User allowed to send message" ),
+                         Mark: "FACDF58A4A66" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: false,
+                         Errors: [],
+                         Warnings: warnings,
+                         Count: 1,
+                         Data: [
+                                 listChannels
+                               ]
+                       };
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 403, //Forbidden
+                         Code: "ERROR_USER_NOT_ALLOWED_SEND_MESSAGE",
+                         Message: await I18NManager.translate( strLanguage, "User denied to send message" ),
+                         Mark: "95AA7132B706" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: errors,
+                         Warnings: [],
+                         Count: 1,
+                         Data: [
+                                 listChannels
+                               ]
+                       };
+
+            }
+
+            /*
             //Check user allowed to send message to channel
             const allowedCheck = await InstantMessageServerManager.checkAllowedToSend( request.body.Channel,
                                                                                        request.body.Message,
@@ -660,6 +905,7 @@ export default class UserInstantMessageServiceController {
                        };
 
             }
+            */
 
           }
           else if ( strCommand === "disconnectedfromserver" ) { //Disconnected from server
@@ -686,7 +932,7 @@ export default class UserInstantMessageServiceController {
 
             for ( let intIndex = 0; intIndex < channelsToLeave.length; intIndex++ ) {
 
-              const strChannelToLeave = channelsToLeave[ intIndex ];
+              const strChannelToLeave = channelsToLeave[ intIndex ].trim();
 
               //Meaybe in the future we can check if possible leave a channel
 

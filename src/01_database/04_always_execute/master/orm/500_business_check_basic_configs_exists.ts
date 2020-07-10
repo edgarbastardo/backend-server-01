@@ -153,7 +153,7 @@ export default class Always {
 
           }
           else if ( !sysConfigValueDataInDB.Tag ||
-                    sysConfigValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                    sysConfigValueDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
             sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             sysConfigValueDataInDB.Value = configValueToCreate.Value;

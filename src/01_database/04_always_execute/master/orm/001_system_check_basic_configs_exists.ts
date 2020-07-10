@@ -80,6 +80,17 @@ export default class Always {
               */
 
             }
+            else if ( !configMetaDataInDB.Tag ||
+                      configMetaDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+
+              configMetaDataInDB.Default = configMetaDataToCreate.Default;
+              configMetaDataInDB.Example = configMetaDataToCreate.Example;
+              configMetaDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+              await SYSConfigMetaData.update( ( configMetaDataInDB as any ).dataValues,
+                                              options );
+
+            }
 
           }
           catch ( error ) {
@@ -605,29 +616,61 @@ export default class Always {
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
+
                                                               "service":"#remote_01#",
+
                                                               "#remote_01#": {
 
-                                                                "host": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_URI || "",
+                                                                "host_rest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
+
+                                                                "host_live": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_URI || "",
 
                                                                 "auth":{
 
-                                                                  "apiKey": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_AUTH || ""
+                                                                  "apiKey": process.env.INSTANT_MESSAGE_SERVER_AUTH || ""
 
                                                                 }
 
                                                               },
-                                                              "channels": {
 
-                                                                "join": {
+                                                              "channel": {
 
-                                                                  "#Business_Managers#":{
+                                                                "config": {
+
+                                                                  "#Drivers#": {
+
+                                                                    "resume": {
+
+                                                                      "messages": 10
+
+                                                                    }
+                                                                  },
+
+                                                                  "@__default__@": {
+
+                                                                    "resume": {
+
+                                                                      "messages": 0
+
+                                                                    }
+
+                                                                  }
+
+                                                                }
+
+                                                              },
+
+                                                              "command": {
+
+                                                                "JoinToChannels": {
+
+                                                                  "#Business_Managers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
 
                                                                   },
-                                                                  "#System_Administrators#":{
+                                                                  "#System_Administrators#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
@@ -645,7 +688,7 @@ export default class Always {
                                                                     "allowed": "#Drivers#,#DriversPosition#"
 
                                                                   },
-                                                                  "@__default__@":{
+                                                                  "@__default__@": {
 
                                                                     "denied": "",
                                                                     "allowed": "*"
@@ -654,34 +697,30 @@ export default class Always {
 
                                                                 },
 
-                                                                "send": {
+                                                                "SendMessage": {
 
-                                                                  "@__default__@":{
+                                                                  "@__default__@": {
 
                                                                     "denied": "#DriversPosition#",
-                                                                    "allowed": "*"
+                                                                    "allowed": "#@@AlreadyJoinedChannels@@#"
 
                                                                   }
 
                                                                 },
 
-                                                                "config": {
+                                                                "ListMembers": {
 
-                                                                  "#Drivers#": {
+                                                                  "@__default__@": {
 
-                                                                    "resume_messages": 10,
-
-                                                                  },
-
-                                                                  "@__default__@":{
-
-                                                                    "resume_messages": 0
+                                                                    "denied": "",
+                                                                    "allowed": "#@@AlreadyJoinedChannels@@#"
 
                                                                   }
 
-                                                                }
+                                                                },
 
                                                               }
+
                                                             }
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -722,7 +761,7 @@ export default class Always {
 
             }
             else if ( !sysConfigValueDataInDB.Tag ||
-                      sysConfigValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                      sysConfigValueDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
               sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
               sysConfigValueDataInDB.Value = configValueToCreate.Value;

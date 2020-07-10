@@ -107,7 +107,7 @@ export default class Always {
 
           }
           else if ( !sysUserSessionPersistentInDB.Tag ||
-                    sysUserSessionPersistentInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                    sysUserSessionPersistentInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
             //sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 

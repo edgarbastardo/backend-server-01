@@ -1837,18 +1837,43 @@ export default class SystemConstants {
                                               Name: "system.instant.message.server",
                                               Default: JSON.stringify(
                                                                        {
+
                                                                          "service": "#im_server_01#",
+
                                                                          "#im_server_01#": {
 
-                                                                           "host": "http://localhost:9191/instant/message/server/kk/api/v1/callback",
+                                                                           "host_rest": "http://localhost:9191/instant/message/server/domain/api/v1",
+
+                                                                           "host_live": "http://localhost:9191/instant/message/server/domain/socket/v1/live",
+
                                                                            "auth":{
+
                                                                              "apiKey": "my_key"
+
                                                                            }
 
                                                                          },
+
                                                                          "channels": {
 
-                                                                           "join": {
+                                                                           "config": {
+
+                                                                             "@__default__@": {
+
+                                                                              "resume": {
+
+                                                                                "messages": 0
+
+                                                                              }
+                                                                             }
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "commands": {
+
+                                                                           "JoinToChannels": {
 
                                                                              "@__default__@":{
 
@@ -1859,18 +1884,30 @@ export default class SystemConstants {
 
                                                                            },
 
-                                                                           "send": {
+                                                                           "SendMessage": {
 
-                                                                             "@__default__@":{
+                                                                             "@__default__@": {
 
                                                                                "denied": "",
-                                                                               "allowed": "*"
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
 
                                                                              }
 
-                                                                           }
+                                                                           },
+
+                                                                           "ListMembers": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
 
                                                                          }
+
                                                                        }
                                                                      ),
                                               Label: "Configuration for instant message server settings",
@@ -1879,10 +1916,15 @@ export default class SystemConstants {
                                               AllowTagAccessW: "#Administrator#",
                                               Example: JSON.stringify(
                                                                        {
+
                                                                          "service": "#im_server_01#",
+
                                                                          "#im_server_01#": {
 
-                                                                           "host": "http://localhost:9191/instant/message/server/kk/api/v1/callback",
+                                                                           "host_rest": "http://localhost:9191/instant/message/server/domain/api/v1",
+
+                                                                           "host_live": "http://localhost:9191/instant/message/server/domain/socket/v1/live",
+
                                                                            "auth":{
 
                                                                              "apiKey": "178fa7c2-bcdc-4051-9773-26b86f49307d"
@@ -1890,17 +1932,36 @@ export default class SystemConstants {
                                                                            }
 
                                                                          },
-                                                                         "channels": {
 
-                                                                           "join": {
+                                                                         "channel": {
 
-                                                                             "#Business_Managers#":{
+                                                                           "config": {
+
+                                                                             "@__default__@": {
+
+                                                                              "resume": {
+
+                                                                                "messages": 0
+
+                                                                              }
+
+                                                                             }
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "command": {
+
+                                                                           "JoinToChannels": {
+
+                                                                             "#Business_Managers#": {
 
                                                                                "denied": "",
                                                                                "allowed": "#Business_Managers#,#Administrators#"
 
                                                                              },
-                                                                             "#System_Administrators#":{
+                                                                             "#System_Administrators#": {
 
                                                                                "denied": "",
                                                                                "allowed": "#System_Administrators#,#Administrators#"
@@ -1924,7 +1985,7 @@ export default class SystemConstants {
                                                                                "allowed": "*"
 
                                                                              },
-                                                                             "#admin01@system.net#":{
+                                                                             "#admin01@system.net#": {
 
                                                                                "denied": "",
                                                                                "allowed": "*"
@@ -1939,18 +2000,30 @@ export default class SystemConstants {
 
                                                                            },
 
-                                                                           "send": {
+                                                                           "SendMessage": {
 
-                                                                             "@__default__@":{
+                                                                             "@__default__@": {
 
                                                                                "denied": "",
-                                                                               "allowed": "#@@UserName@@#"
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
 
                                                                              }
 
-                                                                           }
+                                                                           },
+
+                                                                           "ListMembers": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
 
                                                                          }
+
                                                                        }
                                                                      ),
                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,

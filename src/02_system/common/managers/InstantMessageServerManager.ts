@@ -119,7 +119,7 @@ export default class InstantMessageServerManager {
                                                                       SystemConstants._CONFIG_ENTRY_IM_Server.Owner,
                                                                       strChannelToJoin,
                                                                       null,
-                                                                      "channels/join",
+                                                                      "command/JoinToChannels",
                                                                       false,
                                                                       transaction,
                                                                       true,
@@ -173,7 +173,7 @@ export default class InstantMessageServerManager {
                                                                       SystemConstants._CONFIG_ENTRY_IM_Server.Owner,
                                                                       strChannelToSend,
                                                                       null,
-                                                                      "channels/send",
+                                                                      "command/SendMessage",
                                                                       false,
                                                                       transaction,
                                                                       true,
@@ -189,6 +189,56 @@ export default class InstantMessageServerManager {
       sourcePosition.method = InstantMessageServerManager.name + "." + this.checkAllowedToJoin.name;
 
       const strMark = "3CFE3FF1B959" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getConfigAllowedToJoin( userSessionStatus: any,
+                                       transaction: any,
+                                       logger: any ): Promise<any> {
+
+    let result = { value: 0, allowed: "*", denied: "" };
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
+                                                                                                SystemConstants._CONFIG_ENTRY_IM_Server.Id,
+                                                                                                SystemConstants._CONFIG_ENTRY_IM_Server.Owner,
+                                                                                                null,
+                                                                                                "command/JoinToChannels",
+                                                                                                false,
+                                                                                                transaction,
+                                                                                                logger );
+
+      result = configData;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.getConfigAllowedToJoin.name;
+
+      const strMark = "8E7213C60CA9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
