@@ -621,11 +621,15 @@ export default class Always {
 
                                                               "#remote_01#": {
 
-                                                                "host_rest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
+                                                                "hostRest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
 
-                                                                "host_live": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_URI || "",
+                                                                "hostLiveDomain": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_DOMAIN || "",
 
-                                                                "auth":{
+                                                                "hostLivePath": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_PATH || "",
+
+                                                                "workers": process.env.INSTANT_MESSAGE_SERVER_WORKERS || 1,
+
+                                                                "auth": {
 
                                                                   "apiKey": process.env.INSTANT_MESSAGE_SERVER_AUTH || ""
 

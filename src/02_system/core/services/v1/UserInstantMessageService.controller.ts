@@ -110,6 +110,21 @@ export default class UserInstantMessageServiceController {
 
       }
 
+      const configDataAllowedToJoin = await InstantMessageServerManager.getConfigAllowedToJoin( userSessionStatus,
+                                                                                                currentTransaction,
+                                                                                                logger );
+
+      let strChannels = "";
+
+      if ( configDataAllowedToJoin.allowed ) {
+
+        strChannels = configDataAllowedToJoin.allowed.replace( new RegExp( "\\#", "gi" ), "" ); //.split( "," );
+
+      }
+
+      const URL = await InstantMessageServerManager.getURLFromInstantMessageServer( currentTransaction,
+                                                                                    logger );
+
       result = {
                  StatusCode: 200, //Ok
                  Code: "SUCCESS_AUTH_TOKEN_CREATED",
@@ -123,6 +138,9 @@ export default class UserInstantMessageServiceController {
                  Data: [
                          {
                            Auth: strSocketToken,
+                           Channels: strChannels,
+                           Domain: URL.Domain,
+                           Path: URL.Path,
                          }
                        ]
                };
@@ -268,9 +286,9 @@ export default class UserInstantMessageServiceController {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
-        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
-                                                                               null,
-                                                                               logger );
+        await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                              null,
+                                                                              logger );
 
         /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
@@ -475,6 +493,7 @@ export default class UserInstantMessageServiceController {
 
         fakeRequest.context.UserSessionStatus = userSessionStatusToCheck;
 
+        ( fakeRequest as any ).notDisconnectFromIMServer = 1; //Prevent recursive call between this server and instant message server
         ( fakeRequest as any ).returnResult = 1; //Force to return the result
 
         let resultData = await MiddlewareManager.middlewareCheckIsAuthenticated( fakeRequest as any,

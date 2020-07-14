@@ -1842,9 +1842,13 @@ export default class SystemConstants {
 
                                                                          "#im_server_01#": {
 
-                                                                           "host_rest": "http://localhost:9191/instant/message/server/domain/api/v1",
+                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
 
-                                                                           "host_live": "http://localhost:9191/instant/message/server/domain/socket/v1/live",
+                                                                           "hostLiveDomain": "http://localhost:5050",
+
+                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
+
+                                                                           "workers": "9191,9192,9193",
 
                                                                            "auth":{
 
@@ -1921,9 +1925,13 @@ export default class SystemConstants {
 
                                                                          "#im_server_01#": {
 
-                                                                           "host_rest": "http://localhost:9191/instant/message/server/domain/api/v1",
+                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
 
-                                                                           "host_live": "http://localhost:9191/instant/message/server/domain/socket/v1/live",
+                                                                           "hostLiveDomain": "http://localhost:5050",
+
+                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
+
+                                                                           "workers": "9191,9192,9193",
 
                                                                            "auth":{
 

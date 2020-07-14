@@ -1993,8 +1993,10 @@ export default class SecurityServiceController {
 
           const strSavedSocketToken = userSessionStatus.SocketToken;
 
+          /*
           //Delete from cache the other tokens
           await CacheManager.deleteData( userSessionStatus.Token, logger );
+
           userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
           userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
 
@@ -2014,6 +2016,11 @@ export default class SecurityServiceController {
                                                                                      7 * 1000, //Second
                                                                                      currentTransaction,
                                                                                      logger );
+                                                                                     */
+
+          userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                   currentTransaction,
+                                                                   logger );  //Force logout the session
 
           if ( userSessionStatus instanceof Error ) {
 
@@ -2045,9 +2052,9 @@ export default class SecurityServiceController {
 
             //FIXME 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
-            await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
-                                                                                   null,
-                                                                                   logger );
+            await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                                  null,
+                                                                                  logger );
 
             /*
             await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,

@@ -43,6 +43,7 @@ import I18NManager from "./managers/I18Manager";
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
 import { SYSUserSessionDevice } from "./database/master/models/SYSUserSessionDevice";
 import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
+import DBConnectionManager from "./managers/DBConnectionManager";
 
 const debug = require( "debug" )( "SystemUtilities" );
 
@@ -1375,6 +1376,140 @@ export default class SystemUtilities {
 
         await CacheManager.unlockResource( lockedResource,
                                            logger );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async logoutSession( userSessionStatus: any,
+                              transaction: any,
+                              logger: any ): Promise<SYSUserSessionStatus> {
+
+    let result = userSessionStatus; //By default always return the session
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      let bUpdated = false;
+
+      //Delete from cache the main auth token
+      await CacheManager.deleteData( userSessionStatus.Token, logger );
+
+      if ( userSessionStatus.BinaryDataToken ) { //Not update if not needed
+
+        //Delete from cache the binary data token
+        userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
+        userSessionStatus.BinaryDataToken = null;
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( userSessionStatus.SocketToken ) { //Not update if not needed
+
+        //Delete from cache the socket token
+        userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
+        userSessionStatus.SocketToken = null;
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( !userSessionStatus.LoggedOutBy ||
+           !userSessionStatus.LoggedOutAt ) { //Not update if not needed
+
+        userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
+        userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( bUpdated ) { //Only update if needed.
+
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        if ( currentTransaction === null ) {
+
+          currentTransaction = await dbConnection.transaction();
+
+          bIsLocalTransaction = true;
+
+        }
+
+        if ( userSessionStatus?.dataValues ) {
+
+          userSessionStatus = userSessionStatus.dataValues
+
+        }
+
+        userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus?.Token,
+                                                                                   userSessionStatus,
+                                                                                   false,    //Set roles?
+                                                                                   null,     //User group roles
+                                                                                   null,     //User roles
+                                                                                   true,     //Force update?
+                                                                                   1,        //Only 1 try
+                                                                                   7 * 1000, //Second
+                                                                                   currentTransaction,
+                                                                                   logger );
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.logoutSession.name;
+
+      const strMark = "7C9E7E9BB98E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = error;
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
 
       }
 

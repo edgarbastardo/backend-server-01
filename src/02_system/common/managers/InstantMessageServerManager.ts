@@ -4,8 +4,8 @@ import cluster from 'cluster';
 
 import CommonConstants from '../CommonConstants';
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 import DBConnectionManager from "./DBConnectionManager";
 import I18NManager from './I18Manager';
 import SYSConfigValueDataService from '../database/master/services/SYSConfigValueDataService';
@@ -262,7 +262,92 @@ export default class InstantMessageServerManager {
 
   }
 
-  static async disconnectFromInstantMessageServer( strSocketToken: string,
+  static async getURLFromInstantMessageServer( transaction: any,
+                                               logger: any ): Promise<{ Domain: string, Path: string }> {
+
+    let result = {
+                   Domain: "",
+                   Path: ""
+                 };
+
+    try {
+
+      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+
+      const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( transaction,
+                                                                                                        logger );
+
+      const headers = {
+
+        "Content-Type": "application/json",
+        "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+
+      }
+
+      const response = await IntantMessageServerRequestServiceV1.selectWorkerSocket(
+                                                                                     jsonServiceConfig.hostRest,
+                                                                                     headers,
+                                                                                   );
+
+      let strWorker = null;
+
+      if ( response?.output?.body?.Data?.length > 0 ) {
+
+        strWorker = response?.output?.body?.Data[ 0 ];
+
+      }
+
+      //Backup plan
+      if ( !strWorker &&
+           jsonServiceConfig.workers ) {
+
+        const workersList = jsonServiceConfig.workers.split( "," );
+
+        if ( workersList?.length > 0 ) {
+
+          strWorker = workersList[ SystemUtilities.getRandomIntegerRange( 0, workersList.length - 1 ) ];
+
+        }
+
+      }
+
+      result = {
+                 Domain: jsonServiceConfig.hostLiveDomain,
+                 Path: jsonServiceConfig.hostLivePath + ( strWorker ?  "/" + strWorker : "" )
+               };
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.getURLFromInstantMessageServer.name;
+
+      const strMark = "75233FA48CBC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async disconnectFromInstantMessageServer( strAuth: string,
                                                    transaction: any,
                                                    logger: any ): Promise<boolean> {
 
@@ -270,21 +355,25 @@ export default class InstantMessageServerManager {
 
     try {
 
+      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+
       const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( transaction,
-                                                                                                         logger );
+                                                                                                        logger );
 
       const headers = {
 
         "Content-Type": "application/json",
-        "Authorization": jsonServiceConfig.auth.apiKey
+        "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
 
       }
 
-      await IntantMessageServerRequestServiceV1.callDisconnectUser( jsonServiceConfig.host,
+      await IntantMessageServerRequestServiceV1.callDisconnectUser(
+                                                                    jsonServiceConfig.hostRest,
                                                                     headers,
                                                                     {
-                                                                      "Auth": strSocketToken
-                                                                    } );
+                                                                      "Auth": strAuth
+                                                                    }
+                                                                  );
 
     }
     catch ( error ) {

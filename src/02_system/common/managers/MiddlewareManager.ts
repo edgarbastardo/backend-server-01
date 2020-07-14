@@ -584,23 +584,33 @@ export default class MiddlewareManager {
                  }
 
       }
-      else if ( userSessionStatus &&
-                userSessionStatus.SocketToken ) {
+      else {
 
-        //FIXME 40E1487688CC Disconnect from remote server
-        //Send to instant message server a message to disconnect this user
-        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
-                                                                               null,
-                                                                               logger );
+        const strSavedSocketToken = userSessionStatus.SocketToken;
 
-        /*
-        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
-                                                                                userSessionStatus.SocketToken,
-                                                                                strLanguage,
-                                                                                null, //No warnings
-                                                                                null, //No transaction
-                                                                                logger );
-        */
+        userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                 null,
+                                                                 logger );
+
+        if ( strSavedSocketToken &&
+             !( request as any ).notDisconnectFromIMServer ) {
+
+          //FIXME 40E1487688CC Disconnect from remote server
+          //Send to instant message server a message to disconnect this user
+          await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                                null,
+                                                                                logger );  //Force logout the session
+
+          /*
+          await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                  userSessionStatus.SocketToken,
+                                                                                  strLanguage,
+                                                                                  null, //No warnings
+                                                                                  null, //No transaction
+                                                                                  logger );
+          */
+
+        }
 
       }
 
@@ -630,14 +640,20 @@ export default class MiddlewareManager {
       }
       else if ( response ) {
 
-        if ( userSessionStatus &&
-             userSessionStatus.SocketToken ) {
+        const strSavedSocketToken = userSessionStatus.SocketToken;
+
+        userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                 null,
+                                                                 logger );
+
+        if ( strSavedSocketToken &&
+             !( request as any ).notDisconnectFromIMServer ) {
 
           //FIXME 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
-          await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
-                                                                                 null,
-                                                                                 logger );
+          await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                                null,
+                                                                                logger );  //Force logout the session
 
           /*
           await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
@@ -657,14 +673,20 @@ export default class MiddlewareManager {
     }
     else if ( response ) {
 
-      if ( userSessionStatus &&
-           userSessionStatus.SocketToken ) {
+      const strSavedSocketToken = userSessionStatus.SocketToken;
+
+      userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                               null,
+                                                               logger ); //Force logout the session
+
+      if ( strSavedSocketToken &&
+           !( request as any ).notDisconnectFromIMServer ) {
 
         //FIXME 40E1487688CC Disconnect from remote server
         //Send to instant message server a message to disconnect this user
-        await InstantMessageServerManager.disconnectFromInstantMessageServer( userSessionStatus.SocketToken,
-                                                                               null,
-                                                                               logger );
+        await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                              null,
+                                                                              logger );
 
         /*
         await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
