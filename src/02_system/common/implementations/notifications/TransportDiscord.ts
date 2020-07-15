@@ -27,16 +27,36 @@ export default class TransportDiscord {
 
     try {
 
-      /*
-      const OneSignal = require( 'onesignal-node' );
+      let strWebHook = transportOptions.target.web_hooks[ messageOptions.channel ];
 
-      const client = new OneSignal.Client( transportOptions.auth.app_id,
-                                           transportOptions.auth.api_key );
+      if ( !strWebHook ) {
 
-      const response = await client.createNotification( messageOptions );
+        strWebHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
 
-      bResult = response.body.id !== null;
-      */
+      }
+
+      if ( strWebHook === null ||
+           strWebHook === undefined ) {
+
+        strWebHook = transportOptions.target.web_hooks[ "@__default__@" ];
+
+      }
+
+      if ( strWebHook ) {
+
+        const toList = CommonUtilities.trimArray( strWebHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+
+        for ( const strTo of toList ) {
+
+          if ( strTo && strTo.trim()  ) {
+
+            //Not implemented yet
+
+          }
+
+        }
+
+      }
 
     }
     catch ( error ) {

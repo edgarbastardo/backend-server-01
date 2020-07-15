@@ -1,3 +1,4 @@
+import CommonUtilities from "./CommonUtilities";
 
 export interface ICheckUserRoles {
 
@@ -1338,7 +1339,7 @@ export default class SystemConstants {
                                                                                "#discord#":{
                                                                                  "type":"discord",
                                                                                  "target":{
-                                                                                   "web_hooks": []
+                                                                                   "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK || `{ "@__default__@": "" }`, null )
                                                                                  }
                                                                                }
                                                                              }
@@ -1353,10 +1354,10 @@ export default class SystemConstants {
                                                                                "#discord#":{
                                                                                  "type":"discord",
                                                                                  "target":{
-                                                                                   "web_hooks": [
-                                                                                                  "url1",
-                                                                                                  "url2"
-                                                                                                ]
+                                                                                  "web_hooks": {
+                                                                                                 "@__default__@": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
+                                                                                                 "#otherChannel": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
+                                                                                               }
                                                                                  }
                                                                                }
                                                                              }
@@ -1379,7 +1380,7 @@ export default class SystemConstants {
                                                                              "#slack#":{
                                                                                "type":"slack",
                                                                                "target":{
-                                                                                 "web_hooks": []
+                                                                                 "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK || `{ "@__default__@": "" }`, null )
                                                                                }
                                                                              }
                                                                            }
@@ -1394,10 +1395,10 @@ export default class SystemConstants {
                                                                              "#slack#":{
                                                                                "type":"slack",
                                                                                "target":{
-                                                                                 "web_hooks": [
-                                                                                                "url1",
-                                                                                                "url2"
-                                                                                              ]
+                                                                                 "web_hooks": {
+                                                                                                "@__default__@": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
+                                                                                                "#otherChannel": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
+                                                                                              }
                                                                                }
                                                                              }
                                                                            }
