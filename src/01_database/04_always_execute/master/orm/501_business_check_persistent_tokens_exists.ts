@@ -40,7 +40,7 @@ export default class Always {
       const userSessionPersistentEntries = [
                                              {
                                                Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
-                                               UserId: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
+                                               UserId: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9", //ForeignSystem01
                                                Token: process.env.FOREIGN_SYSTEM_01_TOKEN || "1",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_01_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_01_SOCKET_TOKEN || null,
@@ -51,7 +51,7 @@ export default class Always {
                                              },
                                              {
                                                Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                                               UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
+                                               UserId: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b", //ForeignSystem02
                                                Token: process.env.FOREIGN_SYSTEM_02_TOKEN || "2",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_02_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_02_SOCKET_TOKEN || null,
@@ -62,7 +62,7 @@ export default class Always {
                                              },
                                              {
                                                Id: "2bc74668-bdca-49de-bc99-058f7f3a5e10",
-                                               UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
+                                               UserId: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03", //ForeignSystem03
                                                Token: process.env.FOREIGN_SYSTEM_03_TOKEN || "3",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_03_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_03_SOCKET_TOKEN || null,
@@ -71,7 +71,18 @@ export default class Always {
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
-                                           ]
+                                             {
+                                               Id: "047c0058-4d36-45da-b6c9-98e69e0bf831",
+                                               UserId: "75cc6129-ae0f-4f65-943a-ff6909317ff0", //IntantMessageServer01
+                                               Token: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_TOKEN || "1",
+                                               BinaryDataToken: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_SOCKET_TOKEN || null,
+                                               Tag: "#ForeignSystem#,#InstantMessageServer01#,#Callback#,#Proxy#",
+                                               Comment: "Callback inbound requests from instant message server to backend data server. Authorization Token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                          ]
 
       const loopUserSessionPersistentEntriesAsync = async () => {
 
@@ -96,7 +107,7 @@ export default class Always {
 
           }
           else if ( !sysUserSessionPersistentInDB.Tag ||
-                    sysUserSessionPersistentInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                    sysUserSessionPersistentInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
             //sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 

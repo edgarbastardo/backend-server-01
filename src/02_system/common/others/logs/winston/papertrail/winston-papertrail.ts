@@ -1,13 +1,13 @@
 import { EventEmitter } from "events";
-//import { SPLAT } from 'triple-beam';
-import TransportStream from 'winston-transport';
-import { Produce } from 'glossy';
-//import { inspect } from 'util';
+//import { SPLAT } from "triple-beam";
+import TransportStream from "winston-transport";
+import { Produce } from "glossy";
+//import { inspect } from "util";
 import { hostname } from "os";
 import { createConnection } from "net";
 import { connect } from "tls";
 
-import safeStringify from 'fast-safe-stringify';
+import safeStringify from "fast-safe-stringify";
 
 
 /**
@@ -129,8 +129,8 @@ export class PapertrailConnection extends EventEmitter {
                                         this.options.host,
                                         this.onConnected.bind( this ) );
 				this.stream.setKeepAlive( true, KEEPALIVE_INTERVAL );
-				this.stream.once( 'error', this.onErrored.bind( this ) );
-        this.stream.once( 'end', this.connect.bind( this ) );
+				this.stream.once( "error", this.onErrored.bind( this ) );
+        this.stream.once( "end", this.connect.bind( this ) );
 
       }
       else {
@@ -147,12 +147,12 @@ export class PapertrailConnection extends EventEmitter {
                                  this.onConnected.bind( this )
                                );
 
-					this.stream.once( 'error', this.onErrored.bind( this ) );
-          this.stream.once( 'end', this.connect.bind( this ) );
+					this.stream.once( "error", this.onErrored.bind( this ) );
+          this.stream.once( "end", this.connect.bind( this ) );
 
 				});
 
-        this.socket.once( 'error', this.onErrored.bind( this ) );
+        this.socket.once( "error", this.onErrored.bind( this ) );
 
 			}
     }
@@ -178,7 +178,7 @@ export class PapertrailConnection extends EventEmitter {
       }
       else {
 
-        // Otherwise, store it in a buffer and write it when we're connected
+        // Otherwise, store it in a buffer and write it when we"re connected
 				this.deferredQueue.push(
                                  {
                                    buffer: text,
@@ -216,7 +216,7 @@ export class PapertrailConnection extends EventEmitter {
 
 				if ( this.deferredQueueLength === 0 ) {
 
-          this.stream.emit( 'empty' );
+          this.stream.emit( "empty" );
 
         }
 
@@ -236,7 +236,7 @@ export class PapertrailConnection extends EventEmitter {
 
 		this.processBuffer();
 
-    this.emit( 'connect', `Connected to Papertrail at ${this.options.host}:${this.options.port}` );
+    this.emit( "connect", `Connected to Papertrail at ${this.options.host}:${this.options.port}` );
 
 	}
 
@@ -260,7 +260,7 @@ export class PapertrailConnection extends EventEmitter {
            this.totalRetries >= this.options.maximumAttempts) {
 
         this.loggingEnabled = false;
-        this.emitSilentError( new Error( 'Max entries eclipsed, disabling buffering' ) );
+        this.emitSilentError( new Error( "Max entries eclipsed, disabling buffering" ) );
 
 			}
 
@@ -273,9 +273,9 @@ export class PapertrailConnection extends EventEmitter {
 
 	emitSilentError( error: any ) {
 
-    if ( this.listenerCount( 'error' ) > 0 ) {
+    if ( this.listenerCount( "error" ) > 0 ) {
 
-      this.emit( 'error', error );
+      this.emit( "error", error );
 
     }
     else {
@@ -297,8 +297,8 @@ export class PapertrailConnection extends EventEmitter {
 
 			}
 
-			this.stream.removeListener( 'end', this.connect );
-			this.stream.removeListener( 'error', this.onErrored );
+			this.stream.removeListener( "end", this.connect );
+			this.stream.removeListener( "error", this.onErrored );
 
 			this.stream.destroy();
       this.stream = null;
@@ -320,7 +320,7 @@ export class PapertrailConnection extends EventEmitter {
 
       if ( this.options.flushOnClose && this.deferredQueueLength > 0 ) {
 
-        this.stream.on( 'empty', () => {
+        this.stream.on( "empty", () => {
 
           this.clean();
 
@@ -355,8 +355,8 @@ export class PapertrailTransport extends TransportStream {
 
                               inlineMeta: false,
                               colorize: false,
-                              program: 'default',
-                              facility: 'daemon',
+                              program: "default",
+                              facility: "daemon",
                               hostname: hostname(),
                               depth: null,
 
@@ -371,7 +371,7 @@ export class PapertrailTransport extends TransportStream {
 
                               logFormat: function( level: string, data: any ): string {
 
-                                return level + ' \"' + safeStringify( data ) + "\"";
+                                return level + " \"" + safeStringify( data ) + "\"";
 
                               },
 
@@ -388,7 +388,7 @@ export class PapertrailTransport extends TransportStream {
 
     setImmediate( () => {
 
-      this.emit( 'logged', info );
+      this.emit( "logged", info );
 
 		});
 
@@ -402,14 +402,14 @@ export class PapertrailTransport extends TransportStream {
 
 		if ( meta ) {
 
-			if ( typeof meta !== 'object' ) {
+			if ( typeof meta !== "object" ) {
 
-        output += ' ' + meta;
+        output += " " + meta;
 
       }
       else if ( meta ) {
 
-        output += '\n' + meta.forEach( ( data: any ) => {
+        output += "\n" + meta.forEach( ( data: any ) => {
 
           return inspect(
                           data,
@@ -420,11 +420,11 @@ export class PapertrailTransport extends TransportStream {
                           }
                         );
 
-        }).join( '\n' );
+        }).join( "\n" );
 
 				if ( this.options.inlineMeta ) {
 
-          //output = output.replace( /[\n\t]\s* /gm, ' ' );
+          //output = output.replace( /[\n\t]\s* /gm, " " );
 
         }
 
@@ -447,18 +447,18 @@ export class PapertrailTransport extends TransportStream {
 
     /*
     let lines: string[] = [];
-		let msg = '';
-		let gap = '';
+		let msg = "";
+		let gap = "";
 
 		// Only split if we actually have a message
 		if ( message ) {
 
-      lines = message.split( '\n' );
+      lines = message.split( "\n" );
 
     }
     else {
 
-      lines = [ '' ];
+      lines = [ "" ];
 
 		}
 
@@ -466,7 +466,7 @@ export class PapertrailTransport extends TransportStream {
 		// line as its own message
 		for ( let i = 0; i < lines.length; i++ ) {
 
-			// don't send extra message if our message ends with a newline
+			// don"t send extra message if our message ends with a newline
       if ( lines[i].length === 0 &&
            i === lines.length - 1 ) {
 
@@ -476,12 +476,12 @@ export class PapertrailTransport extends TransportStream {
 
 			if ( i === 1 ) {
 
-        gap = '   ';
+        gap = "   ";
 
 			}
 
 			// Strip escape characters (for colorization)
-      const cleanedLevel = level.replace( /\u001b\[\d+m/g, '' );
+      const cleanedLevel = level.replace( /\u001b\[\d+m/g, "" );
 
 			msg += this.producer.produce(
                                     {
@@ -491,7 +491,7 @@ export class PapertrailTransport extends TransportStream {
                                       date: new Date(),
                                       message: this.options.logFormat( level, gap + lines[i] ),
                                     }
-                                  ) + '\r\n';
+                                  ) + "\r\n";
 
     }
     */

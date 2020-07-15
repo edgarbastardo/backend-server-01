@@ -1,21 +1,21 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import CommonConstants from "../../../../common/CommonConstants";
 
-import CommonUtilities from '../../../../common/CommonUtilities';
+import CommonUtilities from "../../../../common/CommonUtilities";
 import SystemUtilities from "../../../../common/SystemUtilities";
 
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from "express";
 
 import DBConnectionManager from "../../../../common/managers/DBConnectionManager";
-import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
+import SYSRouteService from "../../../../common/database/master/services/SYSRouteService";
 import ModelServiceManager from "../../../../common/managers/ModelServiceManager";
 import I18NManager from "../../../../common/managers/I18Manager";
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 
-import { ModelToRestAPIServiceController } from '../../../services/v1/ModelToRestAPIService.controller';
+import { ModelToRestAPIServiceController } from "../../../services/v1/ModelToRestAPIService.controller";
 
-const debug = require( 'debug' )( 'DatabaseModel.controller' );
+const debug = require( "debug" )( "DatabaseModel.controller" );
 
 export default class DatabaseModelController {
 
@@ -192,15 +192,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: '5AA705EE0690' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "5AA705EE0690" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -240,8 +240,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -301,15 +301,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: '443D8E18870B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "443D8E18870B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -349,8 +349,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -408,15 +408,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: '8DC756579436' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "8DC756579436" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -456,8 +456,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -514,15 +514,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
-                             Mark: '41587FD16BEE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unkown model name [%s]", strModelName ),
+                             Mark: "41587FD16BEE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unkown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unkown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -562,8 +562,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -623,15 +623,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: 'C21B6321CD80' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "C21B6321CD80" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -671,8 +671,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -729,15 +729,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: 'A5FE807FE07E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "A5FE807FE07E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -777,8 +777,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -836,15 +836,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: 'F1D8627ABF2C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "F1D8627ABF2C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -884,8 +884,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -941,15 +941,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: 'A938DC0DAD71' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "A938DC0DAD71" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -989,8 +989,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,
@@ -1047,15 +1047,15 @@ export default class DatabaseModelController {
 
             const result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_UNKNOWN_MODEL',
-                             Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
-                             Mark: '7B5730193E81' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNKNOWN_MODEL",
+                             Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
+                             Mark: "7B5730193E81" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_UNKNOWN_MODEL',
-                                         Message: await I18NManager.translate( strLanguage, 'Unknown model name [%s]', strModelName ),
+                                         Code: "ERROR_UNKNOWN_MODEL",
+                                         Message: await I18NManager.translate( strLanguage, "Unknown model name [%s]", strModelName ),
                                          Details: null
                                        }
                                      ],
@@ -1095,8 +1095,8 @@ export default class DatabaseModelController {
 
           const result = {
                            StatusCode: 500, //Internal server error
-                           Code: 'ERROR_UNEXPECTED',
-                           Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                            Mark: strMark,
                            LogId: error.LogId,
                            IsError: true,

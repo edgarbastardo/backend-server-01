@@ -27,7 +27,7 @@ export default class GeneriRun {
     await NotificationManager.publishOnTopic( "SystemEvent",
                                               {
                                                 SystemId: SystemUtilities.getSystemId(),
-                                                SystemName: process.env.APP_SERVER_IM_NAME,
+                                                SystemName: process.env.APP_PROJECT_NAME,
                                                 SubSystem: "Server",
                                                 Token: "No apply",
                                                 UserId: "No apply",
@@ -55,7 +55,7 @@ export default class GeneriRun {
 
     SystemUtilities.strBaseRunPath = __dirname;
     SystemUtilities.strBaseRootPath = appRoot.path;
-    SystemUtilities.strAPPName = process.env.APP_SERVER_IM_NAME;
+    SystemUtilities.strAPPName = process.env.APP_PROJECT_NAME;
 
     try {
 

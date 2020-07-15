@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import CommonConstants from "../CommonConstants";
 import SystemConstants from "../SystemContants";
@@ -8,9 +8,9 @@ import SystemUtilities from "../SystemUtilities";
 
 import DBConnectionManager from "./DBConnectionManager";
 import SYSConfigValueDataService from "../database/master/services/SYSConfigValueDataService";
-import GeoMapGoogle from '../implementations/geomaps/GeoMapGoogle';
+import GeoMapGoogle from "../implementations/geomaps/GeoMapGoogle";
 
-const debug = require( 'debug' )( 'GeoMapManager' );
+const debug = require( "debug" )( "GeoMapManager" );
 
 export default class GeoMapManager {
 
@@ -298,7 +298,7 @@ export default class GeoMapManager {
     if ( serviceConfig === "@__none__@" ) {
 
       const strDateTime = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 );
-      const strMessage = `Explicit '@__none__@' defined for the config of map ${strService} service`
+      const strMessage = `Explicit "@__none__@" defined for the config of map ${strService} service`
       const strMark = "947BFD9CFCB1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );

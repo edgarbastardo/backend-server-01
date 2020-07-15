@@ -1,13 +1,13 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import Redis from "ioredis";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
-const debug = require( 'debug' )( 'RedisConnectionManager' );
+const debug = require( "debug" )( "RedisConnectionManager" );
 
 export default class RedisConnectionManager {
 
