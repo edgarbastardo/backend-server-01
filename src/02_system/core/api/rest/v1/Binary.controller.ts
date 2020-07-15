@@ -1,11 +1,11 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Router,
   Request,
   Response,
   NextFunction
-} from 'express';
+} from "express";
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
@@ -22,19 +22,19 @@ import {
 import {
   //injectable,
   inject
-} from 'inversify';
+} from "inversify";
 
-import CommonConstants from '../../../../common/CommonConstants';
+import CommonConstants from "../../../../common/CommonConstants";
 
-import CommonUtilities from '../../../../common/CommonUtilities';
+import CommonUtilities from "../../../../common/CommonUtilities";
 import SystemUtilities from "../../../../common/SystemUtilities";
 
-import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
+import SYSRouteService from "../../../../common/database/master/services/SYSRouteService";
 import BinaryServiceController from "../../../services/v1/BinaryService.controller";
 import I18NManager from "../../../../common/managers/I18Manager";
-import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 
-const debug = require( 'debug' )( 'Binary.controller' );
+const debug = require( "debug" )( "Binary.controller" );
 
 //@injectable()
 @controller( process.env.SERVER_ROOT_PATH + BinaryController._BASE_PATH )
@@ -156,10 +156,10 @@ export default class BinaryController {
 
             const options = {
                               headers: {
-                                         'Content-Disposition': `filename="${result.Name}"`, //attachment;
-                                         'Content-Type': result.Mime,
-                                         'Content-Length': result.Size,
-                                         'X-Body-Response': JSON.stringify( result[ "X-Body-Response" ] )
+                                         "Content-Disposition": `filename="${result.Name}"`, //attachment;
+                                         "Content-Type": result.Mime,
+                                         "Content-Length": result.Size,
+                                         "X-Body-Response": JSON.stringify( result[ "X-Body-Response" ] )
                                        }
                             }
             response.status( result.StatusCode ).sendFile( result.File,
@@ -201,8 +201,8 @@ export default class BinaryController {
 
           const resultHeaders = {
                                   StatusCode: 500, //Internal server error
-                                  Code: 'ERROR_UNEXPECTED',
-                                  Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                                  Code: "ERROR_UNEXPECTED",
+                                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                                   Mark: strMark,
                                   LogId: error.LogId,
                                   IsError: true,

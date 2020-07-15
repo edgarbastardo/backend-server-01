@@ -69,7 +69,7 @@ export default class SYSRoleService extends BaseService {
       }
       else if ( bUpdate &&
               ( !sysRoleInDB.Tag ||
-                sysRoleInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) {
+                sysRoleInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) ) {
 
         sysRoleInDB.Name = strName;
         sysRoleInDB.Comment = strComment;

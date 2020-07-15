@@ -1,30 +1,30 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
-//import { Sequelize } from 'sequelize-typescript';
-import { Request } from 'express';
+//import { Sequelize } from "sequelize-typescript";
+import { Request } from "express";
 import {
   Model,
   FindOptions,
   Includeable,
   FindAttributeOptions,
   Sequelize as OriginSequelize
-} from 'sequelize';
+} from "sequelize";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 
-import CommonUtilities from '../../../common/CommonUtilities';
-import SystemUtilities from '../../../common/SystemUtilities';
+import CommonUtilities from "../../../common/CommonUtilities";
+import SystemUtilities from "../../../common/SystemUtilities";
 
-import BaseService from '../../../common/database/master/services/BaseService';
-import I18NManager from '../../../common/managers/I18Manager';
+import BaseService from "../../../common/database/master/services/BaseService";
+import I18NManager from "../../../common/managers/I18Manager";
 
-const debug = require( 'debug' )( 'ModelToRestAPIServiceController' );
+const debug = require( "debug" )( "ModelToRestAPIServiceController" );
 
 /*
   err format;
   {
-       message:'Err message',
-       name ' 'ERROR_CODE,
+       message:"Err message",
+       name " "ERROR_CODE,
        ...
   }
 */
@@ -100,16 +100,16 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '3308D6A4C648' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_WRONG_WHERE_FORMAT",
+                   Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                   Mark: "3308D6A4C648" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -132,15 +132,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: 'A17D19DAF07E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
+                     Mark: "A17D19DAF07E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                                 Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
                                  Details: null
                                }
                              ],
@@ -163,15 +163,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                       Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
-                       Mark: '73178B2D81D5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_WRONG_ATTRIBUTES_FORMAT",
+                       Message: await I18NManager.translate( strLanguage, "Query parameter \"attributes\" format error" ),
+                       Mark: "73178B2D81D5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
+                                   Code: "ERROR_WRONG_ATTRIBUTES_FORMAT",
+                                   Message: await I18NManager.translate( strLanguage, "Query parameter \"attributes\" format error" ),
                                    Details: `The right format is atributes=[ "valid_field_name_1", "valid_field_name_2" ] in the url. Use ?atributes=... for only one parameter or &atributes=... for concatenate more of one query parameters`
                                  }
                                ],
@@ -244,6 +244,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                                    FilterFields: 1, //Force to remove fields like password and value
                                                                                    TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                    Include: includeFnResult.Result,
+                                                                                   Exclude: null, //[ { model: SYSUser } ],
                                                                                    Logger: logger,
                                                                                    ExtraInfo: {
                                                                                                 Request: request
@@ -274,9 +275,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_GET',
-                       Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                       Mark: '17BC08C03272' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_GET",
+                       Message: await I18NManager.translate( strLanguage, "Success get the information" ),
+                       Mark: "17BC08C03272" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -319,8 +320,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -375,12 +376,12 @@ export class ModelToRestAPIServiceController extends BaseService {
                                "$or": [
                                         {
                                           "ExtraData": {
-                                                         "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\"'`
+                                                         "$regexp": `"\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\""`
                                                        }
                                         },
                                         {
                                           "ExtraData": {
-                                                         "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
+                                                         "$regexp": `"\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\""`
                                                        }
                                         }
                                       ],
@@ -395,16 +396,16 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: 'B81F215FB722' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_WRONG_WHERE_FORMAT",
+                   Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                   Mark: "B81F215FB722" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -427,15 +428,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: '5B06A3DD6871' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
+                     Mark: "5B06A3DD6871" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                                 Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
                                  Details: null
                                }
                              ],
@@ -459,15 +460,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_WRONG_ORDER_FORMAT',
-                       Message: await I18NManager.translate( strLanguage, 'Query parameter \'order\' format error' ),
-                       Mark: '7E2B9BB2C8D1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_WRONG_ORDER_FORMAT",
+                       Message: await I18NManager.translate( strLanguage, "Query parameter \"order\" format error" ),
+                       Mark: "7E2B9BB2C8D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_WRONG_ORDER_FORMAT',
-                                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'order\' format error' ),
+                                   Code: "ERROR_WRONG_ORDER_FORMAT",
+                                   Message: await I18NManager.translate( strLanguage, "Query parameter \"order\" format error" ),
                                    Details: null
                                  }
                                ],
@@ -490,15 +491,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                         Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
-                         Mark: '00E981270A7E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_WRONG_ATTRIBUTES_FORMAT",
+                         Message: await I18NManager.translate( strLanguage, "Query parameter \"attributes\" format error" ),
+                         Mark: "00E981270A7E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_WRONG_ATTRIBUTES_FORMAT',
-                                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'attributes\' format error' ),
+                                     Code: "ERROR_WRONG_ATTRIBUTES_FORMAT",
+                                     Message: await I18NManager.translate( strLanguage, "Query parameter \"attributes\" format error" ),
                                      Details: `The right format is atributes=[ "valid_field_name_1", "valid_field_name_2" ] in the url. Use ?atributes=... for only one parameter or &atributes=... for concatenate more of one query parameters in the url.`
                                    }
                                  ],
@@ -522,19 +523,19 @@ export class ModelToRestAPIServiceController extends BaseService {
         const warnings = [];
 
         if ( request.query.limit &&
-             isNaN( parseInt( request.query.limit ) ) === false &&
-             Number.parseInt( request.query.limit ) <= intDefaultMaxRows ) {
+             isNaN( parseInt( request.query.limit as string ) ) === false &&
+             Number.parseInt( request.query.limit as string ) <= intDefaultMaxRows ) {
 
-          intLimit = Number.parseInt( request.query.limit );
+          intLimit = Number.parseInt( request.query.limit as string );
 
         }
         else {
 
           warnings.push(
                          {
-                           Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                           Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                           Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                           Code: "WARNING_DATA_LIMITED_TO_MAX",
+                           Message: await I18NManager.translate( strLanguage, "Data limited to the maximun of %s rows", intLimit ),
+                           Details: await I18NManager.translate( strLanguage, "To protect to server and client of large result set of data, the default maximun rows is %s, you must use \"offset\" and \"limit\" query parameters to paginate large result set of data.", intLimit )
                          }
                        );
 
@@ -543,7 +544,7 @@ export class ModelToRestAPIServiceController extends BaseService {
         let filter: FindOptions = {
 
           where: whereFnResult.Result,
-          offset: request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? Number.parseInt( request.query.offset ) : 0,
+          offset: request.query.offset && !isNaN( parseInt( request.query.offset as string ) ) ? Number.parseInt( request.query.offset as string ) : 0,
           limit:  intLimit,
           order: orderFnResult.Result,
           include: includeFnResult.Result,
@@ -606,6 +607,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                                                                                  FilterFields: 1, //Force to remove fields like password and value
                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                  Include: includeFnResult.Result,
+                                                                                 Exclude: null, //[ { model: SYSUser } ],
                                                                                  Logger: logger,
                                                                                  ExtraInfo: {
                                                                                               Request: request
@@ -643,9 +645,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_SEARCH',
-                   Message: await I18NManager.translate( strLanguage, 'Success search the information' ),
-                   Mark: '545F8DE9950F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_SEARCH",
+                   Message: await I18NManager.translate( strLanguage, "Success search the information" ),
+                   Mark: "545F8DE9950F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -683,8 +685,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -734,16 +736,16 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '126F342F0F0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_WRONG_WHERE_FORMAT",
+                   Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                   Mark: "126F342F0F0E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -766,15 +768,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
-                     Mark: 'DB99B13E8999' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
+                     Mark: "DB99B13E8999" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_INCLUDE_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'Query parameter \'include\' format error' ),
+                                 Code: "ERROR_WRONG_INCLUDE_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "Query parameter \"include\" format error" ),
                                  Details: null
                                }
                              ],
@@ -797,9 +799,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_SEARCH_COUNT',
-                     Message: await I18NManager.translate( strLanguage, 'Success count the information' ),
-                     Mark: 'D0C4F28783EA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_SEARCH_COUNT",
+                     Message: await I18NManager.translate( strLanguage, "Success count the information" ),
+                     Mark: "D0C4F28783EA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -843,8 +845,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -915,9 +917,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 201, //Accepted
-                 Code: 'SUCCESS_CREATE',
-                 Message: await I18NManager.translate( strLanguage, 'Success created the information' ),
-                 Mark: '275AF508CF64' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_CREATE",
+                 Message: await I18NManager.translate( strLanguage, "Success created the information" ),
+                 Mark: "275AF508CF64" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -979,8 +981,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                    Mark: strMark,
                    LogId: error.LogId,
                    IsError: true,
@@ -1091,8 +1093,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               warnings.push(
                             {
-                              Code: 'WARNING_CANNOT_CREATE_DATA',
-                              Message: await I18NManager.translate( strLanguage, 'Cannot create the information at the index %s', intIndex ),
+                              Code: "WARNING_CANNOT_CREATE_DATA",
+                              Message: await I18NManager.translate( strLanguage, "Cannot create the information at the index %s", intIndex ),
                               Details: { Index: intIndex }
                             }
                           );
@@ -1117,23 +1119,23 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_BULK_CREATE';
-            strMessage = await I18NManager.translate( strLanguage, 'Success created ALL information' );
+            strCode = "SUCCESS_BULK_CREATE";
+            strMessage = await I18NManager.translate( strLanguage, "Success created ALL information" );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_BULK_CREATE';
-            strMessage = await I18NManager.translate( strLanguage, 'Cannot create ANY new information. Please check the errors and warnings section' );
+            strCode = "ERROR_BULK_CREATE";
+            strMessage = await I18NManager.translate( strLanguage, "Cannot create ANY new information. Please check the errors and warnings section" );
             bIsError = true;
 
           }
           else {
 
             intStatusCode = 202
-            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been created. Please check the data and errors and warnings section' );
+            strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+            strMessage = await I18NManager.translate( strLanguage, "Not all information has been created. Please check the data and errors and warnings section" );
             bIsError = errors && errors.length > 0;
 
           }
@@ -1142,7 +1144,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
-                     Mark: '05C1A40B10F9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "05C1A40B10F9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -1156,15 +1158,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'C8D2D8FD1BAE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
+                     Mark: "C8D2D8FD1BAE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -1180,15 +1182,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: 'D56ECA63D091' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
+                     Mark: "D56ECA63D091" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
                                  Details: null
                                }
                              ],
@@ -1226,8 +1228,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1278,16 +1280,16 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '69C56831D2F1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_WRONG_WHERE_FORMAT",
+                   Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                   Mark: "69C56831D2F1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -1310,15 +1312,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                       StatusCode: 404, //Not found
-                      Code: 'ERROR_RECORD_NOT_FOUND',
-                      Message: await I18NManager.translate( strLanguage, 'Record not found' ),
-                      Mark: 'B3FD90CAC12C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                      Code: "ERROR_RECORD_NOT_FOUND",
+                      Message: await I18NManager.translate( strLanguage, "Record not found" ),
+                      Mark: "B3FD90CAC12C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
-                                  Code: 'ERROR_RECORD_NOT_FOUND',
-                                  Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                                  Code: "ERROR_RECORD_NOT_FOUND",
+                                  Message: await I18NManager.translate( strLanguage, "Record not found" ),
                                   Details: null
                                 }
                               ],
@@ -1362,9 +1364,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_UPDATE',
-                     Message: await I18NManager.translate( strLanguage, 'Success updated the information' ),
-                     Mark: 'CC6466005703' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_UPDATE",
+                     Message: await I18NManager.translate( strLanguage, "Success updated the information" ),
+                     Mark: "CC6466005703" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1406,8 +1408,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1471,8 +1473,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                 warnings.push(
                                {
-                                 Code: 'WARNING_CANNOT_UPDATE_DATA',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
+                                 Code: "WARNING_CANNOT_UPDATE_DATA",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot update the information at the index %s", intIndex ),
                                  Details: { Index: intIndex }
                                }
                              );
@@ -1480,16 +1482,16 @@ export class ModelToRestAPIServiceController extends BaseService {
                 errors.push(
                              {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Mark: '46EA0B6920D8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Mark: "46EA0B6920D8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_WRONG_WHERE_FORMAT',
-                                           Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                                           Code: "ERROR_WRONG_WHERE_FORMAT",
+                                           Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                                           }
                                        ],
                                Warnings: [],
@@ -1513,8 +1515,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                   warnings.push(
                                 {
-                                  Code: 'WARNING_CANNOT_UPDATE_DATA',
-                                  Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
+                                  Code: "WARNING_CANNOT_UPDATE_DATA",
+                                  Message: await I18NManager.translate( strLanguage, "Cannot update the information at the index %s", intIndex ),
                                   Details: { Index: intIndex }
                                 }
                               );
@@ -1522,15 +1524,15 @@ export class ModelToRestAPIServiceController extends BaseService {
                   errors.push(
                                {
                                  StatusCode: 404, //Not found
-                                 Code: 'ERROR_RECORD_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'Record not found' ),
-                                 Mark: '77C1515A83D2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_RECORD_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "Record not found" ),
+                                 Mark: "77C1515A83D2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
-                                             Code: 'ERROR_RECORD_NOT_FOUND',
-                                             Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                                             Code: "ERROR_RECORD_NOT_FOUND",
+                                             Message: await I18NManager.translate( strLanguage, "Record not found" ),
                                              Details: null
                                            }
                                          ],
@@ -1606,8 +1608,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               warnings.push(
                              {
-                               Code: 'WARNING_CANNOT_UPDATE_DATA',
-                               Message: await I18NManager.translate( strLanguage, 'Cannot update the information at the index %s', intIndex ),
+                               Code: "WARNING_CANNOT_UPDATE_DATA",
+                               Message: await I18NManager.translate( strLanguage, "Cannot update the information at the index %s", intIndex ),
                                Details: { Index: intIndex }
                              }
                            );
@@ -1632,23 +1634,23 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_BULK_UPDATE';
-            strMessage = await I18NManager.translate( strLanguage, 'Success updated ALL information' );
+            strCode = "SUCCESS_BULK_UPDATE";
+            strMessage = await I18NManager.translate( strLanguage, "Success updated ALL information" );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_BULK_UPDATE';
-            strMessage = await I18NManager.translate( strLanguage, 'Cannot update ANY information. Please check the errors and warnings section' );
+            strCode = "ERROR_BULK_UPDATE";
+            strMessage = await I18NManager.translate( strLanguage, "Cannot update ANY information. Please check the errors and warnings section" );
             bIsError = true;
 
           }
           else {
 
             intStatusCode = 202
-            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been updated. Please check the data and errors and warnings section' );
+            strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+            strMessage = await I18NManager.translate( strLanguage, "Not all information has been updated. Please check the data and errors and warnings section" );
             bIsError = errors && errors.length > 0;
 
           }
@@ -1657,7 +1659,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
-                     Mark: '86C6647E8920' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "86C6647E8920" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -1671,15 +1673,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'FFCD9E96FB0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
+                     Mark: "FFCD9E96FB0E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -1695,15 +1697,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: '85D4A82588B9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
+                     Mark: "85D4A82588B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
                                  Details: null
                                }
                              ],
@@ -1741,8 +1743,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1792,16 +1794,16 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_WRONG_WHERE_FORMAT',
-                   Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                   Mark: '101C16C68A46' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_WRONG_WHERE_FORMAT",
+                   Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                   Mark: "101C16C68A46" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                              }
                            ],
                    Warnings: [],
@@ -1824,15 +1826,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
             StatusCode: 404, //Not found
-            Code: 'ERROR_RECORD_NOT_FOUND',
-            Message: await I18NManager.translate( strLanguage, 'Record not found' ),
-            Mark: 'C7BCDD44280D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+            Code: "ERROR_RECORD_NOT_FOUND",
+            Message: await I18NManager.translate( strLanguage, "Record not found" ),
+            Mark: "C7BCDD44280D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
             LogId: null,
             IsError: true,
             Errors: [
               {
-                Code: 'ERROR_RECORD_NOT_FOUND',
-                Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                Code: "ERROR_RECORD_NOT_FOUND",
+                Message: await I18NManager.translate( strLanguage, "Record not found" ),
                 Details: null
               }
             ],
@@ -1848,9 +1850,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
             StatusCode: 200, //Ok
-            Code: 'SUCCESS_DELETE',
-            Message: await I18NManager.translate( strLanguage, 'Success delete the information' ),
-            Mark: '1F6F499BCA5D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+            Code: "SUCCESS_DELETE",
+            Message: await I18NManager.translate( strLanguage, "Success delete the information" ),
+            Mark: "1F6F499BCA5D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
             LogId: null,
             IsError: false,
             Errors: [],
@@ -1894,8 +1896,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1957,8 +1959,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                 warnings.push(
                                {
-                                 Code: 'WARNING_CANNOT_DELETE_DATA',
-                                 Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
+                                 Code: "WARNING_CANNOT_DELETE_DATA",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot delete the information at the index %s", intIndex ),
                                  Details: { Index: intIndex }
                                }
                              );
@@ -1966,16 +1968,16 @@ export class ModelToRestAPIServiceController extends BaseService {
                 errors.push(
                              {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_WRONG_WHERE_FORMAT',
-                               Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                               Mark: 'DF7908C22E32' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_WRONG_WHERE_FORMAT",
+                               Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                               Mark: "DF7908C22E32" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_WRONG_WHERE_FORMAT',
-                                           Message: await I18NManager.translate( strLanguage, 'Query parameter \'where\' format error' ),
-                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ '$or': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$and': [ { 'Id': { '$eq': 1 } }, { 'Id': { '$eq': 2 } } ] }, or where={ '$or': [ { 'process': { '$like': '%\\00%' } }, { 'id': { '$eq': 500 } } ] }` )
+                                           Code: "ERROR_WRONG_WHERE_FORMAT",
+                                           Message: await I18NManager.translate( strLanguage, "Query parameter \"where\" format error" ),
+                                           Details: I18NManager.translate( strLanguage, `Valid examples are where={ "$or": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$and": [ { "Id": { "$eq": 1 } }, { "Id": { "$eq": 2 } } ] }, or where={ "$or": [ { "process": { "$like": "%\\00%" } }, { "id": { "$eq": 500 } } ] }` )
                                          }
                                        ],
                                Warnings: [],
@@ -1999,8 +2001,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
                   warnings.push(
                                 {
-                                  Code: 'WARNING_CANNOT_DELETE_DATA',
-                                  Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
+                                  Code: "WARNING_CANNOT_DELETE_DATA",
+                                  Message: await I18NManager.translate( strLanguage, "Cannot delete the information at the index %s", intIndex ),
                                   Details: { Index: intIndex }
                                 }
                               );
@@ -2008,15 +2010,15 @@ export class ModelToRestAPIServiceController extends BaseService {
                   errors.push(
                                {
                                  StatusCode: 404, //Not found
-                                 Code: 'ERROR_RECORD_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'Record not found' ),
-                                 Mark: '4F7813BFB2D7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_RECORD_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "Record not found" ),
+                                 Mark: "4F7813BFB2D7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: true,
                                  Errors: [
                                            {
-                                             Code: 'ERROR_RECORD_NOT_FOUND',
-                                             Message: await I18NManager.translate( strLanguage, 'Record not found' ),
+                                             Code: "ERROR_RECORD_NOT_FOUND",
+                                             Message: await I18NManager.translate( strLanguage, "Record not found" ),
                                              Details: null
                                            }
                                          ],
@@ -2062,8 +2064,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
               warnings.push(
                              {
-                               Code: 'WARNING_CANNOT_DELETE_DATA',
-                               Message: await I18NManager.translate( strLanguage, 'Cannot delete the information at the index %s', intIndex ),
+                               Code: "WARNING_CANNOT_DELETE_DATA",
+                               Message: await I18NManager.translate( strLanguage, "Cannot delete the information at the index %s", intIndex ),
                                Details: { Index: intIndex }
                              }
                            );
@@ -2088,23 +2090,23 @@ export class ModelToRestAPIServiceController extends BaseService {
           if ( errors.length === 0 ) {
 
             intStatusCode = 200
-            strCode = 'SUCCESS_BULK_DELETE';
-            strMessage = await I18NManager.translate( strLanguage, 'Success deleted the ALL information' );
+            strCode = "SUCCESS_BULK_DELETE";
+            strMessage = await I18NManager.translate( strLanguage, "Success deleted the ALL information" );
 
           }
           else if ( errors.length === request.body.bulk.length ) {
 
             intStatusCode = 400
-            strCode = 'ERROR_BULK_DELETE';
-            strMessage = await I18NManager.translate( strLanguage, 'Cannot delete ANY information. Please check the errors and warnings section' );
+            strCode = "ERROR_BULK_DELETE";
+            strMessage = await I18NManager.translate( strLanguage, "Cannot delete ANY information. Please check the errors and warnings section" );
             bIsError = true;
 
           }
           else {
 
             intStatusCode = 202
-            strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-            strMessage = await I18NManager.translate( strLanguage, 'Not all information has been deleted. Please check the data and errors and warnings section' );
+            strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+            strMessage = await I18NManager.translate( strLanguage, "Not all information has been deleted. Please check the data and errors and warnings section" );
             bIsError = errors && errors.length > 0;
 
           }
@@ -2113,7 +2115,7 @@ export class ModelToRestAPIServiceController extends BaseService {
                      StatusCode: intStatusCode,
                      Code: strCode,
                      Message: strMessage,
-                     Mark: 'D29E6A276E7E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "D29E6A276E7E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: bIsError,
                      Errors: errors,
@@ -2127,15 +2129,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
-                     Mark: 'EE06E3FE408C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
+                     Mark: "EE06E3FE408C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with maximun %s elements', intDefaultMaxRows ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with maximun %s elements", intDefaultMaxRows ),
                                  Details: null
                                }
                              ],
@@ -2151,15 +2153,15 @@ export class ModelToRestAPIServiceController extends BaseService {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_WRONG_BULK_FORMAT',
-                     Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
-                     Mark: '5736792DDB37' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_WRONG_BULK_FORMAT",
+                     Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
+                     Mark: "5736792DDB37" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_WRONG_BULK_FORMAT',
-                                 Message: await I18NManager.translate( strLanguage, 'The field \'bulk\' must be a array with at less 1 element' ),
+                                 Code: "ERROR_WRONG_BULK_FORMAT",
+                                 Message: await I18NManager.translate( strLanguage, "The field \"bulk\" must be a array with at less 1 element" ),
                                  Details: null
                                }
                              ],
@@ -2197,8 +2199,8 @@ export class ModelToRestAPIServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2238,12 +2240,12 @@ export class ModelToRestAPIServiceController extends BaseService {
                               "$or": [
                                       {
                                         "ExtraData": {
-                                                        "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\"'`
+                                                        "$regexp": `"\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserGroupTestV1#.*\\\\\\\\""`
                                                       }
                                       },
                                       {
                                         "ExtraData": {
-                                                        "$regexp": `'\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\"'`
+                                                        "$regexp": `"\\\\\\\\"Tag\\\\\\\\":\\\\\\\\".*#UserTestV1#.*\\\\\\\\""`
                                                       }
                                       }
                                     ],
@@ -2443,9 +2445,9 @@ export class ModelToRestAPIServiceController extends BaseService {
 
         for ( let i = 0; i < orderArray.length; i++ ) {
 
-          if ( orderArray[ i ][ 0 ].indexOf( '.' ) > 0 ) {
+          if ( orderArray[ i ][ 0 ].indexOf( "." ) > 0 ) {
 
-            let index = orderArray[ i ][ 0 ].indexOf( '.' );
+            let index = orderArray[ i ][ 0 ].indexOf( "." );
             let arr = [];
 
             arr.push( ModelToRestAPIServiceController.sequelizeModelList[ orderArray[ i ][ 0 ].substring( 0, index ) ] );

@@ -1,15 +1,15 @@
 //import os from "os";
 import cluster from "cluster";
 
-import Discover from '@dashersw/node-discover';
-//import uuidv4 from 'uuid/v4';
+import Discover from "@dashersw/node-discover";
+//import uuidv4 from "uuid/v4";
 
 import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-const debug = require( 'debug' )( 'NetworkLeaderManager' );
+const debug = require( "debug" )( "NetworkLeaderManager" );
 
 export default class NetworkLeaderManager {
 

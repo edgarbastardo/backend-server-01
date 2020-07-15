@@ -269,39 +269,6 @@ CREATE TABLE IF NOT EXISTS `sysUserSessionDevice` (
   CONSTRAINT `FK_sysUserSessionDevice_Token_From_sysUserSessionStatus_Token` FOREIGN KEY (`UserSessionStatusToken`) REFERENCES `sysUserSessionStatus` (`Token`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store user device information associated to the session';
 
-CREATE TABLE IF NOT EXISTS `sysUserSessionPresence` (
-  `UserSessionStatusToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID. And foreign key from Token field value in table sysUserSessionStatus',
-  `PresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Socket Id',
-  `Server` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name host name or server where the user is connected right now',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
-  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`UserSessionStatusToken`),
-  UNIQUE KEY `UNQ_sysUserSessionPresence_PresenceId_idx` (`PresenceId`),
-  CONSTRAINT `FK_sysUserSessionPresence_Token_From_sysUserSessionStatus_Token` FOREIGN KEY (`UserSessionStatusToken`) REFERENCES `sysUserSessionStatus` (`Token`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence information associated to the session';
-
-CREATE TABLE IF NOT EXISTS `sysPresenceRoom` (
-  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier UUID.',
-  `Name` varchar(120) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of the room',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `UNQ_sysPresenceRoom_Name_idx` (`Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence room information';
-
-CREATE TABLE IF NOT EXISTS `sysUserSessionPresenceInRoom` (
-  `UserSessionPresenceId` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the PresenceId field of sysUserSessionPresence table.',
-  `RoomId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key to the Id field of sysPresenceRoom table.',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  PRIMARY KEY (`UserSessionPresenceId`,`RoomId`),
-  CONSTRAINT `FK_sysUserSPInRoom_PresenceId_From_sysUserSP_PresenceId` FOREIGN KEY (`UserSessionPresenceId`) REFERENCES `sysUserSessionPresence` (`PresenceId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_sysUserSPInRoom_RoomId_From_sysPresenceRoom_RoomId` FOREIGN KEY (`RoomId`) REFERENCES `sysPresenceRoom` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store presence information relation between sysUserSessionPresence and sysPresenceRoom tables';
-
 CREATE TABLE IF NOT EXISTS `sysRoute` (
   `Id` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Id from path, generated with xxhash',
   `AccessKind` tinyint(3) unsigned DEFAULT NULL COMMENT '1=Public, 2=Authenticated, 3=Role',
@@ -483,23 +450,4 @@ CREATE TABLE IF NOT EXISTS `sysSystemEventLog` (
   PRIMARY KEY (`Id`),
   KEY `sysSystemEventLog_UserId_idx` (`UserId`),
   KEY `sysSystemEventLog_UserName_idx` (`UserName`)
-) ENGINE=InnoDB AUTO_INCREMENT=3941 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs and importat information.';
-
-CREATE TABLE IF NOT EXISTS `sysInstantMessageLog` (
-  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID',
-  `FromId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUser field Id',
-  `FromName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the user name from table sysUser field Name',
-  `ToId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the UUID from table sysUser field Id or room://',
-  `ToName` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the user name from table sysUser field Name or room://',
-  `ToPresenceId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Generally the id (socket io) from table sysUserSessionPresence field PresenceId or room://',
-  `Data` json NOT NULL COMMENT 'All information from the body field',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`Id`),
-  KEY `sysInstantMessageLog_FromId_idx` (`FromId`),
-  KEY `sysInstantMessageLog_FromName_idx` (`FromName`),
-  KEY `sysInstantMessageLog_ToId_idx` (`ToId`),
-  KEY `sysInstantMessageLog_ToName_idx` (`ToName`),
-  KEY `sysInstantMessageLog_CreatedAt_idx` (`CreatedAt`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs of instant message.';
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores all logs and importat information.';

@@ -1,22 +1,22 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import NotificationManager from '../../../common/managers/NotificationManager';
-import SYSUserSessionDeviceService from '../../../common/database/master/services/SYSUserSessionDeviceService';
+import NotificationManager from "../../../common/managers/NotificationManager";
+import SYSUserSessionDeviceService from "../../../common/database/master/services/SYSUserSessionDeviceService";
 //import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
 
-const debug = require( 'debug' )( 'UserPushServiceController' );
+const debug = require( "debug" )( "UserPushServiceController" );
 
 export default class UserPushServiceController {
 
@@ -70,9 +70,9 @@ export default class UserPushServiceController {
 
           result = {
                      StatusCode: 500, //Internal server error
-                     Code: 'ERROR_UNEXPECTED',
-                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                     Mark: '02C1D1A9AD35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "02C1D1A9AD35" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -93,15 +93,15 @@ export default class UserPushServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_SESSION_PUSH_TOKEN_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'User session push token not found' ),
-                     Mark: 'B0C41F4E5AA9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_SESSION_PUSH_TOKEN_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "User session push token not found" ),
+                     Mark: "B0C41F4E5AA9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_SESSION_PUSH_TOKEN_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'User session push token not found' ),
+                                 Code: "ERROR_USER_SESSION_PUSH_TOKEN_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "User session push token not found" ),
                                  Details: null
                                }
                              ],
@@ -117,18 +117,18 @@ export default class UserPushServiceController {
                                                "push",
                                                {
                                                  headings: {
-                                                             'en': 'Notification Test Title',
-                                                             'es': 'Notificación de Prueba Título',
+                                                             "en": "Notification Test Title",
+                                                             "es": "Notificación de Prueba Título",
                                                            },
                                                  contents: {
-                                                             'en': 'Notification Text Body',
-                                                             'es': 'Notificación de Prueba Cuerpo',
+                                                             "en": "Notification Text Body",
+                                                             "es": "Notificación de Prueba Cuerpo",
                                                            },
                                                  include_player_ids: [ sysUserSessionDevice.PushToken ],
                                                  // included_segments: [ "Subscribed Users", "Active Users" ],
                                                  data: { Test: 1 },
                                                  // filters: [
-                                                 //   { field: 'tag', key: 'level', relation: '>', value: 10 }
+                                                 //   { field: "tag", key: "level", relation: ">", value: 10 }
                                                  // ]
                                                },
                                                logger
@@ -136,9 +136,9 @@ export default class UserPushServiceController {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_SEND_PUSH_TEST_MESSAGE',
-                       Message: await I18NManager.translate( strLanguage, 'Success send push test message' ),
-                       Mark: 'D80DDA2A6958' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_SEND_PUSH_TEST_MESSAGE",
+                       Message: await I18NManager.translate( strLanguage, "Success send push test message" ),
+                       Mark: "D80DDA2A6958" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -154,15 +154,15 @@ export default class UserPushServiceController {
 
             result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_CANNOT_SEND_PUSH_TEST_MESSAGE',
-                       Message: await I18NManager.translate( strLanguage, 'Error cannot send the test push message' ),
-                       Mark: 'E8058394DA08' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_CANNOT_SEND_PUSH_TEST_MESSAGE",
+                       Message: await I18NManager.translate( strLanguage, "Error cannot send the test push message" ),
+                       Mark: "E8058394DA08" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_CANNOT_SEND_PUSH_TEST_MESSAGE',
-                                   Message: await I18NManager.translate( strLanguage, 'Error cannot send the test push message' ),
+                                   Code: "ERROR_CANNOT_SEND_PUSH_TEST_MESSAGE",
+                                   Message: await I18NManager.translate( strLanguage, "Error cannot send the test push message" ),
                                    Details: null
                                  }
                                ],
@@ -221,8 +221,8 @@ export default class UserPushServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

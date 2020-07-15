@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import CommonConstants from "../CommonConstants";
 import SystemConstants from "../SystemContants";
@@ -13,11 +13,11 @@ import TransportSMTP from "../implementations/notifications/TransportSMTP";
 import TransportSendGrid from "../implementations/notifications/TransportSendGrid";
 import TransportSMSGateway from "../implementations/notifications/TransportSMSGateway";
 import TransportOneSignal from "../implementations/notifications/TransportOneSignal";
-import TransportRedis from '../implementations/notifications/TransportRedis';
-import TransportDiscord from '../implementations/notifications/TransportDiscord';
-import TransportSlack from '../implementations/notifications/TransportSlack';
+import TransportRedis from "../implementations/notifications/TransportRedis";
+import TransportDiscord from "../implementations/notifications/TransportDiscord";
+import TransportSlack from "../implementations/notifications/TransportSlack";
 
-const debug = require( 'debug' )( 'NotificationManager' );
+const debug = require( "debug" )( "NotificationManager" );
 
 export default class NotificationManager {
 
@@ -742,7 +742,7 @@ export default class NotificationManager {
     if ( serviceConfig === "@__none__@" ) {
 
       const strDateTime = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 );
-      const strMessage = `Explicit '@__none__@' defined for the config of ${strService} transport service`
+      const strMessage = `Explicit "@__none__@" defined for the config of ${strService} transport service`
       const strMark = "DF30C39CD6E8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );

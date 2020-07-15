@@ -1,18 +1,18 @@
-import cluster from 'cluster';
-import path from 'path';
-import fs from 'fs'; //Load the filesystem module
+import cluster from "cluster";
+import path from "path";
+import fs from "fs"; //Load the filesystem module
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-//import Jimp from 'jimp';
+//import Jimp from "jimp";
 import glob from "glob";
 
 import {
   Request,
   Response
-} from 'express';
+} from "express";
 
 import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants, { ICheckUserRoles } from "../../../common/SystemContants";
@@ -21,24 +21,24 @@ import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
 
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import MiddlewareManager from '../../../common/managers/MiddlewareManager';
+import MiddlewareManager from "../../../common/managers/MiddlewareManager";
 import CacheManager from "../../../common/managers/CacheManager";
-import I18NManager from '../../../common/managers/I18Manager';
-import NotificationManager from '../../../common/managers/NotificationManager';
+import I18NManager from "../../../common/managers/I18Manager";
+import NotificationManager from "../../../common/managers/NotificationManager";
 
 import BaseService from "../../../common/database/master/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
 import SYSBinaryIndexService from "../../../common/database/master/services/SYSBinaryIndexService";
-import SYSUserService from '../../../common/database/master/services/SYSUserService';
-import SYSUserGroupService from '../../../common/database/master/services/SYSUserGroupService';
+import SYSUserService from "../../../common/database/master/services/SYSUserService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
 
-import { SYSUserGroup } from '../../../common/database/master/models/SYSUserGroup';
-import { SYSUser } from '../../../common/database/master/models/SYSUser';
-import { SYSBinaryIndex } from '../../../common/database/master/models/SYSBinaryIndex';
-import SYSUserSessionPersistentService from '../../../common/database/master/services/SYSUserSessionPersistentService';
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSBinaryIndex } from "../../../common/database/master/models/SYSBinaryIndex";
+import SYSUserSessionPersistentService from "../../../common/database/master/services/SYSUserSessionPersistentService";
 //import { AccessKind } from "../../../common/CommonConstants";
 
-const debug = require( 'debug' )( 'BinaryServiceController' );
+const debug = require( "debug" )( "BinaryServiceController" );
 
 export default class BinaryServiceController extends BaseService {
 
@@ -162,10 +162,12 @@ export default class BinaryServiceController extends BaseService {
                                                    transaction: any,
                                                    logger: any ): Promise<any> {
 
+    //ANCHOR getConfigValueDataObjectDeniedAllowed
     return await SYSConfigValueDataService.getConfigValueDataObjectDeniedAllowed( userSessionStatus,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                                   strCategory,
+                                                                                  null,
                                                                                   true,
                                                                                   transaction,
                                                                                   logger );
@@ -181,6 +183,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id,
                                                                                   SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                                   strCategory,
+                                                                                  null,
                                                                                   true,
                                                                                   transaction,
                                                                                   logger );
@@ -201,6 +204,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -279,6 +283,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -358,6 +363,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataProcess.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -441,6 +447,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Owner,
                                                                     strCategory,
                                                                     "",
+                                                                    null,
                                                                     false,
                                                                     transaction,
                                                                     true,
@@ -472,6 +479,7 @@ export default class BinaryServiceController extends BaseService {
                                                                     SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Owner,
                                                                     strMimeType,
                                                                     strCategory,
+                                                                    null,
                                                                     true,
                                                                     transaction,
                                                                     true,
@@ -503,6 +511,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Id,
                                                                                       SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner.Owner,
                                                                                       strCategory,
+                                                                                      null,
                                                                                       false,
                                                                                       transaction,
                                                                                       logger );
@@ -709,10 +718,10 @@ export default class BinaryServiceController extends BaseService {
 
       debugMark( "Reading binary file" );
 
-      const util = require( 'util' );
-      const exec = util.promisify( require( 'child_process' ).exec );
+      const util = require( "util" );
+      const exec = util.promisify( require( "child_process" ).exec );
 
-      const strCommandIdentify = `identify -format "%w;%h" ${strFullPath}${strFileName}${strFileExtension}`;
+      const strCommandIdentify = `identify -format '%w;%h" ${strFullPath}${strFileName}${strFileExtension}`;
 
       const { stdout } = await exec( strCommandIdentify );
 
@@ -1637,9 +1646,9 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_AUTH_TOKEN_CREATED',
-                 Message: await I18NManager.translate( strLanguage, 'The binary data authorization token has been success created.' ),
-                 Mark: '73057DAD2CAF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_AUTH_TOKEN_CREATED",
+                 Message: await I18NManager.translate( strLanguage, "The binary data authorization token has been success created." ),
+                 Mark: "73057DAD2CAF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -1699,8 +1708,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1792,9 +1801,9 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_AUTH_TOKEN_DELETED',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data authorization token has been success deleted.' ),
-                     Mark: '473D6FEA3F86' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_AUTH_TOKEN_DELETED",
+                     Message: await I18NManager.translate( strLanguage, "The binary data authorization token has been success deleted." ),
+                     Mark: "473D6FEA3F86" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -1810,15 +1819,15 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data authorization token not found.' ),
-                     Mark: '3B11E61CDD49' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_AUTH_TOKEN_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The binary data authorization token not found." ),
+                     Mark: "3B11E61CDD49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_AUTH_TOKEN_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The binary data authorization token not found.' ),
+                                 Code: "ERROR_AUTH_TOKEN_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The binary data authorization token not found." ),
                                }
                              ],
                      Warnings: [],
@@ -1833,15 +1842,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                   Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
-                   Mark: '88EE1E318404' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_AUTH_TOKEN_IS_PERSISTENT",
+                   Message: await I18NManager.translate( strLanguage, "Auth token provided is persistent. You cannot delete it" ),
+                   Mark: "88EE1E318404" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_AUTH_TOKEN_IS_PERSISTENT',
-                               Message: await I18NManager.translate( strLanguage, 'Auth token provided is persistent. You cannot delete it' ),
+                               Code: "ERROR_AUTH_TOKEN_IS_PERSISTENT",
+                               Message: await I18NManager.translate( strLanguage, "Auth token provided is persistent. You cannot delete it" ),
                                Details: null
                              }
                            ],
@@ -1896,8 +1905,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1945,12 +1954,12 @@ export default class BinaryServiceController extends BaseService {
 
         if ( strResult ) {
 
-          strResult = strResult + " Or A.Owner Like '%" + strCurrentTag + "%'";
+          strResult = strResult + " Or A.Owner Like '%' + strCurrentTag + '%'";
 
         }
         else {
 
-          strResult = "A.Owner Like '%" + strCurrentTag + "%'";
+          strResult = "A.Owner Like '%' + strCurrentTag + '%'";
 
         }
 
@@ -2154,19 +2163,19 @@ export default class BinaryServiceController extends BaseService {
       const warnings = [];
 
       if ( request.query.limit &&
-           isNaN( parseInt( request.query.limit ) ) === false &&
-           Number.parseInt( request.query.limit ) <= intLimit ) {
+           isNaN( parseInt( request.query.limit as any ) ) === false &&
+           Number.parseInt( request.query.limit as any ) <= intLimit ) {
 
-        intLimit = Number.parseInt( request.query.limit );
+        intLimit = Number.parseInt( request.query.limit as any );
 
       }
       else {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_LIMITED_TO_MAX',
-                         Message: await I18NManager.translate( strLanguage, 'Data limited to the maximun of %s rows', intLimit ),
-                         Details: await I18NManager.translate( strLanguage, 'To protect to server and client of large result set of data, the default maximun rows is %s, you must use \'offset\' and \'limit\' query parameters to paginate large result set of data.', intLimit )
+                         Code: "WARNING_DATA_LIMITED_TO_MAX",
+                         Message: await I18NManager.translate( strLanguage, "Data limited to the maximun of %s rows", intLimit ),
+                         Details: await I18NManager.translate( strLanguage, "To protect to server and client of large result set of data, the default maximun rows is %s, you must use \"offset\" and \"limit\" query parameters to paginate large result set of data.", intLimit )
                        }
                      );
 
@@ -2176,8 +2185,8 @@ export default class BinaryServiceController extends BaseService {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not shown due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -2188,7 +2197,7 @@ export default class BinaryServiceController extends BaseService {
 
       //if ( DBConnectionManager.currentInstance.options.dialect === "mysql" ) {
 
-      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset ) ) ? request.query.offset : "0" );
+      strSQL = strSQL + " LIMIT " + intLimit.toString() + " OFFSET " + ( request.query.offset && !isNaN( parseInt( request.query.offset as any ) ) ? request.query.offset : "0" );
 
       //}
 
@@ -2208,7 +2217,8 @@ export default class BinaryServiceController extends BaseService {
                                                                          Data: currentRow,
                                                                          FilterFields: 1, //Force to remove fields like password and value
                                                                          TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                         Include: null,
+                                                                         Include: null, //[ { model: SYSUser } ],
+                                                                         Exclude: null, //[ { model: SYSUser } ],
                                                                          Logger: logger,
                                                                          ExtraInfo: {
                                                                                       Request: request
@@ -2230,9 +2240,9 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH',
-                 Message: await I18NManager.translate( strLanguage, 'Success search.' ),
-                 Mark: '29B492BF56BC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH",
+                 Message: await I18NManager.translate( strLanguage, "Success search." ),
+                 Mark: "29B492BF56BC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -2287,8 +2297,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2505,8 +2515,8 @@ export default class BinaryServiceController extends BaseService {
 
         warnings.push(
                        {
-                         Code: 'WARNING_DATA_RESTRICTED',
-                         Message: await I18NManager.translate( strLanguage, 'It is possible that certain information is not shown due to limitations in their roles' ),
+                         Code: "WARNING_DATA_RESTRICTED",
+                         Message: await I18NManager.translate( strLanguage, "It is possible that certain information is not shown due to limitations in their roles" ),
                          Details: {
                                     Role: userSessionStatus.Role
                                   }
@@ -2524,9 +2534,9 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_SEARCH_COUNT',
-                 Message: await I18NManager.translate( strLanguage, 'Success search count.' ),
-                 Mark: '29B492BF56BC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Code: "SUCCESS_SEARCH_COUNT",
+                 Message: await I18NManager.translate( strLanguage, "Success search count." ),
+                 Mark: "29B492BF56BC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -2585,8 +2595,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2632,7 +2642,7 @@ export default class BinaryServiceController extends BaseService {
     try {
 
       const options = {
-                        method: 'GET',
+                        method: "GET",
                         body: null,
                         headers: headers,
                       };
@@ -2644,7 +2654,7 @@ export default class BinaryServiceController extends BaseService {
 
       const jsonXBodyResponse = CommonUtilities.parseJSON( strXBodyResponse, null );
 
-      const strPath = query.SavePath + '/' + jsonXBodyResponse.Name;
+      const strPath = query.SavePath + "/" + jsonXBodyResponse.Name;
 
       fs.mkdirSync( query.SavePath, { recursive: true }  );
 
@@ -2655,7 +2665,7 @@ export default class BinaryServiceController extends BaseService {
 
         await new Promise( ( resolve: any, reject: any ) => {
 
-          callResult.body.pipe( destinationFileStream ).on( 'close', () => { resolve( true ) } ); //Wait for the stream finish to write to file system
+          callResult.body.pipe( destinationFileStream ).on( "close", () => { resolve( true ) } ); //Wait for the stream finish to write to file system
 
         } );
 
@@ -2703,7 +2713,7 @@ export default class BinaryServiceController extends BaseService {
 
       fs.mkdirSync( strFullSavePath, { recursive: true } );
 
-      let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URL;
+      let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URI;
 
       strRequestPath = strRequestPath.replace( "@__id__@", strId );
       strRequestPath = strRequestPath.replace( "@__auth__@", process.env.BINARY_DATA_SERVICE_FALLBACK_AUTH );
@@ -2792,9 +2802,9 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const strId = request.query.id;
-      const strAuth = request.query.auth;
-      const strThumbnail = request.query.thumbnail;
+      const strId = request.query.id as string;
+      const strAuth = request.query.auth as string;
+      const strThumbnail = request.query.thumbnail as string;
 
       if ( CommonUtilities.isNotNullOrEmpty( strId ) ) {
 
@@ -3095,7 +3105,7 @@ export default class BinaryServiceController extends BaseService {
                                      StatusCode: 403, //Forbidden
                                      Code: "ERROR_ACCESS_NOT_ALLOWED",
                                      Message: await I18NManager.translate( strLanguage, "Access not allowed to binary data" ),
-                                     Mark: 'B429C5C08377' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                     Mark: "B429C5C08377" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                      LogId: null,
                                      IsError: true,
                                      Errors: [
@@ -3151,14 +3161,14 @@ export default class BinaryServiceController extends BaseService {
 
                 const resultHeaders = {
                                         StatusCode: 400, //Bad request
-                                        Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
-                                        Message: await I18NManager.translate( strLanguage, 'The auth parameter cannot be empty.' ),
-                                        Mark: 'B0D3A4067071' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Code: "ERROR_AUTH_PARAMETER_IS_EMPTY",
+                                        Message: await I18NManager.translate( strLanguage, "The auth parameter cannot be empty." ),
+                                        Mark: "B0D3A4067071" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                         LogId: null,
                                         IsError: true,
                                         Errors: [
                                                   {
-                                                    Code: 'ERROR_AUTH_PARAMETER_IS_EMPTY',
+                                                    Code: "ERROR_AUTH_PARAMETER_IS_EMPTY",
                                                     Message: await I18NManager.translate( strLanguage, `The auth parameter cannot be empty.` ),
                                                     Details: null,
                                                   }
@@ -3290,15 +3300,15 @@ export default class BinaryServiceController extends BaseService {
 
                   const resultHeaders = {
                                           StatusCode: 404, //Not found
-                                          Code: 'ERROR_FILE_NOT_FOUND',
-                                          Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
-                                          Mark: '1109E2A671E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Code: "ERROR_FILE_NOT_FOUND",
+                                          Message: await I18NManager.translate( strLanguage, "The binary data file not found." ),
+                                          Mark: "1109E2A671E8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                           LogId: null,
                                           IsError: true,
                                           Errors: [
                                                     {
-                                                      Code: 'ERROR_FILE_NOT_FOUND',
-                                                      Message: await I18NManager.translate( strLanguage, 'The binary data file not found.' ),
+                                                      Code: "ERROR_FILE_NOT_FOUND",
+                                                      Message: await I18NManager.translate( strLanguage, "The binary data file not found." ),
                                                       Details: null,
                                                     }
                                                   ],
@@ -3326,15 +3336,15 @@ export default class BinaryServiceController extends BaseService {
 
               const resultHeaders = {
                                       StatusCode: 400, //Bad request
-                                      Code: 'ERROR_BINARY_DATA_EXPIRED',
-                                      Message: await I18NManager.translate( strLanguage, 'The binary data is expired.' ),
-                                      Mark: 'C3B1BFFB4FF1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_BINARY_DATA_EXPIRED",
+                                      Message: await I18NManager.translate( strLanguage, "The binary data is expired." ),
+                                      Mark: "C3B1BFFB4FF1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       LogId: null,
                                       IsError: true,
                                       Errors: [
                                                 {
-                                                  Code: 'ERROR_BINARY_DATA_EXPIRED',
-                                                  Message: await I18NManager.translate( strLanguage, 'The binary data is expired.' ),
+                                                  Code: "ERROR_BINARY_DATA_EXPIRED",
+                                                  Message: await I18NManager.translate( strLanguage, "The binary data is expired." ),
                                                   Details: null,
                                                 }
                                               ],
@@ -3360,15 +3370,15 @@ export default class BinaryServiceController extends BaseService {
 
             const resultHeaders = {
                                     StatusCode: 400, //Bad request
-                                    Code: 'ERROR_BINARY_DATA_DISABLED',
-                                    Message: await I18NManager.translate( strLanguage, 'The binary data is disabled.' ),
-                                    Mark: '7E8321B74295' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Code: "ERROR_BINARY_DATA_DISABLED",
+                                    Message: await I18NManager.translate( strLanguage, "The binary data is disabled." ),
+                                    Mark: "7E8321B74295" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     LogId: null,
                                     IsError: true,
                                     Errors: [
                                               {
-                                                Code: 'ERROR_BINARY_DATA_DISABLED',
-                                                Message: await I18NManager.translate( strLanguage, 'The binary data is disabled.' ),
+                                                Code: "ERROR_BINARY_DATA_DISABLED",
+                                                Message: await I18NManager.translate( strLanguage, "The binary data is disabled." ),
                                                 Details: null,
                                               }
                                             ],
@@ -3394,15 +3404,15 @@ export default class BinaryServiceController extends BaseService {
 
           const resultHeaders = {
                                   StatusCode: 404, //Not found
-                                  Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                                  Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
-                                  Mark: 'E4650CE42D99' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                                  Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
+                                  Mark: "E4650CE42D99" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                   LogId: null,
                                   IsError: true,
                                   Errors: [
                                             {
-                                              Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                                              Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                                              Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                                              Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
                                               Details: null,
                                             }
                                           ],
@@ -3428,15 +3438,15 @@ export default class BinaryServiceController extends BaseService {
 
         const resultHeaders = {
                                 StatusCode: 400, //Bad request
-                                Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
-                                Mark: '67F2D64A113E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                Code: "ERROR_ID_PARAMETER_IS_EMPTY",
+                                Message: await I18NManager.translate( strLanguage, "The id parameter cannot be empty." ),
+                                Mark: "67F2D64A113E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                 LogId: null,
                                 IsError: true,
                                 Errors: [
                                           {
-                                            Code: 'ERROR_ID_PARAMETER_IS_EMPTY',
-                                            Message: await I18NManager.translate( strLanguage, 'The id parameter cannot be empty.' ),
+                                            Code: "ERROR_ID_PARAMETER_IS_EMPTY",
+                                            Message: await I18NManager.translate( strLanguage, "The id parameter cannot be empty." ),
                                             Details: null,
                                           }
                                         ],
@@ -3496,8 +3506,8 @@ export default class BinaryServiceController extends BaseService {
 
       const resultHeaders = {
                               StatusCode: 500, //Internal server error
-                              Code: 'ERROR_UNEXPECTED',
-                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                              Code: "ERROR_UNEXPECTED",
+                              Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                               Mark: strMark,
                               LogId: error.LogId,
                               IsError: true,
@@ -3574,7 +3584,7 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id as string,
                                                                       null,
                                                                       currentTransaction,
                                                                       logger );
@@ -3585,9 +3595,9 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: 'AEEC8C097CD6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "AEEC8C097CD6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -3693,7 +3703,8 @@ export default class BinaryServiceController extends BaseService {
                                                                            Data: modelData,
                                                                            FilterFields: 1, //Force to remove fields like password and value
                                                                            TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                           Include: null,
+                                                                           Include: null, //[ { model: SYSUser } ],
+                                                                           Exclude: null, //[ { model: SYSUser } ],
                                                                            Logger: logger,
                                                                            ExtraInfo: {
                                                                                         Request: request
@@ -3709,9 +3720,9 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_GET_BINARY_DATA_DETAILS',
-                     Message: await I18NManager.translate( strLanguage, 'Success binary data details from the id %s', sysBinaryIndexInDB.Id ),
-                     Mark: 'F5509D216548' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_GET_BINARY_DATA_DETAILS",
+                     Message: await I18NManager.translate( strLanguage, "Success binary data details from the id %s", sysBinaryIndexInDB.Id ),
+                     Mark: "F5509D216548" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -3729,7 +3740,7 @@ export default class BinaryServiceController extends BaseService {
                      StatusCode: 403, //Forbidden
                      Code: "ERROR_CANNOT_GET_BINARY_DATA",
                      Message: await I18NManager.translate( strLanguage, "Not allowed to get the binary data information" ),
-                     Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "BE576C66151B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -3751,15 +3762,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
-                   Mark: '344684A4B26F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
+                   Mark: "344684A4B26F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
                                Details: null,
                              }
                            ],
@@ -3814,8 +3825,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -3874,7 +3885,7 @@ export default class BinaryServiceController extends BaseService {
 
       strLanguage = context.Language;
 
-      let debugMark = debug.extend( '9B7197376B5B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      let debugMark = debug.extend( "9B7197376B5B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       debugMark( "Time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( "uploadRegularBinaryData" );
 
@@ -3900,7 +3911,7 @@ export default class BinaryServiceController extends BaseService {
           if ( request.body.Category ) {
 
             let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
-                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` );
+                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,.""\`` );
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
@@ -3936,15 +3947,15 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( !strId ||
                          !userSessionStatus.UserTag ||
-                         userSessionStatus.UserTag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
+                         userSessionStatus.UserTag.includes( "#Binary_Data_Allow_To_Define_Id#" ) === false ) {
 
                       if ( !strId ||
                            !userSessionStatus.UserGroupTag ||
-                           userSessionStatus.UserGroupTag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
+                           userSessionStatus.UserGroupTag.includes( "#Binary_Data_Allow_To_Define_Id#" ) === false ) {
 
                         if ( !strId ||
                              !userSessionStatus.Tag ||
-                             userSessionStatus.Tag.indexOf( "#Binary_Data_Allow_To_Define_Id#" ) === -1 ) {
+                             userSessionStatus.Tag.includes( "#Binary_Data_Allow_To_Define_Id#" ) === false ) {
 
                            strId = SystemUtilities.getUUIDv4();
 
@@ -3965,15 +3976,15 @@ export default class BinaryServiceController extends BaseService {
 
                     if ( !strDate ||
                          !userSessionStatus.UserTag ||
-                         userSessionStatus.UserTag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
+                         userSessionStatus.UserTag.includes( "#Binary_Data_Allow_To_Define_Date#" ) ) {
 
                       if ( !strDate ||
                            !userSessionStatus.UserGroupTag ||
-                           userSessionStatus.UserGroupTag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
+                           userSessionStatus.UserGroupTag.includes( "#Binary_Data_Allow_To_Define_Date#" ) ) {
 
                         if ( !strDate ||
                              !userSessionStatus.Tag ||
-                             userSessionStatus.Tag.indexOf( "#Binary_Data_Allow_To_Define_Date#" ) === -1 ) {
+                             userSessionStatus.Tag.includes( "#Binary_Data_Allow_To_Define_Date#" ) ) {
 
                           strDate = SystemUtilities.getCurrentDateAndTime().format( "YYYY-MM-DD-HH" );
 
@@ -3991,7 +4002,7 @@ export default class BinaryServiceController extends BaseService {
                                                                                                    logger );
 
                     let strContextPath = CommonUtilities.clearSpecialChars( request.body.ContextPath,
-                                                                            `!@#$^&%*()+=[]\\{}|:<>?,."'\`` );
+                                                                            `!@#$^&%*()+=[]\\{}|:<>?,.""\`` );
 
                     strContextPath = CommonUtilities.unaccent( strContextPath );
 
@@ -4182,9 +4193,9 @@ export default class BinaryServiceController extends BaseService {
 
                       result = {
                                  StatusCode: 200, //Ok
-                                 Code: 'SUCCESS_BINARY_DATA_UPLOAD',
-                                 Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
-                                 Mark: '8030662B75FA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "SUCCESS_BINARY_DATA_UPLOAD",
+                                 Message: await I18NManager.translate( strLanguage, "The binary data has been uploaded success." ),
+                                 Mark: "8030662B75FA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: false,
                                  Errors: [],
@@ -4206,9 +4217,9 @@ export default class BinaryServiceController extends BaseService {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_UNEXPECTED',
-                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: 'E8913CD0BAD0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "E8913CD0BAD0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.LogId,
                                  IsError: true,
                                  Errors: [
@@ -4230,15 +4241,15 @@ export default class BinaryServiceController extends BaseService {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
-                               Mark: '47946C96B03B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_NOT_VALID_FILE_MIME_TYPE",
+                               Message: await I18NManager.translate( strLanguage, "The %s detected for the file is invalid in the category.", fileDetectedType.mime ),
+                               Mark: "47946C96B03B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
+                                           Code: "ERROR_NOT_VALID_FILE_MIME_TYPE",
+                                           Message: await I18NManager.translate( strLanguage, "The %s detected for the file is invalid in the category.", fileDetectedType.mime ),
                                            Details: {
                                                       Category: strCategory,
                                                       Detected: fileDetectedType.mime,
@@ -4259,15 +4270,15 @@ export default class BinaryServiceController extends BaseService {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                             Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
-                             Mark: '7FBB0F51D723' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_NOT_VALID_STORAGE_KIND_DEFINED",
+                             Message: await I18NManager.translate( strLanguage, "The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values." ),
+                             Mark: "7FBB0F51D723" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                                         Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
+                                         Code: "ERROR_NOT_VALID_STORAGE_KIND_DEFINED",
+                                         Message: await I18NManager.translate( strLanguage, "The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values." ),
                                          Details: {
                                                     0: "Persistent",
                                                     1: "Temporal",
@@ -4286,15 +4297,15 @@ export default class BinaryServiceController extends BaseService {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                           Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
-                           Mark: '4E8EDBF7499A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_NOT_VALID_ACCESS_KIND_DEFINED",
+                           Message: await I18NManager.translate( strLanguage, "The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values." ),
+                           Mark: "4E8EDBF7499A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                                       Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
+                                       Code: "ERROR_NOT_VALID_ACCESS_KIND_DEFINED",
+                                       Message: await I18NManager.translate( strLanguage, "The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values." ),
                                        Details: {
                                                   1: "Public",
                                                   2: "Authenticated",
@@ -4314,15 +4325,15 @@ export default class BinaryServiceController extends BaseService {
 
               result = {
                         StatusCode: 400, //Bad request
-                        Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                        Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
-                        Mark: '242D82D6BF0D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        Code: "ERROR_NOT_VALID_CATEGORY_NAME",
+                        Message: await I18NManager.translate( strLanguage, "The Category parameter is not valid." ),
+                        Mark: "242D82D6BF0D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                         LogId: null,
                         IsError: true,
                         Errors: [
                                   {
-                                    Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                                    Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
+                                    Code: "ERROR_NOT_VALID_CATEGORY_NAME",
+                                    Message: await I18NManager.translate( strLanguage, "The Category parameter is not valid." ),
                                     Details: {
                                                Category: strCategory,
                                                Denied: allowedCategory.denied,
@@ -4342,15 +4353,15 @@ export default class BinaryServiceController extends BaseService {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                       Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
-                       Mark: '0372A2B30F59' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_NOT_VALID_CATEGORY_DEFINED",
+                       Message: await I18NManager.translate( strLanguage, "The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid." ),
+                       Mark: "0372A2B30F59" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                                   Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
+                                   Code: "ERROR_NOT_VALID_CATEGORY_DEFINED",
+                                   Message: await I18NManager.translate( strLanguage, "The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid." ),
                                    Details: {
                                               Valid: [ "A-Z", "a-z", "0-9", "_", "-" ],
                                             }
@@ -4371,15 +4382,15 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 413, //Request Entity Too Large
-                     Code: 'ERROR_FILE_TOO_BIG',
-                     Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
-                     Mark: 'B7AF6279E7EB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FILE_TOO_BIG",
+                     Message: await I18NManager.translate( strLanguage, "The file is too big." ),
+                     Mark: "B7AF6279E7EB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FILE_TOO_BIG',
-                                 Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
+                                 Code: "ERROR_FILE_TOO_BIG",
+                                 Message: await I18NManager.translate( strLanguage, "The file is too big." ),
                                  Details: {
                                             Maximum: intBinaryDataMaximumSize / 1024,
                                             Unit: "kilobytes"
@@ -4398,15 +4409,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_NOT_FILE_UPLOADED',
-                   Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
-                   Mark: '8E3E1D2078AE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NOT_FILE_UPLOADED",
+                   Message: await I18NManager.translate( strLanguage, "No file uploaded." ),
+                   Mark: "8E3E1D2078AE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NOT_FILE_UPLOADED',
-                               Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
+                               Code: "ERROR_NOT_FILE_UPLOADED",
+                               Message: await I18NManager.translate( strLanguage, "No file uploaded." ),
                                Details: null
                              }
                            ],
@@ -4461,8 +4472,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -4595,9 +4606,9 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_BINARY_DATA_UPLOAD',
-                     Message: await I18NManager.translate( strLanguage, 'The binary data has been uploaded success.' ),
-                     Mark: 'AF4FE8CB700E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_BINARY_DATA_UPLOAD",
+                     Message: await I18NManager.translate( strLanguage, "The binary data has been uploaded success." ),
+                     Mark: "AF4FE8CB700E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -4619,15 +4630,15 @@ export default class BinaryServiceController extends BaseService {
 
           result = {
                      StatusCode: 413, //Request Entity Too Large
-                     Code: 'ERROR_FILE_TOO_BIG',
-                     Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
-                     Mark: '288FCEE65C27' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FILE_TOO_BIG",
+                     Message: await I18NManager.translate( strLanguage, "The file is too big." ),
+                     Mark: "288FCEE65C27" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FILE_TOO_BIG',
-                                 Message: await I18NManager.translate( strLanguage, 'The file is too big.' ),
+                                 Code: "ERROR_FILE_TOO_BIG",
+                                 Message: await I18NManager.translate( strLanguage, "The file is too big." ),
                                  Details: {
                                             Maximum: intBinaryDataMaximumSize / 1024,
                                             Unit: "kilobytes"
@@ -4646,15 +4657,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_NOT_FILE_UPLOADED',
-                   Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
-                   Mark: '4ED8443CDF85' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NOT_FILE_UPLOADED",
+                   Message: await I18NManager.translate( strLanguage, "No file uploaded." ),
+                   Mark: "4ED8443CDF85" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NOT_FILE_UPLOADED',
-                               Message: await I18NManager.translate( strLanguage, 'No file uploaded.' ),
+                               Code: "ERROR_NOT_FILE_UPLOADED",
+                               Message: await I18NManager.translate( strLanguage, "No file uploaded." ),
                                Details: null
                              }
                            ],
@@ -4709,8 +4720,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -4905,9 +4916,9 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '301F6A1F6FEE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "301F6A1F6FEE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -5009,7 +5020,7 @@ export default class BinaryServiceController extends BaseService {
           if ( request.body.Category ) {
 
             let strCategory = CommonUtilities.clearSpecialChars( request.body.Category,
-                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,."'\`` );
+                                                                 `!@#$^&%*()+=[]\/\\{}|:<>?,.""\`` );
 
             strCategory = CommonUtilities.unaccent( strCategory );
 
@@ -5152,9 +5163,9 @@ export default class BinaryServiceController extends BaseService {
 
                         result = {
                                    StatusCode: 500, //Internal server error
-                                   Code: 'ERROR_UNEXPECTED',
-                                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                   Mark: 'DB8042C7F21E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_UNEXPECTED",
+                                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                   Mark: "DB8042C7F21E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: error.LogId,
                                    IsError: true,
                                    Errors: [
@@ -5195,7 +5206,8 @@ export default class BinaryServiceController extends BaseService {
                                                                                   Data: modelData,
                                                                                   FilterFields: 1, //Force to remove fields like password and value
                                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                                  Include: null,
+                                                                                  Include: null, //[ { model: SYSUser } ],
+                                                                                  Exclude: null, //[ { model: SYSUser } ],
                                                                                   Logger: logger,
                                                                                   ExtraInfo: {
                                                                                                Request: request
@@ -5211,9 +5223,9 @@ export default class BinaryServiceController extends BaseService {
 
                         result = {
                                    StatusCode: 200, //Ok
-                                   Code: 'SUCCESS_BINARY_DATA_UPDATE',
-                                   Message: await I18NManager.translate( strLanguage, 'Success binary data update.' ),
-                                   Mark: 'FBE65384949A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "SUCCESS_BINARY_DATA_UPDATE",
+                                   Message: await I18NManager.translate( strLanguage, "Success binary data update." ),
+                                   Mark: "FBE65384949A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: false,
                                    Errors: [],
@@ -5235,9 +5247,9 @@ export default class BinaryServiceController extends BaseService {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_UNEXPECTED',
-                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: '10BA34FB2495' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "10BA34FB2495" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.LogId,
                                  IsError: true,
                                  Errors: [
@@ -5259,15 +5271,15 @@ export default class BinaryServiceController extends BaseService {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                               Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
-                               Mark: '47946C96B03B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_NOT_VALID_FILE_MIME_TYPE",
+                               Message: await I18NManager.translate( strLanguage, "The %s detected for the file is invalid in the category.", fileDetectedType.mime ),
+                               Mark: "47946C96B03B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_NOT_VALID_FILE_MIME_TYPE',
-                                           Message: await I18NManager.translate( strLanguage, 'The %s detected for the file is invalid in the category.', fileDetectedType.mime ),
+                                           Code: "ERROR_NOT_VALID_FILE_MIME_TYPE",
+                                           Message: await I18NManager.translate( strLanguage, "The %s detected for the file is invalid in the category.", fileDetectedType.mime ),
                                            Details: {
                                                       Category: strCategory,
                                                       Detected: fileDetectedType.mime,
@@ -5288,15 +5300,15 @@ export default class BinaryServiceController extends BaseService {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                             Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
-                             Mark: '7FBB0F51D723' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_NOT_VALID_STORAGE_KIND_DEFINED",
+                             Message: await I18NManager.translate( strLanguage, "The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values." ),
+                             Mark: "7FBB0F51D723" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_NOT_VALID_STORAGE_KIND_DEFINED',
-                                         Message: await I18NManager.translate( strLanguage, 'The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values.' ),
+                                         Code: "ERROR_NOT_VALID_STORAGE_KIND_DEFINED",
+                                         Message: await I18NManager.translate( strLanguage, "The StorageKind parameter cannot be empty or null. Only 0 or 1 are valid values." ),
                                          Details: {
                                                     0: "Persistent",
                                                     1: "Temporal",
@@ -5315,15 +5327,15 @@ export default class BinaryServiceController extends BaseService {
 
                 result = {
                           StatusCode: 400, //Bad request
-                          Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                          Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
-                          Mark: '63D318D61799' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                          Code: "ERROR_NOT_VALID_ACCESS_KIND_DEFINED",
+                          Message: await I18NManager.translate( strLanguage, "The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values." ),
+                          Mark: "63D318D61799" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                           LogId: null,
                           IsError: true,
                           Errors: [
                                     {
-                                      Code: 'ERROR_NOT_VALID_ACCESS_KIND_DEFINED',
-                                      Message: await I18NManager.translate( strLanguage, 'The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values.' ),
+                                      Code: "ERROR_NOT_VALID_ACCESS_KIND_DEFINED",
+                                      Message: await I18NManager.translate( strLanguage, "The AccessKind parameter cannot be empty or null. Only 1 or 2 or 3 are valid values." ),
                                       Details: {
                                                  1: "Public",
                                                  2: "Authenticated",
@@ -5343,15 +5355,15 @@ export default class BinaryServiceController extends BaseService {
 
               result = {
                         StatusCode: 400, //Bad request
-                        Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                        Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
-                        Mark: '1E13DBCFF853' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        Code: "ERROR_NOT_VALID_CATEGORY_NAME",
+                        Message: await I18NManager.translate( strLanguage, "The Category parameter is not valid." ),
+                        Mark: "1E13DBCFF853" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                         LogId: null,
                         IsError: true,
                         Errors: [
                                   {
-                                    Code: 'ERROR_NOT_VALID_CATEGORY_NAME',
-                                    Message: await I18NManager.translate( strLanguage, 'The Category parameter is not valid.' ),
+                                    Code: "ERROR_NOT_VALID_CATEGORY_NAME",
+                                    Message: await I18NManager.translate( strLanguage, "The Category parameter is not valid." ),
                                     Details: {
                                                Category: strCategory,
                                                Denied: allowedCategory.denied,
@@ -5371,15 +5383,15 @@ export default class BinaryServiceController extends BaseService {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                       Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
-                       Mark: 'FDA7E437172D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_NOT_VALID_CATEGORY_DEFINED",
+                       Message: await I18NManager.translate( strLanguage, "The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid." ),
+                       Mark: "FDA7E437172D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_NOT_VALID_CATEGORY_DEFINED',
-                                   Message: await I18NManager.translate( strLanguage, 'The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid.' ),
+                                   Code: "ERROR_NOT_VALID_CATEGORY_DEFINED",
+                                   Message: await I18NManager.translate( strLanguage, "The Category parameter cannot be empty, null or contains especial chars. Only A-Z a-z , - are valid." ),
                                    Details: {
                                               Valid: [ "A-Z", "a-z", "0-9", "_", "-" ],
                                             }
@@ -5399,7 +5411,7 @@ export default class BinaryServiceController extends BaseService {
                      StatusCode: 403, //Forbidden
                      Code: "ERROR_CANNOT_UDPATE_BINARY_DATA",
                      Message: await I18NManager.translate( strLanguage, "Not allowed to update the binary data" ),
-                     Mark: '05947E763583' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "05947E763583" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -5421,15 +5433,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
-                   Mark: '1FCC26425B32' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
+                   Mark: "1FCC26425B32" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
                                Details: null,
                              }
                            ],
@@ -5484,8 +5496,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -5561,9 +5573,9 @@ export default class BinaryServiceController extends BaseService {
             result.errors.push (
                                  {
                                    Id: bulkUserData.Id,
-                                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                                   Mark: 'CA9D0E3BB1FE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                   Message: 'The binary data not found in database.',
+                                   Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                                   Mark: "CA9D0E3BB1FE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Message: "The binary data not found in database.",
                                    Details: null,
                                  }
                                );
@@ -5577,7 +5589,7 @@ export default class BinaryServiceController extends BaseService {
                                  {
                                    Id: bulkUserData.Id,
                                    Code: error.name,
-                                   Mark: 'D7CB3D1C049C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Mark: "D7CB3D1C049C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    Message: error.message,
                                    Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
@@ -5672,9 +5684,9 @@ export default class BinaryServiceController extends BaseService {
                 result.errors.push(
                                     {
                                       Id: sysBinaryIndexInDB.Id,
-                                      Code: 'ERROR_CANNOT_DELETE_BINARY_DATA',
-                                      Mark: 'FE62746C4B68' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the binary data' ),
+                                      Code: "ERROR_CANNOT_DELETE_BINARY_DATA",
+                                      Mark: "FE62746C4B68" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to delete the binary data" ),
                                       Details: null
                                     }
                                   );
@@ -5685,9 +5697,9 @@ export default class BinaryServiceController extends BaseService {
                 result.errors.push(
                                     {
                                       Id: sysBinaryIndexInDB.Id,
-                                      Code: 'ERROR_CANNOT_UDPATE_BINARY_DATA',
-                                      Mark: '1C70E75F0D28' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the binary data' ),
+                                      Code: "ERROR_CANNOT_UDPATE_BINARY_DATA",
+                                      Mark: "1C70E75F0D28" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to update the binary data" ),
                                       Details: null
                                     }
                                   );
@@ -5708,9 +5720,9 @@ export default class BinaryServiceController extends BaseService {
                 result.errors.push(
                                     {
                                       Id: sysBinaryIndexInDB.Id,
-                                      Code: 'ERROR_UNEXPECTED',
-                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                      Mark: '18851D6A2F26' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_UNEXPECTED",
+                                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                      Mark: "18851D6A2F26" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                     }
                                   );
@@ -5722,9 +5734,9 @@ export default class BinaryServiceController extends BaseService {
                 result.data.push(
                                   {
                                     Id: sysBinaryIndexInDB.Id,
-                                    Code: 'SUCCESS_BINARY_DATA_DELETE',
-                                    Message: await I18NManager.translate( strLanguage, 'Success binary data with id %s deleted.', sysBinaryIndexInDB.Id ),
-                                    Mark: '1EE09075BE43' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Code: "SUCCESS_BINARY_DATA_DELETE",
+                                    Message: await I18NManager.translate( strLanguage, "Success binary data with id %s deleted.", sysBinaryIndexInDB.Id ),
+                                    Mark: "1EE09075BE43" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     Details: null
                                   }
                                 );
@@ -5735,9 +5747,9 @@ export default class BinaryServiceController extends BaseService {
                 result.errors.push(
                                     {
                                       Id: sysBinaryIndexInDB.Id,
-                                      Code: 'ERROR_BINARY_DATA_DELETE',
-                                      Message: await I18NManager.translate( strLanguage, 'Error in binary data delete.' ),
-                                      Mark: '8E5B5D6B1FE4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_BINARY_DATA_DELETE",
+                                      Message: await I18NManager.translate( strLanguage, "Error in binary data delete." ),
+                                      Mark: "8E5B5D6B1FE4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: "Method deleteByModel return false"
                                     }
                                   );
@@ -5774,9 +5786,9 @@ export default class BinaryServiceController extends BaseService {
                 result.errors.push(
                                     {
                                       Id: sysBinaryIndexInDB.Id,
-                                      Code: 'ERROR_UNEXPECTED',
-                                      Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                      Mark: 'E1FF18F8269C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Code: "ERROR_UNEXPECTED",
+                                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                      Mark: "E1FF18F8269C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                       Details: await SystemUtilities.processErrorDetails( error ) //error
                                     }
                                   );
@@ -5787,9 +5799,9 @@ export default class BinaryServiceController extends BaseService {
                 result.data.push(
                                   {
                                     Id: sysBinaryIndexInDB.Id,
-                                    Code: 'SUCCESS_BINARY_DATA_UPDATE',
-                                    Message: await I18NManager.translate( strLanguage, 'Success binary data update.' ),
-                                    Mark: '5BF69F0B73CE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Code: "SUCCESS_BINARY_DATA_UPDATE",
+                                    Message: await I18NManager.translate( strLanguage, "Success binary data update." ),
+                                    Mark: "5BF69F0B73CE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                     Details: {
                                                DisabledBy: sysBinaryIndexInDB.DisabledBy,
                                                DisabledAt: sysBinaryIndexInDB.DisabledAt
@@ -5811,9 +5823,9 @@ export default class BinaryServiceController extends BaseService {
                               Id: bulkUserData.Id,
                               ShortId: bulkUserData.ShortId,
                               Name: bulkUserData.Name,
-                              Code: 'ERROR_UNEXPECTED',
-                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                              Mark: '348D1629BE0B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                              Code: "ERROR_UNEXPECTED",
+                              Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                              Mark: "348D1629BE0B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                               Details: await SystemUtilities.processErrorDetails( error ) //error
                             }
                           );
@@ -5849,8 +5861,8 @@ export default class BinaryServiceController extends BaseService {
 
       result.errors.push(
                           {
-                            Code: 'ERROR_UNEXPECTED',
-                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                            Code: "ERROR_UNEXPECTED",
+                            Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                             Mark: strMark,
                             Details: await SystemUtilities.processErrorDetails( error ) //error
                           }
@@ -5905,23 +5917,23 @@ export default class BinaryServiceController extends BaseService {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_BINARY_DATA_DISABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL binary data' );
+        strCode = "SUCCESS_BULK_BINARY_DATA_DISABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success disable ALL binary data" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_BINARY_DATA_DIABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the binary data. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_BINARY_DATA_DIABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot disable the binary data. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been disabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL binary data has been disabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -5930,7 +5942,7 @@ export default class BinaryServiceController extends BaseService {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: 'CBEFF0A51342' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "CBEFF0A51342" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -5985,8 +5997,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -6066,23 +6078,23 @@ export default class BinaryServiceController extends BaseService {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_BINARY_DATA_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL binary data' );
+        strCode = "SUCCESS_BULK_BINARY_DATA_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success enable ALL binary data" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_BINARY_DATA_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the binary data. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_BINARY_DATA_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot enable the binary data. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been enabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL binary data has been enabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -6091,7 +6103,7 @@ export default class BinaryServiceController extends BaseService {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: 'DB9BB148AE82' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "DB9BB148AE82" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -6146,8 +6158,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -6216,7 +6228,7 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
-      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id,
+      const sysBinaryIndexInDB = await SYSBinaryIndexService.getById( request.query.id as string,
                                                                       null,
                                                                       currentTransaction,
                                                                       logger );
@@ -6227,9 +6239,9 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_UNEXPECTED',
-                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                   Mark: '8516092C5844' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "8516092C5844" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -6367,9 +6379,9 @@ export default class BinaryServiceController extends BaseService {
 
             result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                       Mark: '429D44B24E88' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                       Mark: "429D44B24E88" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -6409,9 +6421,9 @@ export default class BinaryServiceController extends BaseService {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_BINARY_DATA_DELETE',
-                       Message: await I18NManager.translate( strLanguage, 'Success binary data with id %s deleted.', sysBinaryIndexInDB.Id ),
-                       Mark: 'BDA125C61987' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_BINARY_DATA_DELETE",
+                       Message: await I18NManager.translate( strLanguage, "Success binary data with id %s deleted.", sysBinaryIndexInDB.Id ),
+                       Mark: "BDA125C61987" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -6427,15 +6439,15 @@ export default class BinaryServiceController extends BaseService {
 
             result = {
                        StatusCode: 500, //Ok
-                       Code: 'ERROR_BINARY_DATA_DELETE',
-                       Message: await I18NManager.translate( strLanguage, 'Error in binary data delete.' ),
-                       Mark: 'CDAC887D1CB4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_BINARY_DATA_DELETE",
+                       Message: await I18NManager.translate( strLanguage, "Error in binary data delete." ),
+                       Mark: "CDAC887D1CB4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [
                                  {
-                                   Code: 'ERROR_METHOD_DELETE_RETURN_FALSE',
-                                   Message: 'Method deleteByModel return false',
+                                   Code: "ERROR_METHOD_DELETE_RETURN_FALSE",
+                                   Message: "Method deleteByModel return false",
                                    Details: null
                                  }
                                ],
@@ -6453,7 +6465,7 @@ export default class BinaryServiceController extends BaseService {
                      StatusCode: 403, //Forbidden
                      Code: "ERROR_CANNOT_DELETE_BINARY_DATA",
                      Message: await I18NManager.translate( strLanguage, "Not allowed to delete the binary data" ),
-                     Mark: 'BE576C66151B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "BE576C66151B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -6475,15 +6487,15 @@ export default class BinaryServiceController extends BaseService {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
-                   Mark: '6AE6292D2DCD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
+                   Mark: "6AE6292D2DCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_BINARY_DATA_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The binary data not found in database.' ),
+                               Code: "ERROR_BINARY_DATA_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The binary data not found in database." ),
                                Details: null,
                              }
                            ],
@@ -6538,8 +6550,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -6619,23 +6631,23 @@ export default class BinaryServiceController extends BaseService {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_BINARY_DATA_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL binary data' );
+        strCode = "SUCCESS_BULK_BINARY_DATA_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Success delete ALL binary data" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_BINARY_DATA_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot delete the binary data. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_BINARY_DATA_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot delete the binary data. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL binary data has been deleted. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL binary data has been deleted. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -6644,7 +6656,7 @@ export default class BinaryServiceController extends BaseService {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: '3D4D0F25EAB5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "3D4D0F25EAB5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -6699,8 +6711,8 @@ export default class BinaryServiceController extends BaseService {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

@@ -1,14 +1,14 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 import { Socket } from "net";
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
@@ -17,18 +17,18 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import CipherManager from '../../../common/managers/CipherManager';
+import CipherManager from "../../../common/managers/CipherManager";
 import ApplicationServerDataManager from "../../../common/managers/ApplicationServerDataManager";
 
-import SecurityServiceController from './SecurityService.controller';
-import UserOthersServiceController from './UserOthersService.controller';
+import SecurityServiceController from "./SecurityService.controller";
+import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
-import SYSUserSignupService from '../../../common/database/master/services/SYSUserSignupService';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
+import SYSUserSignupService from "../../../common/database/master/services/SYSUserSignupService";
 
-const debug = require( 'debug' )( 'UserSingupServiceController' );
+const debug = require( "debug" )( "UserSingupServiceController" );
 
 export default class UserSingupServiceController {
 
@@ -87,11 +87,11 @@ export default class UserSingupServiceController {
                signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
             let rules = {
-                          Name: [ 'required', 'min:3', 'regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g' ],
-                          EMail: 'required|emailList', //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                          Phone: 'present|phoneUSList', //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
-                          FirstName: [ 'required', 'min:2', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
-                          LastName: [ 'required', 'min:1', 'regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g' ],
+                          Name: [ "required", "min:3", "regex:/^[a-zA-Z0-9\#\@\.\_\-]+$/g" ],
+                          EMail: "required|emailList", //<-- emailList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          Phone: "present|phoneUSList", //<-- phoneUSList is a custom validator defined in SystemUtilities.createCustomValidatorSync
+                          FirstName: [ "required", "min:2", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
+                          LastName: [ "required", "min:1", "regex:/^[a-zA-Z0-9\#\@\.\_\-\\sñÑáéíóúàèìòùäëïöüÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ]+$/g" ],
                         };
 
             const validator = SystemUtilities.createCustomValidatorSync( signupData,
@@ -106,7 +106,7 @@ export default class UserSingupServiceController {
 
               if ( signupData.Name.includes( "@system.net" ) ) {
 
-                checkFieldValueResults[ "Name" ] = await I18NManager.translate( strLanguage, 'The user name %s is invalid', signupData.Name );
+                checkFieldValueResults[ "Name" ] = await I18NManager.translate( strLanguage, "The user name %s is invalid", signupData.Name );
 
               }
 
@@ -147,15 +147,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 404, //Not found
-                               Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, signupData.Kind ),
-                               Mark: '49EEF768004F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, signupData.Kind ),
+                               Mark: "49EEF768004F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, signupData.Kind ),
+                                           Code: "ERROR_USER_GROUP_NOT_FOUND",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -170,15 +170,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, signupData.Kind ),
-                               Mark: '3BAC1FA1D2A2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, signupData.Kind ),
+                               Mark: "3BAC1FA1D2A2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, signupData.Kind ),
+                                           Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -195,15 +195,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, signupData.Kind ),
-                               Mark: '88C3AE24AB5E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, signupData.Kind ),
+                               Mark: "88C3AE24AB5E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_DISABLED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, signupData.Kind ),
+                                           Code: "ERROR_USER_GROUP_DISABLED",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -220,15 +220,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, signupData.Kind ),
-                               Mark: '53EC3D039492' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_EXPIRED",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, signupData.Kind ),
+                               Mark: "53EC3D039492" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_EXPIRED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, signupData.Kind ),
+                                           Code: "ERROR_USER_GROUP_EXPIRED",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, signupData.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -244,15 +244,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', signupData.Name ),
-                               Mark: 'B43E4A5C0D8D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                               Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", signupData.Name ),
+                               Mark: "B43E4A5C0D8D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', signupData.Name ),
+                                           Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                                           Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", signupData.Name ),
                                            Details: null
                                          }
                                        ],
@@ -363,9 +363,9 @@ export default class UserSingupServiceController {
 
                           result = {
                                      StatusCode: 200, //Ok
-                                     Code: 'SUCCESS_USER_SIGNUP',
-                                     Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. Now you need check for your mailbox' ),
-                                     Mark: 'B3F0B0AF21AC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                     Code: "SUCCESS_USER_SIGNUP",
+                                     Message: await I18NManager.translate( strLanguage, "Success to made the user signup. Now you need check for your mailbox" ),
+                                     Mark: "B3F0B0AF21AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                      LogId: null,
                                      IsError: false,
                                      Errors: [],
@@ -402,15 +402,15 @@ export default class UserSingupServiceController {
 
                           result = {
                                      StatusCode: 500, //Internal server error //ok
-                                     Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                     Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                                     Mark: '5B91FA66FE6D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                     Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
+                                     Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
+                                     Mark: "5B91FA66FE6D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                      LogId: null,
                                      IsError: true,
                                      Errors: [
                                                {
-                                                 Code: 'ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL',
-                                                 Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                                 Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
+                                                 Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
                                                  Details: {
                                                             EMail: signupData.EMail
                                                           }
@@ -428,9 +428,9 @@ export default class UserSingupServiceController {
 
                         result = {
                                    StatusCode: 200, //Ok
-                                   Code: 'SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION',
-                                   Message: await I18NManager.translate( strLanguage, 'Success to made the user signup. But you need wait to system administrator activate your new account' ),
-                                   Mark: 'AE4751429BC8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "SUCCESS_USER_SIGNUP_MANUAL_ACTIVATION",
+                                   Message: await I18NManager.translate( strLanguage, "Success to made the user signup. But you need wait to system administrator activate your new account" ),
+                                   Mark: "AE4751429BC8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: false,
                                    Errors: [],
@@ -450,9 +450,9 @@ export default class UserSingupServiceController {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_UNEXPECTED',
-                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: '619404BC65B1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "619404BC65B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.logId,
                                  IsError: true,
                                  Errors: [
@@ -476,9 +476,9 @@ export default class UserSingupServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_PASSWORD_NOT_VALID',
-                             Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
-                             Mark: '24742802D110' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_PASSWORD_NOT_VALID",
+                             Message: await I18NManager.translate( strLanguage, "The password is not valid" ),
+                             Mark: "24742802D110" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
@@ -500,15 +500,15 @@ export default class UserSingupServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_CHECK_FIELD_VALUES_FAILED',
-                           Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                           Mark: '2AE9478D6D22' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_CHECK_FIELD_VALUES_FAILED",
+                           Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                           Mark: "2AE9478D6D22" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_CHECK_FIELD_VALUES_FAILED',
-                                       Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                       Code: "ERROR_CHECK_FIELD_VALUES_FAILED",
+                                       Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                        Details: checkFieldValueResults
                                      }
                                    ],
@@ -524,15 +524,15 @@ export default class UserSingupServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                         Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
-                         Mark: 'F01229E593EE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                         Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                         Mark: "F01229E593EE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_FIELD_VALUES_ARE_INVALID',
-                                     Message: await I18NManager.translate( strLanguage, 'One or more field values are invalid' ),
+                                     Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                                     Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
                                      Details: validator.errors.all()
                                    }
                                  ],
@@ -548,15 +548,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', signupData.Kind ),
-                       Mark: 'E0E3A7CC1A6A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", signupData.Kind ),
+                       Mark: "E0E3A7CC1A6A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', signupData.Kind ),
+                                   Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                                   Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", signupData.Kind ),
                                    Details: null
                                  }
                                ],
@@ -572,15 +572,15 @@ export default class UserSingupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
-                     Mark: '9333A33809AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
+                     Mark: "9333A33809AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
                                  Details: null
                                }
                              ],
@@ -613,15 +613,15 @@ export default class UserSingupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: '59B45FDEFADE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "59B45FDEFADE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -659,8 +659,8 @@ export default class UserSingupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -832,7 +832,7 @@ export default class UserSingupServiceController {
 
             //Call to check the token https://oauth2.googleapis.com/tokeninfo?id_token=request.body.TokenId
             const options = {
-                              method: 'GET',
+                              method: "GET",
                               //headers: {},
                               body: null,
                             };
@@ -914,15 +914,15 @@ export default class UserSingupServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_TOKEN_NOT_VALID',
-                         Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
-                         Mark: 'A709A312EC35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_TOKEN_NOT_VALID",
+                         Message: await I18NManager.translate( strLanguage, "The google token is not valid" ),
+                         Mark: "A709A312EC35" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_TOKEN_NOT_VALID',
-                                     Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                                     Code: "ERROR_TOKEN_NOT_VALID",
+                                     Message: await I18NManager.translate( strLanguage, "The google token is not valid" ),
                                      Details: null
                                    }
                                  ],
@@ -938,15 +938,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
-                       Mark: 'B40EF4F2157B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
+                       Mark: "B40EF4F2157B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                                   Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
                                    Details: null
                                  }
                                ],
@@ -962,15 +962,15 @@ export default class UserSingupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
-                     Mark: 'E47542BBCD1B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
+                     Mark: "E47542BBCD1B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
                                  Details: null
                                }
                              ],
@@ -1003,15 +1003,15 @@ export default class UserSingupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: '8726114482F0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "8726114482F0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -1049,8 +1049,8 @@ export default class UserSingupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1168,7 +1168,7 @@ export default class UserSingupServiceController {
             */
 
             const options = {
-                              method: 'GET',
+                              method: "GET",
                               //headers: {},
                               body: null,
                             };
@@ -1265,15 +1265,15 @@ export default class UserSingupServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_TOKEN_NOT_VALID',
-                         Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
-                         Mark: 'A709A312EC35' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_TOKEN_NOT_VALID",
+                         Message: await I18NManager.translate( strLanguage, "The facebook token is not valid" ),
+                         Mark: "A709A312EC35" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_TOKEN_NOT_VALID',
-                                     Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
+                                     Code: "ERROR_TOKEN_NOT_VALID",
+                                     Message: await I18NManager.translate( strLanguage, "The facebook token is not valid" ),
                                      Details: null
                                    }
                                  ],
@@ -1289,15 +1289,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
-                       Mark: 'D979438E70E9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
+                       Mark: "D979438E70E9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                                   Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
                                    Details: null
                                  }
                                ],
@@ -1313,15 +1313,15 @@ export default class UserSingupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
-                     Mark: '796976F247D8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
+                     Mark: "796976F247D8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
                                  Details: null
                                }
                              ],
@@ -1354,15 +1354,15 @@ export default class UserSingupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: 'DBA17A9E9FF7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "DBA17A9E9FF7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -1400,8 +1400,8 @@ export default class UserSingupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1495,15 +1495,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                       Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
-                       Mark: '7F545A613045' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                       Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
+                       Mark: "7F545A613045" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                   Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', request.body.Kind ),
+                                   Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                                   Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", request.body.Kind ),
                                    Details: null
                                  }
                                ],
@@ -1519,15 +1519,15 @@ export default class UserSingupServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                     Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
-                     Mark: '0907C966A4FC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
+                     Mark: "0907C966A4FC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                 Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                 Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
                                  Details: null
                                }
                              ],
@@ -1560,15 +1560,15 @@ export default class UserSingupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: 'BBF8C16023C0' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "BBF8C16023C0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -1606,8 +1606,8 @@ export default class UserSingupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1718,15 +1718,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 404, //Not found
-                               Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, sysUserSignupInDB.Kind ),
-                               Mark: '0EA9AC54E217' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Mark: "0EA9AC54E217" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_NOT_FOUND',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s not found', signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Code: "ERROR_USER_GROUP_NOT_FOUND",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1741,15 +1741,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, sysUserSignupInDB.Kind ),
-                               Mark: '832157FFA57C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Mark: "832157FFA57C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s already exists', signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1766,15 +1766,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
-                               Mark: '74E11EE1CFE2' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Mark: "74E11EE1CFE2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_DISABLED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is disabled. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Code: "ERROR_USER_GROUP_DISABLED",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1791,15 +1791,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
-                               Mark: '2E99F86FF13B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_GROUP_EXPIRED",
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Mark: "2E99F86FF13B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_GROUP_EXPIRED',
-                                           Message: await I18NManager.translate( strLanguage, 'The user group %s defined by signup kind %s is expired. You cannot signup new users', signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Code: "ERROR_USER_GROUP_EXPIRED",
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1815,15 +1815,15 @@ export default class UserSingupServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                               Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', sysUserSignupInDB.Name ),
-                               Mark: '46F913842BF5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                               Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", sysUserSignupInDB.Name ),
+                               Mark: "46F913842BF5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_USER_NAME_ALREADY_EXISTS',
-                                           Message: await I18NManager.translate( strLanguage, 'The user name %s already exists.', sysUserSignupInDB.Name ),
+                                           Code: "ERROR_USER_NAME_ALREADY_EXISTS",
+                                           Message: await I18NManager.translate( strLanguage, "The user name %s already exists.", sysUserSignupInDB.Name ),
                                            Details: null
                                          }
                                        ],
@@ -2046,9 +2046,9 @@ export default class UserSingupServiceController {
 
                           result = {
                                      StatusCode: 200, //Ok
-                                     Code: 'SUCCESS_USER_ACTIVATION',
-                                     Message: await I18NManager.translate( strLanguage, 'Success to made the user activation' ),
-                                     Mark: '1E74B6B63B07' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                     Code: "SUCCESS_USER_ACTIVATION",
+                                     Message: await I18NManager.translate( strLanguage, "Success to made the user activation" ),
+                                     Mark: "1E74B6B63B07" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                      LogId: null,
                                      IsError: false,
                                      Errors: [],
@@ -2066,9 +2066,9 @@ export default class UserSingupServiceController {
 
                           result = {
                                      StatusCode: 500, //Internal server error
-                                     Code: 'ERROR_UNEXPECTED',
-                                     Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                     Mark: '0FA42BB1DE80' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                     Code: "ERROR_UNEXPECTED",
+                                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                     Mark: "0FA42BB1DE80" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                      LogId: error.logId,
                                      IsError: true,
                                      Errors: [
@@ -2092,9 +2092,9 @@ export default class UserSingupServiceController {
 
                         result = {
                                    StatusCode: 500, //Internal server error
-                                   Code: 'ERROR_UNEXPECTED',
-                                   Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                   Mark: 'AB370C6C4B51' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_UNEXPECTED",
+                                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                   Mark: "AB370C6C4B51" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: error.logId,
                                    IsError: true,
                                    Errors: [
@@ -2118,9 +2118,9 @@ export default class UserSingupServiceController {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_UNEXPECTED',
-                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: '91F9DE73ECDB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "91F9DE73ECDB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.logId,
                                  IsError: true,
                                  Errors: [
@@ -2144,15 +2144,15 @@ export default class UserSingupServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                             Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', sysUserSignupInDB.Kind ),
-                             Mark: 'C632418EF717' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                             Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", sysUserSignupInDB.Kind ),
+                             Mark: "C632418EF717" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_SIGNUP_KIND_NOT_VALID',
-                                         Message: await I18NManager.translate( strLanguage, 'The signup kind %s is not valid', sysUserSignupInDB.Kind ),
+                                         Code: "ERROR_SIGNUP_KIND_NOT_VALID",
+                                         Message: await I18NManager.translate( strLanguage, "The signup kind %s is not valid", sysUserSignupInDB.Kind ),
                                          Details: null
                                        }
                                      ],
@@ -2168,15 +2168,15 @@ export default class UserSingupServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                           Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
-                           Mark: '2A8CD841F553' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                           Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
+                           Mark: "2A8CD841F553" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                       Message: await I18NManager.translate( strLanguage, 'Not allowed to signup from this the kind of frontend' ),
+                                       Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                       Message: await I18NManager.translate( strLanguage, "Not allowed to signup from this the kind of frontend" ),
                                        Details: null
                                      }
                                    ],
@@ -2192,15 +2192,15 @@ export default class UserSingupServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                         Message: await I18NManager.translate( strLanguage, 'Activation code is expired' ),
-                         Mark: 'B212EA552AEA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_ACTIVATION_CODE_EXPIRED",
+                         Message: await I18NManager.translate( strLanguage, "Activation code is expired" ),
+                         Mark: "B212EA552AEA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_ACTIVATION_CODE_EXPIRED',
-                                     Message: await I18NManager.translate( strLanguage, 'Activation code is expired' ),
+                                     Code: "ERROR_ACTIVATION_CODE_EXPIRED",
+                                     Message: await I18NManager.translate( strLanguage, "Activation code is expired" ),
                                      Details: sysUserSignupInDB.ExpireAt
                                    }
                                  ],
@@ -2216,15 +2216,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_ACTIVATION_CODE_ALREADY_USED',
-                       Message: await I18NManager.translate( strLanguage, 'Activation code is already used' ),
-                       Mark: 'B212EA552AEA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_ACTIVATION_CODE_ALREADY_USED",
+                       Message: await I18NManager.translate( strLanguage, "Activation code is already used" ),
+                       Mark: "B212EA552AEA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_ACTIVATION_CODE_ALREADY_USED',
-                                   Message: await I18NManager.translate( strLanguage, 'Activation code is already used' ),
+                                   Code: "ERROR_ACTIVATION_CODE_ALREADY_USED",
+                                   Message: await I18NManager.translate( strLanguage, "Activation code is already used" ),
                                    Details: null
                                  }
                                ],
@@ -2238,15 +2238,15 @@ export default class UserSingupServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_ACTIVATION_CODE_INVALID_STATUS',
-                       Message: await I18NManager.translate( strLanguage, 'Activation code has invalid status' ),
-                       Mark: '925EA3C66617' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_ACTIVATION_CODE_INVALID_STATUS",
+                       Message: await I18NManager.translate( strLanguage, "Activation code has invalid status" ),
+                       Mark: "925EA3C66617" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_ACTIVATION_CODE_INVALID_STATUS',
-                                   Message: await I18NManager.translate( strLanguage, 'Activation code has invalid status' ),
+                                   Code: "ERROR_ACTIVATION_CODE_INVALID_STATUS",
+                                   Message: await I18NManager.translate( strLanguage, "Activation code has invalid status" ),
                                    Details: null
                                  }
                                ],
@@ -2262,15 +2262,15 @@ export default class UserSingupServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'Activation code is not found' ),
-                     Mark: '7A446BC21A83' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_ACTIVATION_CODE_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "Activation code is not found" ),
+                     Mark: "7A446BC21A83" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_ACTIVATION_CODE_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'Activation code is not found' ),
+                                 Code: "ERROR_ACTIVATION_CODE_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "Activation code is not found" ),
                                  Details: null
                                }
                              ],
@@ -2303,15 +2303,15 @@ export default class UserSingupServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: 'DB5BA575E59D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "DB5BA575E59D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -2349,8 +2349,8 @@ export default class UserSingupServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

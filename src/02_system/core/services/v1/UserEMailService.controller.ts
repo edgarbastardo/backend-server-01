@@ -1,12 +1,12 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
-import bcrypt from 'bcrypt';
+} from "express";
+import bcrypt from "bcrypt";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
@@ -19,11 +19,11 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
-import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
-import SYSUserGroupService from '../../../common/database/master/services/SYSUserGroupService';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
+import SYSActionTokenService from "../../../common/database/master/services/SYSActionTokenService";
+import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
 
-const debug = require( 'debug' )( 'UserEMailServiceController' );
+const debug = require( "debug" )( "UserEMailServiceController" );
 
 export default class UserEMailServiceController {
 
@@ -82,15 +82,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
-                       Mark: 'EF21E15D0ACA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                       Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the email" ),
+                       Mark: "EF21E15D0ACA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the email" ),
                                    Details: null
                                  }
                                ],
@@ -106,15 +106,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.sysUserGroup.Name ),
-                       Mark: 'B308899A1A43' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", userInDB.sysUserGroup.Name ),
+                       Mark: "B308899A1A43" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', userInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", userInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -130,15 +130,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.sysUserGroup.Name ),
-                       Mark: '0A4F7A24E7F9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", userInDB.sysUserGroup.Name ),
+                       Mark: "0A4F7A24E7F9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', userInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", userInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -154,15 +154,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
-                       Mark: 'E5543FAB4485' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", userInDB.Name ),
+                       Mark: "E5543FAB4485" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', userInDB.Name ),
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", userInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -178,15 +178,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
-                       Mark: '1BD2335313DC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", userInDB.Name ),
+                       Mark: "1BD2335313DC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', userInDB.Name ),
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", userInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -276,9 +276,9 @@ export default class UserEMailServiceController {
 
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_SEND_EMAIL_CHANGE_CODE_EMAIL',
-                               Message: await I18NManager.translate( strLanguage, 'Success to send email change code. Please check your mailbox' ),
-                               Mark: '9145ACBE178E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "SUCCESS_SEND_EMAIL_CHANGE_CODE_EMAIL",
+                               Message: await I18NManager.translate( strLanguage, "Success to send email change code. Please check your mailbox" ),
+                               Mark: "9145ACBE178E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
                                Errors: [],
@@ -298,15 +298,15 @@ export default class UserEMailServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL',
-                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                               Mark: '150A614E67B7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL",
+                               Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
+                               Mark: "150A614E67B7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL',
-                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                           Code: "ERROR_SEND_EMAIL_CHANGE_CODE_EMAIL",
+                                           Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
                                            Details: {
                                                       EMail: CommonUtilities.maskEMailList( request.body.EMail )
                                                     }
@@ -326,9 +326,9 @@ export default class UserEMailServiceController {
 
                   result = {
                              StatusCode: 500, //Internal server error
-                             Code: 'ERROR_UNEXPECTED',
-                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: 'E739AB104B52' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNEXPECTED",
+                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                             Mark: "E739AB104B52" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: error.logId,
                              IsError: true,
                              Errors: [
@@ -350,15 +350,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_EMAIL_IS_INVALID',
-                           Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
-                           Mark: '01E51F2FB37F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_EMAIL_IS_INVALID",
+                           Message: await I18NManager.translate( strLanguage, "The email is not valid" ),
+                           Mark: "01E51F2FB37F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_EMAIL_IS_INVALID',
-                                       Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                                       Code: "ERROR_EMAIL_IS_INVALID",
+                                       Message: await I18NManager.translate( strLanguage, "The email is not valid" ),
                                        Details: {
                                                   EMail: request.body.EMail
                                                 }
@@ -376,15 +376,15 @@ export default class UserEMailServiceController {
 
               result = {
                          StatusCode: 401, //Unauthorized
-                         Code: 'ERROR_WRONG_PASSWORD',
-                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
-                         Mark: '70AFDA615BD7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "70AFDA615BD7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_WRONG_PASSWORD',
-                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
                                      Details: null,
                                    }
                                  ],
@@ -402,15 +402,15 @@ export default class UserEMailServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
-                     Mark: '4FC2BD9354AD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
+                     Mark: "4FC2BD9354AD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
                                  Details: null,
                                }
                              ],
@@ -428,15 +428,15 @@ export default class UserEMailServiceController {
 
         result = {
                    StatusCode: 429, //Too Many Requests
-                   Code: 'ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST',
-                   Message: await I18NManager.translate( strLanguage, 'The user %s has too many email change requests', request.body.Name ),
+                   Code: "ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST",
+                   Message: await I18NManager.translate( strLanguage, "The user %s has too many email change requests", request.body.Name ),
                    Mark: strMark,
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST',
-                               Message: await I18NManager.translate( strLanguage, 'The user %s has too many email change requests', request.body.Name ),
+                               Code: "ERROR_TOO_MANY_EMAIL_CHANGE_REQUEST",
+                               Message: await I18NManager.translate( strLanguage, "The user %s has too many email change requests", request.body.Name ),
                                Details: { Count: intCount, Comment: "In last 10 minutes" }
                              }
                            ],
@@ -448,12 +448,12 @@ export default class UserEMailServiceController {
         const debugMark = debug.extend( strMark );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'The user %s has too many email change requests', request.body.Name );
+        debugMark( "The user %s has too many email change requests", request.body.Name );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'The user %s has too many email change requests', request.body.Name );
+          logger.warning( "The user %s has too many email change requests", request.body.Name );
 
         }
 
@@ -503,8 +503,8 @@ export default class UserEMailServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -597,15 +597,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                           Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
-                           Mark: 'B4381A42D579' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                           Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the email" ),
+                           Mark: "B4381A42D579" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the email' ),
+                                       Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                       Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the email" ),
                                        Details: null
                                      }
                                    ],
@@ -621,15 +621,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
-                           Mark: 'C29DB5D3E5B9' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_GROUP_DISABLED",
+                           Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                           Mark: "C29DB5D3E5B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
+                                       Code: "ERROR_USER_GROUP_DISABLED",
+                                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -645,15 +645,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
-                           Mark: '3C05036866E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_GROUP_EXPIRED",
+                           Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                           Mark: "3C05036866E6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the email', sysUserInDB.sysUserGroup.Name ),
+                                       Code: "ERROR_USER_GROUP_EXPIRED",
+                                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -669,15 +669,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', sysUserInDB.Name ),
-                           Mark: 'D70CB73D33AB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_DISABLED",
+                           Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", sysUserInDB.Name ),
+                           Mark: "D70CB73D33AB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the email', sysUserInDB.Name ),
+                                       Code: "ERROR_USER_DISABLED",
+                                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -693,15 +693,15 @@ export default class UserEMailServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', sysUserInDB.Name ),
-                           Mark: 'EE18C1A52A3C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_EXPIRED",
+                           Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", sysUserInDB.Name ),
+                           Mark: "EE18C1A52A3C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the email', sysUserInDB.Name ),
+                                       Code: "ERROR_USER_EXPIRED",
+                                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -782,9 +782,9 @@ export default class UserEMailServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: 'D111D4B14F3D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "D111D4B14F3D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: error.logId,
                                IsError: true,
                                Errors: [
@@ -806,9 +806,9 @@ export default class UserEMailServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: 'A73E92AF2757' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "A73E92AF2757" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -910,9 +910,9 @@ export default class UserEMailServiceController {
 
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_EMAIL_CHANGE',
-                               Message: await I18NManager.translate( strLanguage, 'Success to change the user email.' ),
-                               Mark: 'D460632D4A2E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "SUCCESS_EMAIL_CHANGE",
+                               Message: await I18NManager.translate( strLanguage, "Success to change the user email." ),
+                               Mark: "D460632D4A2E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
                                Errors: [],
@@ -930,15 +930,15 @@ export default class UserEMailServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_EMAIL_NOT_VALID',
-                             Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
-                             Mark: 'B4A37DF40A10' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_EMAIL_NOT_VALID",
+                             Message: await I18NManager.translate( strLanguage, "The email is not valid" ),
+                             Mark: "B4A37DF40A10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_EMAIL_NOT_VALID',
-                                         Message: await I18NManager.translate( strLanguage, 'The email is not valid' ),
+                                         Code: "ERROR_EMAIL_NOT_VALID",
+                                         Message: await I18NManager.translate( strLanguage, "The email is not valid" ),
                                          Details: {
                                                     EMail: request.body.EMail
                                                   }
@@ -958,15 +958,15 @@ export default class UserEMailServiceController {
 
               result = {
                          StatusCode: 404, //Not found
-                         Code: 'ERROR_USER_NOT_FOUND',
-                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
-                         Mark: '81CBFCD7E4E8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_NOT_FOUND",
+                         Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
+                         Mark: "81CBFCD7E4E8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_NOT_FOUND',
-                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
+                                     Code: "ERROR_USER_NOT_FOUND",
+                                     Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
                                      Details: null,
                                    }
                                  ],
@@ -982,15 +982,15 @@ export default class UserEMailServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_EMAIL_CHANGE_CODE_ALREADY_USED',
-                       Message: await I18NManager.translate( strLanguage, 'The email change code %s already used', request.body.Code ),
-                       Mark: 'EBB44FAB84DB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_EMAIL_CHANGE_CODE_ALREADY_USED",
+                       Message: await I18NManager.translate( strLanguage, "The email change code %s already used", request.body.Code ),
+                       Mark: "EBB44FAB84DB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_EMAIL_CHANGE_CODE_ALREADY_USED',
-                                   Message: await I18NManager.translate( strLanguage, 'The email change code %s already used', request.body.Code ),
+                                   Code: "ERROR_EMAIL_CHANGE_CODE_ALREADY_USED",
+                                   Message: await I18NManager.translate( strLanguage, "The email change code %s already used", request.body.Code ),
                                    Details: null,
                                  }
                                ],
@@ -1006,15 +1006,15 @@ export default class UserEMailServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_EMAIL_CHANGE_CODE_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The email change code %s is expired', request.body.Code ),
-                     Mark: 'B810BD062AF4' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_EMAIL_CHANGE_CODE_EXPIRED",
+                     Message: await I18NManager.translate( strLanguage, "The email change code %s is expired", request.body.Code ),
+                     Mark: "B810BD062AF4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_EMAIL_CHANGE_CODE_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The email change code %s is expired', request.body.Code ),
+                                 Code: "ERROR_EMAIL_CHANGE_CODE_EXPIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The email change code %s is expired", request.body.Code ),
                                  Details: null,
                                }
                              ],
@@ -1030,15 +1030,15 @@ export default class UserEMailServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_EMAIL_CHANGE_CODE_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The email change code %s not found in database', request.body.Code ),
-                   Mark: '5241B773D358' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_EMAIL_CHANGE_CODE_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The email change code %s not found in database", request.body.Code ),
+                   Mark: "5241B773D358" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_EMAIL_CHANGE_CODE_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The email change code %s not found in database', request.body.Code ),
+                               Code: "ERROR_EMAIL_CHANGE_CODE_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The email change code %s not found in database", request.body.Code ),
                                Details: null,
                              }
                            ],
@@ -1093,8 +1093,8 @@ export default class UserEMailServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

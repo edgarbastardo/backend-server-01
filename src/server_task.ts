@@ -125,7 +125,7 @@ export default class ServerTask {
     await NotificationManager.publishOnTopic( "SystemEvent",
                                               {
                                                 SystemId: SystemUtilities.getSystemId(),
-                                                SystemName: process.env.APP_SERVER_IM_NAME,
+                                                SystemName: process.env.APP_SERVER_TASK_NAME,
                                                 SubSystem: "Server",
                                                 Token: "No apply",
                                                 UserId: "No apply",
@@ -153,7 +153,7 @@ export default class ServerTask {
 
     SystemUtilities.strBaseRunPath = __dirname;
     SystemUtilities.strBaseRootPath = appRoot.path;
-    SystemUtilities.strAPPName = process.env.APP_SERVER_IM_NAME;
+    SystemUtilities.strAPPName = process.env.APP_SERVER_TASK_NAME;
 
     try {
 

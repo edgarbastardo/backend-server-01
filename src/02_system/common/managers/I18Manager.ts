@@ -1,11 +1,11 @@
-import cluster from 'cluster';
-import util from 'util';
-import fs from 'fs';
-import { promises as fsPromises } from 'fs';
+import cluster from "cluster";
+import util from "util";
+import fs from "fs";
+import { promises as fsPromises } from "fs";
 import os from "os";
-import path from 'path';
+import path from "path";
 
-import appRoot from 'app-root-path';
+import appRoot from "app-root-path";
 
 import CommonConstants from "../CommonConstants";
 
@@ -14,7 +14,7 @@ import CommonUtilities from "../CommonUtilities";
 
 import LoggerManager from "./LoggerManager";
 
-const debug = require( 'debug' )( 'I18Manager' );
+const debug = require( "debug" )( "I18Manager" );
 
 export default class I18NManager {
 
@@ -32,7 +32,7 @@ export default class I18NManager {
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
-                      .filter( file => file.indexOf( '.' ) !== 0 && ( file.slice( -5 ) === '.json' ) );
+                      .filter( file => file.indexOf( "." ) !== 0 && ( file.slice( -5 ) === ".json" ) );
 
       const dirs = fs.readdirSync( directory )
                      .filter( file => fs.lstatSync( path.join( directory, file ) ).isDirectory() );
@@ -45,7 +45,7 @@ export default class I18NManager {
 
           const jsonData = ( await import( path.join( directory, file ) ) ).default; //.then( module => module.default );
 
-          //let debugMark = debug.extend( '09B016268A87' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          //let debugMark = debug.extend( "09B016268A87" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           //debugMark( "%O", jsonData );
 
           const strLanguage = pathParts[ pathParts.length - 1 ];

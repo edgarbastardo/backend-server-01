@@ -1,18 +1,18 @@
 
-import cluster from 'cluster';
+import cluster from "cluster";
 
-import appRoot from 'app-root-path';
+import appRoot from "app-root-path";
 
 import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-//require( 'dotenv' );
+//require( "dotenv" );
 
-require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
+require( "dotenv" ).config( { path: appRoot.path + "/.env.secrets" } );
 
-const debug = require( 'debug' )( 'CipherManager' );
+const debug = require( "debug" )( "CipherManager" );
 
 export default class CipherManager {
 

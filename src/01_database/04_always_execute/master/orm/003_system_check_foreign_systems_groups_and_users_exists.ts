@@ -71,7 +71,7 @@ export default class Always {
 
           }
           else if ( !userGroupInDB.Tag ||
-                     userGroupInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                     userGroupInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
             userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
@@ -231,6 +231,20 @@ export default class Always {
                               DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
+                              Id: "75cc6129-ae0f-4f65-943a-ff6909317ff0",
+                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 0,
+                              Name: "InstantMessageServer01",
+                              Password: "@",
+                              Role: null,
+                              Tag: "#ForeignSystem#,#InstantMessageServer01#",
+                              Comment: "Created from backend startup.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
                               Id: "56adc517-e571-41f7-90be-5c5e97909c99",
                               GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
                               ForceChangePassword: 0,
@@ -280,7 +294,7 @@ export default class Always {
 
           }
           else if ( !sysUserInDB.Tag ||
-                    sysUserInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                    sysUserInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
             //sysUserInDB.Name = userToCreate.Name;
             //sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );

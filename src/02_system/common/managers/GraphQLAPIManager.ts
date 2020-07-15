@@ -1,20 +1,20 @@
-import fs from 'fs';
-import path from 'path';
-import cluster from 'cluster';
+import fs from "fs";
+import path from "path";
+import cluster from "cluster";
 
-import { ForbiddenError } from 'apollo-server-express';
-import { makeExecutableSchema } from 'graphql-tools';
-import { applyMiddleware } from 'graphql-middleware';
-import { shield } from 'graphql-shield';
+import { ForbiddenError } from "apollo-server-express";
+import { makeExecutableSchema } from "graphql-tools";
+import { applyMiddleware } from "graphql-middleware";
+import { shield } from "graphql-shield";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import CommonUtilities from '../CommonUtilities';
+import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-import SYSRouteService from '../database/master/services/SYSRouteService';
+import SYSRouteService from "../database/master/services/SYSRouteService";
 
-const debug = require( 'debug' )( 'GraphQLAPIManager' );
+const debug = require( "debug" )( "GraphQLAPIManager" );
 
 export default class GraphQLAPIManager {
 
@@ -64,7 +64,7 @@ export default class GraphQLAPIManager {
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
-                      .filter( file => file.indexOf( '.' ) !== 0 && ( file.slice( -3 ) === '.js' || file.slice( -3 ) === '.ts' ) );
+                      .filter( file => file.indexOf( "." ) !== 0 && ( file.slice( -3 ) === ".js" || file.slice( -3 ) === ".ts" ) );
 
       const dirs = fs.readdirSync( directory )
                      .filter( file => fs.lstatSync( path.join( directory, file ) ).isDirectory() );
@@ -262,7 +262,7 @@ export default class GraphQLAPIManager {
                                   this._permissions,
                                   {
                                     allowExternalErrors: true,
-                                    fallbackError: new ForbiddenError( 'Not authorised!' )
+                                    fallbackError: new ForbiddenError( "Not authorised!" )
                                   }
                                 )
                               );

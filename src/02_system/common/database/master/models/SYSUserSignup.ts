@@ -202,14 +202,29 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
         if ( Array.isArray( params.Include ) ) {
 
-          for ( const modelIncluded of params.Include ) {
+          for ( const modelToInclude of params.Include ) {
 
-            if ( modelIncluded.model &&
-                 result[ modelIncluded.model.name ] ) {
+            if ( modelToInclude.model &&
+                 result[ modelToInclude.model.name ] ) {
 
-              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues,
-                                                                                              strTimeZoneId,
-                                                                                              params.Logger );
+              result[ modelToInclude.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelToInclude.model.name ].dataValues,
+                                                                                               strTimeZoneId,
+                                                                                               params.Logger );
+
+            }
+
+          }
+
+        }
+
+        if ( Array.isArray( params.Exclude ) ) {
+
+          for ( const modelToExclude of params.Exclude ) {
+
+            if ( modelToExclude.model &&
+                 result[ modelToExclude.model.name ] ) {
+
+              delete result[ modelToExclude.model.name ];
 
             }
 
