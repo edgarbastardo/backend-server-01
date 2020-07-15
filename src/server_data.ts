@@ -54,12 +54,12 @@ export default class ServerMain {
   static intCountHTTPWorkerKilled = 0;
   static intCountProcessWorkerKilled = 0;
 
-  static async httpWorkerProcessExit( httpWorkerProcess: any,
+  static async httpWorkerProcessExit( httpWorker: any,
                                       strCode: any,
                                       strSignal: any,
                                       logger: any ) {
 
-    if ( httpWorkerProcess &&
+    if ( httpWorker &&
          cluster.isMaster ) {
 
       let debugMark = debug.extend( "F79A4FFC66ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
@@ -120,26 +120,44 @@ export default class ServerMain {
 
       if ( strSignal ) {
 
-        debugMark( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorkerProcess.id, strSignal );
+        debugMark( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorker.id, strSignal );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.warning( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorkerProcess.id, strSignal );
+          logger.warning( `HTTP worker process with id: %s killed by signal: %s. Starting another worker to replace!`, httpWorker.id, strSignal );
 
         }
 
-        httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
+        httpWorker = cluster.fork(
+                                   {
+                                     WORKER_KIND: "http_worker_process",
+                                     ...process.env
+                                   }
+                                 ); //Start the http worker (Again)
 
-        httpWorkerProcess.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        httpWorker.on( "message", async ( message: any ) => {
 
-          await ServerMain.httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
+          if ( message.command === "start_done" ) {
+
+            //
+
+          }
 
         });
 
-        httpWorkerProcess.on( 'online', async () => {
+        httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+
+          await ServerMain.httpWorkerProcessExit( httpWorker,
+                                                  strCode,
+                                                  strSignal,
+                                                  logger );
+
+        });
+
+        httpWorker.on( 'online', async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'HTTP worker process with id: %d is online', httpWorkerProcess.id );
+          debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
 
         });
 
@@ -147,27 +165,45 @@ export default class ServerMain {
       else if ( strCode !== 0 ) {
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorkerProcess.id, strCode );
+        debugMark( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorker.id, strCode );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorkerProcess.id, strCode );
+          logger.warning( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorker.id, strCode );
 
         }
 
-        httpWorkerProcess = cluster.fork( { WORKER_KIND: "http_worker_process", ...process.env } ); //Start the http worker (Again)
+        httpWorker = cluster.fork(
+                                   {
+                                     WORKER_KIND: "http_worker_process",
+                                     ...process.env
+                                   }
+                                 ); //Start the http worker (Again)
 
-        httpWorkerProcess.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        httpWorker.on( "message", async ( message: any ) => {
 
-          await ServerMain.httpWorkerProcessExit( httpWorkerProcess, strCode, strSignal, logger );
+          if ( message.command === "start_done" ) {
+
+            //
+
+          }
 
         });
 
-        httpWorkerProcess.on( 'online', async () => {
+        httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+
+          await ServerMain.httpWorkerProcessExit( httpWorker,
+                                                  strCode,
+                                                  strSignal,
+                                                  logger );
+
+        });
+
+        httpWorker.on( 'online', async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'HTTP worker process with id: %d is online', httpWorkerProcess.id );
+          debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
 
         });
 
@@ -175,11 +211,11 @@ export default class ServerMain {
       else {
 
         //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %s success!', httpWorkerProcess.id );
+        debugMark( 'HTTP worker process with id: %s success!', httpWorker.id );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.info( 'HTTP worker process with id: %s success!', httpWorkerProcess.id );
+          logger.info( 'HTTP worker process with id: %s success!', httpWorker.id );
 
         }
 
@@ -189,12 +225,12 @@ export default class ServerMain {
 
   }
 
-  static async jobWorkerProcessExit( jobProcessWorker: any,
+  static async jobWorkerProcessExit( jobWorker: any,
                                      strCode: any,
                                      strSignal: any,
                                      logger: any ) {
 
-    if ( jobProcessWorker &&
+    if ( jobWorker &&
          cluster.isMaster ) {
 
       let debugMark = debug.extend( "7CF8309CAA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
@@ -255,29 +291,44 @@ export default class ServerMain {
       if ( strSignal ) {
 
         //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobProcessWorker.id, strSignal );
+        debugMark( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobWorker.id, strSignal );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.warning( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobProcessWorker.id, strSignal );
+          logger.warning( `JOB worker process with id: %s killed by signal: %s. Starting another worker to replace!`, jobWorker.id, strSignal );
 
         }
 
-        jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
+        jobWorker = cluster.fork(
+                                  {
+                                    WORKER_KIND: "job_worker_process",
+                                    ...process.env
+                                  }
+                                ); //Start the job worker (Again)
 
-        jobProcessWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        jobWorker.on( "message", async ( message: any ) => {
 
-          await ServerMain.jobWorkerProcessExit( jobProcessWorker,
+          if ( message.command === "start_done" ) {
+
+            //
+
+          }
+
+        });
+
+        jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+
+          await ServerMain.jobWorkerProcessExit( jobWorker,
                                                  strCode,
                                                  strSignal,
                                                  logger );
 
         });
 
-        jobProcessWorker.on( 'online', async () => {
+        jobWorker.on( 'online', async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'JOB worker process with id: %d is online', jobProcessWorker.id );
+          debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
 
         });
 
@@ -285,27 +336,45 @@ export default class ServerMain {
       else if ( strCode !== 0 ) {
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobProcessWorker.id, strCode );
+        debugMark( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobWorker.id, strCode );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobProcessWorker.id, strCode );
+          logger.warning( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobWorker.id, strCode );
 
         }
 
-        jobProcessWorker = cluster.fork( { WORKER_KIND: "job_worker_process", ...process.env } ); //Start the http worker (Again)
+        jobWorker = cluster.fork(
+                                  {
+                                    WORKER_KIND: "job_worker_process",
+                                    ...process.env
+                                  }
+                                ); //Start the job worker (Again)
 
-        jobProcessWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        jobWorker.on( "message", async ( message: any ) => {
 
-          await ServerMain.httpWorkerProcessExit( jobProcessWorker, strCode, strSignal, logger );
+          if ( message.command === "start_done" ) {
+
+            //
+
+          }
 
         });
 
-        jobProcessWorker.on( 'online', async () => {
+        jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+
+          await ServerMain.jobWorkerProcessExit( jobWorker,
+                                                 strCode,
+                                                 strSignal,
+                                                 logger );
+
+        });
+
+        jobWorker.on( 'online', async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'JOB worker process with id: %d is online', jobProcessWorker.id );
+          debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
 
         });
 
@@ -313,11 +382,11 @@ export default class ServerMain {
       else {
 
         //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'Worker process with id: %s success!', jobProcessWorker.id );
+        debugMark( 'Worker process with id: %s success!', jobWorker.id );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.info( 'Worker process with id: %s success!', jobProcessWorker.id );
+          logger.info( 'Worker process with id: %s success!', jobWorker.id );
 
         }
 
@@ -362,7 +431,11 @@ export default class ServerMain {
 
           } );
 
-          process.send( { command: "start_done" } ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
+          process.send(
+                        {
+                          command: "start_done"
+                        }
+                      ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
         }
 
@@ -1018,7 +1091,11 @@ export default class ServerMain {
 
             } );
 
-            process.send( { command: "start_done" } ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
+            process.send(
+                          {
+                            command: "start_done"
+                          }
+                        ); //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
           }
 
@@ -1034,7 +1111,11 @@ export default class ServerMain {
         debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
         debugMark( `JOB worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
 
-        process.send( { command: "start_done" } );  //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
+        process.send(
+                      {
+                        command: "start_done"
+                      }
+                    );  //VERY IMPORTANT send this custom message to parent process. To allow to continue to parent process
 
         await JobQueueManager.create( null,
                                       ApplicationServerDataManager.currentInstance );
