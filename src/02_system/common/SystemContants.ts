@@ -1827,59 +1827,216 @@ export default class SystemConstants {
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
                                                       };
 
-  static readonly _CONFIG_ENTRY_IM_Rooms_SCHEMA = "";
+  static readonly _CONFIG_ENTRY_IM_Server_SCHEMA = "";
 
-  static readonly _CONFIG_ENTRY_IM_Rooms = {
-                                             Id: "e52433ea-307b-46a3-a629-a724acab23a1",
-                                             Scope: "system",
-                                             Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                             Category: "Instant Message",
-                                             Name: "system.instant.message.rooms",
-                                             Default: JSON.stringify(
-                                                                      {
-                                                                        "@__default__@":{
+  static readonly _CONFIG_ENTRY_IM_Server = {
+                                              Id: "98bf2878-f94d-4119-b64d-a96eeee0d8bf",
+                                              Scope: "system",
+                                              Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                              Category: "Instant Message",
+                                              Name: "system.instant.message.server",
+                                              Default: JSON.stringify(
+                                                                       {
 
-                                                                          "rooms": "#@@UserName@@#"
+                                                                         "service": "#im_server_01#",
 
-                                                                        }
-                                                                      }
-                                                                    ),
-                                             Label: "Configuration for instant message rooms auto join",
-                                             Description: "Configuration for instant message rooms auto join, can be sysUser.Id, sysUser.Name, sysUserGroup.Id, sysUserGroup.Name in the same order of priority",
-                                             AllowTagAccessR: "#Administrator#",
-                                             AllowTagAccessW: "#Administrator#",
-                                             Example: JSON.stringify(
-                                                                      {
-                                                                        "#Business_Managers#":{
+                                                                         "#im_server_01#": {
 
-                                                                          "rooms": "#Business_Managers#,#CommonAdmin#"
+                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
 
-                                                                        },
-                                                                        "#System_Administrators#":{
+                                                                           "hostLiveDomain": "http://localhost:5050",
 
-                                                                          "rooms": "#System_Administrators#,#CommonAdmin#"
+                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
 
-                                                                        },
-                                                                        "#userexample01#": {
+                                                                           "workers": "9191,9192,9193",
 
-                                                                          "rooms": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+                                                                           "auth":{
 
-                                                                        },
-                                                                        "#admin01@system.net#":{
+                                                                             "apiKey": "my_key"
 
-                                                                          "rooms": "#System_Administrators#,#CommonAdmin#,#Admin01#"
+                                                                           }
 
-                                                                        },
-                                                                        "@__default__@":{
+                                                                         },
 
-                                                                          "rooms": "#@@UserName@@#"
+                                                                         "channels": {
 
-                                                                        }
-                                                                      }
-                                                                    ),
-                                             CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
-                                           };
+                                                                           "config": {
+
+                                                                             "@__default__@": {
+
+                                                                              "resume": {
+
+                                                                                "messages": 0
+
+                                                                              }
+                                                                             }
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "commands": {
+
+                                                                           "JoinToChannels": {
+
+                                                                             "@__default__@":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "*"
+
+                                                                             }
+
+                                                                           },
+
+                                                                           "SendMessage": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
+
+                                                                           "ListMembers": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
+
+                                                                         }
+
+                                                                       }
+                                                                     ),
+                                              Label: "Configuration for instant message server settings",
+                                              Description: "Configuration for instant message settings",
+                                              AllowTagAccessR: "#Administrator#",
+                                              AllowTagAccessW: "#Administrator#",
+                                              Example: JSON.stringify(
+                                                                       {
+
+                                                                         "service": "#im_server_01#",
+
+                                                                         "#im_server_01#": {
+
+                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
+
+                                                                           "hostLiveDomain": "http://localhost:5050",
+
+                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
+
+                                                                           "workers": "9191,9192,9193",
+
+                                                                           "auth":{
+
+                                                                             "apiKey": "178fa7c2-bcdc-4051-9773-26b86f49307d"
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "channel": {
+
+                                                                           "config": {
+
+                                                                             "@__default__@": {
+
+                                                                              "resume": {
+
+                                                                                "messages": 0
+
+                                                                              }
+
+                                                                             }
+
+                                                                           }
+
+                                                                         },
+
+                                                                         "command": {
+
+                                                                           "JoinToChannels": {
+
+                                                                             "#Business_Managers#": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#Business_Managers#,#Administrators#"
+
+                                                                             },
+                                                                             "#System_Administrators#": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#System_Administrators#,#Administrators#"
+
+                                                                             },
+                                                                             "#userexample01#": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
+
+                                                                             },
+                                                                             "#userexample02#": {
+
+                                                                               "denied": "*",
+                                                                               "allowed": ""
+
+                                                                             },
+                                                                             "#userexample03#": {
+
+                                                                               "denied": "#My_Denied_Channel01#,#My_Denied_Channel02#",
+                                                                               "allowed": "*"
+
+                                                                             },
+                                                                             "#admin01@system.net#": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "*"
+
+                                                                             },
+                                                                             "@__default__@":{
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@UserName@@#"
+
+                                                                             }
+
+                                                                           },
+
+                                                                           "SendMessage": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
+
+                                                                           "ListMembers": {
+
+                                                                             "@__default__@": {
+
+                                                                               "denied": "",
+                                                                               "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                             }
+
+                                                                           },
+
+                                                                         }
+
+                                                                       }
+                                                                     ),
+                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                              ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
+                                            };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
@@ -1905,7 +2062,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_User_Settings,
                                                SystemConstants._CONFIG_ENTRY_UserGroup_Settings,
                                                SystemConstants._CONFIG_ENTRY_Database_Log_Tables,
-                                               SystemConstants._CONFIG_ENTRY_IM_Rooms
+                                               SystemConstants._CONFIG_ENTRY_IM_Server
                                              ];
 
 }

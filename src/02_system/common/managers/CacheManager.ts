@@ -1,6 +1,6 @@
 import cluster from "cluster";
 import Redlock from "redlock";
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 
 import CommonConstants from "../CommonConstants";
 
@@ -8,7 +8,7 @@ import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 import RedisConnectionManager from "./RedisConnectionManager";
 
-const debug = require( 'debug' )( 'CacheManager' );
+const debug = require( "debug" )( "CacheManager" );
 
 export default class CacheManager {
 

@@ -1,29 +1,29 @@
 import crypto from "crypto";
-import fs from 'fs'; //Load the filesystem module
-import path from 'path';
+import fs from "fs"; //Load the filesystem module
+import path from "path";
 import os from "os";
 import cluster from "cluster";
 
 import glob from "glob";
 
 import moment, { Moment } from "moment-timezone";
-import XXHash from 'xxhashjs';
+import XXHash from "xxhashjs";
 //import  from "moment-timezone";
-import uuidv4 from 'uuid/v4';
-//import Hashes from 'jshashes';
-import crc from 'node-crc';
-import { CRC32Stream } from 'crc32-stream';
-import readChunk from 'read-chunk';
-import fileType from 'file-type';
+import uuidv4 from "uuid/v4";
+//import Hashes from "jshashes";
+import crc from "node-crc";
+import { CRC32Stream } from "crc32-stream";
+import readChunk from "read-chunk";
+import fileType from "file-type";
 //import { loggers } from "winston";
 
-import { UAParser } from 'ua-parser-js';
+import { UAParser } from "ua-parser-js";
 
-import archiver, { ArchiverError } from 'archiver';
+import archiver, { ArchiverError } from "archiver";
 
-import NodeRSA from 'node-rsa';
+import NodeRSA from "node-rsa";
 
-import Validator from 'validatorjs';
+import Validator from "validatorjs";
 
 import { Random } from "random-js";
 
@@ -41,8 +41,11 @@ import CacheManager from "./managers/CacheManager";
 import LoggerManager from "./managers/LoggerManager";
 import I18NManager from "./managers/I18Manager";
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
+import { SYSUserSessionDevice } from "./database/master/models/SYSUserSessionDevice";
+import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
+import DBConnectionManager from "./managers/DBConnectionManager";
 
-const debug = require( 'debug' )( 'SystemUtilities' );
+const debug = require( "debug" )( "SystemUtilities" );
 
 export default class SystemUtilities {
 
@@ -478,7 +481,7 @@ export default class SystemUtilities {
       }
       else if ( intAlgorimts === 2 ) {
 
-        strResult = crc.crc32( Buffer.from( strToHash, 'utf8' ) ).toString( 'hex' ); //Hashes.CRC32( strToHash ).toString( 16 );
+        strResult = crc.crc32( Buffer.from( strToHash, "utf8" ) ).toString( "hex" ); //Hashes.CRC32( strToHash ).toString( 16 );
 
       }
       else {
@@ -739,6 +742,109 @@ export default class SystemUtilities {
 
   }
 
+  static async injectUserSessionData( currentSessionData: any,
+                                      transaction: any,
+                                      logger: any ): Promise<any> {
+
+    let result = {
+                   Role: "",
+                   GroupRole: "",
+                   Data: currentSessionData
+                 };
+
+    const sysUserInDB = await SYSUserService.getById( result.Data.UserId,
+                                                      null,
+                                                      transaction,
+                                                      logger );
+
+    const sysUserDeviceInDB = await SYSUserSessionDeviceService.getByToken( result.Data.UserId,
+                                                                            null,
+                                                                            transaction,
+                                                                            logger );
+
+    result.Role = sysUserInDB.Role;
+
+    const sysUserGroupInDB = sysUserInDB.sysUserGroup;
+
+    result.GroupRole = sysUserGroupInDB.Role;
+
+    if ( sysUserInDB.sysPerson ) {
+
+      const sysPerson = sysUserInDB.sysPerson;
+
+      result.Data[ "PersonId" ] = sysPerson.Id;
+      result.Data[ "Title" ] = sysPerson.Title;
+      result.Data[ "FirstName" ] = sysPerson.FirstName;
+      result.Data[ "LastName" ] = sysPerson.LastName;
+      result.Data[ "EMail" ] = sysPerson.EMail;
+      result.Data[ "Phone" ] = sysPerson.Phone;
+
+    }
+    else {
+
+      result.Data[ "PersonId" ] = "";
+      result.Data[ "Title" ] = "";
+      result.Data[ "FirstName" ] = "";
+      result.Data[ "LastName" ] = "";
+      result.Data[ "EMail" ] = "";
+      result.Data[ "Phone" ] = "";
+
+    }
+
+    result.Data[ "UserDevice" ] = sysUserDeviceInDB ? sysUserDeviceInDB.DeviceInfoParsed: "";
+    result.Data[ "UserAvatar" ] = sysUserInDB.Avatar ? sysUserInDB.Avatar: "";
+    result.Data[ "UserName" ] = sysUserInDB.Name;
+    result.Data[ "UserTag" ] = sysUserInDB.Tag;
+    result.Data[ "UserGroupId" ] = sysUserGroupInDB.Id;
+    result.Data[ "UserGroupName" ] = sysUserGroupInDB.Name;
+    result.Data[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
+
+    let jsonExtraData = null;
+
+    if ( typeof result.Data[ "ExtraData" ] === "string"  ) {
+
+      jsonExtraData = CommonUtilities.parseJSON( result.Data[ "ExtraData" ],
+                                                 logger )
+
+    }
+    else {
+
+      jsonExtraData = result.Data[ "ExtraData" ];
+
+    }
+
+    delete result.Data[ "ExtraData" ];
+
+    if ( jsonExtraData ) {
+
+      if ( jsonExtraData.Private ) {
+
+        delete jsonExtraData.Private;
+
+      }
+
+      if ( jsonExtraData.Business ) {
+
+        result.Data[ "Business" ] = jsonExtraData.Business;
+
+      }
+      else {
+
+        result.Data[ "Business" ] = {};
+
+      }
+
+    }
+    else {
+
+      result.Data[ "Business" ] = {};
+
+    }
+
+    return result;
+
+  }
+
   static async getUserSessionStatusPersistent( strToken: string,
                                                requestContext: any,
                                                bUpdateAt: boolean,
@@ -761,6 +867,14 @@ export default class SystemUtilities {
         result = CommonUtilities.parseJSON( strJSONUserSessionStatus,
                                             logger ); //Try to parse and transform to json object
 
+        if ( result &&
+             !result.UserGroupName ) {
+
+          let debugMark = debug.extend( "386299777D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+        }
+
         bFromCache = true;
 
       }
@@ -771,98 +885,35 @@ export default class SystemUtilities {
       if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionPersistentByToken
-        let sysUserSessionPersistent = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
-                                                                                                              null,
-                                                                                                              logger ); //Find in the database
+        let sysUserSessionPersistentInDB = await SYSUserSessionPersistentService.getUserSessionPersistentByToken( strToken,
+                                                                                                                  transaction,
+                                                                                                                  logger ); //Find in the database
 
-        let sysUserSessionPersistentData = null;
+        //let sysUserSessionPersistentData = null;
+        let userSession = null;
 
-        if ( sysUserSessionPersistent ) {
+        if ( sysUserSessionPersistentInDB ) {
 
-          sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionPersistentInDB as any ).dataValues,
+                                                                     transaction,
+                                                                     logger );
 
-          const sysUserInDB = await SYSUserService.getById( sysUserSessionPersistentData.UserId,
-                                                            null,
-                                                            null,
-                                                            logger );
-
-          strUserRole = sysUserInDB.Role;
-
-          const sysUserGroupInDB = sysUserInDB.sysUserGroup;
-
-          strUserGroupRole = sysUserGroupInDB.Role;
-
-          if ( sysUserInDB.sysPerson ) {
-
-            const sysPerson = sysUserInDB.sysPerson;
-
-            sysUserSessionPersistentData[ "PersonId" ] = sysPerson.Id;
-            sysUserSessionPersistentData[ "Title" ] = sysPerson.Title;
-            sysUserSessionPersistentData[ "FirstName" ] = sysPerson.FirstName;
-            sysUserSessionPersistentData[ "LastName" ] = sysPerson.LastName;
-            sysUserSessionPersistentData[ "EMail" ] = sysPerson.EMail;
-            sysUserSessionPersistentData[ "Phone" ] = sysPerson.Phone;
-
-          }
-          else {
-
-            sysUserSessionPersistentData[ "PersonId" ] = "";
-            sysUserSessionPersistentData[ "Title" ] = "";
-            sysUserSessionPersistentData[ "FirstName" ] = "";
-            sysUserSessionPersistentData[ "LastName" ] = "";
-            sysUserSessionPersistentData[ "EMail" ] = "";
-            sysUserSessionPersistentData[ "Phone" ] = "";
-
-          }
-
-          sysUserSessionPersistentData[ "UserName" ] = sysUserInDB.Name;
-          sysUserSessionPersistentData[ "UserTag" ] = sysUserInDB.Tag;
-          sysUserSessionPersistentData[ "UserGroupId" ] = sysUserGroupInDB.Id;
-          sysUserSessionPersistentData[ "UserGroupName" ] = sysUserGroupInDB.Name;
-          sysUserSessionPersistentData[ "UserGroupTag" ] = sysUserGroupInDB.Tag;
-
-          const jsonExtraData = CommonUtilities.parseJSON( sysUserSessionPersistentData[ "ExtraData" ],
-                                                           logger );
-
-          delete sysUserSessionPersistentData[ "ExtraData" ];
-
-          if ( jsonExtraData ) {
-
-            if ( jsonExtraData.Private ) {
-
-              delete jsonExtraData.Private;
-
-            }
-
-            if ( jsonExtraData.Business ) {
-
-              sysUserSessionPersistentData[ "Business" ] = jsonExtraData.Business;
-
-            }
-            else {
-
-              sysUserSessionPersistentData[ "Business" ] = {};
-
-            }
-
-          }
-          else {
-
-            sysUserSessionPersistentData[ "Business" ] = {};
-
-          }
+          strUserRole = userSession.Role;
+          strUserGroupRole = userSession.GroupRole;
+          ////result = userSession.Data;
 
           bFromCache = false;
 
         }
 
-        if ( sysUserSessionPersistentData &&
-             !sysUserSessionPersistentData.DisabledAt &&
-             SystemUtilities.checkUserSessionStatusExpired( sysUserSessionPersistentData, logger ).Expired === false &&
+        if ( userSession &&
+             !userSession.Data.DisabledAt &&
+             SystemUtilities.checkUserSessionStatusExpired( userSession.Data, logger ).Expired === false &&
              bUpdateAt ) {
 
           result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                  null,
+                                                                                  transaction,
                                                                                   logger );
 
           const strRolesMerged = SystemUtilities.mergeTokens( strUserGroupRole,
@@ -870,29 +921,29 @@ export default class SystemUtilities {
                                                               true,
                                                               logger );
 
-          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( sysUserSessionPersistentData.DisabledAt,
-                                                                          sysUserSessionPersistentData.ExpireAt );
+          const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( userSession.Data.DisabledAt,
+                                                                          userSession.Data.ExpireAt );
 
           if ( !result ) {
 
             //Insert new entry in the session status table
             result = {
-                       UserId: sysUserSessionPersistentData.UserId,
+                       UserId: userSession.Data.UserId,
                        //UserName: sysUserSessionPersistentData.UserName,
-                       UserName: sysUserSessionPersistentData[ "UserName" ],
-                       UserGroupId: sysUserSessionPersistentData[ "UserGroupId" ],
+                       UserName: userSession.Data[ "UserName" ],
+                       UserGroupId: userSession.Data[ "UserGroupId" ],
                        Token: strToken,
-                       BinaryDataToken: sysUserSessionPersistentData[ "BinaryDataToken" ],
-                       SocketToken: sysUserSessionPersistentData[ "SocketToken" ],
+                       BinaryDataToken: userSession.Data[ "BinaryDataToken" ],
+                       SocketToken: userSession.Data[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
                        Role: strRolesMerged,
                        ExpireKind: 3,
                        ExpireOn: expireAt,
                        HardLimit: null,
-                       Tag: sysUserSessionPersistentData[ "Tag" ],
-                       CreatedBy: sysUserSessionPersistentData[ "UserName" ],
-                       UpdatedBy: sysUserSessionPersistentData[ "UserName" ],
+                       Tag: userSession.Data[ "Tag" ],
+                       CreatedBy: userSession.Data[ "UserName" ],
+                       UpdatedBy: userSession.Data[ "UserName" ],
                      };
 
           }
@@ -909,18 +960,30 @@ export default class SystemUtilities {
           }
 
           //Add additional info to memory cache struct
-          result[ "PersonId" ] = sysUserSessionPersistentData[ "PersonId" ];
-          result[ "Title" ] = sysUserSessionPersistentData[ "Title" ];
-          result[ "FirstName" ] = sysUserSessionPersistentData[ "FirstName" ];
-          result[ "LastName" ] = sysUserSessionPersistentData[ "LastName" ];
-          result[ "EMail" ] = sysUserSessionPersistentData[ "EMail" ];
-          result[ "Phone" ] = sysUserSessionPersistentData[ "Phone" ];
+          result[ "PersonId" ] = userSession.Data[ "PersonId" ];
+          result[ "Title" ] = userSession.Data[ "Title" ];
+          result[ "FirstName" ] = userSession.Data[ "FirstName" ];
+          result[ "LastName" ] = userSession.Data[ "LastName" ];
+          result[ "EMail" ] = userSession.Data[ "EMail" ];
+          result[ "Phone" ] = userSession.Data[ "Phone" ];
 
-          result[ "UserTag" ] = sysUserSessionPersistentData[ "UserTag" ];
-          result[ "UserGroupName" ] =  sysUserSessionPersistentData[ "UserGroupName" ];
-          result[ "UserGroupTag" ] =  sysUserSessionPersistentData[ "UserGroupTag" ];
+          result[ "UserTag" ] = userSession.Data[ "UserTag" ];
+          result[ "UserGroupName" ] =  userSession.Data[ "UserGroupName" ];
+          result[ "UserGroupTag" ] =  userSession.Data[ "UserGroupTag" ];
 
         }
+
+      }
+      else if ( !result.UserGroupName ) {
+
+        let debugMark = debug.extend( "01D5303CE42C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
+
+        const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         transaction,
+                                                                         logger );
+
+        result = userSession.Data;
 
       }
 
@@ -978,7 +1041,7 @@ export default class SystemUtilities {
         if ( result &&
              !result.UserGroupName ) {
 
-          let debugMark = debug.extend( 'AA5A6DE536DF' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+          let debugMark = debug.extend( "AA5A6DE536DF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
 
         }
@@ -993,14 +1056,28 @@ export default class SystemUtilities {
       if ( !result ) { //Is not in cache or is not valid json struct
 
         // ANCHOR  getUserSessionStatusByToken
-        result = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                null,
-                                                                                logger ); //Find in the database
+        let sysUserSessionTemporalInDB = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                                        null,
+                                                                                                        logger ); //Find in the database
 
-        if ( result ) {
+        let userSession = null;
+
+        if ( sysUserSessionTemporalInDB ) {
 
           //result = ( result as any ).dataValues; //Get only the basic json struct object with field values from the orm model
 
+          //sysUserSessionPersistentData = ( sysUserSessionPersistent as any ).dataValues; //Get only the basic json struct object with field values from the orm model
+          userSession = await SystemUtilities.injectUserSessionData( ( sysUserSessionTemporalInDB as any ).dataValues,
+                                                                     transaction,
+                                                                     logger );
+
+          strUserRole = userSession.Role;
+          strUserGroupRole = userSession.GroupRole;
+          result = userSession.Data;
+
+          bFromCache = false;
+
+          /*
           //Add additional info to memory cache struct
           const sysUserInDB = await SYSUserService.getById( result.UserId,
                                                             null,
@@ -1093,8 +1170,21 @@ export default class SystemUtilities {
           result.UpdatedBy = sysUserInDB.Name;
 
           bFromCache = false;
+          */
 
         }
+
+      }
+      else if ( !result.UserGroupName ) {
+
+        let debugMark = debug.extend( "EDC7699EA08B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
+
+        const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                         transaction,
+                                                                         logger );
+
+        result = userSession.Data;
 
       }
 
@@ -1192,7 +1282,7 @@ export default class SystemUtilities {
 
           if ( !userSessionStatus.UserGroupName ) {
 
-            let debugMark = debug.extend( 'E9008B789BF0' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+            let debugMark = debug.extend( "E9008B789BF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
             debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
 
           }
@@ -1209,37 +1299,37 @@ export default class SystemUtilities {
 
           if ( userSessionStatus.BinaryDataToken !== undefined ) {
 
-            dataToWriteToDB[ 'BinaryDataToken' ] = userSessionStatus.BinaryDataToken;
+            dataToWriteToDB[ "BinaryDataToken" ] = userSessionStatus.BinaryDataToken;
 
           }
 
           if ( userSessionStatus.SocketToken !== undefined ) {
 
-            dataToWriteToDB[ 'SocketToken' ] = userSessionStatus.SocketToken;
+            dataToWriteToDB[ "SocketToken" ] = userSessionStatus.SocketToken;
 
           }
 
           if ( userSessionStatus.Tag !== undefined ) {
 
-            dataToWriteToDB[ 'Tag' ] = userSessionStatus.Tag;
+            dataToWriteToDB[ "Tag" ] = userSessionStatus.Tag;
 
           }
 
           if ( userSessionStatus.ExtraData !== undefined ) {
 
-            dataToWriteToDB[ 'ExtraData' ] = userSessionStatus.ExtraData;
+            dataToWriteToDB[ "ExtraData" ] = userSessionStatus.ExtraData;
 
           }
 
           if ( userSessionStatus.LoggedOutBy !== undefined ) {
 
-            dataToWriteToDB[ 'LoggedOutBy' ] = userSessionStatus.LoggedOutBy;
+            dataToWriteToDB[ "LoggedOutBy" ] = userSessionStatus.LoggedOutBy;
 
           }
 
           if ( userSessionStatus.LoggedOutAt !== undefined ) {
 
-            dataToWriteToDB[ 'LoggedOutAt' ] = userSessionStatus.LoggedOutAt;
+            dataToWriteToDB[ "LoggedOutAt" ] = userSessionStatus.LoggedOutAt;
 
           }
 
@@ -1286,6 +1376,140 @@ export default class SystemUtilities {
 
         await CacheManager.unlockResource( lockedResource,
                                            logger );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async logoutSession( userSessionStatus: any,
+                              transaction: any,
+                              logger: any ): Promise<SYSUserSessionStatus> {
+
+    let result = userSessionStatus; //By default always return the session
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      let bUpdated = false;
+
+      //Delete from cache the main auth token
+      await CacheManager.deleteData( userSessionStatus.Token, logger );
+
+      if ( userSessionStatus.BinaryDataToken ) { //Not update if not needed
+
+        //Delete from cache the binary data token
+        userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
+        userSessionStatus.BinaryDataToken = null;
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( userSessionStatus.SocketToken ) { //Not update if not needed
+
+        //Delete from cache the socket token
+        userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
+        userSessionStatus.SocketToken = null;
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( !userSessionStatus.LoggedOutBy ||
+           !userSessionStatus.LoggedOutAt ) { //Not update if not needed
+
+        userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
+        userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+
+        bUpdated = true; //Mark updated needed
+
+      }
+
+      if ( bUpdated ) { //Only update if needed.
+
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        if ( currentTransaction === null ) {
+
+          currentTransaction = await dbConnection.transaction();
+
+          bIsLocalTransaction = true;
+
+        }
+
+        if ( userSessionStatus?.dataValues ) {
+
+          userSessionStatus = userSessionStatus.dataValues
+
+        }
+
+        userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus?.Token,
+                                                                                   userSessionStatus,
+                                                                                   false,    //Set roles?
+                                                                                   null,     //User group roles
+                                                                                   null,     //User roles
+                                                                                   true,     //Force update?
+                                                                                   1,        //Only 1 try
+                                                                                   7 * 1000, //Second
+                                                                                   currentTransaction,
+                                                                                   logger );
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.logoutSession.name;
+
+      const strMark = "7C9E7E9BB98E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = error;
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
 
       }
 
@@ -1708,7 +1932,7 @@ export default class SystemUtilities {
                                "markdown": "md",
                              };
 
-        const mime = require( 'mime' );
+        const mime = require( "mime" );
 
         let strExtension = mime.extension( strDefaultMimeType );
 
@@ -1719,8 +1943,8 @@ export default class SystemUtilities {
         }
 
         result = {
-                   ext: strExtension ? strExtension : 'unknown',
-                   mime: strDefaultMimeType ? strDefaultMimeType : 'unknown'
+                   ext: strExtension ? strExtension : "unknown",
+                   mime: strDefaultMimeType ? strDefaultMimeType : "unknown"
                  };
 
       }
@@ -1769,7 +1993,7 @@ export default class SystemUtilities {
                        logger: any ): Promise<boolean> {
 
     const archive = archiver(
-                              'zip',
+                              "zip",
                               {
                                 zlib: {
                                         level: 9
@@ -1782,7 +2006,7 @@ export default class SystemUtilities {
 
       const strPath = path.basename( strSource );
 
-      archive.directory( strSource, strPath ).on( 'error',
+      archive.directory( strSource, strPath ).on( "error",
                                                   ( error: ArchiverError ) => {
 
                                                     const strMark = "C0709DD4C024" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
@@ -1804,7 +2028,7 @@ export default class SystemUtilities {
                                                 )
                                               .pipe( stream );
 
-      stream.on( 'close', () => resolve( true ) );
+      stream.on( "close", () => resolve( true ) );
 
       archive.finalize();
 
@@ -2102,7 +2326,7 @@ export default class SystemUtilities {
       if ( instance.rawAttributes[ "ShortId" ] &&
            instance.rawAttributes[ "Id" ] &&
            ( !instance.ShortId ||
-             instance.ShortId === '0' ) ) {
+             instance.ShortId === "0" ) ) {
 
         instance.ShortId = SystemUtilities.hashString( instance.Id,
                                                        2,
@@ -2143,6 +2367,13 @@ export default class SystemUtilities {
              !instance.createdAt ) {
 
           instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+
+        }
+
+        if ( !options.notClearUpdateField ) {
+
+          instance.UpdatedBy = null;
+          instance.UpdatedAt = null;
 
         }
 
@@ -2693,7 +2924,7 @@ export default class SystemUtilities {
     try {
 
       Validator.register(
-                          'emailList',
+                          "emailList",
                           function( value: any, requirement, attribute ) {
 
                             let bResult: boolean;
@@ -2717,21 +2948,21 @@ export default class SystemUtilities {
                             return bResult;
 
                           },
-                          'The :attribute is not in the format of list user1@domain.com, user2@domain.com or user1@domain.com.'
+                          "The :attribute is not in the format of list user1@domain.com, user2@domain.com or user1@domain.com."
                         );
 
       Validator.register(
-                          'phoneUS',
+                          "phoneUS",
                           function( value: any, requirement, attribute ) {
 
                             return value.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g ); //  /^\d{1-3}-\d{3}-\d{3}-\d{4}$/ );
 
                           },
-                          'The :attribute phone number is not in the format X-XXX-XXX-XXXX.'
+                          "The :attribute phone number is not in the format X-XXX-XXX-XXXX."
                         );
 
       Validator.register(
-                          'phoneUSList',
+                          "phoneUSList",
                           function( value: any, requirement, attribute ) {
 
                             let bResult: boolean;
@@ -2755,17 +2986,17 @@ export default class SystemUtilities {
                             return bResult;
 
                           },
-                          'The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX.'
+                          "The :attribute phone number is not in the format of list X-XXX-XXX-XXXX, XX-XXX-XXX-XXXX or XXX-XXX-XXX-XXXX."
                         );
 
       Validator.register(
-                          'dateInFormat01',
+                          "dateInFormat01",
                           function( value: any, requirement, attribute ) {
 
                             return CommonUtilities.isValidDateInFormat01( value );
 
                           },
-                          'The :attribute is not in the format YYYY-MM-DD and valid date value.'
+                          "The :attribute is not in the format YYYY-MM-DD and valid date value."
                         );
 
       if ( registerCallback ) {
@@ -3108,7 +3339,7 @@ export default class SystemUtilities {
       strResult = await new Promise<string>( ( resolve, reject ) => {
 
         // Algorithm depends on availability of OpenSSL on platform
-        // Another algorithms: 'sha1', 'md5', 'sha256', 'sha512' ...
+        // Another algorithms: "sha1", "md5", "sha256", "sha512" ...
         let checkSum = strAlgorithm !== "crc32" ? crypto.createHash( strAlgorithm ): new CRC32Stream();
 
         try {
@@ -3117,7 +3348,7 @@ export default class SystemUtilities {
 
           if ( strAlgorithm !== "crc32" ) {
 
-            readStream.on( 'data', function ( data: any ) {
+            readStream.on( "data", function ( data: any ) {
 
               checkSum.update( data )
 
@@ -3131,9 +3362,9 @@ export default class SystemUtilities {
           }
 
           // making digest
-          readStream.on( 'end', function () {
+          readStream.on( "end", function () {
 
-            const strHash = checkSum.digest( 'hex' );
+            const strHash = checkSum.digest( "hex" );
 
             if ( strAlgorithm === "crc32" ) {
 

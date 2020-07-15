@@ -7,11 +7,11 @@
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-//import DBConnectionManager from '../../../02_system/common/managers/DBConnectionManager';
+//import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
 
 import BaseService from "../../../02_system/common/database/master/services/BaseService";
 
-const debug = require( 'debug' )( 'CommonBusinessServices' );
+const debug = require( "debug" )( "CommonBusinessServices" );
 
 export default class CommonBusinessServices extends BaseService {
 

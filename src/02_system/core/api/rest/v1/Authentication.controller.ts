@@ -1,11 +1,11 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   //Router,
   Request,
   Response,
   //NextFunction
-} from 'express';
+} from "express";
 
 import {
   controller,
@@ -19,19 +19,19 @@ import {
 import {
   //injectable,
   inject
-} from 'inversify';
+} from "inversify";
 
-import CommonConstants from '../../../../common/CommonConstants';
+import CommonConstants from "../../../../common/CommonConstants";
 
-import CommonUtilities from '../../../../common/CommonUtilities';
+import CommonUtilities from "../../../../common/CommonUtilities";
 import SystemUtilities from "../../../../common/SystemUtilities";
 
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
-import SYSRouteService from '../../../../common/database/master/services/SYSRouteService';
-import SecurityServiceController from '../../../services/v1/SecurityService.controller';
-import MiddlewareManager from '../../../../common/managers/MiddlewareManager';
+import SYSRouteService from "../../../../common/database/master/services/SYSRouteService";
+import SecurityServiceController from "../../../services/v1/SecurityService.controller";
+import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
 
-const debug = require( 'debug' )( 'Authentication.controller' );
+const debug = require( "debug" )( "Authentication.controller" );
 
 //@injectable()
 @controller( process.env.SERVER_ROOT_PATH + AuthenticationController._BASE_PATH )

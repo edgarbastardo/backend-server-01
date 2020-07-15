@@ -1,9 +1,9 @@
-import cluster from 'cluster';
-import path from 'path';
+import cluster from "cluster";
+import path from "path";
 
 import { AccessKind, HTTPMethod } from "./CommonConstants";
 
-const debug = require( 'debug' )( 'CommonUtilities' );
+const debug = require( "debug" )( "CommonUtilities" );
 
 export default class CommonUtilities {
 
@@ -293,14 +293,14 @@ export default class CommonUtilities {
 
       if ( !Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone ) {
 
-        throw 'Time zones are not available in this environment';
+        throw "Time zones are not available in this environment";
 
       }
 
       if ( tz ) {
 
         Intl.DateTimeFormat( undefined, { timeZone:  tz } ).format( new Date() );
-        //let debugMark = debug.extend( '39AE8190588D' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        //let debugMark = debug.extend( "39AE8190588D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
         //debugMark( "Valid!!" );
         bResult = true;
 
@@ -309,7 +309,7 @@ export default class CommonUtilities {
     }
     catch ( error ) {
 
-      //let debugMark = debug.extend( 'BDA1708B1AAE' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      //let debugMark = debug.extend( "BDA1708B1AAE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       //debugMark( "Invalid!!" );
       //return false;
 
@@ -375,7 +375,7 @@ export default class CommonUtilities {
     let bResult = false;
 
     if ( this.isNotNullOrEmpty( objectToTest ) &&
-         typeof objectToTest[ functionName ] === 'function' ) {
+         typeof objectToTest[ functionName ] === "function" ) {
 
       bResult = true;
 
@@ -406,7 +406,7 @@ export default class CommonUtilities {
 
       const stack = new Error().stack;
 
-      //let debugMark = debug.extend( 'B4FC6014F2E3' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      //let debugMark = debug.extend( "B4FC6014F2E3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       //debugMark( "%O", stack );
 
       // package.json => build: --async-stack-trace node build/server.js And tsconfig.json => "target": "es2018"
@@ -775,7 +775,7 @@ export default class CommonUtilities {
 
   }
 
-  static clearSpecialChars( data: string, strSpecialChars = `!@#$^&%*()+=-[]\/\\{}|:<>?,."'_` ): string {
+  static clearSpecialChars( data: string, strSpecialChars = `!@#$^&%*()+=-[]\/\\{}|:<>?,.""_` ): string {
 
     let result = data;
 
@@ -1076,7 +1076,7 @@ export default class CommonUtilities {
 
     try {
 
-      const strCleaned = ( '' + strPhoneNumber ).replace( /\D/g, '' );
+      const strCleaned = ( "" + strPhoneNumber ).replace( /\D/g, "" );
 
       const match = strCleaned.match( /^(\d{1,3})?(\d{3})(\d{3})(\d{4})$/ );
       //const match = strCleaned.match( /(\d{1,3}-)?(\d{3}-){2}\d{4}/g );
@@ -1084,9 +1084,9 @@ export default class CommonUtilities {
 
       if ( match ) {
 
-        const strInternationalCode = ( !match[ 1 ] ? '1' : match[ 1 ] );
+        const strInternationalCode = ( !match[ 1 ] ? "1" : match[ 1 ] );
 
-        strResult = [ strInternationalCode, '-', match[ 2 ], '-', match[ 3 ], '-', match[ 4 ] ].join( '' );
+        strResult = [ strInternationalCode, "-", match[ 2 ], "-", match[ 3 ], "-", match[ 4 ] ].join( "" );
 
       }
 
