@@ -88,7 +88,7 @@ export default class BulkCreateOrder {
 
               let intRow = 1;
 
-              let strDefaultAuthorization = argv.authorization ? argv.authorization: process.env.ODIN_API_KEY1;
+              let strDefaultAuthorization = argv.authorization ? argv.authorization: process.env._ODINV1_API_KEY_01;
 
               if ( !argv.authorization ) {
 
