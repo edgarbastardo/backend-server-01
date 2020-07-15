@@ -418,7 +418,7 @@ export default class BulkOrderCreateJob {
               const headers = {
 
                 "Content-Type": "application/json",
-                "Authorization": process.env.ODIN_API_KEY1
+                "Authorization": process.env.ODINV1_API_KEY_01
 
               }
 
