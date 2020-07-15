@@ -75,6 +75,9 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
   Success: number;
 
   @Column( { type: DataType.STRING( 150 ) } )
+  Comment: string;
+
+  @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
   @Column( { type: DataType.STRING( 30 ) } )

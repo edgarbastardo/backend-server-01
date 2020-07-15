@@ -1,21 +1,21 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-//import Hashes from 'jshashes';
-//import uuidv4 from 'uuid/v4';
-//import moment from 'moment-timezone';
-import fs from 'fs';
+//import Hashes from "jshashes";
+//import uuidv4 from "uuid/v4";
+//import moment from "moment-timezone";
+import fs from "fs";
 //import os from "os";
 import cluster from "cluster";
 
-import minify from 'pg-minify';
+import minify from "pg-minify";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 //import config from "../database/00_config/config.json"
 
-const debug = require( 'debug' )( 'DBMigrationManagerMYSQL' );
+const debug = require( "debug" )( "DBMigrationManagerMYSQL" );
 
 export class DBMigrationManagerMYSQL {
 
@@ -96,7 +96,7 @@ export class DBMigrationManagerMYSQL {
 
     let bResult: boolean = false;
 
-    const strRootPath =  __dirname; //require( 'app-root-path' );
+    const strRootPath =  __dirname; //require( "app-root-path" );
 
     const strFullFilePath = strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/00_one_time_execute.sql`;
 
@@ -124,7 +124,7 @@ export class DBMigrationManagerMYSQL {
         debugMark( "%s", dateTime.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( "Executing 00_one_time_execute.sql file" );
 
-        const LineByLine = require( 'n-readlines' );
+        const LineByLine = require( "n-readlines" );
 
         const lineReader = new LineByLine( strFullFilePath );
 
@@ -275,9 +275,9 @@ export class DBMigrationManagerMYSQL {
 
     let bResult: boolean = false;
 
-    //const minify = require( 'pg-minify' );
-    //const fs = require( 'fs' );
-    const strRootPath =  __dirname; //require( 'app-root-path' );
+    //const minify = require( "pg-minify" );
+    //const fs = require( "fs" );
+    const strRootPath =  __dirname; //require( "app-root-path" );
 
     const strFullFilePath = strRootPath + `/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql`;
 
@@ -285,7 +285,7 @@ export class DBMigrationManagerMYSQL {
 
       if ( fs.existsSync( strFullFilePath ) ) {
 
-        const LineByLine = require( 'n-readlines' );
+        const LineByLine = require( "n-readlines" );
 
         const lineReader = new LineByLine( strFullFilePath );
 
@@ -351,7 +351,7 @@ export class DBMigrationManagerMYSQL {
       /*
       if ( fs.existsSync( strRootPath + "/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql" ) ) {
 
-        let strSQLContents = fs.readFileSync( strRootPath + "/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql", 'utf8' );
+        let strSQLContents = fs.readFileSync( strRootPath + "/../../../01_database/01_Before/${strDatabase}/mysql/01_all_time_execute.sql", "utf8" );
 
         strSQLContents = minify( strSQLContents, { compress: false } );
 
@@ -652,8 +652,8 @@ export class DBMigrationManagerMYSQL {
 
         for ( let row of tableContent[ 0 ] ) {
 
-          if ( row[ 'FilePath' ] === strFilePath &&
-               row[ 'FileName' ] === strFileName ) {
+          if ( row[ "FilePath" ] === strFilePath &&
+               row[ "FileName" ] === strFileName ) {
 
             bResult = true;
             break;
@@ -668,8 +668,8 @@ export class DBMigrationManagerMYSQL {
           let debugMark = debug.extend( "F42473B14422" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
           debugMark( "FilePath => ", strFilePath );
           debugMark( "FileName => ", strFileName );
-          debugMark( "Row FP => ", row[ 'FilePath' ] );
-          debugMark( "Row FN => ", row[ 'FileName' ] );
+          debugMark( "Row FP => ", row[ "FilePath" ] );
+          debugMark( "Row FN => ", row[ "FileName" ] );
 
         })
         */
@@ -718,7 +718,7 @@ export class DBMigrationManagerMYSQL {
 
     try {
 
-      let strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, 'utf8' );
+      let strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, "utf8" );
 
       strFileContent = minify( strFileContent, { compress: false } );
 
@@ -784,10 +784,10 @@ export class DBMigrationManagerMYSQL {
                                                              "sysDBMigratedData",
                                                              logger );
 
-      const strRootPath = __dirname; //require( 'app-root-path' );
+      const strRootPath = __dirname; //require( "app-root-path" );
       const strMigrationsFolder = strRootPath + `/../../../01_database/02_migration_data/${strDatabase}/mysql/`;
-      const path = require('path')
-      const os = require( 'os' );
+      const path = require("path")
+      const os = require( "os" );
 
       const dirs = fs.existsSync( strMigrationsFolder ) ? fs.readdirSync( strMigrationsFolder ): [];
 
@@ -815,7 +815,7 @@ export class DBMigrationManagerMYSQL {
 
               bSuccess = resultCall.bSuccess;
               bEmptyContent = resultCall.bEmptyContent;
-              //strContentCheckSum = resultCall.strContentCheckSum;
+              strContentCheckSum = resultCall.strContentCheckSum;
 
             }
             else if ( strFileExt === ".js" ||
@@ -834,7 +834,7 @@ export class DBMigrationManagerMYSQL {
 
                 if ( bSuccess && bEmptyContent === false ) {
 
-                  const strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, 'utf8' );
+                  const strFileContent = fs.readFileSync( strMigrationsFolder + "/" + strFileName, "utf8" );
 
                   strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
@@ -971,10 +971,10 @@ export class DBMigrationManagerMYSQL {
                                                                 "sysDBImportedData",
                                                                 logger );
 
-      const strRootPath = __dirname; //require( 'app-root-path' );
+      const strRootPath = __dirname; //require( "app-root-path" );
       const strImportDataFolder = strRootPath + `/../../../01_database/03_import_data/${strDatabase}/mysql/`;
-      const path = require('path')
-      const os = require( 'os' );
+      const path = require("path")
+      const os = require( "os" );
 
       const dirs = fs.existsSync( strImportDataFolder ) ? fs.readdirSync( strImportDataFolder ): [];
 
@@ -1021,7 +1021,7 @@ export class DBMigrationManagerMYSQL {
 
                 if ( bSuccess && bEmptyContent === false ) {
 
-                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, 'utf8' );
+                  const strFileContent = fs.readFileSync( strImportDataFolder + "/" + strFileName, "utf8" );
 
                   strContentCheckSum = SystemUtilities.hashString( strFileContent, 2, null ); //Hashes.CRC32( strFileContent ).toString( 16 );
 
@@ -1066,7 +1066,7 @@ export class DBMigrationManagerMYSQL {
                 const strValues = "'" + SystemUtilities.getUUIDv4() + "','" +
                                   os.hostname() + "','" +
                                   strImportDataFolder + "','" +
-                                  strFileName + "','" +
+                                  strFileName + "',''" +
                                   strFullPathCheckSum + "','" +
                                   strContentCheckSum + "'," +
                                   ( bSuccess ? 1 : 0 ) +

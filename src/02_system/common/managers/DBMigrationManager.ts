@@ -1,19 +1,19 @@
-import cluster from 'cluster';
-//import uuidv4 from 'uuid/v4';
-import appRoot from 'app-root-path';
-import fs from 'fs'; //Load the filesystem module
+import cluster from "cluster";
+//import uuidv4 from "uuid/v4";
+import appRoot from "app-root-path";
+import fs from "fs"; //Load the filesystem module
 
 import { DBMigrationManagerMYSQL } from "./DBMigrationManagerMYSQL";
 import CommonUtilities from "../CommonUtilities";
 
 //import config from "../../../01_database/00_config/config.json"
-import SystemUtilities from '../SystemUtilities';
-import { DBMigrationManagerORM } from './DBMigrationManagerORM';
-import DBConnectionManager from './DBConnectionManager';
-import CommonConstants from '../CommonConstants';
+import SystemUtilities from "../SystemUtilities";
+import { DBMigrationManagerORM } from "./DBMigrationManagerORM";
+import DBConnectionManager from "./DBConnectionManager";
+import CommonConstants from "../CommonConstants";
 //import dbConnection from "./DBConnectionManager";
 
-const debug = require( 'debug' )( 'DBMigrationManager' );
+const debug = require( "debug" )( "DBMigrationManager" );
 
 export default class DBMigrationManager {
 

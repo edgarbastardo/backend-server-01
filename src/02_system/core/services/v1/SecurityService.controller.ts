@@ -1,6 +1,6 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 //import { Socket } from "net";
 
@@ -9,12 +9,12 @@ import {
   Request,
   //Response,
   //NextFunction
-} from 'express';
+} from "express";
 
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
@@ -26,15 +26,17 @@ import SYSConfigValueDataService from "../../../common/database/master/services/
 import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 
-import DBConnectionManager from '../../../common/managers/DBConnectionManager';
+import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import NotificationManager from '../../../common/managers/NotificationManager';
-import SYSUserSessionPresenceService from '../../../common/database/master/services/SYSUserSessionPresenceService';
+import NotificationManager from "../../../common/managers/NotificationManager";
+import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
-import { SYSUser } from '../../../common/database/master/models/SYSUser';
+//import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
-const debug = require( 'debug' )( 'SecurityServiceController' );
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
+
+const debug = require( "debug" )( "SecurityServiceController" );
 
 export interface PasswordParameters {
 
@@ -742,7 +744,8 @@ export default class SecurityServiceController {
                                                                Data: userDataResponse,
                                                                FilterFields: 1, //Force to remove fields like password and value
                                                                TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                               Include: null,
+                                                               Include: null, //[ { model: SYSUser } ],
+                                                               Exclude: null, //[ { model: SYSUser } ],
                                                                Logger: logger,
                                                                ExtraInfo: {
                                                                             Request: null
@@ -1064,9 +1067,9 @@ export default class SecurityServiceController {
           delete userSessionStatusData[ "ExtraData" ];
 
           await CacheManager.setDataWithTTL( strAuthorization,
-                                            JSON.stringify( userSessionStatusData ),
-                                            300, //5 minutes in seconds
-                                            logger );
+                                             JSON.stringify( userSessionStatusData ),
+                                             300, //5 minutes in seconds
+                                             logger );
 
           if ( userSessionStatus !== null ) {
 
@@ -1096,9 +1099,9 @@ export default class SecurityServiceController {
 
               result = {
                         StatusCode: 200, //Ok
-                        Code: 'SUCCESS_LOGIN',
-                        Message: await I18NManager.translate( context.Language, 'Success login' ),
-                        Mark: '9F6F3B735B7D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                        Code: "SUCCESS_LOGIN",
+                        Message: await I18NManager.translate( context.Language, "Success login" ),
+                        Mark: "9F6F3B735B7D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                         LogId: null,
                         IsError: false,
                         Errors: [],
@@ -1158,15 +1161,15 @@ export default class SecurityServiceController {
 
           result = {
                      StatusCode: 401, //Unauthorized
-                     Code: 'ERROR_USER_HAS_NOT_REQUIRED_ROLE',
-                     Message: await I18NManager.translate( context.Language, 'Login failed (User has not required role)' ),
-                     Mark: '187A01C7C65A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_HAS_NOT_REQUIRED_ROLE",
+                     Message: await I18NManager.translate( context.Language, "Login failed (User has not required role)" ),
+                     Mark: "187A01C7C65A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_HAS_NOT_REQUIRED_ROLE',
-                                 Message: await I18NManager.translate( context.Language, 'Login failed (User has not required role)' ),
+                                 Code: "ERROR_USER_HAS_NOT_REQUIRED_ROLE",
+                                 Message: await I18NManager.translate( context.Language, "Login failed (User has not required role)" ),
                                  Details: null
                                }
                              ],
@@ -1182,15 +1185,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USERNAME_FIELD_MISSING',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (Username field are missing)' ),
-                   Mark: 'C116D28F30EE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USERNAME_FIELD_MISSING",
+                   Message: await I18NManager.translate( context.Language, "Login failed (Username field are missing)" ),
+                   Mark: "C116D28F30EE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USERNAME_FIELD_MISSING',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (Username field are missing)' ),
+                               Code: "ERROR_USERNAME_FIELD_MISSING",
+                               Message: await I18NManager.translate( context.Language, "Login failed (Username field are missing)" ),
                                Details: null
                              }
                            ],
@@ -1204,15 +1207,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_DISABLED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
-                   Mark: 'C2344BE0E051' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_DISABLED",
+                   Message: await I18NManager.translate( context.Language, "Login failed (User disabled)" ),
+                   Mark: "C2344BE0E051" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_DISABLED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User disabled)' ),
+                               Code: "ERROR_USER_DISABLED",
+                               Message: await I18NManager.translate( context.Language, "Login failed (User disabled)" ),
                                Details: null
                              }
                            ],
@@ -1226,15 +1229,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_EXPIRED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
-                   Mark: '5E65F3A6BB84' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_EXPIRED",
+                   Message: await I18NManager.translate( context.Language, "Login failed (User expired)" ),
+                   Mark: "5E65F3A6BB84" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_EXPIRED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User expired)' ),
+                               Code: "ERROR_USER_EXPIRED",
+                               Message: await I18NManager.translate( context.Language, "Login failed (User expired)" ),
                                Details: null
                              }
                            ],
@@ -1248,15 +1251,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_GROUP_DISABLED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
-                   Mark: 'C0631A69B6F6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_GROUP_DISABLED",
+                   Message: await I18NManager.translate( context.Language, "Login failed (User group disabled)" ),
+                   Mark: "C0631A69B6F6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_GROUP_DISABLED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User group disabled)' ),
+                               Code: "ERROR_USER_GROUP_DISABLED",
+                               Message: await I18NManager.translate( context.Language, "Login failed (User group disabled)" ),
                                Details: null
                              }
                            ],
@@ -1270,15 +1273,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
-                   Mark: 'B621392319E6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_USER_GROUP_EXPIRED",
+                   Message: await I18NManager.translate( context.Language, "Login failed (User group expired)" ),
+                   Mark: "B621392319E6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_USER_GROUP_EXPIRED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (User group expired)' ),
+                               Code: "ERROR_USER_GROUP_EXPIRED",
+                               Message: await I18NManager.translate( context.Language, "Login failed (User group expired)" ),
                                Details: null
                              }
                            ],
@@ -1292,15 +1295,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                   Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
-                   Mark: 'D8E7BA64792D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                   Message: await I18NManager.translate( context.Language, "Not allowed to login from this the kind of frontend" ),
+                   Mark: "D8E7BA64792D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                               Message: await I18NManager.translate( context.Language, 'Not allowed to login from this the kind of frontend' ),
+                               Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                               Message: await I18NManager.translate( context.Language, "Not allowed to login from this the kind of frontend" ),
                                Details: null
                              }
                            ],
@@ -1329,15 +1332,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_LOGIN_FAILED',
-                   Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
-                   Mark: '22E89FB65D2B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_LOGIN_FAILED",
+                   Message: await I18NManager.translate( context.Language, "Login failed (Username and/or Password are invalid)" ),
+                   Mark: "22E89FB65D2B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_LOGIN_FAILED',
-                               Message: await I18NManager.translate( context.Language, 'Login failed (Username and/or Password are invalid)' ),
+                               Code: "ERROR_LOGIN_FAILED",
+                               Message: await I18NManager.translate( context.Language, "Login failed (Username and/or Password are invalid)" ),
                                Details: null
                              }
                            ],
@@ -1383,8 +1386,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1489,8 +1492,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1554,7 +1557,7 @@ export default class SecurityServiceController {
       const strLanguage = context.Language;
 
       const options = {
-                        method: 'GET',
+                        method: "GET",
                         //headers: {},
                         body: null,
                       };
@@ -1587,15 +1590,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_TOKEN_NOT_VALID',
-                   Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
-                   Mark: '602D23CFC6ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_TOKEN_NOT_VALID",
+                   Message: await I18NManager.translate( strLanguage, "The google token is not valid" ),
+                   Mark: "602D23CFC6ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_TOKEN_NOT_VALID',
-                               Message: await I18NManager.translate( strLanguage, 'The google token is not valid' ),
+                               Code: "ERROR_TOKEN_NOT_VALID",
+                               Message: await I18NManager.translate( strLanguage, "The google token is not valid" ),
                                Details: null
                              }
                            ],
@@ -1641,8 +1644,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1706,7 +1709,7 @@ export default class SecurityServiceController {
       const strLanguage = context.Language;
 
       const options = {
-                        method: 'GET',
+                        method: "GET",
                         //headers: {},
                         body: null,
                       };
@@ -1751,15 +1754,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_TOKEN_NOT_VALID',
-                   Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
-                   Mark: 'AE88C13E3104' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_TOKEN_NOT_VALID",
+                   Message: await I18NManager.translate( strLanguage, "The facebook token is not valid" ),
+                   Mark: "AE88C13E3104" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_TOKEN_NOT_VALID',
-                               Message: await I18NManager.translate( strLanguage, 'The facebook token is not valid' ),
+                               Code: "ERROR_TOKEN_NOT_VALID",
+                               Message: await I18NManager.translate( strLanguage, "The facebook token is not valid" ),
                                Details: null
                              }
                            ],
@@ -1805,8 +1808,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1912,8 +1915,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( context.Language, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1990,8 +1993,10 @@ export default class SecurityServiceController {
 
           const strSavedSocketToken = userSessionStatus.SocketToken;
 
+          /*
           //Delete from cache the other tokens
           await CacheManager.deleteData( userSessionStatus.Token, logger );
+
           userSessionStatus.BinaryDataToken ? await CacheManager.deleteData( userSessionStatus.BinaryDataToken, logger ): null;
           userSessionStatus.SocketToken ? await CacheManager.deleteData( userSessionStatus.SocketToken, logger ): null;
 
@@ -2011,6 +2016,11 @@ export default class SecurityServiceController {
                                                                                      7 * 1000, //Second
                                                                                      currentTransaction,
                                                                                      logger );
+                                                                                     */
+
+          userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                   currentTransaction,
+                                                                   logger );  //Force logout the session
 
           if ( userSessionStatus instanceof Error ) {
 
@@ -2018,15 +2028,15 @@ export default class SecurityServiceController {
 
             result = {
                        StatusCode: 500, //Internal server error
-                       Code: 'ERROR_UNEXPECTED',
-                       Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                        Mark: "8D6DF9F3623E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: error.LogId,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_LOGOUT_FAILED',
-                                   Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
+                                   Code: "ERROR_LOGOUT_FAILED",
+                                   Message: await I18NManager.translate( strLanguage, "Cannot complete the logout" ),
                                    Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
                                ],
@@ -2040,13 +2050,20 @@ export default class SecurityServiceController {
 
             const warnings = [];
 
+            //FIXME 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
+            await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                                  null,
+                                                                                  logger );
+
+            /*
             await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
                                                                                     strSavedSocketToken,
                                                                                     strLanguage,
                                                                                     warnings,
                                                                                     currentTransaction,
                                                                                     logger );
+            */
 
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
@@ -2065,9 +2082,9 @@ export default class SecurityServiceController {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: 'SUCCESS_LOGOUT',
-                       Message: await I18NManager.translate( strLanguage, 'Success logout' ),
-                       Mark: '86B853E96517' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "SUCCESS_LOGOUT",
+                       Message: await I18NManager.translate( strLanguage, "Success logout" ),
+                       Mark: "86B853E96517" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
                        Errors: [],
@@ -2114,9 +2131,9 @@ export default class SecurityServiceController {
 
               result = {
                          StatusCode: 200, //Ok
-                         Code: 'SUCCESS_LOGOUT',
-                         Message: await I18NManager.translate( strLanguage, 'Success logout' ),
-                         Mark: '86B853E96517' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "SUCCESS_LOGOUT",
+                         Message: await I18NManager.translate( strLanguage, "Success logout" ),
+                         Mark: "86B853E96517" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: false,
                          Errors: [],
@@ -2154,15 +2171,15 @@ export default class SecurityServiceController {
 
             result = {
                         StatusCode: 500, //Internal server error
-                        Code: 'ERROR_LOGOUT_FAILED',
-                        Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
+                        Code: "ERROR_LOGOUT_FAILED",
+                        Message: await I18NManager.translate( strLanguage, "Cannot complete the logout" ),
                         Mark: strMark,
                         LogId: error.LogId,
                         IsError: true,
                         Errors: [
                                   {
-                                    Code: 'ERROR_LOGOUT_FAILED',
-                                    Message: await I18NManager.translate( strLanguage, 'Cannot complete the logout' ),
+                                    Code: "ERROR_LOGOUT_FAILED",
+                                    Message: await I18NManager.translate( strLanguage, "Cannot complete the logout" ),
                                     Details: await SystemUtilities.processErrorDetails( error ) //error
                                   }
                                 ],
@@ -2179,15 +2196,15 @@ export default class SecurityServiceController {
 
           result = {
                       StatusCode: 400, //Bad request
-                      Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                      Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made logout' ),
-                      Mark: '2EA2C0E7ACEF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                      Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                      Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
+                      Mark: "2EA2C0E7ACEF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                       LogId: null,
                       IsError: true,
                       Errors: [
                                 {
-                                  Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                  Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot made logout' ),
+                                  Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                  Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
                                   Details: null
                                 }
                               ],
@@ -2203,15 +2220,15 @@ export default class SecurityServiceController {
 
         result = {
                    StatusCode: 401, //Unauthorized
-                   Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
-                   Mark: '3EF6C35B0645' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
+                   Mark: "3EF6C35B0645" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_INVALID_AUTHORIZATION_TOKEN',
-                               Message: await I18NManager.translate( strLanguage, 'Authorization token provided is invalid' ),
+                               Code: "ERROR_INVALID_AUTHORIZATION_TOKEN",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is invalid" ),
                                Details: null
                              }
                            ],
@@ -2257,8 +2274,8 @@ export default class SecurityServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -2332,9 +2349,9 @@ export default class SecurityServiceController {
 
     const result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_TOKEN_IS_VALID',
-                     Message: await I18NManager.translate( strLanguage, 'The token is valid' ),
-                     Mark: '789A41A512E5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "SUCCESS_TOKEN_IS_VALID",
+                     Message: await I18NManager.translate( strLanguage, "The token is valid" ),
+                     Mark: "789A41A512E5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],

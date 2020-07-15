@@ -1,11 +1,11 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
 import SystemUtilities from "../../../common/SystemUtilities";
@@ -15,10 +15,10 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
-import UserOthersServiceController from './UserOthersService.controller';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
+import UserOthersServiceController from "./UserOthersService.controller";
 
-const debug = require( 'debug' )( 'UserBulkServiceController' );
+const debug = require( "debug" )( "UserBulkServiceController" );
 
 export default class UserBulkServiceController {
 
@@ -80,8 +80,8 @@ export default class UserBulkServiceController {
                                    Id: bulkUserData.Id,
                                    ShortId: bulkUserData.ShortId,
                                    Name: bulkUserData.Name,
-                                   Code: 'ERROR_USER_NOT_FOUND',
-                                   Mark: 'AF5B2A2B856B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_USER_NOT_FOUND",
+                                   Mark: "AF5B2A2B856B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    Message: strMessage,
                                    Details: null,
                                  }
@@ -98,7 +98,7 @@ export default class UserBulkServiceController {
                                    ShortId: bulkUserData.ShortId,
                                    Name: bulkUserData.Name,
                                    Code: error.name,
-                                   Mark: '4D8DB096189E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Mark: "4D8DB096189E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    Message: error.message,
                                    Details: await SystemUtilities.processErrorDetails( error ) //error
                                  }
@@ -111,12 +111,12 @@ export default class UserBulkServiceController {
 
             if ( strBulkOperation === "deleteUser" ) {
 
-              strMessage = await I18NManager.translate( strLanguage, 'The user to delete cannot be yourself.' );
+              strMessage = await I18NManager.translate( strLanguage, "The user to delete cannot be yourself." );
 
             }
             else {
 
-              strMessage = await I18NManager.translate( strLanguage, 'The user to update cannot be yourself.' );
+              strMessage = await I18NManager.translate( strLanguage, "The user to update cannot be yourself." );
 
             }
 
@@ -125,8 +125,8 @@ export default class UserBulkServiceController {
                                   Id: sysUserInDB.Id,
                                   ShortId: sysUserInDB.ShortId,
                                   Name: sysUserInDB.Name,
-                                  Code: 'ERROR_USER_NOT_VALID',
-                                  Mark: 'DB0BF01CAA7A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Code: "ERROR_USER_NOT_VALID",
+                                  Mark: "DB0BF01CAA7A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                   Message: strMessage,
                                   Details: null
                                 }
@@ -142,14 +142,14 @@ export default class UserBulkServiceController {
 
             if ( strBulkOperation === "deleteUser" ) {
 
-              strCode = 'ERROR_CANNOT_DELETE_USER';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to delete the user. The user has #Administrator# role, but you NOT has.' );
+              strCode = "ERROR_CANNOT_DELETE_USER";
+              strMessage = await I18NManager.translate( strLanguage, "Not allowed to delete the user. The user has #Administrator# role, but you NOT has." );
 
             }
             else {
 
-              strCode = 'ERROR_CANNOT_UPDATE_USER';
-              strMessage = await I18NManager.translate( strLanguage, 'Not allowed to update the user. The user has #Administrator# role, but you NOT has.' );
+              strCode = "ERROR_CANNOT_UPDATE_USER";
+              strMessage = await I18NManager.translate( strLanguage, "Not allowed to update the user. The user has #Administrator# role, but you NOT has." );
 
             }
 
@@ -160,7 +160,7 @@ export default class UserBulkServiceController {
                                   Name: sysUserInDB.Name,
                                   Code: strCode,
                                   Message: strMessage,
-                                  Mark: '3BA7F38FA6DD' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                  Mark: "3BA7F38FA6DD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                   Details: null,
                                 }
                               );
@@ -194,9 +194,9 @@ export default class UserBulkServiceController {
                                       Id: sysUserInDB.Id,
                                       ShortId: sysUserInDB.ShortId,
                                       Name: sysUserInDB.Name,
-                                      Code: 'ERROR_CANNOT_DELETE_USER',
-                                      Mark: '3CEF42A3B047' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to delete the user' ),
+                                      Code: "ERROR_CANNOT_DELETE_USER",
+                                      Mark: "3CEF42A3B047" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to delete the user" ),
                                       Details: null
                                     }
                                   );
@@ -209,9 +209,9 @@ export default class UserBulkServiceController {
                                       Id: sysUserInDB.Id,
                                       ShortId: sysUserInDB.ShortId,
                                       Name: sysUserInDB.Name,
-                                      Code: 'ERROR_CANNOT_UDPATE_USER',
-                                      Mark: 'AF5B2A2B856B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                      Message: await I18NManager.translate( strLanguage, 'Not allowed to update the user' ),
+                                      Code: "ERROR_CANNOT_UDPATE_USER",
+                                      Mark: "AF5B2A2B856B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                      Message: await I18NManager.translate( strLanguage, "Not allowed to update the user" ),
                                       Details: null
                                     }
                                   );
@@ -250,9 +250,9 @@ export default class UserBulkServiceController {
                                     Id: sysUserInDB.Id,
                                     ShortId: sysUserInDB.ShortId,
                                     Name: sysUserInDB.Name,
-                                    Code: 'ERROR_CANNOT_UDPATE_USER',
-                                    Mark: '7E8570FF7D8A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                    Message: await I18NManager.translate( strLanguage, 'Not allowed to move the user to the target user group' ),
+                                    Code: "ERROR_CANNOT_UDPATE_USER",
+                                    Mark: "7E8570FF7D8A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                    Message: await I18NManager.translate( strLanguage, "Not allowed to move the user to the target user group" ),
                                     Details: null
                                   }
                                 );
@@ -290,9 +290,9 @@ export default class UserBulkServiceController {
                                         Id: sysUserInDB.Id,
                                         ShortId: sysUserInDB.ShortId,
                                         Name: sysUserInDB.Name,
-                                        Code: 'ERROR_CANNOT_UDPATE_USER',
-                                        Mark: '97BAA8711727' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                        Message: await I18NManager.translate( strLanguage, 'The target user group not found in database' ),
+                                        Code: "ERROR_CANNOT_UDPATE_USER",
+                                        Mark: "97BAA8711727" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Message: await I18NManager.translate( strLanguage, "The target user group not found in database" ),
                                         Details: null
                                       }
                                     );
@@ -343,9 +343,9 @@ export default class UserBulkServiceController {
                                           Id: sysUserInDB.Id,
                                           ShortId: sysUserInDB.ShortId,
                                           Name: sysUserInDB.Name,
-                                          Code: 'ERROR_UNEXPECTED',
-                                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                          Mark: '4B1421967200' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Code: "ERROR_UNEXPECTED",
+                                          Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                          Mark: "4B1421967200" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                           Details: await SystemUtilities.processErrorDetails( error ) //error
                                         }
                                       );
@@ -359,9 +359,9 @@ export default class UserBulkServiceController {
                                         Id: sysUserInDB.Id,
                                         ShortId: sysUserInDB.ShortId,
                                         Name: sysUserInDB.Name,
-                                        Code: 'SUCCESS_USER_DELETE',
-                                        Message: await I18NManager.translate( strLanguage, 'Success user delete.' ),
-                                        Mark: 'D746E4B3913A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Code: "SUCCESS_USER_DELETE",
+                                        Message: await I18NManager.translate( strLanguage, "Success user delete." ),
+                                        Mark: "D746E4B3913A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                         Details: null
                                       }
                                     );
@@ -374,9 +374,9 @@ export default class UserBulkServiceController {
                                           Id: sysUserInDB.Id,
                                           ShortId: sysUserInDB.ShortId,
                                           Name: sysUserInDB.Name,
-                                          Code: 'ERROR_USER_DELETE',
-                                          Message: await I18NManager.translate( strLanguage, 'Error in user delete.' ),
-                                          Mark: '26ECAAE77AAA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Code: "ERROR_USER_DELETE",
+                                          Message: await I18NManager.translate( strLanguage, "Error in user delete." ),
+                                          Mark: "26ECAAE77AAA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                           Details: "Method deleteByModel return false"
                                         }
                                       );
@@ -400,9 +400,9 @@ export default class UserBulkServiceController {
                                           Id: sysUserInDB.Id,
                                           ShortId: sysUserInDB.ShortId,
                                           Name: sysUserInDB.Name,
-                                          Code: 'ERROR_UNEXPECTED',
-                                          Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                          Mark: '1F3070410157' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                          Code: "ERROR_UNEXPECTED",
+                                          Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                          Mark: "1F3070410157" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                           Details: await SystemUtilities.processErrorDetails( error ) //error
                                         }
                                       );
@@ -437,9 +437,9 @@ export default class UserBulkServiceController {
                                         Id: sysUserInDB.Id,
                                         ShortId: sysUserInDB.ShortId,
                                         Name: sysUserInDB.Name,
-                                        Code: 'SUCCESS_USER_UPDATE',
-                                        Message: await I18NManager.translate( strLanguage, 'Success user update.' ),
-                                        Mark: '14B48DBC5ECC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                        Code: "SUCCESS_USER_UPDATE",
+                                        Message: await I18NManager.translate( strLanguage, "Success user update." ),
+                                        Mark: "14B48DBC5ECC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                         Details: details
                                       }
                                     );
@@ -462,9 +462,9 @@ export default class UserBulkServiceController {
                               Id: bulkUserData.Id,
                               ShortId: bulkUserData.ShortId,
                               Name: bulkUserData.Name,
-                              Code: 'ERROR_UNEXPECTED',
-                              Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                              Mark: 'AB36DD82F682' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                              Code: "ERROR_UNEXPECTED",
+                              Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                              Mark: "AB36DD82F682" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                               Details: await SystemUtilities.processErrorDetails( error ) //error
                             }
                           );
@@ -500,8 +500,8 @@ export default class UserBulkServiceController {
 
       result.errors.push(
                           {
-                            Code: 'ERROR_UNEXPECTED',
-                            Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                            Code: "ERROR_UNEXPECTED",
+                            Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                             Mark: strMark,
                             Details: await SystemUtilities.processErrorDetails( error ) //error
                           }
@@ -556,23 +556,23 @@ export default class UserBulkServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_DISABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success disable ALL users' );
+        strCode = "SUCCESS_BULK_USER_DISABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success disable ALL users" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_DISABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot disable the users. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_DISABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot disable the users. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been disabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL users has been disabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -581,7 +581,7 @@ export default class UserBulkServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: 'F750518D59A8' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "F750518D59A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -636,8 +636,8 @@ export default class UserBulkServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -717,23 +717,23 @@ export default class UserBulkServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success enable ALL users' );
+        strCode = "SUCCESS_BULK_USER_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Success enable ALL users" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_ENABLE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot enable the users. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_ENABLE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot enable the users. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been enabled. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL users has been enabled. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -742,7 +742,7 @@ export default class UserBulkServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: 'B8A5ED6E6C21' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "B8A5ED6E6C21" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -797,8 +797,8 @@ export default class UserBulkServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -878,23 +878,23 @@ export default class UserBulkServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_MOVE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success move ALL users to the user group' );
+        strCode = "SUCCESS_BULK_USER_MOVE";
+        strMessage = await I18NManager.translate( strLanguage, "Success move ALL users to the user group" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_MOVE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot move the users. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_MOVE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot move the users. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been moved. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL users has been moved. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -903,7 +903,7 @@ export default class UserBulkServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: '340268D12456' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "340268D12456" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -958,8 +958,8 @@ export default class UserBulkServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -1039,23 +1039,23 @@ export default class UserBulkServiceController {
       if ( bulkResult.errors.length === 0 ) {
 
         intStatusCode = 200
-        strCode = 'SUCCESS_BULK_USER_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Success delete ALL users' );
+        strCode = "SUCCESS_BULK_USER_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Success delete ALL users" );
 
       }
       else if ( bulkResult.errors.length === request.body.bulk.length ) {
 
         intStatusCode = 400
-        strCode = 'ERROR_BULK_USER_DELETE';
-        strMessage = await I18NManager.translate( strLanguage, 'Cannot delete the users. Please check the errors and warnings section' );
+        strCode = "ERROR_BULK_USER_DELETE";
+        strMessage = await I18NManager.translate( strLanguage, "Cannot delete the users. Please check the errors and warnings section" );
         bIsError = true;
 
       }
       else {
 
         intStatusCode = 202
-        strCode = 'CHECK_DATA_AND_ERRORS_AND_WARNINGS';
-        strMessage = await I18NManager.translate( strLanguage, 'Not ALL users has been deleted. Please check the data and errors and warnings section' );
+        strCode = "CHECK_DATA_AND_ERRORS_AND_WARNINGS";
+        strMessage = await I18NManager.translate( strLanguage, "Not ALL users has been deleted. Please check the data and errors and warnings section" );
         bIsError = bulkResult.errors && bulkResult.errors.length > 0;
 
       }
@@ -1064,7 +1064,7 @@ export default class UserBulkServiceController {
                  StatusCode: intStatusCode,
                  Code: strCode,
                  Message: strMessage,
-                 Mark: '6AEBEABDD14A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "6AEBEABDD14A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: bIsError,
                  Errors: bulkResult.errors,
@@ -1119,8 +1119,8 @@ export default class UserBulkServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

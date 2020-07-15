@@ -18,7 +18,7 @@ import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 import { SYSConfigMetaData } from "../../../../02_system/common/database/master/models/SYSConfigMetaData";
 import { SYSConfigValueData } from '../../../../02_system/common/database/master/models/SYSConfigValueData';
 
-const debug = require( 'debug' )( '002_system_check_basic_configs_exists' );
+const debug = require( 'debug' )( '001_system_check_basic_configs_exists' );
 
 require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
 
@@ -78,6 +78,17 @@ export default class Always {
 
               }
               */
+
+            }
+            else if ( !configMetaDataInDB.Tag ||
+                      configMetaDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+
+              configMetaDataInDB.Default = configMetaDataToCreate.Default;
+              configMetaDataInDB.Example = configMetaDataToCreate.Example;
+              configMetaDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+              await SYSConfigMetaData.update( ( configMetaDataInDB as any ).dataValues,
+                                              options );
 
             }
 
@@ -629,12 +640,16 @@ export default class Always {
                                                             {
                                                               "service":"#google_maps#",
                                                               "#google_maps#":{
+
                                                                 "type":"google_maps",
                                                                 "host":"https://maps.googleapis.com/maps/api/geocode/json",
                                                                 "port":443,
                                                                 "auth":{
+
                                                                   "api_key":process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
+
                                                                 }
+
                                                               }
                                                             }
                                                           ),
@@ -647,12 +662,16 @@ export default class Always {
                                                             {
                                                               "service":"#google_maps#",
                                                               "#google_maps#":{
+
                                                                 "type":"google_maps",
                                                                 "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
                                                                 "port":443,
                                                                 "auth":{
+
                                                                   "api_key":process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
+
                                                                 }
+
                                                               }
                                                             }
                                                           ),
@@ -669,30 +688,119 @@ export default class Always {
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Rooms.Id,
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Server.Id,
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
-                                                              "#Drivers#":{
 
-                                                                "rooms": "#Drivers#,#Support#"
+                                                              "service":"#remote_01#",
+
+                                                              "#remote_01#": {
+
+                                                                "hostRest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
+
+                                                                "hostLiveDomain": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_DOMAIN || "",
+
+                                                                "hostLivePath": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_PATH || "",
+
+                                                                "workers": process.env.INSTANT_MESSAGE_SERVER_WORKERS || 1,
+
+                                                                "auth": {
+
+                                                                  "apiKey": process.env.INSTANT_MESSAGE_SERVER_AUTH || ""
+
+                                                                }
 
                                                               },
-                                                              "#System_Administrators#":{
 
-                                                                "rooms": "#System_Administrators#,#CommonAdmin#"
+                                                              "channel": {
+
+                                                                "config": {
+
+                                                                  "#Drivers#": {
+
+                                                                    "resume": {
+
+                                                                      "messages": 10
+
+                                                                    }
+                                                                  },
+
+                                                                  "@__default__@": {
+
+                                                                    "resume": {
+
+                                                                      "messages": 0
+
+                                                                    }
+
+                                                                  }
+
+                                                                }
 
                                                               },
-                                                              "#admin01@system.net#":{
 
-                                                                "rooms": "#@@UserName@@#,#System_Administrators#,#CommonAdmin#,#Admin01#"
+                                                              "command": {
 
-                                                              },
-                                                              "@__default__@":{
+                                                                "JoinToChannels": {
 
-                                                                "rooms": "#@@UserName@@#"
+                                                                  "#Business_Managers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
+
+                                                                  },
+                                                                  "#System_Administrators#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
+
+                                                                  },
+                                                                  "#Drivers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Drivers#,#Support#"
+
+                                                                  },
+                                                                  "#Dispachers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Drivers#,#DriversPosition#"
+
+                                                                  },
+                                                                  "@__default__@": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "*"
+
+                                                                  }
+
+                                                                },
+
+                                                                "SendMessage": {
+
+                                                                  "@__default__@": {
+
+                                                                    "denied": "#DriversPosition#",
+                                                                    "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                  }
+
+                                                                },
+
+                                                                "ListMembers": {
+
+                                                                  "@__default__@": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#@@AlreadyJoinedChannels@@#"
+
+                                                                  }
+
+                                                                },
 
                                                               }
+
                                                             }
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -733,7 +841,7 @@ export default class Always {
 
             }
             else if ( !sysConfigValueDataInDB.Tag ||
-                      sysConfigValueDataInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) {
+                      sysConfigValueDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
 
               sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
               sysConfigValueDataInDB.Value = configValueToCreate.Value;

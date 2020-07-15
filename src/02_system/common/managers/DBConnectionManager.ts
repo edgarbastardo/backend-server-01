@@ -1,24 +1,29 @@
-import fs from 'fs'; //Load the filesystem module
-import path from 'path';
-import cluster from 'cluster';
+import fs from "fs"; //Load the filesystem module
+import path from "path";
+import cluster from "cluster";
 
-import { Transaction } from 'sequelize';
+import { Transaction } from "sequelize";
 
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize } from "sequelize-typescript";
 
 import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
-import appRoot from 'app-root-path';
+import appRoot from "app-root-path";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
+<<<<<<< HEAD
 import SystemUtilities from '../SystemUtilities';
 //import config from '../../../01_database/00_config/config.json';
+=======
+import SystemUtilities from "../SystemUtilities";
+//import config from "../../../01_database/00_config/config.json";
+>>>>>>> master
 //import BusinessQueries from "../../../01_database/05_query/mysql/BusinessQueries";
 //import SystemQueries from "../../../01_database/05_query/mysql/SystemQueries";
 
-const debug = require( 'debug' )( 'DBConnectionManager' );
+const debug = require( "debug" )( "DBConnectionManager" );
 
 export default class DBConnectionManager {
 
@@ -172,7 +177,7 @@ export default class DBConnectionManager {
           /*
           dbConfig.migrations = [
 
-            __dirname + '/migrations/',
+            __dirname + "/migrations/",
             __dirname + "/../../business/common/database/migrations/"
 
           ]
@@ -199,7 +204,7 @@ export default class DBConnectionManager {
 
           dbConfig.isolationLevel = Transaction.ISOLATION_LEVELS.READ_COMMITTED;
 
-          const Sequelize1 = require( 'sequelize' );
+          const Sequelize1 = require( "sequelize" );
           const Op = Sequelize1.Op;
 
           dbConfig.operatorsAliases = {
@@ -247,9 +252,9 @@ export default class DBConnectionManager {
           result[ strCurrentDatabase ].dbConnection = null;
 
           const dbConnection = new Sequelize(
-                                              dbConfig[ 'database' ],
-                                              dbConfig[ 'username' ],
-                                              dbConfig[ 'password' ],
+                                              dbConfig[ "database" ],
+                                              dbConfig[ "username" ],
+                                              dbConfig[ "password" ],
                                               dbConfig,
                                             );
 
@@ -647,7 +652,7 @@ export default class DBConnectionManager {
       }
       else if ( dbConfig.dialect === "pgsql" ) {
 
-        result = require( '../../../01_database/05_query/pgsql/queries' ).default;
+        result = require( "../../../01_database/05_query/pgsql/queries" ).default;
 
       }
       */
