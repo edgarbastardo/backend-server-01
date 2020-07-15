@@ -1,4 +1,4 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
@@ -7,11 +7,11 @@ import {
   Request,
   //Response,
   //NextFunction
-} from 'express';
+} from "express";
 
-//import bcrypt from 'bcrypt';
+//import bcrypt from "bcrypt";
 //import { OriginalSequelize } from "sequelize"; //Original sequelize
-//import uuidv4 from 'uuid/v4';
+//import uuidv4 from "uuid/v4";
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import CommonConstants from "../../../common/CommonConstants";
@@ -21,11 +21,11 @@ import SystemUtilities from "../../../common/SystemUtilities";
 
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import CacheManager from '../../../common/managers/CacheManager';
+import CacheManager from "../../../common/managers/CacheManager";
 
 import RedisConnectionManager from "../../../common/managers/RedisConnectionManager";
 
-const debug = require( 'debug' )( 'SystemServiceController' );
+const debug = require( "debug" )( "SystemServiceController" );
 
 export default class SystemServiceController {
 
@@ -79,7 +79,7 @@ export default class SystemServiceController {
 
           databaseStatus.success[ databaseList[ intDatabaseIndex ] ] = {
                                                                          Code: "SUCCESS_CONNECTED_DATABASE",
-                                                                         Message: await I18NManager.translate( strLanguage, 'Success connection to database' ),
+                                                                         Message: await I18NManager.translate( strLanguage, "Success connection to database" ),
                                                                          Details: null
                                                                        };
 
@@ -154,7 +154,7 @@ export default class SystemServiceController {
 
           cacheStatus.Code = "ERROR_NOT_CONNECTED_CACHE"
           cacheStatus.Message = await I18NManager.translate( strLanguage, "Failed o delayed connection to cache" );
-          cacheStatus.Details = `CacheManager.currentInstance.status === '${strStatus}'`;
+          cacheStatus.Details = `CacheManager.currentInstance.status === "${strStatus}"`;
 
           error[ "cache" ] = cacheStatus;
 
@@ -196,9 +196,9 @@ export default class SystemServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_DATABASE_CONNECTION_FAILED',
-                   Message: await I18NManager.translate( strLanguage, 'One o more database connection failed' ),
-                   Mark: 'DA13E1748E25' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_DATABASE_CONNECTION_FAILED",
+                   Message: await I18NManager.translate( strLanguage, "One o more database connection failed" ),
+                   Mark: "DA13E1748E25" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: errors,
@@ -222,9 +222,9 @@ export default class SystemServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_STATUS',
-                   Message: await I18NManager.translate( strLanguage, 'Success status' ),
-                   Mark: '620A7376DB42' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_STATUS",
+                   Message: await I18NManager.translate( strLanguage, "Success status" ),
+                   Mark: "620A7376DB42" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -256,15 +256,15 @@ export default class SystemServiceController {
 
         result = {
                    StatusCode: 500, //Internal server error
-                   Code: 'ERROR_NOT_DATABASE_CONNECTION',
-                   Message: await I18NManager.translate( strLanguage, 'Not database connection open' ),
-                   Mark: 'DA13E1748E25' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_NOT_DATABASE_CONNECTION",
+                   Message: await I18NManager.translate( strLanguage, "Not database connection open" ),
+                   Mark: "DA13E1748E25" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_NOT_DATABASE_CONNECTION',
-                               Message: await I18NManager.translate( strLanguage, 'Not database connection open' ),
+                               Code: "ERROR_NOT_DATABASE_CONNECTION",
+                               Message: await I18NManager.translate( strLanguage, "Not database connection open" ),
                                Details: dbConfig
                              }
                            ],
@@ -284,9 +284,9 @@ export default class SystemServiceController {
 
         result = {
                    StatusCode: 200, //Ok
-                   Code: 'SUCCESS_GET_STATUS',
-                   Message: await I18NManager.translate( strLanguage, 'Success get the status' ),
-                   Mark: '620A7376DB42' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "SUCCESS_GET_STATUS",
+                   Message: await I18NManager.translate( strLanguage, "Success get the status" ),
+                   Mark: "620A7376DB42" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: false,
                    Errors: [],
@@ -346,8 +346,8 @@ export default class SystemServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

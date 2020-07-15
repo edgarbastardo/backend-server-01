@@ -1,22 +1,22 @@
-import cluster from 'cluster';
-import appRoot from 'app-root-path';
-import winston, { format } from 'winston';
-import { consoleFormat } from 'winston-console-format';
+import cluster from "cluster";
+import appRoot from "app-root-path";
+import winston, { format } from "winston";
+import { consoleFormat } from "winston-console-format";
 import os from "os";
-import fs from 'fs';
+import fs from "fs";
 
-import safeStringify from 'fast-safe-stringify';
+import safeStringify from "fast-safe-stringify";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import SystemUtilities from '../SystemUtilities';
-import CommonUtilities from '../CommonUtilities';
+import SystemUtilities from "../SystemUtilities";
+import CommonUtilities from "../CommonUtilities";
 
-import { PapertrailConnection, PapertrailTransport } from '../others/logs/winston/papertrail/winston-papertrail';
+import { PapertrailConnection, PapertrailTransport } from "../others/logs/winston/papertrail/winston-papertrail";
 
-const debug = require( 'debug' )( 'LoggerManager' );
+const debug = require( "debug" )( "LoggerManager" );
 
-require( 'dotenv' ).config( { path: appRoot.path + "/.env.log" } );
+require( "dotenv" ).config( { path: appRoot.path + "/.env.log" } );
 
 export default class LoggerManager {
 
@@ -42,7 +42,7 @@ export default class LoggerManager {
 
           file: {
 
-            //level: 'error',
+            //level: "error",
             filename: `${appRoot}/logs/${os.hostname}/${strDateTimeFormat}_${strWorkerId}/${SystemUtilities.strAPPName}/main.logger.log`,
             handleExceptions: true,
             json: false,
@@ -108,12 +108,12 @@ export default class LoggerManager {
 
                 try {
 
-                  let debugMark = debug.extend( '948014A902B0' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+                  let debugMark = debug.extend( "948014A902B0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
                   //debugMark( "%O", logData );
 
-                  delete logData[ Symbol.for( 'level' ) ];
-                  delete logData[ Symbol.for( 'message' ) ];
-                  delete logData[ Symbol.for( 'splat' ) ];
+                  delete logData[ Symbol.for( "level" ) ];
+                  delete logData[ Symbol.for( "message" ) ];
+                  delete logData[ Symbol.for( "splat" ) ];
 
                   if ( logData[ "stack" ] ) {
 
@@ -186,7 +186,7 @@ export default class LoggerManager {
 
             new winston.transports.Stream({
 
-              stream: fs.createWriteStream( '/dev/null' )
+              stream: fs.createWriteStream( "/dev/null" )
 
             })
 
@@ -214,7 +214,7 @@ export default class LoggerManager {
             format: winston.format.combine(
 
               //winston.format.timestamp(),
-              //label({ label: 'main' }),
+              //label({ label: "main" }),
               appendFields(),
               //winston.format.ms(),
               winston.format.errors( { stack: true } ),
@@ -232,12 +232,12 @@ export default class LoggerManager {
 
           });
 
-          // create a stream object with a 'write' function that will be used by `morgan`
+          // create a stream object with a "write" function that will be used by `morgan`
           ( result as any ).stream = {
 
             write: function( message: any, encoding: any ) {
 
-              // use the 'info' log level so the output will be picked up by both transports (file and console)
+              // use the "info" log level so the output will be picked up by both transports (file and console)
               result.info( message );
 
             },

@@ -1,9 +1,9 @@
-import fs from 'fs';
-//import { promises as fsPromises } from 'fs';
+import fs from "fs";
+//import { promises as fsPromises } from "fs";
 //import os from "os";
-import path from 'path';
-//import appRoot from 'app-root-path';
-import cluster from 'cluster';
+import path from "path";
+//import appRoot from "app-root-path";
+import cluster from "cluster";
 
 import CommonConstants from "../CommonConstants";
 
@@ -12,9 +12,9 @@ import CommonUtilities from "../CommonUtilities";
 
 //import LoggerManager from "./LoggerManager";
 
-//import util from 'util';
+//import util from "util";
 
-const debug = require( 'debug' )( 'JobQueueManager' );
+const debug = require( "debug" )( "JobQueueManager" );
 
 export default class JobQueueManager {
 
@@ -30,7 +30,7 @@ export default class JobQueueManager {
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
-                      .filter( file => file.indexOf( '.' ) !== 0 && ( file.slice( -3 ) === '.js' || file.slice( -3 ) === '.ts' ) );
+                      .filter( file => file.indexOf( "." ) !== 0 && ( file.slice( -3 ) === ".js" || file.slice( -3 ) === ".ts" ) );
 
       const dirs = fs.readdirSync( directory )
                      .filter( file => fs.lstatSync( path.join( directory, file ) ).isDirectory() );

@@ -1,13 +1,13 @@
-import fs from 'fs';
-import path from 'path';
-import cluster from 'cluster';
+import fs from "fs";
+import path from "path";
+import cluster from "cluster";
 
-import CommonConstants from '../CommonConstants';
+import CommonConstants from "../CommonConstants";
 
-import CommonUtilities from '../CommonUtilities';
-import SystemUtilities from '../SystemUtilities';
+import CommonUtilities from "../CommonUtilities";
+import SystemUtilities from "../SystemUtilities";
 
-const debug = require( 'debug' )( 'RestAPIManager' );
+const debug = require( "debug" )( "RestAPIManager" );
 
 export default class RestAPIManager {
 
@@ -37,7 +37,7 @@ export default class RestAPIManager {
 
       const files = fs.readdirSync( directory )
                       .filter( file => fs.lstatSync( path.join( directory, file ) ).isFile() )
-                      .filter( file => file.indexOf( '.' ) !== 0 && ( file.slice( -3 ) === '.js' || file.slice( -3 ) === '.ts' ) );
+                      .filter( file => file.indexOf( "." ) !== 0 && ( file.slice( -3 ) === ".js" || file.slice( -3 ) === ".ts" ) );
 
       const dirs = fs.readdirSync( directory )
                      .filter( file => fs.lstatSync( path.join( directory, file ) ).isDirectory() );

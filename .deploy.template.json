@@ -1,7 +1,10 @@
 {
-  "comment01": "copy this file to a folder in homedir/copy_install_backend/.deploy.json, Example: /home/dsistemas/copy_install_backend/.deploy.json",
-  "comment02": "Change the name backend-server-data-01 to my-project-name",
-  "comment03": "Change the host, user and password fields to right config values.",
+
+  "comment01": "Copy this file to a folder in homedir/deploy_nodejs/.deploy.json, Example: /home/dsistemas/deploy_nodejs/.deploy.json",
+  "comment02": "Copy this file to a folder in project_root/.deploy.json",
+  "comment03": "Change the name backend-server-data-01 to my-project-name",
+  "comment04": "Change the host, user and password fields to right config values.",
+
   "backend-server-data-01": {
 
     "test01": {

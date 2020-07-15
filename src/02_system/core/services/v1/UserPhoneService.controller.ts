@@ -1,12 +1,12 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 
 import {
   Request,
   //json,
-} from 'express';
-import bcrypt from 'bcrypt';
+} from "express";
+import bcrypt from "bcrypt";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
@@ -18,10 +18,10 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSPersonService from '../../../common/database/master/services/SYSPersonService';
-import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
+import SYSPersonService from "../../../common/database/master/services/SYSPersonService";
+import SYSActionTokenService from "../../../common/database/master/services/SYSActionTokenService";
 
-const debug = require( 'debug' )( 'UserPhoneServiceController' );
+const debug = require( "debug" )( "UserPhoneServiceController" );
 
 export default class UserPhoneServiceController {
 
@@ -81,15 +81,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
-                       Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                       Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the phone number" ),
+                       Mark: "4FB3974048ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                   Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the phone number" ),
                                    Details: null
                                  }
                                ],
@@ -105,15 +105,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
-                       Mark: '98366EF44736' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "98366EF44736" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -129,15 +129,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
-                       Mark: '563CBF3EE2A5' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "563CBF3EE2A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_GROUP_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
                                    Details: null
                                  }
                                ],
@@ -153,15 +153,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_DISABLED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
-                       Mark: '6D46A46F3106' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
+                       Mark: "6D46A46F3106" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_DISABLED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -177,15 +177,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_USER_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
-                       Mark: 'B722C2897726' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
+                       Mark: "B722C2897726" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
                                    Details: null
                                  }
                                ],
@@ -244,7 +244,7 @@ export default class UserPhoneServiceController {
                                                          //device_id: "*",
                                                          body: {
                                                                  kind: "self",
-                                                                 text: await I18NManager.translate( strLanguage, 'Your phone number change code is: %s', strChangeCode )
+                                                                 text: await I18NManager.translate( strLanguage, "Your phone number change code is: %s", strChangeCode )
                                                                }
                                                        },
                                                        logger
@@ -252,9 +252,9 @@ export default class UserPhoneServiceController {
 
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
-                               Message: await I18NManager.translate( strLanguage, 'Success to send phone number change code. Please check your phone' ),
-                               Mark: 'B6EFE4864DA7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "SUCCESS_SEND_PHONE_NUMBER_CHANGE_CODE_SMS",
+                               Message: await I18NManager.translate( strLanguage, "Success to send phone number change code. Please check your phone" ),
+                               Mark: "B6EFE4864DA7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
                                Errors: [],
@@ -274,15 +274,15 @@ export default class UserPhoneServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
-                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
-                               Mark: '3657E857AF1F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS",
+                               Message: await I18NManager.translate( strLanguage, "Error cannot send the sms to requested phone number" ),
+                               Mark: "3657E857AF1F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
-                                           Code: 'ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS',
-                                           Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                                           Code: "ERROR_SEND_PHONE_NUMBER_CHANGE_CODE_SMS",
+                                           Message: await I18NManager.translate( strLanguage, "Error cannot send the sms to requested phone number" ),
                                            Details: {
                                                       Phone: CommonUtilities.maskPhoneList( request.body.Phone )
                                                     }
@@ -302,9 +302,9 @@ export default class UserPhoneServiceController {
 
                   result = {
                              StatusCode: 500, //Internal server error
-                             Code: 'ERROR_UNEXPECTED',
-                             Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                             Mark: 'B035AEB41192' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_UNEXPECTED",
+                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                             Mark: "B035AEB41192" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: error.logId,
                              IsError: true,
                              Errors: [
@@ -326,15 +326,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_PHONE_NUMBER_IS_INVALID',
-                           Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
-                           Mark: '01E51F2FB37F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_PHONE_NUMBER_IS_INVALID",
+                           Message: await I18NManager.translate( strLanguage, "The phone number is not valid" ),
+                           Mark: "01E51F2FB37F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_PHONE_NUMBER_IS_INVALID',
-                                       Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                                       Code: "ERROR_PHONE_NUMBER_IS_INVALID",
+                                       Message: await I18NManager.translate( strLanguage, "The phone number is not valid" ),
                                        Details: {
                                                   EMail: request.body.Phone
                                                 }
@@ -352,15 +352,15 @@ export default class UserPhoneServiceController {
 
               result = {
                          StatusCode: 401, //Unauthorized
-                         Code: 'ERROR_WRONG_PASSWORD',
-                         Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
-                         Mark: '920F14EFBDE7' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "920F14EFBDE7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_WRONG_PASSWORD',
-                                     Message: await I18NManager.translate( strLanguage, 'Your current password not match' ),
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
                                      Details: null,
                                    }
                                  ],
@@ -378,15 +378,15 @@ export default class UserPhoneServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_USER_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
-                     Mark: '00FB818E026E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
+                     Mark: "00FB818E026E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_USER_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
                                  Details: null,
                                }
                              ],
@@ -404,15 +404,15 @@ export default class UserPhoneServiceController {
 
         result = {
                    StatusCode: 429, //Too Many Requests
-                   Code: 'ERROR_TOO_MANY_PHONE_NUMBER_CHANGE_REQUEST',
-                   Message: await I18NManager.translate( strLanguage, 'The user %s has too many phone number change requests', request.body.Name ),
+                   Code: "ERROR_TOO_MANY_PHONE_NUMBER_CHANGE_REQUEST",
+                   Message: await I18NManager.translate( strLanguage, "The user %s has too many phone number change requests", request.body.Name ),
                    Mark: strMark,
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_TOO_MANY_PHONE_CHANGE_REQUEST',
-                               Message: await I18NManager.translate( strLanguage, 'The user %s has too many phone number change requests', request.body.Name ),
+                               Code: "ERROR_TOO_MANY_PHONE_CHANGE_REQUEST",
+                               Message: await I18NManager.translate( strLanguage, "The user %s has too many phone number change requests", request.body.Name ),
                                Details: { Count: intCount, Comment: "In last 10 minutes" }
                              }
                            ],
@@ -424,12 +424,12 @@ export default class UserPhoneServiceController {
         const debugMark = debug.extend( strMark );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'The user %s has too many phone change requests', request.body.Name );
+        debugMark( "The user %s has too many phone change requests", request.body.Name );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'The user %s has too many phone change requests', request.body.Name );
+          logger.warning( "The user %s has too many phone change requests", request.body.Name );
 
         }
 
@@ -479,8 +479,8 @@ export default class UserPhoneServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -573,15 +573,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                           Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
-                           Mark: '4FB3974048ED' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                           Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the phone number" ),
+                           Mark: "4FB3974048ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT',
-                                       Message: await I18NManager.translate( strLanguage, 'Authorization token provided is persistent. You cannot change the phone number' ),
+                                       Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                       Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change the phone number" ),
                                        Details: null
                                      }
                                    ],
@@ -597,15 +597,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_GROUP_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
-                           Mark: 'EAA7E9E5C6FA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_GROUP_DISABLED",
+                           Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                           Mark: "EAA7E9E5C6FA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_GROUP_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
+                                       Code: "ERROR_USER_GROUP_DISABLED",
+                                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -621,15 +621,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_GROUP_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
-                           Mark: 'E52573CD2052' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_GROUP_EXPIRED",
+                           Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                           Mark: "E52573CD2052" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_GROUP_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot change the phone number', sysUserInDB.sysUserGroup.Name ),
+                                       Code: "ERROR_USER_GROUP_EXPIRED",
+                                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
                                        Details: null
                                      }
                                    ],
@@ -645,15 +645,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_DISABLED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
-                           Mark: '8AB386DAE87B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_DISABLED",
+                           Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
+                           Mark: "8AB386DAE87B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_DISABLED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot change the phone number', sysUserInDB.Name ),
+                                       Code: "ERROR_USER_DISABLED",
+                                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -669,15 +669,15 @@ export default class UserPhoneServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_USER_EXPIRED',
-                           Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
-                           Mark: '15CB6C1B117B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_EXPIRED",
+                           Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
+                           Mark: "15CB6C1B117B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_EXPIRED',
-                                       Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot change the phone number', sysUserInDB.Name ),
+                                       Code: "ERROR_USER_EXPIRED",
+                                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
                                        Details: null
                                      }
                                    ],
@@ -758,9 +758,9 @@ export default class UserPhoneServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: '16C6BCD6839E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "16C6BCD6839E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: error.logId,
                                IsError: true,
                                Errors: [
@@ -782,9 +782,9 @@ export default class UserPhoneServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: 'BE0B313EAA02' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "BE0B313EAA02" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -845,7 +845,7 @@ export default class UserPhoneServiceController {
                                                            //device_id: "*",
                                                            body: {
                                                                    kind: "self",
-                                                                   text: await I18NManager.translate( strLanguage, 'Phone number change success!' )
+                                                                   text: await I18NManager.translate( strLanguage, "Phone number change success!" )
                                                                  }
                                                          },
                                                          logger
@@ -865,9 +865,9 @@ export default class UserPhoneServiceController {
 
                     result = {
                                StatusCode: 200, //Ok
-                               Code: 'SUCCESS_PHONE_NUMBER_CHANGE',
-                               Message: await I18NManager.translate( strLanguage, 'Success to change the user phone number.' ),
-                               Mark: '1DF00A420467' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "SUCCESS_PHONE_NUMBER_CHANGE",
+                               Message: await I18NManager.translate( strLanguage, "Success to change the user phone number." ),
+                               Mark: "1DF00A420467" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: false,
                                Errors: [],
@@ -885,15 +885,15 @@ export default class UserPhoneServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_PHONE_NUMBER_NOT_VALID',
-                             Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
-                             Mark: '8AC35D3BD025' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_PHONE_NUMBER_NOT_VALID",
+                             Message: await I18NManager.translate( strLanguage, "The phone number is not valid" ),
+                             Mark: "8AC35D3BD025" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_PHONE_NUMBER_NOT_VALID',
-                                         Message: await I18NManager.translate( strLanguage, 'The phone number is not valid' ),
+                                         Code: "ERROR_PHONE_NUMBER_NOT_VALID",
+                                         Message: await I18NManager.translate( strLanguage, "The phone number is not valid" ),
                                          Details: {
                                                     Phone: request.body.Phone
                                                   }
@@ -913,15 +913,15 @@ export default class UserPhoneServiceController {
 
               result = {
                          StatusCode: 404, //Not found
-                         Code: 'ERROR_USER_NOT_FOUND',
-                         Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
-                         Mark: '17B6D60D5199' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_NOT_FOUND",
+                         Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
+                         Mark: "17B6D60D5199" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_NOT_FOUND',
-                                     Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
+                                     Code: "ERROR_USER_NOT_FOUND",
+                                     Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
                                      Details: null,
                                    }
                                  ],
@@ -937,15 +937,15 @@ export default class UserPhoneServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED',
-                       Message: await I18NManager.translate( strLanguage, 'The phone number change code %s already used', request.body.Code ),
-                       Mark: '6CDB3A2649DA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED",
+                       Message: await I18NManager.translate( strLanguage, "The phone number change code %s already used", request.body.Code ),
+                       Mark: "6CDB3A2649DA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED',
-                                   Message: await I18NManager.translate( strLanguage, 'The phone number change code %s already used', request.body.Code ),
+                                   Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_ALREADY_USED",
+                                   Message: await I18NManager.translate( strLanguage, "The phone number change code %s already used", request.body.Code ),
                                    Details: null,
                                  }
                                ],
@@ -961,15 +961,15 @@ export default class UserPhoneServiceController {
 
           result = {
                      StatusCode: 400, //Bad request
-                     Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED',
-                     Message: await I18NManager.translate( strLanguage, 'The phone number change code %s is expired', request.body.Code ),
-                     Mark: '3B86B9F1AD0E' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED",
+                     Message: await I18NManager.translate( strLanguage, "The phone number change code %s is expired", request.body.Code ),
+                     Mark: "3B86B9F1AD0E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED',
-                                 Message: await I18NManager.translate( strLanguage, 'The phone number change code %s is expired', request.body.Code ),
+                                 Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_EXPIRED",
+                                 Message: await I18NManager.translate( strLanguage, "The phone number change code %s is expired", request.body.Code ),
                                  Details: null,
                                }
                              ],
@@ -985,15 +985,15 @@ export default class UserPhoneServiceController {
 
         result = {
                    StatusCode: 404, //Not found
-                   Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND',
-                   Message: await I18NManager.translate( strLanguage, 'The phone number change code %s not found in database', request.body.Code ),
-                   Mark: 'C0A61871B549' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The phone number change code %s not found in database", request.body.Code ),
+                   Mark: "C0A61871B549" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND',
-                               Message: await I18NManager.translate( strLanguage, 'The phone number change code %s not found in database', request.body.Code ),
+                               Code: "ERROR_PHONE_NUMBER_CHANGE_CODE_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The phone number change code %s not found in database", request.body.Code ),
                                Details: null,
                              }
                            ],
@@ -1048,8 +1048,8 @@ export default class UserPhoneServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,

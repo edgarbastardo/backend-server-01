@@ -121,7 +121,7 @@ export default class Always {
           else if ( CommonUtilities.isNotNullOrEmpty( sysUserInDB ) && //The user exists in the db
                     CommonUtilities.isNullOrEmpty( sysUserInDB.Password ) && //The password is '', set again the default password
                     CommonUtilities.isNullOrEmpty( sysUserInDB.DisabledAt ) && //But the user is not disabled
-                    ( !sysUserInDB.Tag || sysUserInDB.Tag.indexOf( "#NotUpdateOnStartup#" ) === -1 ) ) { //And not tagged to not update at startup
+                    ( !sysUserInDB.Tag || sysUserInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) ) { //And not tagged to not update at startup
 
             sysUserInDB.Name = userToCreate.Name;
             sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );

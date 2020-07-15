@@ -1,12 +1,12 @@
-import cluster from 'cluster';
+import cluster from "cluster";
 import { Socket } from "net";
 
 import {
   Request,
   //json,
-} from 'express';
+} from "express";
 
-import CommonConstants from '../../../common/CommonConstants';
+import CommonConstants from "../../../common/CommonConstants";
 import SystemConstants from "../../../common/SystemContants";
 
 import CommonUtilities from "../../../common/CommonUtilities";
@@ -15,16 +15,16 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
-import ApplicationServerDataManager from '../../../common/managers/ApplicationServerDataManager';
+import ApplicationServerDataManager from "../../../common/managers/ApplicationServerDataManager";
 
-import SecurityServiceController from './SecurityService.controller';
+import SecurityServiceController from "./SecurityService.controller";
 import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
-import SYSActionTokenService from '../../../common/database/master/services/SYSActionTokenService';
+import SYSActionTokenService from "../../../common/database/master/services/SYSActionTokenService";
 
-const debug = require( 'debug' )( 'UserPasswordServiceController' );
+const debug = require( "debug" )( "UserPasswordServiceController" );
 
 export default class UserPasswordServiceController {
 
@@ -86,15 +86,15 @@ export default class UserPasswordServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_DISABLED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                         Mark: '39212A25A17D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_DISABLED",
+                         Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                         Mark: "39212A25A17D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_DISABLED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                     Code: "ERROR_USER_GROUP_DISABLED",
+                                     Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                      Details: null
                                    }
                                  ],
@@ -110,15 +110,15 @@ export default class UserPasswordServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_GROUP_EXPIRED',
-                         Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                         Mark: '2E99F86FF13B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_GROUP_EXPIRED",
+                         Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                         Mark: "2E99F86FF13B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_GROUP_EXPIRED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                     Code: "ERROR_USER_GROUP_EXPIRED",
+                                     Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                      Details: null
                                    }
                                  ],
@@ -134,15 +134,15 @@ export default class UserPasswordServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_DISABLED',
-                         Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
-                         Mark: '231463F16B95' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_DISABLED",
+                         Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
+                         Mark: "231463F16B95" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_DISABLED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
+                                     Code: "ERROR_USER_DISABLED",
+                                     Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
                                      Details: null
                                    }
                                  ],
@@ -158,15 +158,15 @@ export default class UserPasswordServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_USER_EXPIRED',
-                         Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
-                         Mark: '55C127F50C3B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_USER_EXPIRED",
+                         Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
+                         Mark: "55C127F50C3B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_USER_EXPIRED',
-                                     Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
+                                     Code: "ERROR_USER_EXPIRED",
+                                     Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
                                      Details: null
                                    }
                                  ],
@@ -189,15 +189,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_NOT_VALID_EMAIL',
-                             Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
-                             Mark: 'CBFE3C19AA9C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_NOT_VALID_EMAIL",
+                             Message: await I18NManager.translate( strLanguage, "The user %s not have a valid email address", request.body.Name ),
+                             Mark: "CBFE3C19AA9C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_NOT_VALID_EMAIL',
-                                         Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid email address', request.body.Name ),
+                                         Code: "ERROR_NOT_VALID_EMAIL",
+                                         Message: await I18NManager.translate( strLanguage, "The user %s not have a valid email address", request.body.Name ),
                                          Details: null,
                                        }
                                      ],
@@ -216,15 +216,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
-                             Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
-                             Mark: 'CBFE3C19AA9C' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_NOT_VALID_PHONE_NUMBER",
+                             Message: await I18NManager.translate( strLanguage, "The user %s not have a valid phone number", request.body.Name ),
+                             Mark: "CBFE3C19AA9C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_NOT_VALID_PHONE_NUMBER',
-                                         Message: await I18NManager.translate( strLanguage, 'The user %s not have a valid phone number', request.body.Name ),
+                                         Code: "ERROR_NOT_VALID_PHONE_NUMBER",
+                                         Message: await I18NManager.translate( strLanguage, "The user %s not have a valid phone number", request.body.Name ),
                                          Details: null,
                                        }
                                      ],
@@ -240,15 +240,15 @@ export default class UserPasswordServiceController {
 
                 result = {
                            StatusCode: 400, //Bad request
-                           Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
-                           Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
-                           Mark: '2E4BC9D07111' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_TRANSPORT_NOT_SUPPORTED",
+                           Message: await I18NManager.translate( strLanguage, "The transport %s is not supported", strTransport ),
+                           Mark: "2E4BC9D07111" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_TRANSPORT_NOT_SUPPORTED',
-                                       Message: await I18NManager.translate( strLanguage, 'The transport %s is not supported', strTransport ),
+                                       Code: "ERROR_TRANSPORT_NOT_SUPPORTED",
+                                       Message: await I18NManager.translate( strLanguage, "The transport %s is not supported", strTransport ),
                                        Details: null,
                                      }
                                    ],
@@ -363,9 +363,9 @@ export default class UserPasswordServiceController {
 
                         result = {
                                    StatusCode: 200, //Ok
-                                   Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL',
-                                   Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your mailbox' ),
-                                   Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
+                                   Message: await I18NManager.translate( strLanguage, "Success to send recover password code. Please check your mailbox" ),
+                                   Mark: "C4F1AF9E67C3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: false,
                                    Errors: [],
@@ -385,15 +385,15 @@ export default class UserPasswordServiceController {
 
                         result = {
                                    StatusCode: 500, //Internal server error
-                                   Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
-                                   Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
-                                   Mark: 'D77EDF617B8B' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL",
+                                   Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
+                                   Mark: "D77EDF617B8B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: true,
                                    Errors: [
                                              {
-                                               Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL',
-                                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the email to requested address' ),
+                                               Code: "ERROR_SEND_RECOVER_PASSWORD_CODE_EMAIL",
+                                               Message: await I18NManager.translate( strLanguage, "Error cannot send the email to requested address" ),
                                                Details: {
                                                           EMail: CommonUtilities.maskEMailList( sysUserInDB.sysPerson.EMail )
                                                         }
@@ -418,7 +418,7 @@ export default class UserPasswordServiceController {
                                                              //device_id: "*",
                                                              body: {
                                                                      kind: "self",
-                                                                     text: await I18NManager.translate( strLanguage, 'Your recover password code is: %s', strRecoverCode )
+                                                                     text: await I18NManager.translate( strLanguage, "Your recover password code is: %s", strRecoverCode )
                                                                    }
                                                            },
                                                            logger
@@ -441,9 +441,9 @@ export default class UserPasswordServiceController {
 
                         result = {
                                    StatusCode: 200, //Ok
-                                   Code: 'SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS',
-                                   Message: await I18NManager.translate( strLanguage, 'Success to send recover password code. Please check your phone' ),
-                                   Mark: 'C4F1AF9E67C3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
+                                   Message: await I18NManager.translate( strLanguage, "Success to send recover password code. Please check your phone" ),
+                                   Mark: "C4F1AF9E67C3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: false,
                                    Errors: [],
@@ -463,15 +463,15 @@ export default class UserPasswordServiceController {
 
                         result = {
                                    StatusCode: 500, //Internal server error
-                                   Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
-                                   Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
-                                   Mark: 'C21B85AD2EE1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                   Code: "ERROR_SEND_RECOVER_PASSWORD_CODE_SMS",
+                                   Message: await I18NManager.translate( strLanguage, "Error cannot send the sms to requested phone number" ),
+                                   Mark: "C21B85AD2EE1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                    LogId: null,
                                    IsError: true,
                                    Errors: [
                                              {
-                                               Code: 'ERROR_SEND_RECOVER_PASSWORD_CODE_SMS',
-                                               Message: await I18NManager.translate( strLanguage, 'Error cannot send the sms to requested phone number' ),
+                                               Code: "ERROR_SEND_RECOVER_PASSWORD_CODE_SMS",
+                                               Message: await I18NManager.translate( strLanguage, "Error cannot send the sms to requested phone number" ),
                                                Details: {
                                                           EMail: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone )
                                                         }
@@ -493,9 +493,9 @@ export default class UserPasswordServiceController {
 
                     result = {
                                StatusCode: 500, //Internal server error
-                               Code: 'ERROR_UNEXPECTED',
-                               Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                               Mark: 'DF70E9F0151D' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_UNEXPECTED",
+                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                               Mark: "DF70E9F0151D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: error.logId,
                                IsError: true,
                                Errors: [
@@ -517,15 +517,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                             Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
-                             Mark: '1B365FFB8CCB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                             Message: await I18NManager.translate( strLanguage, "Not allowed to recover password from this the kind of frontend" ),
+                             Mark: "1B365FFB8CCB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_FRONTEND_KIND_NOT_ALLOWED',
-                                         Message: await I18NManager.translate( strLanguage, 'Not allowed to recover password from this the kind of frontend' ),
+                                         Code: "ERROR_FRONTEND_KIND_NOT_ALLOWED",
+                                         Message: await I18NManager.translate( strLanguage, "Not allowed to recover password from this the kind of frontend" ),
                                          Details: null
                                        }
                                      ],
@@ -545,15 +545,15 @@ export default class UserPasswordServiceController {
 
             result = {
                        StatusCode: 404, //Not found
-                       Code: 'ERROR_USER_NOT_FOUND',
-                       Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
-                       Mark: '7D761301ED89' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_USER_NOT_FOUND",
+                       Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
+                       Mark: "7D761301ED89" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_USER_NOT_FOUND',
-                                   Message: await I18NManager.translate( strLanguage, 'The user %s not found in database', request.body.Name ),
+                                   Code: "ERROR_USER_NOT_FOUND",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s not found in database", request.body.Name ),
                                    Details: null,
                                  }
                                ],
@@ -571,15 +571,15 @@ export default class UserPasswordServiceController {
 
           result = {
                      StatusCode: 429, //Too Many Requests
-                     Code: 'ERROR_TOO_MANY_RECOVER_REQUEST',
-                     Message: await I18NManager.translate( strLanguage, 'The user %s has too many password recovery requests', request.body.Name ),
+                     Code: "ERROR_TOO_MANY_RECOVER_REQUEST",
+                     Message: await I18NManager.translate( strLanguage, "The user %s has too many password recovery requests", request.body.Name ),
                      Mark: strMark,
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_TOO_MANY_RECOVER_REQUEST',
-                                 Message: await I18NManager.translate( strLanguage, 'The user %s has too many password recovery requests', request.body.Name ),
+                                 Code: "ERROR_TOO_MANY_RECOVER_REQUEST",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s has too many password recovery requests", request.body.Name ),
                                  Details: { Count: intCount, Comment: "In last 10 minutes" }
                                }
                              ],
@@ -591,12 +591,12 @@ export default class UserPasswordServiceController {
           const debugMark = debug.extend( strMark );
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'The user %s has too many password recovery requests', request.body.Name );
+          debugMark( "The user %s has too many password recovery requests", request.body.Name );
 
           if ( logger &&
                typeof logger.warning === "function" ) {
 
-            logger.warning( 'The user %s has too many password recovery requests', request.body.Name );
+            logger.warning( "The user %s has too many password recovery requests", request.body.Name );
 
           }
 
@@ -624,15 +624,15 @@ export default class UserPasswordServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: 'B97BEA6F6036' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "B97BEA6F6036" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -670,8 +670,8 @@ export default class UserPasswordServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
@@ -770,15 +770,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_GROUP_DISABLED',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                             Mark: '63C9C6FBCB8F' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_USER_GROUP_DISABLED",
+                             Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                             Mark: "63C9C6FBCB8F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_GROUP_DISABLED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s is disabled. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                         Code: "ERROR_USER_GROUP_DISABLED",
+                                         Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                          Details: null
                                        }
                                      ],
@@ -794,15 +794,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_GROUP_EXPIRED',
-                             Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
-                             Mark: '9471EA8763E3' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_USER_GROUP_EXPIRED",
+                             Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                             Mark: "9471EA8763E3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_GROUP_EXPIRED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user group %s is expired. You cannot recover your password', sysUserInDB.sysUserGroup.Name ),
+                                         Code: "ERROR_USER_GROUP_EXPIRED",
+                                         Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
                                          Details: null
                                        }
                                      ],
@@ -818,15 +818,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_DISABLED',
-                             Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
-                             Mark: 'D013A4C4C1D6' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_USER_DISABLED",
+                             Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
+                             Mark: "D013A4C4C1D6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_DISABLED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user %s is disabled. You cannot recover your password', sysUserInDB.Name ),
+                                         Code: "ERROR_USER_DISABLED",
+                                         Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
                                          Details: null
                                        }
                                      ],
@@ -842,15 +842,15 @@ export default class UserPasswordServiceController {
 
                   result = {
                              StatusCode: 400, //Bad request
-                             Code: 'ERROR_USER_EXPIRED',
-                             Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
-                             Mark: '5EE4EEA9A907' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             Code: "ERROR_USER_EXPIRED",
+                             Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
+                             Mark: "5EE4EEA9A907" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: true,
                              Errors: [
                                        {
-                                         Code: 'ERROR_USER_EXPIRED',
-                                         Message: await I18NManager.translate( strLanguage, 'The user %s is expired. You cannot recover your password', sysUserInDB.Name ),
+                                         Code: "ERROR_USER_EXPIRED",
+                                         Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
                                          Details: null
                                        }
                                      ],
@@ -1006,9 +1006,9 @@ export default class UserPasswordServiceController {
 
                       result = {
                                  StatusCode: 200, //Ok
-                                 Code: 'SUCCESS_PASSWORD_CHANGE',
-                                 Message: await I18NManager.translate( strLanguage, 'Success to change the password. Remember use it in the next login' ),
-                                 Mark: '49E15D297D10' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "SUCCESS_PASSWORD_CHANGE",
+                                 Message: await I18NManager.translate( strLanguage, "Success to change the password. Remember use it in the next login" ),
+                                 Mark: "49E15D297D10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: null,
                                  IsError: false,
                                  Errors: [],
@@ -1026,9 +1026,9 @@ export default class UserPasswordServiceController {
 
                       result = {
                                  StatusCode: 500, //Internal server error
-                                 Code: 'ERROR_UNEXPECTED',
-                                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
-                                 Mark: 'D5659A5825AC' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "D5659A5825AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                  LogId: error.logId,
                                  IsError: true,
                                  Errors: [
@@ -1050,9 +1050,9 @@ export default class UserPasswordServiceController {
 
                     result = {
                                StatusCode: 400, //Bad request
-                               Code: 'ERROR_PASSWORD_NOT_VALID',
-                               Message: await I18NManager.translate( strLanguage, 'The password is not valid' ),
-                               Mark: '77B7830DEB04' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               Code: "ERROR_PASSWORD_NOT_VALID",
+                               Message: await I18NManager.translate( strLanguage, "The password is not valid" ),
+                               Mark: "77B7830DEB04" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
@@ -1076,15 +1076,15 @@ export default class UserPasswordServiceController {
 
                 result = {
                            StatusCode: 404, //Not found
-                           Code: 'ERROR_USER_NOT_FOUND',
-                           Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
-                           Mark: '7DDC6B0761EE' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           Code: "ERROR_USER_NOT_FOUND",
+                           Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
+                           Mark: "7DDC6B0761EE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                            LogId: null,
                            IsError: true,
                            Errors: [
                                      {
-                                       Code: 'ERROR_USER_NOT_FOUND',
-                                       Message: await I18NManager.translate( strLanguage, 'The user with id %s not found in database', sysActionTokenInDB.Owner ),
+                                       Code: "ERROR_USER_NOT_FOUND",
+                                       Message: await I18NManager.translate( strLanguage, "The user with id %s not found in database", sysActionTokenInDB.Owner ),
                                        Details: null,
                                      }
                                    ],
@@ -1100,15 +1100,15 @@ export default class UserPasswordServiceController {
 
               result = {
                          StatusCode: 400, //Bad request
-                         Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
-                         Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Code ),
-                         Mark: '9512C5FEBECA' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Code: "ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED",
+                         Message: await I18NManager.translate( strLanguage, "The recover password code %s already used", request.body.Code ),
+                         Mark: "9512C5FEBECA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
                                    {
-                                     Code: 'ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED',
-                                     Message: await I18NManager.translate( strLanguage, 'The recover password code %s already used', request.body.Code ),
+                                     Code: "ERROR_RECOVER_PASSWORD_CODE_ALREADY_USED",
+                                     Message: await I18NManager.translate( strLanguage, "The recover password code %s already used", request.body.Code ),
                                      Details: null,
                                    }
                                  ],
@@ -1124,15 +1124,15 @@ export default class UserPasswordServiceController {
 
             result = {
                        StatusCode: 400, //Bad request
-                       Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
-                       Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Code ),
-                       Mark: '42E47D603396' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Code: "ERROR_RECOVER_PASSWORD_CODE_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The recover password code %s is expired", request.body.Code ),
+                       Mark: "42E47D603396" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: 'ERROR_RECOVER_PASSWORD_CODE_EXPIRED',
-                                   Message: await I18NManager.translate( strLanguage, 'The recover password code %s is expired', request.body.Code ),
+                                   Code: "ERROR_RECOVER_PASSWORD_CODE_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The recover password code %s is expired", request.body.Code ),
                                    Details: null,
                                  }
                                ],
@@ -1148,15 +1148,15 @@ export default class UserPasswordServiceController {
 
           result = {
                      StatusCode: 404, //Not found
-                     Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
-                     Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Code ),
-                     Mark: '567B7A76F7BB' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: "ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The recover password code %s not found in database", request.body.Code ),
+                     Mark: "567B7A76F7BB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
-                                 Code: 'ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND',
-                                 Message: await I18NManager.translate( strLanguage, 'The recover password code %s not found in database', request.body.Code ),
+                                 Code: "ERROR_RECOVER_PASSWORD_CODE_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The recover password code %s not found in database", request.body.Code ),
                                  Details: null,
                                }
                              ],
@@ -1189,15 +1189,15 @@ export default class UserPasswordServiceController {
 
         result = {
                    StatusCode: 400, //Bad request
-                   Code: 'ERROR_PATH_DISABLED',
-                   Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
-                   Mark: '6829189D28C1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Code: "ERROR_PATH_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
+                   Mark: "6829189D28C1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
-                               Code: 'ERROR_PATH_DISABLED',
-                               Message: await I18NManager.translate( strLanguage, 'Not allowed because the path is disabled' ),
+                               Code: "ERROR_PATH_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "Not allowed because the path is disabled" ),
                                Details: null
                              }
                            ],
@@ -1235,8 +1235,8 @@ export default class UserPasswordServiceController {
 
       result = {
                  StatusCode: 500, //Internal server error
-                 Code: 'ERROR_UNEXPECTED',
-                 Message: await I18NManager.translate( strLanguage, 'Unexpected error. Please read the server log for more details.' ),
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
                  LogId: error.LogId,
                  IsError: true,
