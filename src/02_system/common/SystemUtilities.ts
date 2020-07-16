@@ -993,12 +993,15 @@ export default class SystemUtilities {
 
         await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                                result,
-                                                               bFromCache === false, //Set roles?
-                                                               strUserGroupRole,     //User group roles
-                                                               strUserRole,          //User roles
-                                                               false,                //Force update?
-                                                               1,                    //Only 1 try
-                                                               7 * 1000,             //Second
+                                                               {
+                                                                 updateAt: true,                 //Update the field updatedAt
+                                                                 setRoles: bFromCache === false, //Set roles?
+                                                                 groupRoles: strUserGroupRole,   //User group roles
+                                                                 userRoles: strUserRole,         //User roles
+                                                                 forceUpdate: false,             //Force update?
+                                                                 tryLock: 1,                     //Only 1 try
+                                                                 lockSeconds: 7 * 1000,          //Second
+                                                               },
                                                                transaction,
                                                                logger );
 
@@ -1197,12 +1200,23 @@ export default class SystemUtilities {
 
         await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                                result,
+                                                               {
+                                                                updateAt: true,                 //Update the field updatedAt
+                                                                setRoles: bFromCache === false, //Set roles?
+                                                                groupRoles: strUserGroupRole,   //User group roles
+                                                                userRoles: strUserRole,         //User roles
+                                                                forceUpdate: false,             //Force update?
+                                                                tryLock: 1,                     //Only 1 try
+                                                                lockSeconds: 7 * 1000,          //Second
+                                                               },
+                                                               /*
                                                                bFromCache === false, //Set roles?
                                                                strUserGroupRole,     //User group roles
                                                                strUserRole,          //User roles
                                                                false,                //Force update?
                                                                1,                    //Only 1 try
                                                                7 * 1000,             //Second
+                                                               */
                                                                transaction,
                                                                logger );
 
@@ -1227,12 +1241,14 @@ export default class SystemUtilities {
 
   static async createOrUpdateUserSessionStatus( strToken: string,
                                                 userSessionStatus: any,
-                                                bSetRoles: boolean,
-                                                groupRoles: any,
-                                                userRoles: any,
-                                                bForceUpdate: boolean,
-                                                intTryLock: number,
-                                                intLockSeconds: number,
+                                                options: any,
+                                                //updateAt: boolean,
+                                                //setRoles: boolean,
+                                                //groupRoles: any,
+                                                //userRoles: any,
+                                                //forceUpdate: boolean,
+                                                //tryLock: number,
+                                                //lockSeconds: number,
                                                 transaction: any,
                                                 logger: any ):Promise<SYSUserSessionStatus> {
 
@@ -1246,16 +1262,16 @@ export default class SystemUtilities {
                                     );
 
     if ( duration.asSeconds() >= 15 ||
-         bForceUpdate ) { //The updated is old to 15 seconds or force update set to true
+         options.forceUpdate ) { //The updated is old to 15 seconds or force update set to true
 
-      if ( bSetRoles &&
-           groupRoles !== null &&
-           groupRoles !== undefined &&
-           userRoles !== null &&
-           userRoles !== undefined ) { //Only if not taked from cache
+      if ( options.setRoles &&
+           options.groupRoles !== null &&
+           options.groupRoles !== undefined &&
+           options.userRoles !== null &&
+           options.userRoles !== undefined ) { //Only if not taked from cache
 
-        const strRolesMerged = SystemUtilities.mergeTokens( groupRoles,
-                                                            userRoles,
+        const strRolesMerged = SystemUtilities.mergeTokens( options.groupRoles,
+                                                            options.userRoles,
                                                             true,
                                                             logger );
 
@@ -1263,7 +1279,11 @@ export default class SystemUtilities {
 
       }
 
-      userSessionStatus.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //Update to current date and time
+      if ( options.updateAt ) {
+
+        userSessionStatus.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //Update to current date and time
+
+      }
 
       let lockedResource = null;
 
@@ -1272,13 +1292,13 @@ export default class SystemUtilities {
         //We need write the shared resource and going to block temporally the write access
         lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
                                                           SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
-                                                          intLockSeconds, //7 * 1000, //7 seconds
-                                                          intTryLock, //1, //Only one try
+                                                          options.lockSeconds, //7 * 1000, //7 seconds
+                                                          options.tryLock, //1, //Only one try
                                                           undefined, //Default 5000 milliseconds
                                                           logger );
 
         if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ||
-             bForceUpdate ) { //Stay sure we had the resource locked or forced to updated is true
+             options.ForceUpdate ) { //Stay sure we had the resource locked or forced to updated is true
 
           if ( !userSessionStatus.UserGroupName ) {
 
@@ -1386,6 +1406,7 @@ export default class SystemUtilities {
   }
 
   static async logoutSession( userSessionStatus: any,
+                              options: any,
                               transaction: any,
                               logger: any ): Promise<SYSUserSessionStatus> {
 
@@ -1452,12 +1473,23 @@ export default class SystemUtilities {
 
         userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus?.Token,
                                                                                    userSessionStatus,
+                                                                                   {
+                                                                                     updateAt: options.updateAt, //Update the field updatedAt
+                                                                                     setRoles: false,            //Set roles?
+                                                                                     groupRoles: null,           //User group roles
+                                                                                     userRoles: null,            //User roles
+                                                                                     forceUpdate: true,          //Force update?
+                                                                                     tryLock: 1,                 //Only 1 try
+                                                                                     lockSeconds: 7 * 1000,      //Second
+                                                                                   },
+                                                                                   /*
                                                                                    false,    //Set roles?
                                                                                    null,     //User group roles
                                                                                    null,     //User roles
                                                                                    true,     //Force update?
                                                                                    1,        //Only 1 try
                                                                                    7 * 1000, //Second
+                                                                                   */
                                                                                    currentTransaction,
                                                                                    logger );
 
@@ -2649,7 +2681,8 @@ export default class SystemUtilities {
 
         }
 
-        if ( instance.rawAttributes[ "UpdatedAt" ] ) {
+        if ( instance.rawAttributes[ "UpdatedAt" ] &&
+             !options.notUpdateAt ) {
 
           instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
 
