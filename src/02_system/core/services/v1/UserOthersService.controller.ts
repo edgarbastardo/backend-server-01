@@ -948,12 +948,23 @@ export default class UserOthersServiceController {
                     //ANCHOR update the session
                     const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
                                                                                                             userSessionStatus,
+                                                                                                            {
+                                                                                                              updateAt: true,        //Update the field updatedAt
+                                                                                                              setRoles: false,       //Set roles?
+                                                                                                              groupRoles: null,      //User group roles
+                                                                                                              userRoles: null,       //User roles
+                                                                                                              forceUpdate: true,     //Force update?
+                                                                                                              tryLock: 3,            //Only 1 try
+                                                                                                              lockSeconds: 3 * 1000, //Second
+                                                                                                            },
+                                                                                                            /*
                                                                                                             false,    //Set roles?
                                                                                                             null,     //User group roles
                                                                                                             null,     //User roles
                                                                                                             true,     //Force update?
                                                                                                             3,        //3 tries
                                                                                                             3 * 1000, //Second
+                                                                                                            */
                                                                                                             currentTransaction,
                                                                                                             logger );
 
@@ -1208,7 +1219,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1473,7 +1484,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1966,7 +1977,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2224,7 +2235,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -3075,7 +3086,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -3350,7 +3361,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -3574,7 +3585,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -3738,7 +3749,7 @@ export default class UserOthersServiceController {
                      Code: "ERROR_UNEXPECTED",
                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                      Mark: "BA37B863BC6C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: error.LogId,
+                     LogId: error.logId,
                      IsError: true,
                      Errors: [
                                {
@@ -3845,7 +3856,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -4084,7 +4095,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -4312,7 +4323,7 @@ export default class UserOthersServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {

@@ -1,20 +1,496 @@
-import fs from 'fs';
-import path from 'path';
+//import fs from 'fs';
+//import path from 'path';
 import cluster from 'cluster';
+
+import io from 'socket.io-client';
 
 import CommonConstants from '../CommonConstants';
 
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
-import DBConnectionManager from "./DBConnectionManager";
-import I18NManager from './I18Manager';
+//import DBConnectionManager from "./DBConnectionManager";
+//import I18NManager from './I18Manager';
 import SYSConfigValueDataService from '../database/master/services/SYSConfigValueDataService';
 import SystemConstants from '../SystemContants';
-import IntantMessageServerRequestServiceV1 from '../others/services/IntantMessageServerRequestServiceV1';
+import InstantMessageServerRequestServiceV1 from '../others/services/InstantMessageServerRequestServiceV1';
 
 const debug = require( 'debug' )( 'IntantMessageServerManager' );
 
 export default class InstantMessageServerManager {
+
+  static currentIMInstance = null;
+
+  static async connect( callbacks: any, logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
+
+      if ( configData?.auth?.apiKey &&
+           configData?.hostLiveDomain &&
+           configData?.hostLivePath ) {
+
+        const socketIOClient = io( configData.hostLiveDomain, {
+
+          path: configData?.hostLivePath,
+
+          query: {
+
+            auth: configData?.auth?.apiKey
+
+          },
+
+        });
+
+        socketIOClient.on( "connect", () => {
+
+          const strMark = "0F5F04EC2A63" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Success connected to: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+
+          if ( callbacks?.connect ) {
+
+            callbacks?.connect;
+
+          }
+
+        });
+
+        socketIOClient.on( "diconnect", () => {
+
+          const strMark = "C8A484EF356C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Diconnected from: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+
+          if ( callbacks?.disconnect ) {
+
+            callbacks?.disconnect;
+
+          }
+
+        });
+
+        let lastShowErrorMark = null;
+
+        socketIOClient.on( "connect_error", ( error: Error ) => {
+
+          if ( lastShowErrorMark === null ||
+               SystemUtilities.getCurrentDateAndTime().diff( lastShowErrorMark, "minutes" ) >= 1 ) {
+
+            const strMark = "DF30496D5C75" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+            const debugMark = debug.extend( strMark );
+
+            debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+            debugMark( "Connect error: [%s].", error.message ? error.message: "No error message available" );
+
+            if ( callbacks?.connect_error ) {
+
+              callbacks?.connect_error;
+
+            }
+
+            lastShowErrorMark = SystemUtilities.getCurrentDateAndTime();
+
+          }
+
+        });
+
+        socketIOClient.on( "reconnect", ( intAttemptNumber: number ) => {
+
+          const strMark = "B6B9BD377CCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "Reconnected to: [%s]. In attempt number: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, intAttemptNumber );
+
+          if ( callbacks?.reconnect ) {
+
+            callbacks?.reconnect;
+
+          }
+
+        });
+
+        result = socketIOClient;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.connect.name;
+
+      const strMark = "3AD813C49BCB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async sendMessageUsingSocket( socketConnection: any,
+                                      strChannels: string,
+                                      strAuth: string,
+                                      message: any,
+                                      responseCallback: any,
+                                      logger: any ): Promise<{ Code: number, Message: string, Error: any }> {
+
+    let result = {
+                   Code: -1,
+                   Message: "",
+                   Error: null
+                 };
+
+    try {
+
+      if ( !strAuth ) {
+
+        const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
+
+        strAuth = configData?.auth?.apiKey;
+
+      }
+
+      if ( strAuth ) {
+
+        if ( !socketConnection ) {
+
+          socketConnection = InstantMessageServerManager.currentIMInstance;
+
+        }
+
+        if ( socketConnection &&
+             socketConnection.connected ) {
+
+          socketConnection.emit( "Command:SendMessage",
+                                 {
+                                   Auth: strAuth,
+                                   Channels: strChannels,
+                                   Message: message
+                                 },
+                                 ( response: any ) => {
+
+            if ( responseCallback ) {
+
+              responseCallback( response );
+
+            }
+
+          });
+
+          result.Code = 1;
+          result.Message = "Success send message";
+
+        }
+        else {
+
+          result.Code = -2;
+          result.Message = "No socket live connection found";
+
+          /*
+          const strMark = "EE7CF8939EDF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+          const debugMark = debug.extend( strMark );
+
+          debugMark( "No socket live" );
+          */
+
+        }
+
+      }
+      else {
+
+        result.Code = -3;
+        result.Message = "No auth in config found in database";
+
+        /*
+        const strMark = "686B75C9C2A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "No auth in config found" );
+        */
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.connect.name;
+
+      const strMark = "3AD813C49BCB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result.Code = -500;
+      result.Message = "Unexpected error";
+      result.Error = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async sendMessageUsingRest( strChannels: string,
+                                     strAuth: string,
+                                     message: any,
+                                     logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
+
+      if ( !strAuth ) {
+
+        strAuth = configData?.auth?.apiKey;
+
+      }
+
+      if ( strAuth &&
+           configData?.hostRest ) {
+
+        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+
+        const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( null,
+                                                                                                          logger );
+
+        const headers = {
+
+          "Content-Type": "application/json",
+          "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+
+        }
+
+        /*
+        const body = {
+
+          "Channels": "Drivers,DriversPosition,Administrators,UnknownChannel",
+          "Message": {
+              "Kind": "text/plain",
+              "Topic": "message",
+              "Data": "Hello from rest service 2"
+          }
+
+        }
+        */
+
+        const body = {
+
+          "Channels": strChannels,
+          "Message": message
+
+        }
+
+        const response = await InstantMessageServerRequestServiceV1.callSendMessage(
+                                                                                     jsonServiceConfig.hostRest,
+                                                                                     headers,
+                                                                                     body,
+                                                                                   );
+
+        if ( response?.output ) {
+
+          result = response.output;
+
+        }
+
+        /*
+        if ( response?.output?.body?.Data?.length > 0 ) {
+
+          result = response.output.body.Data[ 0 ];
+
+        }
+        */
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.sendMessageUsingRest.name;
+
+      const strMark = "3AD813C49BCB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getChannelMembers( strChannels: string,
+                                  strAuth: string,
+                                  logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
+
+      if ( !strAuth ) {
+
+        strAuth = configData?.auth?.apiKey;
+
+      }
+
+      if ( strAuth &&
+           configData?.hostRest ) {
+
+        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+
+        const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( null,
+                                                                                                          logger );
+
+        const headers = {
+
+          "Content-Type": "application/json",
+          "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+
+        }
+
+        /*
+        const body = {
+
+          "Channels": "Drivers,DriversPosition,Administrators,UnknownChannel",
+          "Message": {
+              "Kind": "text/plain",
+              "Topic": "message",
+              "Data": "Hello from rest service 2"
+          }
+
+        }
+        */
+
+        const query = {
+
+          "Channels": strChannels
+
+        }
+
+        const response = await InstantMessageServerRequestServiceV1.callChannelMembers(
+                                                                                        jsonServiceConfig.hostRest,
+                                                                                        headers,
+                                                                                        query,
+                                                                                      );
+
+        if ( response?.output ) {
+
+          result = response.output;
+
+        };
+
+        /*
+        if ( response?.output?.body?.Data?.length > 0 ) {
+
+          result = response.output.body.Data[ 0 ];
+
+        }
+        */
+
+      }
+      else {
+
+        const strMark = "1D49560E9221" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "Cannot get channel members: [%s], no host rest or no auth found", strChannels,  );
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = InstantMessageServerManager.name + "." + this.getChannelMembers.name;
+
+      const strMark = "2E94AEB2B35E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
 
   static async getConfigInstantMessageServerService( transaction: any,
                                                      logger: any ): Promise<any> {
@@ -104,6 +580,7 @@ export default class InstantMessageServerManager {
     return result;
 
   }
+
 
   static async checkAllowedToJoin( strChannelToJoin: string,
                                    userSessionStatus: any,
@@ -284,10 +761,10 @@ export default class InstantMessageServerManager {
 
       }
 
-      const response = await IntantMessageServerRequestServiceV1.selectWorkerSocket(
-                                                                                     jsonServiceConfig.hostRest,
-                                                                                     headers,
-                                                                                   );
+      const response = await InstantMessageServerRequestServiceV1.callSelectWorkerSocket(
+                                                                                      jsonServiceConfig.hostRest,
+                                                                                      headers,
+                                                                                    );
 
       let strWorker = null;
 
@@ -367,7 +844,7 @@ export default class InstantMessageServerManager {
 
       }
 
-      await IntantMessageServerRequestServiceV1.callDisconnectUser(
+      await InstantMessageServerRequestServiceV1.callDisconnectUser(
                                                                     jsonServiceConfig.hostRest,
                                                                     headers,
                                                                     {
