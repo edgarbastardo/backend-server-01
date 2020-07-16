@@ -553,10 +553,7 @@ export default class Always {
                                                               "#discord#":{
                                                                 "type":"discord",
                                                                 "target":{
-                                                                  "web_hooks":[
-                                                                                process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK_01 || "",
-                                                                                process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK_02 || "",
-                                                                              ]
+                                                                  "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK || `{ "@__default__@": "" }`, null )
                                                                 }
                                                               }
                                                             }
@@ -572,10 +569,7 @@ export default class Always {
                                                              "#slack#":{
                                                                "type":"slack",
                                                                "target":{
-                                                                 "web_hooks":[
-                                                                               process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK_01 || "",
-                                                                               process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK_02 || "",
-                                                                             ]
+                                                                 "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK || `{ "@__default__@": "" }`, null )
                                                                }
                                                              }
                                                            }
@@ -693,9 +687,9 @@ export default class Always {
                                      Value: JSON.stringify(
                                                             {
 
-                                                              "service":"#remote_01#",
+                                                              "service":"#im_server_01#",
 
-                                                              "#remote_01#": {
+                                                              "#im_server_01#": {
 
                                                                 "hostRest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
 

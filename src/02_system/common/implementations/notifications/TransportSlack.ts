@@ -28,94 +28,114 @@ export default class TransportSlack {
 
     try {
 
-      const toList = transportOptions.target.web_hooks; //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+      let strWebHook = transportOptions.target.web_hooks[ messageOptions.channel ];
 
-      for ( const strTo of toList ) {
+      if ( !strWebHook ) {
 
-        if ( strTo && strTo.trim()  ) {
+        strWebHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
 
-          let notificationKind = { color: null, title: null };
+      }
 
-          if ( messageOptions.body.kind === "notification" ) {
+      if ( strWebHook === null ||
+           strWebHook === undefined ) {
 
-            notificationKind.color = "#36a64f";
-            notificationKind.title = ":bell: Notification";
+        strWebHook = transportOptions.target.web_hooks[ "@__default__@" ];
 
-          }
-          else if ( messageOptions.body.kind === "warning" ) {
+      }
 
-            notificationKind.color = "#ffff00";
-            notificationKind.title = ":warning: Warning";
+      if ( strWebHook ) {
 
-          }
-          else if ( messageOptions.body.kind === "error" ) {
+        const toList = CommonUtilities.trimArray( strWebHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
 
-            notificationKind.color = "#ff4000";
-            notificationKind.title = ":red_circle: Error";
+        for ( const strTo of toList ) {
 
-          }
+          if ( strTo && strTo.trim()  ) {
 
-          const notification = {
-                                 //"channel": "ABCDEBF1",
-                                 "attachments": [
-                                                  {
-                                                    "mrkdwn_in": ["text"],
-                                                    "color": notificationKind.color, //"#ffff00", //"#36a64f",
-                                                    "author_name": notificationKind.title, //":warning: Warning",
-                                                    "text": messageOptions.body.text,
-                                                    "fields": messageOptions.body.fields,
-                                                    "footer": messageOptions.body.footer
-                                                    /*
-                                                     "fields": [
-                                                                {
-                                                                  "title": "A field's title",
-                                                                  "value": "This field's value",
-                                                                  "short": false
-                                                                },
-                                                                {
-                                                                  "title": "A short field's title",
-                                                                  "value": "A short field's value",
-                                                                  "short": true
-                                                                },
-                                                                {
-                                                                  "title": "A second short field's title",
-                                                                  "value": "A second short field's value",
-                                                                  "short": true
-                                                                }
-                                                              ],
-                                                              */
-                                                    //"thumb_url": "http://placekitten.com/g/200/200",
-                                                    //"footer": "footer",
-                                                    //"footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
-                                                    //"ts": 123456789
-                                                  }
-                                                ]
-                               };
+            let notificationKind = { color: null, title: null };
 
-          const options = {
-                            method: 'POST',
-                            body: JSON.stringify( notification ) //JSON.stringify( { text: messageOptions.body.text } )
-                          };
+            if ( messageOptions.body.kind === "notification" ) {
 
-          const result = await fetch( strTo, options );
+              notificationKind.color = "#36a64f";
+              notificationKind.title = ":bell: Notification";
 
-          if ( process.env.ENV === "dev" && result.ok ) {
+            }
+            else if ( messageOptions.body.kind === "warning" ) {
 
-            //const json = await result.json();
-            //const body = result.body;
+              notificationKind.color = "#ffff00";
+              notificationKind.title = ":warning: Warning";
 
-            let debugMark = debug.extend( '0D89CCBB12E4' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
-            debugMark( "Ok published to slack" );
-            //debugMark( json );
-            //debugMark( body );
+            }
+            else if ( messageOptions.body.kind === "error" ) {
+
+              notificationKind.color = "#ff4000";
+              notificationKind.title = ":red_circle: Error";
+
+            }
+
+            const notification = {
+                                   //"channel": "ABCDEBF1",
+                                   "attachments": [
+                                                    {
+                                                      "mrkdwn_in": ["text"],
+                                                      "color": notificationKind.color, //"#ffff00", //"#36a64f",
+                                                      "author_name": notificationKind.title, //":warning: Warning",
+                                                      "text": messageOptions.body.text,
+                                                      "fields": messageOptions.body.fields,
+                                                      "footer": messageOptions.body.footer
+                                                      /*
+                                                      "fields": [
+                                                                  {
+                                                                    "title": "A field's title",
+                                                                    "value": "This field's value",
+                                                                    "short": false
+                                                                  },
+                                                                  {
+                                                                    "title": "A short field's title",
+                                                                    "value": "A short field's value",
+                                                                    "short": true
+                                                                  },
+                                                                  {
+                                                                    "title": "A second short field's title",
+                                                                    "value": "A second short field's value",
+                                                                    "short": true
+                                                                  }
+                                                                ],
+                                                                */
+                                                      //"thumb_url": "http://placekitten.com/g/200/200",
+                                                      //"footer": "footer",
+                                                      //"footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
+                                                      //"ts": 123456789
+                                                    }
+                                                  ]
+                                 };
+
+            const options = {
+                              method: 'POST',
+                              body: JSON.stringify( notification ) //JSON.stringify( { text: messageOptions.body.text } )
+                            };
+
+            const result = await fetch( strTo, options );
+
+            if ( process.env.ENV === "dev" && result.ok ) {
+
+              //const json = await result.json();
+              //const body = result.body;
+
+              let debugMark = debug.extend( '0D89CCBB12E4' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+              debugMark( "Ok published to slack" );
+              //debugMark( json );
+              //debugMark( body );
+
+            }
 
           }
 
         }
 
+       bResult = true;
+
       }
 
-      bResult = true;
 
     }
     catch ( error ) {

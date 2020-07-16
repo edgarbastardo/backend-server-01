@@ -30,6 +30,7 @@ import NotificationManager from './02_system/common/managers/NotificationManager
 
 import SYSSystemEventLogService from './02_system/common/database/master/services/SYSSystemEventLogService';
 //import PresenceManager from './02_system/common/managers/PresenceManager';
+import InstantMessageServerManager from "./02_system/common/managers/InstantMessageServerManager";
 
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
@@ -763,6 +764,9 @@ export default class ServerMain {
 
         ApplicationServerDataManager.currentInstance = await ApplicationServerDataManager.create( DBConnectionManager.getDBConnection( "master" ),
                                                                                                   LoggerManager.mainLoggerInstance );
+
+        InstantMessageServerManager.currentIMInstance = await InstantMessageServerManager.connect( null,
+                                                                                                   LoggerManager.mainLoggerInstance );
 
       }
 
