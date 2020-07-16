@@ -1389,7 +1389,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1495,7 +1495,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1647,7 +1647,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1811,7 +1811,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1918,7 +1918,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( context.Language, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2019,6 +2019,9 @@ export default class SecurityServiceController {
                                                                                      */
 
           userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                   {
+                                                                     updateAt: true
+                                                                   },
                                                                    currentTransaction,
                                                                    logger );  //Force logout the session
 
@@ -2031,7 +2034,7 @@ export default class SecurityServiceController {
                        Code: "ERROR_UNEXPECTED",
                        Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                        Mark: "8D6DF9F3623E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: error.LogId,
+                       LogId: error.logId,
                        IsError: true,
                        Errors: [
                                  {
@@ -2174,7 +2177,7 @@ export default class SecurityServiceController {
                         Code: "ERROR_LOGOUT_FAILED",
                         Message: await I18NManager.translate( strLanguage, "Cannot complete the logout" ),
                         Mark: strMark,
-                        LogId: error.LogId,
+                        LogId: error.logId,
                         IsError: true,
                         Errors: [
                                   {
@@ -2277,7 +2280,7 @@ export default class SecurityServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {

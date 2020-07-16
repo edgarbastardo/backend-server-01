@@ -673,7 +673,7 @@ export default class UserPasswordServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1238,7 +1238,7 @@ export default class UserPasswordServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {

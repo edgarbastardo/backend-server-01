@@ -300,7 +300,7 @@ export default class MiddlewareManager {
                        Code: "ERROR_UNEXPECTED",
                        Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                        Mark: strMark,
-                       LogId: error.LogId,
+                       LogId: error.logId,
                        IsError: true,
                        Errors: [
                                  {
@@ -389,9 +389,11 @@ export default class MiddlewareManager {
 
     if ( CommonUtilities.isNotNullOrEmpty( userSessionStatus ) ) {
 
-      if ( CommonUtilities.isNullOrEmpty( userSessionStatus.LoggedOutAt ) ) {
+      if ( userSessionStatus.Tag?.includes( "#TOKEN_EXPIRED#" ) ||
+           !userSessionStatus.LoggedOutAt ) {
 
-        authorization = SystemUtilities.checkUserSessionStatusExpired( userSessionStatus, logger );
+        authorization = SystemUtilities.checkUserSessionStatusExpired( userSessionStatus,
+                                                                       logger );
 
       }
       else {
@@ -450,6 +452,11 @@ export default class MiddlewareManager {
                  Data: []
                };
 
+      userSessionStatus.Tag = SystemUtilities.mergeTokens( userSessionStatus.Tag || "",
+                                                           "#TOKEN_LOGGED_OUT#",
+                                                           false,
+                                                           logger );
+
     }
     else if ( authorization.Expired ) {
 
@@ -480,6 +487,11 @@ export default class MiddlewareManager {
                  Count: 0,
                  Data: []
                };
+
+      userSessionStatus.Tag = SystemUtilities.mergeTokens( userSessionStatus.Tag || "",
+                                                           "#TOKEN_EXPIRED#",
+                                                           false,
+                                                           logger );
 
     }
     else if ( userSessionStatus.Tag &&
@@ -589,6 +601,9 @@ export default class MiddlewareManager {
         const strSavedSocketToken = userSessionStatus.SocketToken;
 
         userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                 {
+                                                                   updateAt: false
+                                                                 },
                                                                  null,
                                                                  logger );
 
@@ -643,6 +658,9 @@ export default class MiddlewareManager {
         const strSavedSocketToken = userSessionStatus.SocketToken;
 
         userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                 {
+                                                                   updateAt: false
+                                                                 },
                                                                  null,
                                                                  logger );
 
@@ -676,6 +694,9 @@ export default class MiddlewareManager {
       const strSavedSocketToken = userSessionStatus.SocketToken;
 
       userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                               {
+                                                                 updateAt: false
+                                                               },
                                                                null,
                                                                logger ); //Force logout the session
 

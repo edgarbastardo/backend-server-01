@@ -1,4 +1,6 @@
-import CommonUtilities from "./CommonUtilities";
+//import appRoot from 'app-root-path';
+//require( 'dotenv' ).config( { path: appRoot.path + "/.env.secrets" } );
+//import CommonUtilities from "./CommonUtilities";
 
 export interface ICheckUserRoles {
 
@@ -1339,7 +1341,11 @@ export default class SystemConstants {
                                                                                "#discord#":{
                                                                                  "type":"discord",
                                                                                  "target":{
-                                                                                   "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK || `{ "@__default__@": "" }`, null )
+                                                                                  "web_hooks": {
+                                                                                                 "@__default__@": "",
+                                                                                                 "#warning": "",
+                                                                                                 "#error": "",
+                                                                                               }
                                                                                  }
                                                                                }
                                                                              }
@@ -1356,7 +1362,8 @@ export default class SystemConstants {
                                                                                  "target":{
                                                                                   "web_hooks": {
                                                                                                  "@__default__@": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
-                                                                                                 "#otherChannel": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
+                                                                                                 "#warning": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
+                                                                                                 "#error": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
                                                                                                }
                                                                                  }
                                                                                }
@@ -1380,7 +1387,11 @@ export default class SystemConstants {
                                                                              "#slack#":{
                                                                                "type":"slack",
                                                                                "target":{
-                                                                                 "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK || `{ "@__default__@": "" }`, null )
+                                                                                 "web_hooks": {
+                                                                                                "@__default__@": "",
+                                                                                                "#warning": "",
+                                                                                                "#error": "",
+                                                                                              }
                                                                                }
                                                                              }
                                                                            }
@@ -1397,7 +1408,8 @@ export default class SystemConstants {
                                                                                "target":{
                                                                                  "web_hooks": {
                                                                                                 "@__default__@": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
-                                                                                                "#otherChannel": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
+                                                                                                "#warning": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
+                                                                                                "#error": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
                                                                                               }
                                                                                }
                                                                              }
@@ -2040,6 +2052,7 @@ export default class SystemConstants {
                                             };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
+                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataBasePath,
@@ -2055,7 +2068,6 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
                                                SystemConstants._CONFIG_ENTRY_PUSH_Service,
                                                SystemConstants._CONFIG_ENTRY_DISCORD_Service,
-                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_Frontend_Rules,
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,
