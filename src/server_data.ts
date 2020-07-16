@@ -409,7 +409,7 @@ export default class ServerMain {
       intPort,
       async () => {
 
-        let debugMark = debug.extend( "182DD8473CBE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        //let debugMark = debug.extend( "182DD8473CBE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );

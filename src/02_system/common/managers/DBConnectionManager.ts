@@ -13,13 +13,8 @@ import appRoot from "app-root-path";
 import CommonConstants from "../CommonConstants";
 
 import CommonUtilities from "../CommonUtilities";
-<<<<<<< HEAD
 import SystemUtilities from '../SystemUtilities';
 //import config from '../../../01_database/00_config/config.json';
-=======
-import SystemUtilities from "../SystemUtilities";
-//import config from "../../../01_database/00_config/config.json";
->>>>>>> master
 //import BusinessQueries from "../../../01_database/05_query/mysql/BusinessQueries";
 //import SystemQueries from "../../../01_database/05_query/mysql/SystemQueries";
 
