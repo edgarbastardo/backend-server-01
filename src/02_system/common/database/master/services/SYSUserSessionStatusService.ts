@@ -336,12 +336,23 @@ export default class SYSUserSessionStatusService extends BaseService {
 
          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                 userSessionStatus,
+                                                                {
+                                                                  updateAt: true,        //Update the field updatedAt
+                                                                  setRoles: false,       //Set roles?
+                                                                  groupRoles: null,      //User group roles
+                                                                  userRoles: null,       //User roles
+                                                                  forceUpdate: true,     //Force update?
+                                                                  tryLock: 1,            //Only 1 try
+                                                                  lockSeconds: 7 * 1000, //Second
+                                                                },
+                                                                /*
                                                                 false,    //Set roles?
                                                                 null,     //User group Roles
                                                                 null,     //User Roles
                                                                 true,     //Force update?
                                                                 1,        //Only 1 try
                                                                 7 * 1000, //Second
+                                                                */
                                                                 currentTransaction,
                                                                 logger );
 
@@ -579,6 +590,8 @@ export default class SYSUserSessionStatusService extends BaseService {
           createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET; //sysUserSessionStatusInDB.UpdatedBy;
 
         }
+
+        ( options as any ).notUpdateAt = true;
 
         await sysUserSessionStatusInDB.update( createOrUpdateData,
                                                options );

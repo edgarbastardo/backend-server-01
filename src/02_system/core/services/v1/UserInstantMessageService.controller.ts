@@ -86,12 +86,23 @@ export default class UserInstantMessageServiceController {
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                userSessionStatus,
+                                                               {
+                                                                 updateAt: true,        //Update the field updatedAt
+                                                                 setRoles: false,       //Set roles?
+                                                                 groupRoles: null,      //User group roles
+                                                                 userRoles: null,       //User roles
+                                                                 forceUpdate: true,     //Force update?
+                                                                 tryLock: 2,            //Only 1 try
+                                                                 lockSeconds: 4 * 1000, //Second
+                                                               },
+                                                               /*
                                                                false,    //Set roles?
                                                                null,     //User group roles
                                                                null,     //User roles
                                                                true,     //Force update?
                                                                2,        //Only 1 try
                                                                4 * 1000, //Second
+                                                               */
                                                                currentTransaction,
                                                                logger );
 
@@ -194,7 +205,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -273,12 +284,23 @@ export default class UserInstantMessageServiceController {
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                userSessionStatus,
+                                                               {
+                                                                 updateAt: true,        //Update the field updatedAt
+                                                                 setRoles: false,       //Set roles?
+                                                                 groupRoles: null,      //User group roles
+                                                                 userRoles: null,       //User roles
+                                                                 forceUpdate: true,     //Force update?
+                                                                 tryLock: 2,            //Only 1 try
+                                                                 lockSeconds: 4 * 1000, //Second
+                                                               },
+                                                               /*
                                                                false,    //Set roles?
                                                                null,     //User group roles
                                                                null,     //User roles
                                                                true,     //Force update?
                                                                2,        //Only 1 try
                                                                4 * 1000, //Second
+                                                               */
                                                                currentTransaction,
                                                                logger );
 
@@ -385,7 +407,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1078,7 +1100,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1113,6 +1135,538 @@ export default class UserInstantMessageServiceController {
 
   }
 
+  static async instantMessageTestUsingSocket( request: Request,
+                                              transaction: any,
+                                              logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      };
+
+      const message = {
+
+                        Kind: "text/plain",
+                        Topic: "message",
+                        Data: "Test message using socket live connection from " + process.env.APP_SERVER_DATA_NAME
+
+                      };
+
+      const resultData = await InstantMessageServerManager.sendMessageUsingSocket( null, //Take from main instance
+                                                                                   "ServerEcho",
+                                                                                   null, //Take from config
+                                                                                   message,
+                                                                                   null,
+                                                                                   logger );
+
+      if ( resultData.Code === 1 ) {
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: "SUCCESS_SEND_TEST_MESSAGE",
+                   Message: await I18NManager.translate( strLanguage, "Success send test message to ServerEcho channel. Using live socket connection" ),
+                   Mark: "D129724E611D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( resultData.Code === -500 ) {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "EB29F6B4C35B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: resultData.Error?.logId,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: resultData.Error?.name,
+                               Message: await I18NManager.translate( strLanguage, resultData.Error?.message ),
+                               Details: await SystemUtilities.processErrorDetails( resultData.Error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_TO_SEND_MESSAGE",
+                   Message: await I18NManager.translate( strLanguage, resultData.Message ),
+                   Mark: "FB374A9ABB9F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: resultData.Code,
+                               Message: await I18NManager.translate( strLanguage, resultData.Message ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.instantMessageTestUsingSocket.name;
+
+      const strMark = "512579DC4A1F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async instantMessageTestUsingRest( request: Request,
+                                            transaction: any,
+                                            logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const message = {
+
+        Kind: "text/plain",
+        Topic: "message",
+        Data: "Test message using rest api connection from " + process.env.APP_SERVER_DATA_NAME
+
+      };
+
+      const resultData = await InstantMessageServerManager.sendMessageUsingRest( "ServerEcho",
+                                                                                 null, //Take from config
+                                                                                 message,
+                                                                                 logger );
+
+      if ( resultData instanceof Error ) {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "E03F2C77DCE0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: ( resultData as any ).logId,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: resultData.name,
+                               Message: resultData.message,
+                               Details: await SystemUtilities.processErrorDetails( resultData ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( resultData?.body?.StatusCode ) {
+
+        result = resultData?.body;
+        result.RemoteMark = result.Mark;
+        result.Mark = "EFDDC3E45C76" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "NO_RESPONSE_FROM_IM_SERVER",
+                   Message: await I18NManager.translate( strLanguage, "Not response from instant message server. Please read the server log for more details." ),
+                   Mark: "C8F622F62C66" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "NO_RESPONSE_FROM_IM_SERVER",
+                               Message: await I18NManager.translate( strLanguage, "Not response from instant message server. Please read the server log for more details." ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.instantMessageTestUsingRest.name;
+
+      const strMark = "254B8FBCE541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async instantMessageGetChannelMembersUsingRest( request: Request,
+                                                         transaction: any,
+                                                         logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const resultData = await InstantMessageServerManager.getChannelMembers( ( request.query.channels as string ),
+                                                                              null, //Take from config
+                                                                              logger );
+
+      if ( resultData instanceof Error ) {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "CD57132F2283" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: ( resultData as any ).logId,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: resultData.name,
+                               Message: resultData.message,
+                               Details: await SystemUtilities.processErrorDetails( resultData ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else if ( resultData?.body?.StatusCode ) {
+
+        result = resultData?.body;
+        result.RemoteMark = result.Mark;
+        result.Mark = "BB9C0F5C94C8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "NO_RESPONSE_FROM_IM_SERVER",
+                   Message: await I18NManager.translate( strLanguage, "Not response from instant message server. Please read the server log for more details." ),
+                   Mark: "EDE8DC83658B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "NO_RESPONSE_FROM_IM_SERVER",
+                               Message: await I18NManager.translate( strLanguage, "Not response from instant message server. Please read the server log for more details." ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.instantMessageTestUsingRest.name;
+
+      const strMark = "254B8FBCE541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
   /*
   static async createInstantMessage( request: Request,
                                      transaction: any,
@@ -1527,7 +2081,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1754,7 +2308,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1972,7 +2526,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2327,7 +2881,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2445,7 +2999,7 @@ export default class UserInstantMessageServiceController {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
