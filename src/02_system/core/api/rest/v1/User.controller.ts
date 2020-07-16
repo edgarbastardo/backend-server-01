@@ -103,6 +103,9 @@ export default class UserController {
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
                                   { Path: UserController._BASE_PATH + "/instant/message/server/callback", Action: "v1.system.user.instant.message.server.callback", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Callback from instant message server action: connect,disconnect,join,leave,send" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/socket/test", Action: "v1.system.user.instant.message.socket.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant test message using socket call" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/rest/test", Action: "v1.system.user.instant.message.rest.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant test message using rest api call" },
+                                  { Path: UserController._BASE_PATH + "/instant/message/channel/members", Action: "v1.system.user.instant.message.channel.members.list", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#", Roles: [ "Administrator", "Business_Manager" ], Description: "Get channel members list" },
                                 ]
 
   _controllerLogger = null;
@@ -867,6 +870,57 @@ export default class UserController {
 
   }
 
+  @httpPost(
+             "/instant/message/socket/test",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async instantMessageTestUsingLive( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.instantMessageTestUsingSocket( request,
+                                                                                            null,
+                                                                                            this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/instant/message/rest/test",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async instantMessageTestUsingRest( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.instantMessageTestUsingRest( request,
+                                                                                          null,
+                                                                                          this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/instant/message/channel/members",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated
+          )
+  async instantMessageGetChannelMembersList( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserInstantMessageServiceController.instantMessageGetChannelMembersUsingRest( request,
+                                                                                                       null,
+                                                                                                       this._controllerLogger || ( context ? context.logger : null ) );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+  //
   /*
   @httpGet(
             "/presence/room",
