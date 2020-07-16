@@ -1620,12 +1620,23 @@ export default class BinaryServiceController extends BaseService {
         //Update the cache and database
         await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                userSessionStatus,
+                                                               {
+                                                                 updateAt: true,        //Update the field updatedAt
+                                                                 setRoles: false,       //Set roles?
+                                                                 groupRoles: null,      //User group roles
+                                                                 userRoles: null,       //User roles
+                                                                 forceUpdate: true,     //Force update?
+                                                                 tryLock: 2,            //Only 1 try
+                                                                 lockSeconds: 4 * 1000, //Second
+                                                               },
+                                                               /*
                                                                false,    //Set roles?
                                                                null,     //User group roles
                                                                null,     //User roles
                                                                true,     //Force update?
                                                                2,        //Only 1 try
                                                                4 * 1000, //Second
+                                                               */
                                                                currentTransaction,
                                                                logger );
 
@@ -1711,7 +1722,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -1790,12 +1801,23 @@ export default class BinaryServiceController extends BaseService {
           //Update the cache and database
           await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                  userSessionStatus,
+                                                                 {
+                                                                   updateAt: true,        //Update the field updatedAt
+                                                                   setRoles: false,       //Set roles?
+                                                                   groupRoles: null,      //User group roles
+                                                                   userRoles: null,       //User roles
+                                                                   forceUpdate: true,     //Force update?
+                                                                   tryLock: 2,            //Only 1 try
+                                                                   lockSeconds: 4 * 1000, //Second
+                                                                 },
+                                                                 /*
                                                                  false,    //Set roles?
                                                                  null,     //User group roles
                                                                  null,     //User roles
                                                                  true,     //Force update?
                                                                  2,        //Only 1 try
                                                                  4 * 1000, //Second
+                                                                 */
                                                                  currentTransaction,
                                                                  logger );
 
@@ -1908,7 +1930,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2300,7 +2322,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -2598,7 +2620,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -3509,7 +3531,7 @@ export default class BinaryServiceController extends BaseService {
                               Code: "ERROR_UNEXPECTED",
                               Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                               Mark: strMark,
-                              LogId: error.LogId,
+                              LogId: error.logId,
                               IsError: true,
                               Errors: [
                                         {
@@ -3828,7 +3850,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -4220,7 +4242,7 @@ export default class BinaryServiceController extends BaseService {
                                  Code: "ERROR_UNEXPECTED",
                                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                                  Mark: "E8913CD0BAD0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                 LogId: error.LogId,
+                                 LogId: error.logId,
                                  IsError: true,
                                  Errors: [
                                            {
@@ -4475,7 +4497,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -4723,7 +4745,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -5166,7 +5188,7 @@ export default class BinaryServiceController extends BaseService {
                                    Code: "ERROR_UNEXPECTED",
                                    Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                                    Mark: "DB8042C7F21E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                   LogId: error.LogId,
+                                   LogId: error.logId,
                                    IsError: true,
                                    Errors: [
                                              {
@@ -5250,7 +5272,7 @@ export default class BinaryServiceController extends BaseService {
                                  Code: "ERROR_UNEXPECTED",
                                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                                  Mark: "10BA34FB2495" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                                 LogId: error.LogId,
+                                 LogId: error.logId,
                                  IsError: true,
                                  Errors: [
                                            {
@@ -5499,7 +5521,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -6000,7 +6022,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -6161,7 +6183,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -6553,7 +6575,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {
@@ -6714,7 +6736,7 @@ export default class BinaryServiceController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  Mark: strMark,
-                 LogId: error.LogId,
+                 LogId: error.logId,
                  IsError: true,
                  Errors: [
                            {

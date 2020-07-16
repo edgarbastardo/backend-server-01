@@ -124,6 +124,8 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
   @BeforeValidate
   static beforeValidateHook( instance: SYSUserSessionStatus, options: any ): void {
 
+    options.notClearUpdateField = true;
+
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
     if ( !instance.ShortToken ) {
@@ -164,6 +166,8 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
   static beforeUpdateHook( instance: SYSUserSessionStatus, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
+
+    //options.notUpdateAt = true; Must be come from SYSUserSessionStatusService.createOrUpdate
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
