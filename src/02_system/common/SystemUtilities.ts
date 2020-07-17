@@ -1926,7 +1926,11 @@ export default class SystemUtilities {
 
       if ( userDataResponse.ChangePasswordEvery > 0 ) { //In days
 
-        const duration = moment.duration( { minutes: SystemUtilities.getCurrentDateAndTimeDiff( userDataResponse.PasswordSetAt, "minutes" ) } );
+        const duration = moment.duration(
+                                          {
+                                            minutes: SystemUtilities.getCurrentDateAndTimeDiff( userDataResponse.PasswordSetAt, "minutes" )
+                                          }
+                                        );
 
         if ( ( duration.asMinutes() * 60 * 24 ) > userDataResponse.ChangePasswordEvery ) {
 
