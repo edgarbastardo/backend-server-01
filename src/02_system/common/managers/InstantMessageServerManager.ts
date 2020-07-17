@@ -36,7 +36,7 @@ export default class InstantMessageServerManager {
 
         const debugMark = debug.extend( strMark );
 
-        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, configData.auth.apiKey );
+        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData.hostLiveDomain + "/" + configData.hostLivePath, configData.auth.apiKey );
 
         const socketIOClient = io( configData.hostLiveDomain, {
 
