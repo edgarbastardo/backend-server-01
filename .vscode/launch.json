@@ -54,20 +54,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Backend Server IM Process (Main)",
-      "program": "${workspaceFolder}/src/server_instant_message.ts",
-      "args": [],
-      "outputCapture": "std",
-      "preLaunchTask": "build-im-server",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "outFiles": [
-        "${workspaceFolder}/build/**/*.js"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Debug Backend Server Task Process (Main)",
       "program": "${workspaceFolder}/src/server_task.ts",
       "args": [],
