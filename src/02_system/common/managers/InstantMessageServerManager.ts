@@ -81,7 +81,7 @@ export default class InstantMessageServerManager {
         socketIOClient.on( "connect_error", ( error: Error ) => {
 
           if ( lastShowErrorMark === null ||
-               SystemUtilities.getCurrentDateAndTime().diff( lastShowErrorMark, "minutes" ) >= 1 ) {
+               SystemUtilities.getCurrentDateAndTimeDiff( lastShowErrorMark, "minutes" ) >= 1 ) {
 
             const strMark = "DF30496D5C75" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
