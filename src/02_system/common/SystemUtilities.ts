@@ -558,7 +558,11 @@ export default class SystemUtilities {
       if ( sessionPersistenStatus.HardLimit ) { //Expired time calculated from Limit
 
         //Check ExpireAt field not more old to current date time
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTimeDiff( sessionPersistenStatus.HardLimit, "seconds" ) } );
+        const duration = moment.duration(
+                                          {
+                                            seconds: SystemUtilities.getCurrentDateAndTimeDiff( sessionPersistenStatus.HardLimit, "seconds" )
+                                          }
+                                        );
 
         result = { Expired: duration.asSeconds() >= 0, Duration: duration };
 
@@ -573,7 +577,11 @@ export default class SystemUtilities {
         if ( expireOn.isValid() ) {
 
           //Check CreatedAt field not more old to ExpireOn minutes
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTimeDiff( expireOn, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTimeDiff( expireOn, "seconds" )
+                                            }
+                                          );
 
           result = { Expired: duration.asSeconds() >= 0, Duration: duration };
 
@@ -585,7 +593,11 @@ export default class SystemUtilities {
       if ( result.Expired === false &&
            CommonUtilities.isNotNullOrEmpty( sessionStatus.LoggedOutAt ) ) {
 
-        const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTimeDiff( sessionStatus.LoggedOutAt, "seconds" ) } );
+        const duration = moment.duration(
+                                          {
+                                            seconds: SystemUtilities.getCurrentDateAndTimeDiff( sessionStatus.LoggedOutAt, "seconds" )
+                                          }
+                                        );
 
         result = { Expired: true, Duration: duration };
 
@@ -649,7 +661,11 @@ export default class SystemUtilities {
         else {
 
           //Check UpdateAt field not more old to ExpireOn minutes
-          const duration = moment.duration( { seconds: SystemUtilities.getCurrentDateAndTimeDiff( userSessionStatus.UpdatedAt, "seconds" ) } );
+          const duration = moment.duration(
+                                            {
+                                              seconds: SystemUtilities.getCurrentDateAndTimeDiff( userSessionStatus.UpdatedAt, "seconds" )
+                                            }
+                                          );
 
           result = {
                      Expired: duration.asSeconds() / 60 >= userSessionStatus.ExpireOn || bLimitIsExpired,
@@ -1910,7 +1926,11 @@ export default class SystemUtilities {
 
       if ( userDataResponse.ChangePasswordEvery > 0 ) { //In days
 
-        const duration = moment.duration( { minutes: SystemUtilities.getCurrentDateAndTimeDiff( userDataResponse.PasswordSetAt, "minutes" ) } );
+        const duration = moment.duration(
+                                          {
+                                            minutes: SystemUtilities.getCurrentDateAndTimeDiff( userDataResponse.PasswordSetAt, "minutes" )
+                                          }
+                                        );
 
         if ( ( duration.asMinutes() * 60 * 24 ) > userDataResponse.ChangePasswordEvery ) {
 
