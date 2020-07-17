@@ -358,6 +358,24 @@ export default class SystemUtilities {
 
   }
 
+  static getCurrentDateAndTimeDiff( dateTime: any, strUnit: string ): number {
+
+    let intResult = -1;
+
+    try {
+
+      intResult = SystemUtilities.getCurrentDateAndTime().diff( dateTime, strUnit );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+  }
+
   static transformObjectToTimeZone( row: any, strTimeZoneId: string, logger: any ): any {
 
     try {
