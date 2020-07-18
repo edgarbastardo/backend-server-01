@@ -7,6 +7,7 @@ export default class UserTestV1 {
   static async test_profile_at_less_one_role( headers: any,
                                               rolesToTest: string[],
                                               strCode: string,
+                                              strTest: string,
                                               strFileName: string,
                                               bIsFail: boolean ): Promise<boolean> {
 
@@ -16,8 +17,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callGetProfile( headers, {} );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -77,6 +79,7 @@ export default class UserTestV1 {
   static async test_profile_all_roles( headers: any,
                                        rolesToTest: string[],
                                        strCode: string,
+                                       strTest: string,
                                        strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -87,8 +90,9 @@ export default class UserTestV1 {
 
       const resultOfTest = []; //rolesToTest[ intRoleToTestIndex ]
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -138,6 +142,7 @@ export default class UserTestV1 {
   static async test_change_password( headers: any,
                                      userData: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -147,8 +152,9 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callChangePassword( headers,
                                                                                userData );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -174,6 +180,7 @@ export default class UserTestV1 {
   static async test_searchUser( headers: any,
                                 params: any,
                                 strCode: string,
+                                strTest: string,
                                 strFileName: string,
                                 intConditionType: number,
                                 intCount: number ): Promise<boolean> {
@@ -183,10 +190,11 @@ export default class UserTestV1 {
     try {
 
       const result = await CommonTest.userRequestServiceV1.callSearchUser( headers,
-                                                                          params );
+                                                                           params );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -231,6 +239,7 @@ export default class UserTestV1 {
   static async test_searchCountUser( headers: any,
                                      params: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string,
                                      intConditionType: number,
                                      intCount: number ): Promise<boolean> {
@@ -242,8 +251,10 @@ export default class UserTestV1 {
       const result = await CommonTest.userRequestServiceV1.callSearchCountUser( headers,
                                                                                 params );
 
+
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -288,6 +299,7 @@ export default class UserTestV1 {
   static async test_deleteUser( headers: any,
                                 userData: any,
                                 strCode: string,
+                                strTest: string,
                                 strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -309,8 +321,9 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callDeleteUser( headers, userRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_CANNOT_DELETE_USER"
       CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
@@ -336,6 +349,7 @@ export default class UserTestV1 {
   static async test_deleteBulkUser( headers: any,
                                     userData: any,
                                     strCode: string,
+                                    strTest: string,
                                     strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -345,8 +359,9 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callDeleteBulkUser( headers,
                                                                             userData ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_CANNOT_DELETE_USER"
       CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&
@@ -372,6 +387,7 @@ export default class UserTestV1 {
   static async test_disableBulkUser( headers: any,
                                      userData: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string,
                                      bIsFail: boolean ): Promise<boolean> {
 
@@ -382,8 +398,9 @@ export default class UserTestV1 {
       let result = await CommonTest.userRequestServiceV1.callDisableBulkUser( headers,
                                                                               userData );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -427,6 +444,7 @@ export default class UserTestV1 {
   static async test_enableBulkUser( headers: any,
                                     userData: any,
                                     strCode: string,
+                                    strTest: string,
                                     strFileName: string,
                                     bIsFail: boolean ): Promise<boolean> {
 
@@ -436,8 +454,9 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callEnableBulkUser( headers, userData );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -481,6 +500,7 @@ export default class UserTestV1 {
   static async test_moveBulkUser( headers: any,
                                   userData: any,
                                   strCode: string,
+                                  strTest: string,
                                   strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -489,8 +509,9 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callMoveBulkUser( headers, userData ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -515,6 +536,7 @@ export default class UserTestV1 {
 
   static async test_createUser_user01_at_TestL01( headers: any,
                                                   strCode: string,
+                                                  strTest: string,
                                                   strFileName: string ): Promise<boolean> {
 
     let bResult = null;
@@ -534,8 +556,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_USER_GROUP_NOT_FOUND"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
@@ -560,6 +583,7 @@ export default class UserTestV1 {
 
   static async test_createUser_user98_at_TestL98( headers: any,
                                                   strCode: string,
+                                                  strTest: string,
                                                   strFileName: string,
                                                   bIsFail: boolean,
                                                   bCreateUserGroup: boolean,
@@ -589,8 +613,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
@@ -663,6 +688,7 @@ export default class UserTestV1 {
 
   static async test_createUser_user97_at_TestL98( headers: any,
                                                   strCode: string,
+                                                  strTest: string,
                                                   strFileName: string,
                                                   bIsFail: boolean,
                                                   bCreateUserGroup: boolean,
@@ -692,8 +718,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
@@ -764,6 +791,7 @@ export default class UserTestV1 {
 
   static async test_createUser_user96_at_TestL98( headers: any,
                                                   strCode: string,
+                                                  strTest: string,
                                                   strFileName: string,
                                                   bIsFail: boolean,
                                                   bCreateUserGroup: boolean,
@@ -793,8 +821,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user98_at_TestL98_success"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_CREATE"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"SUCCESS_USER_CREATE"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user98_at_TestL98_success"
 
       if ( result &&
@@ -863,7 +892,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user01_at_TestL01_success( headers: any ): Promise<boolean> {
+  static async test_createUser_user01_at_TestL01_success( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -886,9 +915,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_createUser_user01_at_TestL01_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveOutput( "test_createUser_user01_at_TestL01_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user01_at_TestL01_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -925,7 +955,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user01_at_TestL02_success( headers: any ): Promise<boolean> {
+  static async test_createUser_user01_at_TestL02_success( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -946,9 +976,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_createUser_user01_at_TestL02_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveOutput( "test_createUser_user01_at_TestL02_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user01_at_TestL02_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user01_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -972,7 +1003,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user02_at_TestL02_success( headers: any ): Promise<boolean> {
+  static async test_createUser_user02_at_TestL02_success( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -996,9 +1027,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_createUser_user02_at_TestL02_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveOutput( "test_createUser_user02_at_TestL02_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user02_at_TestL02_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1034,7 +1066,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user01_at_TestL01_again_fail( headers: any ): Promise<boolean> {
+  static async test_createUser_user01_at_TestL01_again_fail( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1057,8 +1089,9 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( "test_createUser_user01_at_TestL01_again_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS", Test: strTest }: null;
       CommonTest.saveOutput( "test_createUser_user01_at_TestL01_again_fail", result.output );
 
       if ( result &&
@@ -1081,7 +1114,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user_group_TestL01_again_fail( headers: any ): Promise<boolean> {
+  static async test_createUser_user_group_TestL01_again_fail( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1104,9 +1137,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
-      CommonTest.saveInput( "test_createUser_user_group_TestL01_again_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
-      CommonTest.saveOutput( "test_createUser_user_group_TestL01_again_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user_group_TestL01_again_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user_group_TestL01_again_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1128,7 +1162,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user02_at_TestL02_fail( headers: any ): Promise<boolean> {
+  static async test_createUser_user02_at_TestL02_fail( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = null;
 
@@ -1146,9 +1180,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
-      CommonTest.saveInput( "test_createUser_user02_at_TestL02_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER" }: null;
-      CommonTest.saveOutput( "test_createUser_user02_at_TestL02_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user02_at_TestL02_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_CANNOT_CREATE_USER", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1170,7 +1205,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user02_at_TestL01_success( headers: any ): Promise<boolean> {
+  static async test_createUser_user02_at_TestL01_success( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1193,9 +1228,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_createUser_user02_at_TestL01_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE" }: null;
-      CommonTest.saveOutput( "test_createUser_user02_at_TestL01_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user02_at_TestL01_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_CREATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1231,7 +1267,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_createUser_user03_at_TestL01_fail( headers: any ): Promise<boolean> {
+  static async test_createUser_user03_at_TestL01_fail( headers: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1251,9 +1287,10 @@ export default class UserTestV1 {
 
       const result = await CommonTest.userRequestServiceV1.callCreateUser( headers, userRequest ); //This request must be fail
 
-      CommonTest.saveInput( "test_createUser_user03_at_TestL01_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_FORBIDDEN_ACCESS" }: null;
-      CommonTest.saveOutput( "test_createUser_user03_at_TestL01_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_createUser_user03_at_TestL01_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_FORBIDDEN_ACCESS", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_createUser_user03_at_TestL01_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1275,7 +1312,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user02_at_TestL02_success( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user02_at_TestL02_success( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1309,9 +1346,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user02_at_TestL02_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user02_at_TestL02_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user02_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1347,7 +1385,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user02_at_TestL02_fail( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user02_at_TestL02_fail( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1380,9 +1418,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS" }: null;
-      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user02_at_TestL02_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NAME_ALREADY_EXISTS", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1404,7 +1443,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user99_at_TestL01_success( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user99_at_TestL01_success( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1439,9 +1478,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user99_at_TestL01_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveOutput( "test_updateUser_user99_at_TestL01_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user99_at_TestL01_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user99_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1477,7 +1517,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user01_at_TestL01_success( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user01_at_TestL01_success( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1509,9 +1549,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user01_at_TestL01_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveOutput( "test_updateUser_user01_at_TestL01_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user01_at_TestL01_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user01_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1541,7 +1582,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user01_at_TestL01_fail( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user01_at_TestL01_fail( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1575,9 +1616,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user01_at_TestL01_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_USER_NOT_VALID" }: null;
-      CommonTest.saveOutput( "test_updateUser_user01_at_TestL01_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user01_at_TestL01_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_NOT_VALID", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user01_at_TestL01_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1599,7 +1641,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user99_at_TestL02_fail( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user99_at_TestL02_fail( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1633,9 +1675,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be fail
 
-      CommonTest.saveInput( "test_updateUser_user02_at_TestL02_fail", result.input );
-      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS" }: null;
-      CommonTest.saveOutput( "test_updateUser_user02_at_TestL02_fail", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user02_at_TestL02_fail", result.input );
+      result && result.output ? result.output.expected = { Code: "ERROR_USER_GROUP_ALREADY_EXISTS", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user02_at_TestL02_fail", result.output );
 
       if ( result &&
            result.output &&
@@ -1658,7 +1701,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user99_at_TestL02_success( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user99_at_TestL02_success( headers: any, userData: any, strTest: string ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1694,9 +1737,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user99_at_TestL02_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveOutput( "test_updateUser_user99_at_TestL02_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user99_at_TestL02_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user99_at_TestL02_success", result.output );
 
       if ( result &&
            result.output &&
@@ -1730,7 +1774,7 @@ export default class UserTestV1 {
 
   }
 
-  static async test_updateUser_user02_at_TestL01_success( headers: any, userData: any ): Promise<boolean> {
+  static async test_updateUser_user02_at_TestL01_success( headers: any, userData: any, strTest: String ): Promise<boolean> {
 
     let bResult = false;
 
@@ -1764,9 +1808,10 @@ export default class UserTestV1 {
 
       let result = await CommonTest.userRequestServiceV1.callUpdateUser( headers, userRequest ); //This request must be success
 
-      CommonTest.saveInput( "test_updateUser_user02_at_TestL01_success", result.input );
-      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE" }: null;
-      CommonTest.saveOutput( "test_updateUser_user02_at_TestL01_success", result.output );
+      result.input.Test = strTest;
+      CommonTest.saveInput( strTest + "_test_updateUser_user02_at_TestL01_success", result.input );
+      result && result.output ? result.output.expected = { Code: "SUCCESS_USER_UPDATE", Test: strTest }: null;
+      CommonTest.saveOutput( strTest + "_test_updateUser_user02_at_TestL01_success", result.output );
 
       if ( result &&
            result.output &&

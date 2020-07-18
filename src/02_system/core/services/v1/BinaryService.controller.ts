@@ -1976,12 +1976,12 @@ export default class BinaryServiceController extends BaseService {
 
         if ( strResult ) {
 
-          strResult = strResult + " Or A.Owner Like '%' + strCurrentTag + '%'";
+          strResult = strResult + " Or A.Owner Like '%" + strCurrentTag + "%'";
 
         }
         else {
 
-          strResult = "A.Owner Like '%' + strCurrentTag + '%'";
+          strResult = "A.Owner Like '%" + strCurrentTag + "%'";
 
         }
 
