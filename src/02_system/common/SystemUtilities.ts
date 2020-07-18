@@ -1212,47 +1212,57 @@ export default class SystemUtilities {
         }
 
       }
-      else if ( !result.UserGroupName ) {
+      /*
+      else {
 
-        let debugMark = debug.extend( "EDC7699EA08B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-        debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
-
-        const userSession = await SystemUtilities.injectUserSessionData( result,
-                                                                         transaction,
-                                                                         logger );
-
-        result = userSession.Data;
 
       }
+      */
 
       if ( result &&
            !result.LoggedOutAt &&
-           SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false &&
-           bUpdateAt ) {
+           SystemUtilities.checkUserSessionStatusExpired( result, logger ).Expired === false ) {
 
-        result.IsValid = true;
+        if ( !result.UserGroupName ) {
 
-        await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
-                                                               result,
-                                                               {
-                                                                updateAt: true,                 //Update the field updatedAt
-                                                                setRoles: bFromCache === false, //Set roles?
-                                                                groupRoles: strUserGroupRole,   //User group roles
-                                                                userRoles: strUserRole,         //User roles
-                                                                forceUpdate: false,             //Force update?
-                                                                tryLock: 1,                     //Only 1 try
-                                                                lockSeconds: 7 * 1000,          //Second
-                                                               },
-                                                               /*
-                                                               bFromCache === false, //Set roles?
-                                                               strUserGroupRole,     //User group roles
-                                                               strUserRole,          //User roles
-                                                               false,                //Force update?
-                                                               1,                    //Only 1 try
-                                                               7 * 1000,             //Second
-                                                               */
-                                                               transaction,
-                                                               logger );
+          let debugMark = debug.extend( "EDC7699EA08B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined recreating from database" );
+
+          const userSession = await SystemUtilities.injectUserSessionData( result,
+                                                                           transaction,
+                                                                           logger );
+
+          result = userSession.Data;
+
+        }
+
+        if ( bUpdateAt ) {
+
+          result.IsValid = true;
+
+          await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
+                                                                result,
+                                                                {
+                                                                  updateAt: true,                 //Update the field updatedAt
+                                                                  setRoles: bFromCache === false, //Set roles?
+                                                                  groupRoles: strUserGroupRole,   //User group roles
+                                                                  userRoles: strUserRole,         //User roles
+                                                                  forceUpdate: false,             //Force update?
+                                                                  tryLock: 1,                     //Only 1 try
+                                                                  lockSeconds: 7 * 1000,          //Second
+                                                                },
+                                                                /*
+                                                                bFromCache === false, //Set roles?
+                                                                strUserGroupRole,     //User group roles
+                                                                strUserRole,          //User roles
+                                                                false,                //Force update?
+                                                                1,                    //Only 1 try
+                                                                7 * 1000,             //Second
+                                                                */
+                                                                transaction,
+                                                                logger );
+
+        }
 
       }
       else if ( result ) {
