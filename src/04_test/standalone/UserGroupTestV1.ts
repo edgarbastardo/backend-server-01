@@ -6,6 +6,7 @@ export default class UserGroupTestV1 {
   static async test_getUserGroup( headers: any,
                                   query: any,
                                   strCode: string,
+                                  strTest: string,
                                   strFileName: string,
                                   bIsFail: boolean ): Promise<boolean> {
 
@@ -16,8 +17,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callGetUserGroup( headers,
                                                                                   query );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -61,6 +63,7 @@ export default class UserGroupTestV1 {
   static async test_searchUserGroup( headers: any,
                                      params: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string,
                                      intConditionType: number,
                                      intCount: number,
@@ -73,8 +76,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callSearchUserGroup( headers,
                                                                                      params );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -128,6 +132,7 @@ export default class UserGroupTestV1 {
   static async test_searchCountUserGroup( headers: any,
                                           params: any,
                                           strCode: string,
+                                          strTest: string,
                                           strFileName: string,
                                           intConditionType: number,
                                           intCount: number,
@@ -140,8 +145,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callSearchCountUserGroup( headers,
                                                                                           params );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -195,6 +201,7 @@ export default class UserGroupTestV1 {
   static async test_deleteUserGroup( headers: any,
                                      groupData: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -217,8 +224,9 @@ export default class UserGroupTestV1 {
       let result = await CommonTest.userGroupRequestServiceV1.call_deleteUserGroup( headers,
                                                                                     userGroupRequest ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUserGroup_TestL01_success"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"SUCCESS_USER_GROUP_DELETE"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"SUCCESS_USER_GROUP_DELETE"
       CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUserGroup_TestL01_success"
 
       if ( result &&
@@ -244,6 +252,7 @@ export default class UserGroupTestV1 {
   static async test_getSettings( headers: any,
                                  query: any,
                                  strCode: string,
+                                 strTest: string,
                                  strFileName: string,
                                  keyList: string[],
                                  valueList: string[] ): Promise<boolean> {
@@ -255,8 +264,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callGetSettings( headers,
                                                                                  query );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -305,6 +315,7 @@ export default class UserGroupTestV1 {
                                  query: any,
                                  body: any,
                                  strCode: string,
+                                 strTest: string,
                                  strFileName: string,
                                  keyList: string[],
                                  valueList: string[],
@@ -318,8 +329,9 @@ export default class UserGroupTestV1 {
                                                                                  query,
                                                                                  body );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -370,6 +382,7 @@ export default class UserGroupTestV1 {
 
   static async test_createUserGroup_TestL55( headers: any,
                                              strCode: string,
+                                             strTest: string,
                                              strFileName: string,
                                              bMustEmptyRole: boolean,
                                              bIsFail: boolean ): Promise<boolean> {
@@ -389,8 +402,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callCreateUserGroup( headers,
                                                                                      userGroupRequest );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_USER_GROUP_NOT_FOUND"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&
@@ -451,6 +465,7 @@ export default class UserGroupTestV1 {
 
   static async test_createUserGroup_TestL56( headers: any,
                                              strCode: string,
+                                             strTest: string,
                                              strFileName: string,
                                              bMustEmptyRole: boolean,
                                              bIsFail: boolean ): Promise<boolean> {
@@ -470,8 +485,9 @@ export default class UserGroupTestV1 {
       const result = await CommonTest.userGroupRequestServiceV1.callCreateUserGroup( headers,
                                                                                      userGroupRequest );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_createUser_user01@TestL01_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_USER_GROUP_NOT_FOUND"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_USER_GROUP_NOT_FOUND"
       CommonTest.saveOutput( strFileName, result.output ); //"test_createUser_user01@TestL01_fail"
 
       if ( result &&

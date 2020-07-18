@@ -32,6 +32,12 @@ export default class InstantMessageServerManager {
            configData?.hostLiveDomain &&
            configData?.hostLivePath ) {
 
+        const strMark = "4D8A86FADEA7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData.hostLiveDomain + "/" + configData.hostLivePath, configData.auth.apiKey );
+
         const socketIOClient = io( configData.hostLiveDomain, {
 
           path: configData?.hostLivePath,
@@ -119,6 +125,15 @@ export default class InstantMessageServerManager {
         });
 
         result = socketIOClient;
+
+      }
+      else {
+
+        const strMark = "BEB0F5FEC129" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+        const debugMark = debug.extend( strMark );
+
+        debugMark( "Missing information to connect to IM server: [%s], apiKey: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, configData.auth.apiKey );
 
       }
 
