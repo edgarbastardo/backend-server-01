@@ -12,6 +12,7 @@ export default class BinaryTestV1 {
 
   static async test_createAuth( headers: any,
                                 strCode: string,
+                                strTest: string,
                                 strFileName: string,
                                 bIsFail: boolean ): Promise<boolean> {
 
@@ -21,8 +22,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callCreateAuth( headers );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -61,6 +63,7 @@ export default class BinaryTestV1 {
 
   static async test_deleteAuth( headers: any,
                                 strCode: string,
+                                strTest: string,
                                 strFileName: string,
                                 bIsFail: boolean ): Promise<boolean> {
 
@@ -70,8 +73,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callDeleteAuth( headers );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -107,6 +111,7 @@ export default class BinaryTestV1 {
 
   static async test_uploadImageTiger( headers: any,
                                       strCode: string,
+                                      strTest: string,
                                       strFileName: string,
                                       strUploadBinaryDataKey: string,
                                       contextData: any ): Promise<boolean> {
@@ -138,8 +143,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -166,6 +172,7 @@ export default class BinaryTestV1 {
 
   static async test_uploadImageTower( headers: any,
                                       strCode: string,
+                                      strTest: string,
                                       strFileName: string,
                                       strUploadBinaryDataKey: string,
                                       contextData: any ): Promise<boolean> {
@@ -197,8 +204,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -225,6 +233,7 @@ export default class BinaryTestV1 {
 
   static async test_uploadImageRoad( headers: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string,
                                      strUploadBinaryDataKey: string,
                                      contextData: any ): Promise<boolean> {
@@ -254,8 +263,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -281,6 +291,7 @@ export default class BinaryTestV1 {
 
   static async test_uploadImageCastle( headers: any,
                                        strCode: string,
+                                       strTest: string,
                                        strFileName: string,
                                        strUploadBinaryDataKey: string,
                                        contextData: any ): Promise<boolean> {
@@ -310,8 +321,9 @@ export default class BinaryTestV1 {
 
       const result = await CommonTest.binaryRequestServiceV1.callUploadBinaryData( headersMultipart, binaryRequest ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -337,6 +349,7 @@ export default class BinaryTestV1 {
 
   static async test_downloadImageThumbnail( headers: any,
                                             strCode: string,
+                                            strTest: string,
                                             strFileName: string,
                                             strUploadBinaryDataKey: string ): Promise<boolean> {
 
@@ -357,8 +370,9 @@ export default class BinaryTestV1 {
                                                                                       SavePath: strPath
                                                                                     } ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -383,6 +397,7 @@ export default class BinaryTestV1 {
 
   static async test_downloadImage( headers: any,
                                    strCode: string,
+                                   strTest: string,
                                    strFileName: string,
                                    strUploadBinaryDataKey: string,
                                    strCheckSum: string ): Promise<boolean> {
@@ -404,8 +419,9 @@ export default class BinaryTestV1 {
                                                                                       SavePath: strPath
                                                                                     } ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -460,6 +476,7 @@ export default class BinaryTestV1 {
 
   static async test_deleteImage( headers: any,
                                  strCode: string,
+                                 strTest: string,
                                  strFileName: string,
                                  strUploadBinaryDataKey: string ): Promise<boolean> {
 
@@ -472,8 +489,9 @@ export default class BinaryTestV1 {
                                                                                     Id: CommonTest.upload_binary_data[ strUploadBinaryDataKey ].Id,
                                                                                   } ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -498,6 +516,7 @@ export default class BinaryTestV1 {
 
   static async test_getImageDetails( headers: any,
                                      strCode: string,
+                                     strTest: string,
                                      strFileName: string,
                                      strUploadBinaryDataKey: string ): Promise<boolean> {
 
@@ -510,8 +529,9 @@ export default class BinaryTestV1 {
                                                                                         Id: CommonTest.upload_binary_data[ strUploadBinaryDataKey ].Id,
                                                                                       } ); //This request must be success
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -537,6 +557,7 @@ export default class BinaryTestV1 {
   static async test_binarySearch( headers: any,
                                   params: any,
                                   strCode: string,
+                                  strTest: string,
                                   strFileName: string,
                                   intConditionType: number,
                                   intCount: number ): Promise<boolean> {
@@ -546,10 +567,11 @@ export default class BinaryTestV1 {
     try {
 
       const result = await CommonTest.binaryRequestServiceV1.callBinarySearch( headers,
-                                                                    params );
+                                                                               params );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -594,6 +616,7 @@ export default class BinaryTestV1 {
   static async test_binarySearchCount( headers: any,
                                        params: any,
                                        strCode: string,
+                                       strTest: string,
                                        strFileName: string,
                                        intConditionType: number,
                                        intCount: number ): Promise<boolean> {
@@ -605,8 +628,9 @@ export default class BinaryTestV1 {
       const result = await CommonTest.binaryRequestServiceV1.callBinarySearchCount( headers,
                                                                                     params );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -651,6 +675,7 @@ export default class BinaryTestV1 {
   static async test_disableBulkBinary( headers: any,
                                        userGroupData: any,
                                        strCode: string,
+                                       strTest: string,
                                        strFileName: string,
                                        bIsFail: boolean ): Promise<boolean> {
 
@@ -661,8 +686,9 @@ export default class BinaryTestV1 {
       let result = await CommonTest.binaryRequestServiceV1.callDisableBulkBinary( headers,
                                                                                   userGroupData );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -706,6 +732,7 @@ export default class BinaryTestV1 {
   static async test_enableBulkBinary( headers: any,
                                       userGroupData: any,
                                       strCode: string,
+                                      strTest: string,
                                       strFileName: string,
                                       bIsFail: boolean ): Promise<boolean> {
 
@@ -716,8 +743,9 @@ export default class BinaryTestV1 {
       let result = await CommonTest.binaryRequestServiceV1.callEnableBulkBinary( headers,
                                                                                  userGroupData );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
@@ -761,6 +789,7 @@ export default class BinaryTestV1 {
   static async test_deleteBulkBinary( headers: any,
                                       userData: any,
                                       strCode: string,
+                                      strTest: string,
                                       strFileName: string ): Promise<boolean> {
 
     let bResult = false;
@@ -770,8 +799,9 @@ export default class BinaryTestV1 {
       let result = await CommonTest.binaryRequestServiceV1.callDeleteBulkBinary( headers,
                                                                                  userData ); //This request must be fail
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
-      result && result.output ? result.output.expected = { Code: strCode }: null; //"ERROR_CANNOT_DELETE_USER"
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null; //"ERROR_CANNOT_DELETE_USER"
       CommonTest.saveOutput( strFileName, result.output ); //"test_deleteUser_by_name_" +  userRequest.Name + "_fail"
 
       if ( result &&

@@ -13,6 +13,7 @@ export default class DatabaseTestV1 {
 
   static async test_search_sysUserGroups( headers: any,
                                           strCode: string,
+                                          strTest: string,
                                           strFileName: string,
                                           bIsFail: boolean,
                                           strWhere: any,
@@ -28,8 +29,9 @@ export default class DatabaseTestV1 {
                                                                                       Where: strWhere
                                                                                     } );
 
+      result.input.Test = strTest;
       CommonTest.saveInput( strFileName, result.input );
-      result && result.output ? result.output.expected = { Code: strCode }: null;
+      result && result.output ? result.output.expected = { Code: strCode, Test: strTest }: null;
       CommonTest.saveOutput( strFileName, result.output );
 
       if ( result &&
