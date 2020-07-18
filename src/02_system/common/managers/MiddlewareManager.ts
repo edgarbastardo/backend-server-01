@@ -596,7 +596,7 @@ export default class MiddlewareManager {
                  }
 
       }
-      else {
+      else if ( userSessionStatus ) {
 
         const strSavedSocketToken = userSessionStatus.SocketToken;
 
@@ -655,6 +655,51 @@ export default class MiddlewareManager {
       }
       else if ( response ) {
 
+        if ( userSessionStatus ) {
+
+          const strSavedSocketToken = userSessionStatus.SocketToken;
+
+          /*
+          //Not logout session, Case ERROR_USER_CHANGE_PASSWORD_REQUIRED
+          userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
+                                                                   {
+                                                                     updateAt: false
+                                                                   },
+                                                                   null,
+                                                                   logger );
+          */
+
+          if ( strSavedSocketToken &&
+               !( request as any ).notDisconnectFromIMServer ) {
+
+            //FIXME 40E1487688CC Disconnect from remote server
+            //Send to instant message server a message to disconnect this user
+            await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
+                                                                                  null,
+                                                                                  logger );  //Force logout the session
+
+            /*
+            await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
+                                                                                    userSessionStatus.SocketToken,
+                                                                                    strLanguage,
+                                                                                    null, //No warnings
+                                                                                    null, //No transaction
+                                                                                    logger );
+            */
+
+          }
+
+        }
+
+        response.status( result.StatusCode ).send( result );
+
+      }
+
+    }
+    else if ( response ) {
+
+      if ( userSessionStatus ) {
+
         const strSavedSocketToken = userSessionStatus.SocketToken;
 
         userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
@@ -662,16 +707,16 @@ export default class MiddlewareManager {
                                                                    updateAt: false
                                                                  },
                                                                  null,
-                                                                 logger );
+                                                                 logger ); //Force logout the session
 
         if ( strSavedSocketToken &&
-             !( request as any ).notDisconnectFromIMServer ) {
+            !( request as any ).notDisconnectFromIMServer ) {
 
           //FIXME 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
           await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                 null,
-                                                                                logger );  //Force logout the session
+                                                                                logger );
 
           /*
           await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
@@ -683,40 +728,6 @@ export default class MiddlewareManager {
           */
 
         }
-
-        response.status( result.StatusCode ).send( result );
-
-      }
-
-    }
-    else if ( response ) {
-
-      const strSavedSocketToken = userSessionStatus.SocketToken;
-
-      userSessionStatus = await SystemUtilities.logoutSession( userSessionStatus,
-                                                               {
-                                                                 updateAt: false
-                                                               },
-                                                               null,
-                                                               logger ); //Force logout the session
-
-      if ( strSavedSocketToken &&
-           !( request as any ).notDisconnectFromIMServer ) {
-
-        //FIXME 40E1487688CC Disconnect from remote server
-        //Send to instant message server a message to disconnect this user
-        await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
-                                                                              null,
-                                                                              logger );
-
-        /*
-        await SYSUserSessionPresenceService.disconnectFromInstantMessageServer( userSessionStatus,
-                                                                                userSessionStatus.SocketToken,
-                                                                                strLanguage,
-                                                                                null, //No warnings
-                                                                                null, //No transaction
-                                                                                logger );
-        */
 
       }
 
@@ -764,7 +775,7 @@ export default class MiddlewareManager {
                                                         logger );
 
     const bIsAuthorized = CommonUtilities.isInList( roles,
-                                                    userSessionStatus.Role,
+                                                    userSessionStatus?.Role,
                                                     logger );
 
     if ( bIsAuthorized === false ) {
@@ -955,7 +966,7 @@ export default class MiddlewareManager {
                                                           logger );
 
       result = CommonUtilities.isInList( roles,
-                                         userSessionStatus.Role,
+                                         userSessionStatus?.Role,
                                          logger );
 
       if ( result === false ) {
