@@ -1024,7 +1024,7 @@ export default class SystemConstants {
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
                                                                                  },
-                                                                                 "#Driver#":{
+                                                                                 "#Drivers#":{
                                                                                    "expireAt":60,
                                                                                    "group":"Drivers",
                                                                                    "createGroup":false,
@@ -1037,9 +1037,9 @@ export default class SystemConstants {
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
                                                                                  },
-                                                                                 "#FinalCustomer01#":{
+                                                                                 "#Final_Customers#":{
                                                                                    "expireAt":60,
-                                                                                   "group":"Final_Customers_01",
+                                                                                   "group":"Final_Customers",
                                                                                    "createGroup":false,
                                                                                    "groupRole":"",
                                                                                    "groupTag":"",
@@ -1050,7 +1050,7 @@ export default class SystemConstants {
                                                                                    "userExpireAt":-1,
                                                                                    "passwordParameterTag":""
                                                                                  },
-                                                                                 "#Establishment#":{
+                                                                                 "#Establishments#":{
                                                                                    "expireAt":60,
                                                                                    "group":"@__FromName__@",
                                                                                    "createGroup":true,
@@ -1594,7 +1594,7 @@ export default class SystemConstants {
                                                                              "#mobile-ionic5-sales-???#": {
                                                                                "userLoginControl": {
                                                                                  "denied": "",
-                                                                                 "allowed": "#Final_Customers_01#,#Administrator#"
+                                                                                 "allowed": "#Final_Customers#,#Administrator#"
                                                                                },
                                                                                "userSignupControl": {
                                                                                  "denied": "",
@@ -2052,7 +2052,6 @@ export default class SystemConstants {
                                             };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
-                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataBasePath,
@@ -2068,6 +2067,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
                                                SystemConstants._CONFIG_ENTRY_PUSH_Service,
                                                SystemConstants._CONFIG_ENTRY_DISCORD_Service,
+                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_Frontend_Rules,
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,

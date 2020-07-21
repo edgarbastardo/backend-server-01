@@ -58,11 +58,20 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserId: string;
 
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  Token: string;
+
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   Latitude: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   Longitude: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  Altitude: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  Speed: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;

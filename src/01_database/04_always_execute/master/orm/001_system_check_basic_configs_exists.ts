@@ -128,9 +128,42 @@ export default class Always {
       //Insert test data
       const configValueEntries = [
                                    {
-                                     ConfigMetaDataId: "9272d39a-4545-40e2-802f-5913998cbb20", //system.authentication.ExpireTimeAuthentication
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id, //system.authentication.ExpireTimeAuthentication
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                     Value: `{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
+                                     //Value: `{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
+                                     Value: JSON.stringify(
+                                                            {
+                                                              "#System_Administrators#": {
+                                                                kind: 0,
+                                                                on: 60 * 2
+                                                              },
+                                                              "#Business_Managers#": {
+                                                                kind: 0,
+                                                                on: 60 * 2
+                                                              },
+                                                              "#Administrative_Asistants#": {
+                                                                kind: 0,
+                                                                on: 60
+                                                              },
+                                                              "#Dispachers#": {
+                                                                kind: 0,
+                                                                on: 60 * 2
+                                                              },
+                                                              "#Drivers#":{
+                                                                kind: 0,
+                                                                on: 60 * 4
+                                                              },
+                                                              "#Final_Customers#":{
+                                                                kind: 1,
+                                                                on: 60 * 24 * 60
+                                                              },
+                                                              //TODO set by role from the user
+                                                              "#Establishment#": {
+                                                                kind: 1,
+                                                                on: 60 * 24 * 60
+                                                              }
+                                                            }
+                                                          ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
@@ -326,7 +359,7 @@ export default class Always {
                                                                 "maxSymbol":0,
                                                                 "symbols":""
                                                               },
-                                                              "#Final_Customers_01#":{
+                                                              "#Final_Customers#":{
                                                                 "minLength":7,
                                                                 "maxLength":9,
                                                                 "minLowerCase":0,
@@ -362,7 +395,7 @@ export default class Always {
                                      Value: JSON.stringify(
                                                             {
                                                               "@__default__@":{
-                                                                "expireAt":60, //Token signup valid time in minutes
+                                                                "expireAt": 60, //Token signup valid time in minutes. 1 hour
                                                                 "group":"@__error__@",
                                                                 "createGroup":false,
                                                                 "groupRole":"",
@@ -374,7 +407,7 @@ export default class Always {
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Driver#":{
-                                                                "expireAt":60, //Token signup valid time in minutes
+                                                                "expireAt": 60, //Token signup valid time in minutes.
                                                                 "group":"Drivers",
                                                                 "createGroup":false,
                                                                 "groupRole":"",
@@ -387,7 +420,7 @@ export default class Always {
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Administrative_Asistant#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
                                                                 "group":"Administrative_Asistants",
                                                                 "createGroup":false,
                                                                 "groupRole":"",
@@ -400,7 +433,7 @@ export default class Always {
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Dispatcher#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "expireAt": 60,
                                                                 "group":"Dispatchers",
                                                                 "createGroup":false,
                                                                 "groupRole":"",
@@ -413,7 +446,7 @@ export default class Always {
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Final_Customer#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
                                                                 "group":"Final_Customers",
                                                                 "createGroup":false,
                                                                 "groupRole":"",
@@ -426,14 +459,14 @@ export default class Always {
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Establishment#":{
-                                                                "expireAt":480,  //Token signup valid time in minutes
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
                                                                 "group":"@__FromName__@",
                                                                 "createGroup":true,
                                                                 "groupRole":"#@__FromName__@#,#Establishment#",
                                                                 "groupTag":"",
                                                                 "groupExpireAt":-1,
                                                                 "status":1,
-                                                                "userRole":"#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                "userRole":"#Master_L01#,#Establishment#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
                                                                 "passwordParameterTag":"#Establishments#"
@@ -711,7 +744,7 @@ export default class Always {
 
                                                                 "config": {
 
-                                                                  "#Drivers#": {
+                                                                  "#Driver#": {
 
                                                                     "resume": {
 
@@ -741,31 +774,44 @@ export default class Always {
                                                                   "#Business_Managers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#Business_Managers#,#Administrators#,#Drivers#,#Drivers_Position#"
 
                                                                   },
                                                                   "#System_Administrators#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#System_Administrators#,#Administrators#,#Drivers#,#Drivers_Position#"
 
                                                                   },
                                                                   "#Drivers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Drivers#,#Support#"
+                                                                    "allowed": "#Users#,#Drivers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
 
                                                                   },
                                                                   "#Dispachers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
+
+                                                                  },
+                                                                  "#Final_Customers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Support#"
+
+                                                                  },
+                                                                  //TODO set by role from the user
+                                                                  "#Establisment#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Users#,#Support#"
 
                                                                   },
                                                                   "@__default__@": {
 
                                                                     "denied": "",
-                                                                    "allowed": "*"
+                                                                    "allowed": "#Support#"
 
                                                                   }
 
