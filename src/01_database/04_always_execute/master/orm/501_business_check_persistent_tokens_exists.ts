@@ -109,14 +109,16 @@ export default class Always {
           else if ( !sysUserSessionPersistentInDB.Tag ||
                     sysUserSessionPersistentInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
-            //sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-
-            //await sysUserSessionPersistentInDB.save( { transaction: currentTransaction } );
-
+            userSessionPersistentToCreate.UserId = sysUserSessionPersistentInDB.UserId;
+            userSessionPersistentToCreate.Token = sysUserSessionPersistentInDB.Token;
+            userSessionPersistentToCreate.BinaryDataToken = sysUserSessionPersistentInDB.BinaryDataToken;
+            userSessionPersistentToCreate.SocketToken = sysUserSessionPersistentInDB.SocketToken;
+            userSessionPersistentToCreate.Tag = sysUserSessionPersistentInDB.Tag;
+            userSessionPersistentToCreate.Comment = sysUserSessionPersistentInDB.Comment;
             userSessionPersistentToCreate.UpdateBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userSessionPersistentToCreate.UpdateAt = null;
 
-            await sysUserSessionPersistentInDB.update( userSessionPersistentToCreate,
+            await sysUserSessionPersistentInDB.update( ( userSessionPersistentToCreate as any ).dataValues,
                                                        options );
 
           }

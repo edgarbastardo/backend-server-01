@@ -268,12 +268,19 @@ export default class Always {
           else if ( !sysUserInDB.Tag ||
                     sysUserInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
-            //sysUserInDB.Name = userToCreate.Name;
-            //sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
-            userToCreate.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userToCreate.UpdatedAt = null;
+            sysUserInDB.GroupId = userToCreate.GroupId;
+            sysUserInDB.ForceChangePassword = userToCreate.ForceChangePassword;
+            sysUserInDB.ChangePasswordEvery = userToCreate.ChangePasswordEvery;
+            sysUserInDB.SessionsLimit = userToCreate.SessionsLimit;
+            sysUserInDB.Name = userToCreate.Name;
+            sysUserInDB.Password = userToCreate.Password;
+            sysUserInDB.Role = userToCreate.Role;
+            sysUserInDB.Tag = userToCreate.Tag;
+            sysUserInDB.Comment = userToCreate.Comment;
+            sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserInDB.UpdatedAt = null;
 
-            await sysUserInDB.update( userToCreate,
+            await sysUserInDB.update( ( sysUserInDB as any ).dataValues,
                                       options );
 
           }
