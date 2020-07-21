@@ -71,7 +71,7 @@ export default class Always {
 
           }
           else if ( !userGroupInDB.Tag ||
-                     userGroupInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+                     userGroupInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
             userGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
@@ -266,7 +266,7 @@ export default class Always {
 
           }
           else if ( !sysUserInDB.Tag ||
-                    sysUserInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+                    sysUserInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
             //sysUserInDB.Name = userToCreate.Name;
             //sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );

@@ -81,7 +81,7 @@ export default class Always {
 
             }
             else if ( !configMetaDataInDB.Tag ||
-                      configMetaDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+                      configMetaDataInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
               configMetaDataInDB.Default = configMetaDataToCreate.Default;
               configMetaDataInDB.Example = configMetaDataToCreate.Example;
@@ -881,7 +881,7 @@ export default class Always {
 
             }
             else if ( !sysConfigValueDataInDB.Tag ||
-                      sysConfigValueDataInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) {
+                      sysConfigValueDataInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
               sysConfigValueDataInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
               sysConfigValueDataInDB.Value = configValueToCreate.Value;
