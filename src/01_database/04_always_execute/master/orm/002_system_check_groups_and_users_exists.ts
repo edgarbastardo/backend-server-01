@@ -58,9 +58,9 @@ export default class Always {
 
           }
 
-          const userGroupInDB = await SYSUserGroup.findOne( options );
+          const sysUserGroupInDB = await SYSUserGroup.findOne( options );
 
-          if ( userGroupInDB === null ) {
+          if ( sysUserGroupInDB === null ) {
 
             //const userGroupCreated =
             await SYSUserGroup.create( userGroupToCreate );
@@ -73,6 +73,22 @@ export default class Always {
 
             }
             */
+
+          }
+          else if ( !sysUserGroupInDB.Tag ||
+                     sysUserGroupInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
+
+            sysUserGroupInDB.Name = userGroupToCreate.Name;
+            sysUserGroupInDB.Role = userGroupToCreate.Role;
+            sysUserGroupInDB.Tag = userGroupToCreate.Tag;
+            sysUserGroupInDB.Comment = userGroupToCreate.Comment;
+            sysUserGroupInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserGroupInDB.DisabledBy = userGroupToCreate.DisabledBy;
+
+            //await sysUserGroupInDB.save( { transaction: currentTransaction } );
+
+            await sysUserGroupInDB.update( ( sysUserGroupInDB as any ).dataValues,
+                                           options );
 
           }
 
@@ -121,7 +137,7 @@ export default class Always {
           else if ( CommonUtilities.isNotNullOrEmpty( sysUserInDB ) && //The user exists in the db
                     CommonUtilities.isNullOrEmpty( sysUserInDB.Password ) && //The password is '', set again the default password
                     CommonUtilities.isNullOrEmpty( sysUserInDB.DisabledAt ) && //But the user is not disabled
-                    ( !sysUserInDB.Tag || sysUserInDB.Tag.includes( "#NotUpdateOnStartup#" ) === false ) ) { //And not tagged to not update at startup
+                    ( !sysUserInDB.Tag || sysUserInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) ) { //And not tagged to not update at startup
 
             sysUserInDB.Name = userToCreate.Name;
             sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
