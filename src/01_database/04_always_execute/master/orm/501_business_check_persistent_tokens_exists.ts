@@ -118,7 +118,7 @@ export default class Always {
             userSessionPersistentToCreate.UpdateBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             userSessionPersistentToCreate.UpdateAt = null;
 
-            await sysUserSessionPersistentInDB.update( userSessionPersistentToCreate,
+            await sysUserSessionPersistentInDB.update( ( userSessionPersistentToCreate as any ).dataValues,
                                                        options );
 
           }
