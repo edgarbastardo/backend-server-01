@@ -1054,6 +1054,7 @@ export default class SecurityServiceController {
 
           }
 
+          userSessionStatusData[ "ShortToken" ] = userSessionStatus.ShortToken;
           userSessionStatusData[ "UserTag" ] = strUserTags;
           //userSessionStatusData[ "User" ] = user.Name;
           userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
@@ -1110,7 +1111,7 @@ export default class SecurityServiceController {
                         Data: [
                                 {
                                   Authorization: strAuthorization,
-                                  ShortToken: userSessionStatus.ShortToken,
+                                  SupportToken: userSessionStatus.ShortToken,
                                   Role: strRolesMerged + strBasicRoles,
                                   LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
                                   Business: {

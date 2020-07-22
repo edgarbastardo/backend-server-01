@@ -162,16 +162,18 @@ CREATE TABLE IF NOT EXISTS `bizDriverStatus` (
 CREATE TABLE IF NOT EXISTS `bizDriverPosition` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',
-  `Token` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUserSessionStatus on field Token. No Database foreign key cascade update or delete',
+  `ShortToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUserSessionStatus on field ShortToken. No Database foreign key cascade update or delete',
+  `Accuracy` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Accuracy parameter.',
   `Latitude` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Latitude coordinate.',
   `Longitude` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Longitude coordinate.',
   `Altitude` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Altitude position.',
   `Speed` varchar(40) COLLATE utf8_unicode_ci NOT NULL  COMMENT 'Speed of movement',
+  `Status` smallint NOT NULL COMMENT '0 = offline. Data/Wifi off saved to local mobile database in the device and later uploaded to backend, 1 = online. Full data connectivity send to backend immediately',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
   PRIMARY KEY (`Id`),
   KEY `FK_bizDriverPosition_UserId_From_bizEstablishment_Id_idx` (`UserId`),
-  KEY `FK_bizDriverPosition_Token_From_sysUserSessionStatus_Token_idx` (`Token`),
+  KEY `FK_bizDriverPosition_Token_From_sysUserSessionStatus_Token_idx` (`ShortToken`),
   CONSTRAINT `FK_bizDriverPosition_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of driver position.';

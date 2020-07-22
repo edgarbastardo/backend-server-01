@@ -967,6 +967,7 @@ export default class SystemUtilities {
                        UserName: userSession.Data[ "UserName" ],
                        UserGroupId: userSession.Data[ "UserGroupId" ],
                        Token: strToken,
+                       ShortToken: userSession.Data[ "ShortToken" ],
                        BinaryDataToken: userSession.Data[ "BinaryDataToken" ],
                        SocketToken: userSession.Data[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
@@ -1241,26 +1242,26 @@ export default class SystemUtilities {
           result.IsValid = true;
 
           await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
-                                                                result,
-                                                                {
-                                                                  updateAt: true,                 //Update the field updatedAt
-                                                                  setRoles: bFromCache === false, //Set roles?
-                                                                  groupRoles: strUserGroupRole,   //User group roles
-                                                                  userRoles: strUserRole,         //User roles
-                                                                  forceUpdate: false,             //Force update?
-                                                                  tryLock: 1,                     //Only 1 try
-                                                                  lockSeconds: 7 * 1000,          //Second
-                                                                },
-                                                                /*
-                                                                bFromCache === false, //Set roles?
-                                                                strUserGroupRole,     //User group roles
-                                                                strUserRole,          //User roles
-                                                                false,                //Force update?
-                                                                1,                    //Only 1 try
-                                                                7 * 1000,             //Second
-                                                                */
-                                                                transaction,
-                                                                logger );
+                                                                 result,
+                                                                 {
+                                                                   updateAt: true,                 //Update the field updatedAt
+                                                                   setRoles: bFromCache === false, //Set roles?
+                                                                   groupRoles: strUserGroupRole,   //User group roles
+                                                                   userRoles: strUserRole,         //User roles
+                                                                   forceUpdate: false,             //Force update?
+                                                                   tryLock: 1,                     //Only 1 try
+                                                                   lockSeconds: 7 * 1000,          //Second
+                                                                 },
+                                                                 /*
+                                                                 bFromCache === false, //Set roles?
+                                                                 strUserGroupRole,     //User group roles
+                                                                 strUserRole,          //User roles
+                                                                 false,                //Force update?
+                                                                 1,                    //Only 1 try
+                                                                 7 * 1000,             //Second
+                                                                 */
+                                                                 transaction,
+                                                                 logger );
 
         }
 
@@ -2444,7 +2445,7 @@ export default class SystemUtilities {
         }
 
         if ( instance.rawAttributes[ "CreatedAt" ] &&
-             !instance.createdAt ) {
+             !instance.CreatedAt ) {
 
           instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
 

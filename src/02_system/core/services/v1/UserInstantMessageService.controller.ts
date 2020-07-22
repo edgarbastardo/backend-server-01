@@ -543,6 +543,7 @@ export default class UserInstantMessageServiceController {
                        Data: [
                                {
                                  Authorization: request.body.Authorization,
+                                 ShortAuthorization: userSessionStatusToCheck.ShortToken,
                                  Id: userSessionStatusToCheck.UserId,
                                  Avatar: userSessionStatusToCheck.UserAvatar,
                                  Name: userSessionStatusToCheck.UserName,

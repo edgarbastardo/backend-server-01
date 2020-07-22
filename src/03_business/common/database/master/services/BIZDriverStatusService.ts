@@ -46,11 +46,13 @@ export default class BIZDriverStatusService extends BaseService {
 
         where: { "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId : "" },
         transaction: currentTransaction,
+        /*
         include: [
                    {
                      model: SYSUser,
                    },
                  ]
+                 */
 
       }
 
@@ -136,7 +138,6 @@ export default class BIZDriverStatusService extends BaseService {
     return result;
 
   }
-
 
   static async getByUserId( strUserId: string,
                             transaction: any,

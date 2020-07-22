@@ -404,6 +404,7 @@ export default class Always {
                                                                 "status":-1,
                                                                 "userRole":"",
                                                                 "userTag":"",
+                                                                "userSessionLimit": 0,
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Driver#":{
@@ -417,7 +418,8 @@ export default class Always {
                                                                 "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
-                                                                "passwordParameterTag":""
+                                                                "userSessionLimit": 1,
+                                                                "passwordParameterTag":"",
                                                               },
                                                               "#Administrative_Asistant#":{
                                                                 "expireAt": 60,  //Token signup valid time in minutes.
@@ -430,6 +432,7 @@ export default class Always {
                                                                 "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Dispatcher#":{
@@ -443,6 +446,7 @@ export default class Always {
                                                                 "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Final_Customer#":{
@@ -456,6 +460,7 @@ export default class Always {
                                                                 "userRole":"",
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
                                                                 "passwordParameterTag":""
                                                               },
                                                               "#Establishment#":{
@@ -469,6 +474,7 @@ export default class Always {
                                                                 "userRole":"#Master_L01#,#Establishment#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                 "userTag":"",
                                                                 "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
                                                                 "passwordParameterTag":"#Establishments#"
                                                               }
                                                             }

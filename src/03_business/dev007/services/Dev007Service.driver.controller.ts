@@ -17,6 +17,7 @@ import BIZDriverStatusService from "../../common/database/master/services/BIZDri
 
 import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
+import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 
 const debug = require( "debug" )( "Dev007DriverServicesController" );
 
@@ -463,24 +464,109 @@ export default class Dev007DriverServicesController extends BaseService {
 
       }
 
-      //
+      let validationRules = {
+                              "bulk.*.Id": [ "present", "string" ],
+                              "bulk.*.Accuracy": [ "required", "numeric" ],
+                              "bulk.*.Latitude": [ "required", "numeric" ],
+                              "bulk.*.Longitude": [ "required", "numeric" ],
+                              "bulk.*.Altitude": [ "required", "numeric" ],
+                              "bulk.*.Speed": [ "required", "numeric" ],
+                              "bulk.*.CreatedAt": [ "present", "string" ],
+                            };
 
-      bApplyTransaction = true;
+      let validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                 validationRules,
+                                                                 null,
+                                                                 logger );
 
-      if ( currentTransaction !== null &&
-           currentTransaction.finished !== "rollback" &&
-           bIsLocalTransaction ) {
+      if ( validator.passes() ) { //Validate request.body field values
 
-        if ( bApplyTransaction ) {
+        let userSessionStatus = context.UserSessionStatus;
 
-          await currentTransaction.commit();
+        const bulkResult = await BIZDriverPositionService.bulkCreate(
+                                                                      request.body.bulk,
+                                                                      userSessionStatus.ShortToken,
+                                                                      userSessionStatus.UserId,
+                                                                      userSessionStatus.UserName,
+                                                                      strLanguage,
+                                                                      currentTransaction,
+                                                                      logger
+                                                                    );
+
+        let intStatusCode = -1;
+        let strCode = "";
+        let strMessage = "";
+        let bIsError = false;
+
+        if ( bulkResult.errors.length === 0 ) {
+
+          intStatusCode = 200
+          strCode = "SUCCESS_SET_DRIVER_POSITION";
+          strMessage = await I18NManager.translate( strLanguage, "Success set driver position" );
+
+          bApplyTransaction = true;
 
         }
         else {
 
-          await currentTransaction.rollback();
+          intStatusCode = 400
+          strCode = "ERROR_SET_DRIVER_POSITION";
+          strMessage = await I18NManager.translate( strLanguage, "Cannot set the driver position" );
+          bIsError = true;
 
         }
+
+        result = {
+                   StatusCode: intStatusCode,
+                   Code: strCode,
+                   Message: strMessage,
+                   Mark: "259CAC71028D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: bIsError,
+                   Errors: bulkResult.errors,
+                   Warnings: [],
+                   Count: request.body.bulk.length - bulkResult.errors.length,
+                   Data: bulkResult.data
+                 };
+
+        if ( currentTransaction !== null &&
+             currentTransaction.finished !== "rollback" &&
+             bIsLocalTransaction ) {
+
+          if ( bApplyTransaction ) {
+
+            await currentTransaction.commit();
+
+          }
+          else {
+
+            await currentTransaction.rollback();
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "F755FE079D55" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                               Details: validator.errors.all()
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
 
       }
 
@@ -579,24 +665,132 @@ export default class Dev007DriverServicesController extends BaseService {
 
       }
 
-      //
+      let userSessionStatus = context.UserSessionStatus;
 
-      bApplyTransaction = true;
+      let validationRules = {
+                              session: [ "present", "string" ],
+                              start: [ "present", "date" ],
+                              end: [ "present", "date" ],
+                              limit: [ "present", "integer", "min:1", "max:25" ],
+                            };
 
-      if ( currentTransaction !== null &&
-           currentTransaction.finished !== "rollback" &&
-           bIsLocalTransaction ) {
+      let validator = SystemUtilities.createCustomValidatorSync( request.query,
+                                                                 validationRules,
+                                                                 null,
+                                                                 logger );
 
-        if ( bApplyTransaction ) {
+      if ( validator.passes() ) { //Validate request.query field values
 
-          await currentTransaction.commit();
+        let lastDriverPositionList = [];
+
+        if ( !request.query.session ||
+             ( request.query.session as string ).toLowerCase() === "current" ) {
+
+          lastDriverPositionList = await BIZDriverPositionService.getLastPositionByShortToken(
+                                                                                               userSessionStatus.ShortToken,
+                                                                                               request.query.start as string,
+                                                                                               request.query.end as string,
+                                                                                               parseInt( request.query.limit as string ),
+                                                                                               currentTransaction,
+                                                                                               logger
+                                                                                             );
 
         }
         else {
 
-          await currentTransaction.rollback();
+          lastDriverPositionList = await BIZDriverPositionService.getLastPositionByUserId(
+                                                                                           userSessionStatus.UserId,
+                                                                                           request.query.start as string,
+                                                                                           request.query.end as string,
+                                                                                           parseInt( request.query.limit as string ),
+                                                                                           currentTransaction,
+                                                                                           logger
+                                                                                         );
 
         }
+
+        if ( lastDriverPositionList &&
+             lastDriverPositionList instanceof Error === false ) {
+
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: "SUCCESS_GET_DRIVER_POSITION",
+                     Message: await I18NManager.translate( strLanguage, "Success get driver position." ),
+                     Mark: "02A84EEC9C0A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: lastDriverPositionList.length,
+                     Data: lastDriverPositionList
+                   };
+
+          bApplyTransaction = true;
+
+        }
+        else {
+
+          const error = lastDriverPositionList as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "2DC29DF23598" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+        if ( currentTransaction !== null &&
+            currentTransaction.finished !== "rollback" &&
+            bIsLocalTransaction ) {
+
+          if ( bApplyTransaction ) {
+
+            await currentTransaction.commit();
+
+          }
+          else {
+
+            await currentTransaction.rollback();
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                   Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                   Mark: "F755FE079D55" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                               Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                               Details: validator.errors.all()
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
 
       }
 

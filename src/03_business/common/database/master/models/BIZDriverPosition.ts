@@ -30,7 +30,7 @@ import CommonConstants from "../../../../../02_system/common/CommonConstants";
 import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
-import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
+//import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
 import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
 
@@ -59,7 +59,10 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
   UserId: string;
 
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  Token: string;
+  ShortToken: string;
+
+  @Column( { type: DataType.STRING( 20 ), allowNull: false } )
+  Accuracy: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   Latitude: string;
@@ -72,6 +75,9 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   Speed: string;
+
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Status: number;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -97,11 +103,14 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
+    /*
+    //This table has a lot write to database. Can collapse the database
     SYSDatabaseLogService.logTableOperation( "master",
                                              "bizDriverPosition",
                                              "create",
                                              instance,
                                              null );
+                                             */
 
   }
 
@@ -112,11 +121,14 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
+    /*
+    //This table has a lot write to database. Can collapse the database
     SYSDatabaseLogService.logTableOperation( "master",
                                              "bizDriverPosition",
                                              "update",
                                              instance,
                                              oldDataValues );
+                                             */
 
   }
 
@@ -125,11 +137,14 @@ export class BIZDriverPosition extends Model<BIZDriverPosition> {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
+    /*
+    //This table has a lot write to database. Can collapse the database
     SYSDatabaseLogService.logTableOperation( "master",
                                              "bizDriverPosition",
                                              "delete",
                                              instance,
                                              null );
+                                             */
 
   }
 
