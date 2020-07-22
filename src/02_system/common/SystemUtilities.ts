@@ -967,6 +967,7 @@ export default class SystemUtilities {
                        UserName: userSession.Data[ "UserName" ],
                        UserGroupId: userSession.Data[ "UserGroupId" ],
                        Token: strToken,
+                       ShortToken: userSession.Data[ "ShortToken" ],
                        BinaryDataToken: userSession.Data[ "BinaryDataToken" ],
                        SocketToken: userSession.Data[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
@@ -2444,7 +2445,7 @@ export default class SystemUtilities {
         }
 
         if ( instance.rawAttributes[ "CreatedAt" ] &&
-             !instance.createdAt ) {
+             !instance.CreatedAt ) {
 
           instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
 

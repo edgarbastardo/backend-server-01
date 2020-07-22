@@ -1110,7 +1110,7 @@ export default class SecurityServiceController {
                         Data: [
                                 {
                                   Authorization: strAuthorization,
-                                  ShortToken: userSessionStatus.ShortToken,
+                                  SupportToken: userSessionStatus.ShortToken,
                                   Role: strRolesMerged + strBasicRoles,
                                   LastLoginAt: lastLoginAt ? lastLoginAt: I18NManager.translateSync( context.Language, "Never" ),
                                   Business: {
