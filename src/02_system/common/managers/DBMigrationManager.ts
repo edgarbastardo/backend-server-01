@@ -67,7 +67,7 @@ export default class DBMigrationManager {
 
             if ( dbConfig[ "dialect" ] === "mysql" ) {
 
-              bResult = await DBMigrationManagerMYSQL.createDatabaseIfNotExits( strDatabase,
+              bResult = await DBMigrationManagerMYSQL.createDatabaseIfNotExits( strCurrentDatabase,
                                                                                 dbConfig,
                                                                                 logger );
 
