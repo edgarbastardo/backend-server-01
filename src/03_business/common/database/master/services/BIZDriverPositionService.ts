@@ -338,63 +338,61 @@ export default class BIZDriverPositionService extends BaseService {
       if ( rows &&
            rows.length >= 1 ) {
 
-        let strLastSession = null;
-        let strLastName = null;
+        let strSavedSessionShortToken = null;
+        let strSavedUserName = null;
 
-        let intSessionIndex = 1;
+        //let intSessionIndex = 1;
 
+        let userNameSessionList = {};
         let sessionPoints = [];
 
         for ( let intIndex = 0; intIndex < rows.length; intIndex++ ) {
 
-          if ( strLastSession === null ) {
+          if ( strSavedSessionShortToken === null ) {
 
-            strLastSession = rows[ intIndex ].Token;
-            strLastName = rows[ intIndex ].Name;
+            strSavedSessionShortToken = rows[ intIndex ].ShortToken;
+            strSavedUserName = rows[ intIndex ].Name;
 
             delete rows[ intIndex ].Name;
-            delete rows[ intIndex ].Token;
+            delete rows[ intIndex ].ShortToken;
 
             sessionPoints.push( rows[ intIndex ] );
 
           }
-          else if ( strLastSession == rows[ intIndex ].Token ) {
+          else if ( strSavedSessionShortToken === rows[ intIndex ].ShortToken ) {
 
-            strLastName = rows[ intIndex ].Name;
+            strSavedUserName = rows[ intIndex ].Name;
 
             delete rows[ intIndex ].Name;
-            delete rows[ intIndex ].Token;
+            delete rows[ intIndex ].ShortToken;
 
             sessionPoints.push( rows[ intIndex ] );
 
           }
-          else if ( strLastSession != rows[ intIndex ].Token ) {
+          else if ( strSavedSessionShortToken !== rows[ intIndex ].ShortToken ) {
 
-            const strSessionName = `${strLastName}_session_${ intSessionIndex < 9 ? "0" + intSessionIndex: intSessionIndex }`
+            userNameSessionList[ strSavedUserName ] = { [ strSavedSessionShortToken ] : [ ...sessionPoints ] };
 
-            result.push( { [ strSessionName ] : [ ...sessionPoints ] } );
+            strSavedSessionShortToken = rows[ intIndex ].ShortToken;
+            strSavedUserName = rows[ intIndex ].Name;
 
-            strLastSession = rows[ intIndex ].Token;
-            strLastName = rows[ intIndex ].Name;
-
-            delete rows[ intIndex ].Token;
             delete rows[ intIndex ].Name;
+            delete rows[ intIndex ].ShortToken;
 
-            sessionPoints = [];
+            sessionPoints = [ rows[ intIndex ] ];
 
-            intSessionIndex += 1;
+            //intSessionIndex += 1;
 
           }
 
         }
 
-        //if ( strLastSession == rows[ rows.length - 1 ].Token ) {
+        userNameSessionList[ strSavedUserName ] = {
+                                                    ...userNameSessionList[ strSavedUserName ],
+                                                    [ strSavedSessionShortToken ] : [ ...sessionPoints ]
+                                                  };
 
-        const strSessionName = `${strLastName}_session_${ intSessionIndex < 10 ? "0" + intSessionIndex: intSessionIndex }`
-
-        result.push( { [ strSessionName ]: [ ...sessionPoints ] } );
-
-        //}
+        result.push( userNameSessionList );
 
       }
       else  {

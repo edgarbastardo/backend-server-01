@@ -12,8 +12,8 @@
 -- delete from sysDBImportedData where FileName = "System.Database.Entity.Group.data.0.json";
 -- delete from sysDBImportedData where FileName = "System.Database.Entity.Operator.data.0.json";
 -- delete from sysDBImportedData where FileName = "Business.Database.Entity.Branch.Office.data.0.json";
-delete from sysDBMigratedData;
-drop table bizDriverPosition;
+-- delete from sysDBMigratedData;
+-- drop table bizDriverPosition;
 -- drop table bizOrder;
 -- drop table bizOrderPaymentMethod;
 -- drop table bizOrderTransaction;
