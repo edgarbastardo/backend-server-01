@@ -1,56 +1,56 @@
-require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
+require( "dotenv" ).config(); //Read the .env file, in the root folder of project
 
-import fs from 'fs'; //Load the filesystem module
-import cluster from 'cluster';
-//import os from 'os';
+import fs from "fs"; //Load the filesystem module
+import cluster from "cluster";
+//import os from "os";
 
-import appRoot from 'app-root-path';
-//import moment = require('moment-timezone');
-//import { createServer } from 'http';
+import appRoot from "app-root-path";
+//import moment = require("moment-timezone");
+//import { createServer } from "http";
 
-import CommonConstants from './02_system/common/CommonConstants';
+import CommonConstants from "./02_system/common/CommonConstants";
 import SystemConstants from "./02_system/common/SystemContants";
 
 import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from "./02_system/common/managers/LoggerManager";
-import ApplicationServerDataManager from './02_system/common/managers/ApplicationServerDataManager';
-import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
+import ApplicationServerDataManager from "./02_system/common/managers/ApplicationServerDataManager";
+import DBMigrationManager from "./02_system/common/managers/DBMigrationManager";
 import DBConnectionManager from "./02_system/common/managers/DBConnectionManager";
-import CacheManager from './02_system/common/managers/CacheManager';
+import CacheManager from "./02_system/common/managers/CacheManager";
 import ModelServiceManager from "./02_system/common/managers/ModelServiceManager";
 import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManager";
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
-import NotificationManager from './02_system/common/managers/NotificationManager';
-//import InstantMenssageManager from './02_system/common/managers/InstantMessageManager';
-//import NotificationManager from './02_system/common/managers/NotificationManager';
+import NotificationManager from "./02_system/common/managers/NotificationManager";
+//import InstantMenssageManager from "./02_system/common/managers/InstantMessageManager";
+//import NotificationManager from "./02_system/common/managers/NotificationManager";
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
-import SYSSystemEventLogService from './02_system/common/database/master/services/SYSSystemEventLogService';
-//import PresenceManager from './02_system/common/managers/PresenceManager';
+import SYSSystemEventLogService from "./02_system/common/database/master/services/SYSSystemEventLogService";
+//import PresenceManager from "./02_system/common/managers/PresenceManager";
 import InstantMessageServerManager from "./02_system/common/managers/InstantMessageServerManager";
 
-let debug = null; //require( 'debug' )( 'server' );
+let debug = null; //require( "debug" )( "server" );
 
 if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
-  debug = require( 'debug' )( 'server_data@http_worker' );
+  debug = require( "debug" )( "server_data@http_worker" );
 
 }
 else if ( process.env.WORKER_KIND === "job_worker_process" ) {
 
-  debug = require( 'debug' )( 'server_data@job_worker' );
+  debug = require( "debug" )( "server_data@job_worker" );
 
 }
 else {
 
-  debug = require( 'debug' )( 'server_data@main_process' );
+  debug = require( "debug" )( "server_data@main_process" );
 
 }
 
-export default class ServerMain {
+export default class App {
 
   static intCountHTTPWorkerKilled = 0;
   static intCountProcessWorkerKilled = 0;
@@ -66,12 +66,12 @@ export default class ServerMain {
       let debugMark = debug.extend( "F79A4FFC66ED" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
-      ServerMain.intCountHTTPWorkerKilled += 1;
+      App.intCountHTTPWorkerKilled += 1;
 
-      if ( ServerMain.intCountHTTPWorkerKilled >= parseInt( process.env.MAX_KILLED_HTTP_WORKER_COUNT ) ) {
+      if ( App.intCountHTTPWorkerKilled >= parseInt( process.env.MAX_KILLED_HTTP_WORKER_COUNT ) ) {
 
         debugMark( `Max HTTP worker process killed count: %s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
-        debugMark( `HTTP worker process killed count: %s`, ServerMain.intCountHTTPWorkerKilled );
+        debugMark( `HTTP worker process killed count: %s`, App.intCountHTTPWorkerKilled );
 
         debugMark( `To much HTTP worker process killed. Aborting main process execution.` );
 
@@ -115,7 +115,7 @@ export default class ServerMain {
       else {
 
         debugMark( `Max HTTP worker process killed count: %s`, process.env.MAX_KILLED_HTTP_WORKER_COUNT );
-        debugMark( `HTTP worker process killed count: %s`, ServerMain.intCountHTTPWorkerKilled );
+        debugMark( `HTTP worker process killed count: %s`, App.intCountHTTPWorkerKilled );
 
       }
 
@@ -146,19 +146,19 @@ export default class ServerMain {
 
         });
 
-        httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-          await ServerMain.httpWorkerProcessExit( httpWorker,
+          await App.httpWorkerProcessExit( httpWorker,
                                                   strCode,
                                                   strSignal,
                                                   logger );
 
         });
 
-        httpWorker.on( 'online', async () => {
+        httpWorker.on( "online", async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
+          debugMark( "HTTP worker process with id: %d is online", httpWorker.id );
 
         });
 
@@ -166,12 +166,12 @@ export default class ServerMain {
       else if ( strCode !== 0 ) {
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorker.id, strCode );
+        debugMark( "HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!", httpWorker.id, strCode );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!', httpWorker.id, strCode );
+          logger.warning( "HTTP worker process with id: %s has down, with code: %s. Starting another worker to replace!", httpWorker.id, strCode );
 
         }
 
@@ -192,19 +192,19 @@ export default class ServerMain {
 
         });
 
-        httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-          await ServerMain.httpWorkerProcessExit( httpWorker,
+          await App.httpWorkerProcessExit( httpWorker,
                                                   strCode,
                                                   strSignal,
                                                   logger );
 
         });
 
-        httpWorker.on( 'online', async () => {
+        httpWorker.on( "online", async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
+          debugMark( "HTTP worker process with id: %d is online", httpWorker.id );
 
         });
 
@@ -212,11 +212,11 @@ export default class ServerMain {
       else {
 
         //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'HTTP worker process with id: %s success!', httpWorker.id );
+        debugMark( "HTTP worker process with id: %s success!", httpWorker.id );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.info( 'HTTP worker process with id: %s success!', httpWorker.id );
+          logger.info( "HTTP worker process with id: %s success!", httpWorker.id );
 
         }
 
@@ -237,12 +237,12 @@ export default class ServerMain {
       let debugMark = debug.extend( "7CF8309CAA49" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
       debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
 
-      ServerMain.intCountProcessWorkerKilled += 1;
+      App.intCountProcessWorkerKilled += 1;
 
-      if ( ServerMain.intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_JOB_WORKER_COUNT ) ) {
+      if ( App.intCountProcessWorkerKilled >= parseInt( process.env.MAX_KILLED_JOB_WORKER_COUNT ) ) {
 
         debugMark( `Max JOB worker process killed count: %s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
-        debugMark( `JOB worker process killed count: %s`, ServerMain.intCountProcessWorkerKilled );
+        debugMark( `JOB worker process killed count: %s`, App.intCountProcessWorkerKilled );
 
         debugMark( `To much JOB worker process killed. Aborting main process execution.` );
 
@@ -285,7 +285,7 @@ export default class ServerMain {
       else {
 
         debugMark( `Max JOB worker process killed count: $s`, process.env.MAX_KILLED_JOB_WORKER_COUNT );
-        debugMark( `JOB worker process killed count: $s`, ServerMain.intCountProcessWorkerKilled );
+        debugMark( `JOB worker process killed count: $s`, App.intCountProcessWorkerKilled );
 
       }
 
@@ -317,19 +317,19 @@ export default class ServerMain {
 
         });
 
-        jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-          await ServerMain.jobWorkerProcessExit( jobWorker,
+          await App.jobWorkerProcessExit( jobWorker,
                                                  strCode,
                                                  strSignal,
                                                  logger );
 
         });
 
-        jobWorker.on( 'online', async () => {
+        jobWorker.on( "online", async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
+          debugMark( "JOB worker process with id: %d is online", jobWorker.id );
 
         });
 
@@ -337,12 +337,12 @@ export default class ServerMain {
       else if ( strCode !== 0 ) {
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobWorker.id, strCode );
+        debugMark( "JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!", jobWorker.id, strCode );
 
         if ( logger &&
              typeof logger.warning === "function" ) {
 
-          logger.warning( 'JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!', jobWorker.id, strCode );
+          logger.warning( "JOB worker process with id: %s has down, with code: %s. Starting another worker to replace!", jobWorker.id, strCode );
 
         }
 
@@ -363,19 +363,19 @@ export default class ServerMain {
 
         });
 
-        jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+        jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-          await ServerMain.jobWorkerProcessExit( jobWorker,
+          await App.jobWorkerProcessExit( jobWorker,
                                                  strCode,
                                                  strSignal,
                                                  logger );
 
         });
 
-        jobWorker.on( 'online', async () => {
+        jobWorker.on( "online", async () => {
 
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-          debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
+          debugMark( "JOB worker process with id: %d is online", jobWorker.id );
 
         });
 
@@ -383,11 +383,11 @@ export default class ServerMain {
       else {
 
         //debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( 'Worker process with id: %s success!', jobWorker.id );
+        debugMark( "Worker process with id: %s success!", jobWorker.id );
 
         if ( logger && typeof logger.warning === "function" ) {
 
-          logger.info( 'Worker process with id: %s success!', jobWorker.id );
+          logger.info( "Worker process with id: %s success!", jobWorker.id );
 
         }
 
@@ -412,7 +412,7 @@ export default class ServerMain {
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
         debugMark( `Main process running on *:%d%s`, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
-        debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
+        debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER === "1"? "Yes":"No"}` );
         debugMark( `Main process is starting the JobQueueManager` );
 
         await JobQueueManager.create( null,
@@ -497,7 +497,7 @@ export default class ServerMain {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = ServerMain.name + "." + ServerMain.handlerListenOnTopic.name;
+      sourcePosition.method = App.name + "." + App.handlerListenOnTopic.name;
 
       debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
       debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
@@ -902,19 +902,19 @@ export default class ServerMain {
 
               });
 
-              httpWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+              httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-                await ServerMain.httpWorkerProcessExit( httpWorker,
+                await App.httpWorkerProcessExit( httpWorker,
                                                         strCode,
                                                         strSignal,
                                                         LoggerManager.mainLoggerInstance );
 
               });
 
-              httpWorker.on( 'online', async () => {
+              httpWorker.on( "online", async () => {
 
                 debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-                debugMark( 'HTTP worker process with id: %d is online', httpWorker.id );
+                debugMark( "HTTP worker process with id: %d is online", httpWorker.id );
 
               });
 
@@ -995,19 +995,19 @@ export default class ServerMain {
 
               });
 
-              jobWorker.on( 'exit', async ( strCode: any, strSignal: any ) => {
+              jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
-                await ServerMain.jobWorkerProcessExit( jobWorker,
+                await App.jobWorkerProcessExit( jobWorker,
                                                        strCode,
                                                        strSignal,
                                                        LoggerManager.mainLoggerInstance );
 
               });
 
-              jobWorker.on( 'online', async () => {
+              jobWorker.on( "online", async () => {
 
                 debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-                debugMark( 'JOB worker process with id: %d is online', jobWorker.id );
+                debugMark( "JOB worker process with id: %d is online", jobWorker.id );
 
               });
 
@@ -1021,7 +1021,7 @@ export default class ServerMain {
 
         if ( intHTTPWorkerProcessCount === 0 ) { //Launch the main to handle the http request
 
-          await ServerMain.startServerListen( debugMark,
+          await App.startServerListen( debugMark,
                                               LoggerManager.mainLoggerInstance );
 
           /*
@@ -1037,7 +1037,7 @@ export default class ServerMain {
               debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
               debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
               debugMark( `Main process running on *:%d%s`, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
-              debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
+              debugMark( `Main process is network leader: ${process.env.IS_NETWORK_LEADER === "1"? "Yes":"No"}` );
               debugMark( `Main process is starting the JobQueueManager` );
 
               await JobQueueManager.create( null,
@@ -1053,15 +1053,15 @@ export default class ServerMain {
         //Listen on
         await NotificationManager.listenOnTopic( "connectionListenOnTopicSystemEvent",
                                                  "SystemEvent",
-                                                 ServerMain.handlerListenOnTopic,
+                                                 App.handlerListenOnTopic,
                                                  LoggerManager.mainLoggerInstance );
 
-        ServerMain.checkHealthDBConnections();
+        App.checkHealthDBConnections();
 
       }
       else if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
-        await ServerMain.startServerListen( debugMark,
+        await App.startServerListen( debugMark,
                                             LoggerManager.mainLoggerInstance );
 
         /*
@@ -1075,7 +1075,7 @@ export default class ServerMain {
             let debugMark = debug.extend( "56C70776F9AC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
             debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-            debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
+            debugMark( `HTTP worker main process is network leader: ${process.env.IS_NETWORK_LEADER === "1"? "Yes":"No"}` );
             debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, process.env.SERVER_ROOT_PATH );
             debugMark( `HTTP worker process with id: %d running on *:%d%s`, cluster.worker.id, intPort, ApplicationServerDataManager.currentInstance.apolloServer.graphqlPath );
             debugMark( `HTTP worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
@@ -1112,7 +1112,7 @@ export default class ServerMain {
         let debugMark = debug.extend( "12D457F51385" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-        debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER === '1'? "Yes":"No"}` );
+        debugMark( `JOB worker main process is network leader: ${process.env.IS_NETWORK_LEADER === "1"? "Yes":"No"}` );
         debugMark( `JOB worker process with id: %d is starting the JobQueueManager`, cluster.worker.id );
 
         process.send(
@@ -1131,7 +1131,7 @@ export default class ServerMain {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = ServerMain.name + "." + ServerMain.main.name;
+      sourcePosition.method = App.name + "." + App.main.name;
 
       const strMark = "54117181D87F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -1156,4 +1156,4 @@ export default class ServerMain {
 
 }
 
-ServerMain.main();
+App.main();

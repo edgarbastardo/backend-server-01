@@ -1,23 +1,23 @@
-require( 'dotenv' ).config(); //Read the .env file, in the root folder of project
+require( "dotenv" ).config(); //Read the .env file, in the root folder of project
 
-import cluster from 'cluster';
+import cluster from "cluster";
 
-import appRoot from 'app-root-path';
+import appRoot from "app-root-path";
 
-import CommonConstants from './02_system/common/CommonConstants';
+import CommonConstants from "./02_system/common/CommonConstants";
 
 import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from "./02_system/common/managers/LoggerManager";
-import NotificationManager from './02_system/common/managers/NotificationManager';
-import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
-import CacheManager from './02_system/common/managers/CacheManager';
+import NotificationManager from "./02_system/common/managers/NotificationManager";
+import DBConnectionManager from "./02_system/common/managers/DBConnectionManager";
+import CacheManager from "./02_system/common/managers/CacheManager";
 import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
 
-let debug = require( 'debug' )( 'server_task@main_process' );
+let debug = require( "debug" )( "server_task@main_process" );
 
-export default class ServerTask {
+export default class App {
 
   /*
   static bRunningTask = false;
@@ -171,21 +171,21 @@ export default class ServerTask {
 
       await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
 
-      process.on( 'SIGTERM', async () => {
+      process.on( "SIGTERM", async () => {
 
-        //console.info('SIGTERM signal received.');
+        //console.info("SIGTERM signal received.");
         debugMark( "SIGTERM signal received." );
 
-        ServerTask.handlerCleanExit();
+        App.handlerCleanExit();
 
       });
 
-      process.on( 'SIGINT', () => {
+      process.on( "SIGINT", () => {
 
-        //console.info('SIGTERM signal received.');
+        //console.info("SIGTERM signal received.");
         debugMark( "SIGINT signal received." );
 
-        ServerTask.handlerCleanExit();
+        App.handlerCleanExit();
 
       });
 
@@ -235,7 +235,7 @@ export default class ServerTask {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.main.name;
+      sourcePosition.method = App.name + "." + App.main.name;
 
       const strMark = "E65067AADF92" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -261,4 +261,4 @@ export default class ServerTask {
 
 }
 
-ServerTask.main();
+App.main();

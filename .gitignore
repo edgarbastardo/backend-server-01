@@ -7,6 +7,7 @@ deploy/
 .deploy.json
 .env.log
 .env.secrets
+.env.bootstrap
 temp/tmp-*
 temp/dsistemas01/
 temp/undefined/
