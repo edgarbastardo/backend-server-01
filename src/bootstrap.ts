@@ -1,17 +1,17 @@
-import appRoot from 'app-root-path';
+import appRoot from "app-root-path";
 
 require( "dotenv" ).config( { path: appRoot.path + "/.env.bootstrap" } ); //Read the .env.bootstrap file, in the root folder of project
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 import cluster from "cluster";
 import fs from "fs"; //Load the filesystem module
 
-import CommonConstants from './02_system/common/CommonConstants';
+import CommonConstants from "./02_system/common/CommonConstants";
 //import SystemConstants from "./02_system/common/SystemContants";
 
-import CommonUtilities from './02_system/common/CommonUtilities';
-import SystemUtilities from './02_system/common/SystemUtilities';
+import CommonUtilities from "./02_system/common/CommonUtilities";
+import SystemUtilities from "./02_system/common/SystemUtilities";
 
 const debug = require( "debug" )( "bootstrap@main_process" );
 
@@ -29,7 +29,7 @@ export default class App {
     try {
 
       const options = {
-                        method: 'GET',
+                        method: "GET",
                         headers: headers,
                         body: null,
                       };
