@@ -25,4 +25,4 @@ tasks/output/task-*
 tasks/input/undefined*
 tasks/output/undefined*
 tasks/undefined/
-config-backup/*
+config_backup/*
