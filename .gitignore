@@ -5,9 +5,9 @@ binary_data/persistent/
 install_distribution/
 deploy/
 .deploy.json
+.env.bootstrap
 .env.log
 .env.secrets
-.env.bootstrap
 temp/tmp-*
 temp/dsistemas01/
 temp/undefined/
