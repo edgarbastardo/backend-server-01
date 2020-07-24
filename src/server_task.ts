@@ -1,5 +1,6 @@
 require( "dotenv" ).config(); //Read the .env file, in the root folder of project
 
+import fs from "fs"; //Load the filesystem module
 import cluster from "cluster";
 
 import appRoot from "app-root-path";
@@ -18,107 +19,6 @@ import ApplicationServerTaskManager from "./02_system/common/managers/Applicatio
 let debug = require( "debug" )( "server_task@main_process" );
 
 export default class App {
-
-  /*
-  static bRunningTask = false;
-
-  static fibo( n: number ): number {
-
-    if ( n < 2 ) {
-
-      return 1;
-
-    }
-    else {
-
-      return ServerTask.fibo( n - 2 ) + ServerTask.fibo( n - 1 );
-
-    }
-
-  }
-
-  static async handlerRunRask(): Promise<boolean> {
-
-    let bResult = false;
-
-    let currentTransaction = null;
-
-    const strMark = "B6BF8BB0C7C6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
-
-    const debugMark = debug.extend( strMark );
-
-    debugMark( "handlerRunRask - start" );
-
-    try {
-
-      if ( ServerTask.bRunningTask === false ) {
-
-        ServerTask.bRunningTask = true;
-
-        const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
-
-        if ( currentTransaction === null ) {
-
-          currentTransaction = await dbConnection.transaction();
-
-        }
-
-        //ServerTask.fibo( 9999 );
-
-        if ( currentTransaction !== null &&
-            currentTransaction.finished !== "rollback" ) {
-
-          await currentTransaction.commit();
-
-        }
-
-        ServerTask.bRunningTask = true;
-
-      }
-
-    }
-    catch ( error ) {
-
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
-
-      sourcePosition.method = ServerTask.name + "." + ServerTask.handlerRunRask.name;
-
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
-      debugMark( "Catched on: %O", sourcePosition );
-
-      error.mark = strMark;
-      error.logId = SystemUtilities.getUUIDv4();
-
-      if ( LoggerManager.mainLoggerInstance &&
-           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
-
-        LoggerManager.mainLoggerInstance.error( error );
-
-      }
-
-      if ( currentTransaction !== null ) {
-
-        try {
-
-          await currentTransaction.rollback();
-
-        }
-        catch ( error ) {
-
-
-        }
-
-      }
-
-    }
-
-    debugMark( "handlerRunRask - finish" );
-
-    return bResult;
-
-  }
-  */
 
   static async handlerCleanExit() {
 
@@ -147,12 +47,70 @@ export default class App {
 
   }
 
+  static async proccessEnviromentContainer() {
+
+    let enviromentContainer = {} as any;
+
+    if ( fs.existsSync( SystemUtilities.strBaseRootPath + "/.env.container" ) ) {
+
+      try {
+
+        const strFileContent = fs.readFileSync( SystemUtilities.strBaseRootPath + "/.env.container" );
+
+        const dotenv = require( "dotenv" );
+
+        enviromentContainer = dotenv.parse( strFileContent );
+
+      }
+      catch ( error ) {
+
+        //
+
+      }
+
+    }
+
+    if ( enviromentContainer?.SEQUENCE &&
+         parseInt( enviromentContainer?.SEQUENCE ) >= 1 ) {
+
+      if ( process.env.APP_PROJECT_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_PROJECT_NAME = process.env.APP_PROJECT_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+      if ( process.env.APP_SERVER_DATA_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_SERVER_DATA_NAME = process.env.APP_SERVER_DATA_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+      if ( process.env.APP_SERVER_TASK_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_SERVER_TASK_NAME = process.env.APP_SERVER_TASK_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+    }
+
+    if ( enviromentContainer?.APP_SERVER_PORT &&
+         parseInt( enviromentContainer?.APP_SERVER_PORT ) >= 1 ) {
+
+      process.env.APP_SERVER_PORT = enviromentContainer?.APP_SERVER_PORT;
+
+    }
+
+  }
+
   static async main() {
 
     SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 
     SystemUtilities.strBaseRunPath = __dirname;
     SystemUtilities.strBaseRootPath = appRoot.path;
+
+    await App.proccessEnviromentContainer(); //Process the enviroment container info
+
     SystemUtilities.strAPPName = process.env.APP_SERVER_TASK_NAME;
 
     try {
@@ -210,7 +168,7 @@ export default class App {
                                                                        },
                                                                        {
                                                                          title: "Application",
-                                                                         value: process.env.APP_SERVER_TASK_NAME,
+                                                                         value: process.env.APP_SERVER_TASK_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                          short: false
                                                                        },
                                                                        {

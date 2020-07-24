@@ -93,7 +93,7 @@ export default class App {
                                                                          },
                                                                          {
                                                                            title: "Application",
-                                                                           value: process.env.APP_SERVER_DATA_NAME,
+                                                                           value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                            short: false
                                                                          },
                                                                          {
@@ -264,7 +264,7 @@ export default class App {
                                                                          },
                                                                          {
                                                                            title: "Application",
-                                                                           value: process.env.APP_SERVER_DATA_NAME,
+                                                                           value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                            short: false
                                                                          },
                                                                          {
@@ -400,7 +400,7 @@ export default class App {
   static async startServerListen( debugMark: any,
                                   logger: any ) {
 
-    const intPort = process.env.APP_SERVER_DATA_PORT || 9090;
+    const intPort = process.env.APP_SERVER_PORT || 9090;
 
     ApplicationServerDataManager.currentInstance.listen(
 
@@ -555,7 +555,7 @@ export default class App {
                                                                            },
                                                                            {
                                                                              title: "Application",
-                                                                             value: process.env.APP_SERVER_DATA_NAME,
+                                                                             value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                              short: false
                                                                            },
                                                                            {
@@ -587,12 +587,70 @@ export default class App {
 
   }
 
+  static async proccessEnviromentContainer() {
+
+    let enviromentContainer = {} as any;
+
+    if ( fs.existsSync( SystemUtilities.strBaseRootPath + "/.env.container" ) ) {
+
+      try {
+
+        const strFileContent = fs.readFileSync( SystemUtilities.strBaseRootPath + "/.env.container" );
+
+        const dotenv = require( "dotenv" );
+
+        enviromentContainer = dotenv.parse( strFileContent );
+
+      }
+      catch ( error ) {
+
+        //
+
+      }
+
+    }
+
+    if ( enviromentContainer?.SEQUENCE &&
+         parseInt( enviromentContainer?.SEQUENCE ) >= 1 ) {
+
+      if ( process.env.APP_PROJECT_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_PROJECT_NAME = process.env.APP_PROJECT_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+      if ( process.env.APP_SERVER_DATA_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_SERVER_DATA_NAME = process.env.APP_SERVER_DATA_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+      if ( process.env.APP_SERVER_TASK_NAME?.includes( "@__container_sequence__@" ) ) {
+
+        process.env.APP_SERVER_TASK_NAME = process.env.APP_SERVER_TASK_NAME.replace( "@__container_sequence__@", enviromentContainer?.SEQUENCE );
+
+      }
+
+    }
+
+    if ( enviromentContainer?.APP_SERVER_PORT &&
+         parseInt( enviromentContainer?.APP_SERVER_PORT ) >= 1 ) {
+
+      process.env.APP_SERVER_PORT = enviromentContainer?.APP_SERVER_PORT;
+
+    }
+
+  }
+
   static async main() {
 
     SystemUtilities.startRun = SystemUtilities.getCurrentDateAndTime(); //new Date();
 
     SystemUtilities.strBaseRunPath = __dirname;
     SystemUtilities.strBaseRootPath = appRoot.path;
+
+    await App.proccessEnviromentContainer(); //Process the enviroment container info
+
     SystemUtilities.strAPPName = process.env.APP_SERVER_DATA_NAME;
 
     if ( fs.existsSync( appRoot.path + "/info.json" ) ) {
@@ -802,7 +860,7 @@ export default class App {
                                                                          },
                                                                          {
                                                                            title: "Application",
-                                                                           value: process.env.APP_SERVER_DATA_NAME,
+                                                                           value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                            short: false
                                                                          },
                                                                          {
@@ -1025,7 +1083,7 @@ export default class App {
                                               LoggerManager.mainLoggerInstance );
 
           /*
-          const intPort = process.env.APP_SERVER_DATA_PORT || 9090;
+          const intPort = process.env.APP_SERVER_PORT || 9090;
 
           ApplicationServerDataManager.currentInstance.listen(
 
@@ -1065,7 +1123,7 @@ export default class App {
                                             LoggerManager.mainLoggerInstance );
 
         /*
-        const intPort = process.env.APP_SERVER_DATA_PORT || 9090;
+        const intPort = process.env.APP_SERVER_PORT || 9090;
 
         ApplicationServerDataManager.currentInstance.listen(
 

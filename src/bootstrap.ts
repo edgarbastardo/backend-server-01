@@ -1,5 +1,8 @@
-import fetch from 'node-fetch';
 import appRoot from 'app-root-path';
+
+require( "dotenv" ).config( { path: appRoot.path + "/.env.bootstrap" } ); //Read the .env.bootstrap file, in the root folder of project
+
+import fetch from 'node-fetch';
 
 import cluster from "cluster";
 import fs from "fs"; //Load the filesystem module
@@ -9,8 +12,6 @@ import CommonConstants from './02_system/common/CommonConstants';
 
 import CommonUtilities from './02_system/common/CommonUtilities';
 import SystemUtilities from './02_system/common/SystemUtilities';
-
-//require( "dotenv" ).config( { path: appRoot.path + "/.env.bootstrap" } ); //Read the .env.bootstrap file, in the root folder of project
 
 const debug = require( "debug" )( "bootstrap@main_process" );
 
@@ -97,12 +98,10 @@ export default class App {
 
           let strFileToDownload = filesToDownload[ intIndex ];
 
-          //console.log( process.env );
-
-          debugMark( "Downloading file from %s", process.env.CONFIG_URI + "/" + strFileToDownload );
+          debugMark( "Downloading file from %s", process.env.CONFIG_URI + "/" + process.env.DEPLOY_TARGET + "/" + strFileToDownload );
 
           let result = await App.downloadFileContent( headers,
-                                                      process.env.CONFIG_URI + "/" + strFileToDownload );
+                                                      process.env.CONFIG_URI + "/" + process.env.DEPLOY_TARGET + "/" + strFileToDownload );
 
           if ( !result.error &&
                result.output &&
@@ -118,8 +117,8 @@ export default class App {
             if ( fs.existsSync( appRoot.path + "/" + strFileToDownload ) ) {
 
               const strLocalFileContentHash = await SystemUtilities.getFileHash( appRoot.path + "/" + strFileToDownload,
-                                                                                   "crc32",
-                                                                                   null );
+                                                                                 "crc32",
+                                                                                 null );
 
               debugMark( "Local file %s", appRoot.path + "/" + strFileToDownload );
               debugMark( "The local file CRC32: %s already exists. Checking content are NOT the same.", strLocalFileContentHash );
