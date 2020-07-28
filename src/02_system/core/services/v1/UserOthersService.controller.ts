@@ -1551,7 +1551,7 @@ export default class UserOthersServiceController {
 
       let strUserName = context.UserSessionStatus.UserName;
 
-      //let strAutorization = context.Authorization;
+      //let strAuthorization = context.Authorization;
 
       let sysUserInDB = await SYSUserService.getByName( strUserName,
                                                         context.TimeZoneId,
