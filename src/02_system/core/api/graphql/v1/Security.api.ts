@@ -23,7 +23,7 @@ export const resolvers = {
     logoutV1: async ( obj: any, args: any, context: any, info: any ) => {
 
       return await SecurityServiceController.logout( context.Language,
-                                                     context.Autorization,
+                                                     context.Authorization,
                                                      null,
                                                      context.Logger );
 
