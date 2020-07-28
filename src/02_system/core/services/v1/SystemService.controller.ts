@@ -94,6 +94,10 @@ export default class SystemServiceController {
       }
 
       const data = {
+                     app: process.env.APP_PROJECT_NAME,
+                     appServerDataName: process.env.APP_SERVER_DATA_NAME,
+                     appServerTaskName: process.env.APP_SERVER_TASK_NAME,
+                     appServerPort: process.env.APP_SERVER_PORT,
                      info: SystemUtilities.info,
                      date: SystemUtilities.getCurrentDateAndTime().format(),
                      startedAt: SystemUtilities.startRun.format(),
