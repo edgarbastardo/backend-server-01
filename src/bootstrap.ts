@@ -108,53 +108,69 @@ export default class App {
                result.output.status === 200 &&
                result.output.body ) {
 
-            debugMark( "Success downloaded file" );
+            if (
+                 result.output.body.startsWith( "CONFIG_MAGIC_NUMBER=#809E33#AD1ECE" ) ||
+                 (
+                   strFileToDownload.endsWith( ".json" ) &&
+                   CommonUtilities.parseJSON( result.output.body, null ) !== null
+                 )
+               ) {
 
-            const strDownloadedFileContentHash = SystemUtilities.hashString( result.output.body,
-                                                                             2,
-                                                                             null );
+              debugMark( "Success downloaded file" );
 
-            if ( fs.existsSync( appRoot.path + "/" + strFileToDownload ) ) {
+              const strDownloadedFileContentHash = SystemUtilities.hashString( result.output.body,
+                                                                              2,
+                                                                              null );
 
-              const strLocalFileContentHash = await SystemUtilities.getFileHash( appRoot.path + "/" + strFileToDownload,
-                                                                                 "crc32",
-                                                                                 null );
+              if ( fs.existsSync( appRoot.path + "/" + strFileToDownload ) ) {
 
-              debugMark( "Local file %s", appRoot.path + "/" + strFileToDownload );
-              debugMark( "The local file CRC32: %s already exists. Checking content are NOT the same.", strLocalFileContentHash );
+                const strLocalFileContentHash = await SystemUtilities.getFileHash( appRoot.path + "/" + strFileToDownload,
+                                                                                  "crc32",
+                                                                                  null );
 
-              if ( strLocalFileContentHash !== strDownloadedFileContentHash ) {
+                debugMark( "Local file %s", appRoot.path + "/" + strFileToDownload );
+                debugMark( "The local file CRC32: %s already exists. Checking content are NOT the same.", strLocalFileContentHash );
 
-                debugMark( "The downloaded file CRC32: %s and the local file CRC32: %s are NOT the same", strDownloadedFileContentHash, strLocalFileContentHash );
+                if ( strLocalFileContentHash !== strDownloadedFileContentHash ) {
 
-                fs.mkdirSync( appRoot.path + "/config_backup/" + strDateTimeFromBackup,
-                              { recursive: true } );
+                  debugMark( "The downloaded file CRC32: %s and the local file CRC32: %s are NOT the same", strDownloadedFileContentHash, strLocalFileContentHash );
 
-                fs.renameSync( appRoot.path + "/" + strFileToDownload,                                                //Old path
-                               appRoot.path + "/config_backup/" + strDateTimeFromBackup + "/" + strFileToDownload );  //New path
+                  fs.mkdirSync( appRoot.path + "/config_backup/" + strDateTimeFromBackup,
+                                { recursive: true } );
 
-                debugMark( "Saved a copy of the local file to %s", appRoot.path + "/config_backup/" + strDateTimeFromBackup + "/" + strFileToDownload );
+                  fs.renameSync( appRoot.path + "/" + strFileToDownload,                                                //Old path
+                                appRoot.path + "/config_backup/" + strDateTimeFromBackup + "/" + strFileToDownload );  //New path
 
-                fs.writeFileSync( appRoot.path + "/" + strFileToDownload,
-                                  result.output.body );
+                  debugMark( "Saved a copy of the local file to %s", appRoot.path + "/config_backup/" + strDateTimeFromBackup + "/" + strFileToDownload );
 
-                debugMark( "Overwrited the local file with the remote file content %s, CRC32: ", appRoot.path + "/" + strFileToDownload, strDownloadedFileContentHash );
+                  fs.writeFileSync( appRoot.path + "/" + strFileToDownload,
+                                    result.output.body );
+
+                  debugMark( "Overwrited the local file with the remote file content %s, CRC32: ", appRoot.path + "/" + strFileToDownload, strDownloadedFileContentHash );
+
+                }
+                else {
+
+                  debugMark( "The remote file and the local file are the same CRC32: %s", strLocalFileContentHash );
+
+                }
 
               }
               else {
 
-                debugMark( "The remote file and the local file are the same CRC32: %s", strLocalFileContentHash );
+                debugMark( "The downloaded file CRC32: %s", strDownloadedFileContentHash );
+                debugMark( "The local file NOT exists. Creating the local file using downloaded file content" );
+
+                fs.writeFileSync( appRoot.path + "/" + strFileToDownload,
+                                  result.output.body );
 
               }
 
             }
             else {
 
-              debugMark( "The downloaded file CRC32: %s", strDownloadedFileContentHash );
-              debugMark( "The local file NOT exists. Creating the local file using downloaded file content" );
-
-              fs.writeFileSync( appRoot.path + "/" + strFileToDownload,
-                                result.output.body );
+              debugMark( "Download failed" );
+              debugMark( "The config file not begin with CONFIG_MAGIC_NUMBER=#809E33#AD1ECE in your first line" );
 
             }
 

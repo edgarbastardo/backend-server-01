@@ -2,8 +2,10 @@ require( "dotenv" ).config(); //Read the .env file, in the root folder of projec
 
 import fs from "fs"; //Load the filesystem module
 import cluster from "cluster";
+import os from "os"; //.homedir();
 
 import appRoot from "app-root-path";
+import rimraf from "rimraf";
 
 import CommonConstants from "./02_system/common/CommonConstants";
 
@@ -114,6 +116,10 @@ export default class App {
     SystemUtilities.strAPPName = process.env.APP_SERVER_TASK_NAME;
 
     try {
+
+      const strTempPath = appRoot.path + "/temp/" + os.hostname + "/";
+
+      rimraf.sync( strTempPath );
 
       let debugMark = debug.extend( "FC96A92FD2FF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
