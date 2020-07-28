@@ -22,12 +22,6 @@
       "problemMatcher": []
     },
     {
-      "label": "build-im-server",
-      "type": "npm",
-      "script": "build-im-server",
-      "problemMatcher": []
-    },
-    {
       "label": "build-task-server",
       "type": "npm",
       "script": "build-task-server",
