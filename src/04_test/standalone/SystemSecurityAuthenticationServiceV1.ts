@@ -33,7 +33,7 @@ export class SystemSecurityAuthenticationServiceV1 {
                         body: JSON.stringify( body ),
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/security/authentication/login";
 
@@ -78,7 +78,7 @@ export class SystemSecurityAuthenticationServiceV1 {
                         body: null, //JSON.stringify( body ),
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/security/authentication/token/check";
 
@@ -121,7 +121,7 @@ export class SystemSecurityAuthenticationServiceV1 {
                         body: null, //JSON.stringify( body ),
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/security/authentication/logout";
 

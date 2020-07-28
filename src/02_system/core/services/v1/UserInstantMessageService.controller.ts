@@ -442,9 +442,9 @@ export default class UserInstantMessageServiceController {
 
   }
 
-  static async instantMessageServerCallback( request: Request,
-                                             transaction: any,
-                                             logger: any ): Promise<any> {
+  static async instantMessageServerHook( request: Request,
+                                         transaction: any,
+                                         logger: any ): Promise<any> {
 
     let result = null;
 
@@ -525,7 +525,7 @@ export default class UserInstantMessageServiceController {
         if ( resultData &&
              resultData.StatusCode === 200 ) { //Ok the authorization token is valid
 
-          const strCommand = request.body.Command.trim().toLowerCase();
+          const strCommand = request.body.Command?.trim().toLowerCase();
 
           if ( strCommand === "connecttoserver" ) { //Connect to server
 
@@ -790,7 +790,7 @@ export default class UserInstantMessageServiceController {
           }
           else if ( strCommand === "sendmessage" ) { //Send message to channel
 
-            const channelsToSend = request.body.Channels.split( "," );
+            const channelsToSend = request.body.Channels?.split( "," );
 
             const listChannels = {};
 
@@ -815,7 +815,7 @@ export default class UserInstantMessageServiceController {
 
                 if ( allowedCheck.allowed.includes( "@@AlreadyJoinedChannels@@" ) ) {
 
-                  if ( request.body.JoinedChannels.includes( strChannelToSend ) ) {
+                  if ( request.body.Channels.includes( strChannelToSend ) ) {
 
                     allowedCheck.value = 1;
 
@@ -1076,7 +1076,7 @@ export default class UserInstantMessageServiceController {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.instantMessageServerCallback.name;
+      sourcePosition.method = this.name + "." + this.instantMessageServerHook.name;
 
       const strMark = "CA2DF8B2E28D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

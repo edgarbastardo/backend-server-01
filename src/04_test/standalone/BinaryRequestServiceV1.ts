@@ -30,7 +30,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/auth";
 
@@ -73,7 +73,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/auth";
 
@@ -117,7 +117,7 @@ export class BinaryRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/search";
 
@@ -216,7 +216,7 @@ export class BinaryRequestServiceV1 {
                         body: null,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/search/count";
 
@@ -270,7 +270,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary";
 
@@ -315,7 +315,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id + "&auth=" + headers.BinaryDataToken + "&thumbnail=" + query.Thumbnail;
 
@@ -377,7 +377,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary?id=" + query.Id;
 
@@ -423,7 +423,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/details?id=" + query.Id;
 
@@ -467,7 +467,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/disable/bulk";
 
@@ -513,7 +513,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/enable/bulk";
 
@@ -559,7 +559,7 @@ export class BinaryRequestServiceV1 {
                         headers: headers,
                       };
 
-      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_DATA_PORT + process.env.SERVER_ROOT_PATH;
+      let strRequestPath = this.strProtocol + this.strHost + ":" + process.env.APP_SERVER_PORT + process.env.SERVER_ROOT_PATH;
 
       strRequestPath = strRequestPath + "/v1/system/binary/bulk";
 
