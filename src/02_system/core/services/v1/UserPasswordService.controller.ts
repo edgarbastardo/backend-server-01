@@ -274,7 +274,7 @@ export default class UserPasswordServiceController {
 
                 if ( bFrontendIdIsAllowed ) {
 
-                  //ANCHOR FroentIdIsAllowed
+                  //ANCHOR FrontIdIsAllowed
                   const strUserName = SystemUtilities.getInfoFromSessionStatus( context.UserSessionStatus,
                                                                                 "UserName",
                                                                                 logger );
@@ -289,7 +289,7 @@ export default class UserPasswordServiceController {
                                                                                        Owner: sysUserInDB.Id,
                                                                                        Token: strRecoverCode,
                                                                                        Status: 1,
-                                                                                       CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                                                                       CreatedBy: strUserName || sysUserInDB.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                        ExpireAt: expireAt.format(),
                                                                                        ExtraData: JSON.stringify( { UserName: sysUserInDB.Name } )
                                                                                      },
@@ -351,10 +351,10 @@ export default class UserPasswordServiceController {
                                                               SystemId: SystemUtilities.getSystemId(),
                                                               SystemName: process.env.APP_SERVER_DATA_NAME,
                                                               SubSystem: "Security",
-                                                              Token: context.UserSessionStatus.Token,
-                                                              UserId: context.UserSessionStatus.UserId,
-                                                              UserName: context.UserSessionStatus.UserName,
-                                                              UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                              Token: context.UserSessionStatus?.Token || "",
+                                                              UserId: context.UserSessionStatus?.UserId || sysUserInDB?.Id || "",
+                                                              UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
+                                                              UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                                               Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
                                                               EventAt: SystemUtilities.getCurrentDateAndTime().format(),
                                                               Data: {}
@@ -414,7 +414,7 @@ export default class UserPasswordServiceController {
                                                            {
                                                              to: sysUserInDB.sysPerson.Phone,
                                                              //context: "AMERICA/NEW_YORK",
-                                                             foreign_data: `{ "user": ${strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                             foreign_data: `{ "user": ${strUserName || sysUserInDB?.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
                                                              //device_id: "*",
                                                              body: {
                                                                      kind: "self",
@@ -429,10 +429,10 @@ export default class UserPasswordServiceController {
                                                               SystemId: SystemUtilities.getSystemId(),
                                                               SystemName: process.env.APP_SERVER_DATA_NAME,
                                                               SubSystem: "Security",
-                                                              Token: context.UserSessionStatus.Token,
-                                                              UserId: context.UserSessionStatus.UserId,
-                                                              UserName: context.UserSessionStatus.UserName,
-                                                              UserGroupId: context.UserSessionStatus.UserGroupId,
+                                                              Token: context.UserSessionStatus?.Token || "",
+                                                              UserId: context.UserSessionStatus?.UserId || sysUserInDB?.Id || "",
+                                                              UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
+                                                              UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                                               Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
                                                               EventAt: SystemUtilities.getCurrentDateAndTime().format(),
                                                               Data: {}

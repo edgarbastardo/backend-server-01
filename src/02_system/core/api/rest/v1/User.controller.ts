@@ -858,13 +858,13 @@ export default class UserController {
              MiddlewareManager.middlewareSetContext,
              MiddlewareManager.middlewareCheckIsAuthenticated
            )
-  async instantMessageServerCallback( request: Request, response: Response ) {
+  async instantMessageServerHook( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await UserInstantMessageServiceController.instantMessageServerCallback( request,
-                                                                                           null,
-                                                                                           this._controllerLogger || ( context ? context.logger : null ) );
+    const result = await UserInstantMessageServiceController.instantMessageServerHook( request,
+                                                                                       null,
+                                                                                       this._controllerLogger || ( context ? context.logger : null ) );
 
     response.status( result.StatusCode ).send( result );
 
