@@ -1034,7 +1034,7 @@ export default class UserOthersServiceController {
                                                               language: context.Language,
                                                               variables: {
                                                                            user_name: sysUserInDB.Name,
-                                                                           user_password: CommonUtilities.maskPassword( request.body.Password ),
+                                                                           user_password: CommonUtilities.maskData( request.body.Password ),
                                                                            web_app_url: strWebAppURL,
                                                                            ... configData
                                                                          }
