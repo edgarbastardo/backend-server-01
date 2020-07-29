@@ -121,7 +121,7 @@ export default class SystemServiceController {
                      runPath: SystemUtilities.strBaseRunPath,
                      worker: cluster.worker && cluster.worker.id ? cluster.worker.id : "master",
                      database: databaseStatus.success,
-                     instanttMessage: instanMessageStatus,
+                     instantMessage: instanMessageStatus,
                      cache: {}
                    }
 
