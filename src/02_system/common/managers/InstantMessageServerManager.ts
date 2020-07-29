@@ -36,7 +36,7 @@ export default class InstantMessageServerManager {
 
         const debugMark = debug.extend( strMark );
 
-        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData.hostLiveDomain + "/" + configData.hostLivePath, configData.auth.apiKey );
+        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData.hostLiveDomain + configData.hostLivePath, configData.auth.apiKey );
 
         const socketIOClient = io( configData.hostLiveDomain, {
 
@@ -755,11 +755,12 @@ export default class InstantMessageServerManager {
   }
 
   static async getURLFromInstantMessageServer( transaction: any,
-                                               logger: any ): Promise<{ Domain: string, Path: string }> {
+                                               logger: any ): Promise<{ Domain: string, Path: string, IMManagerConnected: boolean }> {
 
     let result = {
                    Domain: "",
-                   Path: ""
+                   Path: "",
+                   IMManagerConnected: false
                  };
 
     try {
@@ -776,15 +777,18 @@ export default class InstantMessageServerManager {
 
       }
 
+      let bIMManagerConnected = false;
+
       const response = await InstantMessageServerRequestServiceV1.callSelectWorkerSocket(
-                                                                                      jsonServiceConfig.hostRest,
-                                                                                      headers,
-                                                                                    );
+                                                                                          jsonServiceConfig.hostRest,
+                                                                                          headers,
+                                                                                        );
 
       let strWorker = null;
 
       if ( response?.output?.body?.Data?.length > 0 ) {
 
+        bIMManagerConnected = true;
         strWorker = response?.output?.body?.Data[ 0 ];
 
       }
@@ -805,7 +809,8 @@ export default class InstantMessageServerManager {
 
       result = {
                  Domain: jsonServiceConfig.hostLiveDomain,
-                 Path: jsonServiceConfig.hostLivePath + ( strWorker ?  "/" + strWorker : "" )
+                 Path: jsonServiceConfig.hostLivePath + ( strWorker ?  "/" + strWorker : "" ),
+                 IMManagerConnected: bIMManagerConnected
                };
 
     }

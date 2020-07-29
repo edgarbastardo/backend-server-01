@@ -74,11 +74,11 @@ export default class Always {
                                              {
                                                Id: "047c0058-4d36-45da-b6c9-98e69e0bf831",
                                                UserId: "75cc6129-ae0f-4f65-943a-ff6909317ff0", //IntantMessageServer01
-                                               Token: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_TOKEN || "1",
-                                               BinaryDataToken: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_BINARY_DATA_TOKEN || null,
-                                               SocketToken: process.env.CALLBACK_BACKEND_DATA_SERVER_PROXY_01_SOCKET_TOKEN || null,
+                                               Token: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_TOKEN || "1",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_SOCKET_TOKEN || null,
                                                Tag: "#ForeignSystem#,#InstantMessageServer01#,#Callback#,#Proxy#",
-                                               Comment: "Callback inbound requests from instant message server to backend data server. Authorization Token (API KEY)",
+                                               Comment: "Authorization token (API KEY) for inbound requests (HOOK) from instant message server",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
