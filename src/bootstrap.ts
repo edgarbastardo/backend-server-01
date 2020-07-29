@@ -1,5 +1,6 @@
 import appRoot from "app-root-path";
 
+require( "dotenv" ).config(); //Read the .env
 require( "dotenv" ).config( { path: appRoot.path + "/.env.bootstrap" } ); //Read the .env.bootstrap file, in the root folder of project
 
 import fetch from "node-fetch";
@@ -93,6 +94,12 @@ export default class App {
         const filesToDownload = process.env.CONFIG_FILES ? process.env.CONFIG_FILES.split( "," ): [];
 
         const strDateTimeFromBackup = SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
+
+        if ( process.env.CONFIG_URI?.includes( "@__app_project_name__@" ) ) {
+
+          process.env.CONFIG_URI = process.env.CONFIG_URI.replace( "@__app_project_name__@", process.env.APP_PROJECT_NAME );
+
+        }
 
         for ( let intIndex = 0; intIndex < filesToDownload.length; intIndex++ ) {
 
