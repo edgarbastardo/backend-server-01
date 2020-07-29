@@ -15,7 +15,7 @@ import SystemUtilities from "../../../common/SystemUtilities";
 import I18NManager from "../../../common/managers/I18Manager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from "../../../common/managers/CacheManager";
-import NotificationManager from "../../../common/managers/NotificationManager";
+//import NotificationManager from "../../../common/managers/NotificationManager";
 //import InstantMenssageManager from "../../../common/managers/InstantMessageManager";
 import MiddlewareManager from "../../../common/managers/MiddlewareManager";
 //import PresenceManager from "../../../common/managers/PresenceManager";
@@ -23,12 +23,12 @@ import MiddlewareManager from "../../../common/managers/MiddlewareManager";
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
 //import { SYSUserSessionPresence } from "../../../common/database/master/models/SYSUserSessionPresence";
-import { SYSUser } from "../../../common/database/master/models/SYSUser";
-import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
-import { SYSUserSessionStatus } from "../../../common/database/master/models/SYSUserSessionStatus";
+//import { SYSUser } from "../../../common/database/master/models/SYSUser";
+//import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
+//import { SYSUserSessionStatus } from "../../../common/database/master/models/SYSUserSessionStatus";
 //import { SYSUserSessionPresenceInRoom } from "../../../common/database/master/models/SYSUserSessionPresenceInRoom";
-import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
-import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
+//import { SYSUserSessionDevice } from "../../../common/database/master/models/SYSUserSessionDevice";
+//import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 import SYSUserSessionStatusService from "../../../common/database/master/services/SYSUserSessionStatusService";
 import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
@@ -152,6 +152,7 @@ export default class UserInstantMessageServiceController {
                            Channels: strChannels,
                            Domain: URL.Domain,
                            Path: URL.Path,
+                           IMManagerConnected: URL.IMManagerConnected
                          }
                        ]
                };
