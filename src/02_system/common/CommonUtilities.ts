@@ -1326,7 +1326,7 @@ export default class CommonUtilities {
 
   }
 
-  public static maskPassword( strPassword: string ): string {
+  public static maskData( strPassword: string ): string {
 
     let strResult = "";
 
