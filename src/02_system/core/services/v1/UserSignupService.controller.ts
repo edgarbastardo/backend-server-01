@@ -2005,7 +2005,7 @@ export default class UserSingupServiceController {
                                                                          language: context.Language,
                                                                          variables: {
                                                                                       user_name: sysUserSignupInDB.Name,
-                                                                                      user_password: signupActivateOptions.maskPassword ? CommonUtilities.maskPassword( strPassword ): strPassword,
+                                                                                      user_password: signupActivateOptions.maskPassword ? CommonUtilities.maskData( strPassword ): strPassword,
                                                                                       web_app_url: strWebAppURL,
                                                                                       ... configData
                                                                                     }
