@@ -24,6 +24,7 @@ import I18NManager from "../../../common/managers/I18Manager";
 import CacheManager from "../../../common/managers/CacheManager";
 
 import RedisConnectionManager from "../../../common/managers/RedisConnectionManager";
+import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 const debug = require( "debug" )( "SystemServiceController" );
 
@@ -93,6 +94,16 @@ export default class SystemServiceController {
 
       }
 
+      const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
+
+      const instanMessageStatus = {
+                                    Auth: CommonUtilities.maskData( configData?.auth?.apiKey ),
+                                    hostLiveDomain: configData?.hostLiveDomain,
+                                    hostLivePath: configData?.hostLivePath,
+                                    connected: InstantMessageServerManager.currentIMInstance?.connected === true
+                                  }
+
+
       const data = {
                      app: process.env.APP_PROJECT_NAME,
                      appServerDataName: process.env.APP_SERVER_DATA_NAME,
@@ -110,6 +121,7 @@ export default class SystemServiceController {
                      runPath: SystemUtilities.strBaseRunPath,
                      worker: cluster.worker && cluster.worker.id ? cluster.worker.id : "master",
                      database: databaseStatus.success,
+                     instanttMessage: instanMessageStatus,
                      cache: {}
                    }
 
