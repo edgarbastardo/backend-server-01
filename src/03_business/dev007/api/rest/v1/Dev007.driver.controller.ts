@@ -49,14 +49,14 @@ export default class Dev007DriverController {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev007/odinv2/driver";
+  static readonly _BASE_PATH = "/v1/business/dev007/driver";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/start", Action: "v1.business.dev007.odinv2.driver.status.work.start", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 1=Working" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/stop", Action: "v1.business.dev007.odinv2.driver.status.work.stop", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 0=Not working" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/status", Action: "v1.business.dev007.odinv2.driver.work.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get current driver status" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.odinv2.driver.position.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the position of the driver" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.odinv2.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the drivers position" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/start", Action: "v1.business.dev007.driver.status.work.start", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 1=Working" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status/work/stop", Action: "v1.business.dev007.driver.status.work.stop", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Change the driver status to 0=Not working" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/status", Action: "v1.business.dev007.driver.work.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get current driver status" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.driver.position.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the position of the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the drivers position" },
                                 ]
 
   _controllerLogger = null;
@@ -141,10 +141,10 @@ export default class Dev007DriverController {
 
     }
 
-    const result = await Dev007DriverServicesController.setDriverStatus( request,
-                                                                         response,
-                                                                         null,
-                                                                         context.logger );
+    const result = await Dev007DriverServicesController.setStatus( request,
+                                                                   response,
+                                                                   null,
+                                                                   context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -177,10 +177,10 @@ export default class Dev007DriverController {
 
     }
 
-    const result = await Dev007DriverServicesController.setDriverStatus( request,
-                                                                         response,
-                                                                         null,
-                                                                         context.logger );
+    const result = await Dev007DriverServicesController.setStatus( request,
+                                                                   response,
+                                                                   null,
+                                                                   context.logger );
 
     response.status( result.StatusCode ).send( result );
 
@@ -196,10 +196,10 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.getDriverStatus( request,
-                                                                         response,
-                                                                         null,
-                                                                         context.logger );
+    const result = await Dev007DriverServicesController.getStatus( request,
+                                                                   response,
+                                                                   null,
+                                                                   context.logger );
 
     response.status( result.StatusCode ).send( result );
 

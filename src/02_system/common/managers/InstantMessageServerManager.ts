@@ -56,7 +56,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Success connected to: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+          debugMark( "Success connected to: [%s]", configData?.hostLiveDomain + configData?.hostLivePath );
 
           if ( callbacks?.connect ) {
 
@@ -72,7 +72,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Diconnected from: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+          debugMark( "Diconnected from: [%s]", configData?.hostLiveDomain + configData?.hostLivePath );
 
           if ( callbacks?.disconnect ) {
 
@@ -114,7 +114,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Reconnected to: [%s]. In attempt number: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, intAttemptNumber );
+          debugMark( "Reconnected to: [%s]. In attempt number: [%s]", configData?.hostLiveDomain + configData?.hostLivePath, intAttemptNumber );
 
           if ( callbacks?.reconnect ) {
 
@@ -133,7 +133,7 @@ export default class InstantMessageServerManager {
 
         const debugMark = debug.extend( strMark );
 
-        debugMark( "Missing information to connect to IM server: [%s], apiKey: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, configData.auth.apiKey );
+        debugMark( "Missing information to connect to IM server: [%s], apiKey: [%s]", configData?.hostLiveDomain + configData?.hostLivePath, configData.auth.apiKey );
 
       }
 

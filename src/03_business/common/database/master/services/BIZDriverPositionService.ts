@@ -461,6 +461,7 @@ export default class BIZDriverPositionService extends BaseService {
                                             strStartDateTime: string,
                                             strEndDateTime: string,
                                             intLimit: number,
+                                            intKind: number,
                                             transaction: any,
                                             logger: any ): Promise<[]> {
 
@@ -485,29 +486,62 @@ export default class BIZDriverPositionService extends BaseService {
 
       let strSQL = null;
 
-      if ( strStartDateTime &&
-           strEndDateTime ) {
+      if ( intKind === 0 ) {
 
-        strSQL = DBConnectionManager.getStatement( "master",
-                                                   "getLastPositionBetweenByShortToken",
-                                                    {
-                                                      ShortToken: strShortToken,
-                                                      StartDateTime: strStartDateTime,
-                                                      EndDateTime: strEndDateTime,
-                                                      Limit: intLimit
-                                                    },
-                                                    logger );
+        if ( strStartDateTime &&
+             strEndDateTime ) {
+
+          strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getLastPositionBetweenByShortToken",
+                                                     {
+                                                       ShortToken: strShortToken,
+                                                       StartDateTime: strStartDateTime,
+                                                       EndDateTime: strEndDateTime,
+                                                       Limit: intLimit
+                                                     },
+                                                     logger );
+
+        }
+        else {
+
+          strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getLastPositionByShortToken",
+                                                     {
+                                                       ShortToken: strShortToken,
+                                                       Limit: intLimit
+                                                     },
+                                                     logger );
+
+        }
 
       }
       else {
 
-        strSQL = DBConnectionManager.getStatement( "master",
-                                                   "getLastPositionByShortToken",
-                                                   {
-                                                     Token: strShortToken,
-                                                     Limit: intLimit
-                                                   },
-                                                   logger );
+        if ( strStartDateTime &&
+             strEndDateTime ) {
+
+          strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getLastPositionBetweenByShortTokenB",
+                                                     {
+                                                       ShortToken: strShortToken,
+                                                       StartDateTime: strStartDateTime,
+                                                       EndDateTime: strEndDateTime,
+                                                       Limit: intLimit
+                                                     },
+                                                     logger );
+
+        }
+        else {
+
+          strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getLastPositionByShortTokenB",
+                                                     {
+                                                       ShortToken: strShortToken,
+                                                       Limit: intLimit
+                                                     },
+                                                     logger );
+
+        }
 
       }
 
@@ -517,7 +551,7 @@ export default class BIZDriverPositionService extends BaseService {
                                                        transaction: currentTransaction
                                                      } );
 
-      if ( rows && rows.length > 1 ) {
+      if ( rows && rows.length > 0 ) {
 
         result = rows;
 

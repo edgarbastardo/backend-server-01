@@ -25,10 +25,10 @@ export default class Dev007DriverServicesController extends BaseService {
 
   //Common business services
 
-  static async setDriverStatus( request: Request,
-                                response: Response,
-                                transaction: any,
-                                logger: any ):Promise<any> {
+  static async setStatus( request: Request,
+                          response: Response,
+                          transaction: any,
+                          logger: any ):Promise<any> {
 
     let result = null;
 
@@ -165,7 +165,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setDriverStatus.name;
+      sourcePosition.method = this.name + "." + this.setStatus.name;
 
       const strMark = "59BE59B1DE0F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -224,10 +224,10 @@ export default class Dev007DriverServicesController extends BaseService {
 
   }
 
-  static async getDriverStatus( request: Request,
-                                response: Response,
-                                transaction: any,
-                                logger: any ):Promise<any> {
+  static async getStatus( request: Request,
+                          response: Response,
+                          transaction: any,
+                          logger: any ):Promise<any> {
 
     let result = null;
 
@@ -374,7 +374,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDriverStatus.name;
+      sourcePosition.method = this.name + "." + this.getStatus.name;
 
       const strMark = "A6C6F6EA7618" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -691,6 +691,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                                request.query.start as string,
                                                                                                request.query.end as string,
                                                                                                parseInt( request.query.limit as string ),
+                                                                                               0, //0 = Full (All field from table)
                                                                                                currentTransaction,
                                                                                                logger
                                                                                              );
