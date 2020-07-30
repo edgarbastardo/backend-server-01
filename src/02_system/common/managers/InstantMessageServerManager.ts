@@ -18,6 +18,8 @@ const debug = require( 'debug' )( 'IntantMessageServerManager' );
 
 export default class InstantMessageServerManager {
 
+  static strAuthToken: string = null;
+
   static currentIMInstance = null;
 
   static async connect( callbacks: any, logger: any ): Promise<any> {
@@ -57,6 +59,8 @@ export default class InstantMessageServerManager {
           const debugMark = debug.extend( strMark );
 
           debugMark( "Success connected to: [%s]", configData?.hostLiveDomain + configData?.hostLivePath );
+
+          InstantMessageServerManager.strAuthToken = configData?.auth?.apiKey;
 
           if ( callbacks?.connect ) {
 

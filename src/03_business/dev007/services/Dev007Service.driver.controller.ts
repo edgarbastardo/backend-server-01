@@ -18,6 +18,8 @@ import BIZDriverStatusService from "../../common/database/master/services/BIZDri
 import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
 import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
+import InstantMessageServerManager from "../../../02_system/common/managers/InstantMessageServerManager";
+import CacheManager from "../../../02_system/common/managers/CacheManager";
 
 const debug = require( "debug" )( "Dev007DriverServicesController" );
 
@@ -528,6 +530,91 @@ export default class Dev007DriverServicesController extends BaseService {
                    Count: request.body.bulk.length - bulkResult.errors.length,
                    Data: bulkResult.data
                  };
+
+        if ( InstantMessageServerManager.currentIMInstance?.connected ) {
+
+          let lockUpdate = CacheManager.getData( "Driver_Position_Last_Update", logger ); //Auto deleted every 5 seconds
+
+          if ( !lockUpdate ) {
+
+            let lockedResource = null;
+
+            try {
+
+              //We need write the shared resource and going to block temporally the write access, and prevent from extend the TTL of the entry
+              lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
+                                                                "Driver_Position:2FF24364A156@lock",
+                                                                5 * 1000, //3 seconds
+                                                                1, //Only one try
+                                                                1000, //1 Seconds
+                                                                logger );
+
+              if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) { //Stay sure we had the resource locked
+
+                await CacheManager.setDataWithTTL( "Driver_Position_Last_Update",
+                                                   SystemUtilities.getCurrentDateAndTime().format(),
+                                                   5, //5 seconds
+                                                   logger ); //Every 5 seconds is deleted from redis
+
+                InstantMessageServerManager.currentIMInstance?.emit(
+                                                                     {
+                                                                       Auth: InstantMessageServerManager.strAuthToken,
+                                                                       Channels: "Drivers_Position",
+                                                                       Message: {
+                                                                                  Kind:  "GPS_POSITION_CHANGED",
+                                                                                  Topic: "message",
+                                                                                  Data: {
+                                                                                          ShortToken: userSessionStatus.ShortToken,
+                                                                                          Accuracy: request.body.bulk[ 0 ].Accuracy,
+                                                                                          Latitude: request.body.bulk[ 0 ].Latitude,
+                                                                                          Longitude: request.body.bulk[ 0 ].Longitude,
+                                                                                          Altitude: request.body.bulk[ 0 ].Altitude,
+                                                                                          Speed: request.body.bulk[ 0 ].Speed,
+                                                                                        }
+                                                                                }
+                                                                     }
+                                                                   );
+
+              }
+
+            }
+            catch ( error ) {
+
+              const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+              sourcePosition.method = this.name + "." + this.setPosition.name;
+
+              const strMark = "6A9548CA9F36" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+              const debugMark = debug.extend( strMark );
+
+              debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+              debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+              debugMark( "Catched on: %O", sourcePosition );
+
+              error.mark = strMark;
+              error.logId = SystemUtilities.getUUIDv4();
+
+              if ( logger && typeof logger.error === "function" ) {
+
+                error.catchedOn = sourcePosition;
+                logger.error( error );
+
+              }
+
+            }
+
+            //Release the write access for another process. VERY IMPORTANT!!!
+            if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) {
+
+              await CacheManager.unlockResource( lockedResource,
+                                                logger );
+
+            }
+
+          }
+
+        }
 
         if ( currentTransaction !== null &&
              currentTransaction.finished !== "rollback" &&
