@@ -105,10 +105,10 @@ export default class App {
 
           let strFileToDownload = filesToDownload[ intIndex ];
 
-          debugMark( "Downloading file from %s", process.env.CONFIG_URI + "/" + process.env.DEPLOY_TARGET + "/" + strFileToDownload );
+          debugMark( "Downloading file from %s", process.env.CONFIG_URI + "/" + "/" + strFileToDownload );
 
           let result = await App.downloadFileContent( headers,
-                                                      process.env.CONFIG_URI + "/" + process.env.DEPLOY_TARGET + "/" + strFileToDownload );
+                                                      process.env.CONFIG_URI + "/" + "/" + strFileToDownload );
 
           if ( !result.error &&
                result.output &&
