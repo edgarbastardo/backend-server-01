@@ -22,17 +22,17 @@ import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
 
 import OrdersService from "../../../common/database/secondary/services/OrdersService"; //DB class with all db odin.orders interactions
-import VromoAPIRequestService from '../../../common/services/VromoAPIRequestService'; //Remote vromo API call, using node-fetch library
+import OdinV2APIRequestService from '../../../common/services/OdinV2APIRequestService'; //Remote vromo API call, using node-fetch library
 
 //import CommonRequestService from "../../../common/services/CommonRequestService";
 import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
 import GeoMapManager from "../../../../02_system/common/managers/GeoMapManager"; //Google map api call manager. check en .env.secrets if not exist copy and rename .env.secrets.template to .env.secrets
 
-let debug = require( 'debug' )( '001_CheckOdinNewOrdersTask' );
+let debug = require( 'debug' )( '001_CheckOdinV1NewOrdersTask' );
 
-export default class CheckOdinNewOrdersTask_001 {
+export default class CheckOdinV1NewOrdersTask_001 {
 
-  public readonly Name = "CheckOdinNewOrdersTask_001";
+  public readonly Name = "CheckOdinV1NewOrdersTask_001";
 
   //public static minutesOfLastCleanPath: any = null;
 
@@ -51,7 +51,7 @@ export default class CheckOdinNewOrdersTask_001 {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = CheckOdinNewOrdersTask_001.name + "." + this.init.name;
+      sourcePosition.method = CheckOdinV1NewOrdersTask_001.name + "." + this.init.name;
 
       const strMark = "D6FD317AD1A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -102,7 +102,7 @@ export default class CheckOdinNewOrdersTask_001 {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = CheckOdinNewOrdersTask_001.name + "." + this.canRunTask.name;
+      sourcePosition.method = CheckOdinV1NewOrdersTask_001.name + "." + this.canRunTask.name;
 
       const strMark = "82CA720EE3C2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -134,7 +134,7 @@ export default class CheckOdinNewOrdersTask_001 {
                                                  {
                                                    body: {
                                                            kind: "error",
-                                                           text: "Error to send odin order to vromo.",
+                                                           text: "Error to send odin-v1 order to odin-v2.",
                                                            fields: [
                                                                      {
                                                                        title: "Date",
@@ -157,7 +157,7 @@ export default class CheckOdinNewOrdersTask_001 {
                                                                        short: false
                                                                      }
                                                                    ],
-                                                             footer: "218BE3813333",
+                                                             footer: "52F222359BE5",
                                                          }
                                                  },
                                                  logger
@@ -194,26 +194,26 @@ export default class CheckOdinNewOrdersTask_001 {
       //Check for new odin orders table orders database odin
       //If new order with no driver (driver_id = null) send to vromo using  the http api
 
-      const debugMark = debug.extend( CheckOdinNewOrdersTask_001.intRunNumber + "-4BBBE0F89A10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      const debugMark = debug.extend( CheckOdinV1NewOrdersTask_001.intRunNumber + "-4BBBE0F89A10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "Running task..." );
 
-      debugMark( "Checking for new delivery orders odin database..." );
+      debugMark( "Checking for new delivery orders in odin v1 database..." );
 
       const newOrderList = await OrdersService.getNewOrdersWithNoDriver( currentTransaction, logger ) as any;
 
       if ( newOrderList.length > 0 ) {
 
-        debugMark( "%s new orders found in odin database...", newOrderList.length );
-        debugMark( "Sending to vromo server..." );
+        debugMark( "%s new delivery orders found in odin v1 database...", newOrderList.length );
+        debugMark( "Sending to odin-v2 server..." );
 
-        const strVromoServer = process.env.VROMO_SERVER; //check env.secrets file in the root of project. if not exists copy env.secrets.template and rename to env.secrets
-        const strVromoAPIKey = process.env.VROMO_API_KEY; //check env.secrets file in the root of project
+        const strOdinV2Server = process.env.ODIN_V2_URL; //check env.secrets file in the root of project. if not exists copy env.secrets.template and rename to env.secrets
+        const strOdinV2APIKey = process.env.ODIN_V2_API_KEY; //check env.secrets file in the root of project
 
         const headers = {
 
           "Content-Type": "application/json",
-          "Authorization": strVromoAPIKey
+          "Authorization": strOdinV2APIKey
 
         };
 
@@ -227,20 +227,26 @@ export default class CheckOdinNewOrdersTask_001 {
                                                                                   logger
                                                                                 );
 
-          //vromo data to send to service
+          //odin-v2 data to send to service
           const body = {
 
             latitude: addressGeocoded[ 0 ].latitude,
             longitude: addressGeocoded[ 0 ].longitude,
             address: newOrderList[ intNewOrderIndex ].address,
-            //Other fields needed by the vromo api service
+
+            hooks: {
+
+                     "DriverAssigned": process.env.ODIN_V2_API_KEY,
+
+                   }
+            //Other fields needed by the odin-v2 api service
 
           }
 
-          const result = await VromoAPIRequestService.sendOrder( headers,
-                                                                 strVromoServer,
-                                                                 body,
-                                                                 logger );
+          const result = await OdinV2APIRequestService.sendOrder( headers,
+                                                                  strOdinV2Server,
+                                                                  body,
+                                                                  logger );
 
           if ( result.error ) {
 
@@ -258,13 +264,13 @@ export default class CheckOdinNewOrdersTask_001 {
       }
       else {
 
-        debugMark( "No new orders found in odin database..." );
+        debugMark( "No new delivery orders found in odin v1 database..." );
 
       }
 
       //check for error in result variable
 
-      CheckOdinNewOrdersTask_001.intRunNumber += 1;
+      CheckOdinV1NewOrdersTask_001.intRunNumber += 1;
 
       //debugMark( "Finishg task..." );
 
@@ -290,7 +296,7 @@ export default class CheckOdinNewOrdersTask_001 {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = CheckOdinNewOrdersTask_001.name + "." + this.runTask.name;
+      sourcePosition.method = CheckOdinV1NewOrdersTask_001.name + "." + this.runTask.name;
 
       const strMark = "EDA3EDF0F471" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

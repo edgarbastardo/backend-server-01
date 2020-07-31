@@ -11,9 +11,9 @@ import CommonConstants from '../../../02_system/common/CommonConstants';
 import CommonUtilities from '../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../02_system/common/SystemUtilities';
 
-let debug = require( 'debug' )( 'VromoAPIRequestService' );
+let debug = require( 'debug' )( 'OdinV2APIRequestService' );
 
-export default class VromoAPIRequestService {
+export default class OdinV2APIRequestService {
 
   static async sendOrder( headers: any,
                           strRequestBasePath: string,
@@ -55,7 +55,7 @@ export default class VromoAPIRequestService {
 
       sourcePosition.method = this.name + "." + this.sendOrder.name;
 
-      const strMark = "FC796E8FE6C9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "9AADD2EDE060" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
