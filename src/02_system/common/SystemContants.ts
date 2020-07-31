@@ -171,43 +171,77 @@ export default class SystemConstants {
                            ];
 
   static readonly _CONFIG_ENTRY_ExpireTimeAuthentication_SCHEMA = JSON.stringify(
+
                                                                                   {
+
                                                                                     "$schema": "http://json-schema.org/draft-07/schema#",
                                                                                     "type": "object",
-                                                                                    "additionalProperties":false,
+                                                                                    "additionalProperties": false,
+
                                                                                     "required": [
+
                                                                                       "@__default__@"
+
                                                                                     ],
+
                                                                                     "patternProperties": {
+
                                                                                       "@__default__@": {
+
                                                                                         "$ref": "#/definitions/validatonDef",
-                                                                                        "optional":false
+                                                                                        "optional": false
+
                                                                                       },
+
                                                                                       "#.*#": {
+
                                                                                         "$ref": "#/definitions/validationDef",
-                                                                                        "optional":false
+                                                                                        "optional": false
+
                                                                                       }
+
                                                                                     },
+
                                                                                     "definitions": {
+
                                                                                       "validationDef": {
+
                                                                                         "type": "object",
-                                                                                        "required": [ "on", "kind" ],
+                                                                                        "required": [
+
+                                                                                          "on",
+                                                                                          "kind"
+
+                                                                                        ],
+
                                                                                         "additionalProperties": false,
+
                                                                                         "properties": {
+
                                                                                           "on": {
+
                                                                                             "type": "number",
                                                                                             "minimum": 1,
                                                                                             "maximum": 999999999
+
                                                                                           },
+
                                                                                           "kind": {
+
                                                                                             "type": "number",
                                                                                             "minimum": 0,
                                                                                             "maximum": 1
+
                                                                                           }
+
                                                                                         }
+
                                                                                       }
+
                                                                                     }
+
                                                                                   }
+
                                                                                 );
 
   static readonly _CONFIG_ENTRY_ExpireTimeAuthentication = {
@@ -217,59 +251,95 @@ export default class SystemConstants {
                                                              Category: "Authentication",
                                                              Name: "system.authentication.expire.time.authentication",
                                                              Default: JSON.stringify(
+
                                                                                       {
+
                                                                                         "@__default__@": {
+
                                                                                           "kind": 0,
                                                                                           "on": 30
+
                                                                                         }
+
                                                                                       }
+
                                                                                     ),
                                                              Label: "Control the SecurityTokenId expire time by groups or users",
                                                              Description: "Control the Authentication token expire time in minutes by specific groups or users",
                                                              AllowTagAccessR: "#Administrator#",
                                                              AllowTagAccessW: "#Administrator#",
                                                              Example: JSON.stringify(
+
                                                                                       {
+
                                                                                         "@__default__@": {
+
                                                                                           "kind": 0,
                                                                                           "on": 30
+
                                                                                         },
+
                                                                                         "#GroupName#": {
+
                                                                                           "kind": 1,
                                                                                           "on": 2880
+
                                                                                         },
+
                                                                                         "#GroupId#": {
+
                                                                                           "kind": 1,
                                                                                           "on": 28
+
                                                                                         }
+
                                                                                       }
+
                                                                                     ),
                                                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                              ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication_SCHEMA }
                                                            };
 
   static readonly _CONFIG_ENTRY_PasswordStrengthParameters_SCHEMA = JSON.stringify(
+
                                                                                     {
-                                                                                      "$schema":"http://json-schema.org/draft-07/schema#",
-                                                                                      "type":"object",
-                                                                                      "additionalProperties":false,
+
+                                                                                      "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                                      "type": "object",
+                                                                                      "additionalProperties": false,
+
                                                                                       "required": [
+
                                                                                         "@__default__@"
+
                                                                                       ],
-                                                                                      "patternProperties":{
-                                                                                          "@__default__@": {
-                                                                                            "$ref": "#/definitions/validatonDef",
-                                                                                            "optional":false
-                                                                                          },
-                                                                                          "#.*#":{
-                                                                                            "$ref":"#/definitions/validationDef",
-                                                                                            "optional":false
-                                                                                          }
+
+                                                                                      "patternProperties": {
+
+                                                                                        "@__default__@": {
+
+                                                                                          "$ref": "#/definitions/validatonDef",
+                                                                                          "optional":false
+
+                                                                                        },
+
+                                                                                        "#.*#": {
+
+                                                                                          "$ref":"#/definitions/validationDef",
+                                                                                          "optional":false
+
+                                                                                        }
+
                                                                                       },
-                                                                                      "definitions":{
-                                                                                        "validationDef":{
-                                                                                          "type":"object",
-                                                                                          "required":[
+
+                                                                                      "definitions": {
+
+                                                                                        "validationDef": {
+
+                                                                                          "type": "object",
+
+                                                                                          "required": [
+
                                                                                             "minLength",
                                                                                             "maxLength",
                                                                                             "minLowerCase",
@@ -278,77 +348,118 @@ export default class SystemConstants {
                                                                                             "minDigit",
                                                                                             "minSymbol",
                                                                                             "maxSymbol"
+
                                                                                           ],
-                                                                                          "additionalProperties":false,
-                                                                                          "properties":{
-                                                                                            "minLength":{
-                                                                                              "type":"number",
-                                                                                              "minimum":4,
-                                                                                              "maximum":80,
-                                                                                              "optional":false
+
+                                                                                          "additionalProperties": false,
+
+                                                                                          "properties": {
+
+                                                                                            "minLength": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 4,
+                                                                                              "maximum": 80,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "maxLength":{
-                                                                                              "type":"number",
-                                                                                              "minimum":4,
-                                                                                              "maximum":80,
-                                                                                              "optional":false
+
+                                                                                            "maxLength": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 4,
+                                                                                              "maximum": 80,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "minLowerCase":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "minLowerCase": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "maxLowerCase":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "maxLowerCase": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "minUpperCase":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "minUpperCase": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "maxUpperCase":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "maxUpperCase": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "minDigit":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "minDigit": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "maxDigit":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "maxDigit": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "minSymbol":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "minSymbol": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "maxSymbol":{
-                                                                                              "type":"number",
-                                                                                              "minimum":0,
-                                                                                              "maximum":10,
-                                                                                              "optional":false
+
+                                                                                            "maxSymbol": {
+
+                                                                                              "type": "number",
+                                                                                              "minimum": 0,
+                                                                                              "maximum": 10,
+                                                                                              "optional": false
+
                                                                                             },
-                                                                                            "Symbols":{
+
+                                                                                            "Symbols": {
+
                                                                                               "type":"string",
                                                                                               "optional":false
+
                                                                                             }
+
                                                                                           }
+
                                                                                         }
+
                                                                                       }
+
                                                                                     }
+
                                                                                   );
 
   static readonly _CONFIG_ENTRY_PasswordStrengthParameters = {
@@ -358,133 +469,166 @@ export default class SystemConstants {
                                                                Category: "Security",
                                                                Name: "system.security.password.strength.parameters",
                                                                Default: JSON.stringify(
+
                                                                                         {
-                                                                                          "@__default__@":{
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":0,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":0,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":0,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                          "@__default__@": {
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 0,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 0,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 0,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
+
                                                                                           "#System_Administrators#": {
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":4,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":2,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":2,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 4,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 2,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 2,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
+
                                                                                           "#Business_Managers#": {
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":4,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":2,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":1,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 4,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 2,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 1,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           }
+
                                                                                         }
+
                                                                                       ),
                                                                Label: "Default password strength parameters",
                                                                Description: "Default password strength parameters defined in json/struct",
                                                                AllowTagAccessR: "#Administrator#",
                                                                AllowTagAccessW: "#Administrator#",
                                                                Example: JSON.stringify(
+
                                                                                         {
-                                                                                          "@__default__@":{
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":0,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":0,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":0,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                          "@__default__@": {
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 0,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 0,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 0,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
+
                                                                                           "#System_Administrators#": {
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":4,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":2,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":2,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 4,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 2,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 2,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
+
                                                                                           "#Business_Managers#": {
-                                                                                            "minLength":8,
-                                                                                            "maxLength":0,
-                                                                                            "minLowerCase":4,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":2,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":1,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 0,
+                                                                                            "minLowerCase": 4,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 2,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 1,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
-                                                                                          "#Drivers#":{
-                                                                                            "minLength":5,
-                                                                                            "maxLength":8,
-                                                                                            "minLowerCase":0,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":0,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":0,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                          "#Drivers#": {
+
+                                                                                            "minLength": 5,
+                                                                                            "maxLength": 8,
+                                                                                            "minLowerCase": 0,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 0,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 0,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
-                                                                                          "#Final_Customers#":{
-                                                                                            "minLength":7,
-                                                                                            "maxLength":9,
-                                                                                            "minLowerCase":0,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":0,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":0,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                          "#Final_Customers#": {
+
+                                                                                            "minLength": 7,
+                                                                                            "maxLength": 9,
+                                                                                            "minLowerCase": 0,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 0,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 0,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           },
-                                                                                          "#Establishments#":{
-                                                                                            "minLength":8,
-                                                                                            "maxLength":10,
-                                                                                            "minLowerCase":0,
-                                                                                            "maxLowerCase":0,
-                                                                                            "minUpperCase":0,
-                                                                                            "maxUpperCase":0,
-                                                                                            "minDigit":0,
-                                                                                            "maxDigit":0,
-                                                                                            "minSymbol":0,
-                                                                                            "maxSymbol":0,
-                                                                                            "symbols":""
+
+                                                                                          "#Establishments#": {
+
+                                                                                            "minLength": 8,
+                                                                                            "maxLength": 10,
+                                                                                            "minLowerCase": 0,
+                                                                                            "maxLowerCase": 0,
+                                                                                            "minUpperCase": 0,
+                                                                                            "maxUpperCase": 0,
+                                                                                            "minDigit": 0,
+                                                                                            "maxDigit": 0,
+                                                                                            "minSymbol": 0,
+                                                                                            "maxSymbol": 0,
+                                                                                            "symbols": ""
+
                                                                                           }
+
                                                                                         }
+
                                                                                       ),
                                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters_SCHEMA }
@@ -539,44 +683,76 @@ export default class SystemConstants {
                                                      };
 
   static readonly _CONFIG_ENTRY_Deny_Allow_SCHEMA = JSON.stringify(
+
                                                                     {
-                                                                      "$schema":"http://json-schema.org/draft-07/schema#",
-                                                                      "type":"object",
-                                                                      "additionalProperties":false,
+
+                                                                      "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                      "type": "object",
+                                                                      "additionalProperties": false,
+
                                                                       "required": [
+
                                                                         "@__default__@"
+
                                                                       ],
-                                                                      "patternProperties":{
+
+                                                                      "patternProperties": {
+
                                                                         "@__default__@": {
+
                                                                           "$ref": "#/definitions/validatonDef",
-                                                                          "optional":false
+                                                                          "optional": false
+
                                                                         },
-                                                                        "#.*#":{
-                                                                          "$ref":"#/definitions/validationDef",
-                                                                          "optional":false
+
+                                                                        "#.*#": {
+
+                                                                          "$ref": "#/definitions/validationDef",
+                                                                          "optional": false
+
                                                                         }
+
                                                                       },
-                                                                      "definitions":{
-                                                                        "validationDef":{
+
+                                                                      "definitions": {
+
+                                                                        "validationDef": {
+
                                                                           "type":"object",
-                                                                          "required":[
+
+                                                                          "required": [
+
                                                                             "denied",
                                                                             "allowed"
+
                                                                           ],
-                                                                          "additionalProperties":false,
-                                                                          "properties":{
-                                                                            "denied":{
-                                                                              "type":"string",
-                                                                              "optional":false
+
+                                                                          "additionalProperties": false,
+
+                                                                          "properties": {
+
+                                                                            "denied": {
+
+                                                                              "type": "string",
+                                                                              "optional": false
+
                                                                             },
-                                                                            "allowed":{
-                                                                              "type":"string",
-                                                                              "optional":false
+
+                                                                            "allowed": {
+
+                                                                              "type": "string",
+                                                                              "optional": false
+
                                                                             }
+
                                                                           }
+
                                                                         }
+
                                                                       }
+
                                                                     }
+
                                                                   );
 
   static readonly _CONFIG_ENTRY_BinaryDataAllowedCategory = {
@@ -586,32 +762,50 @@ export default class SystemConstants {
                                                               Category: "Binary Data",
                                                               Name: "system.binary.data.allowed.category",
                                                               Default: JSON.stringify(
+
                                                                                        {
+
                                                                                          "@__default__@": {
+
                                                                                            "denied": "",
                                                                                            "allowed": "*"
+
                                                                                          }
+
                                                                                        }
+
                                                                                      ),
                                                               Label: "Define witch categories are allowed",
                                                               Description: "Define witch categories are allowed to create or add binary data inside. Always the config entry defined in lowercase, to match with any input combination.",
                                                               AllowTagAccessR: "#Administrator#",
                                                               AllowTagAccessW: "#Administrator#",
                                                               Example: JSON.stringify(
+
                                                                                        {
-                                                                                         "@__default__@":{
-                                                                                           "denied":"*",
-                                                                                           "allowed":""
+
+                                                                                         "@__default__@": {
+
+                                                                                           "denied": "*",
+                                                                                           "allowed": ""
+
                                                                                          },
-                                                                                         "#group01#":{
-                                                                                           "denied":"",
-                                                                                           "allowed":"#ticket#,#profile#,#avatar#"
+
+                                                                                         "#group01#": {
+
+                                                                                           "denied": "",
+                                                                                           "allowed": "#ticket#,#profile#,#avatar#"
+
                                                                                          },
-                                                                                         "#user01#":{
-                                                                                           "denied":"#ticket#",
-                                                                                           "allowed":"*"
+
+                                                                                         "#user01#": {
+
+                                                                                           "denied": "#ticket#",
+                                                                                           "allowed": "*"
+
                                                                                          },
+
                                                                                        }
+
                                                                                      ),
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                               ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA }
@@ -624,55 +818,87 @@ export default class SystemConstants {
                                                               Category: "Binary Data",
                                                               Name: "system.binary.data.allowed.mime.type",
                                                               Default: JSON.stringify(
+
                                                                                        {
+
                                                                                          "@__default__@": {
+
                                                                                            "denied": "",
                                                                                            "allowed": "*"
+
                                                                                          }
+
                                                                                        }
+
                                                                                      ),
                                                               Label: "Define witch binary data types are allowed in base in your mime types",
                                                               Description: "Define witch binary data types are allowed in base in your mime types",
                                                               AllowTagAccessR: "#Administrator#",
                                                               AllowTagAccessW: "#Administrator#",
                                                               Example: JSON.stringify(
+
                                                                                        {
-                                                                                         "@__default__@":{
-                                                                                           "denied":"*",
-                                                                                           "allowed":""
+
+                                                                                         "@__default__@": {
+
+                                                                                           "denied": "*",
+                                                                                           "allowed": ""
+
                                                                                          },
-                                                                                         "#group01#":{
-                                                                                           "denied":"",
-                                                                                           "allowed":"#image/png#,#application/pdf#"
+
+                                                                                         "#group01#": {
+
+                                                                                           "denied": "",
+                                                                                           "allowed": "#image/png#,#application/pdf#"
+
                                                                                          },
-                                                                                         "#user01#":{
-                                                                                           "denied":"#image/jpg#,#application/pdf#",
-                                                                                           "allowed":"*"
+
+                                                                                         "#user01#": {
+
+                                                                                           "denied": "#image/jpg#,#application/pdf#",
+                                                                                           "allowed": "*"
+
                                                                                          },
+
                                                                                        }
+
                                                                                      ),
                                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                               ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Deny_Allow_SCHEMA }
                                                             };
 
   static readonly _CONFIG_ENTRY_BinaryDataDefaultOwner_SCHEMA = JSON.stringify(
+
                                                                                 {
+
                                                                                   "$schema": "http://json-schema.org/draft-07/schema#",
                                                                                   "type": "object",
-                                                                                  "additionalProperties":false,
+                                                                                  "additionalProperties": false,
+
                                                                                   "required": [
+
                                                                                     "@__default__@"
+
                                                                                   ],
+
                                                                                   "patternProperties": {
+
                                                                                     "@__default__@": {
+
                                                                                       "type": "string",
-                                                                                      "optional":false
+                                                                                      "optional": false
+
                                                                                     },
+
                                                                                     "#.*#": {
+
                                                                                       "type": "string",
-                                                                                      "optional":false
+                                                                                      "optional": false
+
                                                                                     }
+
                                                                                   }
+
                                                                                 }
                                                                               );
 
@@ -683,73 +909,121 @@ export default class SystemConstants {
                                                            Category: "Binary Data",
                                                            Name: "system.binary.data.default.owner",
                                                            Default: JSON.stringify(
+
                                                                                     {
+
                                                                                       "@__default__@": "#@@UserName@@#,#@@Category@@#"
+
                                                                                     }
+
                                                                                   ),
                                                            Label: "Add owners to the binary data",
                                                            Description: "Add owners to the binary data when uploaded sysUserGroup.Id, sysUserGroup.Name, sysUserGroup.Tag, sysUser.Id, sysUser.Name, sysUser.Tag, sysUserSessionStatus.Role",
                                                            AllowTagAccessR: "#Administrator#",
                                                            AllowTagAccessW: "#Administrator#",
                                                            Example: JSON.stringify(
+
                                                                                     {
+
                                                                                       "@__default__@": "#@@UserGroupId@@#,#@@UserGroupShortId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserShortId@@#,#@@UserName@@#",
                                                                                       "#user01#.ticket": "#user02#,#user03#,#Business_Manager#",
                                                                                       "#user01#.avatar": "#user10#",
                                                                                       "#Group01#": "#Group02#,#user03#"
+
                                                                                     }
+
                                                                                   ),
                                                            CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                            ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataDefaultOwner_SCHEMA }
                                                          };
 
     static readonly _CONFIG_ENTRY_BinaryDataThumbnail_SCHEMA =  JSON.stringify(
+
                                                                                 {
+
                                                                                   "$schema": "http://json-schema.org/draft-07/schema#",
                                                                                   "type": "object",
-                                                                                  "additionalProperties":false,
+                                                                                  "additionalProperties": false,
+
                                                                                   "required": [
+
                                                                                     "@__default__@"
+
                                                                                   ],
+
                                                                                   "patternProperties": {
+
                                                                                     "@__default__@": {
+
                                                                                       "$ref": "#/definitions/validatonDefNotEmpty",
-                                                                                      "optional":false
+                                                                                      "optional": false
+
                                                                                     },
+
                                                                                     "#.*#": {
+
                                                                                       "$ref": "#/definitions/validatonDefNotEmpty",
-                                                                                      "optional":false
+                                                                                      "optional": false
+
                                                                                     }
+
                                                                                   },
+
                                                                                   "definitions": {
+
                                                                                     "validatonDefNotEmpty": {
+
                                                                                       "type": "array",
                                                                                       //"additionalProperties": false,
                                                                                       //"minLength": 1,
                                                                                       "minItems": 1,
+
                                                                                       "items": {
+
                                                                                         "$ref": "#/definitions/validatonObjectDef"
+
                                                                                       }
+
                                                                                     },
+
                                                                                     "validatonObjectDef": {
+
                                                                                       "type": "object",
                                                                                       "additionalProperties": false,
-                                                                                      "required": [ "Mime", "Factor" ],
+
+                                                                                      "required": [
+
+                                                                                        "Mime",
+                                                                                        "Factor"
+
+                                                                                      ],
+
                                                                                       "properties": {
+
                                                                                         "Mime": {
+
                                                                                           "type": "string",
                                                                                           //"minLength": 1,
-                                                                                          "optional":false
+                                                                                          "optional": false
+
                                                                                         },
+
                                                                                         "Factor": {
+
                                                                                           "type": "number",
                                                                                           "minimum": 50,
-                                                                                          "optional":false
+                                                                                          "optional": false
+
                                                                                         }
+
                                                                                       }
+
                                                                                     }
+
                                                                                   }
+
                                                                                 }
+
                                                                               );
 
   static readonly _CONFIG_ENTRY_BinaryDataThumbnail = {
@@ -759,94 +1033,155 @@ export default class SystemConstants {
                                                         Category: "Binary Data",
                                                         Name: "system.binary.data.thumbnail",
                                                         Default: JSON.stringify(
+
                                                                                  {
-                                                                                   "@__default__@":[
-                                                                                     {
-                                                                                       "mime":"#image/png#,#image/jpeg#",
-                                                                                       "factor":300
-                                                                                     }
+
+                                                                                   "@__default__@": [
+
+                                                                                      {
+
+                                                                                        "mime": "#image/png#,#image/jpeg#",
+                                                                                        "factor": 300
+
+                                                                                      }
+
                                                                                    ]
+
                                                                                  }
+
                                                                                ),
                                                         Label: "Generate thumbnail for mime types",
                                                         Description: "Generate thumbnail for mime types. The factor take the more small size from the image (width or height) and resize to factor number.",
                                                         AllowTagAccessR: "#Administrator#",
                                                         AllowTagAccessW: "#Administrator#",
                                                         Example: JSON.stringify(
+
                                                                                  {
-                                                                                   "@__default__@":[
+
+                                                                                   "@__default__@": [
+
                                                                                      {
-                                                                                       "mime":"#image/png#,#image/jpeg#",
-                                                                                       "factor":300
+
+                                                                                       "mime": "#image/png#,#image/jpeg#",
+                                                                                       "factor": 300
+
                                                                                      }
+
                                                                                    ],
-                                                                                   "#Group01#.ticket":[
+
+                                                                                   "#Group01#.ticket": [
+
                                                                                      {
-                                                                                       "mime":"#image/png#,#image/jpeg#",
-                                                                                       "factor":500
+
+                                                                                       "mime": "#image/png#,#image/jpeg#",
+                                                                                       "factor": 500
+
                                                                                      }
+
                                                                                    ]
+
                                                                                  }
+
                                                                                ),
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataThumbnail_SCHEMA }
                                                       };
 
   static readonly _CONFIG_ENTRY_BinaryDataProcess_SCHEMA = JSON.stringify(
+
                                                                            {
-                                                                             "$schema":"http://json-schema.org/draft-07/schema#",
-                                                                             "type":"object",
-                                                                             "additionalProperties":false,
+
+                                                                             "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                             "type": "object",
+                                                                             "additionalProperties": false,
+
                                                                              "required": [
+
                                                                                "@__default__@"
+
                                                                              ],
-                                                                             "patternProperties":{
-                                                                               "@__default__@":{
+
+                                                                             "patternProperties": {
+
+                                                                               "@__default__@": {
+
                                                                                  "$ref":"#/definitions/validatonDefNotEmpty",
                                                                                  "optional":false
+
                                                                                },
-                                                                               "#.*#":{
+
+                                                                               "#.*#": {
+
                                                                                  "$ref":"#/definitions/validatonDefNotEmpty",
                                                                                  "optional":false
+
                                                                                }
+
                                                                              },
-                                                                             "definitions":{
-                                                                               "validatonDefNotEmpty":{
+
+                                                                             "definitions": {
+
+                                                                               "validatonDefNotEmpty": {
+
                                                                                  "type":"array",
                                                                                  //"additionalProperties":false,
                                                                                  //"minLength":1,
                                                                                  "minItems":1,
-                                                                                 "items":{
+
+                                                                                 "items": {
+
                                                                                    "$ref":"#/definitions/validatonObjectDef"
+
                                                                                  },
+
                                                                                },
-                                                                               "validatonObjectDef":{
+
+                                                                               "validatonObjectDef": {
+
                                                                                  "type":"object",
                                                                                  "additionalProperties":false,
-                                                                                 "required":[
+
+                                                                                 "required": [
+
                                                                                    "Mime",
                                                                                    "Factor",
                                                                                    "keepOriginal"
+
                                                                                  ],
-                                                                                 "properties":{
-                                                                                   "Mime":{
-                                                                                     "type":"string",
+
+                                                                                 "properties": {
+
+                                                                                   "Mime": {
+
+                                                                                     "type": "string",
                                                                                      //"minLength":1,
-                                                                                     "optional":false
+                                                                                     "optional": false
+
                                                                                    },
-                                                                                   "Factor":{
-                                                                                     "type":"number",
-                                                                                     "minimum":50,
-                                                                                     "optional":false
+
+                                                                                   "Factor": {
+
+                                                                                     "type": "number",
+                                                                                     "minimum": 50,
+                                                                                     "optional": false
+
                                                                                    },
-                                                                                   "keepOriginal":{
+
+                                                                                   "keepOriginal": {
+
                                                                                      "type":"boolean",
                                                                                      "optional":false
+
                                                                                    }
+
                                                                                  }
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          );
 
   static readonly _CONFIG_ENTRY_BinaryDataProcess = {
@@ -856,68 +1191,107 @@ export default class SystemConstants {
                                                       Category: "Binary Data",
                                                       Name: "system.binary.data.process",
                                                       Default: JSON.stringify(
+
                                                                                {
-                                                                                 "@__default__@":[
+
+                                                                                 "@__default__@": [
+
                                                                                    {
+
                                                                                      "mime": "#image/png#,#image/jpeg#",
                                                                                      "factor": 1500,
                                                                                      "size": 1024,
                                                                                      "keepOriginal": true
+
                                                                                    }
+
                                                                                  ]
+
                                                                                }
+
                                                                              ),
                                                       Label: "Generate more small images",
                                                       Description: "Generate more small images. Using the mime types and size in kilobytes. Scaled to factor using the more small size of image.",
                                                       AllowTagAccessR: "#Administrator#",
                                                       AllowTagAccessW: "#Administrator#",
                                                       Example: JSON.stringify(
+
                                                                                {
-                                                                                 "@__default__@":[
+
+                                                                                 "@__default__@": [
+
                                                                                    {
-                                                                                     "mime":"#image/png#,#image/jpeg#",
-                                                                                     "factor":1500,
-                                                                                     "size":1024,
-                                                                                     "keepOriginal":true
+
+                                                                                     "mime": "#image/png#,#image/jpeg#",
+                                                                                     "factor": 1500,
+                                                                                     "size": 1024,
+                                                                                     "keepOriginal": true
+
                                                                                    }
+
                                                                                  ],
-                                                                                 "#Group01#.ticket":[
+
+                                                                                 "#Group01#.ticket": [
+
                                                                                    {
-                                                                                     "mime":"#image/png#,#image/jpeg#",
-                                                                                     "factor":1000,
-                                                                                     "size":512,
-                                                                                     "keepOriginal":true
+
+                                                                                     "mime": "#image/png#,#image/jpeg#",
+                                                                                     "factor": 1000,
+                                                                                     "size": 512,
+                                                                                     "keepOriginal": true
+
                                                                                    }
+
                                                                                  ]
+
                                                                                }
+
                                                                              ),
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                       ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_BinaryDataProcess_SCHEMA }
                                                     };
 
   static readonly _CONFIG_ENTRY_UserSignupProcess_SCHEMA = JSON.stringify(
+
                                                                            {
-                                                                             "$schema":"http://json-schema.org/draft-07/schema#",
-                                                                             "type":"object",
-                                                                             "additionalProperties":false,
-                                                                             "required":[
+
+                                                                             "$schema": "http://json-schema.org/draft-07/schema#",
+                                                                             "type": "object",
+                                                                             "additionalProperties": false,
+
+                                                                             "required": [
+
                                                                                "@__default__@"
+
                                                                              ],
-                                                                             "patternProperties":{
-                                                                               "@__default__@":{
-                                                                                 "$ref":"#/definitions/validatonObjectDef",
-                                                                                 "optional":false
+
+                                                                             "patternProperties": {
+
+                                                                               "@__default__@": {
+
+                                                                                 "$ref": "#/definitions/validatonObjectDef",
+                                                                                 "optional": false
+
                                                                                },
-                                                                               "#.*#":{
-                                                                                 "$ref":"#/definitions/validatonObjectDef",
-                                                                                 "optional":false
+
+                                                                               "#.*#": {
+
+                                                                                 "$ref": "#/definitions/validatonObjectDef",
+                                                                                 "optional": false
+
                                                                                }
+
                                                                              },
-                                                                             "definitions":{
-                                                                               "validatonObjectDef":{
-                                                                                 "type":"object",
-                                                                                 "additionalProperties":false,
-                                                                                 "required":[
+
+                                                                             "definitions": {
+
+                                                                               "validatonObjectDef": {
+
+                                                                                 "type": "object",
+                                                                                 "additionalProperties": false,
+
+                                                                                 "required": [
+
                                                                                    "expireAt",
                                                                                    "group",
                                                                                    "createGroup",
@@ -926,60 +1300,127 @@ export default class SystemConstants {
                                                                                    "status",
                                                                                    "userRole",
                                                                                    "userTag",
-                                                                                   "userExpireAt"
+                                                                                   "userExpireAt",
+                                                                                   "sessionsLimit"
+
                                                                                  ],
-                                                                                 "properties":{
-                                                                                   "expireAt":{
+
+                                                                                 "properties": {
+
+                                                                                   "expireAt": {
+
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 5,
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "group": {
+
+                                                                                     "type": "string",
+                                                                                     "minLength": 2,
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "createGroup": {
+
+                                                                                     "type": "boolean",
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "groupExpireAt": {
+
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": -1,
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "groupRole": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "groupTag": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "status": {
+
                                                                                      "type":"number",
-                                                                                     "multipleOf":1.0,
-                                                                                     "minimum":5,
                                                                                      "optional":false
+
                                                                                    },
-                                                                                   "group":{
-                                                                                     "type":"string",
-                                                                                     "minLength":2,
-                                                                                     "optional":false
+
+                                                                                   "userRole": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
                                                                                    },
-                                                                                   "createGroup":{
-                                                                                     "type":"boolean",
-                                                                                     "optional":false
+
+                                                                                   "userTag": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
                                                                                    },
-                                                                                   "groupExpireAt":{
-                                                                                     "type":"number",
-                                                                                     "multipleOf":1.0,
-                                                                                     "minimum":-1,
-                                                                                     "optional":false
+
+                                                                                   "userExpireAt": {
+
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": -1,
+                                                                                     "optional": false
+
                                                                                    },
-                                                                                   "groupRole":{
-                                                                                     "type":"string",
-                                                                                     "optional":false
+
+                                                                                   "forceChangePassword": {
+
+                                                                                    "type": "number",
+                                                                                    "multipleOf": 1.0,
+                                                                                    "minimum": 0,
+                                                                                    "miximum": 1,
+                                                                                    "optional": false
+
                                                                                    },
-                                                                                   "groupTag":{
-                                                                                     "type":"string",
-                                                                                     "optional":false
+
+                                                                                   "changePasswordEvery": {
+
+                                                                                    "type": "number",
+                                                                                    "multipleOf": 1.0,
+                                                                                    "minimum": 0,
+                                                                                    "miximum": 1,
+                                                                                    "optional": false
+
                                                                                    },
-                                                                                   "status":{
-                                                                                     "type":"number",
-                                                                                     "optional":false
-                                                                                   },
-                                                                                   "userRole":{
-                                                                                     "type":"string",
-                                                                                     "optional":false
-                                                                                   },
-                                                                                   "userTag":{
-                                                                                     "type":"string",
-                                                                                     "optional":false
-                                                                                   },
-                                                                                   "userExpireAt":{
-                                                                                     "type":"number",
-                                                                                     "multipleOf":1.0,
-                                                                                     "minimum":-1,
-                                                                                     "optional":false
+
+                                                                                   "sessionsLimit": {
+
+                                                                                    "type": "number",
+                                                                                    "multipleOf": 1.0,
+                                                                                    "minimum": 0,
+                                                                                    "optional": false
+
                                                                                    }
+
                                                                                  }
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          );
 
   static readonly _CONFIG_ENTRY_UserSignupProcess = {
@@ -989,81 +1430,117 @@ export default class SystemConstants {
                                                       Category: "Singup",
                                                       Name: "system.user.signup.process",
                                                       Default: JSON.stringify(
+
                                                                                {
-                                                                                 "@__default__@":{
-                                                                                   "expireAt":60,
-                                                                                   "group":"@__error__@",
-                                                                                   "createGroup":false,
-                                                                                   "groupRole":"",
-                                                                                   "groupTag":"",
-                                                                                   "groupExpireAt":-1,
-                                                                                   "status":-1,
-                                                                                   "userRole":"",
-                                                                                   "userTag":"",
-                                                                                   "userExpireAt":-1,
-                                                                                   "passwordParameters":""
+
+                                                                                 "@__default__@": {
+
+                                                                                   "expireAt": 60,
+                                                                                   "group": "@__error__@",
+                                                                                   "createGroup": false,
+                                                                                   "groupRole": "",
+                                                                                   "groupTag": "",
+                                                                                   "groupExpireAt": -1,
+                                                                                   "status": -1,
+                                                                                   "userRole": "",
+                                                                                   "userTag": "",
+                                                                                   "userExpireAt": -1,
+                                                                                   "passwordParameters": "",
+                                                                                   "forceChangePassword": 0,
+                                                                                   "changePasswordEvery": 0,
+                                                                                   "sessionsLimit": 0,
+
                                                                                  }
+
                                                                                }
+
                                                                              ),
                                                       Label: "Process signup kind",
                                                       Description: "Process signup of users. The group must be exists before of singup if createGroup = false. groupRole only apply if group is created first time createGroup = true",
                                                       AllowTagAccessR: "#Administrator#",
                                                       AllowTagAccessW: "#Administrator#",
                                                       Example: JSON.stringify(
+
                                                                                {
-                                                                                 "@__default__@":{
-                                                                                   "expireAt":60,
-                                                                                   "group":"@__error__@",
-                                                                                   "createGroup":false,
-                                                                                   "groupRole":"",
-                                                                                   "groupTag":"",
-                                                                                   "groupExpireAt":-1,
-                                                                                   "status":-1,
-                                                                                   "userRole":"",
-                                                                                   "userTag":"",
-                                                                                   "userExpireAt":-1,
-                                                                                   "passwordParameterTag":""
+
+                                                                                 "@__default__@": {
+
+                                                                                   "expireAt" :60,
+                                                                                   "group": "@__error__@",
+                                                                                   "createGroup": false,
+                                                                                   "groupRole": "",
+                                                                                   "groupTag": "",
+                                                                                   "groupExpireAt": -1,
+                                                                                   "status": -1,
+                                                                                   "userRole": "",
+                                                                                   "userTag": "",
+                                                                                   "userExpireAt": -1,
+                                                                                   "passwordParameterTag": "",
+                                                                                   "forceChangePassword": 0,
+                                                                                   "changePasswordEvery": 0,
+                                                                                   "sessionsLimit": 0
+
                                                                                  },
-                                                                                 "#Driver#":{
-                                                                                   "expireAt":60,
-                                                                                   "group":"Drivers",
-                                                                                   "createGroup":false,
-                                                                                   "groupRole":"",
-                                                                                   "groupTag":"",
-                                                                                   "groupExpireAt":-1,
-                                                                                   "status":0,
-                                                                                   "userRole":"#Driver#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                                                                   "userTag":"",
-                                                                                   "userExpireAt":-1,
-                                                                                   "passwordParameterTag":""
+
+                                                                                 "#Driver#": {
+
+                                                                                   "expireAt": 60,
+                                                                                   "group": "Drivers",
+                                                                                   "createGroup": false,
+                                                                                   "groupRole": "",
+                                                                                   "groupTag": "",
+                                                                                   "groupExpireAt": -1,
+                                                                                   "status": 0,
+                                                                                   "userRole": "#Driver#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                                   "userTag": "",
+                                                                                   "userExpireAt": -1,
+                                                                                   "passwordParameterTag": "",
+                                                                                   "forceChangePassword": 0,
+                                                                                   "changePasswordEvery": 0,
+                                                                                   "sessionsLimit": 1
+
                                                                                  },
-                                                                                 "#FinalCustomer01#":{
-                                                                                   "expireAt":60,
-                                                                                   "group":"Final_Customers_01",
-                                                                                   "createGroup":false,
-                                                                                   "groupRole":"",
-                                                                                   "groupTag":"",
-                                                                                   "groupExpireAt":-1,
-                                                                                   "status":0,
-                                                                                   "userRole":"#FinalCustomer#,#FinalCustomer01#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                                                                   "userTag":"",
-                                                                                   "userExpireAt":-1,
-                                                                                   "passwordParameterTag":""
+
+                                                                                 "#FinalCustomer01#": {
+
+                                                                                   "expireAt": 60,
+                                                                                   "group": "Final_Customers_01",
+                                                                                   "createGroup": false,
+                                                                                   "groupRole": "",
+                                                                                   "groupTag": "",
+                                                                                   "groupExpireAt": -1,
+                                                                                   "status": 0,
+                                                                                   "userRole": "#FinalCustomer#,#FinalCustomer01#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                                                                   "userTag": "",
+                                                                                   "userExpireAt": -1,
+                                                                                   "passwordParameterTag": "",
+                                                                                   "forceChangePassword": 0,
+                                                                                   "changePasswordEvery": 0,
+                                                                                   "sessionsLimit": 1
+
                                                                                  },
-                                                                                 "#Establishment#":{
-                                                                                   "expireAt":60,
-                                                                                   "group":"@__FromName__@",
-                                                                                   "createGroup":true,
-                                                                                   "groupRole":"#@__FromName__@#,#Establishment#",
-                                                                                   "groupTag":"",
-                                                                                   "groupExpireAt":-1,
-                                                                                   "status":0,
-                                                                                   "userRole":"#Master_L01#", //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
-                                                                                   "userTag":"",
-                                                                                   "userExpireAt":-1,
-                                                                                   "passwordParameterTag":"#Establishment#"
+
+                                                                                 "#Establishment#": {
+
+                                                                                   "expireAt": 60,
+                                                                                   "group": "@__FromName__@",
+                                                                                   "createGroup": true,
+                                                                                   "groupRole": "#@__FromName__@#,#Establishment#",
+                                                                                   "groupTag": "",
+                                                                                   "groupExpireAt": -1,
+                                                                                   "status": 0,
+                                                                                   "userRole": "#Master_L01#", //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                                   "userTag": "",
+                                                                                   "userExpireAt": -1,
+                                                                                   "passwordParameterTag": "#Establishment#",
+                                                                                   "forceChangePassword": 0,
+                                                                                   "changePasswordEvery": 0,
+                                                                                   "sessionsLimit": 1
+
                                                                                  }
+
                                                                                }
+
                                                                              ),
                                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                       ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserSignupProcess_SCHEMA }
@@ -1078,49 +1555,87 @@ export default class SystemConstants {
                                                        Category: "User",
                                                        Name: "system.user.role.auto.assign",
                                                        Default: JSON.stringify(
+
                                                                                 {
+
                                                                                   "create": {
-                                                                                    "@__default__@":{
+
+                                                                                    "@__default__@": {
+
                                                                                       "@__default__@": ""
+
                                                                                     }
+
                                                                                   },
+
                                                                                   "update": {
-                                                                                    "@__default__@":{
+
+                                                                                    "@__default__@": {
+
                                                                                       "@__default__@": ""
+
                                                                                     }
+
                                                                                   }
+
                                                                                 }
+
                                                                               ),
                                                        Label: "Process auto assign of role to the user creation or update",
                                                        Description: "Process auto assign of role in the user creation or update. When the user that create or update has the role.",
                                                        AllowTagAccessR: "#Administrator#",
                                                        AllowTagAccessW: "#Administrator#",
                                                        Example: JSON.stringify(
+
                                                                                 {
+
                                                                                   "create": {
-                                                                                    "@__default__@":{
+
+                                                                                    "@__default__@": {
+
                                                                                       "@__default__@": ""
+
                                                                                     },
+
                                                                                     "#Master_L01#": {
+
                                                                                       "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                     },
+
                                                                                     "#Master_L02#": {
+
                                                                                       "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                     },
+
                                                                                     "#Master_L03#": {
+
                                                                                       "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                     },
+
                                                                                     "#RoleName01#": {
+
                                                                                       "#GroupName01#": "#RoleName02#,#RoleName03#",
                                                                                       "@__default__@": "#RoleName02#"
+
                                                                                     }
+
                                                                                   },
+
                                                                                   "update": {
-                                                                                    "@__default__@":{
+
+                                                                                    "@__default__@": {
+
                                                                                       "@__default__@": ""
+
                                                                                     },
+
                                                                                   }
+
                                                                                 }
+
                                                                               ),
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                        ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA }
@@ -1135,49 +1650,87 @@ export default class SystemConstants {
                                                             Category: "User Group",
                                                             Name: "system.user.group.role.auto.assign",
                                                             Default: JSON.stringify(
+
                                                                                       {
+
                                                                                         "create": {
-                                                                                          "@__default__@":{
+
+                                                                                          "@__default__@": {
+
                                                                                             "@__default__@": ""
+
                                                                                           }
+
                                                                                         },
+
                                                                                         "update": {
-                                                                                          "@__default__@":{
+
+                                                                                          "@__default__@": {
+
                                                                                             "@__default__@": ""
+
                                                                                           }
+
                                                                                         }
+
                                                                                       }
+
                                                                                     ),
                                                             Label: "Process auto assign of role to the user group creation or update",
                                                             Description: "Process auto assign of role in the user group creation or update. When the user group that create or update has the role.",
                                                             AllowTagAccessR: "#Administrator#",
                                                             AllowTagAccessW: "#Administrator#",
                                                             Example: JSON.stringify(
+
                                                                                      {
+
                                                                                        "create": {
-                                                                                         "@__default__@":{
+
+                                                                                         "@__default__@": {
+
                                                                                            "@__default__@": ""
+
                                                                                          },
+
                                                                                          "#Master_L01#": {
+
                                                                                            "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                          },
+
                                                                                          "#Master_L02#": {
+
                                                                                            "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                          },
+
                                                                                          "#Master_L03#": {
+
                                                                                            "@__default__@": "#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                                          },
+
                                                                                          "#RoleName01#": {
+
                                                                                            "#GroupName01#": "#RoleName02#,#RoleName03#",
                                                                                            "@__default__@": "#RoleName02#"
+
                                                                                          }
+
                                                                                        },
+
                                                                                        "update": {
-                                                                                         "@__default__@":{
+
+                                                                                         "@__default__@": {
+
                                                                                            "@__default__@": ""
+
                                                                                          },
+
                                                                                        }
+
                                                                                      }
+
                                                                                    ),
                                                             CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                             ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign_SCHEMA }
@@ -1192,46 +1745,72 @@ export default class SystemConstants {
                                                   Category: "Notification",
                                                   Name: "system.notification.email.service",
                                                   Default: JSON.stringify(
+
                                                                            {
-                                                                             "service":"@__none__@",
-                                                                             "#gmail#":{
-                                                                               "type":"smtp",
-                                                                               "host":"smtp.gmail.com",
-                                                                               "port":465,
-                                                                               "secure":true,
-                                                                               "auth":{
-                                                                                 "user":"myuser@gmail.com",
-                                                                                 "pass":"secret"
+
+                                                                             "service": "@__none__@",
+
+                                                                             "#gmail#": {
+
+                                                                               "type": "smtp",
+                                                                               "host": "smtp.gmail.com",
+                                                                               "port": 465,
+                                                                               "secure": true,
+
+                                                                               "auth": {
+
+                                                                                 "user": "myuser@gmail.com",
+                                                                                 "pass": "secret"
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          ),
                                                   Label: "Configuration for the notifications email transport",
                                                   Description: "Configuration for the notification email transport",
                                                   AllowTagAccessR: "#Administrator#",
                                                   AllowTagAccessW: "#Administrator#",
                                                   Example: JSON.stringify(
+
                                                                            {
-                                                                             "service":"#gmail#",
-                                                                             "#gmail#":{
-                                                                               "type":"smtp",
-                                                                               "host":"smtp.gmail.com",
-                                                                               "port":465,
-                                                                               "secure":true,
-                                                                               "auth":{
-                                                                                 "user":"myuser@gmail.com",
-                                                                                 "pass":"secret"
+
+                                                                             "service": "#gmail#",
+
+                                                                             "#gmail#": {
+
+                                                                               "type": "smtp",
+                                                                               "host": "smtp.gmail.com",
+                                                                               "port": 465,
+                                                                               "secure": true,
+
+                                                                               "auth": {
+
+                                                                                 "user": "myuser@gmail.com",
+                                                                                 "pass": "secret"
+
                                                                                }
+
                                                                              },
-                                                                             "#send_grid#":{
-                                                                               "type":"send_grid",
-                                                                               "host":"api.sendgrid.com/v3/mail/send",
-                                                                               "port":443,
-                                                                               "auth":{
-                                                                                 "api_key":"my_key"
+
+                                                                             "#send_grid#": {
+
+                                                                               "type": "send_grid",
+                                                                               "host": "api.sendgrid.com/v3/mail/send",
+                                                                               "port": 443,
+
+                                                                               "auth": {
+
+                                                                                 "api_key": "my_key"
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                   ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMAIL_Service_SCHEMA }
@@ -1246,38 +1825,58 @@ export default class SystemConstants {
                                                 Category: "Notification",
                                                 Name: "system.notification.sms.service",
                                                 Default: JSON.stringify(
+
                                                                          {
+
                                                                            "service":"@__none__@",
-                                                                           "#sms_gateway#":{
-                                                                             "type":"sms_gateway",
-                                                                             "host":"https://domain.com/backend-sms-gateway",
-                                                                             "port":443,
-                                                                             "device_id":"*",
-                                                                             "context":"AMERICA/NEW_YORK",
-                                                                             "auth":{
-                                                                               "api_key":"my_key"
+
+                                                                           "#sms_gateway#": {
+
+                                                                             "type": "sms_gateway",
+                                                                             "host": "https://domain.com/backend-sms-gateway",
+                                                                             "port": 443,
+                                                                             "device_id": "*",
+                                                                             "context": "AMERICA/NEW_YORK",
+
+                                                                             "auth": {
+
+                                                                               "api_key": "my_key"
+
                                                                              }
+
                                                                            }
+
                                                                          }
+
                                                                        ),
                                                 Label: "Configuration for the notifications sms transport",
                                                 Description: "Configuration for the notification sms transport",
                                                 AllowTagAccessR: "#Administrator#",
                                                 AllowTagAccessW: "#Administrator#",
                                                 Example: JSON.stringify(
+
                                                                          {
-                                                                           "service":"#sms_gateway#",
-                                                                           "#sms_gateway#":{
-                                                                             "type":"sms_gateway",
-                                                                             "host":"https://domain.com/backend-sms-gateway",
-                                                                             "port":443,
-                                                                             "device_id":"*",
-                                                                             "context":"AMERICA/NEW_YORK",
-                                                                             "auth":{
-                                                                               "api_key":"my_key"
+
+                                                                           "service": "#sms_gateway#",
+
+                                                                           "#sms_gateway#": {
+
+                                                                             "type": "sms_gateway",
+                                                                             "host": "https://domain.com/backend-sms-gateway",
+                                                                             "port": 443,
+                                                                             "device_id": "*",
+                                                                             "context": "AMERICA/NEW_YORK",
+
+                                                                             "auth": {
+
+                                                                               "api_key": "my_key"
+
                                                                              }
+
                                                                            }
+
                                                                          }
+
                                                                        ),
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                 ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_EMAIL_Service_SCHEMA }
@@ -1292,36 +1891,56 @@ export default class SystemConstants {
                                                  Category: "Notification",
                                                  Name: "system.notification.push.service",
                                                  Default: JSON.stringify(
+
                                                                           {
-                                                                            "service":"@__none__@",
-                                                                            "#one_signal#":{
-                                                                              "type":"one_signal",
-                                                                              "host":"https://onesignal.com/api/v1/notifications",
-                                                                              "port":443,
-                                                                              "auth":{
-                                                                                "appId":"my_app_id",
-                                                                                "apiKey":"my_key"
+
+                                                                            "service": "@__none__@",
+
+                                                                            "#one_signal#": {
+
+                                                                              "type": "one_signal",
+                                                                              "host": "https://onesignal.com/api/v1/notifications",
+                                                                              "port": 443,
+
+                                                                              "auth": {
+
+                                                                                "app_id": "my_app_id",
+                                                                                "api_key": "my_key"
+
                                                                               }
+
                                                                             }
+
                                                                           }
+
                                                                         ),
                                                  Label: "Configuration for the notifications push transport",
                                                  Description: "Configuration for the notification push transport",
                                                  AllowTagAccessR: "#Administrator#",
                                                  AllowTagAccessW: "#Administrator#",
                                                  Example: JSON.stringify(
+
                                                                           {
-                                                                            "service":"#one_signal#",
-                                                                            "#one_signal#":{
-                                                                              "type":"one_signal",
-                                                                              "host":"https://onesignal.com/api/v1/notifications",
-                                                                              "port":443,
+
+                                                                            "service": "#one_signal#",
+
+                                                                            "#one_signal#": {
+
+                                                                              "type": "one_signal",
+                                                                              "host": "https://onesignal.com/api/v1/notifications",
+                                                                              "port": 443,
+
                                                                               "auth":{
-                                                                                "appId":"my_app_id",
-                                                                                "apiKey":"my_key"
+
+                                                                                "app_id": "my_app_id",
+                                                                                "api_key": "my_key"
+
                                                                               }
+
                                                                             }
+
                                                                           }
+
                                                                         ),
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_PUSH_Service_SCHEMA }
@@ -1336,38 +1955,60 @@ export default class SystemConstants {
                                                     Category: "Notification",
                                                     Name: "system.notification.discord.service",
                                                     Default: JSON.stringify(
+
                                                                              {
-                                                                               "service":"@__none__@",
-                                                                               "#discord#":{
-                                                                                 "type":"discord",
-                                                                                 "target":{
+
+                                                                               "service": "@__none__@",
+
+                                                                               "#discord#": {
+
+                                                                                 "type": "discord",
+
+                                                                                 "target": {
+
                                                                                   "web_hooks": {
                                                                                                  "@__default__@": "",
                                                                                                  "#warning": "",
                                                                                                  "#error": "",
                                                                                                }
+
                                                                                  }
+
                                                                                }
+
                                                                              }
+
                                                                            ),
                                                     Label: "Configuration for the notifications discord transport",
                                                     Description: "Configuration for the notification discord transport",
                                                     AllowTagAccessR: "#Administrator#",
                                                     AllowTagAccessW: "#Administrator#",
                                                     Example: JSON.stringify(
+
                                                                              {
-                                                                               "service":"#discord#",
-                                                                               "#discord#":{
-                                                                                 "type":"discord",
-                                                                                 "target":{
+
+                                                                               "service": "#discord#",
+
+                                                                               "#discord#": {
+
+                                                                                 "type": "discord",
+
+                                                                                 "target": {
+
                                                                                   "web_hooks": {
+
                                                                                                  "@__default__@": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
                                                                                                  "#warning": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
                                                                                                  "#error": "https://discordapps.com/api/webhooks/???????????/???????????/????????????????????????",
+
                                                                                                }
+
                                                                                  }
+
                                                                                }
+
                                                                              }
+
                                                                            ),
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                     ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_DISCORD_Service_SCHEMA }
@@ -1382,38 +2023,62 @@ export default class SystemConstants {
                                                   Category: "Notification",
                                                   Name: "system.notification.slack.service",
                                                   Default: JSON.stringify(
+
                                                                            {
-                                                                             "service":"@__none__@",
-                                                                             "#slack#":{
-                                                                               "type":"slack",
-                                                                               "target":{
+
+                                                                             "service": "@__none__@",
+
+                                                                             "#slack#": {
+
+                                                                               "type": "slack",
+
+                                                                               "target": {
+
                                                                                  "web_hooks": {
+
                                                                                                 "@__default__@": "",
                                                                                                 "#warning": "",
                                                                                                 "#error": "",
+
                                                                                               }
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          ),
                                                   Label: "Configuration for the notifications slack transport",
                                                   Description: "Configuration for the notification slack transport",
                                                   AllowTagAccessR: "#Administrator#",
                                                   AllowTagAccessW: "#Administrator#",
                                                   Example: JSON.stringify(
+
                                                                            {
-                                                                             "service":"#slack#",
-                                                                             "#slack#":{
+
+                                                                             "service": "#slack#",
+
+                                                                             "#slack#": {
+
                                                                                "type":"slack",
-                                                                               "target":{
+
+                                                                               "target": {
+
                                                                                  "web_hooks": {
+
                                                                                                 "@__default__@": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
                                                                                                 "#warning": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
                                                                                                 "#error": "https://hooks.slack.com/services/???????????/???????????/????????????????????????",
+
                                                                                               }
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                   ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_SLACK_Service_SCHEMA }
@@ -1428,34 +2093,54 @@ export default class SystemConstants {
                                                         Category: "Maps",
                                                         Name: "system.maps.geocode.service",
                                                         Default: JSON.stringify(
+
                                                                                  {
-                                                                                   "service":"@__none__@",
-                                                                                   "#google_maps#":{
-                                                                                     "type":"google_maps",
-                                                                                     "host":"https://maps.googleapis.com/maps/api/geocode/json",
-                                                                                     "port":443,
-                                                                                     "auth":{
-                                                                                       "apiKey":"my_key"
+
+                                                                                   "service": "@__none__@",
+
+                                                                                   "#google_maps#": {
+
+                                                                                     "type": "google_maps",
+                                                                                     "host": "https://maps.googleapis.com/maps/api/geocode/json",
+                                                                                     "port": 443,
+
+                                                                                     "auth": {
+
+                                                                                       "api_key": "my_key"
+
                                                                                      }
+
                                                                                    }
+
                                                                                  }
+
                                                                                ),
                                                         Label: "Configuration for the geocode map service",
                                                         Description: "Configuration for the geocode map service",
                                                         AllowTagAccessR: "#Administrator#",
                                                         AllowTagAccessW: "#Administrator#",
                                                         Example: JSON.stringify(
+
                                                                                  {
-                                                                                   "service":"#google_maps#",
-                                                                                   "#google_maps#":{
-                                                                                     "type":"google_maps",
-                                                                                     "host":"https://maps.googleapis.com/maps/api/geocode/json",
-                                                                                     "port":443,
-                                                                                     "auth":{
-                                                                                       "apiKey":"my_key"
+
+                                                                                   "service": "#google_maps#",
+
+                                                                                   "#google_maps#": {
+
+                                                                                     "type": "google_maps",
+                                                                                     "host": "https://maps.googleapis.com/maps/api/geocode/json",
+                                                                                     "port": 443,
+
+                                                                                     "auth": {
+
+                                                                                       "api_key": "my_key"
+
                                                                                      }
+
                                                                                    }
+
                                                                                  }
+
                                                                                ),
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA }
@@ -1470,208 +2155,393 @@ export default class SystemConstants {
                                                          Category: "Maps",
                                                          Name: "system.map.distance.service",
                                                          Default: JSON.stringify(
+
                                                                                   {
-                                                                                    "service":"@__none__@",
-                                                                                    "#google_maps#":{
-                                                                                      "type":"google_maps",
-                                                                                      "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
-                                                                                      "port":443,
-                                                                                      "auth":{
-                                                                                        "apiKey":"my_key"
+
+                                                                                    "service": "@__none__@",
+
+                                                                                    "#google_maps#": {
+
+                                                                                      "type": "google_maps",
+                                                                                      "host": "https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                                      "port": 443,
+
+                                                                                      "auth": {
+
+                                                                                        "api_key": "my_key"
+
                                                                                       }
+
                                                                                     }
+
                                                                                   }
+
                                                                                 ),
                                                          Label: "Configuration for the geocode map service",
                                                          Description: "Configuration for the geocode map service",
                                                          AllowTagAccessR: "#Administrator#",
                                                          AllowTagAccessW: "#Administrator#",
                                                          Example: JSON.stringify(
+
                                                                                   {
-                                                                                    "service":"#google_maps#",
-                                                                                    "#google_maps#":{
-                                                                                      "type":"google_maps",
-                                                                                      "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
-                                                                                      "port":443,
-                                                                                      "auth":{
-                                                                                        "apiKey":"my_key"
+
+                                                                                    "service": "#google_maps#",
+
+                                                                                    "#google_maps#": {
+
+                                                                                      "type": "google_maps",
+                                                                                      "host": "https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                                      "port": 443,
+
+                                                                                      "auth": {
+
+                                                                                        "api_key": "my_key"
+
                                                                                       }
+
                                                                                     }
+
                                                                                   }
+
                                                                                 ),
                                                          CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                          ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service_SCHEMA }
                                                        };
 
   static readonly _CONFIG_ENTRY_Frontend_Rules_SCHEMA = JSON.stringify(
+
                                                                         {
+
                                                                           "$schema": "http://json-schema.org/draft-07/schema#",
                                                                           "type": "object",
-                                                                          "additionalProperties":false,
-                                                                          "required": [ "@__default__@" ],
+                                                                          "additionalProperties": false,
+
+                                                                          "required": [
+
+                                                                            "@__default__@"
+
+                                                                          ],
+
                                                                           "patternProperties": {
+
                                                                             "@__default__@": {
+
                                                                               "$ref": "#/definitions/validatonObjectDef"
+
                                                                             },
+
                                                                             "#.*#": {
+
                                                                               "$ref": "#/definitions/validatonObjectDef"
+
                                                                             }
+
                                                                           },
+
                                                                           "definitions": {
+
                                                                             "validatonObjectDef": {
+
                                                                               "type": "object",
                                                                               "additionalProperties": false,
-                                                                              "required": [ "userLoginControl", "userSignupControl", "tag", "url", "route" ],
+
+                                                                              "required": [
+
+                                                                                "user_login_control",
+                                                                                "user_signup_control",
+                                                                                "tag",
+                                                                                "url",
+                                                                                "route"
+
+                                                                              ],
+
                                                                               "properties": {
-                                                                                "userLoginControl": {
+
+                                                                                "user_login_control": {
+
                                                                                   "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
-                                                                                "userSignupControl": {
+
+                                                                                "user_signup_control": {
+
                                                                                   "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
-                                                                                "userRecoverPasswordControl": {
+
+                                                                                "user_recover_password_control": {
+
                                                                                   "$ref": "#/definitions/validatonObjectDefDeniedAllowed",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
+
                                                                                 "tag": {
+
                                                                                   "type": "string",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
+
                                                                                 "url": {
+
                                                                                   "type": "string",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
+
                                                                                 "route": {
+
                                                                                   "$ref": "#/definitions/validatonObjectDefExcludeInclude",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 }
+
                                                                               }
+
                                                                             },
+
                                                                             "validatonObjectDefDeniedAllowed": {
+
                                                                               "type": "object",
                                                                               "additionalProperties": false,
-                                                                              "required": [ "denied", "allowed" ],
+
+                                                                              "required": [
+
+                                                                                "denied",
+                                                                                "allowed"
+
+                                                                              ],
+
                                                                               "properties": {
+
                                                                                 "denied": {
+
                                                                                   "type": "string",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 },
+
                                                                                 "allowed": {
+
                                                                                   "type": "string",
-                                                                                  "optional":false
+                                                                                  "optional": false
+
                                                                                 }
+
                                                                               }
+
                                                                             },
+
                                                                             "validatonObjectDefExcludeInclude": {
+
                                                                               "type": "object",
                                                                               "additionalProperties": false,
-                                                                              "required": [ "exclude", "include" ],
+
+                                                                              "required": [
+
+                                                                                "exclude",
+                                                                                "include"
+
+                                                                              ],
+
                                                                               "properties": {
+
                                                                                 "exclude": {
+
                                                                                   "type": "array",
-                                                                                  "optional":false,
+                                                                                  "optional": false,
+
                                                                                   "items": {
+
                                                                                     "type": "string"
+
                                                                                   }
+
                                                                                 },
+
                                                                                 "include": {
+
                                                                                   "type": "array",
-                                                                                  "optional":false,
+                                                                                  "optional": false,
+
                                                                                   "items": {
+
                                                                                     "type": "string"
+
                                                                                   }
+
                                                                                 }
+
                                                                               }
+
                                                                             }
+
                                                                           }
+
                                                                         }
                                                                       );
 
     static readonly _CONFIG_ENTRY_Frontend_Rules_EXAMPLE = JSON.stringify(
+
                                                                            {
+
                                                                              "#mobile-ionic5-sales-???#": {
-                                                                               "userLoginControl": {
+
+                                                                               "user_login_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "#Final_Customers_01#,#Administrator#"
+
                                                                                },
-                                                                               "userSignupControl": {
+
+                                                                               "user_signup_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "#finalCustomer#"
+
                                                                                },
+
                                                                                "tag": "#mobile#,#phone#,#phone_android#,#phone_ios#,#tablet#,#tablet_android#,#tablet_ios#",
                                                                                "url": "http://mycompany.com/myapp/url/",
+
                                                                                "route": {
-                                                                                 "exclude": [
-                                                                                   "GET:/my/service",
-                                                                                   "POST:/my/service2"
-                                                                                 ],
-                                                                                 "include": []
+
+                                                                                "exclude": [
+
+                                                                                  "GET:/my/service",
+                                                                                  "POST:/my/service2"
+
+                                                                                ],
+
+                                                                                "include": [
+
+                                                                                  //
+
+                                                                                ]
+
                                                                                }
+
                                                                              },
+
                                                                              "#web-reactjs-establisment-???#": {
-                                                                               "userLoginControl": {
+
+                                                                               "user_login_Control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "#Establishment#,#Administrator#"
+
                                                                                },
-                                                                               "userSignupControl": {
+
+                                                                               "user_signup_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "#establishment#"
+
                                                                                },
+
                                                                                "tag": "#web#,#web_desktop#",
                                                                                "url": "http://mycompany.com/myapp/url/",
+
                                                                                "route": {
+
                                                                                  "exclude": [
+
                                                                                    "GET:/my/service",
                                                                                    "POST:/my/service2"
+
                                                                                  ],
+
                                                                                  "include": [
+
                                                                                    "Public:PUBLIC:GET:/my/other/service",
                                                                                    "Authenticated:AUTHENTICATED:POST:/my/other/duper/service"
+
                                                                                  ]
+
                                                                                }
+
                                                                              },
+
                                                                              "#web-reactjs-delivery-???#": {
-                                                                               "userLoginControl": {
+
+                                                                               "user_login_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "#Dispachers#,#Administrator#"
+
                                                                                },
-                                                                               "userSignupControl": {
+
+                                                                               "user_signup_control": {
+
                                                                                  "denied": "*",
                                                                                  "allowed": ""
+
                                                                                },
+
                                                                                "tag": "#web#,#web_desktop#",
                                                                                "url": "http://mycompany.com/myapp/url/",
+
                                                                                "route": {
+
                                                                                  "exclude": [
+
                                                                                    "GET:/my/service",
                                                                                    "POST:/my/service2"
+
                                                                                  ],
+
                                                                                  "include": [
+
                                                                                    "MyRole:ROLE:POST:/my/other/super/service"
+
                                                                                  ]
+
                                                                                }
+
                                                                              },
+
                                                                              "@__default__@": {
-                                                                               "userLoginControl": {
+
+                                                                               "user_login_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "*"
+
                                                                                },
-                                                                               "userSignupControl": {
+
+                                                                               "user_signup_control": {
+
                                                                                  "denied": "",
                                                                                  "allowed": "*"
+
                                                                                },
+
                                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
                                                                                "url": "http://mycompany.com/myapp/url/",
+
                                                                                "route": {
+
                                                                                  "exclude": [
+
                                                                                    "*"
+
                                                                                  ],
-                                                                                 "include": []
+
+                                                                                 "include": [
+
+                                                                                   //
+
+                                                                                 ]
+
                                                                                }
+
                                                                              }
+
                                                                            }
+
                                                                          );
 
   static readonly _CONFIG_ENTRY_Frontend_Rules = {
@@ -1682,30 +2552,53 @@ export default class SystemConstants {
                                                    Name: "system.frontend.rules",
                                                    Default: JSON.stringify(
                                                                             {
-                                                                              "@__default__@":{
-                                                                                "userLoginControl":{
-                                                                                  "denied":"",
-                                                                                  "allowed":"*"
+
+                                                                              "@__default__@": {
+
+                                                                                "user_login_control": {
+
+                                                                                  "denied": "",
+                                                                                  "allowed": "*"
+
                                                                                 },
-                                                                                "userSignupControl":{
-                                                                                  "denied":"",
-                                                                                  "allowed":"*"
+
+                                                                                "user_signup_control": {
+
+                                                                                  "denied": "",
+                                                                                  "allowed": "*"
+
                                                                                 },
-                                                                                "userRecoverPasswordControl":{
-                                                                                  "denied":"",
-                                                                                  "allowed":"*"
+
+                                                                                "user_recover_password_control": {
+
+                                                                                  "denied": "",
+                                                                                  "allowed": "*"
+
                                                                                 },
-                                                                                "tag":"#web#,#mobile#,#phone#,#tablet#",
-                                                                                "url":"http://mycompany.com/myapp/url/",
-                                                                                "route":{
-                                                                                  "exclude":[
+
+                                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                                "url": "http://mycompany.com/myapp/url/",
+
+                                                                                "route": {
+
+                                                                                  "exclude": [
+
+                                                                                    //
+
                                                                                   ],
-                                                                                  "include":[
+
+                                                                                  "include": [
+
                                                                                     "*"
+
                                                                                   ]
+
                                                                                 }
+
                                                                               }
+
                                                                             }
+
                                                                           ),
                                                    Label: "Configuration for different frontend clients id rules",
                                                    Description: "Configuration for different frontend clients id rules",
@@ -1725,36 +2618,44 @@ export default class SystemConstants {
                                                                 Category: "General",
                                                                 Name: "system.general.default.information",
                                                                 Default: JSON.stringify(
+
                                                                                          {
-                                                                                           "sys_admin_email":"admin@mycompany.com",
-                                                                                           "sys_admin_phone":"+1-336-776-9897",
-                                                                                           "feed_back_email":"feedback@mycompany.com",
-                                                                                           "no_response_email":"no-response@mycompany.com",
-                                                                                           "company_name":"MY COMPANY LLC",
-                                                                                           "company_address":"1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
-                                                                                           "company_zip_code":"FL98284",
-                                                                                           "company_phone":"1-989-345-6789, 1-456-345-6789",
-                                                                                           "company_web":"https://www.mycompanyweb.com, https://www.othercompanyweb.com",
-                                                                                           "company_email":"admin@mycompany.com, other@mydomain.com"
+
+                                                                                           "sys_admin_email": "admin@mycompany.com",
+                                                                                           "sys_admin_phone": "+1-336-776-9897",
+                                                                                           "feed_back_email": "feedback@mycompany.com",
+                                                                                           "no_response_email": "no-response@mycompany.com",
+                                                                                           "company_name": "MY COMPANY LLC",
+                                                                                           "company_address": "1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
+                                                                                           "company_zip_code": "FL98284",
+                                                                                           "company_phone": "1-989-345-6789, 1-456-345-6789",
+                                                                                           "company_web": "https://www.mycompanyweb.com, https://www.othercompanyweb.com",
+                                                                                           "company_email": "admin@mycompany.com, other@mydomain.com"
+
                                                                                          }
+
                                                                                        ),
                                                                 Label: "Configuration for default values",
                                                                 Description: "Configuration for default values",
                                                                 AllowTagAccessR: "#Administrator#",
                                                                 AllowTagAccessW: "#Administrator#",
                                                                 Example: JSON.stringify(
+
                                                                                          {
-                                                                                           "sys_admin_email":"admin@mycompany.com, otheradmin@domain.com",
-                                                                                           "sys_admin_phone":"1-336-776-9897, 1-360-767-9192",
-                                                                                           "feed_back_email":"feedback@mycompany.com",
-                                                                                           "no_response_email":"no-response@mycompany.com",
-                                                                                           "company_name":"MY COMPANY LLC",
-                                                                                           "company_address":"1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
-                                                                                           "company_zip_code":"FL98284",
-                                                                                           "company_phone":"1-989-345-6789, 1-456-345-6789",
-                                                                                           "company_web":"https://www.mycompanyweb.com, https://www.othercompanyweb.com",
-                                                                                           "company_email":"admin@mycompany.com, other@mydomain.com"
+
+                                                                                           "sys_admin_email": "admin@mycompany.com, otheradmin@domain.com",
+                                                                                           "sys_admin_phone": "1-336-776-9897, 1-360-767-9192",
+                                                                                           "feed_back_email": "feedback@mycompany.com",
+                                                                                           "no_response_email": "no-response@mycompany.com",
+                                                                                           "company_name": "MY COMPANY LLC",
+                                                                                           "company_address": "1234N Murdock St, Coral Gables, FL98284, Florida, USA, Office 102",
+                                                                                           "company_zip_code": "FL98284",
+                                                                                           "company_phone": "1-989-345-6789, 1-456-345-6789",
+                                                                                           "company_web": "https://www.mycompanyweb.com, https://www.othercompanyweb.com",
+                                                                                           "company_email": "admin@mycompany.com, other@mydomain.com"
+
                                                                                          }
+
                                                                                        ),
                                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                 ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_General_Default_Information_SCHEMA }
@@ -1769,18 +2670,26 @@ export default class SystemConstants {
                                                   Category: "User",
                                                   Name: "system.user.settings",
                                                   Default: JSON.stringify(
+
                                                                            {
+
                                                                              "entry":"value"
+
                                                                            }
+
                                                                          ),
                                                   Label: "Configuration for user settings values",
                                                   Description: "Configuration for user settings values",
                                                   AllowTagAccessR: "#Administrator#",
                                                   AllowTagAccessW: "#Administrator#",
                                                   Example: JSON.stringify(
+
                                                                            {
+
                                                                              "entry":"value"
+
                                                                            }
+
                                                                          ),
                                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                   ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_User_Settings_SCHEMA }
@@ -1795,18 +2704,26 @@ export default class SystemConstants {
                                                        Category: "User Group",
                                                        Name: "system.user.group.settings",
                                                        Default: JSON.stringify(
+
                                                                                 {
+
                                                                                   "entry":"value"
+
                                                                                 }
+
                                                                               ),
                                                        Label: "Configuration for user group settings values",
                                                        Description: "Configuration for user group settings values",
                                                        AllowTagAccessR: "#Administrator#",
                                                        AllowTagAccessW: "#Administrator#",
                                                        Example: JSON.stringify(
+
                                                                                 {
+
                                                                                   "entry":"value"
+
                                                                                 }
+
                                                                               ),
                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                        ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_UserGroup_Settings_SCHEMA }
@@ -1821,20 +2738,51 @@ export default class SystemConstants {
                                                         Category: "Database",
                                                         Name: "database.log.tables",
                                                         Default: JSON.stringify(
+
                                                                                  {
-                                                                                   "master.sysTableNoExists": [ "create", "update", "delete" ]
+
+                                                                                   "master.sysTableNoExists": [
+
+                                                                                     "create",
+                                                                                     "update",
+                                                                                     "delete"
+
+                                                                                   ]
+
                                                                                  }
+
                                                                                ),
                                                         Label: "Configuration for database log tables",
                                                         Description: "Configuration for database log tables",
                                                         AllowTagAccessR: "#Administrator#",
                                                         AllowTagAccessW: "#Administrator#",
                                                         Example: JSON.stringify(
+
                                                                                  {
-                                                                                   "master.sysUser": [ "create", "update", "delete" ],
-                                                                                   "master.sysUserGroup": [ "create", "delete" ],
-                                                                                   "master.bizOtherTable": [ "delete" ],
+
+                                                                                   "master.sysUser": [
+
+                                                                                     "create",
+                                                                                     "update",
+                                                                                     "delete"
+
+                                                                                   ],
+
+                                                                                   "master.sysUserGroup": [
+
+                                                                                    "create",
+                                                                                    "delete"
+
+                                                                                   ],
+
+                                                                                   "master.bizOtherTable": [
+
+                                                                                     "delete"
+
+                                                                                   ],
+
                                                                                  }
+
                                                                                ),
                                                         CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                         ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
@@ -1855,17 +2803,17 @@ export default class SystemConstants {
 
                                                                          "#im_server_01#": {
 
-                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
+                                                                           "host_rest": "http://localhost:5050/instant/message/server/domain/api/v1",
 
-                                                                           "hostLiveDomain": "http://localhost:5050",
+                                                                           "host_live_domain": "http://localhost:5050",
 
-                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
+                                                                           "host_live_path": "/instant/message/server/domain/socket/v1/live",
 
                                                                            "workers": "9191,9192,9193",
 
                                                                            "auth":{
 
-                                                                             "apiKey": "my_key"
+                                                                             "api_key": "my_key"
 
                                                                            }
 
@@ -1938,17 +2886,17 @@ export default class SystemConstants {
 
                                                                          "#im_server_01#": {
 
-                                                                           "hostRest": "http://localhost:5050/instant/message/server/domain/api/v1",
+                                                                           "host_rest": "http://localhost:5050/instant/message/server/domain/api/v1",
 
-                                                                           "hostLiveDomain": "http://localhost:5050",
+                                                                           "host_live_domain": "http://localhost:5050",
 
-                                                                           "hostLivePath": "/instant/message/server/domain/socket/v1/live",
+                                                                           "host_live_path": "/instant/message/server/domain/socket/v1/live",
 
                                                                            "workers": "9191,9192,9193",
 
                                                                            "auth":{
 
-                                                                             "apiKey": "178fa7c2-bcdc-4051-9773-26b86f49307d"
+                                                                             "api_key": "178fa7c2-bcdc-4051-9773-26b86f49307d"
 
                                                                            }
 
@@ -1982,36 +2930,42 @@ export default class SystemConstants {
                                                                                "allowed": "#Business_Managers#,#Administrators#"
 
                                                                              },
+
                                                                              "#System_Administrators#": {
 
                                                                                "denied": "",
                                                                                "allowed": "#System_Administrators#,#Administrators#"
 
                                                                              },
+
                                                                              "#userexample01#": {
 
                                                                                "denied": "",
                                                                                "allowed": "#@@UserGroupId@@#,#@@UserGroupName@@#,#@@UserId@@#,#@@UserName@@#"
 
                                                                              },
+
                                                                              "#userexample02#": {
 
                                                                                "denied": "*",
                                                                                "allowed": ""
 
                                                                              },
+
                                                                              "#userexample03#": {
 
                                                                                "denied": "#My_Denied_Channel01#,#My_Denied_Channel02#",
                                                                                "allowed": "*"
 
                                                                              },
+
                                                                              "#admin01@system.net#": {
 
                                                                                "denied": "",
                                                                                "allowed": "*"
 
                                                                              },
+
                                                                              "@__default__@":{
 
                                                                                "denied": "",

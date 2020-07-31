@@ -33,7 +33,7 @@ export default class TransportSMSGateway {
 
         const params = new URLSearchParams();
         params.append( "request.SecurityTokenId", transportOptions.auth.api_key ); //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
-        params.append( "request.DeviceId", messageOptions.device_id || transportOptions.deviceId );
+        params.append( "request.DeviceId", messageOptions.device_id || transportOptions.device_id );
         params.append( "request.PhoneNumber", strTo ); //"3057769594",
         params.append( "request.Message", messageOptions.body.text );  //"Test message",
         params.append( "request.ForeignData", messageOptions.foreign_data );  //`{ "user": "myuser" }`,
@@ -50,7 +50,7 @@ export default class TransportSMSGateway {
                           uri: transportOptions.host,
                           form: {
                                   "request.SecurityTokenId": transportOptions.auth.api_key, //"cebeae94-246e-4bac-86b3-4ed0dc5f890d",
-                                  "request.DeviceId": messageOptions.device_id || transportOptions.deviceId,
+                                  "request.DeviceId": messageOptions.device_id || transportOptions.device_id,
                                   "request.PhoneNumber": strTo, //"3057769594",
                                   "request.Message": messageOptions.body.text,  //"Test message",
                                   "request.ForeignData": messageOptions.foreign_data,  //`{ "user": "myuser" }`,
