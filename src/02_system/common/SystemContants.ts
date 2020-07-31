@@ -900,6 +900,7 @@ export default class SystemConstants {
                                                                                   }
 
                                                                                 }
+
                                                                               );
 
   static readonly _CONFIG_ENTRY_BinaryDataDefaultOwner = {
@@ -1301,7 +1302,8 @@ export default class SystemConstants {
                                                                                    "userRole",
                                                                                    "userTag",
                                                                                    "userExpireAt",
-                                                                                   "sessionsLimit"
+                                                                                   "sessionsLimit",
+                                                                                   "passwordParameterTag",
 
                                                                                  ],
 
@@ -1384,34 +1386,41 @@ export default class SystemConstants {
 
                                                                                    },
 
-                                                                                   "forceChangePassword": {
+                                                                                   "userForceChangePassword": {
 
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "miximum": 1,
-                                                                                    "optional": false
-
-                                                                                   },
-
-                                                                                   "changePasswordEvery": {
-
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "miximum": 1,
-                                                                                    "optional": false
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "miximum": 1,
+                                                                                     "optional": false
 
                                                                                    },
 
-                                                                                   "sessionsLimit": {
+                                                                                   "userChangePasswordEvery": {
 
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "optional": false
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "miximum": 1,
+                                                                                     "optional": false
 
-                                                                                   }
+                                                                                   },
+
+                                                                                   "userSessionsLimit": {
+
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "passwordParameterTag": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
+                                                                                   },
 
                                                                                  }
 
@@ -1445,10 +1454,10 @@ export default class SystemConstants {
                                                                                    "userRole": "",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameters": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 0,
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 0,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  }
 
@@ -1475,10 +1484,10 @@ export default class SystemConstants {
                                                                                    "userRole": "",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 0
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 0,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
@@ -1494,14 +1503,14 @@ export default class SystemConstants {
                                                                                    "userRole": "#Driver#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "UserSessionsLimit": 1,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
-                                                                                 "#FinalCustomer01#": {
+                                                                                 "#Final_Customer#": {
 
                                                                                    "expireAt": 60,
                                                                                    "group": "Final_Customers_01",
@@ -1513,10 +1522,10 @@ export default class SystemConstants {
                                                                                    "userRole": "#FinalCustomer#,#FinalCustomer01#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 1,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
@@ -1532,10 +1541,10 @@ export default class SystemConstants {
                                                                                    "userRole": "#Master_L01#", //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "#Establishment#",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 1,
+                                                                                   "passwordParameterTag": "#Establishment#"
 
                                                                                  }
 
@@ -1930,7 +1939,7 @@ export default class SystemConstants {
                                                                               "host": "https://onesignal.com/api/v1/notifications",
                                                                               "port": 443,
 
-                                                                              "auth":{
+                                                                              "auth": {
 
                                                                                 "app_id": "my_app_id",
                                                                                 "api_key": "my_key"
@@ -2382,6 +2391,7 @@ export default class SystemConstants {
                                                                           }
 
                                                                         }
+
                                                                       );
 
     static readonly _CONFIG_ENTRY_Frontend_Rules_EXAMPLE = JSON.stringify(
@@ -2797,6 +2807,7 @@ export default class SystemConstants {
                                               Category: "Instant Message",
                                               Name: "system.instant.message.server",
                                               Default: JSON.stringify(
+
                                                                        {
 
                                                                          "service": "#im_server_01#",
@@ -2811,7 +2822,7 @@ export default class SystemConstants {
 
                                                                            "workers": "9191,9192,9193",
 
-                                                                           "auth":{
+                                                                           "auth": {
 
                                                                              "api_key": "my_key"
 
@@ -2830,6 +2841,7 @@ export default class SystemConstants {
                                                                                 "messages": 0
 
                                                                               }
+
                                                                              }
 
                                                                            }
@@ -2840,7 +2852,7 @@ export default class SystemConstants {
 
                                                                            "JoinToChannels": {
 
-                                                                             "@__default__@":{
+                                                                             "@__default__@": {
 
                                                                                "denied": "",
                                                                                "allowed": "*"
@@ -2874,12 +2886,14 @@ export default class SystemConstants {
                                                                          }
 
                                                                        }
+
                                                                      ),
                                               Label: "Configuration for instant message server settings",
                                               Description: "Configuration for instant message settings",
                                               AllowTagAccessR: "#Administrator#",
                                               AllowTagAccessW: "#Administrator#",
                                               Example: JSON.stringify(
+
                                                                        {
 
                                                                          "service": "#im_server_01#",
@@ -2894,7 +2908,7 @@ export default class SystemConstants {
 
                                                                            "workers": "9191,9192,9193",
 
-                                                                           "auth":{
+                                                                           "auth": {
 
                                                                              "api_key": "178fa7c2-bcdc-4051-9773-26b86f49307d"
 
@@ -2966,7 +2980,7 @@ export default class SystemConstants {
 
                                                                              },
 
-                                                                             "@__default__@":{
+                                                                             "@__default__@": {
 
                                                                                "denied": "",
                                                                                "allowed": "#@@UserName@@#"
@@ -3000,6 +3014,7 @@ export default class SystemConstants {
                                                                          }
 
                                                                        }
+
                                                                      ),
                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                               ExtraData: { "Type": "struct/json", "Schema": SystemConstants._CONFIG_ENTRY_Database_Log_Tables_SCHEMA }
