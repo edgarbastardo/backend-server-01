@@ -128,13 +128,27 @@ export default class Always {
       //Insert test data
       const configValueEntries = [
                                    {
-                                     ConfigMetaDataId: "9272d39a-4545-40e2-802f-5913998cbb20", //system.authentication.ExpireTimeAuthentication
+                                     ConfigMetaDataId:SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id, // "9272d39a-4545-40e2-802f-5913998cbb20", //system.authentication.ExpireTimeAuthentication
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
-                                     Value: `{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
+                                     Value: JSON.stringify(
+
+                                                            {
+
+                                                              "#System_Administrators#": {
+
+                                                                "kind": 0,
+                                                                "on": 120
+
+                                                              }
+
+                                                            }
+
+                                                          ),
+                                            //`{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "f318f541-8367-42e7-ac71-904cab35bac1", //system.binary.data.BinaryDataMaximumSize
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_BinaryDataMaximumSize.Id,  //"f318f541-8367-42e7-ac71-904cab35bac1", //system.binary.data.BinaryDataMaximumSize
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: `10240`,
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -143,26 +157,32 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_BinaryDataAllowedCategory.Id, //"c0ea3ece-277c-4490-b2c1-a06f54382520", //system.binary.data.AllowedCategory
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "#System_Administrators#":{
-                                                                "denied":"",
-                                                                "allowed":"*"
+
+                                                              "#System_Administrators#": {
+
+                                                                "denied": "",
+                                                                "allowed": "*"
+
                                                               },
-                                                              "#DocumentAllowL01#":{
-                                                                "denied":"",
-                                                                "allowed":"#document#"
+
+                                                              "#DocumentAllowL01#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#document#"
+
                                                               },
-                                                              /*
-                                                              "#admin01@system.net#":{
-                                                                "denied":"",
-                                                                "allowed":"#test#,#other#"
-                                                              },
-                                                              */
-                                                              "@__default__@":{
-                                                                "denied":"",
-                                                                "allowed":"*"
+
+                                                              "@__default__@": {
+
+                                                                "denied": "",
+                                                                "allowed": "*"
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -170,139 +190,196 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_BinaryDataAllowedMimeType.Id, //"e2f57878-e408-4754-ac13-d7186ed451ba", //system.binary.data.AllowedMimeType
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "#System_Administrators#.other":{
-                                                                "denied":"#image/png#,#image/jpeg#",
-                                                                "allowed":"*"
+
+                                                              "#System_Administrators#.other": {
+
+                                                                "denied": "#image/png#,#image/jpeg#",
+                                                                "allowed": "*"
+
                                                               },
-                                                              "#System_Administrators#.test2":{
-                                                                "denied":"*",
-                                                                "allowed":""
+
+                                                              "#System_Administrators#.test2": {
+
+                                                                "denied": "*",
+                                                                "allowed": ""
+
                                                               },
-                                                              "#Documents_Allow_01#":{
-                                                                "denied":"",
-                                                                "allowed":"#application/pdf#"
+
+                                                              "#Documents_Allow_01#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#application/pdf#"
+
                                                               },
-                                                              "#admin01@system.net#.test1":{
-                                                                "denied":"#application/json#",
-                                                                "allowed":"#image/png#,#image/jpeg#"
+
+                                                              "#admin01@system.net#.test1": {
+
+                                                                "denied": "#application/json#",
+                                                                "allowed": "#image/png#,#image/jpeg#"
+
                                                               },
-                                                              "#testgif#":{
-                                                               "denied":"",
-                                                               "allowed":"#image/gif#"
+
+                                                              "#testgif#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#image/gif#"
+
                                                               },
-                                                              "#testjpeg#":{
-                                                               "denied":"",
-                                                               "allowed":"#image/jpeg#"
+
+                                                              "#testjpeg#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#image/jpeg#"
+
                                                               },
-                                                              "#testpng#":{
-                                                               "denied":"",
-                                                               "allowed":"#image/png#"
+
+                                                              "#testpng#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#image/png#"
+
                                                               },
-                                                              "#test#":{
-                                                               "denied":"",
-                                                               "allowed":"#image/png#,#image/jpeg#"
+
+                                                              "#test#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#image/png#,#image/jpeg#"
+
                                                               },
-                                                              "#ticket#":{
-                                                               "denied":"",
-                                                               "allowed":"#image/png#,#image/jpeg#,#image/gif#"
+
+                                                              "#ticket#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#image/png#,#image/jpeg#,#image/gif#"
+
                                                               },
-                                                              "#document#":{
-                                                               "denied":"",
-                                                               "allowed":"#application/pdf#,#application/docx#,#application/xlsx#"
+
+                                                              "#document#": {
+
+                                                                "denied": "",
+                                                                "allowed": "#application/pdf#,#application/docx#,#application/xlsx#"
+
                                                               },
-                                                              "@__default__@":{
-                                                                "denied":"",
-                                                                "allowed":"*"
+
+                                                              "@__default__@": {
+
+                                                                "denied": "",
+                                                                "allowed": "*"
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "4a7819e9-712f-42e4-936b-3915b3d8a666", //system.Security.PasswordStrengthParameters
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters.Id, //system.Security.PasswordStrengthParameters
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "@__default__@":{
-                                                                "minLength":8,
-                                                                "maxLength":0,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                              "@__default__@": {
+
+                                                                "minLength": 8,
+                                                                "maxLength": 0,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               },
+
                                                               "#System_Administrators#": {
-                                                                "minLength":8,
-                                                                "maxLength":0,
-                                                                "minLowerCase":4,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":2,
-                                                                "maxDigit":0,
-                                                                "minSymbol":2,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                                "minLength": 8,
+                                                                "maxLength": 0,
+                                                                "minLowerCase": 4,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 2,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 2,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               },
+
                                                               "#Business_Managers#": {
-                                                                "minLength":8,
-                                                                "maxLength":0,
-                                                                "minLowerCase":4,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":2,
-                                                                "maxDigit":0,
-                                                                "minSymbol":1,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                                "minLength": 8,
+                                                                "maxLength": 0,
+                                                                "minLowerCase": 4,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 2,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 1,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               },
-                                                              "#Drivers#":{
-                                                                "minLength":5,
-                                                                "maxLength":8,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                              "#Drivers#": {
+
+                                                                "minLength": 5,
+                                                                "maxLength": 8,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               },
-                                                              "#Final_Customers_01#":{
-                                                                "minLength":7,
-                                                                "maxLength":9,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                              "#Final_Customers_01#": {
+
+                                                                "minLength": 7,
+                                                                "maxLength": 9,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               },
-                                                              "#Establishments#":{
-                                                                "minLength":8,
-                                                                "maxLength":10,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
+
+                                                              "#Establishments#": {
+
+                                                                "minLength": 8,
+                                                                "maxLength": 10,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -310,59 +387,86 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_UserSignupProcess.Id, //system.user.signup.Process
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "@__default__@":{
-                                                                "expireAt":60, //Token signup valid time in minutes
-                                                                "group":"@__error__@",
-                                                                "createGroup":false,
-                                                                "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":-1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "passwordParameterTag":""
+
+                                                              "@__default__@": {
+
+                                                                "expireAt": 60, //Token signup valid time in minutes
+                                                                "group": "@__error__@",
+                                                                "createGroup": false,
+                                                                "groupRole": "",
+                                                                "groupTag": "",
+                                                                "groupExpireAt": -1,
+                                                                "status": -1,
+                                                                "userRole": "",
+                                                                "userTag": "",
+                                                                "passwordParameterTag": "",
+                                                                "forceChangePassword": 0,
+                                                                "changePasswordEvery": 0,
+                                                                "sessionsLimit": 0
+
                                                               },
-                                                              "#Driver#":{
-                                                                "expireAt":60, //Token signup valid time in minutes
-                                                                "group":"Drivers",
-                                                                "createGroup":false,
-                                                                "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "passwordParameterTag":""
+
+                                                              "#Driver#": {
+
+                                                                "expireAt": 60, //Token signup valid time in minutes
+                                                                "group": "Drivers",
+                                                                "createGroup": false,
+                                                                "groupRole": "",
+                                                                "groupTag": "",
+                                                                "groupExpireAt": -1,
+                                                                "status": 1,
+                                                                "userRole": "",
+                                                                "userTag": "",
+                                                                "userExpireAt": -1,
+                                                                "passwordParameterTag": "",
+                                                                "forceChangePassword": 0,
+                                                                "changePasswordEvery": 0,
+                                                                "sessionsLimit": 1 //Only 1 session at time
+
                                                               },
-                                                              "#FinalCustomer01#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
-                                                                "group":"Final_Customers",
-                                                                "createGroup":false,
-                                                                "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "passwordParameterTag":""
+
+                                                              "#FinalCustomer01#": {
+
+                                                                "expireAt": 60,  //Token signup valid time in minutes
+                                                                "group": "Final_Customers",
+                                                                "createGroup": false,
+                                                                "groupRole": "",
+                                                                "groupTag": "",
+                                                                "groupExpireAt": -1,
+                                                                "status": 1,
+                                                                "userRole": "",
+                                                                "userTag": "",
+                                                                "userExpireAt": -1,
+                                                                "passwordParameterTag": "",
+                                                                "forceChangePassword": 0,
+                                                                "changePasswordEvery": 0,
+                                                                "sessionsLimit": 1 //Only 1 session at time
+
                                                               },
-                                                              "#Establishment#":{
-                                                                "expireAt":60,  //Token signup valid time in minutes
-                                                                "group":"@__FromName__@",
-                                                                "createGroup":true,
-                                                                "groupRole":"#@__FromName__@#,#Establishment#",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "passwordParameterTag":"#Establishments#"
+
+                                                              "#Establishment#": {
+
+                                                                "expireAt": 60,  //Token signup valid time in minutes
+                                                                "group": "@__FromName__@",
+                                                                "createGroup": true,
+                                                                "groupRole": "#@__FromName__@#,#Establishment#",
+                                                                "groupTag": "",
+                                                                "groupExpireAt": -1,
+                                                                "status": 1,
+                                                                "userRole": "#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                "userTag": "",
+                                                                "userExpireAt": -1,
+                                                                "passwordParameterTag": "#Establishments#",
+                                                                "forceChangePassword": 0,
+                                                                "changePasswordEvery": 0,
+                                                                "sessionsLimit": 1 //Only 1 session at time
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -370,33 +474,61 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_UserAutoRoleAssign.Id, //system.user.autorole.Assign
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
+
                                                               "create": {
-                                                                "@__default__@":{
+
+                                                                "@__default__@": {
+
                                                                   "@__default__@": ""
+
                                                                 },
+
                                                                 "#Master_L01#": {
+
                                                                   "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                 },
+
                                                                 "#Master_L02#": {
+
                                                                   "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                 },
+
                                                                 "#Master_L03#": {
+
                                                                   "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                 },
+
                                                                 "#Driver#": {
+
                                                                   "@__default__@": "#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                 },
+
                                                                 "#Establishment#": {
+
                                                                   "@__default__@": "#Presence_Working#,#Search_Binary#,#Upload_Binary#,#Update_Binary#,#Delete_Binary#"
+
                                                                 }
+
                                                               },
+
                                                               "update": {
-                                                                "@__default__@":{
+
+                                                                "@__default__@": {
+
                                                                   "@__default__@": ""
+
                                                                 },
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -404,27 +536,43 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_EMAIL_Service.Id, //system.notification.email.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "service":"#send_grid#",
-                                                              "#gmail#":{
-                                                                "type":"smtp",
-                                                                "host":"smtp.gmail.com",
-                                                                "port":465,
-                                                                "secure":true,
-                                                                "auth":{
-                                                                  "user":process.env.NOTIFICATION_TRANSPORT_SMTP_USER || "",
-                                                                  "pass":process.env.NOTIFICATION_TRANSPORT_SMTP_PASSWORD || ""
+
+                                                              "service": "#send_grid#",
+
+                                                              "#gmail#": {
+
+                                                                "type": "smtp",
+                                                                "host": "smtp.gmail.com",
+                                                                "port": 465,
+                                                                "secure": true,
+
+                                                                "auth": {
+
+                                                                  "user": process.env.NOTIFICATION_TRANSPORT_SMTP_USER || "",
+                                                                  "pass": process.env.NOTIFICATION_TRANSPORT_SMTP_PASSWORD || ""
+
                                                                 }
+
                                                               },
-                                                              "#send_grid#":{
-                                                                "type":"send_grid",
-                                                                "host":"api.sendgrid.com/v3/mail/send",
-                                                                "port":443,
-                                                                "auth":{
-                                                                  "api_key":process.env.NOTIFICATION_TRANSPORT_SEND_GRID_API_KEY || ""
+
+                                                              "#send_grid#": {
+
+                                                                "type": "send_grid",
+                                                                "host": "api.sendgrid.com/v3/mail/send",
+                                                                "port": 443,
+
+                                                                "auth": {
+
+                                                                  "api_key": process.env.NOTIFICATION_TRANSPORT_SEND_GRID_API_KEY || ""
+
                                                                 }
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -432,20 +580,30 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_SMS_Service.Id, //system.notification.sms.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "service":"#sms_gateway#",
-                                                              "#sms_gateway#":{
-                                                                "type":"sms_gateway",
-                                                                "host":process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_URI || "",
-                                                                "port":443,
-                                                                "deviceId":"*",
-                                                                "context":"AMERICA/NEW_YORK",
-                                                                "auth":{
-                                                                  "api_key":process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY || "",
-                                                                  "api_key1":process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY1 || ""
+
+                                                              "service": "#sms_gateway#",
+
+                                                              "#sms_gateway#": {
+
+                                                                "type": "sms_gateway",
+                                                                "host": process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_URI || "",
+                                                                "port": 443,
+                                                                "device_id": "*",
+                                                                "context": "AMERICA/NEW_YORK",
+
+                                                                "auth": {
+
+                                                                  "api_key": process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY || "",
+                                                                  "api_key1": process.env.NOTIFICATION_TRANSPORT_SMS_GATEWAY_API_KEY1 || ""
+
                                                                 }
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -453,18 +611,28 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_PUSH_Service.Id, //system.notification.push.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "service":"#one_signal#",
-                                                              "#one_signal#":{
-                                                                "type":"one_signal",
-                                                                "host":"https://onesignal.com/api/v1/notifications",
-                                                                "port":443,
-                                                                "auth":{
-                                                                  "app_id":process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_APP_ID || "",
-                                                                  "api_key":process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_API_KEY || ""
+
+                                                              "service": "#one_signal#",
+
+                                                              "#one_signal#": {
+
+                                                                "type": "one_signal",
+                                                                "host": "https://onesignal.com/api/v1/notifications",
+                                                                "port": 443,
+
+                                                                "auth": {
+
+                                                                  "app_id": process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_APP_ID || "",
+                                                                  "api_key": process.env.NOTIFICATION_TRANSPORT_ONE_SIGNAL_API_KEY || ""
+
                                                                 }
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -472,31 +640,51 @@ export default class Always {
                                       ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_DISCORD_Service.Id, //system.notification.discord.service
                                       Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                       Value: JSON.stringify(
-                                                            {
-                                                              "service":"#discord#",
-                                                              "#discord#":{
-                                                                "type":"discord",
-                                                                "target":{
-                                                                  "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK || `{ "@__default__@": "" }`, null )
-                                                                }
-                                                              }
-                                                            }
-                                                          ),
+
+                                                             {
+
+                                                               "service": "#discord#",
+
+                                                               "#discord#": {
+
+                                                                 "type": "discord",
+
+                                                                 "target": {
+
+                                                                   "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_DISCORD_WEB_HOOK || `{ "@__default__@": "" }`, null )
+
+                                                                 }
+
+                                                               }
+
+                                                             }
+
+                                                           ),
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                   },
                                   {
                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_SLACK_Service.Id, //system.notification.slack.service
                                     Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                     Value: JSON.stringify(
+
                                                            {
-                                                             "service":"#slack#",
-                                                             "#slack#":{
-                                                               "type":"slack",
-                                                               "target":{
+
+                                                             "service": "#slack#",
+
+                                                             "#slack#": {
+
+                                                               "type": "slack",
+
+                                                               "target": {
+
                                                                  "web_hooks": CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_SLACK_WEB_HOOK || `{ "@__default__@": "" }`, null )
+
                                                                }
+
                                                              }
+
                                                            }
+
                                                          ),
                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                   },
@@ -505,93 +693,142 @@ export default class Always {
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
                                                             {
-                                                              "#ccc#":{
-                                                                "userLoginControl":{
-                                                                  "denied":"*",
-                                                                  "allowed":""
+
+                                                              "#ccc#": {
+
+                                                                "user_login_control": {
+
+                                                                  "denied": "*",
+                                                                  "allowed": ""
+
                                                                 },
-                                                                "userSignupControl":{
-                                                                  "denied":"*",
-                                                                  "allowed":""
+
+                                                                "user_signup_control": {
+
+                                                                  "denied": "*",
+                                                                  "allowed": ""
+
                                                                 },
-                                                                "tag":"#web#,#mobile#,#phone#,#tablet#",
-                                                                "url":"http://mycompany.com/myapp/url/",
-                                                                "route":{
-                                                                  "exclude":[
+
+                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                "url": "http://mycompany.com/myapp/url/",
+
+                                                                "route": {
+
+                                                                  "exclude": [
+
                                                                     "*"
+
                                                                   ],
-                                                                  "include":[
+
+                                                                  "include": [
+
+                                                                    //
+
                                                                   ]
+
                                                                 }
+
                                                               },
-                                                              "@__default__@":{
-                                                                "userLoginControl":{
-                                                                  "denied":"",
-                                                                  "allowed":"*"
+
+                                                              "@__default__@": {
+
+                                                                "user_login_control": {
+
+                                                                  "denied": "",
+                                                                  "allowed": "*"
+
                                                                 },
-                                                                "userSignupControl":{
-                                                                  "denied":"",
-                                                                  "allowed":"*"
+
+                                                                "user_signup_control": {
+
+                                                                  "denied": "",
+                                                                  "allowed": "*"
+
                                                                 },
-                                                                "tag":"#web#,#mobile#,#phone#,#tablet#",
-                                                                "url":"http://mycompany.com/myapp/url/",
-                                                                "route":{
-                                                                  "include":[
+
+                                                                "tag": "#web#,#mobile#,#phone#,#tablet#",
+                                                                "url": "http://mycompany.com/myapp/url/",
+
+                                                                "route": {
+
+                                                                  "include": [
+
                                                                     //"POST:/my/test/service:system",
                                                                     //"POST:graphQLTestService",
                                                                     //"GET:/my/other/public/service"
+
                                                                   ],
-                                                                  "exclude":[
+
+                                                                  "exclude": [
+
                                                                     //"POST:/system/user/signup",
                                                                     //"POST:login"
+
                                                                   ]
+
                                                                 }
+
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "e87b5ce8-e488-4869-be72-a754314e5f75", //system.maps.geocode.service
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service.Id, // "e87b5ce8-e488-4869-be72-a754314e5f75", //system.maps.geocode.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
-                                                            {
-                                                              "service":"#google_maps#",
-                                                              "#google_maps#":{
 
-                                                                "type":"google_maps",
-                                                                "host":"https://maps.googleapis.com/maps/api/geocode/json",
-                                                                "port":443,
-                                                                "auth":{
+                                                            {
+
+                                                              "service": "#google_maps#",
+
+                                                              "#google_maps#": {
+
+                                                                "type": "google_maps",
+                                                                "host": "https://maps.googleapis.com/maps/api/geocode/json",
+                                                                "port": 443,
+
+                                                                "auth": {
 
                                                                   "api_key":process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
 
                                                                 }
 
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
-                                     ConfigMetaDataId: "0d06e235-c282-4d8a-bac5-8d7b84010939", //system.maps.distance.service
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_MAP_DISTANCE_Service.Id, // "0d06e235-c282-4d8a-bac5-8d7b84010939", //system.maps.distance.service
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
-                                                            {
-                                                              "service":"#google_maps#",
-                                                              "#google_maps#":{
 
-                                                                "type":"google_maps",
-                                                                "host":"https://maps.googleapis.com/maps/api/distancematrix/json",
-                                                                "port":443,
-                                                                "auth":{
+                                                            {
+
+                                                              "service": "#google_maps#",
+
+                                                              "#google_maps#": {
+
+                                                                "type": "google_maps",
+                                                                "host": "https://maps.googleapis.com/maps/api/distancematrix/json",
+                                                                "port": 443,
+
+                                                                "auth": {
 
                                                                   "api_key":process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
 
                                                                 }
 
                                                               }
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -599,9 +836,19 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_Database_Log_Tables.Id,
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
-                                                              "master.sysUserGroup": [ "create", "update", "delete" ]
+
+                                                              "master.sysUserGroup": [
+
+                                                                "create",
+                                                                "update",
+                                                                "delete"
+
+                                                              ]
+
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
@@ -609,23 +856,24 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_IM_Server.Id,
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
 
                                                               "service":"#im_server_01#",
 
                                                               "#im_server_01#": {
 
-                                                                "hostRest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
+                                                                "host_rest": process.env.INSTANT_MESSAGE_SERVER_REST_URI || "",
 
-                                                                "hostLiveDomain": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_DOMAIN || "",
+                                                                "host_live_domain": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_DOMAIN || "",
 
-                                                                "hostLivePath": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_PATH || "",
+                                                                "host_live_path": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_PATH || "",
 
                                                                 "workers": process.env.INSTANT_MESSAGE_SERVER_WORKERS || 1,
 
                                                                 "auth": {
 
-                                                                  "apiKey": process.env.INSTANT_MESSAGE_SERVER_AUTH || ""
+                                                                  "api_key": process.env.INSTANT_MESSAGE_SERVER_AUTH || ""
 
                                                                 }
 
@@ -642,6 +890,7 @@ export default class Always {
                                                                       "messages": 10
 
                                                                     }
+
                                                                   },
 
                                                                   "@__default__@": {
@@ -668,24 +917,28 @@ export default class Always {
                                                                     "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
 
                                                                   },
+
                                                                   "#System_Administrators#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
 
                                                                   },
+
                                                                   "#Drivers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Drivers#,#Support#"
 
                                                                   },
+
                                                                   "#Dispachers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Drivers#,#DriversPosition#"
 
                                                                   },
+
                                                                   "@__default__@": {
 
                                                                     "denied": "",
@@ -720,6 +973,7 @@ export default class Always {
                                                               }
 
                                                             }
+
                                                           ),
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
