@@ -461,7 +461,7 @@ export default class Always {
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
                                                                 "userSessionsLimit": 1, //Only 1 session at time
-                                                                "passwordParameterTag": "#Establishments#"
+                                                                "passwordParameterTag": ""
 
                                                               }
 
