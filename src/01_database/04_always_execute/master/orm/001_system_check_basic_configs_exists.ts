@@ -298,7 +298,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#System_Administrators#": {
+                                                              "#System_Administrators#": { //<= Group name
 
                                                                 "minLength": 8,
                                                                 "maxLength": 0,
@@ -314,7 +314,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Business_Managers#": {
+                                                              "#Business_Managers#": { //<= Group name
 
                                                                 "minLength": 8,
                                                                 "maxLength": 0,
@@ -330,7 +330,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Drivers#": {
+                                                              "#Drivers#": { //<= Group name
 
                                                                 "minLength": 5,
                                                                 "maxLength": 8,
@@ -346,7 +346,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Final_Customers_01#": {
+                                                              "#Final_Customers#": { //<= Group name
 
                                                                 "minLength": 7,
                                                                 "maxLength": 9,
@@ -362,7 +362,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Establishments#": {
+                                                              "#Establishments#": { //<= Group name
 
                                                                 "minLength": 8,
                                                                 "maxLength": 10,
@@ -401,10 +401,10 @@ export default class Always {
                                                                 "status": -1,
                                                                 "userRole": "",
                                                                 "userTag": "",
-                                                                "passwordParameterTag": "",
-                                                                "forceChangePassword": 0,
-                                                                "changePasswordEvery": 0,
-                                                                "sessionsLimit": 0
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 0,
+                                                                "passwordParameterTag": ""
 
                                                               },
 
@@ -420,14 +420,14 @@ export default class Always {
                                                                 "userRole": "",
                                                                 "userTag": "",
                                                                 "userExpireAt": -1,
-                                                                "passwordParameterTag": "",
-                                                                "forceChangePassword": 0,
-                                                                "changePasswordEvery": 0,
-                                                                "sessionsLimit": 1 //Only 1 session at time
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "passwordParameterTag": ""
 
                                                               },
 
-                                                              "#FinalCustomer01#": {
+                                                              "#Final_Customer#": {
 
                                                                 "expireAt": 60,  //Token signup valid time in minutes
                                                                 "group": "Final_Customers",
@@ -439,10 +439,10 @@ export default class Always {
                                                                 "userRole": "",
                                                                 "userTag": "",
                                                                 "userExpireAt": -1,
-                                                                "passwordParameterTag": "",
-                                                                "forceChangePassword": 0,
-                                                                "changePasswordEvery": 0,
-                                                                "sessionsLimit": 1 //Only 1 session at time
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "passwordParameterTag": ""
 
                                                               },
 
@@ -458,10 +458,10 @@ export default class Always {
                                                                 "userRole": "#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                 "userTag": "",
                                                                 "userExpireAt": -1,
-                                                                "passwordParameterTag": "#Establishments#",
-                                                                "forceChangePassword": 0,
-                                                                "changePasswordEvery": 0,
-                                                                "sessionsLimit": 1 //Only 1 session at time
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "passwordParameterTag": ""
 
                                                               }
 
@@ -692,6 +692,7 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, // "70835d21-afdd-4f5b-9a56-61762ba55013", //system.frontend.rules
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
 
                                                               "#ccc#": {
