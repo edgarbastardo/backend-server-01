@@ -861,6 +861,7 @@ export default class Always {
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id, // "70835d21-afdd-4f5b-9a56-61762ba55013", //system.frontend.rules
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      Value: JSON.stringify(
+
                                                             {
 
                                                               "#ccc#": {
