@@ -432,37 +432,6 @@ export default class Always {
 
                                                               },
 
-                                                              "#Administrative_Asistants#": { //<= Group name
-
-                                                                "minLength":5,
-                                                                "maxLength":8,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
-
-                                                              },
-
-                                                              "#Dispachers#": {  //<= Group name
-
-                                                                "minLength":5,
-                                                                "maxLength":8,
-                                                                "minLowerCase":0,
-                                                                "maxLowerCase":0,
-                                                                "minUpperCase":0,
-                                                                "maxUpperCase":0,
-                                                                "minDigit":0,
-                                                                "maxDigit":0,
-                                                                "minSymbol":0,
-                                                                "maxSymbol":0,
-                                                                "symbols":""
-                                                              },
-
                                                               "#Drivers#": {  //<= Group name
 
                                                                 "minLength":5,
@@ -509,6 +478,37 @@ export default class Always {
                                                                 "maxSymbol": 0,
                                                                 "symbols": ""
 
+                                                              },
+
+                                                              "#Administrative_Asistants#": { //<= Group name
+
+                                                                "minLength":5,
+                                                                "maxLength":8,
+                                                                "minLowerCase":0,
+                                                                "maxLowerCase":0,
+                                                                "minUpperCase":0,
+                                                                "maxUpperCase":0,
+                                                                "minDigit":0,
+                                                                "maxDigit":0,
+                                                                "minSymbol":0,
+                                                                "maxSymbol":0,
+                                                                "symbols":""
+
+                                                              },
+
+                                                              "#Dispachers#": {  //<= Group name
+
+                                                                "minLength":5,
+                                                                "maxLength":8,
+                                                                "minLowerCase":0,
+                                                                "maxLowerCase":0,
+                                                                "minUpperCase":0,
+                                                                "maxUpperCase":0,
+                                                                "minDigit":0,
+                                                                "maxDigit":0,
+                                                                "minSymbol":0,
+                                                                "maxSymbol":0,
+                                                                "symbols":""
                                                               }
 
                                                             }
@@ -560,6 +560,40 @@ export default class Always {
 
                                                               },
 
+                                                              "#Final_Customer#": {
+
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
+                                                                "group":"Final_Customers",
+                                                                "createGroup":false,
+                                                                "groupRole":"",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"",
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
+                                                                "passwordParameterTag":""
+
+                                                              },
+
+                                                              "#Establishment#":{
+
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
+                                                                "group":"@__FromName__@",
+                                                                "createGroup":true,
+                                                                "groupRole":"#@__FromName__@#,#Establishment#",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"#Master_L01#,#Establishment#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
+                                                                "userSessionLimit": 1,
+                                                                "passwordParameterTag":"#Establishments#"
+
+                                                              },
+
                                                               "#Administrative_Asistant#": {
 
                                                                 "expireAt": 60,  //Token signup valid time in minutes.
@@ -593,40 +627,6 @@ export default class Always {
                                                                 "userExpireAt":-1,
                                                                 "userSessionLimit": 1,
                                                                 "passwordParameterTag":""
-
-                                                              },
-
-                                                              "#Final_Customer#": {
-
-                                                                "expireAt": 60,  //Token signup valid time in minutes.
-                                                                "group":"Final_Customers",
-                                                                "createGroup":false,
-                                                                "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "userSessionLimit": 1,
-                                                                "passwordParameterTag":""
-
-                                                              },
-
-                                                              "#Establishment#":{
-
-                                                                "expireAt": 60,  //Token signup valid time in minutes.
-                                                                "group":"@__FromName__@",
-                                                                "createGroup":true,
-                                                                "groupRole":"#@__FromName__@#,#Establishment#",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"#Master_L01#,#Establishment#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "userSessionLimit": 1,
-                                                                "passwordParameterTag":"#Establishments#"
 
                                                               }
 
