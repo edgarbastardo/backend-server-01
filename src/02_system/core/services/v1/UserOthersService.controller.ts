@@ -65,18 +65,18 @@ export default class UserOthersServiceController {
                                                           logger );
 
         if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
-             jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl ) {
+             jsonConfigData[ "#" + strFrontendId + "#" ].user_signup_control ) {
 
-          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl.denied;
-          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].user_signup_control.denied;
+          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].user_signup_control.allowed;
           bSet = true;
 
         }
         else if ( jsonConfigData[ "@__default__@" ] &&
-                  jsonConfigData[ "@__default__@" ].userSignupControl ) {
+                  jsonConfigData[ "@__default__@" ].user_signup_control ) {
 
-          result.denied = jsonConfigData[ "@__default__@" ].userSignupControl.denied;
-          result.allowed = jsonConfigData[ "@__default__@" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].user_signup_control.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].user_signup_control.allowed;
           bSet = true;
 
         }
@@ -90,10 +90,10 @@ export default class UserOthersServiceController {
                                                           logger );
 
         if ( jsonConfigData[ "@__default__@" ] &&
-             jsonConfigData[ "@__default__@" ].userSignupControl ) {
+             jsonConfigData[ "@__default__@" ].user_signup_control ) {
 
-          result.denied = jsonConfigData[ "@__default__@" ].userSignupControl.denied;
-          result.allowed = jsonConfigData[ "@__default__@" ].userSignupControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].user_signup_control.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].user_signup_control.allowed;
 
         }
 
