@@ -87,7 +87,7 @@ export default class CommonTest {
                              "Id": null,
                              "Name": "",
                              "Password": "",
-                             "ForceChangePassword": false,
+                             "userForceChangePassword": false,
                              "ChangePasswordEvery": 0,
                              "SessionsLimit": 0,
                              "Comment": null,

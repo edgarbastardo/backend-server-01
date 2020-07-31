@@ -1680,7 +1680,7 @@ export default class UserSingupServiceController {
 
         }
 
-        let sysUserSignupInDB = await SYSUserSignupService.getByToken( signupActivateData.Activation, //request.body.Activation,
+        let sysUserSignupInDB = await SYSUserSignupService.getByToken( signupActivateData.Activation?.trim(), //request.body.Activation,
                                                                        context.TimeZoneId,
                                                                        currentTransaction,
                                                                        logger );
@@ -1700,33 +1700,33 @@ export default class UserSingupServiceController {
 
               if ( bFrontendIdIsAllowed ) {
 
-                const signupProcessData = await UserOthersServiceController.getConfigSignupProcess( sysUserSignupInDB.Kind,
+                const signupConfigProcessData = await UserOthersServiceController.getConfigSignupProcess( sysUserSignupInDB.Kind,
                                                                                                     currentTransaction,
                                                                                                     logger );
 
-                if ( signupProcessData &&
-                     signupProcessData.group &&
-                     signupProcessData.group.trim() !== "" &&
-                     signupProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
+                if ( signupConfigProcessData &&
+                     signupConfigProcessData.group &&
+                     signupConfigProcessData.group.trim() !== "" &&
+                     signupConfigProcessData.group.trim().toLowerCase() !== "@__error__@" ) {
 
-                  const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                  const bUserGroupExists = await SYSUserGroupService.checkExistsByName( signupConfigProcessData.group !== "@__FromName__@" ? signupConfigProcessData.group : sysUserSignupInDB.Name,
                                                                                         currentTransaction,
                                                                                         logger );
 
-                  if ( signupProcessData.createGroup === false &&
+                  if ( signupConfigProcessData.createGroup === false &&
                        bUserGroupExists === false ) {
 
                     result = {
                                StatusCode: 404, //Not found
                                Code: "ERROR_USER_GROUP_NOT_FOUND",
-                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                Mark: "0EA9AC54E217" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: "ERROR_USER_GROUP_NOT_FOUND",
-                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s not found", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1736,20 +1736,20 @@ export default class UserSingupServiceController {
                              }
 
                   }
-                  else if ( signupProcessData.createGroup &&
+                  else if ( signupConfigProcessData.createGroup &&
                             bUserGroupExists ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
-                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                Mark: "832157FFA57C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: "ERROR_USER_GROUP_ALREADY_EXISTS",
-                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s already exists", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1760,21 +1760,21 @@ export default class UserSingupServiceController {
 
                   }
                   else if ( bUserGroupExists &&
-                            await SYSUserGroupService.checkDisabledByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                            await SYSUserGroupService.checkDisabledByName( signupConfigProcessData.group !== "@__FromName__@" ? signupConfigProcessData.group : sysUserSignupInDB.Name,
                                                                            currentTransaction,
                                                                            logger ) ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: "ERROR_USER_GROUP_DISABLED",
-                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                Mark: "74E11EE1CFE2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: "ERROR_USER_GROUP_DISABLED",
-                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is disabled. You cannot signup new users", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1785,21 +1785,21 @@ export default class UserSingupServiceController {
 
                   }
                   else if ( bUserGroupExists &&
-                            await SYSUserGroupService.checkExpiredByName( signupProcessData.group !== "@__FromName__@" ? signupProcessData.group : sysUserSignupInDB.Name,
+                            await SYSUserGroupService.checkExpiredByName( signupConfigProcessData.group !== "@__FromName__@" ? signupConfigProcessData.group : sysUserSignupInDB.Name,
                                                                           currentTransaction,
                                                                           logger ) ) {
 
                     result = {
                                StatusCode: 400, //Bad request
                                Code: "ERROR_USER_GROUP_EXPIRED",
-                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                               Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                Mark: "2E99F86FF13B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
                                IsError: true,
                                Errors: [
                                          {
                                            Code: "ERROR_USER_GROUP_EXPIRED",
-                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupProcessData.group, sysUserSignupInDB.Kind ),
+                                           Message: await I18NManager.translate( strLanguage, "The user group %s defined by signup kind %s is expired. You cannot signup new users", signupConfigProcessData.group, sysUserSignupInDB.Kind ),
                                            Details: null
                                          }
                                        ],
@@ -1844,13 +1844,13 @@ export default class UserSingupServiceController {
                     let sysUser = null;
                     let sysPerson = null;
 
-                    if ( signupProcessData.createGroup ) {
+                    if ( signupConfigProcessData.createGroup ) {
 
-                      const expireAt = signupProcessData.groupExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.groupExpireAt ): null;
+                      const expireAt = signupConfigProcessData.groupExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupConfigProcessData.groupExpireAt ): null;
 
-                      const strRole = signupProcessData.groupRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                      const strRole = signupConfigProcessData.groupRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                      const strTag = signupProcessData.groupTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                      const strTag = signupConfigProcessData.groupTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
                       //Create new group
                       sysUserGroup = await SYSUserGroupService.createOrUpdate(
@@ -1870,7 +1870,7 @@ export default class UserSingupServiceController {
                     }
                     else {
 
-                      sysUserGroup = await SYSUserGroupService.getByName( signupProcessData.group,
+                      sysUserGroup = await SYSUserGroupService.getByName( signupConfigProcessData.group,
                                                                           context.TimeZoneId,
                                                                           currentTransaction,
                                                                           logger );
@@ -1900,11 +1900,11 @@ export default class UserSingupServiceController {
 
                         const strPassword = await CipherManager.decrypt( sysUserSignupInDB.Password, logger );
 
-                        const expireAt = signupProcessData.userExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupProcessData.userExpireAt ) : null;
+                        const expireAt = signupConfigProcessData.userExpireAt !== -1 ? SystemUtilities.getCurrentDateAndTimeIncMinutes( signupConfigProcessData.userExpireAt ) : null;
 
-                        let strRole = signupProcessData.userRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                        let strRole = signupConfigProcessData.userRole.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
-                        let strTag = signupProcessData.userTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
+                        let strTag = signupConfigProcessData.userTag.replace( "@__FromName__@", sysUserSignupInDB.Name );
 
                         if ( signupActivateOptions.tag ) {
 
@@ -1930,6 +1930,9 @@ export default class UserSingupServiceController {
                                                                          Id: sysPerson.Id,
                                                                          PersonId: sysPerson.Id,
                                                                          GroupId: sysUserGroup.Id,
+                                                                         ForceChangePassword: signupConfigProcessData.userForceChangePassword || 0,
+                                                                         ChangePasswordEvery: signupConfigProcessData.userChangePasswordEvery || 0,
+                                                                         SessionsLimit: signupConfigProcessData.userSessionsLimit || 0,
                                                                          Avatar: signupActivateOptions.avatar ? signupActivateOptions.avatar: null,
                                                                          Name: sysUserSignupInDB.Name,
                                                                          Password: strPassword,

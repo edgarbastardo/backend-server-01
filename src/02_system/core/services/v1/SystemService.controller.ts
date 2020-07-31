@@ -97,9 +97,9 @@ export default class SystemServiceController {
       const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
 
       const instanMessageStatus = {
-                                    Auth: CommonUtilities.maskData( configData?.auth?.apiKey ),
-                                    hostLiveDomain: configData?.hostLiveDomain,
-                                    hostLivePath: configData?.hostLivePath,
+                                    Auth: CommonUtilities.maskData( configData?.auth?.api_key ),
+                                    hostLiveDomain: configData?.host_live_domain,
+                                    hostLivePath: configData?.host_live_path,
                                     connected: InstantMessageServerManager.currentIMInstance?.connected === true
                                   }
 
