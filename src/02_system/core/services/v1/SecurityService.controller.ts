@@ -182,18 +182,18 @@ export default class SecurityServiceController {
                                                           logger );
 
         if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
-             jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl ) {
+             jsonConfigData[ "#" + strFrontendId + "#" ].user_login_control ) {
 
-          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl.denied;
-          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "#" + strFrontendId + "#" ].user_login_control.denied;
+          result.allowed = jsonConfigData[ "#" + strFrontendId + "#" ].user_login_control.allowed;
           bSet = true;
 
         }
         else if ( jsonConfigData[ "@__default__@" ] &&
-                  jsonConfigData[ "@__default__@" ].userLoginControl  ) {
+                  jsonConfigData[ "@__default__@" ].user_login_control  ) {
 
-          result.denied = jsonConfigData[ "@__default__@" ].userLoginControl.denied;
-          result.allowed = jsonConfigData[ "@__default__@" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].user_login_control.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].user_login_control.allowed;
           bSet = true;
 
         }
@@ -207,10 +207,10 @@ export default class SecurityServiceController {
                                                           logger );
 
         if ( jsonConfigData[ "@__default__@" ] &&
-             jsonConfigData[ "@__default__@" ].userLoginControl ) {
+             jsonConfigData[ "@__default__@" ].user_login_control ) {
 
-          result.denied = jsonConfigData[ "@__default__@" ].userLoginControl.denied;
-          result.allowed = jsonConfigData[ "@__default__@" ].userLoginControl.allowed;
+          result.denied = jsonConfigData[ "@__default__@" ].user_login_control.denied;
+          result.allowed = jsonConfigData[ "@__default__@" ].user_login_control.allowed;
 
         }
 

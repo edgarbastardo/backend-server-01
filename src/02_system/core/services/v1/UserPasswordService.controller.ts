@@ -261,7 +261,7 @@ export default class UserPasswordServiceController {
 
               if ( result === null ) {
 
-                //Use the config of _CONFIG_ENTRY_Frontend_Rules.userLoginControl
+                //Use the config of _CONFIG_ENTRY_Frontend_Rules.user_login_control
                 const bFrontendIdIsAllowed = await SecurityServiceController.getFrontendIdIsAllowed( context.FrontendId,
                                                                                                      sysUserInDB.sysUserGroup.Id,
                                                                                                      sysUserInDB.sysUserGroup.Name,
