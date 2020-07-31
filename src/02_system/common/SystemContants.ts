@@ -1301,7 +1301,8 @@ export default class SystemConstants {
                                                                                    "userRole",
                                                                                    "userTag",
                                                                                    "userExpireAt",
-                                                                                   "sessionsLimit"
+                                                                                   "sessionsLimit",
+                                                                                   "passwordParameters",
 
                                                                                  ],
 
@@ -1384,34 +1385,41 @@ export default class SystemConstants {
 
                                                                                    },
 
-                                                                                   "forceChangePassword": {
+                                                                                   "userForceChangePassword": {
 
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "miximum": 1,
-                                                                                    "optional": false
-
-                                                                                   },
-
-                                                                                   "changePasswordEvery": {
-
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "miximum": 1,
-                                                                                    "optional": false
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "miximum": 1,
+                                                                                     "optional": false
 
                                                                                    },
 
-                                                                                   "sessionsLimit": {
+                                                                                   "userChangePasswordEvery": {
 
-                                                                                    "type": "number",
-                                                                                    "multipleOf": 1.0,
-                                                                                    "minimum": 0,
-                                                                                    "optional": false
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "miximum": 1,
+                                                                                     "optional": false
 
-                                                                                   }
+                                                                                   },
+
+                                                                                   "userSessionsLimit": {
+
+                                                                                     "type": "number",
+                                                                                     "multipleOf": 1.0,
+                                                                                     "minimum": 0,
+                                                                                     "optional": false
+
+                                                                                   },
+
+                                                                                   "passwordParameterTag": {
+
+                                                                                     "type": "string",
+                                                                                     "optional": false
+
+                                                                                   },
 
                                                                                  }
 
@@ -1445,10 +1453,10 @@ export default class SystemConstants {
                                                                                    "userRole": "",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameters": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 0,
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 0,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  }
 
@@ -1475,10 +1483,10 @@ export default class SystemConstants {
                                                                                    "userRole": "",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 0
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 0,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
@@ -1494,10 +1502,10 @@ export default class SystemConstants {
                                                                                    "userRole": "#Driver#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "UserSessionsLimit": 1,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
@@ -1513,10 +1521,10 @@ export default class SystemConstants {
                                                                                    "userRole": "#FinalCustomer#,#FinalCustomer01#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 1,
+                                                                                   "passwordParameterTag": ""
 
                                                                                  },
 
@@ -1532,10 +1540,10 @@ export default class SystemConstants {
                                                                                    "userRole": "#Master_L01#", //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                                    "userTag": "",
                                                                                    "userExpireAt": -1,
-                                                                                   "passwordParameterTag": "#Establishment#",
-                                                                                   "forceChangePassword": 0,
-                                                                                   "changePasswordEvery": 0,
-                                                                                   "sessionsLimit": 1
+                                                                                   "userForceChangePassword": 0,
+                                                                                   "userChangePasswordEvery": 0,
+                                                                                   "userSessionsLimit": 1,
+                                                                                   "passwordParameterTag": "#Establishment#"
 
                                                                                  },
 
