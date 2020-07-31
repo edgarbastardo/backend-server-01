@@ -1302,7 +1302,7 @@ export default class SystemConstants {
                                                                                    "userTag",
                                                                                    "userExpireAt",
                                                                                    "sessionsLimit",
-                                                                                   "passwordParameters",
+                                                                                   "passwordParameterTag",
 
                                                                                  ],
 
