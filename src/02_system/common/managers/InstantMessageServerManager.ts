@@ -18,7 +18,7 @@ const debug = require( 'debug' )( 'IntantMessageServerManager' );
 
 export default class InstantMessageServerManager {
 
-  static strAuth: string = null;
+  static strAuthToken: string = null;
 
   static currentIMInstance = null;
 
@@ -60,7 +60,7 @@ export default class InstantMessageServerManager {
 
           debugMark( "Success connected to: [%s]", configData?.host_live_domain + configData?.host_live_path );
 
-          InstantMessageServerManager.strAuth = configData?.auth?.api_key;
+          InstantMessageServerManager.strAuthToken = configData?.auth?.api_key;
 
           if ( callbacks?.connect ) {
 
