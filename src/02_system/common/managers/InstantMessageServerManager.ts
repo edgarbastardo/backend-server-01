@@ -28,23 +28,23 @@ export default class InstantMessageServerManager {
 
       const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
 
-      if ( configData?.auth?.apiKey &&
-           configData?.hostLiveDomain &&
-           configData?.hostLivePath ) {
+      if ( configData?.auth?.api_key &&
+           configData?.host_live_domain &&
+           configData?.host_live_path ) {
 
         const strMark = "4D8A86FADEA7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
         const debugMark = debug.extend( strMark );
 
-        debugMark( "Connecting to IM server: [%s], apiKey: [%s]", configData.hostLiveDomain + configData.hostLivePath, configData.auth.apiKey );
+        debugMark( "Connecting to IM server: [%s], api_key: [%s]", configData.host_live_domain + configData.host_live_path, configData.auth.api_key );
 
-        const socketIOClient = io( configData.hostLiveDomain, {
+        const socketIOClient = io( configData.host_live_domain, {
 
-          path: configData?.hostLivePath,
+          path: configData?.host_live_path,
 
           query: {
 
-            auth: configData?.auth?.apiKey
+            auth: configData?.auth?.api_key
 
           },
 
@@ -56,7 +56,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Success connected to: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+          debugMark( "Success connected to: [%s]", configData?.host_live_domain + "/" + configData?.host_live_path );
 
           if ( callbacks?.connect ) {
 
@@ -72,7 +72,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Diconnected from: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath );
+          debugMark( "Diconnected from: [%s]", configData?.host_live_domain + "/" + configData?.host_live_path );
 
           if ( callbacks?.disconnect ) {
 
@@ -114,7 +114,7 @@ export default class InstantMessageServerManager {
 
           const debugMark = debug.extend( strMark );
 
-          debugMark( "Reconnected to: [%s]. In attempt number: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, intAttemptNumber );
+          debugMark( "Reconnected to: [%s]. In attempt number: [%s]", configData?.host_live_domain + "/" + configData?.host_live_path, intAttemptNumber );
 
           if ( callbacks?.reconnect ) {
 
@@ -133,7 +133,7 @@ export default class InstantMessageServerManager {
 
         const debugMark = debug.extend( strMark );
 
-        debugMark( "Missing information to connect to IM server: [%s], apiKey: [%s]", configData?.hostLiveDomain + "/" + configData?.hostLivePath, configData.auth.apiKey );
+        debugMark( "Missing information to connect to IM server: [%s], api_key: [%s]", configData?.host_live_domain + "/" + configData?.host_live_path, configData.auth.api_key );
 
       }
 
@@ -187,7 +187,7 @@ export default class InstantMessageServerManager {
 
         const configData = await InstantMessageServerManager.getConfigInstantMessageServerService( null, logger );
 
-        strAuth = configData?.auth?.apiKey;
+        strAuth = configData?.auth?.api_key;
 
       }
 
@@ -301,12 +301,12 @@ export default class InstantMessageServerManager {
 
       if ( !strAuth ) {
 
-        strAuth = configData?.auth?.apiKey;
+        strAuth = configData?.auth?.api_key;
 
       }
 
       if ( strAuth &&
-           configData?.hostRest ) {
+           configData?.host_rest ) {
 
         const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
 
@@ -316,7 +316,7 @@ export default class InstantMessageServerManager {
         const headers = {
 
           "Content-Type": "application/json",
-          "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+          "Auth": jsonServiceConfig.auth.api_key + "+" + strClientId
 
         }
 
@@ -341,7 +341,7 @@ export default class InstantMessageServerManager {
         }
 
         const response = await InstantMessageServerRequestServiceV1.callSendMessage(
-                                                                                     jsonServiceConfig.hostRest,
+                                                                                     jsonServiceConfig.host_rest,
                                                                                      headers,
                                                                                      body,
                                                                                    );
@@ -407,12 +407,12 @@ export default class InstantMessageServerManager {
 
       if ( !strAuth ) {
 
-        strAuth = configData?.auth?.apiKey;
+        strAuth = configData?.auth?.api_key;
 
       }
 
       if ( strAuth &&
-           configData?.hostRest ) {
+           configData?.host_rest ) {
 
         const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
 
@@ -422,7 +422,7 @@ export default class InstantMessageServerManager {
         const headers = {
 
           "Content-Type": "application/json",
-          "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+          "Auth": jsonServiceConfig.auth.api_key + "+" + strClientId
 
         }
 
@@ -446,7 +446,7 @@ export default class InstantMessageServerManager {
         }
 
         const response = await InstantMessageServerRequestServiceV1.callChannelMembers(
-                                                                                        jsonServiceConfig.hostRest,
+                                                                                        jsonServiceConfig.host_rest,
                                                                                         headers,
                                                                                         query,
                                                                                       );
@@ -773,14 +773,14 @@ export default class InstantMessageServerManager {
       const headers = {
 
         "Content-Type": "application/json",
-        "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+        "Auth": jsonServiceConfig.auth.api_key + "+" + strClientId
 
       }
 
       let bIMManagerConnected = false;
 
       const response = await InstantMessageServerRequestServiceV1.callSelectWorkerSocket(
-                                                                                          jsonServiceConfig.hostRest,
+                                                                                          jsonServiceConfig.host_rest,
                                                                                           headers,
                                                                                         );
 
@@ -808,8 +808,8 @@ export default class InstantMessageServerManager {
       }
 
       result = {
-                 Domain: jsonServiceConfig.hostLiveDomain,
-                 Path: jsonServiceConfig.hostLivePath + ( strWorker ?  "/" + strWorker : "" ),
+                 Domain: jsonServiceConfig.host_live_domain,
+                 Path: jsonServiceConfig.host_live_path + ( strWorker ?  "/" + strWorker : "" ),
                  IMManagerConnected: bIMManagerConnected
                };
 
@@ -860,12 +860,12 @@ export default class InstantMessageServerManager {
       const headers = {
 
         "Content-Type": "application/json",
-        "Auth": jsonServiceConfig.auth.apiKey + "+" + strClientId
+        "Auth": jsonServiceConfig.auth.api_key + "+" + strClientId
 
       }
 
       await InstantMessageServerRequestServiceV1.callDisconnectUser(
-                                                                    jsonServiceConfig.hostRest,
+                                                                    jsonServiceConfig.host_rest,
                                                                     headers,
                                                                     {
                                                                       "Auth": strAuth
