@@ -238,7 +238,7 @@ export default class Always {
 
                                                               },
                                                               /*
-                                                              "#admin01@system.net#":{
+                                                              "#admin01@system.net#": {
 
                                                                 "denied":"",
                                                                 "allowed":"#test#,#other#"
@@ -596,7 +596,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Administrative_Asistant#":{
+                                                              "#Administrative_Asistant#": {
 
                                                                 "expireAt": 60,  //Token signup valid time in minutes.
                                                                 "group":"Administrative_Asistants",
@@ -615,7 +615,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispatcher#":{
+                                                              "#Dispatcher#": {
 
                                                                 "expireAt": 60,
                                                                 "group":"Dispatchers",
