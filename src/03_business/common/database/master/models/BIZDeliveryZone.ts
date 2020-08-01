@@ -44,6 +44,9 @@ export class BIZDeliveryZone extends Model<BIZDeliveryZone> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Kind: number;
+
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Name: string;
 
