@@ -757,7 +757,7 @@ export default class UserGroupServiceController {
                                {
                                  Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
                                  Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
-                                 Details: validator.errors.all()
+                                 Details: ""
                                }
                              ],
                      Warnings: [],
@@ -1137,7 +1137,7 @@ export default class UserGroupServiceController {
                                {
                                  Code: "ERROR_USER_GROUP_NAME_ALREADY_EXISTS",
                                  Message: await I18NManager.translate( strLanguage, "The user group name %s already exists.", request.body.Name ),
-                                 Details: validator.errors.all()
+                                 Details: null
                                }
                              ],
                      Warnings: [],

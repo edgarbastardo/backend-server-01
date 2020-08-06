@@ -54,11 +54,24 @@ export class BIZDriverInDeliveryZone extends Model<BIZDriverInDeliveryZone> {
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
   UserId: string;
 
+  @PrimaryKey
+  @Column( { type: DataType.DATEONLY, allowNull: false } )
+  AtDate: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  LockByRole: string;
+
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
+
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
+  UpdatedBy: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  UpdatedAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;

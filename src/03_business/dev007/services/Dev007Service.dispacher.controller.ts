@@ -334,7 +334,7 @@ export default class Dev007DispacherServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "78CA84E654B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {

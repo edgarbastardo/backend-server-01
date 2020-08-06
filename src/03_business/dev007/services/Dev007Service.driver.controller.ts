@@ -64,6 +64,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                              {
 
                                                                                UserId: userSessionStatus.UserId,
+                                                                               AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
                                                                                Status: request.body.Status, //1 = Working, 0 = Not working
                                                                                Description: request.body.Description,
                                                                                CreatedBy: userSessionStatus.UserName,
@@ -261,6 +262,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
       let bizDriverStatusInDB = await BIZDriverStatusService.getByUserId(
                                                                           userSessionStatus.UserId,
+                                                                          SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
                                                                           currentTransaction,
                                                                           logger
                                                                         );
@@ -271,6 +273,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                            {
 
                                                                              UserId: userSessionStatus.UserId,
+                                                                             AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
                                                                              Status: 0, //1 = Working, 0 = Not working
                                                                              Description: "Not working",
                                                                              CreatedBy: userSessionStatus.UserName,

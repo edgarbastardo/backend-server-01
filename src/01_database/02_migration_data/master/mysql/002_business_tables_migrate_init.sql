@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS `bizDeliveryZone` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
+  `Kind` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = On demand, 1 = Fixed place, 2 = Route',
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of Delivery Zone',
   `Distance` decimal(10,2)  NOT NULL DEFAULT '0.00' COMMENT 'Maximun distance of delivery',
   `Quantity` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Quantity maximun of delivery',
@@ -18,9 +19,9 @@ CREATE TABLE IF NOT EXISTS `bizDeliveryZone` (
 CREATE TABLE IF NOT EXISTS `bizEstablishment` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `DeliveryZoneId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Delivery zone associated with the Establisment.',
-  `Kind` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = Regular, 1 = Cantina',
+  `Kind` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = On demand, 1 = Fixed place, 2 = Route',
   `Name` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of establishment',
-  `Address` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Physical address of establishment',
+  `Address` varchar(512) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Physical address of establishment',
   `Latitude` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Latitude coordinate.',
   `Longitude` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Longitude coordinate.',
   `EMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Email of establisment',
@@ -133,13 +134,17 @@ CREATE TABLE IF NOT EXISTS `bizEstablishmentInUserGroup` (
   CONSTRAINT `FK_bizEstaInUserGroup_EstablishmentId_From_bizEstablishment_Id` FOREIGN KEY (`EstablishmentId`) REFERENCES `bizEstablishment` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of stablisment and user group.';
 
-CREATE TABLE IF NOT EXISTS `bizDriverInDeliveryZone` (
+CREATE TABLE `bizDriverInDeliveryZone` (
   `DeliveryZoneId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDeliveryZone',
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',
+  `AtDate` date NOT NULL COMMENT 'Indicate the date for delivery zone',
+  `LockByRole` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Indicate the role allowed to change',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date updated of the row.',
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`DeliveryZoneId`,`UserId`),
+  PRIMARY KEY (`DeliveryZoneId`,`UserId`,`AtDate`),
   KEY `FK_bizDriInDeliveryZone_DeliveryZoneId_From_sysUser_Id_idx` (`DeliveryZoneId`),
   KEY `FK_bizDriInDeliveryZone_UserId_From_bizEstablishment_Id_idx` (`UserId`),
   CONSTRAINT `FK_bizDriInDeliveryZone_DeliveryZoneId_From_bizDeliveryZone_Id` FOREIGN KEY (`DeliveryZoneId`) REFERENCES `bizDeliveryZone` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -148,14 +153,15 @@ CREATE TABLE IF NOT EXISTS `bizDriverInDeliveryZone` (
 
 CREATE TABLE IF NOT EXISTS `bizDriverStatus` (
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',
+  `AtDate` date NOT NULL date NOT NULL COMMENT 'Indicate the date for delivery zone',
   `Status` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Status id of the driver',
-  `Description` varchar(50) NOT NULL COMMENT 'Status text of the driver',
+  `Description` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Status text of the driver',
   `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
   `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
   `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
   `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
   `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`UserId`),
+  PRIMARY KEY (`UserId`,`AtDate`),
   CONSTRAINT `FK_bizDriverStatus_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of driver status.';
 

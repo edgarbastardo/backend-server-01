@@ -140,6 +140,7 @@ export default class BIZDriverStatusService extends BaseService {
   }
 
   static async getByUserId( strUserId: string,
+                            strAtDate: string,
                             transaction: any,
                             logger: any ): Promise<BIZDriverStatus> {
 
@@ -163,7 +164,7 @@ export default class BIZDriverStatusService extends BaseService {
 
       const options = {
 
-        where: { "UserId": strUserId ? strUserId : "" },
+        where: { "UserId": strUserId ? strUserId : "", AtDate: strAtDate },
         transaction: currentTransaction,
         include: [
                    {

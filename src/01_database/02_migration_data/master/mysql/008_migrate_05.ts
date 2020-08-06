@@ -20,11 +20,11 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select Kind From bizDeliveryZone limit 1, 1";
+      let strSQL = "Select AtDate From bizDriverStatus limit 1, 1";
 
       try {
 
-        //Check field Kind exists
+        //Check field Date exists
         await dbConnection.execute( strSQL );
 
       }
@@ -32,8 +32,13 @@ export default class Migrate {
 
         //The field Kind NOT exists. Must be created
 
-        strSQL = "ALTER TABLE `bizDeliveryZone` " +
-                 "ADD COLUMN `Kind` SMALLINT(1) NOT NULL COMMENT '0 = On demand, 1 = Fixed place, 2 = Route' AFTER `Id`";
+        strSQL = "DELETE FROM `bizDriverStatus`;" +  //<-- This is needed to apply not null
+                 "ALTER TABLE `bizDriverStatus` " +
+                 "ADD COLUMN `AtDate` DATE NOT NULL AFTER `UserId`, " +
+                 "ADD COLUMN `UpdatedBy` VARCHAR(150) NULL AFTER `CreatedAt`, " +
+                 "ADD COLUMN `UpdatedAt` VARCHAR(30) NULL AFTER `UpdatedBy`, " +
+                 "DROP PRIMARY KEY, " +
+                 "ADD PRIMARY KEY (`UserId`, `AtDate`);";
 
         await dbConnection.execute( strSQL );
 

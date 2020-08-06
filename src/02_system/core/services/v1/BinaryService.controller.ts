@@ -6460,7 +6460,7 @@ export default class BinaryServiceController extends BaseService {
           else {
 
             result = {
-                       StatusCode: 500, //Ok
+                       StatusCode: 500, //Internal server error
                        Code: "ERROR_BINARY_DATA_DELETE",
                        Message: await I18NManager.translate( strLanguage, "Error in binary data delete." ),
                        Mark: "CDAC887D1CB4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
