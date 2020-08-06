@@ -20,7 +20,7 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select AtDate From bizDriverInDeliveryZone limit 1, 1";
+      let strSQL = "Select AtDate, LockByRole, UpdatedBy, UpdatedAt From bizDriverInDeliveryZone limit 1, 1";
 
       try {
 
@@ -32,7 +32,8 @@ export default class Migrate {
 
         //The field Kind NOT exists. Must be created
 
-        strSQL = "ALTER TABLE `bizDriverInDeliveryZone` " +
+        strSQL = "DELETE FROM `bizDriverInDeliveryZone`;" + //<-- This is needed to apply not null
+                 "ALTER TABLE `bizDriverInDeliveryZone` " +
                  "ADD COLUMN `AtDate` DATE NOT NULL AFTER `UserId`, " +
                  "DROP PRIMARY KEY, " +
                  "ADD PRIMARY KEY (`DeliveryZoneId`, `UserId`, `AtDate`), " +
