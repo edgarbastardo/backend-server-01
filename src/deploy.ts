@@ -616,7 +616,7 @@ export default class App {
 
           }
 
-          if ( deployConfigFile[ process.env.DEPLOY_TARGET ] ) {
+          if ( deployConfigFile[ process.env.APP_PROJECT_NAME ][ process.env.DEPLOY_TARGET ] ) {
 
             const target = deployConfigFile[ process.env.APP_PROJECT_NAME ][ process.env.DEPLOY_TARGET ];
 
