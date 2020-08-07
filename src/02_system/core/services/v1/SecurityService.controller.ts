@@ -1054,6 +1054,7 @@ export default class SecurityServiceController {
 
           }
 
+          userSessionStatusData[ "ShortToken" ] = userSessionStatus.ShortToken;
           userSessionStatusData[ "UserTag" ] = strUserTags;
           //userSessionStatusData[ "User" ] = user.Name;
           userSessionStatusData[ "UserGroupTag" ] = strGroupTags;
