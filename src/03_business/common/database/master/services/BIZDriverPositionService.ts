@@ -12,7 +12,7 @@ import BaseService from "../../../../../02_system/common/database/master/service
 import DBConnectionManager from "../../../../../02_system/common/managers/DBConnectionManager";
 
 //import { BIZDriverStatus } from "../models/BIZDriverStatus";
-import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
+//import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
 import { BIZDriverPosition } from "../models/BIZDriverPosition";
 import I18NManager from "../../../../../02_system/common/managers/I18Manager";
 
