@@ -31,7 +31,7 @@ import SYSRouteService from "../../../../../02_system/common/database/master/ser
 import MiddlewareManager from "../../../../../02_system/common/managers/MiddlewareManager";
 //import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
 import Dev007DriverServicesController from "../../../services/Dev007Service.driver.controller";
-import Dev007DispacherServicesController from "../../../services/Dev007Service.dispacher.controller";
+import Dev007DispatcherServicesController from "../../../services/Dev007Service.dispacher.controller";
 
 const debug = require( "debug" )( "Dev007.dispatcher.controller" );
 
@@ -121,10 +121,10 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispacherServicesController.getPosition( request,
-                                                                        response,
-                                                                        null,
-                                                                        context.logger );
+    const result = await Dev007DispatcherServicesController.getPosition( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
 
     response.status( result.StatusCode ).send( result );
 

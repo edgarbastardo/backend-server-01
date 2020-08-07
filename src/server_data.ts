@@ -834,7 +834,7 @@ export default class App {
       const strSQL = "Select a.tip, b.ticket, b.created_at From deliveries as a inner join orders as b on a.order_id=b.id Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";
       //const strSQL = "Select NOW()";
 
-      const rows = await dbConnection.query( strSQL, {
+      const rows = await dbConnection.execute( strSQL, {
                                                       raw: true,
                                                       type: QueryTypes.SELECT,
                                                       transaction: null,

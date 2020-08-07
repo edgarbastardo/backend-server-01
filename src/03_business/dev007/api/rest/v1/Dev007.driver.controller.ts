@@ -57,6 +57,8 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/status", Action: "v1.business.dev007.driver.work.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get current driver status" },
                                   { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.driver.position.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the position of the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the drivers position" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/zone", Action: "v1.business.dev007.driver.delivery.zone.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the delivery zone to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/zone", Action: "v1.business.dev007.driver.delivery.zone.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current delivery zone from the driver" },
                                 ]
 
   _controllerLogger = null;
@@ -238,6 +240,44 @@ export default class Dev007DriverController {
                                                                      response,
                                                                      null,
                                                                      context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/delivery/zone",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async setDeliveryZone( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DriverServicesController.setDeliveryZone( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/zone",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getDeliveryZone( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DriverServicesController.getDeliveryZone( request,
+                                                                         response,
+                                                                         null,
+                                                                         context.logger );
 
     response.status( result.StatusCode ).send( result );
 

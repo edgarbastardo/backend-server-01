@@ -20,9 +20,9 @@ import { SYSUser } from "../../../02_system/common/database/master/models/SYSUse
 import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import InstantMessageServerManager from "../../../02_system/common/managers/InstantMessageServerManager";
 
-const debug = require( "debug" )( "Dev007DispacherServicesController" );
+const debug = require( "debug" )( "Dev007DispatcherServicesController" );
 
-export default class Dev007DispacherServicesController extends BaseService {
+export default class Dev007DispatcherServicesController extends BaseService {
 
   //Common business services
 

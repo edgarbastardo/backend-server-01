@@ -67,7 +67,7 @@ export default class Always {
                                   Name: "Dispatchers",
                                   Role: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
                                   Tag: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Comment: "Created from backend startup. Group of users Dispachers.",
+                                  Comment: "Created from backend startup. Group of users Dispatchers.",
                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                 },

@@ -16,7 +16,7 @@ export default class Migrate {
   static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
 
     let bSuccess = false;
-    let bEmptyContent = true;
+    let bEmptyContent = false;  //VERY IMPORTANT
 
     try {
 
@@ -27,21 +27,25 @@ export default class Migrate {
         //Check field Date exists
         await dbConnection.execute( strSQL );
 
+        bSuccess = true;  //VERY IMPORTANT
+
       }
       catch ( error ) {
 
-        //The field Kind NOT exists. Must be created
+        //The field AtDate, LockByRole, UpdatedBy, UpdatedAt NOT exists. Must be created
 
-        strSQL = "DELETE FROM `bizDriverInDeliveryZone`;" + //<-- This is needed to apply not null
-                 "ALTER TABLE `bizDriverInDeliveryZone` " +
-                 "ADD COLUMN `AtDate` DATE NOT NULL AFTER `UserId`, " +
+        strSQL = "DELETE FROM bizDriverInDeliveryZone;" + //<-- This is needed to apply not null
+                 "ALTER TABLE bizDriverInDeliveryZone " +
+                 "ADD COLUMN AtDate DATE NOT NULL AFTER UserId, " +
                  "DROP PRIMARY KEY, " +
-                 "ADD PRIMARY KEY (`DeliveryZoneId`, `UserId`, `AtDate`), " +
-                 "ADD COLUMN `LockByRole` VARCHAR(30) NOT NULL AFTER `AtDate`, " +
-                 "ADD COLUMN `UpdatedBy` VARCHAR(150) NULL AFTER `CreatedAt`, " +
-                 "ADD COLUMN `UpdatedAt` VARCHAR(30) NULL AFTER `UpdatedBy`;";
+                 "ADD PRIMARY KEY (DeliveryZoneId, UserId, AtDate), " +
+                 "ADD COLUMN LockByRole VARCHAR(30) NOT NULL AFTER AtDate, " +
+                 "ADD COLUMN UpdatedBy VARCHAR(150) NULL AFTER CreatedAt, " +
+                 "ADD COLUMN UpdatedAt VARCHAR(30) NULL AFTER UpdatedBy;"; //`
 
-        await dbConnection.execute( strSQL );
+        await dbConnection.query( strSQL );
+
+        bSuccess = true;  //VERY IMPORTANT
 
       }
 

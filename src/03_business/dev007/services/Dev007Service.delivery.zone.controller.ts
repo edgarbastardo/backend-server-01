@@ -199,7 +199,7 @@ export default class Dev007DeliveryZoneServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "798505EF52C3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {

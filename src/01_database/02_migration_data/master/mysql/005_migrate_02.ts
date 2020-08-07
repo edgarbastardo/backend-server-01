@@ -16,7 +16,7 @@ export default class Migrate {
   static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
 
     let bSuccess = false;
-    let bEmptyContent = true;
+    let bEmptyContent = false;
 
     try {
 
@@ -27,6 +27,8 @@ export default class Migrate {
         //Check field Action exists
         await dbConnection.execute( strSQL );
 
+        bSuccess = true;
+
       }
       catch ( error ) {
 
@@ -34,11 +36,13 @@ export default class Migrate {
 
         strSQL = `ALTER TABLE \`sysRoute\` ADD COLUMN \`Action\` VARCHAR(75) NULL AFTER \`Path\``;
 
-        await dbConnection.execute( strSQL );
+        await dbConnection.query( strSQL );
 
         strSQL = `ALTER TABLE \`sysRoute\` ADD UNIQUE INDEX \`UNQ_sysRoute_Action_idx\` (\`Action\` ASC)`;
 
-        await dbConnection.execute( strSQL );
+        await dbConnection.query( strSQL );
+
+        bSuccess = true;
 
       }
 

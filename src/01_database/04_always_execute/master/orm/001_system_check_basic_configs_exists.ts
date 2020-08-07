@@ -156,7 +156,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {
+                                                              "#Dispatchers#": {
 
                                                                 kind: 0,
                                                                 on: 60 * 2
@@ -493,7 +493,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {  //<= Group name
+                                                              "#Dispatchers#": {  //<= Group name
 
                                                                 "minLength": 5,
                                                                 "maxLength": 8,
@@ -1053,7 +1053,7 @@ export default class Always {
 
                                                                 "config": {
 
-                                                                  "#Driver#": {
+                                                                  "#Drivers#": {
 
                                                                     "resume": {
 
@@ -1102,18 +1102,20 @@ export default class Always {
 
                                                                   },
 
-                                                                  "#Dispachers#": {
+                                                                  "#Dispatchers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
+                                                                    "allowed": "#Users#,#Dispatchers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
 
                                                                   },
+
                                                                   "#Final_Customers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Support#"
 
                                                                   },
+
                                                                   //TODO set by role from the user
                                                                   "#Establisment#": {
 

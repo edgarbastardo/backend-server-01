@@ -20,6 +20,9 @@ import { SYSUser } from "../../../02_system/common/database/master/models/SYSUse
 import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import InstantMessageServerManager from "../../../02_system/common/managers/InstantMessageServerManager";
 import CacheManager from "../../../02_system/common/managers/CacheManager";
+import BIZDriverInDeliveryZoneService from "../../common/database/master/services/BIZDriverInDeliveryZoneService";
+import { BIZDriverInDeliveryZone } from "../../common/database/master/models/BIZDriverInDeliveryZone";
+import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
 const debug = require( "debug" )( "Dev007DriverServicesController" );
 
@@ -193,7 +196,7 @@ export default class Dev007DriverServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "8A8748A321B4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {
@@ -404,7 +407,7 @@ export default class Dev007DriverServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "D90BA45EF1C5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {
@@ -690,7 +693,7 @@ export default class Dev007DriverServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "E12BF6DB6F34" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {
@@ -915,7 +918,477 @@ export default class Dev007DriverServicesController extends BaseService {
                  Code: "ERROR_UNEXPECTED",
                  Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
                  LogId: error.LogId,
-                 Mark: "78CA84E654B1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: strMark,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async setDeliveryZone( request: Request,
+                                response: Response,
+                                transaction: any,
+                                logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByDriverId( userSessionStatus.UserId,
+                                                                                            null, //By default the current date in the server
+                                                                                            currentTransaction,
+                                                                                            logger );
+
+      if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
+
+        const error = bizDriverInDeliveryZoneInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "C6F92ABD8EE9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bizDriverInDeliveryZoneInDB &&
+                bizDriverInDeliveryZoneInDB.LockByRole &&
+                userSessionStatus.Roles.includes( bizDriverInDeliveryZoneInDB.LockByRole ) === false ) {
+
+        result = {
+                   StatusCode: 403, //Forbidden
+                   Code: "ERROR_DRIVER_NOT_ALLOWED",
+                   Message: await I18NManager.translate( strLanguage, "The driver not allowed to set the delivery zone." ),
+                   Mark: "233A7F9D16A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      };
+
+      if ( result === null ) {
+
+        bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
+                                                                                           {
+
+                                                                                             UserId: userSessionStatus.UserId,
+                                                                                             DeliveryZoneId: request.body.DeliveryZoneId,
+                                                                                             AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
+                                                                                             LockByRole: "#Driver#",
+                                                                                             CreatedBy: userSessionStatus.UserName,
+                                                                                             UpdatedBy: userSessionStatus.UserName,
+
+                                                                                           },
+                                                                                           true,
+                                                                                           currentTransaction,
+                                                                                           logger
+                                                                                         );
+
+        if ( bizDriverInDeliveryZoneInDB &&
+             bizDriverInDeliveryZoneInDB instanceof Error === false ) {
+
+          let modelData = ( bizDriverInDeliveryZoneInDB as any ).dataValues;
+
+          const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
+                                                                                  {
+                                                                                    Data: modelData,
+                                                                                    FilterFields: 1, //Force to remove fields like password and value
+                                                                                    TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                    Include: [
+                                                                                               {
+                                                                                                 model: SYSUser
+                                                                                               },
+                                                                                               {
+                                                                                                 model: BIZDeliveryZone
+                                                                                               }
+                                                                                             ],
+                                                                                    Exclude: null, //[ { model: SYSUser } ],
+                                                                                    Logger: logger,
+                                                                                    ExtraInfo: {
+                                                                                                 Request: request,
+                                                                                                 FilterFields: 1
+                                                                                               }
+                                                                                  }
+                                                                                );
+
+          if ( tempModelData ) {
+
+            modelData = tempModelData;
+
+          }
+
+          //ANCHOR success user update
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: "SUCCESS_DRIVER_DELIVERY_ZONE_SET",
+                     Message: await I18NManager.translate( strLanguage, "Success driver delivery zone set." ),
+                     Mark: "D2F8D4512DF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             modelData
+                           ]
+                   }
+
+          bApplyTransaction = true;
+
+        }
+        else {
+
+          const error = bizDriverInDeliveryZoneInDB as any;
+
+          result = {
+                     StatusCode: 500, //Internal server error
+                     Code: "ERROR_UNEXPECTED",
+                     Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                     Mark: "E720AE75720E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: error.name,
+                                 Message: error.message,
+                                 Details: await SystemUtilities.processErrorDetails( error ) //error
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setStatus.name;
+
+      const strMark = "625CCCC1FBB7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: strMark,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getDeliveryZone( request: Request,
+                                response: Response,
+                                transaction: any,
+                                logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByDriverId( userSessionStatus.UserId,
+                                                                                            null, //By default the current date in the server
+                                                                                            currentTransaction,
+                                                                                            logger );
+
+      if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
+
+        const error = bizDriverInDeliveryZoneInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "93120CCD85CC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( !bizDriverInDeliveryZoneInDB ) {
+
+        result = {
+                   StatusCode: 400, //Internal server error
+                   Code: "ERROR_DRIVER_DELIVERY_ZONE_NOT_SET",
+                   Message: await I18NManager.translate( strLanguage, "The driver delivery zone not set." ),
+                   Mark: "A724A27AA4F4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        let modelData = ( bizDriverInDeliveryZoneInDB as any ).dataValues;
+
+        const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
+                                                                                {
+                                                                                  Data: modelData,
+                                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                  Include: [
+                                                                                             {
+                                                                                               model: SYSUser
+                                                                                             },
+                                                                                             {
+                                                                                               model: BIZDeliveryZone
+                                                                                             }
+                                                                                           ],
+                                                                                  Exclude: null, //[ { model: SYSUser } ],
+                                                                                  Logger: logger,
+                                                                                  ExtraInfo: {
+                                                                                               Request: request,
+                                                                                               FilterFields: 1
+                                                                                             }
+                                                                                }
+                                                                              );
+
+          if ( tempModelData ) {
+
+            modelData = tempModelData;
+
+          }
+
+          //ANCHOR success user update
+          result = {
+                     StatusCode: 200, //Ok
+                     Code: "SUCCESS_GET_DRIVER_DELIVERY_ZONE",
+                     Message: await I18NManager.translate( strLanguage, "Success get the driver delivery zone." ),
+                     Mark: "635C2229C003" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 1,
+                     Data: [
+                             modelData
+                           ]
+                   }
+
+          bApplyTransaction = true;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.setStatus.name;
+
+      const strMark = "0BE03CB21E95" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: strMark,
                  IsError: true,
                  Errors: [
                            {

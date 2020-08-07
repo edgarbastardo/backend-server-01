@@ -16,21 +16,23 @@ export default class Migrate {
   static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
 
     let bSuccess = false;
-    let bEmptyContent = true;
+    let bEmptyContent = false;  //VERY IMPORTANT
 
     try {
 
-      let strSQL = "Select AtDate From bizDriverStatus limit 1, 1";
+      let strSQL = "Select AtDate, UpdatedBy, UpdatedAt From bizDriverStatus limit 1, 1";
 
       try {
 
         //Check field Date exists
         await dbConnection.execute( strSQL );
 
+        bSuccess = true;  //VERY IMPORTANT
+
       }
       catch ( error ) {
 
-        //The field Kind NOT exists. Must be created
+        //The field AtDate, UpdatedBy, UpdatedAt NOT exists. Must be created
 
         strSQL = "DELETE FROM `bizDriverStatus`;" +  //<-- This is needed to apply not null
                  "ALTER TABLE `bizDriverStatus` " +
@@ -40,7 +42,9 @@ export default class Migrate {
                  "DROP PRIMARY KEY, " +
                  "ADD PRIMARY KEY (`UserId`, `AtDate`);";
 
-        await dbConnection.execute( strSQL );
+        await dbConnection.query( strSQL );
+
+        bSuccess = true;  //VERY IMPORTANT
 
       }
 

@@ -16,7 +16,7 @@ export default class Migrate {
   static async migrateUp( dbConnection: any, logger: any ): Promise<any> {
 
     let bSuccess = false;
-    let bEmptyContent = true;
+    let bEmptyContent = false;
 
     try {
 
@@ -27,6 +27,8 @@ export default class Migrate {
         //Check field Kind exists
         await dbConnection.execute( strSQL );
 
+        bSuccess = true;
+
       }
       catch ( error ) {
 
@@ -35,7 +37,9 @@ export default class Migrate {
         strSQL = "ALTER TABLE `bizDeliveryZone` " +
                  "ADD COLUMN `Kind` SMALLINT(1) NOT NULL COMMENT '0 = On demand, 1 = Fixed place, 2 = Route' AFTER `Id`";
 
-        await dbConnection.execute( strSQL );
+        await dbConnection.query( strSQL );
+
+        bSuccess = true;
 
       }
 
