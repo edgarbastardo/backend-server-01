@@ -985,10 +985,15 @@ export default class Dev007DriverServicesController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByDriverId( userSessionStatus.UserId,
-                                                                                            null, //By default the current date in the server
-                                                                                            currentTransaction,
-                                                                                            logger );
+      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByUserId( userSessionStatus.UserId,
+                                                                                          null, //By default the current date in the server
+                                                                                          currentTransaction,
+                                                                                          logger );
+
+
+      const bIsAdmin = userSessionStatus?.Role?.includes( "#Administrator#" ) ||
+                       userSessionStatus?.Role?.includes( "#BManager_L99#" ) ||
+                       userSessionStatus?.Role?.includes( "#Business_Manager#" );
 
       if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
 
@@ -1016,7 +1021,8 @@ export default class Dev007DriverServicesController extends BaseService {
       }
       else if ( bizDriverInDeliveryZoneInDB &&
                 bizDriverInDeliveryZoneInDB.LockByRole &&
-                userSessionStatus.Roles.includes( bizDriverInDeliveryZoneInDB.LockByRole ) === false ) {
+                bIsAdmin === false &&
+                userSessionStatus?.Role?.includes( bizDriverInDeliveryZoneInDB.LockByRole ) === false ) {
 
         result = {
                    StatusCode: 403, //Forbidden
@@ -1059,7 +1065,10 @@ export default class Dev007DriverServicesController extends BaseService {
           const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
                                                                                   {
                                                                                     Data: modelData,
-                                                                                    FilterFields: 1, //Force to remove fields like password and value
+                                                                                    IncludeFields: [
+                                                                                                     "Id",
+                                                                                                     "Name",
+                                                                                                   ],
                                                                                     TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                     Include: [
                                                                                                {
@@ -1073,7 +1082,6 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                     Logger: logger,
                                                                                     ExtraInfo: {
                                                                                                  Request: request,
-                                                                                                 FilterFields: 1
                                                                                                }
                                                                                   }
                                                                                 );
@@ -1244,10 +1252,10 @@ export default class Dev007DriverServicesController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByDriverId( userSessionStatus.UserId,
-                                                                                            null, //By default the current date in the server
-                                                                                            currentTransaction,
-                                                                                            logger );
+      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByUserId( userSessionStatus.UserId,
+                                                                                          null, //By default the current date in the server
+                                                                                          currentTransaction,
+                                                                                          logger );
 
       if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
 
@@ -1296,7 +1304,10 @@ export default class Dev007DriverServicesController extends BaseService {
         const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
                                                                                 {
                                                                                   Data: modelData,
-                                                                                  FilterFields: 1, //Force to remove fields like password and value
+                                                                                  IncludeFields: [
+                                                                                                   "Id",
+                                                                                                   "Name",
+                                                                                                 ],
                                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                                   Include: [
                                                                                              {
@@ -1310,7 +1321,6 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                   Logger: logger,
                                                                                   ExtraInfo: {
                                                                                                Request: request,
-                                                                                               FilterFields: 1
                                                                                              }
                                                                                 }
                                                                               );

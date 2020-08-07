@@ -50,7 +50,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
         where: {
                  "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId: "",
-                 "DeliveryZoneId": createOrUpdateData.DeliveryId ? createOrUpdateData.DeliveryId: "",
+                 "DeliveryZoneId": createOrUpdateData.DeliveryZoneId ? createOrUpdateData.DeliveryZoneId: "",
                  "AtDate": createOrUpdateData.AtDate ? createOrUpdateData.AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
                },
         transaction: currentTransaction,
@@ -86,9 +86,9 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
         await bizDriverInDeliveryZoneInDB.update( createOrUpdateData,
                                                   options );
 
-        bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZone.findOne( options );
-
       }
+
+      bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZone.findOne( options );
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -148,10 +148,10 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
   }
 
-  static async getByDriverId( strDriverId: string,
-                              strAtDate: string,
-                              transaction: any,
-                              logger: any ): Promise<BIZDriverInDeliveryZone> {
+  static async getByUserId( strUserId: string,
+                            strAtDate: string,
+                            transaction: any,
+                            logger: any ): Promise<BIZDriverInDeliveryZone> {
 
     let result = null;
 
@@ -174,7 +174,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
       const options = {
 
         where: {
-                 "DriverId": strDriverId ? strDriverId: "",
+                 "UserId": strUserId ? strUserId: "",
                  "AtDate": strAtDate ? strAtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
                },
         transaction: currentTransaction,
@@ -206,7 +206,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getByDriverId.name;
+      sourcePosition.method = this.name + "." + this.getByUserId.name;
 
       const strMark = "905C0A28C597" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

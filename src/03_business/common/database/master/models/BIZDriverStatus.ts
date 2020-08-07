@@ -153,15 +153,83 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
             if ( modelIncluded.model &&
                  result[ modelIncluded.model.name ] ) {
 
-              result[ modelIncluded.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
-                                                                                        result[ modelIncluded.model.name ].dataValues:
-                                                                                        result[ modelIncluded.model.name ],
-                                                                                        strTimeZoneId,
-                                                                                        params.Logger );
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
+                                                                                              result[ modelIncluded.model.name ].dataValues:
+                                                                                              result[ modelIncluded.model.name ],
+                                                                                              strTimeZoneId,
+                                                                                              params.Logger );
 
               if ( params.FilterFields === 1 ) {
 
                 delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+              }
+              else if ( params.FilterFields?.length > 0 ) {
+
+                delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+                result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
+                                                                                         params.FilterFields,
+                                                                                         params.logger );
+
+              }
+
+              if ( params.IncludeFields?.length > 0 ) {
+
+                result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
+                                                                                          params.IncludeFields,
+                                                                                          params.logger );
+
+              }
+
+              if ( result[ modelIncluded.model.name ].ExtraData ) {
+
+                let extraData = result[ modelIncluded.model.name ].ExtraData;
+
+                if ( typeof extraData === "string" ) {
+
+                  extraData = CommonUtilities.parseJSON( extraData,
+                                                         params.logger );
+
+                }
+
+                if ( extraData &&
+                     extraData.Private ) {
+
+                  delete extraData.Private;
+
+                }
+
+                if ( !params.KeepExtraData ||
+                     params.KeepExtraData === 0 ) {
+
+                  if ( extraData.Business ) {
+
+                    result[ modelIncluded.model.name ].Business = extraData.Business;
+
+                    delete extraData.Business;
+
+                    if ( extraData ) {
+
+                      result[ modelIncluded.model.name ].Business = { ...result[ modelIncluded.model.name ].Business, ...extraData };
+
+                    }
+
+                  }
+                  else {
+
+                    result[ modelIncluded.model.name ].Business = extraData;
+
+                  }
+
+                  delete result[ modelIncluded.model.name ].ExtraData;
+
+                }
+                else {
+
+                  result[ modelIncluded.model.name ].ExtraData = extraData;
+
+                }
 
               }
 
