@@ -100,7 +100,7 @@ export default class SecurityServiceController {
         }
         else { //} if ( jsonConfigValue[ "#" + strOperatorTag + "#" ] ) {
 
-          const jsonConfigValueByTag =  CommonUtilities.searchFirstFieldFromList( jsonConfigValue,
+           const jsonConfigValueByTag = CommonUtilities.searchFirstFieldFromList( jsonConfigValue,
                                                                                   strOperatorTag ? strOperatorTag.split( "," ): [],
                                                                                   "",
                                                                                   "",
