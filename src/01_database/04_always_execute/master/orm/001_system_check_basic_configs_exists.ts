@@ -617,25 +617,6 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispatcher#": {
-
-                                                                "expireAt": 60,
-                                                                "group":"Dispatchers",
-                                                                "createGroup":false,
-                                                                "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
-                                                                "userForceChangePassword": 0,
-                                                                "userChangePasswordEvery": 0,
-                                                                "userSessionsLimit": 1, //Only 1 session at time
-                                                                "passwordParameterTag": ""
-
-                                                              }
-
                                                             }
 
                                                           ),
