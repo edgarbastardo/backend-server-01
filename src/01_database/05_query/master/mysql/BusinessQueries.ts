@@ -11,41 +11,6 @@ export default class BusinessQueries {
 
     let strResult = "";
 
-    if ( strDialect === "mysql" ) {
-
-      if ( strName === "getLastPositionByShortToken" ) {
-
-        strResult = `Select B.* From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' Order By B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-      else if ( strName === "getLastPositionByShortTokenB" ) {
-
-        strResult = `Select B.Accuracy As Accuracy, B.Latitude As Latitude, B.Longitude As Longitude, B.Altitude As Altitude, B.Speed As Speed From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' Order By B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-      else if ( strName === "getLastPositionByUserId" ) {
-
-        strResult = `Select B.*, C.Name As Name From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Inner Join sysUser C On C.Id = B.UserId Where B.UserId = '${params.UserId}' Order By B.ShortToken, B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-      else if ( strName === "getLastPositionBetweenByShortToken" ) {
-
-        strResult = `Select B.* From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' And Cast( B.CreatedAt As DateTime ) Between CAST( '${params.StartDateTime}' As DateTime ) And Cast( '${params.EndDateTime}' As DateTime ) Order By B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-      else if ( strName === "getLastPositionBetweenByShortTokenB" ) {
-
-        strResult = `Select B.Accuracy As Accuracy, B.Latitude As Latitude, B.Longitude As Longitude, B.Altitude As Altitude, B.Speed As Speed From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' And Cast( B.CreatedAt As DateTime ) Between CAST( '${params.StartDateTime}' As DateTime ) And Cast( '${params.EndDateTime}' As DateTime ) Order By B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-      else if ( strName === "getLastPositionBetweenByUserId" ) {
-
-        strResult = `Select B.*, C.Name As Name From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Inner Join sysUser C On C.Id = B.UserId Where B.UserId = '${params.UserId}' And Cast( B.CreatedAt As DateTime ) Between CAST( '${params.StartDateTime}' As DateTime ) And Cast( '${params.EndDateTime}' As DateTime ) Order By B.ShortToken, B.CreatedAt Desc Limit ${params.Limit};`;
-
-      }
-
-    }
-
     //Here the common business queries
 
     //Example

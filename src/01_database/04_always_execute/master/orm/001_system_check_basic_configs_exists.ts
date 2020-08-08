@@ -156,13 +156,6 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {
-
-                                                                kind: 0,
-                                                                on: 60 * 2
-
-                                                              },
-
                                                               "#Drivers#": {
 
                                                                 kind: 0,
@@ -492,22 +485,6 @@ export default class Always {
                                                                 "symbols": ""
 
                                                               },
-
-                                                              "#Dispachers#": {  //<= Group name
-
-                                                                "minLength": 5,
-                                                                "maxLength": 8,
-                                                                "minLowerCase": 0,
-                                                                "maxLowerCase": 0,
-                                                                "minUpperCase": 0,
-                                                                "maxUpperCase": 0,
-                                                                "minDigit": 0,
-                                                                "maxDigit": 0,
-                                                                "minSymbol": 0,
-                                                                "maxSymbol": 0,
-                                                                "symbols": ""
-
-                                                              }
 
                                                             }
 
@@ -1083,18 +1060,13 @@ export default class Always {
 
                                                                   },
 
-                                                                  "#Dispachers#": {
-
-                                                                    "denied": "",
-                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
-
-                                                                  },
                                                                   "#Final_Customers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Support#"
 
                                                                   },
+
                                                                   //TODO set by role from the user
                                                                   "#Establisment#": {
 
