@@ -2480,7 +2480,7 @@ export default class SystemConstants {
                                                                                "user_login_control": {
 
                                                                                  "denied": "",
-                                                                                 "allowed": "#Dispachers#,#Administrator#"
+                                                                                 "allowed": "#Administrator#"
 
                                                                                },
 
