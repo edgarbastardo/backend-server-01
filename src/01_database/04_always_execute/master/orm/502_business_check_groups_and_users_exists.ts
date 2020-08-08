@@ -63,15 +63,6 @@ export default class Always {
                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                 },
                                 {
-                                  Id: "9916bd73-093d-47c8-a549-65e7edd4f171",
-                                  Name: "Dispatchers",
-                                  Role: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Tag: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Comment: "Created from backend startup. Group of users Dispachers.",
-                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                                },
-                                {
                                   Id: "03e91fb3-6b70-4162-9af8-7219ce446e9f",
                                   Name: "Final_Customers",
                                   Role: "#Final_Customer#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
