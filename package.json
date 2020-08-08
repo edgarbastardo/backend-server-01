@@ -1,5 +1,5 @@
 {
-  "name": "backend-server-01",
+  "name": "odin-v2-integration-task-01",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -79,6 +79,7 @@
     "pug": "^2.0.4",
     "random-js": "^2.1.0",
     "read-chunk": "^3.2.0",
+    "read-excel-file": "^4.0.6",
     "redlock": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
@@ -145,7 +146,7 @@
     "ssh2-sftp-client": "^4.3.0",
     "ts-jest": "^25.3.0",
     "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
+    "typescript": "^3.9.6"
   },
   "jest": {
     "testEnvironment": "node"

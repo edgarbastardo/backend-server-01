@@ -62,7 +62,7 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSRoleHasRouteService, options: any ): void {
+  static beforeCreateHook( instance: SYSRoleHasRoute, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
@@ -75,7 +75,7 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: SYSRoleHasRouteService, options: any ): void {
+  static beforeUpdateHook( instance: SYSRoleHasRoute, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
 
@@ -90,7 +90,7 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: SYSRoleHasRouteService, options: any ): void {
+  static beforeDestroyHook( instance: SYSRoleHasRoute, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 

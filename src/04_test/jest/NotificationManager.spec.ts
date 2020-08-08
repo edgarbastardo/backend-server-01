@@ -1,3 +1,10 @@
+test( `Test NotificationManager SMSGateway transport library 001`, async () => {
+
+  expect( true ).toBe( true );
+
+})
+
+/*
 import NotificationManager from "../../02_system/common/managers/NotificationManager";
 import DBConnectionManager from "../../02_system/common/managers/DBConnectionManager";
 
@@ -31,6 +38,7 @@ test( `Test NotificationManager SMSGateway transport library 001`, async () => {
   expect( bResult ).toBe( true );
 
 })
+*/
 
     //import appRoot from 'app-root-path';
 

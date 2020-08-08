@@ -202,6 +202,223 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
         if ( Array.isArray( params.Include ) ) {
 
+          for ( const modelIncluded of params.Include ) {
+
+            if ( modelIncluded.model &&
+                 result[ modelIncluded.model.name ] ) {
+
+              result[ modelIncluded.model.name ] = SystemUtilities.transformObjectToTimeZone( result[ modelIncluded.model.name ].dataValues ?
+                                                                                              result[ modelIncluded.model.name ].dataValues:
+                                                                                              result[ modelIncluded.model.name ],
+                                                                                              strTimeZoneId,
+                                                                                              params.Logger );
+
+              if ( params.FilterFields === 1 ) {
+
+                delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+              }
+              else if ( params.FilterFields?.length > 0 ) {
+
+                delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+                result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
+                                                                                         params.FilterFields,
+                                                                                         params.logger );
+
+              }
+
+              if ( params.IncludeFields?.length > 0 ) {
+
+                result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
+                                                                                          params.IncludeFields,
+                                                                                          params.logger );
+
+              }
+
+              if ( result[ modelIncluded.model.name ].ExtraData ) {
+
+                let extraData = result[ modelIncluded.model.name ].ExtraData;
+
+                if ( typeof extraData === "string" ) {
+
+                  extraData = CommonUtilities.parseJSON( extraData,
+                                                         params.logger );
+
+                }
+
+                if ( extraData &&
+                     extraData.Private ) {
+
+                  delete extraData.Private;
+
+                }
+
+                if ( !params.KeepExtraData ||
+                     params.KeepExtraData === 0 ) {
+
+                  if ( extraData.Business ) {
+
+                    result[ modelIncluded.model.name ].Business = extraData.Business;
+
+                    delete extraData.Business;
+
+                    if ( extraData ) {
+
+                      result[ modelIncluded.model.name ].Business = { ...result[ modelIncluded.model.name ].Business, ...extraData };
+
+                    }
+
+                  }
+                  else {
+
+                    result[ modelIncluded.model.name ].Business = extraData;
+
+                  }
+
+                  delete result[ modelIncluded.model.name ].ExtraData;
+
+                }
+                else {
+
+                  result[ modelIncluded.model.name ].ExtraData = extraData;
+
+                }
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if ( Array.isArray( params.Exclude ) ) {
+
+          for ( const modelToExcluded of params.Exclude ) {
+
+            if ( modelToExcluded.model &&
+                 result[ modelToExcluded.model.name ] ) {
+
+              delete result[ modelToExcluded.model.name ];
+
+            }
+
+          }
+
+        }
+
+      }
+
+      if ( result.ExtraData ) {
+
+        let extraData = result.ExtraData;
+
+        if ( typeof extraData === "string" ) {
+
+          extraData = CommonUtilities.parseJSON( extraData,
+                                                 params.logger );
+
+        }
+
+        if ( extraData &&
+             extraData.Private ) {
+
+          delete extraData.Private;
+
+        }
+
+        if ( !params.KeepExtraData ||
+             params.KeepExtraData === 0 ) {
+
+          if ( extraData.Business ) {
+
+            result.Business = extraData.Business;
+
+            delete extraData.Business;
+
+            if ( extraData ) {
+
+              result.Business = { ...result.Business, ...extraData };
+
+            }
+
+          }
+          else {
+
+            result.Business = extraData;
+
+          }
+
+          delete result.ExtraData;
+
+        }
+        else {
+
+          result.ExtraData = extraData;
+
+        }
+
+      }
+      else {
+
+        delete result.ExtraData;
+
+        result.Business = {};
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.convertFieldValues.name;
+
+      const strMark = "1DCCC1BE5898" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( params.logger &&
+           typeof params.logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        params.logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  /*
+  static async convertFieldValues( params: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      result = params.Data;
+
+      if ( params.TimeZoneId ) {
+
+        const strTimeZoneId = params.TimeZoneId;
+
+        result = SystemUtilities.transformObjectToTimeZone( params.Data,
+                                                            strTimeZoneId,
+                                                            params.Logger );
+
+        if ( Array.isArray( params.Include ) ) {
+
           for ( const modelToInclude of params.Include ) {
 
             if ( modelToInclude.model &&
@@ -271,6 +488,7 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
     return result;
 
   }
+  */
 
   public getPrimaryKey(): string[] {
 
