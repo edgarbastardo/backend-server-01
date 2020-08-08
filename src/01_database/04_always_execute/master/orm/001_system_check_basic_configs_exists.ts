@@ -454,7 +454,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Establishments#": { //<= Group name
+                                                              "#Establishment#": { //<= This is a tag
 
                                                                 "minLength": 8,
                                                                 "maxLength": 10,
@@ -549,7 +549,7 @@ export default class Always {
                                                                 "userExpireAt": -1,
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
-                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "userSessionsLimit": 0, //Only 1 session at time
                                                                 "passwordParameterTag": ""
 
                                                               },
@@ -569,7 +569,7 @@ export default class Always {
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
                                                                 "userSessionsLimit": 1, //Only 1 session at time
-                                                                "passwordParameterTag": ""
+                                                                "passwordParameterTag": "Establishment"
 
                                                               },
 
