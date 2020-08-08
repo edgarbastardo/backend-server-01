@@ -178,7 +178,7 @@ export default class Always {
 
                                                               },
 
-                                                              //TODO set by role from the user
+                                                              //DONE set by role from the user
                                                               "#Establishment#": {
 
                                                                 kind: 1,
@@ -1100,7 +1100,7 @@ export default class Always {
 
                                                                   },
 
-                                                                  //TODO set by role from the user
+                                                                  //DONE set by role from the user
                                                                   "#Establisment#": {
 
                                                                     "denied": "",
