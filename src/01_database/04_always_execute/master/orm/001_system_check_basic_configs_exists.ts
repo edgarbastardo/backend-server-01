@@ -128,23 +128,66 @@ export default class Always {
       //Insert test data
       const configValueEntries = [
                                    {
-                                     ConfigMetaDataId:SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id, // "9272d39a-4545-40e2-802f-5913998cbb20", //system.authentication.ExpireTimeAuthentication
+                                     ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id, //system.authentication.ExpireTimeAuthentication
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                     //Value: `{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
                                      Value: JSON.stringify(
 
                                                             {
 
                                                               "#System_Administrators#": {
 
-                                                                "kind": 0,
-                                                                "on": 120
+                                                                kind: 0,
+                                                                on: 60 * 2
+
+                                                              },
+
+                                                              "#Business_Managers#": {
+
+                                                                kind: 0,
+                                                                on: 60 * 2
+
+                                                              },
+
+                                                              "#Administrative_Asistants#": {
+
+                                                                kind: 0,
+                                                                on: 60
+
+                                                              },
+
+                                                              "#Dispachers#": {
+
+                                                                kind: 0,
+                                                                on: 60 * 2
+
+                                                              },
+
+                                                              "#Drivers#": {
+
+                                                                kind: 0,
+                                                                on: 60 * 4
+
+                                                              },
+
+                                                              "#Final_Customers#": {
+
+                                                                kind: 1,
+                                                                on: 60 * 24 * 60
+
+                                                              },
+
+                                                              //TODO set by role from the user
+                                                              "#Establishment#": {
+
+                                                                kind: 1,
+                                                                on: 60 * 24 * 60
 
                                                               }
 
                                                             }
 
                                                           ),
-                                            //`{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                    },
                                    {
@@ -174,12 +217,40 @@ export default class Always {
 
                                                               },
 
+                                                              "#Business_Managers#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+
+                                                              "#Administrative_Asistants#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+
+                                                              "#Drivers#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+                                                              /*
+                                                              "#admin01@system.net#": {
+
+                                                                "denied":"",
+                                                                "allowed":"#test#,#other#"
+
+                                                              },
                                                               "@__default__@": {
 
                                                                 "denied": "",
                                                                 "allowed": "*"
 
                                                               }
+                                                              */
 
                                                             }
 
@@ -197,6 +268,34 @@ export default class Always {
 
                                                                 "denied": "#image/png#,#image/jpeg#",
                                                                 "allowed": "*"
+
+                                                              },
+
+                                                              "#System_Administrators#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+
+                                                              "#Business_Managers#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+
+                                                              "#Administrative_Asistants#": {
+
+                                                                "denied":"",
+                                                                "allowed":"*"
+
+                                                              },
+
+                                                              "#Drivers#": {
+
+                                                                "denied":"",
+                                                                "allowed":"#image/png#,#image/jpeg#,#image/jpg#"
 
                                                               },
 
@@ -376,6 +475,38 @@ export default class Always {
                                                                 "maxSymbol": 0,
                                                                 "symbols": ""
 
+                                                              },
+
+                                                              "#Administrative_Asistants#": {  //<= Group name
+
+                                                                "minLength": 5,
+                                                                "maxLength": 8,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
+                                                              },
+
+                                                              "#Dispachers#": {  //<= Group name
+
+                                                                "minLength": 5,
+                                                                "maxLength": 8,
+                                                                "minLowerCase": 0,
+                                                                "maxLowerCase": 0,
+                                                                "minUpperCase": 0,
+                                                                "maxUpperCase": 0,
+                                                                "minDigit": 0,
+                                                                "maxDigit": 0,
+                                                                "minSymbol": 0,
+                                                                "maxSymbol": 0,
+                                                                "symbols": ""
+
                                                               }
 
                                                             }
@@ -458,6 +589,44 @@ export default class Always {
                                                                 "userRole": "#Master_L01#,#Establishment#,#Presence_Working#",  //No need the #Upload_Binary#,#Delete_Binary#,#Update_Binary# because #Master_L01# allow that
                                                                 "userTag": "",
                                                                 "userExpireAt": -1,
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "passwordParameterTag": ""
+
+                                                              },
+
+                                                              "#Administrative_Asistant#": {
+
+                                                                "expireAt": 60,  //Token signup valid time in minutes.
+                                                                "group":"Administrative_Asistants",
+                                                                "createGroup":false,
+                                                                "groupRole":"",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"",
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
+                                                                "userForceChangePassword": 0,
+                                                                "userChangePasswordEvery": 0,
+                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "passwordParameterTag": ""
+
+                                                              },
+
+                                                              "#Dispatcher#": {
+
+                                                                "expireAt": 60,
+                                                                "group":"Dispatchers",
+                                                                "createGroup":false,
+                                                                "groupRole":"",
+                                                                "groupTag":"",
+                                                                "groupExpireAt":-1,
+                                                                "status":1,
+                                                                "userRole":"",
+                                                                "userTag":"",
+                                                                "userExpireAt":-1,
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
                                                                 "userSessionsLimit": 1, //Only 1 session at time
@@ -884,7 +1053,7 @@ export default class Always {
 
                                                                 "config": {
 
-                                                                  "#Drivers#": {
+                                                                  "#Driver#": {
 
                                                                     "resume": {
 
@@ -915,35 +1084,48 @@ export default class Always {
                                                                   "#Business_Managers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Business_Managers#,#Administrators#,#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#Business_Managers#,#Administrators#,#Drivers#,#Drivers_Position#"
 
                                                                   },
 
                                                                   "#System_Administrators#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#System_Administrators#,#Administrators#,#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#System_Administrators#,#Administrators#,#Drivers#,#Drivers_Position#"
 
                                                                   },
 
                                                                   "#Drivers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Drivers#,#Support#"
+                                                                    "allowed": "#Users#,#Drivers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
 
                                                                   },
 
                                                                   "#Dispachers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Drivers#,#DriversPosition#"
+                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
+
+                                                                  },
+                                                                  "#Final_Customers#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Support#"
+
+                                                                  },
+                                                                  //TODO set by role from the user
+                                                                  "#Establisment#": {
+
+                                                                    "denied": "",
+                                                                    "allowed": "#Users#,#Support#"
 
                                                                   },
 
                                                                   "@__default__@": {
 
                                                                     "denied": "",
-                                                                    "allowed": "*"
+                                                                    "allowed": "#Support#"
 
                                                                   }
 

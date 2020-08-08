@@ -29,7 +29,14 @@ export default class BusinessQueries {
       /*
       else if ( strName === "getOldUserSessionStatus" ) {
 
-        strResult = `Update deliveries as a inner join orders as b on a.order_id=b.id Set Tip = ${params.Tip} Where b.establishment_id = '${params.EstablishmentId}' And date(b.created_at) = '${params.Date}' And b.ticket = '${params.Ticket}';`;
+        strResult = SqlString.format( `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ?, a.tip_method='online' Where b.establishment_id = ? And date(b.created_at) = ? And b.ticket = ?`, [ params.Tip, params.EstablishmentId, params.Date, params.Ticket ] );
+
+      }
+      else if ( strName === "getDrivers" ) {
+
+        //Pending
+        strResult = `select b.id, a.first_name, a.last_name, a.phone, a.email as user from users a inner join drivers b on b.user_id = a.id where a.deleted_at is null and a.role = "driver" order by first_name, last_name;`;
+        //strResult = `select a.id, a.first_name, a.last_name, a.phone, a.email as user from users a where a.deleted_at is null and a.role = "driver" order by first_name, last_name;`;
 
       }
       */
