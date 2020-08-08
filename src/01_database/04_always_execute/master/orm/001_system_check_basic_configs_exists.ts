@@ -156,13 +156,6 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {
-
-                                                                kind: 0,
-                                                                on: 60 * 2
-
-                                                              },
-
                                                               "#Drivers#": {
 
                                                                 kind: 0,
@@ -461,7 +454,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Establishments#": { //<= Group name
+                                                              "#Establishment#": { //<= This is a tag
 
                                                                 "minLength": 8,
                                                                 "maxLength": 10,
@@ -478,22 +471,6 @@ export default class Always {
                                                               },
 
                                                               "#Administrative_Asistants#": {  //<= Group name
-
-                                                                "minLength": 5,
-                                                                "maxLength": 8,
-                                                                "minLowerCase": 0,
-                                                                "maxLowerCase": 0,
-                                                                "minUpperCase": 0,
-                                                                "maxUpperCase": 0,
-                                                                "minDigit": 0,
-                                                                "maxDigit": 0,
-                                                                "minSymbol": 0,
-                                                                "maxSymbol": 0,
-                                                                "symbols": ""
-
-                                                              },
-
-                                                              "#Dispachers#": {  //<= Group name
 
                                                                 "minLength": 5,
                                                                 "maxLength": 8,
@@ -572,7 +549,7 @@ export default class Always {
                                                                 "userExpireAt": -1,
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
-                                                                "userSessionsLimit": 1, //Only 1 session at time
+                                                                "userSessionsLimit": 0, //Only 1 session at time
                                                                 "passwordParameterTag": ""
 
                                                               },
@@ -592,7 +569,7 @@ export default class Always {
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
                                                                 "userSessionsLimit": 1, //Only 1 session at time
-                                                                "passwordParameterTag": ""
+                                                                "passwordParameterTag": "Establishment"
 
                                                               },
 
@@ -1083,18 +1060,13 @@ export default class Always {
 
                                                                   },
 
-                                                                  "#Dispachers#": {
-
-                                                                    "denied": "",
-                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
-
-                                                                  },
                                                                   "#Final_Customers#": {
 
                                                                     "denied": "",
                                                                     "allowed": "#Support#"
 
                                                                   },
+
                                                                   //TODO set by role from the user
                                                                   "#Establisment#": {
 
