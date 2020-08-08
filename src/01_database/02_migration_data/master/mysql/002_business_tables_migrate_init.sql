@@ -40,29 +40,6 @@ CREATE TABLE IF NOT EXISTS `bizEstablishment` (
   CONSTRAINT `FK_bizEstablishment_DeliveryZoneId_From_bizDeliveryZone_Id` FOREIGN KEY (`DeliveryZoneId`) REFERENCES `bizDeliveryZone` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Stores establishment.';
 
-CREATE TABLE IF NOT EXISTS `bizOrigin` (
-  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
-  `UserId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table sysUser',
-  `EstablishmentId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table bizEstablisment',
-  `Address` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Physical address',
-  `Latitude` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Latitude coordinate.',
-  `Longitude` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Longitude coordinate.',
-  `Name` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of customer/establisment',
-  `EMail` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Email of customer/establisment',
-  `Phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Phone of customer/establisment',
-  `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
-  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
-  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
-  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
-  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
-  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
-  PRIMARY KEY (`Id`),
-  KEY `FK_bizOrigin_UserId_From_bizUser_Id_idx` (`UserId`),
-  KEY `FK_bizOrigin_EstablishmentId_From_bizEstablishment_Id_idx` (`EstablishmentId`),
-  CONSTRAINT `FK_bizOrigin_UserId_From_bizUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_bizOrigin_EstablishmentId_From_bizEstablishment_Id` FOREIGN KEY (`EstablishmentId`) REFERENCES `bizEstablishment` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of origin point.';
-
 CREATE TABLE IF NOT EXISTS `bizDestination` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `UserId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table sysUser',
