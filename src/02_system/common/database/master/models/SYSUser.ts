@@ -321,6 +321,11 @@ export class SYSUser extends Model<SYSUser> {
                 }
 
               }
+              else {
+
+                delete result[ modelIncluded.model.name ].ExtraData;
+
+              }
 
             }
 

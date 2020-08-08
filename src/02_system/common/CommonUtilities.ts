@@ -709,6 +709,62 @@ export default class CommonUtilities {
 
   }
 
+  static searchFirstFieldFromList( objectToSearch: any,
+                                   fieldList: string[],
+                                   strPrefix: string,
+                                   strPostfix: string,
+                                   logger: any ): any {
+
+    let result = null;
+
+    try {
+
+      if ( objectToSearch && fieldList ) {
+
+        for ( let intIndex = 0; intIndex < fieldList.length; intIndex++ ) {
+
+          if ( objectToSearch[ strPrefix + fieldList[ intIndex ] + strPostfix ] ) {
+
+            result = objectToSearch[ strPrefix + fieldList[ intIndex ] + strPostfix ];
+
+            break;
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.searchFirstFieldFromList.name;
+
+      const strMark = "D3C57914093A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      //error.logId = SystemUtilities.getUUIDv4(); //Circular reference not allowed and not like import the uuid library dependence
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static isInMultiSimpleList( strList1: string,
                               strDivisor: string,
                               strList2: string,

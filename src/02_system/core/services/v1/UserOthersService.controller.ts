@@ -34,8 +34,8 @@ import SYSRoleHasRouteService from "../../../common/database/master/services/SYS
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 
-import { SYSUser } from "../../../common/database/master/models/SYSUser";
 import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
+import { SYSUser } from "../../../common/database/master/models/SYSUser";
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
 const debug = require( "debug" )( "UserOthersServiceController" );
@@ -2154,7 +2154,14 @@ export default class UserOthersServiceController {
                                                                   Data: modelData,
                                                                   FilterFields: 1, //Force to remove fields like password and value
                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                  Include: null, //[ { model: SYSUser } ],
+                                                                  Include: [
+                                                                             {
+                                                                               model: SYSPerson
+                                                                             },
+                                                                             {
+                                                                               model: SYSUserGroup
+                                                                             }
+                                                                           ],
                                                                   Exclude: null, //[ { model: SYSUser } ],
                                                                   Logger: logger,
                                                                   ExtraInfo: {
@@ -3003,7 +3010,14 @@ export default class UserOthersServiceController {
                                                                   Data: currentRow,
                                                                   FilterFields: 1, //Force to remove fields like password and value
                                                                   TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                  Include: null, //[ { model: SYSUser } ],
+                                                                  Include: [
+                                                                             {
+                                                                               model: SYSPerson
+                                                                             },
+                                                                             {
+                                                                               model: SYSUserGroup
+                                                                             }
+                                                                           ],
                                                                   Exclude: null, //[ { model: SYSUser } ],
                                                                   Logger: logger,
                                                                   ExtraInfo: {
