@@ -163,10 +163,6 @@ export default class SYSRoleHasRouteService extends BaseService {
         result = jsonConfigValue[ "#" + strFrontendIdWithWildcard + "#" ].route;
 
       }
-      else if ( jsonConfigValue[ "#" + strFrontendId + "#" ] ) {
-
-
-      }
       else if ( jsonConfigValue[ "@__default__@" ] ) {
 
         result = jsonConfigValue[ "@__default__@" ].route;
