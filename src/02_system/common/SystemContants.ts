@@ -2403,7 +2403,7 @@ export default class SystemConstants {
                                                                                "user_login_control": {
 
                                                                                  "denied": "",
-                                                                                 "allowed": "#Final_Customers_01#,#Administrator#"
+                                                                                 "allowed": "#Final_Customers#,#Administrator#"
 
                                                                                },
 
@@ -3021,7 +3021,6 @@ export default class SystemConstants {
                                             };
 
   static readonly _CONFIG_METADATA_ENTRIES = [
-                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication,
                                                SystemConstants._CONFIG_ENTRY_PasswordStrengthParameters,
                                                SystemConstants._CONFIG_ENTRY_BinaryDataBasePath,
@@ -3037,6 +3036,7 @@ export default class SystemConstants {
                                                SystemConstants._CONFIG_ENTRY_SMS_Service,
                                                SystemConstants._CONFIG_ENTRY_PUSH_Service,
                                                SystemConstants._CONFIG_ENTRY_DISCORD_Service,
+                                               SystemConstants._CONFIG_ENTRY_SLACK_Service,
                                                SystemConstants._CONFIG_ENTRY_Frontend_Rules,
                                                SystemConstants._CONFIG_ENTRY_General_Default_Information,
                                                SystemConstants._CONFIG_ENTRY_MAP_GEOCODE_Service,

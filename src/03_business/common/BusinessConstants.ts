@@ -15,7 +15,7 @@ export default class BusinessConstants {
   //                                               Description: "Configuration for the notification sms system",
   //                                               AllowTagAccessR: "#Administrator#",
   //                                               AllowTagAccessW: "#Administrator#",
-  //                                               Example: '{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }',
+  //                                               Example: "{ "service": "#sms_gateway#", "#sms_gateway#": { "type": "sms_gateway", "server": "https://domain.com/backend-sms-gateway", "port": "443", "auth": { "api_key": "my_key" } } }",
   //                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
   //                                               ExtraData: `{ "Type": "struct/json", "Schema": "" }`
   //                                             };
