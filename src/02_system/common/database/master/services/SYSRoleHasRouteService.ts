@@ -144,11 +144,12 @@ export default class SYSRoleHasRouteService extends BaseService {
       let jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                        logger );
 
-      let strFrontendIdWildcard = strFrontendId;
+      let strFrontendIdWithWildcard = strFrontendId;
 
-      if ( strFrontendIdWildcard.includes( "-[" ) ) {
+      if ( strFrontendIdWithWildcard?.includes( "-[" ) ) {
 
-        strFrontendIdWildcard = strFrontendIdWildcard.replace( "/\-\[(.*?)\]/", "" );
+        //kk-fl-miami-app-mobile-driver-rn-[0.0.9] => kk-fl-miami-app-mobile-driver-rn-[*]
+        strFrontendIdWithWildcard = strFrontendIdWithWildcard.replace( "/\-\[(.*?)\]/", "-[*]" );
 
       }
 
@@ -157,9 +158,9 @@ export default class SYSRoleHasRouteService extends BaseService {
         result = jsonConfigValue[ "#" + strFrontendId + "#" ].route;
 
       }
-      else if ( jsonConfigValue[ "#" + strFrontendIdWildcard + "-[*]#" ] ) {
+      else if ( jsonConfigValue[ "#" + strFrontendIdWithWildcard + "#" ] ) {
 
-        result = jsonConfigValue[ "#" + strFrontendIdWildcard + "-[*]#" ].route;
+        result = jsonConfigValue[ "#" + strFrontendIdWithWildcard + "#" ].route;
 
       }
       else if ( jsonConfigValue[ "#" + strFrontendId + "#" ] ) {
