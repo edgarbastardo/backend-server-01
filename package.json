@@ -1,5 +1,5 @@
 {
-  "name": "odin-v2",
+  "name": "odin-v1",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -145,7 +145,7 @@
     "ssh2-sftp-client": "^4.3.0",
     "ts-jest": "^25.3.0",
     "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
+    "typescript": "^3.9.6"
   },
   "jest": {
     "testEnvironment": "node"

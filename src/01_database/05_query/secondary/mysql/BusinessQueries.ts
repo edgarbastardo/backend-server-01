@@ -13,6 +13,7 @@ export default class BusinessQueries {
 
     //Here the common business queries
 
+    /*
     if ( strDialect === "mysql" ) {
 
       if ( strName === "getEstablishments" ) {
@@ -36,7 +37,7 @@ export default class BusinessQueries {
         strResult = `select b.id, first_name,phone, a.email as user, address, zone, b.email as email, b.email1 as additionalemail, b.driversfijos as onsite from users as a inner join establishments as b on a.id=b.user_id where b.driversfijos = 2 and a.deleted_at is null order by first_name;`;
 
       }
-      */
+      * /
       else if ( strName === "updateOrderTip" ) {
 
         strResult = SqlString.format( `Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = ?, a.tip_method='online' Where b.establishment_id = ? And date(b.created_at) = ? And b.ticket = ?`, [ params.Tip, params.EstablishmentId, params.Date, params.Ticket ] );
@@ -51,6 +52,7 @@ export default class BusinessQueries {
       }
 
     }
+    */
 
     return strResult;
 

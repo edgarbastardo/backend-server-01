@@ -129,7 +129,6 @@ export default class Always {
       const configValueEntries = [
 
                                    {
-
                                      ConfigMetaDataId: SystemConstants._CONFIG_ENTRY_ExpireTimeAuthentication.Id, //system.authentication.ExpireTimeAuthentication
                                      Owner: SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
                                      //Value: `{ "#System_Administrators#": { "kind": 0, "on": 120 } }`,
@@ -158,7 +157,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {
+                                                              "#Dispatchers#": {
 
                                                                 kind: 0,
                                                                 on: 60 * 2
@@ -277,28 +276,29 @@ export default class Always {
 
                                                               "#System_Administrators#": {
 
-                                                                "denied": "",
-                                                                "allowed": "*"
+                                                                "denied":"",
+                                                                "allowed":"*"
 
                                                               },
 
                                                               "#Business_Managers#": {
 
-                                                                "denied": "",
-                                                                "allowed": "*"
+                                                                "denied":"",
+                                                                "allowed":"*"
 
                                                               },
 
                                                               "#Administrative_Asistants#": {
 
-                                                                "denied": "",
-                                                                "allowed": "*"
+                                                                "denied":"",
+                                                                "allowed":"*"
+
                                                               },
 
                                                               "#Drivers#": {
 
-                                                                "denied": "",
-                                                                "allowed": "#image/png#,#image/jpeg#,#image/jpg#"
+                                                                "denied":"",
+                                                                "allowed":"#image/png#,#image/jpeg#,#image/jpg#"
 
                                                               },
 
@@ -480,7 +480,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Administrative_Asistants#": { //<= Group name
+                                                              "#Administrative_Asistants#": {  //<= Group name
 
                                                                 "minLength": 5,
                                                                 "maxLength": 8,
@@ -496,7 +496,7 @@ export default class Always {
 
                                                               },
 
-                                                              "#Dispachers#": {  //<= Group name
+                                                              "#Dispatchers#": {  //<= Group name
 
                                                                 "minLength": 5,
                                                                 "maxLength": 8,
@@ -509,6 +509,7 @@ export default class Always {
                                                                 "minSymbol": 0,
                                                                 "maxSymbol": 0,
                                                                 "symbols": ""
+
                                                               }
 
                                                             }
@@ -612,7 +613,7 @@ export default class Always {
                                                                 "userExpireAt":-1,
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
-                                                                "userSessionsLimit": 0, //Only 1 session at time
+                                                                "userSessionsLimit": 1, //Only 1 session at time
                                                                 "passwordParameterTag": ""
 
                                                               },
@@ -1085,10 +1086,10 @@ export default class Always {
 
                                                                   },
 
-                                                                  "#Dispachers#": {
+                                                                  "#Dispatchers#": {
 
                                                                     "denied": "",
-                                                                    "allowed": "#Users#,#Dispachers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
+                                                                    "allowed": "#Users#,#Dispatchers#,#Drivers_Position#,#Delivery_Orders#,#Support#"
 
                                                                   },
 

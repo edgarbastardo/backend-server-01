@@ -1546,7 +1546,7 @@ export default class SystemConstants {
                                                                                    "userSessionsLimit": 1,
                                                                                    "passwordParameterTag": "#Establishment#"
 
-                                                                                 },
+                                                                                 }
 
                                                                                }
 
@@ -2403,7 +2403,7 @@ export default class SystemConstants {
                                                                                "user_login_control": {
 
                                                                                  "denied": "",
-                                                                                 "allowed": "#Final_Customer#,#Administrator#"
+                                                                                 "allowed": "#Final_Customers#,#Administrator#"
 
                                                                                },
 
@@ -2480,7 +2480,7 @@ export default class SystemConstants {
                                                                                "user_login_control": {
 
                                                                                  "denied": "",
-                                                                                 "allowed": "#Dispachers#,#Administrator#"
+                                                                                 "allowed": "#Dispatchers#,#Administrator#"
 
                                                                                },
 
