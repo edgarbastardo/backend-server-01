@@ -34,7 +34,9 @@ import InstantMessageServerManager from "../../../common/managers/InstantMessage
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
+import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
 import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
 const debug = require( "debug" )( "SecurityServiceController" );
 
@@ -810,7 +812,14 @@ export default class SecurityServiceController {
                                                                Data: userDataResponse,
                                                                FilterFields: 1, //Force to remove fields like password and value
                                                                TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                               Include: null, //[ { model: SYSUser } ],
+                                                               Include: [
+                                                                          {
+                                                                            model: SYSPerson
+                                                                          },
+                                                                          {
+                                                                            model: SYSUserGroup
+                                                                          }
+                                                                        ],
                                                                Exclude: null, //[ { model: SYSUser } ],
                                                                Logger: logger,
                                                                ExtraInfo: {
@@ -2123,7 +2132,7 @@ export default class SecurityServiceController {
 
             const warnings = [];
 
-            //FIXME 40E1487688CC Disconnect from remote server
+            //DONE 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
             await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                   null,

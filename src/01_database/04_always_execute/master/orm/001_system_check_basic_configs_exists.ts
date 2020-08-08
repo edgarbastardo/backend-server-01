@@ -170,7 +170,6 @@ export default class Always {
 
                                                               },
 
-                                                              //TODO set by role from the user
                                                               "#Establishment#": {
 
                                                                 kind: 1,
