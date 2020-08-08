@@ -231,7 +231,6 @@ export default class Dev007DeliveryZoneController {
 
   }
 
-
   @httpDelete(
                "/bulk",
                MiddlewareManager.middlewareSetContext,
