@@ -144,9 +144,26 @@ export default class SYSRoleHasRouteService extends BaseService {
       let jsonConfigValue = CommonUtilities.parseJSON( configData.Value,
                                                        logger );
 
+      let strFrontendIdWildcard = strFrontendId;
+
+      if ( strFrontendIdWildcard.includes( "-[" ) ) {
+
+        strFrontendIdWildcard = strFrontendIdWildcard.replace( "/\-\[(.*?)\]/", "" );
+
+      }
+
       if ( jsonConfigValue[ "#" + strFrontendId + "#" ] ) {
 
         result = jsonConfigValue[ "#" + strFrontendId + "#" ].route;
+
+      }
+      else if ( jsonConfigValue[ "#" + strFrontendIdWildcard + "-[*]#" ] ) {
+
+        result = jsonConfigValue[ "#" + strFrontendIdWildcard + "-[*]#" ].route;
+
+      }
+      else if ( jsonConfigValue[ "#" + strFrontendId + "#" ] ) {
+
 
       }
       else if ( jsonConfigValue[ "@__default__@" ] ) {
