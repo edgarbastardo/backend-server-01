@@ -5223,19 +5223,19 @@ export default class BinaryServiceController extends BaseService {
 
                         fs.writeFileSync( strFullPath + sysBinaryIndexInDB.Id + "." + fileDetectedType.ext + ".meta.json", JSON.stringify( modelData, null, 2 ) );
 
-                        const tempModelData = await SYSUser.convertFieldValues(
-                                                                                {
-                                                                                  Data: modelData,
-                                                                                  FilterFields: 1, //Force to remove fields like password and value
-                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                                  Include: null, //[ { model: SYSUser } ],
-                                                                                  Exclude: null, //[ { model: SYSUser } ],
-                                                                                  Logger: logger,
-                                                                                  ExtraInfo: {
-                                                                                               Request: request
-                                                                                             }
-                                                                                }
-                                                                              );
+                        const tempModelData = await SYSBinaryIndex.convertFieldValues(
+                                                                                       {
+                                                                                         Data: modelData,
+                                                                                         FilterFields: 1, //Force to remove fields like password and value
+                                                                                         TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                         Include: null, //[ { model: SYSUser } ],
+                                                                                         Exclude: null, //[ { model: SYSUser } ],
+                                                                                         Logger: logger,
+                                                                                         ExtraInfo: {
+                                                                                                      Request: request
+                                                                                                    }
+                                                                                       }
+                                                                                     );
 
                         if ( tempModelData ) {
 
