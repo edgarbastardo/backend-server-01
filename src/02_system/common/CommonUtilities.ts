@@ -547,6 +547,54 @@ export default class CommonUtilities {
 
   }
 
+  static includeObjectFields( dataObject: any, fieldNamesToInclude: string[], logger: any ): any {
+
+    let result = dataObject;
+
+    try {
+
+      if ( CommonUtilities.isNotNullOrEmpty( dataObject ) ) {
+
+        result = {}; //Object.assign( {}, dataObject );
+
+        fieldNamesToInclude.forEach( ( strFieldName: string, intIndex: number ) => {
+
+          result[ strFieldName ] = dataObject[ strFieldName ];
+
+        } );
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.includeObjectFields.name;
+
+      const strMark = "2C4BEF13D2F7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      //error.logId = SystemUtilities.getUUIDv4(); //Circular reference not allowed and not like import the uuid library dependence
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   static parseJSON( strJSONToParse: string, logger: any ): any {
 
     let result = {}; //Safe empty object

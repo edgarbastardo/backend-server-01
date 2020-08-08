@@ -3,7 +3,7 @@
 //import CommonUtilities from "../../02_system/common/CommonUtilities";
 //import SystemUtilities from "../../02_system/common/SystemUtilities";
 
-const debug = require( 'debug' )( 'BusinessUtilities' );
+const debug = require( "debug" )( "BusinessUtilities" );
 
 export default class BusinessUtilities {
 

@@ -407,7 +407,7 @@ export default class App {
       intPort,
       async () => {
 
-        let debugMark = debug.extend( "182DD8473CBE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+        //let debugMark = debug.extend( "182DD8473CBE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
         debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
         debugMark( `Main process running on *:%d%s`, intPort, process.env.SERVER_ROOT_PATH );
@@ -825,6 +825,24 @@ export default class App {
                                                                                                    LoggerManager.mainLoggerInstance );
 
       }
+
+      /*
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+      //And DATE( b.created_at ) = '2020-06-22'
+      // const strSQL = "Update deliveries as a inner join orders as b on a.order_id=b.id Set a.tip = 10.10 Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";  And DATE( b.created_at ) = ?
+      const strSQL = "Select a.tip, b.ticket, b.created_at From deliveries as a inner join orders as b on a.order_id=b.id Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";
+      //const strSQL = "Select NOW()";
+
+      const rows = await dbConnection.query( strSQL, {
+                                                      raw: true,
+                                                      type: QueryTypes.SELECT,
+                                                      transaction: null,
+                                                      //replacements: [ new Date( 2020, 6, 22 ) ]
+                                                    } );
+
+      debugMark( rows );
+      */
 
       if ( resourceLocked !== null ) {
 
