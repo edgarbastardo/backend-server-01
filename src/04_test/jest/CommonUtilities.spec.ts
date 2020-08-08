@@ -165,3 +165,229 @@ test( `Test isValidDateInFormat01 004`, async () => {
   expect( bResult ).toEqual( false );
 
 });
+
+test( `Test searchFirstFieldFromList( 001`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "#Hello1#,#Field01#,#Hello2#".split( "," ),
+                                                           "", //Prefix
+                                                           "", //Postfix
+                                                           null );
+
+  expect( result.Data01 === "test01" ).toBe( true );
+
+});
+
+test( `Test searchFirstFieldFromList( 001`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "#Hello1#,#Hello2#".split( "," ),
+                                                           "", //Prefix
+                                                           "", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});
+
+test( `Test searchFirstFieldFromList( 003`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "#Hello1#,#Field01#,#Hello2#".split( "," ),
+                                                           "#", //Prefix
+                                                           "", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});
+
+
+test( `Test searchFirstFieldFromList( 004`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "#Hello1#,#Field01#,#Hello2#".split( "," ),
+                                                           "", //Prefix
+                                                           "#", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});
+
+test( `Test searchFirstFieldFromList( 005`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "#Hello1#,#Field01#,#Hello2#".split( "," ),
+                                                           "#", //Prefix
+                                                           "#", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});
+
+test( `Test searchFirstFieldFromList( 006`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           "Hello1,Field01,Hello2".split( "," ),
+                                                           "#", //Prefix
+                                                           "#", //Postfix
+                                                           null );
+
+  expect( result.Data01 === "test01" ).toBe( true );
+
+});
+
+test( `Test searchFirstFieldFromList( 007`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( objectToSearch,
+                                                           null,
+                                                           "#", //Prefix
+                                                           "#", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});
+
+
+test( `Test searchFirstFieldFromList( 007`, async () => {
+
+  const objectToSearch = {
+
+    "#Field01#": {
+
+      "Data01": "test01"
+
+    },
+
+    "#Field02#": {
+
+      "Data02": "test02"
+
+    }
+
+  }
+
+  const result = CommonUtilities.searchFirstFieldFromList( null,
+                                                           null,
+                                                           "#", //Prefix
+                                                           "#", //Postfix
+                                                           null );
+
+  expect( !result ).toBe( true );
+
+});

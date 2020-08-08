@@ -34,7 +34,9 @@ import InstantMessageServerManager from "../../../common/managers/InstantMessage
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
 
+import { SYSPerson } from "../../../common/database/master/models/SYSPerson";
 import { SYSUser } from "../../../common/database/master/models/SYSUser";
+import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 
 const debug = require( "debug" )( "SecurityServiceController" );
 
@@ -60,8 +62,11 @@ export default class SecurityServiceController {
 
   static async getConfigExpireTimeAuthentication( strGroupId: string,
                                                   strGroupName: string,
+                                                  strGroupTag: string,
                                                   strOperatorId: string,
                                                   strOperatorName: string,
+                                                  strOperatorTag: string,
+                                                  strRoles: string,
                                                   transaction: any,
                                                   logger: any ): Promise<any> {
 
@@ -93,25 +98,88 @@ export default class SecurityServiceController {
           bSet = true;
 
         }
-        else if ( jsonConfigValue[ "#" + strGroupId + "#" ] ) {
+        else { //} if ( jsonConfigValue[ "#" + strOperatorTag + "#" ] ) {
 
-          result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
-          bSet = true;
+           const jsonConfigValueByTag = CommonUtilities.searchFirstFieldFromList( jsonConfigValue,
+                                                                                  strOperatorTag ? strOperatorTag.split( "," ): [],
+                                                                                  "",
+                                                                                  "",
+                                                                                   logger );
+
+          if ( jsonConfigValueByTag.kind &&
+               jsonConfigValueByTag.on ) {
+
+            result.kind = jsonConfigValueByTag.kind;
+            result.on = jsonConfigValueByTag.on;
+            bSet = true;
+
+          }
 
         }
-        else if ( jsonConfigValue[ "#" + strGroupName + "#" ] ) {
 
-          result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
-          result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
-          bSet = true;
+        if ( bSet === false ) {
 
-        }
-        else if ( jsonConfigValue[ "@__default__@" ] ) {
+          if ( jsonConfigValue[ "#" + strGroupId + "#" ] ) {
 
-          result.kind = jsonConfigValue[ "@__default__@" ].kind;
-          result.on = jsonConfigValue[ "@__default__@" ].on;
-          bSet = true;
+            result.kind = jsonConfigValue[ "#" + strGroupId + "#" ].kind;
+            result.on = jsonConfigValue[ "#" + strGroupId + "#" ].on;
+            bSet = true;
+
+          }
+          else if ( jsonConfigValue[ "#" + strGroupName + "#" ] ) {
+
+            result.kind = jsonConfigValue[ "#" + strGroupName + "#" ].kind;
+            result.on = jsonConfigValue[ "#" + strGroupName + "#" ].on;
+            bSet = true;
+
+          }
+          else { //} if ( jsonConfigValue[ "#" + strGroupTag + "#" ] ) {
+
+            const jsonConfigValueByTag =  CommonUtilities.searchFirstFieldFromList( jsonConfigValue,
+                                                                                    strGroupTag ? strGroupTag.split( "," ): [],
+                                                                                    "",
+                                                                                    "",
+                                                                                    logger );
+
+            if ( jsonConfigValueByTag?.kind &&
+                 jsonConfigValueByTag?.on ) {
+
+              result.kind = jsonConfigValueByTag.kind;
+              result.on = jsonConfigValueByTag.on;
+              bSet = true;
+
+            }
+
+          }
+
+          if ( bSet === false ) {
+
+            //Look by the role
+            const jsonConfigValueByRole =  CommonUtilities.searchFirstFieldFromList( jsonConfigValue,
+                                                                                     strRoles ? strRoles.split( "," ): [],
+                                                                                     "",
+                                                                                     "",
+                                                                                     logger );
+
+            if ( jsonConfigValueByRole?.kind &&
+                 jsonConfigValueByRole?.on ) {
+
+              result.kind = jsonConfigValueByRole.kind;
+              result.on = jsonConfigValueByRole.on;
+              bSet = true;
+
+            }
+
+            if ( bSet === false &&
+                 jsonConfigValue[ "@__default__@" ] ) {
+
+              result.kind = jsonConfigValue[ "@__default__@" ].kind;
+              result.on = jsonConfigValue[ "@__default__@" ].on;
+              bSet = true;
+
+            }
+
+          }
 
         }
 
@@ -744,7 +812,14 @@ export default class SecurityServiceController {
                                                                Data: userDataResponse,
                                                                FilterFields: 1, //Force to remove fields like password and value
                                                                TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                               Include: null, //[ { model: SYSUser } ],
+                                                               Include: [
+                                                                          {
+                                                                            model: SYSPerson
+                                                                          },
+                                                                          {
+                                                                            model: SYSUserGroup
+                                                                          }
+                                                                        ],
                                                                Exclude: null, //[ { model: SYSUser } ],
                                                                Logger: logger,
                                                                ExtraInfo: {
@@ -815,10 +890,55 @@ export default class SecurityServiceController {
         }
         */
 
+        const strRolesMerged = SystemUtilities.mergeTokens( strGroupRoles,
+                                                            strUserRoles,
+                                                            true,
+                                                            logger );
+
+        let strBasicRoles = "";
+
+        if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
+
+          if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Authenticated#";
+
+          }
+          else {
+
+            strBasicRoles = "#Authenticated#";
+
+          }
+
+        }
+
+        if ( strRolesMerged.includes( "#Public#" ) === false ) {
+
+          if ( strBasicRoles.length > 0 ) {
+
+            strBasicRoles = strBasicRoles + ",#Public#";
+
+          }
+          else if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Public#";
+
+          }
+          else {
+
+            strBasicRoles = "#Public#";
+
+          }
+
+        }
+
         const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( sysUserInDB.sysUserGroup.Id,
                                                                                               sysUserInDB.sysUserGroup.Name,
+                                                                                              sysUserInDB.sysUserGroup.Tag,
                                                                                               sysUserInDB.Id,
                                                                                               sysUserInDB.Name,
+                                                                                              sysUserInDB.Tag,
+                                                                                              strRolesMerged + strBasicRoles,
                                                                                               transaction,
                                                                                               logger );
 
@@ -857,48 +977,6 @@ export default class SecurityServiceController {
               configData.hardLimit = expireAt; //Copy value from ExpireAt to HardLimit
 
             }
-
-          }
-
-        }
-
-        const strRolesMerged = SystemUtilities.mergeTokens( strGroupRoles,
-                                                            strUserRoles,
-                                                            true,
-                                                            logger );
-
-        let strBasicRoles = "";
-
-        if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
-
-          if ( strRolesMerged.length > 0 ) {
-
-            strBasicRoles = ",#Authenticated#";
-
-          }
-          else {
-
-            strBasicRoles = "#Authenticated#";
-
-          }
-
-        }
-
-        if ( strRolesMerged.includes( "#Public#" ) === false ) {
-
-          if ( strBasicRoles.length > 0 ) {
-
-            strBasicRoles = strBasicRoles + ",#Public#";
-
-          }
-          else if ( strRolesMerged.length > 0 ) {
-
-            strBasicRoles = ",#Public#";
-
-          }
-          else {
-
-            strBasicRoles = "#Public#";
 
           }
 
@@ -2054,7 +2132,7 @@ export default class SecurityServiceController {
 
             const warnings = [];
 
-            //FIXME 40E1487688CC Disconnect from remote server
+            //DONE 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
             await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                   null,
