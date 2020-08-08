@@ -312,7 +312,21 @@ export default class SYSConfigValueDataService extends BaseService {
 
               if ( searchConfigData === null ) {
 
-                jsonConfig = jsonConfig[ "@__default__@" ];
+                searchConfigData = SYSConfigValueDataService.searchInTags( jsonConfig,
+                                                                           userSessionStatus.Role,
+                                                                           strPostfix,
+                                                                           logger );
+
+                if ( searchConfigData === null ) {
+
+                  jsonConfig = jsonConfig[ "@__default__@" ];
+
+                }
+                else {
+
+                  jsonConfig = searchConfigData;
+
+                }
 
               }
               else {

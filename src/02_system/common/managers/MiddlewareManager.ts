@@ -610,7 +610,7 @@ export default class MiddlewareManager {
         if ( strSavedSocketToken &&
              !( request as any ).notDisconnectFromIMServer ) {
 
-          //FIXME 40E1487688CC Disconnect from remote server
+          //DONE 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
           await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                 null,
@@ -672,7 +672,7 @@ export default class MiddlewareManager {
           if ( strSavedSocketToken &&
                !( request as any ).notDisconnectFromIMServer ) {
 
-            //FIXME 40E1487688CC Disconnect from remote server
+            //DONE 40E1487688CC Disconnect from remote server
             //Send to instant message server a message to disconnect this user
             await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                   null,
@@ -712,7 +712,7 @@ export default class MiddlewareManager {
         if ( strSavedSocketToken &&
             !( request as any ).notDisconnectFromIMServer ) {
 
-          //FIXME 40E1487688CC Disconnect from remote server
+          //DONE 40E1487688CC Disconnect from remote server
           //Send to instant message server a message to disconnect this user
           await InstantMessageServerManager.disconnectFromInstantMessageServer( strSavedSocketToken,
                                                                                 null,
