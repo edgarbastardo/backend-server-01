@@ -539,7 +539,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
         if ( InstantMessageServerManager.currentIMInstance?.connected ) {
 
-          let lockUpdate = CacheManager.getData( "Driver_Position_Last_Update", logger ); //Auto deleted every 5 seconds
+          let lockUpdate = await CacheManager.getData( "Driver_Position_Last_Update", logger ); //Auto deleted every 5 seconds
 
           if ( !lockUpdate ) {
 
@@ -550,7 +550,7 @@ export default class Dev007DriverServicesController extends BaseService {
               //We need write the shared resource and going to block temporally the write access, and prevent from extend the TTL of the entry
               lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
                                                                 "Driver_Position:2FF24364A156@lock",
-                                                                5 * 1000, //3 seconds
+                                                                2 * 1000, //2 seconds
                                                                 1, //Only one try
                                                                 1000, //1 Seconds
                                                                 logger );
@@ -559,10 +559,11 @@ export default class Dev007DriverServicesController extends BaseService {
 
                 await CacheManager.setDataWithTTL( "Driver_Position_Last_Update",
                                                    SystemUtilities.getCurrentDateAndTime().format(),
-                                                   5, //5 seconds
-                                                   logger ); //Every 5 seconds is deleted from redis
+                                                   2, //2 seconds
+                                                   logger ); //Every 2 seconds is deleted from redis
 
                 InstantMessageServerManager.currentIMInstance?.emit(
+                                                                     "Command:SendMessage",
                                                                      {
                                                                        Auth: InstantMessageServerManager.strAuthToken,
                                                                        Channels: "Drivers_Position",
@@ -614,7 +615,7 @@ export default class Dev007DriverServicesController extends BaseService {
             if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) {
 
               await CacheManager.unlockResource( lockedResource,
-                                                logger );
+                                                 logger );
 
             }
 
