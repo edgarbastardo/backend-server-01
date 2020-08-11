@@ -62,7 +62,7 @@ export default class InstantMessageServerManager {
 
           InstantMessageServerManager.strAuthToken = configData?.auth?.api_key;
 
-          InstantMessageServerManager.strAuthToken = configData?.auth?.apiKey;
+          //InstantMessageServerManager.strAuthToken = configData?.auth?.apiKey;
 
           if ( callbacks?.connect ) {
 
