@@ -219,22 +219,22 @@ export default class Always {
 
                                                               "#Business_Managers#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
 
                                                               "#Administrative_Asistants#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
 
                                                               "#Drivers#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
                                                               /*
@@ -273,29 +273,29 @@ export default class Always {
 
                                                               "#System_Administrators#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
 
                                                               "#Business_Managers#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
 
                                                               "#Administrative_Asistants#": {
 
-                                                                "denied":"",
-                                                                "allowed":"*"
+                                                                "denied": "",
+                                                                "allowed": "*"
 
                                                               },
 
                                                               "#Drivers#": {
 
-                                                                "denied":"",
-                                                                "allowed":"#image/png#,#image/jpeg#,#image/jpg#"
+                                                                "denied": "",
+                                                                "allowed": "#image/png#,#image/jpeg#,#image/jpg#"
 
                                                               },
 
@@ -599,15 +599,15 @@ export default class Always {
                                                               "#Administrative_Asistant#": {
 
                                                                 "expireAt": 60,  //Token signup valid time in minutes.
-                                                                "group":"Administrative_Asistants",
-                                                                "createGroup":false,
+                                                                "group": "Administrative_Asistants",
+                                                                "createGroup": false,
                                                                 "groupRole":"",
-                                                                "groupTag":"",
-                                                                "groupExpireAt":-1,
-                                                                "status":1,
-                                                                "userRole":"",
-                                                                "userTag":"",
-                                                                "userExpireAt":-1,
+                                                                "groupTag": "",
+                                                                "groupExpireAt": -1,
+                                                                "status": 1,
+                                                                "userRole": "",
+                                                                "userTag": "",
+                                                                "userExpireAt": -1,
                                                                 "userForceChangePassword": 0,
                                                                 "userChangePasswordEvery": 0,
                                                                 "userSessionsLimit": 1, //Only 1 session at time
@@ -944,7 +944,7 @@ export default class Always {
 
                                                                 "auth": {
 
-                                                                  "api_key":process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
+                                                                  "api_key": process.env.MAP_GEOCODE_GOOGLE_API_KEY || ""
 
                                                                 }
 
@@ -972,7 +972,7 @@ export default class Always {
 
                                                                 "auth": {
 
-                                                                  "api_key":process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
+                                                                  "api_key": process.env.MAP_DISTANCE_GOOGLE_API_KEY || ""
 
                                                                 }
 
@@ -1010,7 +1010,7 @@ export default class Always {
 
                                                             {
 
-                                                              "service":"#im_server_01#",
+                                                              "service": "#im_server_01#",
 
                                                               "#im_server_01#": {
 
