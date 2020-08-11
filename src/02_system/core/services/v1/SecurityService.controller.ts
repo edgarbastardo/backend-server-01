@@ -106,8 +106,8 @@ export default class SecurityServiceController {
                                                                                   "",
                                                                                    logger );
 
-          if ( jsonConfigValueByTag.kind &&
-               jsonConfigValueByTag.on ) {
+          if ( jsonConfigValueByTag?.kind &&
+               jsonConfigValueByTag?.on ) {
 
             result.kind = jsonConfigValueByTag.kind;
             result.on = jsonConfigValueByTag.on;
