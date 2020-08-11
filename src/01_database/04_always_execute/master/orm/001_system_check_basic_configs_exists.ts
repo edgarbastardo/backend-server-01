@@ -997,7 +997,7 @@ export default class Always {
 
                                                                 "host_live_path": process.env.INSTANT_MESSAGE_SERVER_SOCKET_LIVE_PATH || "",
 
-                                                                "workers": process.env.INSTANT_MESSAGE_SERVER_WORKERS || 1,
+                                                                "workers": process.env.INSTANT_MESSAGE_SERVER_WORKERS || "",
 
                                                                 "auth": {
 
