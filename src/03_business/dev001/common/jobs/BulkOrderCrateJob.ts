@@ -64,7 +64,7 @@ export default class BulkOrderCreateJob {
                                                                      },
                                                                      {
                                                                        title: "Application",
-                                                                       value: process.env.APP_SERVER_DATA_NAME,
+                                                                       value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
                                                                        short: false
                                                                      },
                                                                      {
