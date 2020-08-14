@@ -8,7 +8,7 @@ import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '005_migrate_02' );
+const debug = require( 'debug' )( '006_migrate_03' );
 
 //Example file migrate files using code
 export default class Migrate {

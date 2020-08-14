@@ -19,3 +19,6 @@
 -- drop table bizOrderTransaction;
 -- drop table bizPaymentMethod;
 -- drop table bizShoppingCart;
+drop table bizDriverInDeliveryZone;
+drop table bizDriverStatus;
+delete from sysDBMigratedData where FileName = "002_business_tables_migrate_init.sql";

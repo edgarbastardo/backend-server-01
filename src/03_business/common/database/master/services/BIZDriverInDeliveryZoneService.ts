@@ -49,9 +49,9 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
       const options = {
 
         where: {
-                 "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId: "",
                  "DeliveryZoneId": createOrUpdateData.DeliveryZoneId ? createOrUpdateData.DeliveryZoneId: "",
-                 "AtDate": createOrUpdateData.AtDate ? createOrUpdateData.AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
+                 "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId: "",
+                 "StartAt": createOrUpdateData.StartAt ? createOrUpdateData.StartAt: SystemUtilities.getCurrentDateAndTime().format()
                },
         transaction: currentTransaction,
         include: [
@@ -148,10 +148,11 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
   }
 
-  static async getByUserId( strUserId: string,
-                            strAtDate: string,
-                            transaction: any,
-                            logger: any ): Promise<BIZDriverInDeliveryZone> {
+  static async getDeliveryZone( strDeliveryZoneId: string,
+                                strUserId: string,
+                                strStartAt: string,
+                                transaction: any,
+                                logger: any ): Promise<BIZDriverInDeliveryZone> {
 
     let result = null;
 
@@ -174,8 +175,9 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
       const options = {
 
         where: {
+                 "DeliveryZoneId": strDeliveryZoneId ? strDeliveryZoneId: "",
                  "UserId": strUserId ? strUserId: "",
-                 "AtDate": strAtDate ? strAtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
+                 "StartAt": strStartAt ? strStartAt: SystemUtilities.getCurrentDateAndTime().format()
                },
         transaction: currentTransaction,
         include: [
@@ -206,7 +208,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getByUserId.name;
+      sourcePosition.method = this.name + "." + this.getDeliveryZone.name;
 
       const strMark = "905C0A28C597" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -250,7 +252,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
   }
 
   static async getByDeliveryZoneId( strDeliveryZoneId: string,
-                                    strAtDate: string,
+                                    strStartAt: string,
                                     transaction: any,
                                     logger: any ): Promise<BIZDriverInDeliveryZone> {
 
@@ -276,7 +278,7 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
 
         where: {
                  "DeliveryZoneId": strDeliveryZoneId ? strDeliveryZoneId : "",
-                 "AtDate": strAtDate ? strAtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
+                 "StartAt": strStartAt ? strStartAt: SystemUtilities.getCurrentDateAndTime().format() // CommonConstants._DATE_TIME_LONG_FORMAT_10 )
                },
         transaction: currentTransaction,
         include: [
@@ -398,6 +400,110 @@ export default class BIZDriverInDeliveryZoneService extends BaseService {
       sourcePosition.method = this.name + "." + this.deleteByModel.name;
 
       const strMark = "5711A8F080A4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getCurrentDeliveryZoneOfDriverAtDate( strUserId: string,
+                                                     strAtDate: string,
+                                                     transaction: any,
+                                                     logger: any ): Promise<BIZDriverInDeliveryZone> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getCurrentDeliveryZoneOfDriverAtDate",
+                                                     {
+                                                       UserId: strUserId,
+                                                       AtDate: strAtDate
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( rows.length > 0 ) {
+
+        result = BIZDriverInDeliveryZoneService.getDeliveryZone( rows[ 0 ].DeliveryZoneId,
+                                                                 rows[ 0 ].UserId,
+                                                                 rows[ 0 ].StartAt,
+                                                                 currentTransaction,
+                                                                 logger );
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getCurrentDeliveryZoneOfDriverAtDate.name;
+
+      const strMark = "A94A4B3F150A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

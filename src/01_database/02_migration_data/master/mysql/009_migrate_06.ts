@@ -8,7 +8,7 @@ import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '008_migrate_05' );
+const debug = require( 'debug' )( '009_migrate_06' );
 
 //Example file migrate files using code
 export default class Migrate {
@@ -20,7 +20,7 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select AtDate, UpdatedBy, UpdatedAt From bizDriverStatus limit 1, 1";
+      let strSQL = "Select StartAt, EndAt, LockTag From bizDriverStatus limit 1, 1";
 
       try {
 
@@ -35,12 +35,10 @@ export default class Migrate {
         //The field AtDate, UpdatedBy, UpdatedAt NOT exists. Must be created
 
         strSQL = "DELETE FROM `bizDriverStatus`;" +  //<-- This is needed to apply not null
-                 "ALTER TABLE `bizDriverStatus` " +
-                 "ADD COLUMN `AtDate` DATE NOT NULL AFTER `UserId`, " +
-                 "ADD COLUMN `UpdatedBy` VARCHAR(150) NULL AFTER `CreatedAt`, " +
-                 "ADD COLUMN `UpdatedAt` VARCHAR(30) NULL AFTER `UpdatedBy`, " +
-                 "DROP PRIMARY KEY, " +
-                 "ADD PRIMARY KEY (`UserId`, `AtDate`);";
+                 "ALTER TABLE `bizDriverInDeliveryZone` " +
+                 "ADD COLUMN `EndAt` VARCHAR(40) NULL AFTER `StartAt`," +
+                 "CHANGE COLUMN `AtDate` `StartAt` VARCHAR(30) NOT NULL ," +
+                 "CHANGE COLUMN `LockByRole` `LockTag` VARCHAR(30) NOT NULL;"
 
         await dbConnection.query( strSQL );
 

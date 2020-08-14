@@ -58,6 +58,9 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
   @Column( { type: DataType.DATEONLY, allowNull: false } )
   AtDate: string;
 
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  ShortToken: string;
+
   @Column( { type: DataType.SMALLINT, allowNull: false } )
   Status: number;
 

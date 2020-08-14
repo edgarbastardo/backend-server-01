@@ -695,7 +695,7 @@ export default class App {
         }
         else {
 
-          console.log( "**** The project name " + process.env.PROJECT_NAME + " NOT found. In config file: " + strConfigFile + " ****" );
+          console.log( "**** The project name " + process.env.APP_PROJECT_NAME + " NOT found. In config file: " + strConfigFile + " ****" );
 
         }
 

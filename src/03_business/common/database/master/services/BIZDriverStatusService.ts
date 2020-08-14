@@ -1,5 +1,7 @@
 import cluster from "cluster";
 
+import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+
 import CommonConstants from "../../../../../02_system/common/CommonConstants";
 import SystemConstants from "../../../../../02_system/common/SystemContants";
 
@@ -44,7 +46,10 @@ export default class BIZDriverStatusService extends BaseService {
 
       const options = {
 
-        where: { "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId : "" },
+        where: {
+                 "UserId": createOrUpdateData.UserId ? createOrUpdateData.UserId : "",
+                 "AtDate": createOrUpdateData.AtDate ? createOrUpdateData.AtDate : SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
+               },
         transaction: currentTransaction,
         /*
         include: [
@@ -194,6 +199,107 @@ export default class BIZDriverStatusService extends BaseService {
       sourcePosition.method = this.name + "." + this.getByUserId.name;
 
       const strMark = "B645226E1541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getDispatcherDriverStatusAtDate( strGroupId: string,
+                                                strAtDate: string,
+                                                transaction: any,
+                                                logger: any ): Promise<any[]> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getDispatcherDriverStatusAtDate",
+                                                     {
+                                                       GroupId: strGroupId,
+                                                       AtDate: strAtDate
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( rows &&
+           rows.length > 0 ) {
+
+        result = rows;
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDispatcherDriverStatusAtDate.name;
+
+      const strMark = "6123430E48E5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

@@ -61,11 +61,17 @@ export class BIZDriverInDeliveryZone extends Model<BIZDriverInDeliveryZone> {
   UserId: string;
 
   @PrimaryKey
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
-  AtDate: string;
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  StartAt: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  EndAt: string;
+
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  ShortToken: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
-  LockByRole: string;
+  LockTag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;

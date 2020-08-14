@@ -68,7 +68,8 @@ export default class Dev007DriverServicesController extends BaseService {
 
                                                                                UserId: userSessionStatus.UserId,
                                                                                AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
-                                                                               Status: request.body.Status, //1 = Working, 0 = Not working
+                                                                               ShortToken: userSessionStatus.ShortToken,
+                                                                               Status: request.body.Status, //1111 = Working, 0 = Not working
                                                                                Description: request.body.Description,
                                                                                CreatedBy: userSessionStatus.UserName,
                                                                                UpdatedBy: userSessionStatus.UserName,
@@ -82,6 +83,77 @@ export default class Dev007DriverServicesController extends BaseService {
       if ( bizDriverStatusInDB &&
            bizDriverStatusInDB instanceof Error === false ) {
 
+        const warnings = [];
+
+        if ( request.body.Status === 0 ) { //Not wokring
+
+          let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
+                                                                                                                       null, //By default use the current date in the server
+                                                                                                                       currentTransaction,
+                                                                                                                       logger );
+
+          if ( bizDriverInDeliveryZoneInDB instanceof Error === true ) {
+
+            const error = bizDriverInDeliveryZoneInDB as any;
+
+            warnings.push(
+                           {
+                             Code: "WARNING_CANNOT_GET_DELIVERY_ZONE",
+                             Message: "Warning to get the current delivery zone from driver",
+                             Details: {
+                                        Code: error.name,
+                                        Message: error.message,
+                                        Details: await SystemUtilities.processErrorDetails( error ) //error
+                                      }
+                           }
+                         );
+
+          }
+          else if ( bizDriverInDeliveryZoneInDB ) {
+
+            bizDriverInDeliveryZoneInDB.EndAt = SystemUtilities.getCurrentDateAndTime().format(), //Close the entry with the current hour
+            bizDriverInDeliveryZoneInDB.ShortToken = userSessionStatus.ShortToken;
+
+            bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
+                                                                                               ( bizDriverInDeliveryZoneInDB as any ).dataValues,
+                                                                                               true,
+                                                                                               currentTransaction,
+                                                                                               logger
+                                                                                             );
+
+            if ( bizDriverInDeliveryZoneInDB instanceof Error === true ) {
+
+              const error = bizDriverInDeliveryZoneInDB as any;
+
+              warnings.push(
+                             {
+                               Code: "WARNING_CANNOT_CLOSE_DELIVERY_ZONE",
+                               Message: "Warning to close the current delivery zone from driver",
+                               Details: {
+                                          Code: error.name,
+                                          Message: error.message,
+                                          Details: await SystemUtilities.processErrorDetails( error ) //error
+                                        }
+                             }
+                           );
+
+            }
+
+          }
+          else {
+
+            warnings.push(
+                           {
+                             Code: "WARNING_NO_DELIVERY_ZONE_SET",
+                             Message: "Warning no delivery zone set for this driver",
+                             Details: "bizDriverInDeliveryZoneInDB === null"
+                           }
+                         );
+
+          }
+
+        }
+
         let modelData = ( bizDriverStatusInDB as any ).dataValues;
 
         const tempModelData = await BIZDriverStatus.convertFieldValues(
@@ -90,7 +162,11 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                           FilterFields: 1, //Force to remove fields like password and value
                                                                           TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
                                                                           Include: null, //[ { model: SYSUser } ],
-                                                                          Exclude: [ { model: SYSUser } ],
+                                                                          Exclude: [
+                                                                                     {
+                                                                                       model: SYSUser
+                                                                                     }
+                                                                                   ],
                                                                           Logger: logger,
                                                                           ExtraInfo: {
                                                                                         Request: request,
@@ -105,6 +181,28 @@ export default class Dev007DriverServicesController extends BaseService {
 
         }
 
+        if ( InstantMessageServerManager.currentIMInstance?.connected ) {
+
+          InstantMessageServerManager.currentIMInstance?.emit(
+                                                               "Command:SendMessage",
+                                                               {
+                                                                 Auth: InstantMessageServerManager.strAuthToken,
+                                                                 Channels: "Dispatchers",
+                                                                 Message: {
+                                                                            Kind:  "DRIVER_STATUS_CHANGED",
+                                                                            Topic: "message",
+                                                                            Data: {
+                                                                                    SupportToken: userSessionStatus.ShortToken,
+                                                                                    UserId: userSessionStatus.UserId,
+                                                                                    DeliveryZoneId: request.body.DeliveryZoneId,
+                                                                                    By: userSessionStatus.UserName
+                                                                                  }
+                                                                          }
+                                                               }
+                                                             );
+
+        }
+
         //ANCHOR success user update
         result = {
                    StatusCode: 200, //Ok
@@ -114,7 +212,7 @@ export default class Dev007DriverServicesController extends BaseService {
                    LogId: null,
                    IsError: false,
                    Errors: [],
-                   Warnings: [],
+                   Warnings: warnings,
                    Count: 1,
                    Data: [
                            modelData
@@ -277,12 +375,26 @@ export default class Dev007DriverServicesController extends BaseService {
 
                                                                              UserId: userSessionStatus.UserId,
                                                                              AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
-                                                                             Status: 0, //1 = Working, 0 = Not working
+                                                                             Status: 0, //1111 = Working, 0 = Not working
+                                                                             ShortToken: userSessionStatus.ShortToken,
                                                                              Description: "Not working",
                                                                              CreatedBy: userSessionStatus.UserName,
                                                                              UpdatedBy: userSessionStatus.UserName,
 
                                                                            },
+                                                                           true,
+                                                                           currentTransaction,
+                                                                           logger
+                                                                         );
+
+      }
+      else if ( bizDriverStatusInDB.ShortToken !== userSessionStatus.ShortToken ) {
+
+        bizDriverStatusInDB.ShortToken = userSessionStatus.ShortToken; //Force to update the current session short token
+        bizDriverStatusInDB.UpdatedBy = userSessionStatus.UserName,
+
+        bizDriverStatusInDB = await BIZDriverStatusService.createOrUpdate(
+                                                                           ( bizDriverStatusInDB as any ).dataValues,
                                                                            true,
                                                                            currentTransaction,
                                                                            logger
@@ -571,12 +683,14 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                   Kind:  "GPS_POSITION_CHANGED",
                                                                                   Topic: "message",
                                                                                   Data: {
-                                                                                          ShortToken: userSessionStatus.ShortToken,
+                                                                                          SupportToken: userSessionStatus.ShortToken,
+                                                                                          UserId: userSessionStatus.UserId,
                                                                                           Accuracy: request.body.bulk[ 0 ].Accuracy,
                                                                                           Latitude: request.body.bulk[ 0 ].Latitude,
                                                                                           Longitude: request.body.bulk[ 0 ].Longitude,
                                                                                           Altitude: request.body.bulk[ 0 ].Altitude,
                                                                                           Speed: request.body.bulk[ 0 ].Speed,
+                                                                                          By: userSessionStatus.UserName
                                                                                         }
                                                                                 }
                                                                      }
@@ -986,133 +1100,39 @@ export default class Dev007DriverServicesController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByUserId( userSessionStatus.UserId,
-                                                                                          null, //By default the current date in the server
-                                                                                          currentTransaction,
-                                                                                          logger );
+      let bizDriverStatusInDB = await BIZDriverStatusService.getByUserId(
+                                                                          userSessionStatus.UserId,
+                                                                          SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        );
 
+      if ( bizDriverStatusInDB &&
+           bizDriverStatusInDB.Status === 1111 ) { //Only working can set yout delivery zone
 
-      const bIsAdmin = userSessionStatus?.Role?.includes( "#Administrator#" ) ||
-                       userSessionStatus?.Role?.includes( "#BManager_L99#" ) ||
-                       userSessionStatus?.Role?.includes( "#Business_Manager#" );
-
-      if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
-
-        const error = bizDriverInDeliveryZoneInDB as any;
-
-        result = {
-                   StatusCode: 500, //Internal server error
-                   Code: "ERROR_UNEXPECTED",
-                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                   Mark: "C6F92ABD8EE9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: true,
-                   Errors: [
-                             {
-                               Code: error.name,
-                               Message: error.message,
-                               Details: await SystemUtilities.processErrorDetails( error ) //error
-                             }
-                           ],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      }
-      else if ( bizDriverInDeliveryZoneInDB &&
-                bizDriverInDeliveryZoneInDB.LockByRole &&
-                bIsAdmin === false &&
-                userSessionStatus?.Role?.includes( bizDriverInDeliveryZoneInDB.LockByRole ) === false ) {
-
-        result = {
-                   StatusCode: 403, //Forbidden
-                   Code: "ERROR_DRIVER_NOT_ALLOWED",
-                   Message: await I18NManager.translate( strLanguage, "The driver not allowed to set the delivery zone." ),
-                   Mark: "233A7F9D16A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                   LogId: null,
-                   IsError: false,
-                   Errors: [],
-                   Warnings: [],
-                   Count: 0,
-                   Data: []
-                 }
-
-      };
-
-      if ( result === null ) {
-
-        bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
-                                                                                           {
-
-                                                                                             UserId: userSessionStatus.UserId,
-                                                                                             DeliveryZoneId: request.body.DeliveryZoneId,
-                                                                                             AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
-                                                                                             LockByRole: "#Driver#",
-                                                                                             CreatedBy: userSessionStatus.UserName,
-                                                                                             UpdatedBy: userSessionStatus.UserName,
-
-                                                                                           },
-                                                                                           true,
-                                                                                           currentTransaction,
-                                                                                           logger
-                                                                                         );
+        let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
+                                                                                                                     null, //By default use the current date in the server
+                                                                                                                     currentTransaction,
+                                                                                                                     logger );
 
         if ( bizDriverInDeliveryZoneInDB &&
-             bizDriverInDeliveryZoneInDB instanceof Error === false ) {
+             bizDriverInDeliveryZoneInDB instanceof Error === false &&
+             bizDriverInDeliveryZoneInDB.EndAt ) {
 
-          let modelData = ( bizDriverInDeliveryZoneInDB as any ).dataValues;
-
-          const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
-                                                                                  {
-                                                                                    Data: modelData,
-                                                                                    IncludeFields: [
-                                                                                                     "Id",
-                                                                                                     "Name",
-                                                                                                   ],
-                                                                                    TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                                    Include: [
-                                                                                               {
-                                                                                                 model: SYSUser
-                                                                                               },
-                                                                                               {
-                                                                                                 model: BIZDeliveryZone
-                                                                                               }
-                                                                                             ],
-                                                                                    Exclude: null, //[ { model: SYSUser } ],
-                                                                                    Logger: logger,
-                                                                                    ExtraInfo: {
-                                                                                                 Request: request,
-                                                                                               }
-                                                                                  }
-                                                                                );
-
-          if ( tempModelData ) {
-
-            modelData = tempModelData;
-
-          }
-
-          //ANCHOR success user update
-          result = {
-                     StatusCode: 200, //Ok
-                     Code: "SUCCESS_DRIVER_DELIVERY_ZONE_SET",
-                     Message: await I18NManager.translate( strLanguage, "Success driver delivery zone set." ),
-                     Mark: "D2F8D4512DF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: false,
-                     Errors: [],
-                     Warnings: [],
-                     Count: 1,
-                     Data: [
-                             modelData
-                           ]
-                   }
-
-          bApplyTransaction = true;
+          bizDriverInDeliveryZoneInDB = null; //This is a closed delivery zone must be ignored and created new one
 
         }
-        else {
+
+        //let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getDeliveryZone( userSessionStatus.UserId,
+        //                                                                                        null, //By default use the current date in the server
+        //                                                                                        currentTransaction,
+        //                                                                                        logger );
+
+        const bIsAdmin = userSessionStatus?.Role?.includes( "#Administrator#" ) ||
+                         userSessionStatus?.Role?.includes( "#BManager_L99#" ) ||
+                         userSessionStatus?.Role?.includes( "#Business_Manager#" );
+
+        if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
 
           const error = bizDriverInDeliveryZoneInDB as any;
 
@@ -1120,7 +1140,7 @@ export default class Dev007DriverServicesController extends BaseService {
                      StatusCode: 500, //Internal server error
                      Code: "ERROR_UNEXPECTED",
                      Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                     Mark: "E720AE75720E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: "C6F92ABD8EE9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
@@ -1133,9 +1153,210 @@ export default class Dev007DriverServicesController extends BaseService {
                      Warnings: [],
                      Count: 0,
                      Data: []
-                   };
+                   }
 
         }
+        else if ( bizDriverInDeliveryZoneInDB &&
+                  bizDriverInDeliveryZoneInDB.LockTag &&
+                  bIsAdmin === false &&
+                  userSessionStatus?.Role?.includes( bizDriverInDeliveryZoneInDB.LockTag ) === false ) {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: "ERROR_DRIVER_NOT_ALLOWED",
+                     Message: await I18NManager.translate( strLanguage, "The driver not allowed to set/change the delivery zone." ),
+                     Mark: "233A7F9D16A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: false,
+                     Errors: [],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        };
+
+        if ( result === null ) {
+
+          let bAddNewEntry = true;
+
+          if ( bizDriverInDeliveryZoneInDB !== null ) {
+
+            if ( bizDriverInDeliveryZoneInDB.DeliveryZoneId === request.body.DeliveryZoneId ) {
+
+              bAddNewEntry = false; //No need to create new entry in the database. Keep the old one
+
+            }
+            else {
+
+              //Update and close the before entry put data in EndAt field
+              bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
+                                                                                                 {
+
+                                                                                                   UserId: bizDriverInDeliveryZoneInDB.UserId,
+                                                                                                   DeliveryZoneId: bizDriverInDeliveryZoneInDB.DeliveryZoneId,
+                                                                                                   StartAt: bizDriverInDeliveryZoneInDB.StartAt,
+                                                                                                   EndAt: SystemUtilities.getCurrentDateAndTime().format(), //Close the entry with the current hour
+                                                                                                   ShortToken: bizDriverInDeliveryZoneInDB.ShortToken,
+                                                                                                   LockTag: "#Driver#",
+                                                                                                   UpdatedBy: userSessionStatus.UserName,
+
+                                                                                                 },
+                                                                                                 true,
+                                                                                                 currentTransaction,
+                                                                                                 logger
+                                                                                               );
+
+              if ( !bizDriverInDeliveryZoneInDB ||
+                  bizDriverInDeliveryZoneInDB instanceof Error ) { //Error the try to close the old entry
+
+                bAddNewEntry = false; //Not add the new entry in the database
+
+              }
+
+            }
+
+          }
+
+          if ( bAddNewEntry ) {
+
+            //Create the new entry in the database
+            bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
+                                                                                               {
+
+                                                                                                 UserId: userSessionStatus.UserId,
+                                                                                                 DeliveryZoneId: request.body.DeliveryZoneId,
+                                                                                                 StartAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                                                 EndAt: null, //Not closed entry
+                                                                                                 ShortToken: userSessionStatus.ShortToken,
+                                                                                                 LockTag: "#Driver#",
+                                                                                                 CreatedBy: userSessionStatus.UserName,
+
+                                                                                               },
+                                                                                               false,
+                                                                                               currentTransaction,
+                                                                                               logger
+                                                                                             );
+
+          }
+
+          if ( bizDriverInDeliveryZoneInDB &&
+              bizDriverInDeliveryZoneInDB instanceof Error === false ) {
+
+            let modelData = ( bizDriverInDeliveryZoneInDB as any ).dataValues;
+
+            const tempModelData = await BIZDriverInDeliveryZone.convertFieldValues(
+                                                                                    {
+                                                                                      Data: modelData,
+                                                                                      IncludeFields: [
+                                                                                                       "Id",
+                                                                                                       "Name",
+                                                                                                     ],
+                                                                                      TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                                      Include: [
+                                                                                                 {
+                                                                                                   model: SYSUser
+                                                                                                 },
+                                                                                                 {
+                                                                                                   model: BIZDeliveryZone
+                                                                                                 }
+                                                                                               ],
+                                                                                      Exclude: null, //[ { model: SYSUser } ],
+                                                                                      Logger: logger,
+                                                                                      ExtraInfo: {
+                                                                                                   Request: request,
+                                                                                                 }
+                                                                                    }
+                                                                                  );
+
+            if ( tempModelData ) {
+
+              modelData = tempModelData;
+
+            }
+
+            if ( InstantMessageServerManager.currentIMInstance?.connected ) {
+
+              InstantMessageServerManager.currentIMInstance?.emit(
+                                                                   "Command:SendMessage",
+                                                                   {
+                                                                     Auth: InstantMessageServerManager.strAuthToken,
+                                                                     Channels: "Dispatchers",
+                                                                     Message: {
+                                                                                Kind:  "DRIVER_DELIVERY_ZONE_CHANGED",
+                                                                                Topic: "message",
+                                                                                Data: {
+                                                                                        SupportToken: userSessionStatus.ShortToken,
+                                                                                        UserId: userSessionStatus.UserId,
+                                                                                        DeliveryZoneId: request.body.DeliveryZoneId,
+                                                                                        By: userSessionStatus.UserName
+                                                                                      }
+                                                                              }
+                                                                   }
+                                                                 );
+
+            }
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_DRIVER_DELIVERY_ZONE_SET",
+                       Message: await I18NManager.translate( strLanguage, "Success driver delivery zone set." ),
+                       Mark: "D2F8D4512DF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 1,
+                       Data: [
+                               modelData
+                             ]
+                     }
+
+            bApplyTransaction = true;
+
+          }
+          else {
+
+            const error = bizDriverInDeliveryZoneInDB as any;
+
+            result = {
+                       StatusCode: 500, //Internal server error
+                       Code: "ERROR_UNEXPECTED",
+                       Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                       Mark: "E720AE75720E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: error.name,
+                                   Message: error.message,
+                                   Details: await SystemUtilities.processErrorDetails( error ) //error
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     };
+
+          }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_CURRENT_DRIVER_STATUS_MUST_BE_WORKING",
+                   Message: await I18NManager.translate( strLanguage, "The current driver status must be working = 1111" ),
+                   Mark: "B6FCFED8E996" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
 
       }
 
@@ -1161,7 +1382,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setStatus.name;
+      sourcePosition.method = this.name + "." + this.setDeliveryZone.name;
 
       const strMark = "625CCCC1FBB7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -1253,10 +1474,25 @@ export default class Dev007DriverServicesController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getByUserId( userSessionStatus.UserId,
-                                                                                          null, //By default the current date in the server
-                                                                                          currentTransaction,
-                                                                                          logger );
+      let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
+                                                                                                                   null, //By default use the current date in the server
+                                                                                                                   currentTransaction,
+                                                                                                                   logger );
+
+      if ( bizDriverInDeliveryZoneInDB &&
+           bizDriverInDeliveryZoneInDB instanceof Error === false &&
+           bizDriverInDeliveryZoneInDB.EndAt &&
+           ( !request.body.Last ||
+             request.body.Last === 0 ) ) {
+
+        bizDriverInDeliveryZoneInDB = null; //This is a closed delivery zone must be ignored and created new one
+
+      }
+
+      //let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getDeliveryZone( userSessionStatus.UserId,
+      //                                                                                        null, //By default the current date in the server
+      //                                                                                        currentTransaction,
+      //                                                                                        logger );
 
       if ( bizDriverInDeliveryZoneInDB instanceof Error ) {
 
@@ -1285,7 +1521,7 @@ export default class Dev007DriverServicesController extends BaseService {
       else if ( !bizDriverInDeliveryZoneInDB ) {
 
         result = {
-                   StatusCode: 400, //Internal server error
+                   StatusCode: 400, //Bad request
                    Code: "ERROR_DRIVER_DELIVERY_ZONE_NOT_SET",
                    Message: await I18NManager.translate( strLanguage, "The driver delivery zone not set." ),
                    Mark: "A724A27AA4F4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
@@ -1299,6 +1535,27 @@ export default class Dev007DriverServicesController extends BaseService {
 
       }
       else {
+
+        if ( userSessionStatus.ShortToken !== bizDriverInDeliveryZoneInDB.ShortToken ) {
+
+          await BIZDriverInDeliveryZoneService.createOrUpdate(
+                                                               {
+
+                                                                 UserId: bizDriverInDeliveryZoneInDB.UserId,
+                                                                 DeliveryZoneId: bizDriverInDeliveryZoneInDB.DeliveryZoneId,
+                                                                 StartAt: bizDriverInDeliveryZoneInDB.StartAt,
+                                                                 ShortToken: userSessionStatus.ShortToken, //Force Update with right short token to database
+                                                                 UpdatedBy: userSessionStatus.UserName,
+
+                                                               },
+                                                               true,
+                                                               currentTransaction,
+                                                               logger
+                                                             );
+
+          bizDriverInDeliveryZoneInDB.ShortToken = userSessionStatus.ShortToken; //Update the short token
+
+        }
 
         let modelData = ( bizDriverInDeliveryZoneInDB as any ).dataValues;
 
@@ -1374,7 +1631,7 @@ export default class Dev007DriverServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.setStatus.name;
+      sourcePosition.method = this.name + "." + this.getDeliveryZone.name;
 
       const strMark = "0BE03CB21E95" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

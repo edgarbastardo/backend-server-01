@@ -54,6 +54,10 @@ export default class Dev007DispacherController {
 
   static readonly _ROUTE_INFO = [
                                   { Path: Dev007DispacherController._BASE_PATH + "/driver/position", Action: "v1.business.dev007.dispatcher.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "Get current connected driver prosition" },
+                                  { Path: Dev007DispacherController._BASE_PATH + "/driver/delivery/zone", Action: "v1.business.dev007.dispatcher.driver.delivery.zone.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "Set current delivery zone to the driver." },
+                                  { Path: Dev007DispacherController._BASE_PATH + "/driver/delivery/zone", Action: "v1.business.dev007.dispatcher.driver.delivery.zone.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "Get current delivery zone to the driver." },
+                                  { Path: Dev007DispacherController._BASE_PATH + "/driver/status", Action: "v1.business.dev007.dispatcher.driver.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "List the driver status from drivers" },
+                                  { Path: Dev007DispacherController._BASE_PATH + "/driver/status/work/stop", Action: "v1.business.dev007.dispatcher.driver.status.work.stop", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Dispatcher#,#Business_Manager#,#Administrator#", Roles: [ "Dispatcher", "Administrator", "Business_Manager" ], Description: "Stop to the driver of working" },
                                 ]
 
   _controllerLogger = null;
@@ -117,14 +121,90 @@ export default class Dev007DispacherController {
             MiddlewareManager.middlewareCheckIsAuthenticated,
             MiddlewareManager.middlewareCheckIsAuthorized,
           )
-  async setStatusToWorking( request: Request, response: Response ) {
+  async getDriverPositionList( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.getPosition( request,
-                                                                         response,
-                                                                         null,
-                                                                         context.logger );
+    const result = await Dev007DispatcherServicesController.getDriverPositionList( request,
+                                                                                   response,
+                                                                                   null,
+                                                                                   context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/driver/delivery/zone",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async setDeliveryZone( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DispatcherServicesController.setDriverDeliveryZone( request,
+                                                                                   response,
+                                                                                   null,
+                                                                                   context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/driver/delivery/zone",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getDriverDeliveryZone( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DispatcherServicesController.getDriverDeliveryZone( request,
+                                                                                   response,
+                                                                                   null,
+                                                                                   context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/driver/status",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async setDriverStatusList( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DispatcherServicesController.getDriverStatusList( request,
+                                                                                 response,
+                                                                                 null,
+                                                                                 context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/driver/status/work/stop",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async setDriverStatusStopWork( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007DispatcherServicesController.setDriverStatusStopWork( request,
+                                                                                     response,
+                                                                                     null,
+                                                                                     context.logger );
 
     response.status( result.StatusCode ).send( result );
 

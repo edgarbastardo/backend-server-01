@@ -128,7 +128,7 @@ export default class Dev007DriverController {
 
     if ( request.body ) {
 
-      request.body.Status = 1;
+      request.body.Status = 1111;
       request.body.Description = "Working";
 
     }
@@ -136,7 +136,7 @@ export default class Dev007DriverController {
 
       request.body = {
 
-                       Status: 1,
+                       Status: 1111,
                        Description: "Working"
 
                      }
@@ -172,7 +172,7 @@ export default class Dev007DriverController {
 
       request.body = {
 
-                       Status: 1,
+                       Status: 0,
                        Description: "Not working"
 
                      }

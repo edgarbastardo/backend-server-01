@@ -1317,6 +1317,61 @@ export default class CommonUtilities {
 
   }
 
+  public static normalizeReturnLines( strValue: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      // Replace all whitespace blocks with single spaces.
+      strResult = strValue != null ? strValue.trim().replace( /\n+/g, " " ) : "";
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
+  public static normalizeSQLWithMultiline( strValue: string ): string {
+
+    let strResult = "";
+
+    try {
+
+      const sqlLines = strValue.split( "\n" );
+
+      const normalizedbuffer = [];
+
+      for ( let intIndex = 0; intIndex < sqlLines.length; intIndex++ ) {
+
+        const strLine = sqlLines[ intIndex ].trim();
+
+        if ( strLine.startsWith( "--" ) === false ) {
+
+          const commentedLine = strLine.split( "--" );
+
+          normalizedbuffer.push( CommonUtilities.normalizeWhitespaces( commentedLine[ 0 ] ) );
+
+        }
+
+      }
+
+      strResult = normalizedbuffer.join( " " );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
   public static formatTitle( strValue: string ): string {
 
     let result = [];
