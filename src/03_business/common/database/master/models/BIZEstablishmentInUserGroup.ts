@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -13,10 +13,10 @@ import {
          //BeforeCreate,
          //BeforeUpdate,
          //Is,
-         NotNull,
-         NotEmpty,
-         IsUUID,
-         Unique,
+         //NotNull,
+         //NotEmpty,
+         //IsUUID,
+         //Unique,
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
@@ -25,9 +25,9 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
@@ -125,6 +125,9 @@ export class BIZEstablishmentInUserGroup extends Model<BIZEstablishmentInUserGro
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -247,6 +250,7 @@ export class BIZEstablishmentInUserGroup extends Model<BIZEstablishmentInUserGro
     }
 
     return result;
+    */
 
   }
 

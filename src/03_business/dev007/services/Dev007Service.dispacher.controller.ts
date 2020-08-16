@@ -13,17 +13,16 @@ import CommonUtilities from "../../../02_system/common/CommonUtilities";
 import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
 import BaseService from "../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../02_system/common/managers/I18Manager";
-//import BIZDriverStatusService from "../../common/database/master/services/BIZDriverStatusService";
-
-//import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
-//import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
-import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import InstantMessageServerManager from "../../../02_system/common/managers/InstantMessageServerManager";
+
+import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import BIZDriverInDeliveryZoneService from "../../common/database/master/services/BIZDriverInDeliveryZoneService";
-import { BIZDriverInDeliveryZone } from "../../common/database/master/models/BIZDriverInDeliveryZone";
-import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
-import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 import BIZDriverStatusService from "../../common/database/master/services/BIZDriverStatusService";
+
+import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
+
+import { BIZDriverInDeliveryZone } from "../../common/database/master/models/BIZDriverInDeliveryZone";
+import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 
 const debug = require( "debug" )( "Dev007DispatcherServicesController" );
@@ -462,7 +461,7 @@ export default class Dev007DispatcherServicesController extends BaseService {
 
             bizDriverInDeliveryZoneInDB.EndAt = SystemUtilities.getCurrentDateAndTime().format() //Close the entry with the current hour
             bizDriverInDeliveryZoneInDB.UpdatedBy = userSessionStatus.UserName;
-            bizDriverInDeliveryZoneInDB.LockTag = request.body.Lock === 1 ? "#Dispatcher#": "#Driver#";
+            bizDriverInDeliveryZoneInDB.Tag = request.body.Lock === 1 ? "#Dispatcher#": "#Driver#";
 
             //Update and close the before entry put data in EndAt field
             bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.createOrUpdate(
@@ -1258,7 +1257,7 @@ export default class Dev007DispatcherServicesController extends BaseService {
 
         const warnings = [];
 
-        if ( bizDriverStatusInDB.Status === 1111 ) { //Working
+        if ( bizDriverStatusInDB.Code === 1111 ) { //Working
 
           let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( request.body.UserId,
                                                                                                                        null, //By default use the current date in the server
@@ -1332,7 +1331,7 @@ export default class Dev007DispatcherServicesController extends BaseService {
 
         }
 
-        bizDriverStatusInDB.Status = 0;
+        bizDriverStatusInDB.Code = 0;
         bizDriverStatusInDB.Description = "Not working";
         bizDriverStatusInDB.UpdatedBy = userSessionStatus.UserName;
 

@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -13,10 +13,10 @@ import {
          //BeforeCreate,
          //BeforeUpdate,
          //Is,
-         NotNull,
-         NotEmpty,
-         IsUUID,
-         Unique,
+         //NotNull,
+         //NotEmpty,
+         //IsUUID,
+         //Unique,
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
@@ -25,25 +25,24 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
-import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
+//import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
 import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
-import { BIZOrigin } from "./BIZOrigin";
-import { BIZDestination } from "./BIZDestination";
+import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
-const debug = require( "debug" )( "BIZDelivery" );
+const debug = require( "debug" )( "BIZDriverRoute" );
 
 @Table( {
   timestamps: false,
-  tableName: "bizDelivery",
-  modelName: "bizDelivery"
+  tableName: "bizDriverRoute",
+  modelName: "bizDriverRoute"
 } )
-export class BIZDelivery extends Model<BIZDelivery> {
+export class BIZDriverRoute extends Model<BIZDriverRoute> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -55,28 +54,19 @@ export class BIZDelivery extends Model<BIZDelivery> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @NotNull
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => BIZOrigin )
-  OriginId: string;
+  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  StartAt: string;
 
-  @NotNull
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => BIZDestination )
-  DestinationId: string;
-
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   @ForeignKey( () => SYSUser )
-  DriverId: string;
+  @PrimaryKey
+  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  UserId: string;
 
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
-  Comment: string;
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  RoutePrioritySort: number;
+
+  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
+  Tag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -90,38 +80,26 @@ export class BIZDelivery extends Model<BIZDelivery> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  DisabledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
-
   @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => BIZOrigin, "OriginId" )
-  bizOrigin: BIZOrigin;
-
-  @BelongsTo( () => BIZDestination, "DestinationId" )
-  bizDestination: BIZDestination;
-
-  @BelongsTo( () => SYSUser, "DriverId" )
+  @BelongsTo( () => SYSUser, "UserId" )
   sysUser: SYSUser;
 
   @BeforeValidate
-  static beforeValidateHook( instance: BIZDelivery, options: any ): void {
+  static beforeValidateHook( instance: BIZDriverRoute, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: BIZDelivery, options: any ): void {
+  static beforeCreateHook( instance: BIZDriverRoute, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDelivery",
+                                             "bizDriverRoute",
                                              "create",
                                              instance,
                                              null );
@@ -129,14 +107,14 @@ export class BIZDelivery extends Model<BIZDelivery> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: BIZDelivery, options: any ): void {
+  static beforeUpdateHook( instance: BIZDriverRoute, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDelivery",
+                                             "bizDriverRoute",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -144,12 +122,12 @@ export class BIZDelivery extends Model<BIZDelivery> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: BIZDelivery, options: any ): void {
+  static beforeDestroyHook( instance: BIZDriverRoute, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDelivery",
+                                             "bizDriverRoute",
                                              "delete",
                                              instance,
                                              null );
@@ -158,6 +136,9 @@ export class BIZDelivery extends Model<BIZDelivery> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -258,7 +239,7 @@ export class BIZDelivery extends Model<BIZDelivery> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "1499BDA8790A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "7ADAFE05EE0E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -280,6 +261,7 @@ export class BIZDelivery extends Model<BIZDelivery> {
     }
 
     return result;
+    */
 
   }
 

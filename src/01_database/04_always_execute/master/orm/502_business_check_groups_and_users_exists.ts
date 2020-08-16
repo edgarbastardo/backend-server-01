@@ -15,6 +15,8 @@ import CommonUtilities from '../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 
 import { SYSUserGroup } from '../../../../02_system/common/database/master/models/SYSUserGroup';
+import { SYSUser } from '../../../../02_system/common/database/master/models/SYSUser';
+import { SYSPerson } from "../../../../02_system/common/database/master/models/SYSPerson";
 
 const debug = require( 'debug' )( '502_check_business_groups_and_users_exists' );
 
@@ -54,33 +56,33 @@ export default class Always {
                                    DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                  },
                                  {
-                                  Id: "12bcf955-a3d0-4a48-aa72-7986d79c73b2",
-                                  Name: "Administrative_Asistants",
-                                  Role: "#Adm_Asistant#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Tag: "#Adm_Asistant#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Comment: "Created from backend startup. Group of users Administrative Asistants.",
-                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                                },
-                                {
-                                  Id: "9916bd73-093d-47c8-a549-65e7edd4f171",
-                                  Name: "Dispatchers",
-                                  Role: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Tag: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Comment: "Created from backend startup. Group of users Dispatchers.",
-                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                                },
-                                {
-                                  Id: "03e91fb3-6b70-4162-9af8-7219ce446e9f",
-                                  Name: "Final_Customers",
-                                  Role: "#Final_Customer#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Tag: "#Final_Customer#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
-                                  Comment: "Created from backend startup. Group of users Final Customers.",
-                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
-                                },
-                              ]
+                                   Id: "12bcf955-a3d0-4a48-aa72-7986d79c73b2",
+                                   Name: "Administrative_Asistants",
+                                   Role: "#Adm_Asistant#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Tag: "#Adm_Asistant#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Comment: "Created from backend startup. Group of users Administrative Asistants.",
+                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                 },
+                                 {
+                                   Id: "9916bd73-093d-47c8-a549-65e7edd4f171",
+                                   Name: "Dispatchers",
+                                   Role: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Tag: "#Dispatcher#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Comment: "Created from backend startup. Group of users Dispatchers.",
+                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                 },
+                                 {
+                                   Id: "03e91fb3-6b70-4162-9af8-7219ce446e9f",
+                                   Name: "Final_Customers",
+                                   Role: "#Final_Customer#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Tag: "#Final_Customer#,#Upload_Binary#,#Delete_Binary#,#Update_Binary#,#Search_Binary#",
+                                   Comment: "Created from backend startup. Group of users Final Customers.",
+                                   CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                   DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                 },
+                               ]
 
       const loopUserGroupEntriesAsync = async () => {
 
@@ -88,11 +90,11 @@ export default class Always {
 
           const options = {
 
-            where: { Id: userGroupToCreate.Id },
-            //individualHooks: true,
-            transaction: currentTransaction,
+                            where: { Id: userGroupToCreate.Id },
+                            //individualHooks: true,
+                            transaction: currentTransaction,
 
-          }
+                          }
 
           const sysUserGroupInDB = await SYSUserGroup.findOne( options );
 
@@ -127,50 +129,488 @@ export default class Always {
 
       await loopUserGroupEntriesAsync();
 
-      /*
+      const personEntries = [
+                              //Driver
+                              {
+                                Id: "7b598ef4-a445-4e2c-816a-0f54fca45ea2",
+                                FirstName: "Driver 01",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver01#",
+                                Comment: "Created from backend startup. driver01.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "960d2f68-b72c-46ca-848d-47092f2af1fe",
+                                FirstName: "Driver 02",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver02#",
+                                Comment: "Created from backend startup. driver02.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "f53d1611-0c2a-4738-b5b0-339abe20f250",
+                                FirstName: "Driver 03",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver03#",
+                                Comment: "Created from backend startup. driver03.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "af1e0673-f00f-4c1e-95f8-6e779b0ca666",
+                                FirstName: "Driver 04",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver04#",
+                                Comment: "Created from backend startup. driver04.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "7f9ae1d8-3e2b-4c96-bb7b-64dc5661d7f7",
+                                FirstName: "Driver 05",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver05#",
+                                Comment: "Created from backend startup. driver05.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              //Dispatchers
+                              {
+                                Id: "72cf0ffc-bfa2-4f82-aec4-3e6d53da6c63",
+                                FirstName: "Dispatcher 01",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Dispatcher#,#dispatcher01#",
+                                Comment: "Created from backend startup. dispatcher01.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "426a0c58-51df-415d-8cd9-b401cf8049ec",
+                                FirstName: "Dispatcher 02",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Dispatcher#,#dispatcher02#",
+                                Comment: "Created from backend startup. dispatcher02.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "43b972fe-6e0d-44fc-b99c-71b339491bcd",
+                                FirstName: "Dispatcher 03",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Dispatcher#,#dispatcher03#",
+                                Comment: "Created from backend startup. dispatcher03.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "42ef10fe-dd8c-4305-801e-5628efb4189f",
+                                FirstName: "Dispatcher 04",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Dispatcher#,#dispatcher04#",
+                                Comment: "Created from backend startup. dispatcher04.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "d17fe937-e148-4c48-b649-bc590d1e94bb",
+                                FirstName: "Dispatcher 05",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Dispatcher#,#dispatcher05#",
+                                Comment: "Created from backend startup. dispatcher05.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              //Administrative Asistant
+                              {
+                                Id: "57795ff0-68a6-49ff-9db6-5c3f1b49fe1f",
+                                FirstName: "Administrative Asistant 01",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm01#",
+                                Comment: "Created from backend startup. adm01",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                FirstName: "Administrative Asistant 02",
+                                Id: "94edabbe-1d63-43e0-97e7-90d409aab80d",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm02#",
+                                Comment: "Created from backend startup. adm02.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "8566cbc0-0542-4fa7-bdf6-02b5e2eb36d9",
+                                FirstName: "Administrative Asistant 03",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,,#adm03#",
+                                Comment: "Created from backend startup. adm03.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "ad0dea09-01ca-49f8-9a4a-8ee03c981bd3",
+                                FirstName: "Administrative Asistant 04",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm04#",
+                                Comment: "Created from backend startup. adm04.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "2fbee026-9953-4a4d-a7a8-a3df8ace8c4c",
+                                FirstName: "Administrative Asistant 05",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm05#",
+                                Comment: "Created from backend startup. adm05.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              }
+                            ]
+
+      const loopPersonEntriesAsync = async () => {
+
+        await CommonUtilities.asyncForEach( personEntries as any, async ( personToCreate: any ) => {
+
+          const options = {
+
+                            where: { Id: personToCreate.Id },
+                            //individualHooks: true,
+                            transaction: currentTransaction,
+
+                          }
+
+          const sysPersonInDB = await SYSPerson.findOne( options );
+
+          if ( sysPersonInDB === null ) {
+
+            await SYSPerson.create(
+                                    personToCreate,
+                                    { transaction: currentTransaction }
+                                  );
+
+          }
+          else if ( !sysPersonInDB.Tag ||
+                    sysPersonInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
+
+             sysPersonInDB.FirstName = personToCreate.FirstName;
+             sysPersonInDB.LastName = personToCreate.LastName;
+             sysPersonInDB.Phone = personToCreate.Phone;
+             sysPersonInDB.EMail = personToCreate.EMail;
+             sysPersonInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+
+             await sysPersonInDB.update( ( sysPersonInDB as any ).dataValues,
+                                         options );
+
+          }
+
+        });
+
+      };
+
+      await loopPersonEntriesAsync();
+
       const userEntries = [
+                            //Driver
                             {
-                              Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
-                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              Id: personEntries[ 0 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
-                              SessionsLimit: 0,
-                              Name: "ForeignSystem01",
-                              Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
-                              Tag: "#Odin#",
-                              Comment: "Created from backend startup. Mobile App Drivers, Restaurants. System Odin.",
+                              SessionsLimit: 1,
+                              Name: "driver01",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver01#",
+                              Comment: "Created from backend startup. driver01.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: "25fd1d60-3285-42ed-98e7-fe3e6e08bc4b",
-                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              Id: personEntries[ 1 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
-                              SessionsLimit: 0,
-                              Name: "ForeignSystem02",
-                              Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
-                              Tag: "#Odin#",
-                              Comment: "Created from backend startup. System Migration command line tool.",
+                              SessionsLimit: 1,
+                              Name: "driver02",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver02#",
+                              Comment: "Created from backend startup. driver02.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
-                              Id: "4041c2d7-f7e2-44bb-b1fc-00c3a298ab03",
-                              GroupId: "fe0476b1-d550-4b32-8731-1aa4c8a2c9bd",
+                              Id: personEntries[ 2 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
-                              SessionsLimit: 0,
-                              Name: "ForeignSystem03",
-                              Password: "@",
-                              Role: "#Foreign_Systems#,#Binary_Basic#,#Binary_Search#,#Odin#",
-                              Tag: "#Odin#",
-                              Comment: "Created from backend startup. System Migration command line tool.",
+                              SessionsLimit: 1,
+                              Name: "driver03",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver03#",
+                              Comment: "Created from backend startup. driver03.",
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                              DisabledBy: "1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
+                            {
+                              Id: personEntries[ 3 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver04",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver04#",
+                              Comment: "Created from backend startup. driver04.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
+                              Id: personEntries[ 4 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver05",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver05#",
+                              Comment: "Created from backend startup. driver05.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            //Dispatchers
+                            {
+                              Id: personEntries[ 5 ].Id,
+                              GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "dispatcher01",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Dispatcher#,#dispatcher01#",
+                              Comment: "Created from backend startup. dispatcher01.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
+                              Id: personEntries[ 6 ].Id,
+                              GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "dispatcher02",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Dispatcher#,#dispatcher02#",
+                              Comment: "Created from backend startup. dispatcher02.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 7 ].Id,
+                              GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "dispatcher03",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Dispatcher#,#dispatcher03#",
+                              Comment: "Created from backend startup. dispatcher03.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 8 ].Id,
+                              GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "dispatcher04",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Dispatcher#,#dispatcher04#",
+                              Comment: "Created from backend startup. dispatcher04.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 9 ].Id,
+                              GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "dispatcher05",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Dispatcher#,#dispatcher05#",
+                              Comment: "Created from backend startup. dispatcher05.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            //Administrative Asistant
+                            {
+                              Id: personEntries[ 10 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm01",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm01#",
+                              Comment: "Created from backend startup. adm01",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 11 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm02",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm02#",
+                              Comment: "Created from backend startup. adm02.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 12 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm03",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,,#adm03#",
+                              Comment: "Created from backend startup. adm03.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 13 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm04",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm04#",
+                              Comment: "Created from backend startup. adm04.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm05",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm05#",
+                              Comment: "Created from backend startup. adm05.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm06",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm06#",
+                              Comment: "Created from backend startup. adm06.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm07",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm07#",
+                              Comment: "Created from backend startup. adm07.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm08",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm08#",
+                              Comment: "Created from backend startup. adm08.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm09",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm09#",
+                              Comment: "Created from backend startup. adm09.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 14 ].Id,
+                              GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "adm10",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Administrative_Asistant#,#adm10#",
+                              Comment: "Created from backend startup. adm10.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            }
                           ]
 
       const loopUserEntriesAsync = async () => {
@@ -179,20 +619,20 @@ export default class Always {
 
           const options = {
 
-            where: { Id: userToCreate.Id },
-            //individualHooks: true,
-            transaction: currentTransaction,
+                            where: { Id: userToCreate.Id },
+                            //individualHooks: true,
+                            transaction: currentTransaction,
 
-          }
+                          }
 
-          const sysUserInDB = await User.findOne( options );
+          const sysUserInDB = await SYSUser.findOne( options );
 
           if ( sysUserInDB === null ) {
 
-            await User.create(
-                               userToCreate,
-                               { transaction: currentTransaction }
-                             );
+            await SYSUser.create(
+                                  userToCreate,
+                                  { transaction: currentTransaction }
+                                );
 
           }
           else if ( !sysUserInDB.Tag ||
@@ -201,6 +641,7 @@ export default class Always {
             sysUserInDB.Name = userToCreate.Name;
             sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
             sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserInDB.DisabledBy = userToCreate.DisabledBy;
 
             //await sysUserInDB.save( { transaction: currentTransaction } ),
 
@@ -214,7 +655,6 @@ export default class Always {
       };
 
       await loopUserEntriesAsync();
-      */
 
       if ( currentTransaction !== null ) {
 

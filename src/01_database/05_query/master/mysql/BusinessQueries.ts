@@ -103,7 +103,7 @@ export default class BusinessQueries {
                             B.FirstName,
                             B.LastName,
                             G.DeviceInfoParsed As Device,
-                            C.Status As StatusCode,
+                            C.Code As StatusCode,
                             C.Description As StatusDescription,
                             E.Id As DeliveryZoneId,
                             E.Name As DeliveryZone,
@@ -175,7 +175,7 @@ export default class BusinessQueries {
                               TIMESTAMP( A.CreatedAt ) >= DATE_SUB( NOW(), INTERVAL 15 DAY )
                             )
                      Order By
-                            C.Status Desc,
+                            C.Code Desc,
                             E.Name Desc,
                             B.FirstName,
                             B.LastName,

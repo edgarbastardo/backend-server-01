@@ -8,15 +8,18 @@ import {
 } from "express";
 
 import CommonConstants from "../../../02_system/common/CommonConstants";
+import SystemConstants from "../../../02_system/common/SystemContants";
 
 import SystemUtilities from "../../../02_system/common/SystemUtilities";
 import CommonUtilities from "../../../02_system/common/CommonUtilities";
 
 import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
-import BaseService from "../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../02_system/common/managers/I18Manager";
+
+import BaseService from "../../../02_system/common/database/master/services/BaseService";
+
 import BIZDeliveryZoneService from "../../common/database/master/services/BIZDeliveryZoneService";
-import SystemConstants from "../../../02_system/common/SystemContants";
+
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
 const debug = require( "debug" )( "Dev007DeliveryZoneServicesController" );
@@ -269,9 +272,15 @@ export default class Dev007DeliveryZoneServicesController extends BaseService {
       let deliveryZoneRules = {
                                 Kind: [ "required", "integer", "min:0" ],
                                 Name: [ "required", "string" ],
-                                Distance: [ "required", "integer", "min:1" ],
-                                Quantity: [ "required", "integer", "min:1" ],
+                                DistanceUnit: [ "required", "integer", "min:0", "max:1" ],
+                                DistanceCalcKind: [ "required", "integer", "min:0" ],
+                                DistanceBase: [ "required", "numeric", "min:0" ],
+                                DistanceMax: [ "required", "numeric", "min:0" ],
+                                DistanceExtraCalcKind: [ "required", "integer", "min:0" ],
+                                DistanceExtraByUnit: [ "required", "numeric", "min:0" ],
+                                DeliveryByDriverMax: [ "required", "integer", "min:0" ],
                                 Comment: [ "present", "string" ],
+                                Tag: [ "present", "string" ],
                                 Business: [ "present" ],
                                 DisabledBy: [ "required", "string", "min:1", "max:1" ]
                               };
@@ -556,9 +565,15 @@ export default class Dev007DeliveryZoneServicesController extends BaseService {
                                 Id: [ "required", "string", "min:36" ],
                                 Kind: [ "required", "integer", "min:0" ],
                                 Name: [ "required", "string" ],
-                                Distance: [ "required", "integer", "min:1" ],
-                                Quantity: [ "required", "integer", "min:1" ],
+                                DistanceUnit: [ "required", "integer", "min:0", "max:1" ],
+                                DistanceCalcKind: [ "required", "integer", "min:0" ],
+                                DistanceBase: [ "required", "numeric", "min:0" ],
+                                DistanceMax: [ "required", "numeric", "min:0" ],
+                                DistanceExtraCalcKind: [ "required", "integer", "min:0" ],
+                                DistanceExtraByUnit: [ "required", "numeric", "min:0" ],
+                                DeliveryByDriverMax: [ "required", "integer", "min:0" ],
                                 Comment: [ "present", "string" ],
+                                Tag: [ "present", "string" ],
                                 Business: [ "present" ],
                                 DisabledBy: [ "required", "string", "min:1", "max:1" ]
                               };

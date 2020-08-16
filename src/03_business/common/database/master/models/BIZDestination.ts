@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -25,8 +25,8 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
@@ -85,6 +85,9 @@ export class BIZDestination extends Model<BIZDestination> {
 
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
+
+  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
+  Tag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -157,6 +160,9 @@ export class BIZDestination extends Model<BIZDestination> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -279,6 +285,7 @@ export class BIZDestination extends Model<BIZDestination> {
     }
 
     return result;
+    */
 
   }
 

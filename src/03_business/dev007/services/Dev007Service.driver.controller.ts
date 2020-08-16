@@ -11,16 +11,19 @@ import SystemUtilities from "../../../02_system/common/SystemUtilities";
 import CommonUtilities from "../../../02_system/common/CommonUtilities";
 
 import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
-import BaseService from "../../../02_system/common/database/master/services/BaseService";
-import I18NManager from "../../../02_system/common/managers/I18Manager";
-import BIZDriverStatusService from "../../common/database/master/services/BIZDriverStatusService";
-
-import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
-import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
-import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import InstantMessageServerManager from "../../../02_system/common/managers/InstantMessageServerManager";
 import CacheManager from "../../../02_system/common/managers/CacheManager";
+import I18NManager from "../../../02_system/common/managers/I18Manager";
+
+import BaseService from "../../../02_system/common/database/master/services/BaseService";
+
+import BIZDriverStatusService from "../../common/database/master/services/BIZDriverStatusService";
+import BIZDriverPositionService from "../../common/database/master/services/BIZDriverPositionService";
 import BIZDriverInDeliveryZoneService from "../../common/database/master/services/BIZDriverInDeliveryZoneService";
+
+import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
+
+import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 import { BIZDriverInDeliveryZone } from "../../common/database/master/models/BIZDriverInDeliveryZone";
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
@@ -1108,7 +1111,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                         );
 
       if ( bizDriverStatusInDB &&
-           bizDriverStatusInDB.Status === 1111 ) { //Only working can set yout delivery zone
+           bizDriverStatusInDB.Code === 1111 ) { //Only working can set yout delivery zone
 
         let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
                                                                                                                      null, //By default use the current date in the server
@@ -1157,9 +1160,9 @@ export default class Dev007DriverServicesController extends BaseService {
 
         }
         else if ( bizDriverInDeliveryZoneInDB &&
-                  bizDriverInDeliveryZoneInDB.LockTag &&
+                  bizDriverInDeliveryZoneInDB.Tag &&
                   bIsAdmin === false &&
-                  userSessionStatus?.Role?.includes( bizDriverInDeliveryZoneInDB.LockTag ) === false ) {
+                  userSessionStatus?.Role?.includes( bizDriverInDeliveryZoneInDB.Tag ) === false ) {
 
           result = {
                      StatusCode: 403, //Forbidden

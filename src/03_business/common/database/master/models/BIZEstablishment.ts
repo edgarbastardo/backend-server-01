@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -27,10 +27,10 @@ import { BuildOptions } from "sequelize/types";
 
 import { BIZDeliveryZone } from "./BIZDeliveryZone";
 
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
@@ -87,6 +87,9 @@ export class BIZEstablishment extends Model<BIZEstablishment> {
 
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
+
+  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
+  Tag: string;
 
   @NotNull
   @NotEmpty
@@ -166,6 +169,9 @@ export class BIZEstablishment extends Model<BIZEstablishment> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -288,6 +294,7 @@ export class BIZEstablishment extends Model<BIZEstablishment> {
     }
 
     return result;
+    */
 
   }
 

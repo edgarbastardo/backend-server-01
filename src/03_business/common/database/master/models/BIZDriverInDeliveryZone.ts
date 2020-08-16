@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -25,9 +25,9 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
@@ -71,7 +71,7 @@ export class BIZDriverInDeliveryZone extends Model<BIZDriverInDeliveryZone> {
   ShortToken: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
-  LockTag: string;
+  Tag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -144,6 +144,9 @@ export class BIZDriverInDeliveryZone extends Model<BIZDriverInDeliveryZone> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -355,6 +358,7 @@ export class BIZDriverInDeliveryZone extends Model<BIZDriverInDeliveryZone> {
     }
 
     return result;
+    */
 
   }
 

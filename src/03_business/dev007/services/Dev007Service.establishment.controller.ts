@@ -8,17 +8,20 @@ import {
 } from "express";
 
 import CommonConstants from "../../../02_system/common/CommonConstants";
+import SystemConstants from "../../../02_system/common/SystemContants";
 
 import SystemUtilities from "../../../02_system/common/SystemUtilities";
 import CommonUtilities from "../../../02_system/common/CommonUtilities";
 
 import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
-import BaseService from "../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../02_system/common/managers/I18Manager";
+
+import BaseService from "../../../02_system/common/database/master/services/BaseService";
+
 import BIZEstablishmentService from "../../common/database/master/services/BIZEstablishmentService";
-import { BIZEstablishment } from "../../common/database/master/models/BIZEstablishment";
 import BIZDeliveryZoneService from "../../common/database/master/services/BIZDeliveryZoneService";
-import SystemConstants from "../../../02_system/common/SystemContants";
+
+import { BIZEstablishment } from "../../common/database/master/models/BIZEstablishment";
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
 const debug = require( "debug" )( "Dev007EstablishmentServicesController" );
@@ -279,6 +282,7 @@ export default class Dev007EstablishmentServicesController extends BaseService {
                                  EMail: [ "present", "string" ],
                                  Phone: [ "present", "string" ],
                                  Comment: [ "present", "string" ],
+                                 Tag: [ "present", "string" ],
                                  Business: [ "present" ],
                                  DisabledBy: [ "required", "string", "min:1", "max:1" ]
                                };
@@ -338,8 +342,13 @@ export default class Dev007EstablishmentServicesController extends BaseService {
                   bizDeliveryZoneInDB = await BIZDeliveryZoneService.createOrUpdate( {
                                                                                        Kind: request.body.Kind,
                                                                                        Name: request.body.Name,
-                                                                                       Distance: 4,
-                                                                                       Quantity: 3,
+                                                                                       DistanceUnit: 0, //0 = Miles,1 = Kilometers
+                                                                                       DistanceCalcKind: 0,
+                                                                                       DistanceBase: 4,
+                                                                                       DistanceMax: 10,
+                                                                                       DistanceExtraCalcKind: 0,
+                                                                                       DistanceExtraByUnit: 1.66,
+                                                                                       DeliveryByDriverMax: 3,
                                                                                        Comment: "Auto created",
                                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                        CreatedAt: null,
@@ -807,8 +816,13 @@ export default class Dev007EstablishmentServicesController extends BaseService {
                     bizDeliveryZoneInDB = await BIZDeliveryZoneService.createOrUpdate( {
                                                                                          Kind: request.body.Kind,
                                                                                          Name: request.body.Name,
-                                                                                         Distance: 4,
-                                                                                         Quantity: 3,
+                                                                                         DistanceUnit: 0, //0 = Miles,1 = Kilometers
+                                                                                         DistanceCalcKind: 0,
+                                                                                         DistanceBase: 4,
+                                                                                         DistanceMax: 10,
+                                                                                         DistanceExtraCalcKind: 0,
+                                                                                         DistanceExtraByUnit: 1.66,
+                                                                                         DeliveryByDriverMax: 3,
                                                                                          Comment: "Auto created",
                                                                                          CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                          CreatedAt: null,

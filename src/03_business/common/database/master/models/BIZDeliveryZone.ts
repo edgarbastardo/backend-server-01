@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Model,
@@ -18,8 +18,8 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
@@ -50,14 +50,32 @@ export class BIZDeliveryZone extends Model<BIZDeliveryZone> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   Name: string;
 
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: false } )
-  Distance: number;
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  DistanceUnit: number;
 
   @Column( { type: DataType.SMALLINT, allowNull: false } )
-  Quantity: number;
+  DistanceCalcKind: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: false } )
+  DistanceBase: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: false } )
+  DistanceMax: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: false } )
+  DistanceExtraCalcKind: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: false } )
+  DistanceExtraByUnit: number;
+
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  DeliveryByDriverMax: number;
 
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
+
+  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
+  Tag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -130,6 +148,9 @@ export class BIZDeliveryZone extends Model<BIZDeliveryZone> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -252,6 +273,7 @@ export class BIZDeliveryZone extends Model<BIZDeliveryZone> {
     }
 
     return result;
+    */
 
   }
 

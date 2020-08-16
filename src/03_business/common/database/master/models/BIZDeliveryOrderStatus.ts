@@ -1,4 +1,4 @@
-import cluster from "cluster";
+//import cluster from "cluster";
 
 import {
          Table,
@@ -25,23 +25,23 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
-import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
-import CommonConstants from "../../../../../02_system/common/CommonConstants";
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
+//import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
-import { BIZDelivery } from "./BIZDelivery";
+import { BIZDeliveryOrder } from "./BIZDeliveryOrder";
 
-const debug = require( "debug" )( "BIZDeliveryStatus" );
+const debug = require( "debug" )( "BIZDeliveryOrderStatus" );
 
 @Table( {
   timestamps: false,
-  tableName: "bizDeliveryStatus",
-  modelName: "bizDeliveryStatus"
+  tableName: "bizDeliveryOrderStatus",
+  modelName: "bizDeliveryOrderStatus"
 } )
-export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
+export class BIZDeliveryOrderStatus extends Model<BIZDeliveryOrderStatus> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -57,14 +57,17 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => BIZDelivery )
-  DeliveryId: string;
+  @ForeignKey( () => BIZDeliveryOrder )
+  DeliveryOrderId: string;
 
   @Column( { type: DataType.SMALLINT, allowNull: false } )
-  Status: number;
+  Code: number;
 
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
-  Comment: string;
+  @Column( { type: DataType.STRING( 50 ), allowNull: false } )
+  Description: string;
+
+  @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
+  Tag: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -75,23 +78,23 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
   @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => BIZDelivery, "DeliveryId" )
-  bizDelivery: BIZDelivery;
+  @BelongsTo( () => BIZDeliveryOrder, "DeliveryOrderId" )
+  bizDeliveryOrder: BIZDeliveryOrder;
 
   @BeforeValidate
-  static beforeValidateHook( instance: BIZDeliveryStatus, options: any ): void {
+  static beforeValidateHook( instance: BIZDeliveryOrderStatus, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: BIZDeliveryStatus, options: any ): void {
+  static beforeCreateHook( instance: BIZDeliveryOrderStatus, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryStatus",
+                                             "bizDeliveryOrderStatus",
                                              "create",
                                              instance,
                                              null );
@@ -99,14 +102,14 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: BIZDeliveryStatus, options: any ): void {
+  static beforeUpdateHook( instance: BIZDeliveryOrderStatus, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryStatus",
+                                             "bizDeliveryOrderStatus",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -114,12 +117,12 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: BIZDeliveryStatus, options: any ): void {
+  static beforeDestroyHook( instance: BIZDeliveryOrderStatus, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryStatus",
+                                             "bizDeliveryOrderStatus",
                                              "delete",
                                              instance,
                                              null );
@@ -128,6 +131,9 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -250,6 +256,7 @@ export class BIZDeliveryStatus extends Model<BIZDeliveryStatus> {
     }
 
     return result;
+    */
 
   }
 

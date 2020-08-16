@@ -8,8 +8,8 @@ import {
          Column,
          BeforeValidate,
          //HasOne,
-         ForeignKey,
-         BelongsTo,
+         //ForeignKey,
+         //BelongsTo,
          //BeforeCreate,
          //BeforeUpdate,
          //Is,
@@ -25,23 +25,23 @@ import {
 
 import { BuildOptions } from "sequelize/types";
 
+//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 //import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
-//import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
-import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
+//import { BIZDeliveryOrder } from "./BIZDeliveryOrder";
 
-const debug = require( "debug" )( "BIZDriverStatus" );
+const debug = require( "debug" )( "BIZDeliveryOrderStatus" );
 
 @Table( {
   timestamps: false,
-  tableName: "bizDriverStatus",
-  modelName: "bizDriverStatus"
+  tableName: "bizDeliveryOrderStatusStep",
+  modelName: "bizDeliveryOrderStatusStep"
 } )
-export class BIZDriverStatus extends Model<BIZDriverStatus> {
+export class BIZDeliveryOrderStatusStep extends Model<BIZDeliveryOrderStatusStep> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -49,23 +49,33 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
   }
 
-  @ForeignKey( () => SYSUser )
   @PrimaryKey
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  UserId: string;
+  @Column( { type: DataType.STRING( 40 ) } )
+  Id: string;
 
-  @PrimaryKey
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
-  AtDate: string;
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Kind: number;
 
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  ShortToken: string;
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Sequence: number;
+
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  First: number;
+
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Last: number;
+
+  @Column( { type: DataType.SMALLINT, allowNull: false } )
+  Canceled: number;
 
   @Column( { type: DataType.SMALLINT, allowNull: false } )
   Code: number;
 
   @Column( { type: DataType.STRING( 50 ), allowNull: false } )
   Description: string;
+
+  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  Comment: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
@@ -82,26 +92,29 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   UpdatedAt: string;
 
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
+  DisabledBy: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  DisabledAt: string;
+
   @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => SYSUser, "UserId" )
-  sysUser: SYSUser;
-
   @BeforeValidate
-  static beforeValidateHook( instance: BIZDriverStatus, options: any ): void {
+  static beforeValidateHook( instance: BIZDeliveryOrderStatusStep, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: BIZDriverStatus, options: any ): void {
+  static beforeCreateHook( instance: BIZDeliveryOrderStatusStep, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDriverStatus",
+                                             "bizDeliveryOrderStatusStep",
                                              "create",
                                              instance,
                                              null );
@@ -109,14 +122,14 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: BIZDriverStatus, options: any ): void {
+  static beforeUpdateHook( instance: BIZDeliveryOrderStatusStep, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDriverStatus",
+                                             "bizDeliveryOrderStatusStep",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -124,12 +137,12 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: BIZDriverStatus, options: any ): void {
+  static beforeDestroyHook( instance: BIZDeliveryOrderStatusStep, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDriverStatus",
+                                             "bizDeliveryOrderStatusStep",
                                              "delete",
                                              instance,
                                              null );
@@ -168,95 +181,6 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
                                                                                               strTimeZoneId,
                                                                                               params.Logger );
 
-              if ( params.FilterFields === 1 ) {
-
-                delete result[ modelIncluded.model.name ].Password; //Delete fields password
-
-              }
-              else if ( params.FilterFields?.length > 0 ) {
-
-                delete result[ modelIncluded.model.name ].Password; //Delete fields password
-
-                result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
-                                                                                         params.FilterFields,
-                                                                                         params.logger );
-
-              }
-
-              if ( params.IncludeFields?.length > 0 ) {
-
-                result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
-                                                                                          params.IncludeFields,
-                                                                                          params.logger );
-
-              }
-
-              if ( result[ modelIncluded.model.name ].ExtraData ) {
-
-                let extraData = result[ modelIncluded.model.name ].ExtraData;
-
-                if ( typeof extraData === "string" ) {
-
-                  extraData = CommonUtilities.parseJSON( extraData,
-                                                         params.logger );
-
-                }
-
-                if ( extraData &&
-                     extraData.Private ) {
-
-                  delete extraData.Private;
-
-                }
-
-                if ( !params.KeepExtraData ||
-                     params.KeepExtraData === 0 ) {
-
-                  if ( extraData.Business ) {
-
-                    result[ modelIncluded.model.name ].Business = extraData.Business;
-
-                    delete extraData.Business;
-
-                    if ( extraData ) {
-
-                      result[ modelIncluded.model.name ].Business = { ...result[ modelIncluded.model.name ].Business, ...extraData };
-
-                    }
-
-                  }
-                  else {
-
-                    result[ modelIncluded.model.name ].Business = extraData;
-
-                  }
-
-                  delete result[ modelIncluded.model.name ].ExtraData;
-
-                }
-                else {
-
-                  result[ modelIncluded.model.name ].ExtraData = extraData;
-
-                }
-
-              }
-
-            }
-
-          }
-
-        }
-
-        if ( Array.isArray( params.Exclude ) ) {
-
-          for ( const modelToExcluded of params.Exclude ) {
-
-            if ( modelToExcluded.model &&
-                 result[ modelToExcluded.model.name ] ) {
-
-              delete result[ modelToExcluded.model.name ];
-
             }
 
           }
@@ -283,8 +207,8 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
         }
 
-        if ( !params.KeepExtraData ||
-             params.KeepExtraData === 0 ) {
+        if ( !params.KeepGroupExtraData ||
+             params.KeepGroupExtraData === 0 ) {
 
           if ( extraData.Business ) {
 
@@ -330,7 +254,7 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
       sourcePosition.method = this.name + "." + this.convertFieldValues.name;
 
-      const strMark = "7ADAFE05EE0E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "1499BDA8790A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -358,7 +282,7 @@ export class BIZDriverStatus extends Model<BIZDriverStatus> {
 
   public getPrimaryKey(): string[] {
 
-    return [ "UserId" ];
+    return [ "Id" ];
 
   }
 
