@@ -895,6 +895,9 @@ export default class SecurityServiceController {
                                                             true,
                                                             logger );
 
+        let strBasicRoles = SystemUtilities.mergeBasicRole( strRolesMerged );
+
+        /*
         let strBasicRoles = "";
 
         if ( strRolesMerged.includes( "#Authenticated#" ) === false ) {
@@ -931,6 +934,7 @@ export default class SecurityServiceController {
           }
 
         }
+        */
 
         const configData = await SecurityServiceController.getConfigExpireTimeAuthentication( sysUserInDB.sysUserGroup.Id,
                                                                                               sysUserInDB.sysUserGroup.Name,
@@ -1144,6 +1148,20 @@ export default class SecurityServiceController {
           userSessionStatusData[ "LoggedOutAt" ] = null;
 
           delete userSessionStatusData[ "ExtraData" ];
+
+          let debugMark = debug.extend( "D2FD68313438" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+          if ( userSessionStatusData.Role?.includes( "#Authenticated#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Authenticated#" );
+
+          }
+
+          if ( userSessionStatusData.Role?.includes( "#Public#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Public#" );
+
+          }
 
           await CacheManager.setDataWithTTL( strAuthorization,
                                              JSON.stringify( userSessionStatusData ),
