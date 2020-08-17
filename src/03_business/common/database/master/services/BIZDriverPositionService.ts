@@ -168,6 +168,7 @@ export default class BIZDriverPositionService extends BaseService {
                                                                                Longitude: bulkData[ intIndex ].Longitude,
                                                                                Altitude: bulkData[ intIndex ].Altitude,
                                                                                Speed: bulkData[ intIndex ].Speed,
+                                                                               Code: bulkData[ intIndex ].Code,
                                                                                CreatedBy: strUserName,
                                                                                CreatedAt: bulkData[ intIndex ].CreatedAt ||
                                                                                           SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),

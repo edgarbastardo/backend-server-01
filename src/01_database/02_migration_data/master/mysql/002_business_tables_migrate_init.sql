@@ -188,6 +188,22 @@ CREATE TABLE IF NOT EXISTS `bizDriverInDeliveryZone` (
   CONSTRAINT `FK_bizDriInDeliveryZone_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of driver delivery zone.';
 
+CREATE TABLE IF NOT EXISTS `bizDriverStatus` (
+  `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',
+  `AtDate` date NOT NULL date NOT NULL COMMENT 'Indicate the date for delivery zone',
+  `ShortToken` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUserSessionStatus on field ShortToken',
+  `Code` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Status id of the driver, 1111 = Working, 1100 = Working (Finishing), 0 = Not working',
+  `Description` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Status text of the driver, 1111 = Working, 1100 = Working (Finishing), 0 = Not working',
+  `Tag` varchar(1024) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Help when allow (Tag === #Driver#) ot not (Tag !== #Driver#) to driver to change the delivery zone by your self.',
+  `CreatedBy` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`UserId`,`AtDate`),
+  CONSTRAINT `FK_bizDriverStatus_UserId_From_sysUser_Id` FOREIGN KEY (`UserId`) REFERENCES `sysUser` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the info of driver status.';
+
 CREATE TABLE IF NOT EXISTS `bizDriverPosition` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `UserId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table sysUser',

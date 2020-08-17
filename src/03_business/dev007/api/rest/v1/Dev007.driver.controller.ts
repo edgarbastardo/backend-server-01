@@ -128,7 +128,7 @@ export default class Dev007DriverController {
 
     if ( request.body ) {
 
-      request.body.Status = 1111;
+      request.body.Code = 1111;
       request.body.Description = "Working";
 
     }
@@ -136,7 +136,7 @@ export default class Dev007DriverController {
 
       request.body = {
 
-                       Status: 1111,
+                       Code: 1111,
                        Description: "Working"
 
                      }
@@ -162,9 +162,10 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
+    //TODO check if driver had deliveries actives to set 1100 Working (Finishing)
     if ( request.body ) {
 
-      request.body.Status = 0;
+      request.body.Code = 0;
       request.body.Description = "Not working";
 
     }
@@ -172,7 +173,7 @@ export default class Dev007DriverController {
 
       request.body = {
 
-                       Status: 0,
+                       Code: 0,
                        Description: "Not working"
 
                      }

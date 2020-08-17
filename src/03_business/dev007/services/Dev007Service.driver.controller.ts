@@ -72,7 +72,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                UserId: userSessionStatus.UserId,
                                                                                AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
                                                                                ShortToken: userSessionStatus.ShortToken,
-                                                                               Status: request.body.Status, //1111 = Working, 0 = Not working
+                                                                               Code: request.body.Code, //1111 = Working, 1100 = Working (Finishing), 0 = Not working
                                                                                Description: request.body.Description,
                                                                                CreatedBy: userSessionStatus.UserName,
                                                                                UpdatedBy: userSessionStatus.UserName,
@@ -378,9 +378,9 @@ export default class Dev007DriverServicesController extends BaseService {
 
                                                                              UserId: userSessionStatus.UserId,
                                                                              AtDate: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ),
-                                                                             Status: 0, //1111 = Working, 0 = Not working
-                                                                             ShortToken: userSessionStatus.ShortToken,
+                                                                             Code: 0, //1111 = Working, 1100 = Working (Finishing), 0 = Not working
                                                                              Description: "Not working",
+                                                                             ShortToken: userSessionStatus.ShortToken,
                                                                              CreatedBy: userSessionStatus.UserName,
                                                                              UpdatedBy: userSessionStatus.UserName,
 
@@ -594,6 +594,7 @@ export default class Dev007DriverServicesController extends BaseService {
                               "bulk.*.Longitude": [ "required", "numeric" ],
                               "bulk.*.Altitude": [ "required", "numeric" ],
                               "bulk.*.Speed": [ "required", "numeric" ],
+                              "bulk.*.Code": [ "present", "numeric" ],
                               "bulk.*.CreatedAt": [ "present", "string" ],
                             };
 

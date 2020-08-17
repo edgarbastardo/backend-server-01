@@ -997,7 +997,8 @@ export default class Dev007DispatcherServicesController extends BaseService {
 
             const driverStatus = driverStatusList[ intDriverStatusIndex ];
 
-            if ( driverStatus.StatusCode === 1111 ) {
+            if ( driverStatus.StatusCode === 1111 ||
+                 driverStatus.StatusCode === 1100 ) {
 
               let bDriverFound = false;
 
