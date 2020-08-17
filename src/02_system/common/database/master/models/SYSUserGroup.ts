@@ -130,6 +130,9 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -341,6 +344,7 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
     }
 
     return result;
+    */
 
   }
 
