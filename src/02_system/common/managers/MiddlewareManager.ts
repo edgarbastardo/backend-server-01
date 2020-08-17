@@ -769,7 +769,9 @@ export default class MiddlewareManager {
 
     }
 
-    const roles = await SystemUtilities.getRoleOfRoute( CommonUtilities.getRequestKindFromString( request.method ), //Always post
+    const strHTTPMethod = CommonUtilities.getRequestKindFromString( request.method );
+
+    const roles = await SystemUtilities.getRoleOfRoute( strHTTPMethod, //Always post
                                                         strPath,
                                                         true,
                                                         logger );
@@ -777,6 +779,28 @@ export default class MiddlewareManager {
     const bIsAuthorized = CommonUtilities.isInList( roles,
                                                     userSessionStatus?.Role,
                                                     logger );
+
+    if ( process.env.DEBUG_CHECK_IS_AUTHORIZED === "1" &&
+         ( !process.env.DEBUG_CHECK_IS_AUTHORIZED_USER ||
+           process.env.DEBUG_CHECK_IS_AUTHORIZED_USER.split( "," ).includes( userSessionStatus?.UserName )  ) ) {
+
+      const strMark = "D512323F8526" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Method String: [%s]", request.method );
+      debugMark( "Method Number: [%s]", strHTTPMethod );
+      debugMark( "Path: [%s]", strPath );
+      debugMark( "Support Token: [%s]", userSessionStatus?.ShortToken );
+      debugMark( "Binary Token: [%s]", userSessionStatus?.BinaryDataToken );
+      debugMark( "Socket Token: [%s]", userSessionStatus?.SocketToken );
+      debugMark( "Roles in database: [%s]", roles );
+      debugMark( "User id in session: [%s]", userSessionStatus?.UserId );
+      debugMark( "User name in session: [%s]", userSessionStatus?.UserName );
+      debugMark( "Roles in session: [%s]", userSessionStatus?.Role );
+      debugMark( "IsAuthorized: [%s]", bIsAuthorized );
+
+    }
 
     if ( bIsAuthorized === false ) {
 
