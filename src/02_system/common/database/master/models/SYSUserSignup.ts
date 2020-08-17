@@ -186,6 +186,9 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -397,6 +400,7 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
     }
 
     return result;
+    */
 
   }
 

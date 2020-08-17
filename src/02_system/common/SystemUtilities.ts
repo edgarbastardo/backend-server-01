@@ -879,6 +879,49 @@ export default class SystemUtilities {
 
   }
 
+  static mergeBasicRole( strRoles: string ): string {
+
+    let strResult = "";
+
+    if ( strRoles?.includes( "#Authenticated#" ) === false ) {
+
+      if ( strRoles.length > 0 ) {
+
+        strResult = ",#Authenticated#";
+
+      }
+      else {
+
+        strResult = "#Authenticated#";
+
+      }
+
+    }
+
+    if ( strRoles?.includes( "#Public#" ) === false ) {
+
+      if ( strResult.length > 0 ) {
+
+        strResult = strResult + ",#Public#";
+
+      }
+      else if ( strRoles.length > 0 ) {
+
+        strResult = ",#Public#";
+
+      }
+      else {
+
+        strResult = "#Public#";
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
   static async getUserSessionStatusPersistent( strToken: string,
                                                requestContext: any,
                                                bUpdateAt: boolean,
@@ -901,11 +944,27 @@ export default class SystemUtilities {
         result = CommonUtilities.parseJSON( strJSONUserSessionStatus,
                                             logger ); //Try to parse and transform to json object
 
-        if ( result &&
-             !result.UserGroupName ) {
+        let debugMark = debug.extend( "386299777D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-          let debugMark = debug.extend( "386299777D40" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+        if ( result ) {
+
+          if ( !result.UserGroupName ) {
+
+            debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+          }
+
+          if ( result.Role?.includes( "#Authenticated#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Authenticated#" );
+
+          }
+
+          if ( result.Role?.includes( "#Public#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Public#" );
+
+          }
 
         }
 
@@ -955,6 +1014,47 @@ export default class SystemUtilities {
                                                               true,
                                                               logger );
 
+          let strBasicRoles = SystemUtilities.mergeBasicRole( strRolesMerged );
+
+          /*
+          let strBasicRoles = "";
+
+          if ( strRolesMerged?.includes( "#Authenticated#" ) === false ) {
+
+            if ( strRolesMerged.length > 0 ) {
+
+              strBasicRoles = ",#Authenticated#";
+
+            }
+            else {
+
+              strBasicRoles = "#Authenticated#";
+
+            }
+
+          }
+
+          if ( strRolesMerged?.includes( "#Public#" ) === false ) {
+
+            if ( strBasicRoles.length > 0 ) {
+
+              strBasicRoles = strBasicRoles + ",#Public#";
+
+            }
+            else if ( strRolesMerged.length > 0 ) {
+
+              strBasicRoles = ",#Public#";
+
+            }
+            else {
+
+              strBasicRoles = "#Public#";
+
+            }
+
+          }
+          */
+
           const expireAt = SystemUtilities.selectMoreCloseTimeBetweenTwo( userSession.Data.DisabledAt,
                                                                           userSession.Data.ExpireAt );
 
@@ -972,7 +1072,7 @@ export default class SystemUtilities {
                        SocketToken: userSession.Data[ "SocketToken" ],
                        FrontendId: requestContext && requestContext.FrontendId ? requestContext.FrontendId: "Unknown_FrontendId",
                        SourceIPAddress: requestContext && requestContext.SourceIPAddress ? requestContext.SourceIPAddress: "Unknown_IP",
-                       Role: strRolesMerged,
+                       Role: strRolesMerged + strBasicRoles,
                        ExpireKind: 3,
                        ExpireOn: expireAt,
                        HardLimit: null,
@@ -1076,11 +1176,27 @@ export default class SystemUtilities {
         result = CommonUtilities.parseJSON( strJSONUserSessionStatus,
                                             logger ); //Try to parse and transform to json object
 
-        if ( result &&
-             !result.UserGroupName ) {
+        let debugMark = debug.extend( "AA5A6DE536DF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-          let debugMark = debug.extend( "AA5A6DE536DF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
-          debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+        if ( result ) {
+
+          if ( !result.UserGroupName ) {
+
+            debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
+
+          }
+
+          if ( result.Role?.includes( "#Authenticated#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Authenticated#" );
+
+          }
+
+          if ( result.Role?.includes( "#Public#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Public#" );
+
+          }
 
         }
 
@@ -1320,7 +1436,48 @@ export default class SystemUtilities {
                                                             true,
                                                             logger );
 
-        userSessionStatus.Role = strRolesMerged; //Update the roles
+        let strBasicRoles = SystemUtilities.mergeBasicRole( strRolesMerged );
+
+        /*
+        let strBasicRoles = "";
+
+        if ( strRolesMerged?.includes( "#Authenticated#" ) === false ) {
+
+          if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Authenticated#";
+
+          }
+          else {
+
+            strBasicRoles = "#Authenticated#";
+
+          }
+
+        }
+
+        if ( strRolesMerged?.includes( "#Public#" ) === false ) {
+
+          if ( strBasicRoles.length > 0 ) {
+
+            strBasicRoles = strBasicRoles + ",#Public#";
+
+          }
+          else if ( strRolesMerged.length > 0 ) {
+
+            strBasicRoles = ",#Public#";
+
+          }
+          else {
+
+            strBasicRoles = "#Public#";
+
+          }
+
+        }
+        */
+
+        userSessionStatus.Role = strRolesMerged + strBasicRoles; //Update the roles
 
       }
 
@@ -1345,12 +1502,26 @@ export default class SystemUtilities {
         if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ||
              options.ForceUpdate ) { //Stay sure we had the resource locked or forced to updated is true
 
+          let debugMark = debug.extend( "E9008B789BF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
           if ( !userSessionStatus.UserGroupName ) {
 
-            let debugMark = debug.extend( "E9008B789BF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
             debugMark( "Warning userSessionStatus.UserGroupName is null or undefined" );
 
           }
+
+          if ( userSessionStatus.Role?.includes( "#Authenticated#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Authenticated#" );
+
+          }
+
+          if ( userSessionStatus.Role?.includes( "#Public#" ) === false ) {
+
+            debugMark( "Warning userSessionStatus.Role not contain role #Public#" );
+
+          }
+
           await CacheManager.setDataWithTTL( strToken,
                                              JSON.stringify( userSessionStatus ),
                                              300, //5 minutes in seconds

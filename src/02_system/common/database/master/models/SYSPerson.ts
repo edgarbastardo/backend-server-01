@@ -151,6 +151,9 @@ export class SYSPerson extends Model<SYSPerson> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -362,6 +365,7 @@ export class SYSPerson extends Model<SYSPerson> {
     }
 
     return result;
+    */
 
   }
 
