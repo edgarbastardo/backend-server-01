@@ -124,6 +124,9 @@ export class SYSActionToken extends Model<SYSActionToken> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -335,6 +338,7 @@ export class SYSActionToken extends Model<SYSActionToken> {
     }
 
     return result;
+    */
 
   }
 
