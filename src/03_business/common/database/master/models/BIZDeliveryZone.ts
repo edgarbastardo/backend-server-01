@@ -11,7 +11,7 @@ import {
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,
-         AutoIncrement,
+         //AutoIncrement,
          //AutoIncrement,
          //AfterFind,
        } from "sequelize-typescript";

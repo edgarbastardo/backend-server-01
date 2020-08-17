@@ -1202,7 +1202,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                                    StartAt: bizDriverInDeliveryZoneInDB.StartAt,
                                                                                                    EndAt: SystemUtilities.getCurrentDateAndTime().format(), //Close the entry with the current hour
                                                                                                    ShortToken: bizDriverInDeliveryZoneInDB.ShortToken,
-                                                                                                   LockTag: "#Driver#",
+                                                                                                   Tag: "#Driver#",
                                                                                                    UpdatedBy: userSessionStatus.UserName,
 
                                                                                                  },
@@ -1233,7 +1233,7 @@ export default class Dev007DriverServicesController extends BaseService {
                                                                                                  StartAt: SystemUtilities.getCurrentDateAndTime().format(),
                                                                                                  EndAt: null, //Not closed entry
                                                                                                  ShortToken: userSessionStatus.ShortToken,
-                                                                                                 LockTag: "#Driver#",
+                                                                                                 Tag: "#Driver#",
                                                                                                  CreatedBy: userSessionStatus.UserName,
 
                                                                                                },

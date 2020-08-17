@@ -16,7 +16,7 @@ import {
          NotNull,
          NotEmpty,
          IsUUID,
-         Unique,
+         //Unique,
          BeforeUpdate,
          BeforeCreate,
          BeforeDestroy,

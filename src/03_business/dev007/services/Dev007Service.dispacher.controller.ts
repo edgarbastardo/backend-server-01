@@ -495,7 +495,7 @@ export default class Dev007DispatcherServicesController extends BaseService {
                                                                                                ShortToken: bizDriverInDeliveryZoneInDB?.ShortToken ?
                                                                                                            bizDriverInDeliveryZoneInDB.ShortToken:
                                                                                                            userSessionStatus.ShortToken,
-                                                                                               LockTag: request.body.Lock === 1 ? "#Dispatcher#": "#Driver#",
+                                                                                               Tag: request.body.Lock === 1 ? "#Dispatcher#": "#Driver#",
                                                                                                CreatedBy: userSessionStatus.UserName,
 
                                                                                              },

@@ -20,7 +20,7 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select StartAt, EndAt, LockTag From bizDriverStatus limit 1, 1";
+      let strSQL = "Select StartAt, EndAt, Tag From bizDriverStatus limit 1, 1";
 
       try {
 
@@ -38,7 +38,7 @@ export default class Migrate {
                  "ALTER TABLE `bizDriverInDeliveryZone` " +
                  "ADD COLUMN `EndAt` VARCHAR(40) NULL AFTER `StartAt`," +
                  "CHANGE COLUMN `AtDate` `StartAt` VARCHAR(30) NOT NULL ," +
-                 "CHANGE COLUMN `LockByRole` `LockTag` VARCHAR(30) NOT NULL;"
+                 "CHANGE COLUMN `LockByRole` `Tag` VARCHAR(1024) NOT NULL;"
 
         await dbConnection.query( strSQL );
 

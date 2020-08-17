@@ -104,10 +104,10 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   CanceledBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   CanceledAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
