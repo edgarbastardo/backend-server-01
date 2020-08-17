@@ -20,7 +20,7 @@ import { BuildOptions } from "sequelize/types";
 //import moment from "moment-timezone";
 
 //import CommonUtilities from "../../CommonUtilities";
-import SystemUtilities from "../../../SystemUtilities";
+//import SystemUtilities from "../../../SystemUtilities";
 
 @Table( {
   timestamps: false,

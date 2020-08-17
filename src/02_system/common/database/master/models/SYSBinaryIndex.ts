@@ -177,6 +177,9 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
 
   static async convertFieldValues( params: any ): Promise<any> {
 
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+    /*
     let result = null;
 
     try {
@@ -388,6 +391,7 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
     }
 
     return result;
+    */
 
   }
 
