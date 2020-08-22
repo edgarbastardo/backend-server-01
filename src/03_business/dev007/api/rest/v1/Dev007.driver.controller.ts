@@ -30,7 +30,9 @@ import SYSRouteService from "../../../../../02_system/common/database/master/ser
 //import I18NManager from "../../../../02_system/common/managers/I18Manager";
 import MiddlewareManager from "../../../../../02_system/common/managers/MiddlewareManager";
 //import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
-import Dev007DriverServicesController from "../../../services/Dev007Service.driver.controller";
+
+import Dev007ServicesDriverController from "../../../services/Dev007Service.driver.controller";
+import Dev007ServicesDriverDeliveryOrderCreateController from "../../../services/Dev007Service.driver.delivery.order.create.controller";
 
 const debug = require( "debug" )( "Dev007.driver.controller" );
 
@@ -59,6 +61,16 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/position", Action: "v1.business.dev007.driver.position.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the drivers position" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/zone", Action: "v1.business.dev007.driver.delivery.zone.set", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Set the delivery zone to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/zone", Action: "v1.business.dev007.driver.delivery.zone.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current delivery zone from the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/zone/establishment/search", Action: "v1.business.dev007.driver.delivery.zone.establishment.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the establishment in delivery zone" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/zone/establishment/search/count", Action: "v1.business.dev007.driver.delivery.zone.establishment.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the establishment count in delivery zone" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/active", Action: "v1.business.dev007.driver.delivery.order.active", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "List active delivery order information" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/active/count", Action: "v1.business.dev007.driver.delivery.order.active.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "List active delivery order count information" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/search", Action: "v1.business.dev007.driver.delivery.order.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Search for delivery order information" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/search/count", Action: "v1.business.dev007.driver.delivery.order.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Search for delivery order count information" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Create a new delivery order to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Modify a delivery order to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/next", Action: "v1.business.dev007.driver.delivery.order.status.next", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the next status the delivery order" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/previous", Action: "v1.business.dev007.driver.delivery.order.status.previous", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the previous status the delivery order" },
                                 ]
 
   _controllerLogger = null;
@@ -143,7 +155,7 @@ export default class Dev007DriverController {
 
     }
 
-    const result = await Dev007DriverServicesController.setStatus( request,
+    const result = await Dev007ServicesDriverController.setStatus( request,
                                                                    response,
                                                                    null,
                                                                    context.logger );
@@ -180,7 +192,7 @@ export default class Dev007DriverController {
 
     }
 
-    const result = await Dev007DriverServicesController.setStatus( request,
+    const result = await Dev007ServicesDriverController.setStatus( request,
                                                                    response,
                                                                    null,
                                                                    context.logger );
@@ -199,7 +211,7 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.getStatus( request,
+    const result = await Dev007ServicesDriverController.getStatus( request,
                                                                    response,
                                                                    null,
                                                                    context.logger );
@@ -218,7 +230,7 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.setPosition( request,
+    const result = await Dev007ServicesDriverController.setPosition( request,
                                                                      response,
                                                                      null,
                                                                      context.logger );
@@ -237,7 +249,7 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.getPosition( request,
+    const result = await Dev007ServicesDriverController.getPosition( request,
                                                                      response,
                                                                      null,
                                                                      context.logger );
@@ -256,7 +268,7 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.setDeliveryZone( request,
+    const result = await Dev007ServicesDriverController.setDeliveryZone( request,
                                                                          response,
                                                                          null,
                                                                          context.logger );
@@ -275,10 +287,262 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DriverServicesController.getDeliveryZone( request,
+    const result = await Dev007ServicesDriverController.getDeliveryZone( request,
                                                                          response,
                                                                          null,
                                                                          context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/zone/establishment/search",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async searchDeliveryZoneEstablishment( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.searchDeliveryZoneEstablishment( request,
+                                                                                         response,
+                                                                                         null,
+                                                                                         context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/zone/establishment/search/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async searchCountDeliveryZoneEstablishment( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.searchCountDeliveryZoneEstablishment( request,
+                                                                                              response,
+                                                                                              null,
+                                                                                              context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/active",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async listActiveDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    let userSessionStatus = context.UserSessionStatus;
+
+    request.query.selectField = `A.Id,
+                                 A.Kind,
+                                 A.DriverRouteId,
+                                 A.DeliveryAt,
+                                 A.OriginId,
+                                 A.DestinationId,
+                                 A.UserId,
+                                 A.StatusCode,
+                                 A.StatusDescription,
+                                 A.RoutePriority,
+                                 A.Comment,
+                                 A.Tag,
+                                 A.CreatedBy,
+                                 A.CreatedAt,
+                                 A.UpdatedBy,
+                                 A.UpdatedAt,
+                                 C.Name,
+                                 C.Latitude,
+                                 C.Longitude,
+                                 C.Phone,
+                                 C.EMail,
+                                 C.Tag,
+                                 D.Address,
+                                 D.Latitude,
+                                 D.Longitude,
+                                 D.Name,
+                                 D.Phone,
+                                 D.EMail,
+                                 D.Comment,
+                                 D.Tag`;
+
+    request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
+                             Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format()}' And
+                             A.CanceledBy Is Null And
+                             A.CanceledAt Is Null And
+                             A.DisabledAt Is Null And
+                             A.DisabledAt Is Null And
+                             E.Canceled = 0 And
+                             E.Last = 0 )`;
+
+    request.query.orderBy = `A.RoutePriority Asc,
+                             A.DeliveryAt Asc`;
+
+    request.query.selectField = SystemUtilities.createSelectAliasFromFieldList( request.query.selectField, "A,C,D" );
+
+    const result = await Dev007ServicesDriverController.searchDeliveryOrder( request,
+                                                                             response,
+                                                                             null,
+                                                                             context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/active/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async listActiveCountDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    let userSessionStatus = context.UserSessionStatus;
+
+    request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
+                             Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format()}' And
+                             A.CanceledBy Is Null And
+                             A.CanceledAt Is Null And
+                             A.DisabledAt Is Null And
+                             A.DisabledAt Is Null And
+                             E.Canceled = 0 And
+                             E.Last = 0 )`;
+
+    request.query.orderBy = null;
+
+    const result = await Dev007ServicesDriverController.searchCountDeliveryOrder( request,
+                                                                                  response,
+                                                                                  null,
+                                                                                  context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/search",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async searchDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    request.query.selectField = "";
+
+    const result = await Dev007ServicesDriverController.searchDeliveryOrder( request,
+                                                                             response,
+                                                                             null,
+                                                                             context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/search/count",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async searchCountDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.searchCountDeliveryOrder( request,
+                                                                                  response,
+                                                                                  null,
+                                                                                  context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/delivery/order",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async createDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderCreateController.createDeliveryOrder( request,
+                                                                                                response,
+                                                                                                null,
+                                                                                                context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/delivery/order",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async updateDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.updateDeliveryOrder( request,
+                                                                             response,
+                                                                             null,
+                                                                             context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/delivery/order/status/next",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async updateDeliveryOrderStatusNext( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.updateDeliveryOrderStatusNext( request,
+                                                                                       response,
+                                                                                       null,
+                                                                                       context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/delivery/order/status/previous",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async updateDeliveryOrderStatusPrevious( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.updateDeliveryOrderStatusPrevious( request,
+                                                                                           response,
+                                                                                           null,
+                                                                                           context.logger );
 
     response.status( result.StatusCode ).send( result );
 

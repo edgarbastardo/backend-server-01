@@ -69,6 +69,9 @@ export class BIZOrigin extends Model<BIZOrigin> {
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Address: string;
 
+  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  FormattedAddress: string;
+
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   Latitude: string;
 

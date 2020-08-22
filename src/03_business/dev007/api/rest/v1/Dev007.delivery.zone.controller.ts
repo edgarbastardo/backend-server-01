@@ -29,7 +29,7 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSRouteService from "../../../../../02_system/common/database/master/services/SYSRouteService";
 import MiddlewareManager from "../../../../../02_system/common/managers/MiddlewareManager";
-import Dev007DeliveryZoneServicesController from "../../../services/Dev007Service.delivery.zone.controller";
+import Dev007ServicesDeliveryZoneController from "../../../services/Dev007Service.delivery.zone.controller";
 
 const debug = require( "debug" )( "Dev007.delivery.zone.controller" );
 
@@ -127,7 +127,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.getDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.getDeliveryZone( request,
                                                                                response,
                                                                                null,
                                                                                context.logger );
@@ -146,7 +146,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.createDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.createDeliveryZone( request,
                                                                                   response,
                                                                                   null,
                                                                                   context.logger );
@@ -165,7 +165,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.modifyDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.modifyDeliveryZone( request,
                                                                                   response,
                                                                                   null,
                                                                                   context.logger );
@@ -184,7 +184,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.disableBulkDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.disableBulkDeliveryZone( request,
                                                                                        response,
                                                                                        null,
                                                                                        context.logger );
@@ -203,7 +203,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.enableBulkDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.enableBulkDeliveryZone( request,
                                                                                       response,
                                                                                       null,
                                                                                       context.logger );
@@ -222,7 +222,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.deleteDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.deleteDeliveryZone( request,
                                                                                   response,
                                                                                   null,
                                                                                   context.logger );
@@ -241,7 +241,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.deleteBulkDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.deleteBulkDeliveryZone( request,
                                                                                       response,
                                                                                       null,
                                                                                       context.logger );
@@ -260,7 +260,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.searchDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.searchDeliveryZone( request,
                                                                                   response,
                                                                                   null,
                                                                                   context.logger );
@@ -279,7 +279,7 @@ export default class Dev007DeliveryZoneController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DeliveryZoneServicesController.searchCountDeliveryZone( request,
+    const result = await Dev007ServicesDeliveryZoneController.searchCountDeliveryZone( request,
                                                                                        response,
                                                                                        null,
                                                                                        context.logger );

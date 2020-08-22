@@ -219,3 +219,18 @@ test( `getCurrentDateAndTimeFromAndDecMinutes 002`, async () => {
   expect( formattedDateAndTime ).toEqual( "2020-01-01T07:00:00" );
 
 })
+
+test( `createSelectAliasFromFieldList`, async () => {
+
+  const strFieldList = `A.Id,
+                        A.Kind,
+                        C.Name,
+                        C.Latitude,
+                        D.Address,
+                        D.Latitude`;
+
+  const selectFieldWithAlias = SystemUtilities.createSelectAliasFromFieldList( strFieldList, "A,C,D" );
+
+  expect( selectFieldWithAlias ).toEqual( "A.Id As A_Id,A.Kind As A_Kind,C.Name As C_Name,C.Latitude As C_Latitude,D.Address As D_Address,D.Latitude As D_Latitude" );
+
+})

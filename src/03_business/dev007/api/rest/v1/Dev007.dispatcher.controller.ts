@@ -31,7 +31,7 @@ import SYSRouteService from "../../../../../02_system/common/database/master/ser
 import MiddlewareManager from "../../../../../02_system/common/managers/MiddlewareManager";
 //import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
 //import Dev007DriverServicesController from "../../../services/Dev007Service.driver.controller";
-import Dev007DispatcherServicesController from "../../../services/Dev007Service.dispacher.controller";
+import Dev007ServicesDispatcherController from "../../../services/Dev007Service.dispacher.controller";
 
 const debug = require( "debug" )( "Dev007.dispatcher.controller" );
 
@@ -125,7 +125,7 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.getDriverPositionList( request,
+    const result = await Dev007ServicesDispatcherController.getDriverPositionList( request,
                                                                                    response,
                                                                                    null,
                                                                                    context.logger );
@@ -144,7 +144,7 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.setDriverDeliveryZone( request,
+    const result = await Dev007ServicesDispatcherController.setDriverDeliveryZone( request,
                                                                                    response,
                                                                                    null,
                                                                                    context.logger );
@@ -163,7 +163,7 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.getDriverDeliveryZone( request,
+    const result = await Dev007ServicesDispatcherController.getDriverDeliveryZone( request,
                                                                                    response,
                                                                                    null,
                                                                                    context.logger );
@@ -182,7 +182,7 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.getDriverStatusList( request,
+    const result = await Dev007ServicesDispatcherController.getDriverStatusList( request,
                                                                                  response,
                                                                                  null,
                                                                                  context.logger );
@@ -201,7 +201,7 @@ export default class Dev007DispacherController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007DispatcherServicesController.setDriverStatusStopWork( request,
+    const result = await Dev007ServicesDispatcherController.setDriverStatusStopWork( request,
                                                                                      response,
                                                                                      null,
                                                                                      context.logger );

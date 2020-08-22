@@ -32,18 +32,19 @@ import SystemConstants from "./SystemContants";
 
 import CommonUtilities from "./CommonUtilities";
 
+import CacheManager from "./managers/CacheManager";
+import LoggerManager from "./managers/LoggerManager";
+import DBConnectionManager from "./managers/DBConnectionManager";
+import I18NManager from "./managers/I18Manager";
+
 import SYSUserService from "./database/master/services/SYSUserService";
 import SYSUserSessionStatusService from "./database/master/services/SYSUserSessionStatusService";
 import SYSUserSessionPersistentService from "./database/master/services/SYSUserSessionPersistentService";
 import SYSRoleService from "./database/master/services/SYSRoleService";
+import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
 
-import CacheManager from "./managers/CacheManager";
-import LoggerManager from "./managers/LoggerManager";
-import I18NManager from "./managers/I18Manager";
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
 //import { SYSUserSessionDevice } from "./database/master/models/SYSUserSessionDevice";
-import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
-import DBConnectionManager from "./managers/DBConnectionManager";
 
 const debug = require( "debug" )( "SystemUtilities" );
 
@@ -2349,6 +2350,37 @@ export default class SystemUtilities {
       } );
 
     } );
+
+    return strResult;
+
+  }
+
+  static createSelectAliasFromFieldList( strFieldList: string, strAliasList: string ) {
+
+    let strResult = "";
+
+    const aliasList = strAliasList.trim().replace( /\n+/g, " " ).split( "," );
+    const fieldList = strFieldList.trim().replace( /\n+/g, " " ).split( "," );
+
+    let result = [];
+
+    for ( let intAliasIndex = 0; intAliasIndex < aliasList.length; intAliasIndex++ ) {
+
+      for ( let intFieldIndex = 0; intFieldIndex < fieldList.length; intFieldIndex++ ) {
+
+        const strReplace = fieldList[ intFieldIndex ].trim().replace( aliasList[ intAliasIndex ].trim() + ".",  aliasList[ intAliasIndex ].trim() + "_" );
+
+        if ( strReplace !== fieldList[ intFieldIndex ].trim() ) {
+
+          result.push( fieldList[ intFieldIndex ].trim() + " As " + strReplace );
+
+        }
+
+      }
+
+    }
+
+    strResult = result.join( "," );
 
     return strResult;
 

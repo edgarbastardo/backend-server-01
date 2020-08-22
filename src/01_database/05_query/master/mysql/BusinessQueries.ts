@@ -189,6 +189,84 @@ export default class BusinessQueries {
         }
 
       }
+      else if ( strName === "searchDeliveryOrder" ) {
+
+        /*
+                       A.Id,
+                       A.Kind,
+                       A.DriverRouteId,
+                       A.DeliveryAt,
+                       A.OriginId,
+                       A.DestinationId,
+                       A.UserId,
+                       A.StatusCode,
+                       A.StatusDescription,
+                       A.RoutePriority,
+                       A.Comment,
+                       A.Tag,
+                       A.CreatedBy,
+                       A.CreatedAt,
+                       A.UpdatedBy,
+                       A.UpdatedAt,
+                       C.Name,
+                       C.Latitude,
+                       C.Longitude,
+                       C.Phone,
+                       C.EMail,
+                       C.Tag,
+                       D.Address,
+                       D.Latitude,
+                       D.Longitude,
+                       D.Name,
+                       D.Phone,
+                       D.EMail,
+                       D.Comment,
+                       D.Tag
+        */
+
+        strResult = `Select
+                       ${params.SelectFields}
+                     From
+                       bizDeliveryOrder As A
+                       Inner Join bizOrigin As B On B.Id = A.OriginId
+                       Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                       Inner Join bizDestination As D On D.Id = A.DestinationId
+                       Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                     Where`;
+                     /*
+                       Date( A.DeliveredAt ) = '2020-08-18' And
+                       A.CanceledBy Is Null And
+                       A.CanceledAt Is Null And
+                       A.DisabledBy Is Null And
+                       A.DisabledAt Is Null And
+                       E.Canceled = 0 And
+                       E.Last = 0
+                     Order By
+                       A.RoutePriority Asc,
+                       A.DeliveryAt Asc`
+                     */
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "searchCountDeliveryOrder" ) {
+
+        strResult = `Select
+                       Count( A.Id ) As Count
+                     From
+                       bizDeliveryOrder As A
+                       Inner Join bizOrigin As B On B.Id = A.OriginId
+                       Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                       Inner Join bizDestination As D On D.Id = A.DestinationId
+                       Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                     Where`;
+
+      }
 
     }
 

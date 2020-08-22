@@ -25,9 +25,9 @@ import { BIZDriverInDeliveryZone } from "../../common/database/master/models/BIZ
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverStatus";
 
-const debug = require( "debug" )( "Dev007DispatcherServicesController" );
+const debug = require( "debug" )( "Dev007ServicesDispatcherController" );
 
-export default class Dev007DispatcherServicesController extends BaseService {
+export default class Dev007ServicesDispatcherController extends BaseService {
 
   //Common business services
 
@@ -778,7 +778,13 @@ export default class Dev007DispatcherServicesController extends BaseService {
                    Mark: "95B26B33A4B3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
-                   Errors: [],
+                   Errors: [
+                             {
+                               Code: "ERROR_DRIVER_DELIVERY_ZONE_NOT_SET",
+                               Message: await I18NManager.translate( strLanguage, "The driver delivery zone not set." ),
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []
@@ -1419,7 +1425,13 @@ export default class Dev007DispatcherServicesController extends BaseService {
                    Mark: "32C8274854E3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
-                   Errors: [],
+                   Errors: [
+                             {
+                               Code: "ERROR_DRIVER_NOT_WORKING",
+                               Message: await I18NManager.translate( strLanguage, "The driver is not working." ),
+                               Details: null
+                             }
+                           ],
                    Warnings: [],
                    Count: 0,
                    Data: []

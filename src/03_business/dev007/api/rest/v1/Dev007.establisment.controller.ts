@@ -27,9 +27,11 @@ import CommonConstants from "../../../../../02_system/common/CommonConstants";
 import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
-import SYSRouteService from "../../../../../02_system/common/database/master/services/SYSRouteService";
 import MiddlewareManager from "../../../../../02_system/common/managers/MiddlewareManager";
-import Dev007EstablishmentServicesController from "../../../services/Dev007Service.establishment.controller";
+
+import SYSRouteService from "../../../../../02_system/common/database/master/services/SYSRouteService";
+
+import Dev007ServicesEstablishmentController from "../../../services/Dev007Service.establishment.controller";
 
 const debug = require( "debug" )( "Dev007.establishment.controller" );
 
@@ -127,7 +129,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.getEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.getEstablishment( request,
                                                                                  response,
                                                                                  null,
                                                                                  context.logger );
@@ -146,7 +148,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.createEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.createEstablishment( request,
                                                                                     response,
                                                                                     null,
                                                                                     context.logger );
@@ -165,7 +167,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.modifyEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.modifyEstablishment( request,
                                                                                     response,
                                                                                     null,
                                                                                     context.logger );
@@ -184,7 +186,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.disableBulkEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.disableBulkEstablishment( request,
                                                                                          response,
                                                                                          null,
                                                                                          context.logger );
@@ -203,7 +205,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.enableBulkEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.enableBulkEstablishment( request,
                                                                                         response,
                                                                                         null,
                                                                                         context.logger );
@@ -222,7 +224,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.deleteEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.deleteEstablishment( request,
                                                                                     response,
                                                                                     null,
                                                                                     context.logger );
@@ -242,7 +244,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.deleteBulkEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.deleteBulkEstablishment( request,
                                                                                         response,
                                                                                         null,
                                                                                         context.logger );
@@ -261,7 +263,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.searchEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.searchEstablishment( request,
                                                                                     response,
                                                                                     null,
                                                                                     context.logger );
@@ -280,7 +282,7 @@ export default class Dev007EstablishmentController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007EstablishmentServicesController.searchCountEstablishment( request,
+    const result = await Dev007ServicesEstablishmentController.searchCountEstablishment( request,
                                                                                          response,
                                                                                          null,
                                                                                          context.logger );

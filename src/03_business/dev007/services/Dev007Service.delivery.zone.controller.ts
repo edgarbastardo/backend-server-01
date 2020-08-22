@@ -22,9 +22,9 @@ import BIZDeliveryZoneService from "../../common/database/master/services/BIZDel
 
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
-const debug = require( "debug" )( "Dev007DeliveryZoneServicesController" );
+const debug = require( "debug" )( "Dev007ServicesDeliveryZoneController" );
 
-export default class Dev007DeliveryZoneServicesController extends BaseService {
+export default class Dev007ServicesDeliveryZoneController extends BaseService {
 
   static async getDeliveryZone( request: Request,
                                 response: Response,
@@ -1615,8 +1615,14 @@ export default class Dev007DeliveryZoneServicesController extends BaseService {
                      Message: await I18NManager.translate( strLanguage, "The delivery zone has " + intEstablishmentCount + " establishment associated" ),
                      Mark: "11592CB8CAF1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
-                     IsError: false,
-                     Errors: [],
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_DELIVERY_ZONE_IS_NOT_EMPTY",
+                                 Message: await I18NManager.translate( strLanguage, "The delivery zone has " + intEstablishmentCount + " establishment associated" ),
+                                 Details: null
+                               }
+                             ],
                      Warnings: [],
                      Count: 0,
                      Data: []

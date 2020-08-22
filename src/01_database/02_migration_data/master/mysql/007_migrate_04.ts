@@ -20,7 +20,7 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select AtDate, LockByRole, UpdatedBy, UpdatedAt From bizDriverInDeliveryZone limit 1, 1";
+      let strSQL = "Select StartAt, EndAt, Tag, UpdatedBy, UpdatedAt From bizDriverInDeliveryZone limit 1, 1";
 
       try {
 
@@ -36,10 +36,11 @@ export default class Migrate {
 
         strSQL = "DELETE FROM bizDriverInDeliveryZone;" + //<-- This is needed to apply not null
                  "ALTER TABLE bizDriverInDeliveryZone " +
-                 "ADD COLUMN AtDate DATE NOT NULL AFTER UserId, " +
+                 "ADD COLUMN StartAt VARCHAR(30) NOT NULL AFTER UserId, " +
+                 "ADD COLUMN EndAt VARCHAR(30) DEFAULT NULL AFTER StartAt, " +
                  "DROP PRIMARY KEY, " +
-                 "ADD PRIMARY KEY (DeliveryZoneId, UserId, AtDate), " +
-                 "ADD COLUMN LockByRole VARCHAR(30) NOT NULL AFTER AtDate, " +
+                 "ADD PRIMARY KEY (DeliveryZoneId, UserId, StartAt), " +
+                 "ADD COLUMN Tag VARCHAR(30) NOT NULL AFTER EndAt, " +
                  "ADD COLUMN UpdatedBy VARCHAR(150) NULL AFTER CreatedAt, " +
                  "ADD COLUMN UpdatedAt VARCHAR(30) NULL AFTER UpdatedBy;"; //`
 

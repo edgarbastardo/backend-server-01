@@ -32,20 +32,16 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
-import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
+import { BIZDeliveryOrder } from "./BIZDeliveryOrder";
 
-import { BIZDriverRoute } from "./BIZDriverRoute";
-import { BIZOrigin } from "./BIZOrigin";
-import { BIZDestination } from "./BIZDestination";
-
-const debug = require( "debug" )( "BIZDeliveryOrder" );
+const debug = require( "debug" )( "BIZDeliveryOrderImage" );
 
 @Table( {
   timestamps: false,
-  tableName: "bizDeliveryOrder",
-  modelName: "bizDeliveryOrder"
+  tableName: "bizDeliveryOrderImage",
+  modelName: "bizDeliveryOrderImage"
 } )
-export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
+export class BIZDeliveryOrderImage extends Model<BIZDeliveryOrderImage> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -57,61 +53,24 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
-  @Column( { type: DataType.SMALLINT, allowNull: false } )
-  Kind: number;
-
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  @ForeignKey( () => BIZDriverRoute )
-  DriverRouteId: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
-  DeliveryAt: string;
-
   @NotNull
   @NotEmpty
   @IsUUID(4)
   @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => BIZOrigin )
-  OriginId: string;
+  @ForeignKey( () => BIZDeliveryOrder )
+  DeliveryOrderId: string;
 
-  @NotNull
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
-  @ForeignKey( () => BIZDestination )
-  DestinationId: string;
+  @Column( { type: DataType.STRING( 75 ), allowNull: false } )
+  Title: string;
 
-  @NotEmpty
-  @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
-  @ForeignKey( () => SYSUser )
-  UserId: string;
+  @Column( { type: DataType.STRING( 2048 ), allowNull: false } )
+  Image: string;
 
-  @Column( { type: DataType.SMALLINT, allowNull: false } )
-  StatusSequence: number;
-
-  @Column( { type: DataType.SMALLINT, allowNull: false } )
-  StatusCode: number;
-
-  @Column( { type: DataType.STRING( 50 ), allowNull: false } )
-  StatusDescription: string;
-
-  @Column( { type: DataType.SMALLINT, allowNull: false } )
-  RoutePriority: number;
-
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 512 ), allowNull: false } )
   Comment: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
-
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  CanceledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  CanceledAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
@@ -119,47 +78,26 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @Column( { type: DataType.STRING( 30 ), allowNull: false } )
   CreatedAt: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  UpdatedBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  UpdatedAt: string;
-
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  DisabledBy: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  DisabledAt: string;
-
   @Column( { type: DataType.JSON, allowNull: true } )
   ExtraData: string;
 
-  @BelongsTo( () => BIZDriverRoute, "DriverRouteId" )
-  BIZDriverRoute: BIZDriverRoute;
-
-  @BelongsTo( () => BIZOrigin, "OriginId" )
-  bizOrigin: BIZOrigin;
-
-  @BelongsTo( () => BIZDestination, "DestinationId" )
-  bizDestination: BIZDestination;
-
-  @BelongsTo( () => SYSUser, "DriverId" )
-  sysUser: SYSUser;
+  @BelongsTo( () => BIZDeliveryOrder, "DeliveryOrderId" )
+  bizDeliveryOrder: BIZDeliveryOrder;
 
   @BeforeValidate
-  static beforeValidateHook( instance: BIZDeliveryOrder, options: any ): void {
+  static beforeValidateHook( instance: BIZDeliveryOrderImage, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: BIZDeliveryOrder, options: any ): void {
+  static beforeCreateHook( instance: BIZDeliveryOrderImage, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryOrder",
+                                             "bizDeliveryOrderImage",
                                              "create",
                                              instance,
                                              null );
@@ -167,14 +105,14 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: BIZDeliveryOrder, options: any ): void {
+  static beforeUpdateHook( instance: BIZDeliveryOrderImage, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValues };
 
     SystemUtilities.commonBeforeUpdateHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryOrder",
+                                             "bizDeliveryOrderImage",
                                              "update",
                                              instance,
                                              oldDataValues );
@@ -182,12 +120,12 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: BIZDeliveryOrder, options: any ): void {
+  static beforeDestroyHook( instance: BIZDeliveryOrderImage, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
     SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizDeliveryOrder",
+                                             "bizDeliveryOrderImage",
                                              "delete",
                                              instance,
                                              null );

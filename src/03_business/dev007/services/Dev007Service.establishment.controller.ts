@@ -24,9 +24,9 @@ import BIZDeliveryZoneService from "../../common/database/master/services/BIZDel
 import { BIZEstablishment } from "../../common/database/master/models/BIZEstablishment";
 import { BIZDeliveryZone } from "../../common/database/master/models/BIZDeliveryZone";
 
-const debug = require( "debug" )( "Dev007EstablishmentServicesController" );
+const debug = require( "debug" )( "Dev007ServicesEstablishmentController" );
 
-export default class Dev007EstablishmentServicesController extends BaseService {
+export default class Dev007ServicesEstablishmentController extends BaseService {
 
   static async getEstablishment( request: Request,
                                  response: Response,
@@ -68,7 +68,7 @@ export default class Dev007EstablishmentServicesController extends BaseService {
 
       if ( !bizEstablishmentInDB ) {
 
-        const strMessage = await I18NManager.translate( strLanguage, "The establishment with id %s, not found in database", request.query.id as string );
+        const strMessage = await I18NManager.translate( strLanguage, "The establishment with id %s. Not found in database", request.query.id as string );
 
         result = {
                    StatusCode: 404, //Not found
