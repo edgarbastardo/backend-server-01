@@ -20,23 +20,48 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select A.Kind From bizDeliveryZone limit 1, 1";
+      let strSQL = "Select Action From sysRoute limit 1, 1";
 
       try {
 
-        //Check field Kind exists
+        //Check field Action exists
         await dbConnection.execute( strSQL );
 
       }
       catch ( error ) {
 
-        //The field Kind NOT exists. Must be created
+        //The field Action NOT exists. Must be created
 
-        strSQL = "ALTER TABLE `bizDeliveryZone` ADD COLUMN `Kind` SMALLINT(1) NOT NULL COMMENT '0 = On demand, 1 = Fixed, 2 = Route' AFTER `Id`";
+        strSQL = `ALTER TABLE \`sysRoute\` ADD COLUMN \`Action\` VARCHAR(75) NULL AFTER \`Path\``;
+
+        await dbConnection.execute( strSQL );
+
+        strSQL = `ALTER TABLE \`sysRoute\` ADD UNIQUE INDEX \`UNQ_sysRoute_Action_idx\` (\`Action\` ASC)`;
 
         await dbConnection.execute( strSQL );
 
       }
+
+      /*
+      ALTER TABLE `BackendServer01DB`.`sysRoute`
+      ADD COLUMN `Action` VARCHAR(75) NULL AFTER `Path`;
+
+      ALTER TABLE `BackendServer01DB`.`sysRoute`
+      ADD UNIQUE INDEX `UNQ_sysRoute_Action_idx` (`Action` ASC);
+
+      const strId = SystemUtilities.getUUIDv4();
+
+      const strShortId = SystemUtilities.hashString( strId, 2, null );
+
+      const strValues = "'" + strId + "','" + strShortId + "','Group01','#Administrator#','Group test created with migration','backend@system.net','" + moment().format() + "'";
+
+      const strSQL = `Insert Into \`sysUserGroup\`( Id, ShortId, Name, Role, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
+
+      await dbConnection.execute( strSQL );
+
+      bSuccess = true;
+      bEmptyContent = false;
+      */
 
     }
     catch ( error ) {
@@ -45,7 +70,7 @@ export default class Migrate {
 
       sourcePosition.method = this.name + "." + this.migrateUp.name;
 
-      const strMark = "65F8BAF52864" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "6C9E8CDB8358" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
