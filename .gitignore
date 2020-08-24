@@ -26,3 +26,4 @@ tasks/input/undefined*
 tasks/output/undefined*
 tasks/undefined/
 config_backup/*
+command.json
