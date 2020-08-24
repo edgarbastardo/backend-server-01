@@ -8,7 +8,7 @@
     "dev": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "TelegramBotDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -28,7 +28,7 @@
     "test": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "TelegramBotDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -48,7 +48,7 @@
     "prod": {
       "username": "root",
       "password": "dsistemas",
-      "database": "BackendServer01DB",
+      "database": "TelegramBotDB",
       "host": "127.0.0.1",
       "port": 3306,
       "dialect": "mysql",
@@ -68,7 +68,7 @@
   },
   "secondary": {
     "system": 0,
-    "connect": true,
+    "connect": false,
     "migrate": false,
     "logStatement": false,
     "timezone": "",

@@ -14,7 +14,10 @@ import NotificationManager from './02_system/common/managers/NotificationManager
 import DBConnectionManager from './02_system/common/managers/DBConnectionManager';
 import CacheManager from './02_system/common/managers/CacheManager';
 
-import BulkCreateOrder from "./05_generic_run/BulkCreateOrder";
+import TelegramBot from "./05_generic_run/TelegramBot";
+import DBMigrationManager from './02_system/common/managers/DBMigrationManager';
+import ModelServiceManager from './02_system/common/managers/ModelServiceManager';
+import I18NManager from './02_system/common/managers/I18Manager';
 
 let debug = require( 'debug' )( 'generic_run@main_process' );
 
@@ -69,9 +72,32 @@ export default class GeneriRun {
 
       CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
 
+      if ( process.env.DB_AUTO_MIGRATION === "1" ) {
+
+        await DBMigrationManager.createDatabaseIfNotExits( "*", LoggerManager.mainLoggerInstance ); //Force create database if not found
+
+        await DBMigrationManager.migrateUsingRawConnection( "*", LoggerManager.mainLoggerInstance ); //Migrate the database using only raw connection
+
+      }
+
+      //DBConnectionManager.dbConnection =
       await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
 
+      //DBConnectionManager.queryStatements =
       await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
+
+      if ( process.env.DB_AUTO_MIGRATION === "1" ) {
+
+        await DBMigrationManager.migrateUsingORMConnection( "*",
+                                                            //DBConnectionManager.getDBConnection( "master" ),
+                                                            LoggerManager.mainLoggerInstance ); //Migrate the database using only orm connection
+
+      }
+
+      await ModelServiceManager.loadModelServices( "*", LoggerManager.mainLoggerInstance );
+
+      await I18NManager.create( {},
+                                LoggerManager.createMainLogger );
 
       process.on( 'SIGTERM', async () => {
 
@@ -114,7 +140,7 @@ export default class GeneriRun {
                                                                        },
                                                                        {
                                                                          title: "Application",
-                                                                         value: "Generic Run",
+                                                                         value: process.env.APP_PROJECT_NAME,
                                                                          short: false
                                                                        },
                                                                        {
@@ -131,9 +157,9 @@ export default class GeneriRun {
 
       //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
 
-      await BulkCreateOrder.bulkCreateOrder( LoggerManager.mainLoggerInstance );
+      await TelegramBot.init( LoggerManager.mainLoggerInstance );
 
-      process.exit( 0 );
+      //process.exit( 0 );
 
     }
     catch ( error ) {

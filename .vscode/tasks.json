@@ -16,6 +16,12 @@
       "problemMatcher": []
     },
     {
+      "label": "build:clean",
+      "type": "npm",
+      "script": "build:clean",
+      "problemMatcher": []
+    },
+    {
       "label": "build-test01-rest-api",
       "type": "npm",
       "script": "build-test01-rest-api",

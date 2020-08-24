@@ -9,6 +9,7 @@ let debug = require( 'debug' )( 'CommonGenericRun' );
 
 export default class CommonGenericRun {
 
+  /*
   public static detectColumnDataPositions( headers: string[], logger: any ): {} {
 
     let result = {
@@ -192,5 +193,6 @@ export default class CommonGenericRun {
     return result;
 
   }
+  */
 
 }
