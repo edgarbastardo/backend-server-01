@@ -109,15 +109,15 @@ export class SYSPerson extends Model<SYSPerson> {
   }
 
   @BeforeCreate
-  static beforeCreateHook( instance: SYSPerson, options: any ): void {
+  static async beforeCreateHook( instance: SYSPerson, options: any ): Promise<void> {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
-    SYSDatabaseLogService.logTableOperation( "master",
-                                             "sysPerson",
-                                             "create",
-                                             instance,
-                                             null );
+    await SYSDatabaseLogService.logTableOperation( "master",
+                                                   "sysPerson",
+                                                   "create",
+                                                   instance,
+                                                   null );
 
   }
 

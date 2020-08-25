@@ -270,19 +270,12 @@ export default class BIZDriverStatusService extends BaseService {
                                                      },
                                                      logger );
 
-      const rows = await dbConnection.query( strSQL,
-                                             {
-                                               raw: true,
-                                               type: QueryTypes.SELECT,
-                                               transaction: currentTransaction
-                                             } );
-
-      if ( rows &&
-           rows.length > 0 ) {
-
-        result = rows;
-
-      }
+      result = await dbConnection.query( strSQL,
+                                        {
+                                          raw: true,
+                                          type: QueryTypes.SELECT,
+                                          transaction: currentTransaction
+                                        } );
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

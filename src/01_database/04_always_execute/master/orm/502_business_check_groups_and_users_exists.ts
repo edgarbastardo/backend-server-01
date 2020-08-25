@@ -181,6 +181,56 @@ export default class Always {
                                 Comment: "Created from backend startup. driver05.",
                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               },
+                              {
+                                Id: "20327855-eaa0-4229-a7da-a413efb27bfb",
+                                FirstName: "Driver 06",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver06#",
+                                Comment: "Created from backend startup. driver06.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "f91618c6-8329-48f2-90dc-546525a62e0f",
+                                FirstName: "Driver 07",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver07#",
+                                Comment: "Created from backend startup. driver07.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "9ca40075-c9ff-40e1-b9a8-60071d0e05c1",
+                                FirstName: "Driver 08",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver08#",
+                                Comment: "Created from backend startup. driver08.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "1bf5a0d5-562d-489a-8156-4d784e1f9b76",
+                                FirstName: "Driver 09",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver09#",
+                                Comment: "Created from backend startup. driver09.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "d3193ed0-99e5-46b1-a756-490c1cf2e78c",
+                                FirstName: "Driver 10",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Driver#,#driver10#",
+                                Comment: "Created from backend startup. driver10.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
                               //Dispatchers
                               {
                                 Id: "72cf0ffc-bfa2-4f82-aec4-3e6d53da6c63",
@@ -244,8 +294,8 @@ export default class Always {
                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               },
                               {
-                                FirstName: "Administrative Asistant 02",
                                 Id: "94edabbe-1d63-43e0-97e7-90d409aab80d",
+                                FirstName: "Administrative Asistant 02",
                                 LastName: "",
                                 Phone: "1-306-776-9999",
                                 Email: "dev.test@weknock-tech.com",
@@ -282,8 +332,59 @@ export default class Always {
                                 Tag: "#Administrative_Asistant#,#adm05#",
                                 Comment: "Created from backend startup. adm05.",
                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "7c50a006-c487-4351-a03a-8dee639bb1a8",
+                                FirstName: "Administrative Asistant 06",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm06#",
+                                Comment: "Created from backend startup. adm06",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "0d0294e9-ab45-4901-ba70-04ee309630b6",
+                                FirstName: "Administrative Asistant 07",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm07#",
+                                Comment: "Created from backend startup. adm07.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "08b90888-4b70-48fc-b407-a2f1d4017ebb",
+                                FirstName: "Administrative Asistant 08",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,,#adm08#",
+                                Comment: "Created from backend startup. adm08.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "70cae715-22fc-4d84-9f98-0dc4e9ce67f0",
+                                FirstName: "Administrative Asistant 09",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm09#",
+                                Comment: "Created from backend startup. adm09.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              },
+                              {
+                                Id: "45b51034-c21d-487f-b107-6273c7e1befb",
+                                FirstName: "Administrative Asistant 10",
+                                LastName: "",
+                                Phone: "1-306-776-9999",
+                                Email: "dev.test@weknock-tech.com",
+                                Tag: "#Administrative_Asistant#,#adm10#",
+                                Comment: "Created from backend startup. adm10.",
+                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               }
                             ]
+
 
       const loopPersonEntriesAsync = async () => {
 
@@ -310,14 +411,14 @@ export default class Always {
           else if ( !sysPersonInDB.Tag ||
                     sysPersonInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
-             sysPersonInDB.FirstName = personToCreate.FirstName;
-             sysPersonInDB.LastName = personToCreate.LastName;
-             sysPersonInDB.Phone = personToCreate.Phone;
-             sysPersonInDB.EMail = personToCreate.EMail;
-             sysPersonInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
+            sysPersonInDB.FirstName = personToCreate.FirstName;
+            sysPersonInDB.LastName = personToCreate.LastName;
+            sysPersonInDB.Phone = personToCreate.Phone;
+            sysPersonInDB.EMail = personToCreate.EMail;
+            sysPersonInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
 
-             await sysPersonInDB.update( ( sysPersonInDB as any ).dataValues,
-                                         options );
+            await sysPersonInDB.update( ( sysPersonInDB as any ).dataValues,
+                                        options );
 
           }
 
@@ -332,6 +433,7 @@ export default class Always {
                             {
                               Id: personEntries[ 0 ].Id,
                               GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 0 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -346,6 +448,7 @@ export default class Always {
                             {
                               Id: personEntries[ 1 ].Id,
                               GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 1 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -360,6 +463,7 @@ export default class Always {
                             {
                               Id: personEntries[ 2 ].Id,
                               GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 2 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -374,6 +478,7 @@ export default class Always {
                             {
                               Id: personEntries[ 3 ].Id,
                               GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 3 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -388,6 +493,7 @@ export default class Always {
                             {
                               Id: personEntries[ 4 ].Id,
                               GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 4 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -399,10 +505,86 @@ export default class Always {
                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
-                            //Dispatchers
                             {
                               Id: personEntries[ 5 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 5 ].Id,
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver06",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver06#",
+                              Comment: "Created from backend startup. driver06.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
+                            },
+                            {
+                              Id: personEntries[ 6 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 6 ].Id,
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver07",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver07#",
+                              Comment: "Created from backend startup. driver07.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
+                              Id: personEntries[ 7 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 7 ].Id,
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver08",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver08#",
+                              Comment: "Created from backend startup. driver08.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
+                              Id: personEntries[ 8 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 8 ].Id,
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver09",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver09#",
+                              Comment: "Created from backend startup. driver09.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            {
+                              Id: personEntries[ 9 ].Id,
+                              GroupId: userGroupEntries[ 0 ].Id, //Drivers
+                              PersonId: personEntries[ 9 ].Id,
+                              ForceChangePassword: 0,
+                              ChangePasswordEvery: 0,
+                              SessionsLimit: 1,
+                              Name: "driver10",
+                              Password: "12345678",
+                              Role: "",
+                              Tag: "#Driver#,#driver10#",
+                              Comment: "Created from backend startup. driver10.",
+                              CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                              DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                            },
+                            //Dispatchers
+                            {
+                              Id: personEntries[ 10 ].Id,
                               GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              PersonId: personEntries[ 10 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -415,8 +597,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                             },
                             {
-                              Id: personEntries[ 6 ].Id,
+                              Id: personEntries[ 11 ].Id,
                               GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              PersonId: personEntries[ 11 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -429,8 +612,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 7 ].Id,
+                              Id: personEntries[ 12 ].Id,
                               GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              PersonId: personEntries[ 12 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -443,8 +627,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 8 ].Id,
+                              Id: personEntries[ 13 ].Id,
                               GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              PersonId: personEntries[ 13 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -457,8 +642,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 9 ].Id,
+                              Id: personEntries[ 14 ].Id,
                               GroupId: userGroupEntries[ 2 ].Id, //Dispatchers
+                              PersonId: personEntries[ 14 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -472,8 +658,9 @@ export default class Always {
                             },
                             //Administrative Asistant
                             {
-                              Id: personEntries[ 10 ].Id,
+                              Id: personEntries[ 15 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 15 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -486,8 +673,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 11 ].Id,
+                              Id: personEntries[ 16 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 16 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -500,8 +688,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 12 ].Id,
+                              Id: personEntries[ 17 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 17 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -514,8 +703,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 13 ].Id,
+                              Id: personEntries[ 18 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 18 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -528,8 +718,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 19 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 19 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -542,8 +733,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 20 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 20 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -556,8 +748,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 21 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 21 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -570,8 +763,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 22 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 22 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -584,8 +778,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 23 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 23 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -598,8 +793,9 @@ export default class Always {
                               DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,,
                             },
                             {
-                              Id: personEntries[ 14 ].Id,
+                              Id: personEntries[ 24 ].Id,
                               GroupId: userGroupEntries[ 1 ].Id, //Administrative_Asistants
+                              PersonId: personEntries[ 24 ].Id,
                               ForceChangePassword: 0,
                               ChangePasswordEvery: 0,
                               SessionsLimit: 1,
@@ -639,7 +835,15 @@ export default class Always {
                     sysUserInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
             sysUserInDB.Name = userToCreate.Name;
+            sysUserInDB.GroupId = userToCreate.GroupId;
+            sysUserInDB.PersonId = userToCreate.PersonId;
+            sysUserInDB.ForceChangePassword = userToCreate.ForceChangePassword;
+            sysUserInDB.ChangePasswordEvery = userToCreate.ChangePasswordEvery;
+            sysUserInDB.SessionsLimit = userToCreate.SessionsLimit;
             sysUserInDB.Password = userToCreate.Password; //await bcrypt.hash( userToCreate.Password, 10 );
+            sysUserInDB.Role = userToCreate.Role;
+            sysUserInDB.Comment = userToCreate.Comment;
+            sysUserInDB.Tag = userToCreate.Tag;
             sysUserInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             sysUserInDB.DisabledBy = userToCreate.DisabledBy;
 

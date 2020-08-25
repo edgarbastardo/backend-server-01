@@ -487,7 +487,7 @@ export default class BIZDriverPositionService extends BaseService {
 
       let strSQL = null;
 
-      if ( intKind === 0 ) {
+      if ( intKind === 0 ) { //Full entity
 
         if ( strStartDateTime &&
              strEndDateTime ) {
@@ -579,6 +579,120 @@ export default class BIZDriverPositionService extends BaseService {
       sourcePosition.method = this.name + "." + this.getLastPositionByShortToken.name;
 
       const strMark = "6C88978630BD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getLastPositionBetween( strStartDateTime: string,
+                                       strEndDateTime: string,
+                                       intLimit: number,
+                                       transaction: any,
+                                       logger: any ): Promise<any[]> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+
+      let strSQL = null;
+
+      if ( strStartDateTime &&
+           strEndDateTime ) {
+
+        strSQL = DBConnectionManager.getStatement( "master",
+                                                   "getLastPositionBetween",
+                                                   {
+                                                     StartDateTime: strStartDateTime,
+                                                     EndDateTime: strEndDateTime,
+                                                     Limit: intLimit
+                                                   },
+                                                   logger );
+
+      }
+
+      const rows = await dbConnection.query( strSQL, {
+                                                       raw: true,
+                                                       type: QueryTypes.SELECT,
+                                                       transaction: currentTransaction
+                                                     } );
+
+      if ( rows && rows.length > 0 ) {
+
+        result = rows;
+
+      }
+      else  {
+
+        result = [];
+
+      };
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getLastPositionBetween.name;
+
+      const strMark = "15B1BCA541BB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

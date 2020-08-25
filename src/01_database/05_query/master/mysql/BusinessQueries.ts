@@ -27,6 +27,46 @@ export default class BusinessQueries {
         strResult = `Select B.Accuracy As Accuracy, B.Latitude As Latitude, B.Longitude As Longitude, B.Altitude As Altitude, B.Speed As Speed From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' Order By B.CreatedAt Desc Limit ${params.Limit};`;
 
       }
+      else if ( strName === "getLastPositionBetween" ) {
+
+        strResult = `Select
+                            B.*
+                     From
+                            sysUserSessionStatus As A
+                            Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken
+                            Inner Join bizDriverStatus As C On C.ShortToken = A.ShortToken
+                     Where
+                            A.LoggedOutBy Is Null -- Session not finished
+                            And
+                            A.LoggedOutAt Is Null -- Session not finished
+                            And
+                            Cast( A.UpdatedAt As DateTime )
+                              Between
+                              Cast( '${params.StartDateTime}' As DateTime )
+                              And
+                              Cast( '${params.EndDateTime}' As DateTime )
+                            And
+                            Cast( B.CreatedAt As DateTime )
+                              Between
+                              Cast( '${params.StartDateTime}' As DateTime )
+                              And
+                              Cast( '${params.EndDateTime}' As DateTime )
+                            And
+                            C.Code <> 0 -- Working and Working (Finishing)
+                            Order By
+                                A.ShortToken,
+                                A.UserId,
+                                B.CreatedAt Desc
+                            Limit ${params.Limit};`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
       else if ( strName === "getLastPositionByUserId" ) {
 
         strResult = `Select B.*, C.Name As Name From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Inner Join sysUser C On C.Id = B.UserId Where B.UserId = '${params.UserId}' Order By B.ShortToken, B.CreatedAt Desc Limit ${params.Limit};`;
