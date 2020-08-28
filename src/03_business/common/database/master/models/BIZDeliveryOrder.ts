@@ -143,7 +143,7 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @BelongsTo( () => BIZDestination, "DestinationId" )
   bizDestination: BIZDestination;
 
-  @BelongsTo( () => SYSUser, "DriverId" )
+  @BelongsTo( () => SYSUser, "UserId" )
   sysUser: SYSUser;
 
   @BeforeValidate

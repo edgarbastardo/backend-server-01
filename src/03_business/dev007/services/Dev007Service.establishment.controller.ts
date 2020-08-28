@@ -917,7 +917,7 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
 
             }
 
-            const intEstablishmentCount = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizDeliveryZoneInDB.Id,
+            const intEstablishmentCount = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizDeliveryZoneInDB.Id,
                                                                                                         currentTransaction,
                                                                                                         logger );
 
@@ -1228,7 +1228,7 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
             }
             else if ( deleteResult === true ) {
 
-              const intCountEstablishments = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizEstablishmentInDB.DeliveryZoneId,
+              const intCountEstablishments = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizEstablishmentInDB.DeliveryZoneId,
                                                                                                            transaction,
                                                                                                            logger ) as any;
 
@@ -1319,7 +1319,7 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
             }
             else {
 
-              const intCountEstablishments = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizEstablishmentInDB.DeliveryZoneId,
+              const intCountEstablishments = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizEstablishmentInDB.DeliveryZoneId,
                                                                                                            transaction,
                                                                                                            logger ) as any;
 
@@ -1835,7 +1835,7 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
       }
       else {
 
-        const intCountEstablishments = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizEstablishmentInDB.DeliveryZoneId,
+        const intCountEstablishments = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizEstablishmentInDB.DeliveryZoneId,
                                                                                                      transaction,
                                                                                                      logger ) as any;
 

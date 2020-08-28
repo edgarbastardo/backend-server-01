@@ -39,12 +39,12 @@ export default class BusinessQueries {
                             A.LoggedOutBy Is Null -- Session not finished
                             And
                             A.LoggedOutAt Is Null -- Session not finished
-                            And
-                            Cast( A.UpdatedAt As DateTime )
-                              Between
-                              Cast( '${params.StartDateTime}' As DateTime )
-                              And
-                              Cast( '${params.EndDateTime}' As DateTime )
+                            -- And
+                            -- Cast( A.UpdatedAt As DateTime )
+                            --  Between
+                            --  Cast( '${params.StartDateTime}' As DateTime )
+                            --  And
+                            --  Cast( '${params.EndDateTime}' As DateTime )
                             And
                             Cast( B.CreatedAt As DateTime )
                               Between
@@ -305,6 +305,266 @@ export default class BusinessQueries {
                        Inner Join bizDestination As D On D.Id = A.DestinationId
                        Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
                      Where`;
+
+      }
+      else if ( strName === "getActiveOrderByDriverId" ) {
+
+        strResult = `Select
+                     	      A.Id,
+                            A.UserId,
+                            F.Name,
+                            G.FirstName,
+                            G.LastName,
+                            A.StatusCode,
+                            A.StatusDescription,
+                            A.StatusSequence,
+                            B.Id As OriginId,
+                            C.Name As OriginName,
+                            B.Address As OriginAddress,
+                            B.Latitude As OriginLatitude,
+                            B.Longitude As OriginLongitude,
+                            D.Id As DestinationId,
+                            D.Address As DestinationAddress,
+                            D.Latitude As DestinationLatitude,
+                            D.Longitude As DestinationLongitude,
+                            A.CreatedBy,
+                            A.CreatedAt
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join bizOrigin As B On B.Id = A.OriginId
+                            Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                            Inner Join bizDestination As D On D.Id = A.DestinationId
+                            Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                            Left Outer Join sysUser As F On F.Id = A.UserId
+                            Left Outer Join sysPerson As G On G.Id = F.PersonId
+                     Where
+                            E.Last = 0
+                            And
+                            E.Canceled = 0
+                            And
+                            A.UserId = '${params.DriverId}'`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "getCountActiveOrderByDriverId" ) {
+
+        strResult = `Select
+                            Count( A.Id ) As Count
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join bizOrigin As B On B.Id = A.OriginId
+                            Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                            Inner Join bizDestination As D On D.Id = A.DestinationId
+                            Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                            Left Outer Join sysUser As F On F.Id = A.UserId
+                            Left Outer Join sysPerson As G On G.Id = F.PersonId
+                     Where
+                            E.Last = 0
+                            And
+                            E.Canceled = 0
+                            And
+                            A.UserId = '${params.DriverId}'`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "getAllActiveOrders" ) {
+
+        strResult = `Select
+                     	      A.Id,
+                            A.UserId,
+                            F.Name,
+                            G.FirstName,
+                            G.LastName,
+                            A.StatusCode,
+                            A.StatusDescription,
+                            A.StatusSequence,
+                            B.Id As OriginId,
+                            C.Name As OriginName,
+                            B.Address As OriginAddress,
+                            B.Latitude As OriginLatitude,
+                            B.Longitude As OriginLongitude,
+                            D.Id As DestinationId,
+                            D.Address As DestinationAddress,
+                            D.Latitude As DestinationLatitude,
+                            D.Longitude As DestinationLongitude,
+                            A.CreatedBy,
+                            A.CreatedAt
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join bizOrigin As B On B.Id = A.OriginId
+                            Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                            Inner Join bizDestination As D On D.Id = A.DestinationId
+                            Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                            Left Outer Join sysUser As F On F.Id = A.UserId
+                            Left Outer Join sysPerson As G On G.Id = F.PersonId
+                     Where
+                            E.Last = 0
+                            And
+                            E.Canceled = 0`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "getAllActiveOrdersCount" ) {
+
+        strResult = `Select
+                            Count( A.Id ) As Count
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join bizOrigin As B On B.Id = A.OriginId
+                            Inner Join bizEstablishment As C On C.Id = B.EstablishmentId
+                            Inner Join bizDestination As D On D.Id = A.DestinationId
+                            Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
+                            Left Outer Join sysUser As F On F.Id = A.UserId
+                            Left Outer Join sysPerson As G On G.Id = F.PersonId
+                     Where
+                            E.Last = 0
+                            And
+                            E.Canceled = 0`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "getDeliveryOrderStatusById" ) {
+
+        strResult = `Select
+                            A.Id,
+                            A.Kind,
+                            A.StatusSequence,
+                            A.StatusCode,
+                            A.StatusDescription,
+                            (
+                              Select
+                                     Z.Sequence
+                     		      From
+                                     bizDeliveryOrderStatusStep As Z
+                     		      Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence < A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                     		      Limit 1
+                            ) As PreviousStatusSequence,
+                            (
+                              Select
+                                     Z.Code
+                     		      From
+                                     bizDeliveryOrderStatusStep As Z
+                     		      Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence < A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                     		      Limit 1
+                     	      ) As PreviousStatusCode,
+                            (
+                              Select
+                                     Z.Description
+                     		      From
+                                     bizDeliveryOrderStatusStep As Z
+                     		      Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence < A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                     		      Limit 1
+                     	      ) As PreviousStatusDescription,
+                            (
+                              Select
+                                     Z.Sequence
+                     		      From
+                                     bizDeliveryOrderStatusStep As Z
+                     		      Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence > A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                     		      Limit 1
+                            ) As NextStatusSequence,
+                            (
+                              Select
+                                     Z.Code
+                     		      From
+                                     bizDeliveryOrderStatusStep As Z
+                     		      Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence > A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                     		      Limit 1
+                     	      ) As NextStatusCode,
+                            (
+                              Select
+                                     Z.Description
+                         	  	From
+                                     bizDeliveryOrderStatusStep As Z
+                         	  	Where
+                                     Z.Kind = A.Kind
+                                     And
+                                     Z.Sequence > A.StatusSequence
+                                     And
+                                     Z.DisabledBy Is Null
+                                     And
+                                     Z.DisabledAt Is Null
+                         	  	Limit 1
+                         	  ) As NextStatusDescription,
+                            A.CreatedBy,
+                            A.CreatedAt
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join bizDeliveryOrderStatusStep As B On B.Kind = A.Kind And B.Code = A.StatusCode
+                     Where
+                            B.Last = 0
+                            And
+                            B.Canceled = 0
+                            And
+                            A.Id = '${params.Id}'
+                     Order By
+                            A.CreatedAt`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
 
       }
 

@@ -38,8 +38,8 @@ const debug = require( "debug" )( "BIZDestination" );
 
 @Table( {
   timestamps: false,
-  tableName: "bizOrigin",
-  modelName: "bizOrigin"
+  tableName: "bizDestination",
+  modelName: "bizDestination"
 } )
 export class BIZDestination extends Model<BIZDestination> {
 

@@ -14,7 +14,7 @@ import DBConnectionManager from "../../../../../02_system/common/managers/DBConn
 
 import { SYSUser } from "../../../../../02_system/common/database/master/models/SYSUser";
 
-import { BIZDeliveryZone } from "../models/BIZDeliveryZone";
+//import { BIZDeliveryZone } from "../models/BIZDeliveryZone";
 import { BIZDeliveryOrder } from "../models/BIZDeliveryOrder";
 import { BIZDriverRoute } from "../models/BIZDriverRoute";
 import { BIZOrigin } from "../models/BIZOrigin";
@@ -29,7 +29,7 @@ export default class BIZDeliveryOrderService extends BaseService {
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<BIZDeliveryZone> {
+                               logger: any ): Promise<BIZDeliveryOrder> {
 
     let result = null;
 
@@ -53,6 +53,20 @@ export default class BIZDeliveryOrderService extends BaseService {
 
         where: { "Id": createOrUpdateData.Id ? createOrUpdateData.Id : "" },
         transaction: currentTransaction,
+        include: [
+                   {
+                     model: BIZDriverRoute,
+                   },
+                   {
+                     model: BIZOrigin,
+                   },
+                   {
+                     model: BIZDestination,
+                   },
+                   {
+                     model: SYSUser,
+                   },
+                 ]
 
       }
 
@@ -62,8 +76,14 @@ export default class BIZDeliveryOrderService extends BaseService {
 
         bizDeliveryOrderInDB = await BIZDeliveryOrder.create(
                                                               createOrUpdateData,
-                                                              { transaction: currentTransaction }
+                                                              {
+                                                                transaction: currentTransaction,
+                                                              }
                                                             );
+
+        options.where.Id = bizDeliveryOrderInDB.Id;
+
+        bizDeliveryOrderInDB = await BIZDeliveryOrder.findOne( options );
 
       }
       else if ( bUpdate ) {
@@ -327,6 +347,192 @@ export default class BIZDeliveryOrderService extends BaseService {
     }
 
     return result;
+
+  }
+
+  static async getActiveOrderByDriverId( strDriverId: string,
+                                         transaction: any,
+                                         logger: any ): Promise<any> {
+
+    let result = [];
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getActiveOrderByDriverId",
+                                                     {
+                                                       DriverId: strDriverId,
+                                                     },
+                                                     logger );
+
+      result = await dbConnection.query( strSQL,
+                                         {
+                                           raw: true,
+                                           type: QueryTypes.SELECT,
+                                           transaction: currentTransaction
+                                         } );
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getActiveOrderByDriverId.name;
+
+      const strMark = "23D3A89C1DDA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getCountActiveOrderByDriverId( strDriverId: string,
+                                              transaction: any,
+                                              logger: any ): Promise<number> {
+
+    let intResult = -1;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getCountActiveOrderByDriverId",
+                                                     {
+                                                       DriverId: strDriverId,
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+      intResult = rows.length > 0 ? rows[ 0 ].Count: 0;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getCountActiveOrderByDriverId.name;
+
+      const strMark = "56AE184C7541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      intResult = error;
+
+    }
+
+    return intResult;
 
   }
 

@@ -59,12 +59,12 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
 
       //let userSessionStatus = context.UserSessionStatus;
 
-      let sysDeliveryZoneInDB = await BIZDeliveryZoneService.getById( request.query.id as string,
+      let bizDeliveryZoneInDB = await BIZDeliveryZoneService.getById( request.query.id as string,
                                                                       currentTransaction,
                                                                       logger );
 
 
-      if ( !sysDeliveryZoneInDB ) {
+      if ( !bizDeliveryZoneInDB ) {
 
         const strMessage = await I18NManager.translate( strLanguage, "The delivery zone with id %s, not found in database", request.query.id as string );
 
@@ -88,9 +88,9 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
                  }
 
       }
-      else if ( sysDeliveryZoneInDB instanceof Error ) {
+      else if ( bizDeliveryZoneInDB instanceof Error ) {
 
-        const error = sysDeliveryZoneInDB as any;
+        const error = bizDeliveryZoneInDB as any;
 
         result = {
                    StatusCode: 500, //Internal server error
@@ -114,7 +114,7 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
       }
       else {
 
-        let modelData = ( sysDeliveryZoneInDB as any ).dataValues;
+        let modelData = ( bizDeliveryZoneInDB as any ).dataValues;
 
         const tempModelData = await BIZDeliveryZone.convertFieldValues(
                                                                         {
@@ -929,7 +929,7 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
           }
           else if ( strBulkOperation === "deleteDeliveryZone" ) {
 
-            const intEstablishmentCount = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizDeliveryZoneInDB.Id,
+            const intEstablishmentCount = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizDeliveryZoneInDB.Id,
                                                                                                         transaction,
                                                                                                         logger );
 
@@ -1531,7 +1531,7 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
       }
       else {
 
-        const intEstablishmentCount = await BIZDeliveryZoneService.getEstablishmentCountAssociated( bizDeliveryZoneInDB.Id,
+        const intEstablishmentCount = await BIZDeliveryZoneService.getCountEstablishmentAssociated( bizDeliveryZoneInDB.Id,
                                                                                                     transaction,
                                                                                                     logger );
 

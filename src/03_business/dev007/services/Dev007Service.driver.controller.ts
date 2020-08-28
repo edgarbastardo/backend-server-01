@@ -2422,6 +2422,7 @@ export default class Dev007ServicesDriverController extends BaseService {
           transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
                                                                                         [
                                                                                           { //BIZDeliveryOrder
+                                                                                            name: "bizDeliveryOrder",
                                                                                             rawAttributes: CommonUtilities.deleteObjectFields( BIZDeliveryOrder.rawAttributes,
                                                                                                                                                [
                                                                                                                                                  "CanceledBy",
@@ -2431,18 +2432,10 @@ export default class Dev007ServicesDriverController extends BaseService {
                                                                                                                                                ],
                                                                                                                                                logger ),
                                                                                           },
-                                                                                          { //BIZEstablishment
+                                                                                          { //BIZOrigin
+                                                                                            name: "bizOrigin",
                                                                                             rawAttributes: {
-                                                                                                             "Name": "",
-                                                                                                             "Latitude": "",
-                                                                                                             "Longitude": "",
-                                                                                                             "Phone": "",
-                                                                                                             "EMail": "",
-                                                                                                             "Tag": ""
-                                                                                                           },
-                                                                                          },
-                                                                                          { //BIZDestination
-                                                                                            rawAttributes: {
+                                                                                                             "Id": "",
                                                                                                              "Address": "",
                                                                                                              "Latitude": "",
                                                                                                              "Longitude": "",
@@ -2451,12 +2444,42 @@ export default class Dev007ServicesDriverController extends BaseService {
                                                                                                              "EMail": "",
                                                                                                              "Comment": "",
                                                                                                              "Tag": ""
+                                                                                                           },
+                                                                                          },
+                                                                                          /*
+                                                                                          { //BIZEstablishment
+                                                                                            name: "bizEstablishment",
+                                                                                            rawAttributes: {
+                                                                                                             "Id": "",
+                                                                                                             "Name": "",
+                                                                                                             "Latitude": "",
+                                                                                                             "Longitude": "",
+                                                                                                             "Address": "",
+                                                                                                             "Phone": "",
+                                                                                                             "EMail": "",
+                                                                                                             "Tag": ""
+                                                                                                           },
+                                                                                          },
+                                                                                          */
+                                                                                          { //BIZDestination
+                                                                                            name: "bizDestination",
+                                                                                            rawAttributes: {
+                                                                                                             "Id": "",
+                                                                                                             "Address": "",
+                                                                                                             "Latitude": "",
+                                                                                                             "Longitude": "",
+                                                                                                             "Name": "",
+                                                                                                             "Phone": "",
+                                                                                                             "EMail": "",
+                                                                                                             "Comment": "",
+                                                                                                             "Tag": "",
+                                                                                                             "ExtraData": "",
                                                                                                            }
                                                                                           }
                                                                                         ],
                                                                                         [
                                                                                           "A",
-                                                                                          "C",
+                                                                                          "B",
                                                                                           "D",
                                                                                         ] );
 
@@ -2471,7 +2494,23 @@ export default class Dev007ServicesDriverController extends BaseService {
                                                                              Data: currentRow,
                                                                              FilterFields: 1, //Force to remove fields like password and value
                                                                              TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                             Include: null, //[ { model: SYSUser } ],
+                                                                             Include: [
+                                                                                        {
+                                                                                          model: BIZDeliveryOrder
+                                                                                        },
+                                                                                        {
+                                                                                          model: BIZOrigin
+                                                                                        },
+                                                                                        {
+                                                                                          model: BIZEstablishment
+                                                                                        },
+                                                                                        {
+                                                                                          model: BIZDestination
+                                                                                        },
+                                                                                        {
+                                                                                          model: BIZDeliveryOrderStatusStep
+                                                                                        }
+                                                                                      ],
                                                                              Exclude: null, //[ { model: SYSUser } ],
                                                                              Logger: logger,
                                                                              ExtraInfo: {
@@ -2622,7 +2661,6 @@ export default class Dev007ServicesDriverController extends BaseService {
       }
 
       let userSessionStatus = context.UserSessionStatus;
-
 
       let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
                                                                                                                    null, //By default use the current date in the server
@@ -2799,6 +2837,334 @@ export default class Dev007ServicesDriverController extends BaseService {
 
   }
 
+  static async getDeliveryOrder( request: Request,
+                                 response: Response,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      request.query.selectField = `A.Id,
+                                   A.Kind,
+                                   A.DriverRouteId,
+                                   A.DeliveryAt,
+                                   A.OriginId,
+                                   A.DestinationId,
+                                   A.UserId,
+                                   A.StatusCode,
+                                   A.StatusDescription,
+                                   A.RoutePriority,
+                                   A.Comment,
+                                   A.Tag,
+                                   A.CreatedBy,
+                                   A.CreatedAt,
+                                   A.UpdatedBy,
+                                   A.UpdatedAt,
+                                   B.Id,
+                                   B.Address,
+                                   B.Latitude,
+                                   B.Longitude,
+                                   B.Name,
+                                   B.Phone,
+                                   B.EMail,
+                                   B.Comment,
+                                   B.Tag,
+                                   D.Id,
+                                   D.Address,
+                                   D.Latitude,
+                                   D.Longitude,
+                                   D.Name,
+                                   D.Phone,
+                                   D.EMail,
+                                   D.Comment,
+                                   D.Tag,
+                                   D.ExtraData`;
+
+      request.query.selectField = SystemUtilities.createSelectAliasFromFieldList( request.query.selectField, "A,B,D" );
+
+      const userSessionStatus = context.UserSessionStatus;
+
+      request.query.where = `A.Id = '${request.query.Id as string}'`;
+
+      const searchResult = await Dev007ServicesDriverController.searchDeliveryOrder( request,
+                                                                                     response,
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+      if ( searchResult.StatusCode === 200  ) {
+
+        if ( searchResult.Count > 0 ) {
+
+          if ( searchResult.Data[ 0 ].UserId !== userSessionStatus.UserId ) {
+
+            result = {
+                       StatusCode: 403, //Fobidden
+                       Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                       Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
+                       Mark: "5E8D7FC52477" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 200, //Ok
+                       Code: "SUCCESS_SEARCH",
+                       Message: await I18NManager.translate( strLanguage, "Success search." ),
+                       Mark: "CE887A144E10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: false,
+                       Errors: [],
+                       Warnings: [],
+                       Count: 1,
+                       Data: searchResult.Data[ 0 ]
+                     }
+
+          }
+
+        }
+        else {
+
+          const strMessage = await I18NManager.translate( strLanguage, "The delivery order with id %s, not found in database", request.query.id as string );
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                     Message: strMessage,
+                     Mark: "10B36A9006B4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                                 Message: strMessage,
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      /*
+      let bizDeliveryOrderInDB = await BIZDeliveryOrderService.getById( request.query.id as string,
+                                                                        currentTransaction,
+                                                                        logger );
+
+      if ( !bizDeliveryOrderInDB ) {
+
+        const strMessage = await I18NManager.translate( strLanguage, "The order with id %s, not found in database", request.query.id as string );
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                   Message: strMessage,
+                   Mark: "6D4119E1F374" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                               Message: strMessage,
+                               Details: null,
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bizDeliveryOrderInDB instanceof Error ) {
+
+        const error = bizDeliveryOrderInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "B9DDE9DC8385" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 };
+
+      }
+      else {
+
+        let modelData = ( bizDeliveryOrderInDB as any ).dataValues;
+
+        const tempModelData = await BIZDeliveryZone.convertFieldValues(
+                                                                        {
+                                                                          Data: modelData,
+                                                                          FilterFields: 1, //Force to remove fields like password and value
+                                                                          TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
+                                                                          Include: null, //[ { model: SYSUser } ],
+                                                                          Exclude: null, //[ { model: SYSUser } ],
+                                                                          Logger: logger,
+                                                                          ExtraInfo: {
+                                                                                       Request: request
+                                                                                     }
+                                                                        }
+                                                                      );
+
+        if ( tempModelData ) {
+
+          modelData = tempModelData;
+
+        }
+
+        result = {
+                   StatusCode: 200, //Ok
+                   Code: "SUCCESS_GET_DELIVERY_ORDER",
+                   Message: await I18NManager.translate( strLanguage, "Success get the delivery order information." ),
+                   Mark: "2F7B538BDE86" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: false,
+                   Errors: [],
+                   Warnings: [],
+                   Count: 1,
+                   Data: [
+                           modelData
+                         ]
+                 }
+
+        bApplyTransaction = true;
+
+      }
+      */
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDeliveryOrder.name;
+
+      const strMark = "1BF229396552" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: strMark,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  /*
   static async updateDeliveryOrder( request: Request,
                                     response: Response,
                                     transaction: any,
@@ -2928,6 +3294,7 @@ export default class Dev007ServicesDriverController extends BaseService {
     return result;
 
   }
+  */
 
   static async updateDeliveryOrderStatusNext( request: Request,
                                               response: Response,

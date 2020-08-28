@@ -4027,26 +4027,50 @@ export default class SystemUtilities {
                                                                                               strTimeZoneId,
                                                                                               params.Logger );
 
-              if ( params.FilterFields === 1 ) {
+              if ( params.FilterFields ) {
 
-                delete result[ modelIncluded.model.name ].Password; //Delete fields password
+                if ( params.FilterFields === 1 ) {
+
+                  delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+                }
+                else if ( params.FilterFields.length > 0 ) {
+
+                  delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+                  result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
+                                                                                           params.FilterFields,
+                                                                                           params.logger );
+
+                }
+                else if ( params.FilterFields[ modelIncluded.model.name ] ) {
+
+                  delete result[ modelIncluded.model.name ].Password; //Delete fields password
+
+                  result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
+                                                                                           params.FilterFields[ modelIncluded.model.name ],
+                                                                                           params.logger );
+
+                }
 
               }
-              else if ( params.FilterFields?.length > 0 ) {
 
-                delete result[ modelIncluded.model.name ].Password; //Delete fields password
+              if ( params.IncludeFields ) {
 
-                result[ modelIncluded.model.name ] = CommonUtilities.deleteObjectFields( result[ modelIncluded.model.name ],
-                                                                                         params.FilterFields,
-                                                                                         params.logger );
+                if ( params.IncludeFields.length > 0 ) {
 
-              }
+                  result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
+                                                                                            params.IncludeFields,
+                                                                                            params.logger );
 
-              if ( params.IncludeFields?.length > 0 ) {
+                }
+                else if ( params.IncludeFields[ modelIncluded.model.name ] ) {
 
-                result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
-                                                                                          params.IncludeFields,
-                                                                                          params.logger );
+                  result[ modelIncluded.model.name ] = CommonUtilities.includeObjectFields( result[ modelIncluded.model.name ],
+                                                                                            params.IncludeFields[ modelIncluded.model.name ],
+                                                                                            params.logger );
+
+                }
 
               }
 
@@ -4098,6 +4122,14 @@ export default class SystemUtilities {
                   result[ modelIncluded.model.name ].ExtraData = extraData;
 
                 }
+
+              }
+              else if ( !params.KeepExtraData ||
+                        params.KeepExtraData === 0 ) {
+
+                delete result[ modelIncluded.model.name ].ExtraData;
+
+                result[ modelIncluded.model.name ].Business = {};
 
               }
 
@@ -4174,7 +4206,8 @@ export default class SystemUtilities {
         }
 
       }
-      else {
+      else if ( !params.KeepExtraData ||
+                params.KeepExtraData === 0 ) {
 
         delete result.ExtraData;
 

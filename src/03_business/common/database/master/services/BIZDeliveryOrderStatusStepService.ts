@@ -77,7 +77,7 @@ export default class BIZDeliveryOrderStatusStepService extends BaseService {
         }
 
         await bizDeliveryOrderStatusStepInDB.update( createOrUpdateData,
-                                           options );
+                                                     options );
 
         bizDeliveryOrderStatusStepInDB = await BIZDeliveryOrderStatusStep.findOne( options );
 

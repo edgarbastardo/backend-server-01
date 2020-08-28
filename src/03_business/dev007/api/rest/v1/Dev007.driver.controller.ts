@@ -33,6 +33,7 @@ import MiddlewareManager from "../../../../../02_system/common/managers/Middlewa
 
 import Dev007ServicesDriverController from "../../../services/Dev007Service.driver.controller";
 import Dev007ServicesDriverDeliveryOrderCreateController from "../../../services/Dev007Service.driver.delivery.order.create.controller";
+import Dev007ServicesDriverDeliveryOrderUpdateController from "../../../services/Dev007Service.driver.delivery.order.update.controller";
 
 const debug = require( "debug" )( "Dev007.driver.controller" );
 
@@ -67,8 +68,10 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/active/count", Action: "v1.business.dev007.driver.delivery.order.active.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "List active delivery order count information" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/search", Action: "v1.business.dev007.driver.delivery.order.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Search for delivery order information" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/search/count", Action: "v1.business.dev007.driver.delivery.order.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Search for delivery order count information" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get delivery order info to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Create a new delivery order to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Modify a delivery order to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status", Action: "v1.business.dev007.driver.delivery.order.status", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/next", Action: "v1.business.dev007.driver.delivery.order.status.next", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the next status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/previous", Action: "v1.business.dev007.driver.delivery.order.status.previous", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the previous status the delivery order" },
                                 ]
@@ -346,6 +349,17 @@ export default class Dev007DriverController {
 
     let userSessionStatus = context.UserSessionStatus;
 
+    /*
+                                 C.Id,
+                                 C.Name,
+                                 C.Address,
+                                 C.Latitude,
+                                 C.Longitude,
+                                 C.Phone,
+                                 C.EMail,
+                                 C.Tag,
+    */
+
     request.query.selectField = `A.Id,
                                  A.Kind,
                                  A.DriverRouteId,
@@ -362,12 +376,16 @@ export default class Dev007DriverController {
                                  A.CreatedAt,
                                  A.UpdatedBy,
                                  A.UpdatedAt,
-                                 C.Name,
-                                 C.Latitude,
-                                 C.Longitude,
-                                 C.Phone,
-                                 C.EMail,
-                                 C.Tag,
+                                 B.Id,
+                                 B.Address,
+                                 B.Latitude,
+                                 B.Longitude,
+                                 B.Name,
+                                 B.Phone,
+                                 B.EMail,
+                                 B.Comment,
+                                 B.Tag,
+                                 D.Id,
                                  D.Address,
                                  D.Latitude,
                                  D.Longitude,
@@ -375,10 +393,12 @@ export default class Dev007DriverController {
                                  D.Phone,
                                  D.EMail,
                                  D.Comment,
-                                 D.Tag`;
+                                 D.Tag,
+                                 D.ExtraData`;
+
+    //Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )}' And
 
     request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
-                             Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format()}' And
                              A.CanceledBy Is Null And
                              A.CanceledAt Is Null And
                              A.DisabledAt Is Null And
@@ -389,7 +409,7 @@ export default class Dev007DriverController {
     request.query.orderBy = `A.RoutePriority Asc,
                              A.DeliveryAt Asc`;
 
-    request.query.selectField = SystemUtilities.createSelectAliasFromFieldList( request.query.selectField, "A,C,D" );
+    request.query.selectField = SystemUtilities.createSelectAliasFromFieldList( request.query.selectField, "A,B,D" );
 
     const result = await Dev007ServicesDriverController.searchDeliveryOrder( request,
                                                                              response,
@@ -412,8 +432,9 @@ export default class Dev007DriverController {
 
     let userSessionStatus = context.UserSessionStatus;
 
+    //Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )}' And
+
     request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
-                             Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format()}' And
                              A.CanceledBy Is Null And
                              A.CanceledAt Is Null And
                              A.DisabledAt Is Null And
@@ -472,6 +493,25 @@ export default class Dev007DriverController {
 
   }
 
+  @httpGet(
+            "/delivery/order",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getDeliveryOrder( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.getDeliveryOrder( request,
+                                                                          response,
+                                                                          null,
+                                                                          context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpPost(
              "/delivery/order",
              MiddlewareManager.middlewareSetContext,
@@ -501,10 +541,10 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007ServicesDriverController.updateDeliveryOrder( request,
-                                                                             response,
-                                                                             null,
-                                                                             context.logger );
+    const result = await Dev007ServicesDriverDeliveryOrderUpdateController.updateDeliveryOrder( request,
+                                                                                                response,
+                                                                                                null,
+                                                                                                context.logger );
 
     response.status( result.StatusCode ).send( result );
 

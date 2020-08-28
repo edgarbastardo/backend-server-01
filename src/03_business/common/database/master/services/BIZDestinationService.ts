@@ -13,6 +13,7 @@ import BaseService from "../../../../../02_system/common/database/master/service
 import DBConnectionManager from "../../../../../02_system/common/managers/DBConnectionManager";
 
 import { BIZDestination } from "../models/BIZDestination";
+import { BIZEstablishment } from "../models/BIZEstablishment";
 
 const debug = require( "debug" )( "BIZDestinationServiceService" );
 
@@ -49,13 +50,11 @@ export default class BIZDestinationService extends BaseService {
                  "Id": createOrUpdateData.Id ? createOrUpdateData.Id : ""
                },
         transaction: currentTransaction,
-        /*
         include: [
                    {
-                     model: SYSUser,
-                   },
+                     model: BIZEstablishment,
+                   }
                  ]
-                 */
 
       }
 
@@ -65,8 +64,14 @@ export default class BIZDestinationService extends BaseService {
 
         bizDestinationInDB = await BIZDestination.create(
                                                           createOrUpdateData,
-                                                          { transaction: currentTransaction }
+                                                          {
+                                                            transaction: currentTransaction,
+                                                          }
                                                         );
+
+        options.where.Id = bizDestinationInDB.Id;
+
+        bizDestinationInDB = await BIZDestination.findOne( options );
 
       }
       else if ( bUpdate ) {

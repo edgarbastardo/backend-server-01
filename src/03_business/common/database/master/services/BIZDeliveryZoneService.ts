@@ -520,7 +520,7 @@ export default class BIZDeliveryZoneService extends BaseService {
 
   }
 
-  static async getEstablishmentCountAssociated( strId: string,
+  static async getCountEstablishmentAssociated( strId: string,
                                                 transaction: any,
                                                 logger: any ): Promise<Number> {
 
@@ -571,7 +571,7 @@ export default class BIZDeliveryZoneService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getEstablishmentCountAssociated.name;
+      sourcePosition.method = this.name + "." + this.getCountEstablishmentAssociated.name;
 
       const strMark = "D7157438838F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -669,7 +669,7 @@ export default class BIZDeliveryZoneService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getEstablishmentCountAssociated.name;
+      sourcePosition.method = this.name + "." + this.getCountEstablishmentAssociated.name;
 
       const strMark = "D7157438838F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

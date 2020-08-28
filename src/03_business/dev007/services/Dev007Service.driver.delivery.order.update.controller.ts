@@ -22,9 +22,9 @@ import BIZDriverInDeliveryZoneService from "../../common/database/master/service
 import BIZEstablishmentService from "../../common/database/master/services/BIZEstablishmentService";
 import BIZOriginService from "../../common/database/master/services/BIZOriginService";
 import BIZDestinationService from "../../common/database/master/services/BIZDestinationService";
-import BIZDeliveryOrderStatusStepService from "../../common/database/master/services/BIZDeliveryOrderStatusStepService";
+//import BIZDeliveryOrderStatusStepService from "../../common/database/master/services/BIZDeliveryOrderStatusStepService";
 import BIZDeliveryOrderService from "../../common/database/master/services/BIZDeliveryOrderService";
-import BIZDeliveryOrderStatusService from "../../common/database/master/services/BIZDeliveryOrderStatusService";
+//import BIZDeliveryOrderStatusService from "../../common/database/master/services/BIZDeliveryOrderStatusService";
 
 import { SYSUser } from "../../../02_system/common/database/master/models/SYSUser";
 
@@ -33,13 +33,13 @@ import { BIZDestination } from "../../common/database/master/models/BIZDestinati
 import { BIZOrigin } from "../../common/database/master/models/BIZOrigin";
 import { BIZDriverRoute } from "../../common/database/master/models/BIZDriverRoute";
 
-const debug = require( "debug" )( "Dev007ServicesDriverDeliveryOrderCreateController" );
+const debug = require( "debug" )( "Dev007ServicesDriverDeliveryOrderUpdateController" );
 
-export default class Dev007ServicesDriverDeliveryOrderCreateController extends BaseService {
+export default class Dev007ServicesDriverDeliveryOrderUpdateController extends BaseService {
 
   //Common business services
 
-  static async createDeliveryOrder( request: Request,
+  static async updateDeliveryOrder( request: Request,
                                     response: Response,
                                     transaction: any,
                                     logger: any ):Promise<any> {
@@ -85,7 +85,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                    StatusCode: 500, //Internal server error
                    Code: "ERROR_UNEXPECTED",
                    Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                   Mark: "21CFA4186B50" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "D08D7A157E63" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -107,7 +107,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                    StatusCode: 400, //Bad request
                    Code: "ERROR_DRIVER_DELIVERY_ZONE_NOT_SET",
                    Message: await I18NManager.translate( strLanguage, "The driver delivery zone not set." ),
-                   Mark: "19C886AA32E9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   Mark: "4EDABF5BABAD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
@@ -126,7 +126,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
       else {
 
         let deliveryOrderRules = {
-                                   EstablishmentId: [ "required", "string", "min:36" ],
+                                   Id: [ "required", "string", "min:36" ],
                                    Address: [ "required", "string" ],
                                    Phone: [ "required", "string" ],
                                    Name: [ "present", "string" ],
@@ -141,23 +141,19 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
         if ( validator.passes() ) { //Validate request.body field values
 
-          const intCountActiveOrders = await BIZDeliveryOrderService.getCountActiveOrderByDriverId( userSessionStatus.UserId,
-                                                                                                    currentTransaction,
-                                                                                                    logger );
+          let bizDeliveryOrderInDB = await BIZDeliveryOrderService.getById( request.body.Id,
+                                                                            currentTransaction,
+                                                                            logger );
 
-          const bizEstablishmentInDB = await BIZEstablishmentService.getById( request.body.EstablishmentId,
-                                                                              currentTransaction,
-                                                                              logger );
+          if ( bizDeliveryOrderInDB instanceof Error ) {
 
-          if ( bizEstablishmentInDB instanceof Error ) {
-
-            const error = bizEstablishmentInDB as any;
+            const error = bizDeliveryOrderInDB as any;
 
             result = {
                        StatusCode: 500, //Internal server error
                        Code: "ERROR_UNEXPECTED",
                        Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                       Mark: "951822CDF2F5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Mark: "2702125081E9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
@@ -173,19 +169,19 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                      }
 
           }
-          else if ( !bizEstablishmentInDB ) {
+          else if ( !bizDeliveryOrderInDB ) {
 
             result = {
                        StatusCode: 404, //Not found
-                       Code: "ERROR_ESTABLISHMENT_NOT_FOUND",
-                       Message: await I18NManager.translate( strLanguage, "The establishment with id %s. Not found in database.", request.body.EstablishmentId ),
+                       Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                       Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not found in database.", request.body.EstablishmentId ),
                        Mark: "87CBC86751A7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: "ERROR_ESTABLISHMENT_NOT_FOUND",
-                                   Message: await I18NManager.translate( strLanguage, "The establishment with id %s. Not found in database.", request.body.EstablishmentId ),
+                                   Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not found in database.", request.body.EstablishmentId ),
                                    Details: ""
                                  }
                                ],
@@ -195,19 +191,19 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                      }
 
           }
-          else if ( bizEstablishmentInDB.DeliveryZoneId !== bizDriverInDeliveryZoneInDB.DeliveryZoneId ) {
+          else if ( bizDeliveryOrderInDB.UserId !== userSessionStatus.UserId ) {
 
             result = {
-                       StatusCode: 400, //Bad request
-                       Code: "ERROR_ESTABLISHEMENT_NOT_IN_DELIVERY_ZONE",
-                       Message: await I18NManager.translate( strLanguage, "The establishemnt with id %s. Not in your current delivery zone.", request.body.EstablishmentId ),
-                       Mark: "9033B31E34EF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       StatusCode: 403, //Fobidden
+                       Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                       Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
+                       Mark: "86609351AB99" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
-                                   Code: "ERROR_ESTABLISHEMENT_NOT_IN_DELIVERY_ZONE",
-                                   Message: await I18NManager.translate( strLanguage, "The establishemnt with id %s. Not in your current delivery zone.", request.body.EstablishmentId ),
+                                   Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
                                    Details: null
                                  }
                                ],
@@ -217,45 +213,20 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                      }
 
           }
-          else if ( bizDriverInDeliveryZoneInDB.bizDeliveryZone.Kind !== 1 ) { //Only in Driver exclusive, the drive can create the order
+          else if ( bizDeliveryOrderInDB.Kind !== 1 ) { //Only in Driver exclusive, the drive can modify the order
 
             result = {
                        StatusCode: 403, //Forbidden
                        Code: "ERROR_DRIVER_NOT_ALLOWED",
-                       Message: await I18NManager.translate( strLanguage, "The driver not allowed to create delivery order in this delivery zone." ),
-                       Mark: "1648F127067A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       Message: await I18NManager.translate( strLanguage, "The driver not allowed to update delivery order in this delivery zone." ),
+                       Mark: "69C639F3FEC3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: true,
                        Errors: [
                                  {
                                    Code: "ERROR_DRIVER_NOT_ALLOWED",
-                                   Message: await I18NManager.translate( strLanguage, "The driver not allowed to create delivery order in this delivery zone." ),
+                                   Message: await I18NManager.translate( strLanguage, "The driver not allowed to update delivery order in this delivery zone." ),
                                    Details: null
-                                 }
-                               ],
-                       Warnings: [],
-                       Count: 0,
-                       Data: []
-                     }
-
-          }
-          else if ( intCountActiveOrders + 1 > bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ) {
-
-            result = {
-                       StatusCode: 400, //Bad request
-                       Code: "ERROR_MAXIMUM_DELIVERY_REACHED",
-                       Message: await I18NManager.translate( strLanguage, "The maximum %s of active deliveries had reached.", bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ),
-                       Mark: "F81691553941" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                       LogId: null,
-                       IsError: true,
-                       Errors: [
-                                 {
-                                   Code: "ERROR_MAXIMUM_DELIVERY_REACHED",
-                                   Message: await I18NManager.translate( strLanguage, "The maximum %s of active deliveries had reached.", bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ),
-                                   Details: {
-                                              ActiveOrders: intCountActiveOrders,
-                                              ActiveOrdersMaximum: bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax
-                                            }
                                  }
                                ],
                        Warnings: [],
@@ -266,25 +237,25 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
           }
           else {
 
-            const bizOriginInDB = await BIZOriginService.createOrUpdate(
-                                                                         {
-                                                                           UserId: null,
-                                                                           EstablishmentId: bizEstablishmentInDB.Id,
-                                                                           Address: bizEstablishmentInDB.Address,
-                                                                           FormattedAddress: bizEstablishmentInDB.Address,
-                                                                           Latitude: bizEstablishmentInDB.Latitude,
-                                                                           Longitude: bizEstablishmentInDB.Longitude,
-                                                                           Name: bizEstablishmentInDB.Name,
-                                                                           EMail: bizEstablishmentInDB.EMail ? bizEstablishmentInDB.EMail: null,
-                                                                           Phone: bizEstablishmentInDB.Phone ? bizEstablishmentInDB.Phone: null,
-                                                                           Comment: null,
-                                                                           Tag: null,
-                                                                           CreatedBy: userSessionStatus.UserName,
-                                                                         },
-                                                                         false,
-                                                                         currentTransaction,
-                                                                         logger
-                                                                       );
+            let bizOriginInDB = await BIZOriginService.getById( bizDeliveryOrderInDB.OriginId,
+                                                                currentTransaction,
+                                                                logger );
+
+            //Refresh the data
+            bizOriginInDB.Address = bizOriginInDB.bizEstablishment.Address;
+            bizOriginInDB.FormattedAddress = bizOriginInDB.bizEstablishment.Address;
+            bizOriginInDB.Latitude = bizOriginInDB.bizEstablishment.Latitude;
+            bizOriginInDB.Longitude = bizOriginInDB.bizEstablishment.Longitude;
+            bizOriginInDB.Name = bizOriginInDB.bizEstablishment.Name;
+            bizOriginInDB.EMail = bizOriginInDB.bizEstablishment.EMail ? bizOriginInDB.bizEstablishment.EMail: null;
+            bizOriginInDB.Phone = bizOriginInDB.bizEstablishment.Phone ? bizOriginInDB.bizEstablishment.Phone: null;
+
+            bizOriginInDB = await BIZOriginService.createOrUpdate(
+                                                                   ( bizOriginInDB as any ).dataValues,
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger
+                                                                 );
 
             if ( bizOriginInDB &&
                  bizOriginInDB instanceof Error === false ) {
@@ -293,11 +264,36 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                                                                       true,
                                                                                       logger );
 
+
+              let bizDestinationInDB = await BIZDestinationService.getById( bizDeliveryOrderInDB.DestinationId,
+                                                                            currentTransaction,
+                                                                            logger );
+
               let distanceInfo = null;
 
-              let strTag = !geocodedAddress[ 0 ].formattedAddress ? "#ADDRESS_ERROR#": null;
+              let strTag = bizDestinationInDB.Tag;
 
-              let distanceEntry = {};
+              if ( !geocodedAddress[ 0 ].formattedAddress ) {
+
+                //Add the tag
+                strTag = SystemUtilities.mergeTokens( strTag,
+                                                      "#ADDRESS_ERROR#",
+                                                      false,
+                                                      logger );
+
+              }
+              else {
+
+                //Remove th tag, just in case
+                strTag = SystemUtilities.mergeTokens( strTag,
+                                                      "-#ADDRESS_ERROR#",
+                                                      true,
+                                                      logger );
+
+              }
+
+
+              let distanceEntry = {} as any;
 
               if ( geocodedAddress[ 0 ].latitude &&
                    geocodedAddress[ 0 ].longitude ) {
@@ -308,8 +304,8 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                   distanceInfo = await GeoMapManager.calcDistanceAndTimeUsingLatAndLng(
                                                                                         bizDriverInDeliveryZoneInDB.bizDeliveryZone.DistanceUnit === 0? "imperial": "metric",
                                                                                         {
-                                                                                          latitude: request.body.Latitude ? request.body.Latitude: "" + bizEstablishmentInDB.Latitude,
-                                                                                          longitude: request.body.Longitude ? request.body.Longitude: "" + bizEstablishmentInDB.Longitude
+                                                                                          latitude: request.body.Latitude ? request.body.Latitude: "" + bizOriginInDB.bizEstablishment.Latitude,
+                                                                                          longitude: request.body.Longitude ? request.body.Longitude: "" + bizOriginInDB.bizEstablishment.Longitude
                                                                                         },
                                                                                         [
                                                                                           {
@@ -326,7 +322,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
                   distanceInfo = await GeoMapManager.calcDistanceAndTimeUsingAddress(
                                                                                       bizDriverInDeliveryZoneInDB.bizDeliveryZone.DistanceUnit === 0? "imperial": "metric",
-                                                                                      bizEstablishmentInDB.Address,
+                                                                                      bizOriginInDB.bizEstablishment.Address,
                                                                                       [
                                                                                         geocodedAddress[ 0 ].formattedAddress
                                                                                       ],
@@ -343,8 +339,18 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                     //Conver the meters (Google maps always return value number in meters) value to miles
                     if ( distanceInfo[ 0 ].distance.value / 1609 > bizDriverInDeliveryZoneInDB.bizDeliveryZone.DistanceMax ) {
 
+                      //Add the tag
                       strTag = SystemUtilities.mergeTokens( strTag,
                                                             "#DISTANCE_WARNING#",
+                                                            false,
+                                                            logger );
+
+                    }
+                    else {
+
+                      //Remove the tag. Just in case
+                      strTag = SystemUtilities.mergeTokens( strTag,
+                                                            "-#DISTANCE_WARNING#",
                                                             true,
                                                             logger );
 
@@ -355,8 +361,18 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
                     if ( distanceInfo[ 0 ].distance.value > bizDriverInDeliveryZoneInDB.bizDeliveryZone.DistanceMax ) {
 
+                      //Add the tag
                       strTag = SystemUtilities.mergeTokens( strTag,
                                                             "#DISTANCE_WARNING#",
+                                                            true,
+                                                            logger );
+
+                    }
+                    else {
+
+                      //Remove the tag. Just in case
+                      strTag = SystemUtilities.mergeTokens( strTag,
+                                                            "-#DISTANCE_WARNING#",
                                                             true,
                                                             logger );
 
@@ -370,9 +386,9 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                                             {
                                                               Index: 0,
                                                               Origin: {
-                                                                        Latitude: request.body.Latitude ? request.body.Latitude: "" + bizEstablishmentInDB.Latitude,
-                                                                        Longitude: request.body.Longitude ? request.body.Longitude: "" + bizEstablishmentInDB.Longitude,
-                                                                        Address: request.body.Latitude && request.body.Longitude ? "": bizEstablishmentInDB.Address
+                                                                        Latitude: request.body.Latitude ? request.body.Latitude: "" + bizOriginInDB.bizEstablishment.Latitude,
+                                                                        Longitude: request.body.Longitude ? request.body.Longitude: "" + bizOriginInDB.bizEstablishment.Longitude,
+                                                                        Address: request.body.Latitude && request.body.Longitude ? "": bizOriginInDB.bizEstablishment.Address
                                                                       },
                                                               Destination: {
                                                                              Latitude: "" + geocodedAddress[ 0 ].latitude,
@@ -385,19 +401,20 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                                               DistanceMeter: distanceInfo[ 0 ].distance.value,
                                                               DurationText: distanceInfo[ 0 ].duration.text,
                                                               DurationSecond: distanceInfo[ 0 ].duration.value,
-                                                              Tag: strTag,
+                                                              Tag: strTag ? strTag: null,
                                                               CreatedBy: userSessionStatus.UserName,
                                                               CreatedAt: SystemUtilities.getCurrentDateAndTime().format(),
                                                             }
                                                           ]
                                               }
+
                                   }
 
                 }
                 else {
 
                   strTag = SystemUtilities.mergeTokens( strTag,
-                                                        "#DISTANCE_WARNING#,#ADDRESS_ERROR#",
+                                                        "#ADDRESS_ERROR#,#DISTANCE_WARNING#",
                                                         true,
                                                         logger );
 
@@ -407,9 +424,9 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                                             {
                                                               Index: 0,
                                                               Origin: {
-                                                                        Latitude: request.body.Latitude ? request.body.Latitude: "" + bizEstablishmentInDB.Latitude,
-                                                                        Longitude: request.body.Longitude ? request.body.Longitude: "" + bizEstablishmentInDB.Longitude,
-                                                                        Address: request.body.Latitude && request.body.Longitude ? "": bizEstablishmentInDB.Address
+                                                                        Latitude: request.body.Latitude ? request.body.Latitude: "" + bizOriginInDB.bizEstablishment.Latitude,
+                                                                        Longitude: request.body.Longitude ? request.body.Longitude: "" + bizOriginInDB.bizEstablishment.Longitude,
+                                                                        Address: request.body.Latitude && request.body.Longitude ? "": bizOriginInDB.bizEstablishment.Address
                                                                       },
                                                               Destination: {
                                                                              Latitude: "",
@@ -428,85 +445,73 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                                             }
                                                           ]
                                               }
-                                  }
+
+                                   }
 
                 }
 
               }
 
-              const bizDestinationInDB = await BIZDestinationService.createOrUpdate(
-                                                                                     {
-                                                                                       UserId: null,
-                                                                                       EstablishmentId: null,
-                                                                                       Address: request.body.Address,
-                                                                                       FormattedAddress: geocodedAddress[ 0 ].formattedAddress,
-                                                                                       Latitude: geocodedAddress[ 0 ].latitude,
-                                                                                       Longitude: geocodedAddress[ 0 ].longitude,
-                                                                                       Name: request.body.Name ? request.body.Name: null,
-                                                                                       Phone: request.body.Phone ? request.body.Phone: null,
-                                                                                       EMail: request.body.EMail ? request.body.EMail: null,
-                                                                                       Comment: request.body.Comment ? request.body.Comment: null,
-                                                                                       Tag: strTag,
-                                                                                       CreatedBy: userSessionStatus.UserName,
-                                                                                       ExtraData: distanceEntry
-                                                                                     },
-                                                                                     false,
-                                                                                     currentTransaction,
-                                                                                     logger
-                                                                                   );
+              bizDestinationInDB.Name = request.body.Name;
+              bizDestinationInDB.Phone = request.body.Phone;
+              bizDestinationInDB.Address = request.body.Address;
+              bizDestinationInDB.FormattedAddress = geocodedAddress[ 0 ].formattedAddress ? geocodedAddress[ 0 ].formattedAddress: null;
+              bizDestinationInDB.Tag = strTag ? strTag: null;
+
+              let extraData = bizDestinationInDB.ExtraData as any instanceof String ?
+                              CommonUtilities.parseJSON( bizDestinationInDB.ExtraData, logger ):
+                              bizDestinationInDB.ExtraData;
+
+              if ( extraData?.Business?.Distance?.length >= 0 ) {
+
+                distanceEntry.Business.Distance[ 0 ].Index = extraData?.Business?.Distance?.length;
+
+                extraData.Business?.Distance?.push( distanceEntry.Business.Distance[ 0 ] );
+
+              }
+              else if ( extraData?.Business ) {
+
+                extraData.Business = {
+                                        Distance: distanceEntry.Business.Distance,
+                                        ...extraData.Business
+                                     }
+
+              }
+              else {
+
+                extraData = {
+                              Business: {
+                                          Distance: extraData?.Business?.Distance,
+                                        },
+                              ...extraData
+                            }
+
+              }
+
+              bizDestinationInDB.ExtraData = extraData;
+
+              bizDestinationInDB = await BIZDestinationService.createOrUpdate(
+                                                                               ( bizDestinationInDB as any ).dataValues,
+                                                                               true,
+                                                                               currentTransaction,
+                                                                               logger
+                                                                             );
 
               if ( bizDestinationInDB &&
                    bizDestinationInDB instanceof Error === false ) {
 
-                //Find the first step in the delivery order step
-                const bizDeliveryOrderStatusStepInDB = await BIZDeliveryOrderStatusStepService.getDeliveryOrderStepByKind( bizDriverInDeliveryZoneInDB.bizDeliveryZone.Kind,
-                                                                                                                           true,  //First
-                                                                                                                           false, //Last
-                                                                                                                           false, //Canceled
-                                                                                                                           currentTransaction,
-                                                                                                                           logger );
+                  bizDeliveryOrderInDB.Tag = strTag ? strTag: null;
+                  bizDeliveryOrderInDB.Comment = request.body.Comment;
 
-                if ( bizDeliveryOrderStatusStepInDB &&
-                     bizDeliveryOrderStatusStepInDB instanceof Error === false ) {
-
-                  const bizDeliveryOrderInDB = await BIZDeliveryOrderService.createOrUpdate(
-                                                                                             {
-                                                                                               Kind: bizDriverInDeliveryZoneInDB.bizDeliveryZone.Kind,
-                                                                                               DriverRouteId: null,
-                                                                                               DeliveryAt: SystemUtilities.getCurrentDateAndTime().format(),
-                                                                                               OriginId: bizOriginInDB.Id,
-                                                                                               DestinationId: bizDestinationInDB.Id,
-                                                                                               UserId: userSessionStatus.UserId,
-                                                                                               StatusSequence: bizDeliveryOrderStatusStepInDB.Sequence,
-                                                                                               StatusCode: bizDeliveryOrderStatusStepInDB.Code,
-                                                                                               StatusDescription: bizDeliveryOrderStatusStepInDB.Description,
-                                                                                               RoutePriority: 0,
-                                                                                               Comment: request.body.Comment,
-                                                                                               Tag: strTag,
-                                                                                               CanceledBy: null,
-                                                                                               CanceledAt: null,
-                                                                                               CreatedBy: userSessionStatus.UserName,
-                                                                                             },
-                                                                                             true,
-                                                                                             currentTransaction,
-                                                                                             logger
-                                                                                           );
+                  bizDeliveryOrderInDB = await BIZDeliveryOrderService.createOrUpdate(
+                                                                                       ( bizDeliveryOrderInDB as any ).dataValues,
+                                                                                       true,
+                                                                                       currentTransaction,
+                                                                                       logger
+                                                                                     );
 
                   if ( bizDeliveryOrderInDB &&
                        bizDeliveryOrderInDB instanceof Error === false ) {
-
-                    await BIZDeliveryOrderStatusService.createOrUpdate(
-                                                                        {
-                                                                          DeliveryOrderId: bizDeliveryOrderInDB.Id,
-                                                                          Code: bizDeliveryOrderStatusStepInDB.Code,
-                                                                          Description: bizDeliveryOrderStatusStepInDB.Description,
-                                                                          Tag: "#" + bizDeliveryOrderStatusStepInDB.Description + "#",
-                                                                          CreatedBy: userSessionStatus.UserName
-                                                                        },
-                                                                        true,
-                                                                        currentTransaction,
-                                                                        logger
-                                                                      );
 
                     let modelData = ( bizDeliveryOrderInDB as any ).dataValues;
 
@@ -559,7 +564,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                     //ANCHOR success user update
                     result = {
                                StatusCode: 200, //Ok
-                               Code: "SUCCESS_CREATE_DELIVERY_ORDER",
+                               Code: "SUCCESS_UPDATE_DELIVERY_ORDER",
                                Message: await I18NManager.translate( strLanguage, "" ),
                                Mark: "564A78418432" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                                LogId: null,
@@ -568,7 +573,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                Warnings: [],
                                Count: 1,
                                Data: [
-                                       bizDeliveryOrderInDB
+                                       modelData
                                      ]
                              }
 
@@ -599,54 +604,6 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                              }
 
                   }
-
-                }
-                else if ( !bizDeliveryOrderStatusStepInDB ) {
-
-                  result = {
-                             StatusCode: 404, //Not found
-                             Code: "ERROR_NO_FIRST_STATUS_FOUND_IN_DELIVERY_ORDER_STATUS_STEP",
-                             Message: await I18NManager.translate( strLanguage, "The no first status found in the database table delivery order status step" ),
-                             Mark: "950F694A7179" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                             LogId: null,
-                             IsError: true,
-                             Errors: [
-                                       {
-                                         Code: "ERROR_NO_FIRST_STATUS_FOUND_IN_DELIVERY_ORDER_STATUS_STEP",
-                                         Message: await I18NManager.translate( strLanguage, "The no first status found in the database table delivery order status step" ),
-                                         Details: ""
-                                       }
-                                     ],
-                             Warnings: [],
-                             Count: 0,
-                             Data: []
-                           }
-
-                }
-                else {
-
-                  const error = bizDeliveryOrderStatusStepInDB as any;
-
-                  result = {
-                             StatusCode: 500, //Internal server error
-                             Code: "ERROR_UNEXPECTED",
-                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                             Mark: "1D01CC122029" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                             LogId: null,
-                             IsError: true,
-                             Errors: [
-                                       {
-                                         Code: error.name,
-                                         Message: error.message,
-                                         Details: await SystemUtilities.processErrorDetails( error ) //error
-                                       }
-                                     ],
-                             Warnings: [],
-                             Count: 0,
-                             Data: []
-                           }
-
-                }
 
               }
               else {
@@ -751,7 +708,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.createDeliveryOrder.name;
+      sourcePosition.method = this.name + "." + this.updateDeliveryOrder.name;
 
       const strMark = "4C85853903C1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

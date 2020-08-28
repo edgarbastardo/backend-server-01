@@ -13,6 +13,7 @@ import BaseService from "../../../../../02_system/common/database/master/service
 import DBConnectionManager from "../../../../../02_system/common/managers/DBConnectionManager";
 
 import { BIZOrigin } from "../models/BIZOrigin";
+import { BIZEstablishment } from "../models/BIZEstablishment";
 
 const debug = require( "debug" )( "BIZOriginServiceService" );
 
@@ -49,13 +50,11 @@ export default class BIZOriginService extends BaseService {
                  "Id": createOrUpdateData.Id ? createOrUpdateData.Id : ""
                },
         transaction: currentTransaction,
-        /*
         include: [
                    {
-                     model: SYSUser,
-                   },
+                     model: BIZEstablishment,
+                   }
                  ]
-                 */
 
       }
 
@@ -64,9 +63,13 @@ export default class BIZOriginService extends BaseService {
       if ( bizOriginInDB === null ) {
 
         bizOriginInDB = await BIZOrigin.create(
-                                                      createOrUpdateData,
-                                                      { transaction: currentTransaction }
-                                                    );
+                                                createOrUpdateData,
+                                                { transaction: currentTransaction }
+                                              );
+
+        options.where.Id = bizOriginInDB.Id;
+
+        bizOriginInDB = await BIZOrigin.findOne( options );
 
       }
       else if ( bUpdate ) {
@@ -168,13 +171,11 @@ export default class BIZOriginService extends BaseService {
 
         where: { "Id": strId ? strId : "" },
         transaction: currentTransaction,
-        /*
         include: [
                    {
-                     model: SYSUser,
-                   },
+                     model: BIZEstablishment,
+                   }
                  ]
-                 */
 
       }
 

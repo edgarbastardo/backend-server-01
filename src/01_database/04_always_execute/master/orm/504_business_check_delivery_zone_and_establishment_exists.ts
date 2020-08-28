@@ -46,9 +46,9 @@ export default class Always {
 
       const deliveryZoneEntries = [
                                     {
-                                      Id: "c4c2f68d-9dc6-454f-9d3d-9ae53b0cab98",
+                                      Id: "d7de58d5-961a-4da9-b5c9-c609d790e59d",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 01",
+                                      Name: "Bandeja Paisa",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -56,15 +56,15 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 01",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_01#",
+                                      Comment: "Created from backend startup. Bandeja Paisa",
+                                      Tag: "#Delivery_Zone#,#Bandeja_Paisa#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      Id: "f0d7ecbf-b1b1-4566-bad9-1ec543a5b0cb",
+                                      Id: "547063bf-14a8-450d-a36c-4f8ce4b3b1e8",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 02",
+                                      Name: "Casa Cuba",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -72,15 +72,15 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 02",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_02#",
+                                      Comment: "Created from backend startup. Casa Cuba",
+                                      Tag: "#Delivery_Zone#,#Casa_Cuba#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      Id: "9dd6f13c-428e-4cdb-912d-f8c9e2863874",
+                                      Id: "2f1e1493-0744-4234-bebf-fd641ece2b59",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 03",
+                                      Name: "La Carreta Bird Road",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -88,15 +88,15 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 03",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_03#",
+                                      Comment: "Created from backend startup. La Carreta Bird Road",
+                                      Tag: "#Delivery_Zone#,#La_Carreta_Bird_Road#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      Id: "120305a8-8132-4305-967b-4c5c705bee38",
+                                      Id: "8488d43a-b9a6-4805-9441-1b4fd9ea2798",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 04",
+                                      Name: "La Carreta Hialeah",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -104,15 +104,15 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 04",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_04#",
+                                      Comment: "Created from backend startup. La Carreta Hialeah",
+                                      Tag: "#Delivery_Zone#,#La_Carreta_Hialeah#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      Id: "6188f48f-59cc-4289-bc37-74894e238f7c",
+                                      Id: "6b82b904-3ae8-4bc2-8b5f-0ace48d63eb6",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 05",
+                                      Name: "La Carreta Kendall",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -120,15 +120,15 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 05",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_05#",
+                                      Comment: "Created from backend startup. La Carreta Kendall",
+                                      Tag: "#Delivery_Zone#,#La_Carreta_Kendall#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     },
                                     {
-                                      Id: "83cc17e6-e5bb-4a5b-b680-fbac5ca2a069",
+                                      Id: "f31d1ecb-c71f-4217-a50a-d20983690289",
                                       Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                      Name: "Delivery Zone 06",
+                                      Name: "Latin Cafe Brickell",
                                       DistanceUnit: 0, //1 = Miles, 1 Kilometers
                                       DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
                                       DistanceBase: 4, //4 miles
@@ -136,8 +136,136 @@ export default class Always {
                                       DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
                                       DistanceExtraByUnit: 1.66, //Price for aditional distance unit
                                       DeliveryByDriverMax: 3, //3 delivery maximun
-                                      Comment: "Created from backend startup. Delivery Zone 06",
-                                      Tag: "#Delivery_Zone#,#Delivery_Zone_06#",
+                                      Comment: "Created from backend startup. Latin Cafe Brickell",
+                                      Tag: "#Delivery_Zone#,#Latin_Cafe_Brickell#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "8f8bec6a-add7-4cc3-b0a9-0c4dc92b2ce7",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Latin Cafe Hialeah",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Latin Cafe Hialeah",
+                                      Tag: "#Delivery_Zone#,#Latin_Cafe_Hialeah#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "23a7309f-9070-4a13-8e60-8034fa07ee03",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "My Roots Doral",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. My Roots Doral",
+                                      Tag: "#Delivery_Zone#,#My_Roots_Doral#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "5d297a90-5378-4b63-befa-bf16af6f4387",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Rice Biscayne",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Rice Biscayne",
+                                      Tag: "#Delivery_Zone#,#Rice_Biscayne#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "02a4ad90-e251-4ada-98a7-e84d6c9d49c8",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Rice Coral Gables",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Rice Coral Gables",
+                                      Tag: "#Delivery_Zone#,#Rice_Coral_Gables#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "44156bea-d0e0-4e43-ae8a-07603b4e5901",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Roots Juicebar",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Roots_Juicebar",
+                                      Tag: "#Delivery_Zone#,#Roots_Juicebar#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "c986fc10-d08f-455e-9be4-e3b8249ca8df",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Sergios Doral",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Sergios_Doral",
+                                      Tag: "#Delivery_Zone#,#Sergios_Doral#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "bc70f6f4-29dc-4b5a-9aa7-1773f8a61be5",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Sergios Kendall 107",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Sergios Kendall 107",
+                                      Tag: "#Delivery_Zone#,#Sergios_Kendall_107#",
+                                      CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                      DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                    },
+                                    {
+                                      Id: "7ad5c432-1e44-4bfc-996b-0f6c5a362faa",
+                                      Kind: 1, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                      Name: "Sergios London Square",
+                                      DistanceUnit: 0, //1 = Miles, 1 Kilometers
+                                      DistanceCalcKind: 0, //Algoritm to use to calculate the delivery price
+                                      DistanceBase: 4, //4 miles
+                                      DistanceMax: 10, //10 Miles
+                                      DistanceExtraCalcKind: 0, //Algoritm to use to calculate the extra distance delivery price
+                                      DistanceExtraByUnit: 1.66, //Price for aditional distance unit
+                                      DeliveryByDriverMax: 3, //3 delivery maximun
+                                      Comment: "Created from backend startup. Sergios London Square",
+                                      Tag: "#Delivery_Zone#,#Sergios_London_Square#",
                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                     }
@@ -197,125 +325,215 @@ export default class Always {
 
       const establishmentEntries = [
                                      {
-                                       Id: deliveryZoneEntries[ 0 ].Id, //Delivery Zone 01
-                                       DeliveryZoneId: deliveryZoneEntries[ 0 ].Id, //Delivery Zone 01
+                                       Id: deliveryZoneEntries[ 0 ].Id, //Bandeja Paisa
+                                       DeliveryZoneId: deliveryZoneEntries[ 0 ].Id, //Bandeja Paisa
                                        Kind: deliveryZoneEntries[ 0 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 01 DZ01",
-                                       Address: "1234S Salmon St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 01",
-                                       Tag: "#Establishment#,#Establishment_01#",
+                                       Name: "Bandeja Paisa",
+                                       Address: "9511 West Flagler St, Miami, FL 33174",
+                                       Latitude: "25,7699185",
+                                       Longitude: "-80,3530852",
+                                       EMail: "carolina@torocol.com",
+                                       Phone: "1-305-226-1551",
+                                       Comment: "Created from backend startup. Bandeja Paisa",
+                                       Tag: "#Establishment#,#Bandeja_Paisa#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: deliveryZoneEntries[ 1 ].Id, //Delivery Zone 02
-                                       DeliveryZoneId: deliveryZoneEntries[ 1 ].Id, //Delivery Zone 02
+                                       Id: deliveryZoneEntries[ 1 ].Id, //Casa Cuba
+                                       DeliveryZoneId: deliveryZoneEntries[ 1 ].Id, //Casa Cuba
                                        Kind: deliveryZoneEntries[ 1 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 02 DZ02",
-                                       Address: "1234S Block St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 02",
-                                       Tag: "#Establishment#,#Establishment_02#",
+                                       Name: "Casa Cuba",
+                                       Address: "5859 SW 73rd st, Miami, FL 33143",
+                                       Latitude: "25,7036793",
+                                       Longitude: "-80,2907212",
+                                       EMail: "dayamig@casacubasomi.com",
+                                       Phone: "1-305-709-1214",
+                                       Comment: "Created from backend startup. Casa Cuba",
+                                       Tag: "#Establishment#,#Casa_Cuba#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: deliveryZoneEntries[ 2 ].Id, //Delivery Zone 03
-                                       DeliveryZoneId: deliveryZoneEntries[ 2 ].Id, //Delivery Zone 03
+                                       Id: deliveryZoneEntries[ 2 ].Id, //La Carreta Bird Road
+                                       DeliveryZoneId: deliveryZoneEntries[ 2 ].Id, //La Carreta Bird Road
                                        Kind: deliveryZoneEntries[ 2 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 03 DZ03",
-                                       Address: "1234S Space St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 03",
-                                       Tag: "#Establishment#,#Establishment_03#",
+                                       Name: "La Carreta Bird Road",
+                                       Address: "8650 Bird  Road, Miami, FL 33155",
+                                       Latitude: "25,7327984",
+                                       Longitude: "-80,3368159",
+                                       EMail: "norailysb@lacarreta.com",
+                                       Phone: "1-305-553-8383",
+                                       Comment: "Created from backend startup. La Carreta Bird Road",
+                                       Tag: "#Establishment#,#La_Carreta_Bird_Road#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: deliveryZoneEntries[ 3 ].Id, //Delivery Zone 04
-                                       DeliveryZoneId: deliveryZoneEntries[ 3 ].Id, //Delivery Zone 04
+                                       Id: deliveryZoneEntries[ 3 ].Id, //La Carreta Hialeah
+                                       DeliveryZoneId: deliveryZoneEntries[ 3 ].Id, //La Carreta Hialeah
                                        Kind: deliveryZoneEntries[ 3 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 04 DZ04",
-                                       Address: "1234S Jam St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 04",
-                                       Tag: "#Establishment#,#Establishment_04#",
+                                       Name: "La Carreta Hialeah",
+                                       Address: "5350 W 16th Ave, Miami, FL 33012",
+                                       Latitude: "25,8709963",
+                                       Longitude: "-80,3178413",
+                                       EMail: "fabiolama@lacarreta.com",
+                                       Phone: "1-305-823-5200",
+                                       Comment: "Created from backend startup. La Carreta Hialeah",
+                                       Tag: "#Establishment#,#La_Carreta_Hialeah#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: deliveryZoneEntries[ 4 ].Id, //Delivery Zone 05
-                                       DeliveryZoneId: deliveryZoneEntries[ 4 ].Id, //Delivery Zone 05
+                                       Id: deliveryZoneEntries[ 4 ].Id, //La Carreta Kendall
+                                       DeliveryZoneId: deliveryZoneEntries[ 4 ].Id, //La Carreta Kendall
                                        Kind: deliveryZoneEntries[ 4 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 05 DZ05",
-                                       Address: "1234S Butter St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 05",
-                                       Tag: "#Establishment#,#Establishment_05#",
+                                       Name: "La Carreta Kendall",
+                                       Address: "11740 SW 88th St, Miami, FL 33186",
+                                       Latitude: "25,6857711",
+                                       Longitude: "-80,3877595",
+                                       EMail: "melbar@lacarreta.com",
+                                       Phone: "1-305-596-5973",
+                                       Comment: "Created from backend startup. La Carreta Kendall",
+                                       Tag: "#Establishment#,#La_Carreta_Kendall#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: "dec3d9d6-95e0-4a93-9192-69f938123eaf",
-                                       DeliveryZoneId: deliveryZoneEntries[ 3 ].Id, //Delivery Zone 04
-                                       Kind: deliveryZoneEntries[ 3 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 06 DZ04",
-                                       Address: "1234S Mosquitto St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 06",
-                                       Tag: "#Establishment#,#Establishment_05#",
+                                       Id: deliveryZoneEntries[ 5 ].Id, //Latin Cafe Brickell
+                                       DeliveryZoneId: deliveryZoneEntries[ 5 ].Id, //Latin Cafe Brickell
+                                       Kind: deliveryZoneEntries[ 5 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Latin Cafe Brickell",
+                                       Address: "1053 Brickell Plaza, Miami, FL 33131",
+                                       Latitude: "25,7636799",
+                                       Longitude: "-80,1946646",
+                                       EMail: "ejc@latincafe.com",
+                                       Phone: "1-305-646-1400",
+                                       Comment: "Created from backend startup. Latin_Cafe_Brickell",
+                                       Tag: "#Establishment#,#Latin_Cafe_Brickell#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: "052a42d1-4d90-49bd-85be-e63190bb2620",
-                                       DeliveryZoneId: deliveryZoneEntries[ 3 ].Id, //Delivery Zone 04
-                                       Kind: deliveryZoneEntries[ 3 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 07 DZ04",
-                                       Address: "1234S Flower St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 07",
-                                       Tag: "#Establishment#,#Establishment_05#",
+                                       Id: deliveryZoneEntries[ 6 ].Id, //Latin Cafe Hialeah
+                                       DeliveryZoneId: deliveryZoneEntries[ 6 ].Id, //Latin Cafe Hialeah
+                                       Kind: deliveryZoneEntries[ 6 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Latin Cafe Hialeah",
+                                       Address: "1192 W 49th St, Hialeah, FL 33012",
+                                       Latitude: "25,8661938",
+                                       Longitude: "-80,3086429",
+                                       EMail: "ejc@latincafe.com",
+                                       Phone: "1-305-820-1919",
+                                       Comment: "Created from backend startup. Latin Cafe Hialeah",
+                                       Tag: "#Establishment#,#Latin_Cafe_Hialeah#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
                                      {
-                                       Id: "15c3a8eb-002f-4a36-a9d4-3fbc78cef59e",
-                                       DeliveryZoneId: deliveryZoneEntries[ 4 ].Id, //Delivery Zone 05
-                                       Kind: deliveryZoneEntries[ 4 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
-                                       Name: "Establishment 08 DZ05",
-                                       Address: "1234S Apex St. Unit I999, 99999 FL",
-                                       Latitude: "1",
-                                       Longitude: "1",
-                                       EMail: "dev.test@weknock-tech.com",
-                                       Phone: "1-305-776-9999",
-                                       Comment: "Created from backend startup. Establishment 08",
-                                       Tag: "#Establishment#,#Establishment_05#",
+                                       Id: deliveryZoneEntries[ 7 ].Id, //My Roots Doral
+                                       DeliveryZoneId: deliveryZoneEntries[ 7 ].Id, //My Roots Doral
+                                       Kind: deliveryZoneEntries[ 7 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "My Roots Doral",
+                                       Address: "4237 Northwest 107th Avenue, Doral, Fl 33178",
+                                       Latitude: "25,8129947",
+                                       Longitude: "-80,3711203",
+                                       EMail: "rootsjuicebarmiami@gmail.com",
+                                       Phone: "1-305-418-0479",
+                                       Comment: "Created from backend startup. My Roots Doral",
+                                       Tag: "#Establishment#,#My_Roots_Doral#",
                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                        DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                      },
+                                     {
+                                       Id: deliveryZoneEntries[ 8 ].Id, //Rice Biscayne
+                                       DeliveryZoneId: deliveryZoneEntries[ 8 ].Id, //Rice Biscayne
+                                       Kind: deliveryZoneEntries[ 8 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Rice Biscayne",
+                                       Address: "2500 Biscayne Blvd, Miami, FL 33137",
+                                       Latitude: "25,801519",
+                                       Longitude: "-80,1916379",
+                                       EMail: "esi@ricekitchen.com",
+                                       Phone: "1-305-705-6090",
+                                       Comment: "Created from backend startup. Rice Biscayne",
+                                       Tag: "#Establishment#,#Rice_Biscayne#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     },
+                                     {
+                                       Id: deliveryZoneEntries[ 9 ].Id, //Rice Coral Gables
+                                       DeliveryZoneId: deliveryZoneEntries[ 9 ].Id, //Rice Coral Gables
+                                       Kind: deliveryZoneEntries[ 9 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Rice Coral Gables",
+                                       Address: "164 Giralda Ave, Coral Gables, FL 33134",
+                                       Latitude: "25,7512018",
+                                       Longitude: "-80,2602433",
+                                       EMail: "esi@ricekitchen.com",
+                                       Phone: "1-305-200-5282",
+                                       Comment: "Created from backend startup. Rice Coral Gables",
+                                       Tag: "#Establishment#,#Rice_Coral_Gables#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     },
+                                     {
+                                       Id: deliveryZoneEntries[ 10 ].Id, //Roots Juicebar
+                                       DeliveryZoneId: deliveryZoneEntries[ 10 ].Id, //Roots Juicebar
+                                       Kind: deliveryZoneEntries[ 10 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Roots Juicebar",
+                                       Address: "8530 SW 124th Ave, Miami, FL 33183",
+                                       Latitude: "25,6885664",
+                                       Longitude: "-80,396627",
+                                       EMail: "rootsjuicebarmiami@gmail.com",
+                                       Phone: "1-786-534-5087",
+                                       Comment: "Created from backend startup. Roots Juicebar",
+                                       Tag: "#Establishment#,#Roots_Juicebar#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     },
+                                     {
+                                       Id: deliveryZoneEntries[ 11 ].Id, //Sergios Doral
+                                       DeliveryZoneId: deliveryZoneEntries[ 11 ].Id, //Sergios Doral
+                                       Kind: deliveryZoneEntries[ 11 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Sergios Doral",
+                                       Address: "1640 NW 87th Ave, Miami, FL 33172",
+                                       Latitude: "25,7882905",
+                                       Longitude: "-80,3399489",
+                                       EMail: "mercedes@weknock.com",
+                                       Phone: "1-786-360-6890",
+                                       Comment: "Created from backend startup. Sergios Doral",
+                                       Tag: "#Establishment#,#Sergios_Doral#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     },
+                                     {
+                                       Id: deliveryZoneEntries[ 12 ].Id, //Sergios Kendall 107
+                                       DeliveryZoneId: deliveryZoneEntries[ 12 ].Id, //Sergios Kendall 107
+                                       Kind: deliveryZoneEntries[ 12 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Sergios Kendall 107",
+                                       Address: "8807 SW 107th Ave, Miami, FL 33176",
+                                       Latitude: "25,6863118",
+                                       Longitude: "-80,366814",
+                                       EMail: "mercedes@weknock.com",
+                                       Phone: "1-305-275-2880",
+                                       Comment: "Created from backend startup. Sergios Kendall 107",
+                                       Tag: "#Establishment#,#Sergios_Kendall_107#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     },
+                                     {
+                                       Id: deliveryZoneEntries[ 13 ].Id, //Sergios London Square
+                                       DeliveryZoneId: deliveryZoneEntries[ 13 ].Id, //Sergios London Square
+                                       Kind: deliveryZoneEntries[ 13 ].Kind, //0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route
+                                       Name: "Sergios London Square",
+                                       Address: "13550 SW 120th St, Miami, FL 33186",
+                                       Latitude: "25,6551499",
+                                       Longitude: "-80,4168448",
+                                       EMail: "mercedes@weknock.com",
+                                       Phone: "1-305-547-9717",
+                                       Comment: "Created from backend startup. Sergios London Square",
+                                       Tag: "#Establishment#,#Sergios_London_Square#",
+                                       CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                       DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                     }
                                    ]
 
       const loopEstablishmentAsync = async () => {

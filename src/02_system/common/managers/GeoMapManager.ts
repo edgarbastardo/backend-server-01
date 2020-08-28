@@ -52,7 +52,7 @@ export default class GeoMapManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+           CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
         const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
@@ -104,7 +104,6 @@ export default class GeoMapManager {
 
   }
 
-
   static async getConfigMapDistanceService( transaction: any,
                                             logger: any ): Promise<any> {
 
@@ -143,7 +142,7 @@ export default class GeoMapManager {
       }
 
       if ( bSet === false &&
-          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+           CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
 
         const jsonConfigValue = CommonUtilities.parseJSON( configData.Default,
                                                            logger );
@@ -397,12 +396,7 @@ export default class GeoMapManager {
 
     try {
 
-      //ANCHOR  geocodeServiceUsingAddress
-      //if ( currentTransaction === null ) {
-
       currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
-
-      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );
@@ -496,12 +490,7 @@ export default class GeoMapManager {
 
     try {
 
-      //ANCHOR  geocodeServiceUsingLatAndLng
-      //if ( currentTransaction === null ) {
-
       currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
-
-      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );
@@ -589,12 +578,7 @@ export default class GeoMapManager {
 
     try {
 
-      //ANCHOR  getGeocodeData
-      //if ( currentTransaction === null ) {
-
       currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
-
-      //}
 
       const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapGeocodeService( currentTransaction,
                                                                                       logger );
@@ -633,6 +617,201 @@ export default class GeoMapManager {
       sourcePosition.method = this.name + "." + this.parseGeocodeResponse.name;
 
       const strMark = "8E8133D7D819" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async calcDistanceAndTimeUsingLatAndLng( strUnit: string,
+                                                  originPoint: {
+                                                                 latitude: string,
+                                                                 longitude: string
+                                                               },
+                                                  destinationPointList: [
+                                                                          {
+                                                                            latitude: string,
+                                                                            longitude: string
+                                                                          }
+                                                                        ],
+                                                  bParseDistanceResponse: boolean,
+                                                  logger: any ): Promise<any[]> {
+
+    let result = [];
+
+    let currentTransaction = null;
+
+    try {
+
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+
+      const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapDistanceService( currentTransaction,
+                                                                                       logger );
+
+      if ( GeoMapManager.handleConfigWarning( "distance",
+                                              mapGeocodeServiceConfig,
+                                              logger ) === false ) {
+
+        if ( CommonUtilities.toLowerCase( mapGeocodeServiceConfig.type ) === "google_maps" ) {
+
+          result = await GeoMapGoogle.calcDistanceAndTimeUsingLatAndLng( mapGeocodeServiceConfig,
+                                                                         strUnit,
+                                                                         originPoint,
+                                                                         destinationPointList,
+                                                                         bParseDistanceResponse,
+                                                                         logger );
+
+        }
+        else {
+
+          GeoMapManager.handleConfigWarning( "distance",
+                                             "config_not_found",
+                                             logger );
+
+        }
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.calcDistanceAndTimeUsingLatAndLng.name;
+
+      const strMark = "123A92B125C5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger &&
+           typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  static async calcDistanceAndTimeUsingAddress( strUnit: string,
+                                                strOriginAddress: string,
+                                                destinationAddressList: string[],
+                                                bParseDistanceResponse: boolean,
+                                                logger: any ): Promise<any[]> {
+
+    let result = [];
+
+    let currentTransaction = null;
+
+    try {
+
+      currentTransaction = await DBConnectionManager.getDBConnection( "master" ).transaction();
+
+      const mapGeocodeServiceConfig = await GeoMapManager.getConfigMapDistanceService( currentTransaction,
+                                                                                       logger );
+
+      if ( GeoMapManager.handleConfigWarning( "distance",
+                                              mapGeocodeServiceConfig,
+                                              logger ) === false ) {
+
+        if ( CommonUtilities.toLowerCase( mapGeocodeServiceConfig.type ) === "google_maps" ) {
+
+          result = await GeoMapGoogle.calcDistanceAndTimeUsingAddress( mapGeocodeServiceConfig,
+                                                                       strUnit,
+                                                                       strOriginAddress,
+                                                                       destinationAddressList,
+                                                                       bParseDistanceResponse,
+                                                                       logger );
+
+        }
+        else {
+
+          GeoMapManager.handleConfigWarning( "distance",
+                                             "config_not_found",
+                                             logger );
+
+        }
+
+      }
+
+      if ( currentTransaction !== null ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.geocodeServiceUsingAddress.name;
+
+      const strMark = "30EFB9A9BFE9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
