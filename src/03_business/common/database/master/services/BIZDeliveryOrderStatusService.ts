@@ -66,6 +66,10 @@ export default class BIZDeliveryOrderStatusService extends BaseService {
                                                                           { transaction: currentTransaction }
                                                                         );
 
+        options.where.Id = bizDeliveryOrderStatusInDB.Id;
+
+        bizDeliveryOrderStatusInDB = await BIZDeliveryOrderStatus.findOne( options );
+
       }
       else if ( bUpdate ) {
 
@@ -76,7 +80,7 @@ export default class BIZDeliveryOrderStatusService extends BaseService {
         }
 
         await bizDeliveryOrderStatusInDB.update( createOrUpdateData,
-                                           options );
+                                                 options );
 
         bizDeliveryOrderStatusInDB = await BIZDeliveryOrderStatus.findOne( options );
 

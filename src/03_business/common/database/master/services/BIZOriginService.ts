@@ -81,7 +81,7 @@ export default class BIZOriginService extends BaseService {
         }
 
         await bizOriginInDB.update( createOrUpdateData,
-                                          options );
+                                    options );
 
         bizOriginInDB = await BIZOrigin.findOne( options );
 

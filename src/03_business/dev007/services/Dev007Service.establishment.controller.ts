@@ -497,7 +497,11 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
                                                                                  Data: modelData,
                                                                                  FilterFields: 1, //Force to remove fields like password and value
                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                                 Include: null, //[ { model: SYSUser } ],
+                                                                                 Include: [
+                                                                                            {
+                                                                                               model: BIZDeliveryZone
+                                                                                            }
+                                                                                          ],
                                                                                  Exclude: null, //[ { model: SYSUser } ],
                                                                                  Logger: logger,
                                                                                  ExtraInfo: {
@@ -708,6 +712,7 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
                                  EMail: [ "present", "string" ],
                                  Phone: [ "present", "string" ],
                                  Comment: [ "present", "string" ],
+                                 Tag: [ "present", "string" ],
                                  Business: [ "present" ],
                                  DisabledBy: [ "required", "string", "min:1", "max:1" ]
                                };
@@ -998,7 +1003,11 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
                                                                                  Data: modelData,
                                                                                  FilterFields: 1, //Force to remove fields like password and value
                                                                                  TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                                 Include: null, //[ { model: SYSUser } ],
+                                                                                 Include: [
+                                                                                            {
+                                                                                              model: BIZDeliveryZone
+                                                                                            }
+                                                                                          ],
                                                                                  Exclude: null, //[ { model: SYSUser } ],
                                                                                  Logger: logger,
                                                                                  ExtraInfo: {

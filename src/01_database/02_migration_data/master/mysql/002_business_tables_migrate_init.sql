@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `bizDeliveryOrderStatusStep` (
   `First` smallint(6) NOT NULL COMMENT '0 = Is not the first step, 1 = Is the last step',
   `Last` smallint(6) NOT NULL COMMENT '0 = Is not the last step, 1 = Is the last step',
   `Canceled` smallint(6) NOT NULL COMMENT '0 = This status indicate a NOT canceled order, 1 = This status indicate a Canceled order',
-  `Code` smallint(6) NOT NULL COMMENT 'Status code to be used/copied in table byzDeliveryOrderStatus field Code and table bizDeliveryOrder field StatusCode',
+  `Code` smallint(6) NOT NULL COMMENT 'Status code to be used/copied in table bizDeliveryOrderStatus field Code and table bizDeliveryOrder field StatusCode',
   `Description` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Status text description to be used/copied to table bizDeliveryOrderStatus field StatusDescription and table bizDeliveryOrder field StatusDescription',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',

@@ -62,6 +62,10 @@ export default class BIZEstablishmentService extends BaseService {
                                                               { transaction: currentTransaction }
                                                             );
 
+        options.where.Id = bizEstablishmentInDB.Id;
+
+        bizEstablishmentInDB = await BIZEstablishment.findOne( options );
+
       }
       else if ( bUpdate ) {
 
@@ -74,9 +78,9 @@ export default class BIZEstablishmentService extends BaseService {
         await bizEstablishmentInDB.update( createOrUpdateData,
                                            options );
 
-      }
+        bizEstablishmentInDB = await BIZEstablishment.findOne( options );
 
-      bizEstablishmentInDB = await BIZEstablishment.findOne( options );
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

@@ -117,7 +117,7 @@ export class BIZEstablishment extends Model<BIZEstablishment> {
   ExtraData: string;
 
   @BelongsTo( () => BIZDeliveryZone, "DeliveryZoneId" )
-  byzDeliveryZone: BIZDeliveryZone;
+  bizDeliveryZone: BIZDeliveryZone;
 
   @BeforeValidate
   static beforeValidateHook( instance: BIZEstablishment, options: any ): any {

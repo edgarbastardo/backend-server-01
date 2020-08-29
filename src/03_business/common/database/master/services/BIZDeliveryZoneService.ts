@@ -59,6 +59,10 @@ export default class BIZDeliveryZoneService extends BaseService {
                                                             { transaction: currentTransaction }
                                                           );
 
+        options.where.Id = bizDeliveryZoneInDB.Id;
+
+        bizDeliveryZoneInDB = await BIZDeliveryZone.findOne( options );
+
       }
       else if ( bUpdate ) {
 

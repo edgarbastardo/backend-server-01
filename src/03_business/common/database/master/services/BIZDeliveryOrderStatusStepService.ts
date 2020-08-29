@@ -67,6 +67,10 @@ export default class BIZDeliveryOrderStatusStepService extends BaseService {
                                                                                   { transaction: currentTransaction }
                                                                                 );
 
+        options.where.Id = bizDeliveryOrderStatusStepInDB.Id;
+
+        bizDeliveryOrderStatusStepInDB = await BIZDeliveryOrderStatusStep.findOne( options );
+
       }
       else if ( bUpdate ) {
 

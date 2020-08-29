@@ -83,7 +83,7 @@ export default class BIZDestinationService extends BaseService {
         }
 
         await bizDestinationInDB.update( createOrUpdateData,
-                                          options );
+                                         options );
 
         bizDestinationInDB = await BIZDestination.findOne( options );
 
