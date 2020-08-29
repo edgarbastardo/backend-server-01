@@ -27,15 +27,17 @@ export default class TelegramBot {
 
   static commandResult = new Map<string,string>();
 
-  static validUserName = [ "dev001", "dev007", "dev748" ];
-  static validUserPassword = [ "me.123.", "super.123.", "develop.123." ];
+  //static validUserName = [ "dev001", "dev007", "dev748" ];
+  //static validUserPassword = [ "me.123.", "super.123.", "develop.123." ];
 
-  static validCommandBackupTarget = [ "dropbox" ];
-  static validCommandBackupDatabase = [ "odin-v1-legacy-kk-fl-miami", "BinaryManagerDB-odin-v1-legacy-kk-fl-miami", "test" ];
+  //static validCommandBackupTarget = [ "dropbox" ];
+  //static validCommandBackupDatabase = [ "odin-v1-legacy-kk-fl-miami", "BinaryManagerDB-odin-v1-legacy-kk-fl-miami", "test" ];
 
-  static validCommandTargetDropboxFolder = [ "ZZZ_odin-v1-legacy-kk-fl-miami-backup", "ZZZ_odin-v1-legacy-kk-fl-miami-BinaryManagerDB-backup" ];
+  //static validCommandTargetDropboxFolder = [ "ZZZ_odin-v1-legacy-kk-fl-miami-backup", "ZZZ_odin-v1-legacy-kk-fl-miami-BinaryManagerDB-backup" ];
 
   static currentInstance = null;
+
+  static botConfig = require( appRoot.path + "/bot_config.json" );
 
   static async init( logger: any ) {
 
@@ -77,7 +79,7 @@ export default class TelegramBot {
 
       TelegramBot.currentInstance.command( "deploy", async ( ctx: any ) => {
 
-        //await TelegramBot.handleDeployCommand( ctx, logger );
+        await TelegramBot.handleDeployCommand( ctx, logger );
 
       } );
 
@@ -335,6 +337,48 @@ export default class TelegramBot {
 
   }
 
+  static validateUserAndPassword( strUserName: string,
+                                  strUserPassword: string,
+                                  logger: any ): string {
+
+    let strResult = "failed";
+
+    try {
+
+      //const strUserName = commandArgs[ 1 ];
+
+      if ( !TelegramBot.botConfig.user[ strUserName ] ) {
+
+        strResult = "Invalid user name";
+
+      }
+      else {
+
+        //const strUserPassword = commandArgs[ 2 ];
+
+        if ( TelegramBot.botConfig.user[ strUserName ] !== strUserPassword ) {
+
+          strResult = "Invalid user password";
+
+        }
+        else {
+
+          strResult = "";
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return strResult;
+
+  }
+
   static async handleStatusCommand( context: any, logger: any ) {
 
     try {
@@ -366,18 +410,32 @@ export default class TelegramBot {
 
             const strUserName = commandArgs[ 1 ];
 
+            /*
             if ( this.validUserName.includes( strUserName ) === false ) {
 
               strRepplyMessage = "Invalid user name";
               bArgumentError = true;
 
             }
+            */
 
             const strUserPassword = commandArgs[ 2 ];
 
+            /*
             if ( this.validUserPassword.includes( strUserPassword ) === false ) {
 
               strRepplyMessage = "Invalid user password";
+              bArgumentError = true;
+
+            }
+            */
+
+            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+                                                                    strUserPassword,
+                                                                    logger );
+
+            if ( strRepplyMessage ) {
+
               bArgumentError = true;
 
             }
@@ -489,44 +547,58 @@ export default class TelegramBot {
 
             const strUserName = commandArgs[ 1 ];
 
+            /*
             if ( this.validUserName.includes( strUserName ) === false ) {
 
               strRepplyMessage = "Invalid user name";
               bArgumentError = true;
 
             }
+            */
 
             const strUserPassword = commandArgs[ 2 ];
 
+            /*
             if ( this.validUserPassword.includes( strUserPassword ) === false ) {
 
               strRepplyMessage = "Invalid user password";
               bArgumentError = true;
 
             }
+            */
 
-            const strTarget = commandArgs[ 3 ];
+            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+                                                                    strUserPassword,
+                                                                    logger );
 
-            if ( this.validCommandBackupTarget.includes( strTarget ) === false ) {
-
-              strRepplyMessage = "Invalid backup target name, valid target names are: " + this.validCommandBackupTarget.join( "," );
+            if ( strRepplyMessage ) {
 
               bArgumentError = true;
 
             }
 
-            const strDatabase = commandArgs[ 4 ];
+            const strTarget = commandArgs[ 3 ];
 
-            if ( this.validCommandBackupDatabase.includes( strDatabase ) === false ) {
+            if ( !TelegramBot.botConfig.database.backup.target.includes( strTarget ) ) { //this.validCommandBackupTarget.includes( strTarget ) === false ) {
 
-              strRepplyMessage = "Invalid backup database name, valid database names are: " + this.validCommandBackupDatabase.join( "," );
+              strRepplyMessage = "Invalid backup target name, valid target names are: " + TelegramBot.botConfig.database.backup.target.join( "," ); //this.validCommandBackupTarget.join( "," );
+
+              bArgumentError = true;
+
+            }
+
+            const strDatabaseName = commandArgs[ 4 ];
+
+            if ( !TelegramBot.botConfig.database.backup.name.includes( strDatabaseName ) ) { //this.validCommandBackupDatabase.includes( strDatabase ) === false ) {
+
+              strRepplyMessage = "Invalid backup database name, valid database names are: " + TelegramBot.botConfig.database.backup.name.join( "," ); //this.validCommandBackupDatabase.join( "," );
               bArgumentError = true;
 
             }
 
             if ( bArgumentError === false ) {
 
-              const command = require( appRoot.path + "/command.json" );
+              const command = TelegramBot.botConfig.command;
 
               const strShellCommandToExecute = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] + "_" + commandArgs[ 4 ] ].command;
               let strShellOutDir = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] + "_" + commandArgs[ 4 ] ].out_dir;
@@ -819,27 +891,41 @@ export default class TelegramBot {
 
             const strUserName = commandArgs[ 1 ];
 
+            /*
             if ( this.validUserName.includes( strUserName ) === false ) {
 
               strRepplyMessage = "Invalid user name";
               bArgumentError = true;
 
             }
+            */
 
             const strUserPassword = commandArgs[ 2 ];
 
+            /*
             if ( this.validUserPassword.includes( strUserPassword ) === false ) {
 
               strRepplyMessage = "Invalid user password";
               bArgumentError = true;
 
             }
+            */
+
+            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+                                                                    strUserPassword,
+                                                                    logger );
+
+            if ( strRepplyMessage ) {
+
+              bArgumentError = true;
+
+            }
 
             const strTargetDropboxFolder = commandArgs[ 3 ];
 
-            if ( this.validCommandTargetDropboxFolder.includes( strTargetDropboxFolder ) === false ) {
+            if ( TelegramBot.botConfig.target.dropbox.folder.includes( strTargetDropboxFolder ) ) { //this.validCommandTargetDropboxFolder.includes( strTargetDropboxFolder ) === false ) {
 
-              strRepplyMessage = "Invalid dropbox folder name, valid dropbox folder names are: " + this.validCommandTargetDropboxFolder.join( "," );
+              strRepplyMessage = "Invalid dropbox folder name, valid dropbox folder names are: " + TelegramBot.botConfig.target.dropbox.folder.join( "," ); //this.validCommandTargetDropboxFolder.join( "," );
 
               bArgumentError = true;
 
@@ -856,7 +942,7 @@ export default class TelegramBot {
 
             if ( bArgumentError === false ) {
 
-              const command = require( appRoot.path + "/command.json" );
+              const command = TelegramBot.botConfig.command;
 
               const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strTargetDropboxFolder + " " + strFileToupload;
               let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir;
@@ -931,6 +1017,253 @@ export default class TelegramBot {
       sourcePosition.method = this.name + "." + this.handleBackupCommand.name;
 
       const strMark = "87A13DE41996" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
+  static async handleRunDeployCommand( strCommandId: string,
+                                       strShellOutDir: string,
+                                       strShellCommandToExecute: string,
+                                       strCommand: string,
+                                       logger: any ) {
+
+    let strResult = "";
+
+    try {
+
+      TelegramBot.commandResult.set( strCommandId, "Working..." );
+
+      TelegramBot.strCommandRunning = strCommand;
+
+      let debugMark = debug.extend( "B9E55F9CEBA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+      //strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
+
+      //shell.mkdir( "-p", strShellOutDir );
+
+      shell.exec( strShellCommandToExecute, function( intCode: number,
+                                                      strStdout: string,
+                                                      strStderr: string ) {
+
+        fs.writeFileSync( strShellOutDir + "/code.txt", "" + intCode );
+        fs.writeFileSync( strShellOutDir + "/stdout.txt", strStdout );
+        fs.writeFileSync( strShellOutDir + "/stderr.txt", strStderr );
+
+        const strOutputError = TelegramBot.parseRCloneOutput( strStdout, true );
+
+        const strStdOutput = TelegramBot.parseRCloneOutput( strStdout, false );
+
+        if ( strOutputError.startsWith( "Error: " ) ) {
+
+          TelegramBot.commandResult.set( strCommandId, "ERROR: Deploy" );
+
+        }
+        else {
+
+          TelegramBot.commandResult.set( strCommandId, "SUCCESS: Deploy" );
+
+        }
+
+        //Remove the command from running
+        TelegramBot.strCommandRunning = "";
+
+        debugMark( TelegramBot.commandResult.get( strCommandId ) );
+
+      });
+
+    }
+    catch ( error ) {
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.handleRunDeployCommand.name;
+
+      const strMark = "81351A32A654" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+      TelegramBot.commandResult[ strCommandId ] = "ERROR: " + error.message;
+
+    }
+
+    return strResult;
+
+  }
+
+  static async handleDeployCommand( context: any, logger: any ) {
+
+    try {
+
+      let debugMark = debug.extend( "6D50849570DD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+      const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
+
+      debugMark( "From id: ", context.message.from.id );
+      debugMark( "From id: ", context.message.from.id );
+      debugMark( "From name: ", context.message.from.first_name );
+
+      debugMark( "Command date time: ", dateTimeFromCommand.format() );
+      debugMark( "Command: ", context.message.text );
+
+      let strRepplyMessage = "";
+
+      const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
+
+      if ( SystemUtilities.isDateAndTimeBeforeAt( currentDateTime.format(), dateTimeFromCommand.format() ) ) {
+
+        if ( !TelegramBot.strCommandRunning &&
+            context.message.from.is_bot === false ) {
+
+          const commandArgs = context.message.text.split( " " );
+
+          if ( commandArgs.length === 5 ) {
+
+            let bArgumentError = false;
+
+            const strUserName = commandArgs[ 1 ];
+
+            const strUserPassword = commandArgs[ 2 ];
+
+            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+                                                                    strUserPassword,
+                                                                    logger );
+
+            if ( strRepplyMessage ) {
+
+              bArgumentError = true;
+
+            }
+
+            const strStageToDeploy = commandArgs[ 3 ]; //Stage
+
+            if ( TelegramBot.botConfig.target.stage.name.includes( strStageToDeploy ) ) {
+
+              strRepplyMessage = "Invalid stage name, valid stage names are: " + TelegramBot.botConfig.target.stage.name.join( "," );
+
+              bArgumentError = true;
+
+            }
+
+            const strProjectNameToDeploy = commandArgs[ 4 ]; //Project name to deploy
+
+            if ( TelegramBot.botConfig.target.deploy.name.includes( strProjectNameToDeploy ) ) {
+
+              strRepplyMessage = "Invalid project name, valid project names are: " + TelegramBot.botConfig.target.deploy.name.join( "," );
+              bArgumentError = true;
+
+            }
+
+            if ( bArgumentError === false ) {
+
+              const command = TelegramBot.botConfig.command;
+
+              const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strStageToDeploy + " " + strProjectNameToDeploy;
+              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir;
+
+              if ( strShellCommandToExecute ) {
+
+                const strCommandId = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, logger );
+
+                TelegramBot.handleRunDeployCommand( strCommandId,
+                                                    strShellOutDir,
+                                                    strShellCommandToExecute,
+                                                    "/deploy",
+                                                    logger );
+
+                strRepplyMessage = "Command running in background with id: " + strCommandId + ". To get the current command status use /status " + strUserName + " " + strUserPassword + " " + strCommandId;
+
+              }
+              else {
+
+                strRepplyMessage = "No shell command found.";
+
+              }
+
+            }
+
+          }
+          else {
+
+            strRepplyMessage = "backup command arguments are: /upload <user_name> <user_password> <remote_folder> <file>";
+
+          }
+
+        }
+        else if ( context.message.from.is_bot ) {
+
+          strRepplyMessage = "Bot not allowed to run commands";
+
+        }
+        else {
+
+          strRepplyMessage = "Command " + TelegramBot.strCommandRunning + " already running";
+
+        }
+
+      }
+      else {
+
+        strRepplyMessage = "Command is old to 1 minute. Ignoring";
+
+      }
+
+      if ( strRepplyMessage ) {
+
+        context.reply( strRepplyMessage );
+        debugMark( strRepplyMessage );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
+      /*
+      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
+                                                                 "/backup",
+                                                                logger );
+                                                              */
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.handleDeployCommand.name;
+
+      const strMark = "3C6D9149D270" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
