@@ -25,7 +25,7 @@ export default class TelegramBot {
 
   static strCommandRunning = "";
 
-  static commandResult = new Map<string,string>();
+  static commandResult = new Map<string,any>();
 
   //static validUserName = [ "dev001", "dev007", "dev748" ];
   //static validUserPassword = [ "me.123.", "super.123.", "develop.123." ];
@@ -83,6 +83,47 @@ export default class TelegramBot {
 
       } );
 
+      /*
+      TelegramBot.currentInstance.command( "ping", async ( ctx: any ) => {
+
+        await new Promise( ( resolve, reject ) => {
+
+          const shellCommandExecution = shell.exec( "/usr/local/bin/custom_command/telegram/bot/commands/test-output/run.sh", { silent: true, async: true } );
+
+          shellCommandExecution.stdout.on( "data", function( strData: string ) {
+
+            fs.appendFileSync( "/tmp/stdout.txt", strData );
+            ctx.reply( strData );
+
+          });
+
+          shellCommandExecution.stdout.on( "close", function( strData: string ) {
+
+            fs.appendFileSync( "/tmp/code.txt", "" + shellCommandExecution.exitCode );
+            ctx.reply( strData );
+            resolve( true );
+
+          });
+
+          shellCommandExecution.stderr.on( "data", function( strData: string ) {
+
+            fs.appendFileSync( "/tmp/stderr.txt", strData );
+            ctx.reply( strData );
+
+          });
+
+          shellCommandExecution.stderr.on( "close", function( strData: string ) {
+
+            fs.appendFileSync( "/tmp/code.txt", strData );
+            ctx.reply( strData );
+
+          });
+
+        } );
+
+      } );
+      */
+
       TelegramBot.currentInstance.launch();
 
     }
@@ -111,6 +152,24 @@ export default class TelegramBot {
       }
 
     }
+
+  }
+
+  static parseJSON( strJSONToParse: string, logger: any ): any {
+
+    let result = null;
+
+    try {
+
+      result = JSON.parse( strJSONToParse );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
 
   }
 
@@ -163,7 +222,8 @@ export default class TelegramBot {
   }
   */
 
-  static parseRCloneOutput( strOutput: string, bLookForError: boolean ): string {
+  /*
+  static parseRCloneOutput( strOutput: string, logger: any ): string {
 
     let strResult = "";
 
@@ -173,31 +233,27 @@ export default class TelegramBot {
 
       const strLine = lines[ intLine ];
 
-      if ( bLookForError ) {
+      if ( strLine.includes( "Failed to copy:" ) ) {
 
-        if ( strLine.includes( "Failed to copy:" ) ) {
+        strResult = "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ];
+        break;
 
-          strResult = "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ];
-          break;
+      }
+      else if ( strLine.includes( ": not found" ) ) {
 
-        }
-        else if ( strLine.includes( ": not found" ) ) {
-
-          strResult = "Error: Not found";
-          break;
-
-        }
+        strResult = "Error: Not found";
+        break;
 
       }
       else if ( strLine.includes( "backup:" ) ) {
 
-        strResult = "backup:" + strLine.split( "backup:" )[ 1 ];
+        strResult = "backup: " + strLine.split( "backup:" )[ 1 ];
         break;
 
       }
       else {
 
-        strResult = "backup:Unknown file";
+        strResult = "backup: Unknown file";
         break;
 
       }
@@ -207,8 +263,90 @@ export default class TelegramBot {
     return strResult;
 
   }
+  */
 
-  static async handleRunBackupCommand( strCommandId: string,
+  static async parseResultFile( strFilePathResult: string,
+                                logger: any ) : Promise<string> {
+
+    let strResult = "";
+
+    try {
+
+      const readline = require( "readline" );
+
+      const fileStream = fs.createReadStream( strFilePathResult );
+
+      const readLineInterface = readline.createInterface( {
+                                                            input: fileStream,
+                                                            crlfDelay: Infinity
+                                                          } );
+      // Note: we use the crlfDelay option to recognize all instances of CR LF
+      // ('\r\n') in input.txt as a single line break.
+
+      for await ( const strLine of readLineInterface ) {
+
+        // Each line in input.txt will be successively available here as `line`.
+        //console.log( `Line from file: ${strLine}` );
+
+        if ( strLine.startsWith( "progress:" ) ) {
+
+          //TelegramBot.commandResult.set( strCommandId, "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ] );
+          strResult = "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ];
+          break;
+
+        }
+        /*
+        else if ( strLine.includes( ": not found" ) ) {
+
+          //TelegramBot.commandResult.set( strCommandId, "Error: Not found" );
+          strResult = "Error: File not found";
+          break;
+
+        }
+        else if ( strLine.includes( "backup:" ) ) {
+
+          //TelegramBot.commandResult.set( strCommandId, strLine );
+          strResult = strLine;
+          break;
+
+        }
+        */
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.parseResultFile.name;
+
+      const strMark = "755E4D781AD5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+  static async handleRunBackupCommand( context: any,
+                                       strCommandId: string,
                                        strShellOutDir: string,
                                        strShellCommandToExecute: string,
                                        strCommand: string,
@@ -228,6 +366,164 @@ export default class TelegramBot {
 
       shell.mkdir( "-p", strShellOutDir );
 
+      await new Promise( ( resolve, reject ) => {
+
+        let strCurrentDate = "";
+
+        const shellCommandExecution = shell.exec( strShellCommandToExecute,
+                                                  {
+                                                    silent: true,
+                                                    async: true
+                                                  } );
+
+        shellCommandExecution.stdout.on( "data", function( strData: string ) {
+
+          const lines = strData.split( "@__EOL__@" );
+
+          for ( let intLineIndex = 0; intLineIndex < lines.length; intLineIndex++ ) {
+
+            const strLine = lines[ intLineIndex ];
+
+            if ( strLine.startsWith( "Current date: " ) ) {
+
+              let strDate = strLine.replace( "Current date: ", "" ).split( "-" );
+
+              strCurrentDate = strDate[ 0 ] + "/" + strDate[ 1 ] + "/" + strDate[ 2 ] + " ";
+
+            }
+
+            if ( strLine.trimLeft().startsWith( "@__OUTPUT_RCLONE__@" ) ) {
+
+              const subLines = strLine.replace( "@__OUTPUT_RCLONE__@", "" ).trimLeft().split( strCurrentDate );
+
+              for ( let intSubLineIndex = 0; intSubLineIndex < subLines.length; intSubLineIndex++ ) {
+
+                let strSubLine = subLines[ intSubLineIndex ].trim();
+
+                if ( strSubLine ) {
+
+                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+
+                  if ( jsonData ) {
+
+                    const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", strJSON );
+
+                  }
+                  else {
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", "progress: " + strCurrentDate + strSubLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+                  }
+
+                }
+
+              }
+
+            }
+            else {
+
+              fs.appendFileSync( strShellOutDir + "/stdout.txt", strLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+            }
+
+          }
+
+        });
+
+        shellCommandExecution.stdout.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFile( strShellOutDir + "/stdout.txt",
+                                                                 logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "data", function( strData: string ) {
+
+          if ( strData.includes( "\n" ) ) {
+
+            const lines = strData.split( "\n" );
+
+            for ( const strLine of lines ) {
+
+              const jsonData = TelegramBot.parseJSON( strLine, null );
+
+              if ( jsonData ) {
+
+                const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strJSON + "\n" );
+
+              }
+              else {
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strLine.trim() + "\n" );
+
+              }
+
+            }
+
+          }
+          else if ( strData.endsWith( "\n" ) ) {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData );
+
+          }
+          else {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData + "\n" );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFile( strShellOutDir + "/stdout.txt",
+                                                                 logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
+
+      });
+
+      /*
       shell.exec( strShellCommandToExecute, function( intCode: number,
                                                       strStdout: string,
                                                       strStderr: string ) {
@@ -256,7 +552,7 @@ export default class TelegramBot {
 
         debugMark( TelegramBot.commandResult.get( strCommandId ) );
 
-        /*
+        / *
         if ( intCode === 0 ) {
 
           debugMark( "Sucess to run command." );
@@ -267,9 +563,10 @@ export default class TelegramBot {
           debugMark( "Failed to run command." );
 
         }
-        */
+        * /
 
       });
+      */
 
       /*
       const shellCommandToExecute = shell.exec( strShellCommandToExecute );
@@ -299,14 +596,6 @@ export default class TelegramBot {
     }
     catch ( error ) {
 
-      //Remove the command from running
-      TelegramBot.strCommandRunning = "";
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 strCommand,
-                                                                 logger );
-                                                              */
-
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = this.name + "." + this.handleRunBackupCommand.name;
@@ -328,6 +617,9 @@ export default class TelegramBot {
         LoggerManager.mainLoggerInstance.error( error );
 
       }
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
 
       TelegramBot.commandResult[ strCommandId ] = "ERROR: " + error.message;
 
@@ -409,26 +701,7 @@ export default class TelegramBot {
             let bArgumentError = false;
 
             const strUserName = commandArgs[ 1 ];
-
-            /*
-            if ( this.validUserName.includes( strUserName ) === false ) {
-
-              strRepplyMessage = "Invalid user name";
-              bArgumentError = true;
-
-            }
-            */
-
             const strUserPassword = commandArgs[ 2 ];
-
-            /*
-            if ( this.validUserPassword.includes( strUserPassword ) === false ) {
-
-              strRepplyMessage = "Invalid user password";
-              bArgumentError = true;
-
-            }
-            */
 
             strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
                                                                     strUserPassword,
@@ -546,26 +819,7 @@ export default class TelegramBot {
             let bArgumentError = false;
 
             const strUserName = commandArgs[ 1 ];
-
-            /*
-            if ( this.validUserName.includes( strUserName ) === false ) {
-
-              strRepplyMessage = "Invalid user name";
-              bArgumentError = true;
-
-            }
-            */
-
             const strUserPassword = commandArgs[ 2 ];
-
-            /*
-            if ( this.validUserPassword.includes( strUserPassword ) === false ) {
-
-              strRepplyMessage = "Invalid user password";
-              bArgumentError = true;
-
-            }
-            */
 
             strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
                                                                     strUserPassword,
@@ -601,13 +855,16 @@ export default class TelegramBot {
               const command = TelegramBot.botConfig.command;
 
               const strShellCommandToExecute = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] + "_" + commandArgs[ 4 ] ].command;
-              let strShellOutDir = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] + "_" + commandArgs[ 4 ] ].out_dir;
+              let strShellOutDir = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] + "_" + commandArgs[ 4 ] ].out_dir + strUserName + "/";
 
               if ( strShellCommandToExecute ) {
 
-                const strCommandId = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, logger );
+                const strCommandId = SystemUtilities.hashString( SystemUtilities.getUUIDv4(),
+                                                                 1,
+                                                                 logger );
 
-                TelegramBot.handleRunBackupCommand( strCommandId,
+                TelegramBot.handleRunBackupCommand( context,
+                                                    strCommandId,
                                                     strShellOutDir,
                                                     strShellCommandToExecute,
                                                     "/backup",
@@ -696,14 +953,6 @@ export default class TelegramBot {
     }
     catch ( error ) {
 
-      //Remove the command from running
-      TelegramBot.strCommandRunning = "";
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 "/backup",
-                                                                logger );
-                                                              */
-
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = this.name + "." + this.handleBackupCommand.name;
@@ -725,6 +974,9 @@ export default class TelegramBot {
         LoggerManager.mainLoggerInstance.error( error );
 
       }
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
 
     }
 
@@ -750,6 +1002,7 @@ export default class TelegramBot {
 
       shell.mkdir( "-p", strShellOutDir );
 
+      /*
       shell.exec( strShellCommandToExecute, function( intCode: number,
                                                       strStdout: string,
                                                       strStderr: string ) {
@@ -778,7 +1031,7 @@ export default class TelegramBot {
 
         debugMark( TelegramBot.commandResult.get( strCommandId ) );
 
-        /*
+        / *
         if ( intCode === 0 ) {
 
           debugMark( "Sucess to run command." );
@@ -789,9 +1042,10 @@ export default class TelegramBot {
           debugMark( "Failed to run command." );
 
         }
-        */
+        * /
 
       });
+      */
 
       /*
       const shellCommandToExecute = shell.exec( strShellCommandToExecute );
@@ -945,7 +1199,7 @@ export default class TelegramBot {
               const command = TelegramBot.botConfig.command;
 
               const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strTargetDropboxFolder + " " + strFileToupload;
-              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir;
+              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir + strUserName + "/";
 
               if ( strShellCommandToExecute ) {
 
@@ -1058,6 +1312,7 @@ export default class TelegramBot {
 
       //shell.mkdir( "-p", strShellOutDir );
 
+      /*
       shell.exec( strShellCommandToExecute, function( intCode: number,
                                                       strStdout: string,
                                                       strStderr: string ) {
@@ -1087,6 +1342,7 @@ export default class TelegramBot {
         debugMark( TelegramBot.commandResult.get( strCommandId ) );
 
       });
+      */
 
     }
     catch ( error ) {
@@ -1192,7 +1448,7 @@ export default class TelegramBot {
               const command = TelegramBot.botConfig.command;
 
               const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strStageToDeploy + " " + strProjectNameToDeploy;
-              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir;
+              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir + strUserName + "/";
 
               if ( strShellCommandToExecute ) {
 
