@@ -756,7 +756,6 @@ export default class GeoMapManager {
 
   }
 
-
   static async calcDistanceAndTimeUsingAddress( strUnit: string,
                                                 strOriginAddress: string,
                                                 destinationAddressList: string[],
