@@ -2612,7 +2612,9 @@ export default class SystemUtilities {
            ( !instance.ShortId ||
              instance.ShortId === "0" ) ) {
 
-        instance.ShortId = SystemUtilities.hashString( instance.Id,
+        instance.ShortId = SystemUtilities.hashString( instance.Id +
+                                                       SystemUtilities.getUUIDv4() +
+                                                       SystemUtilities.getUUIDv4(),
                                                        2,
                                                        null ); //Hashes.CRC32( instance.Id ).toString( 16 );
 
