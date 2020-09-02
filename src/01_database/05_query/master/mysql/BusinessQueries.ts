@@ -306,6 +306,13 @@ export default class BusinessQueries {
                        Inner Join bizDeliveryOrderStatusStep As E On E.Kind = A.Kind And E.Code = A.StatusCode
                      Where`;
 
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
       }
       else if ( strName === "getActiveOrderByDriverId" ) {
 

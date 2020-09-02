@@ -8,7 +8,7 @@ import SystemUtilities from '../../../../02_system/common/SystemUtilities';
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 //import Hashes from 'jshashes';
 
-const debug = require( 'debug' )( '008_migrate_05' );
+const debug = require( 'debug' )( '009_migrate_06' );
 
 //Example file migrate files using code
 export default class Migrate {
@@ -20,11 +20,11 @@ export default class Migrate {
 
     try {
 
-      let strSQL = "Select AtDate, UpdatedBy, UpdatedAt From bizDriverStatus limit 1, 1";
+      let strSQL = "Select ShortId From bizDeliveryOrder limit 1, 1";
 
       try {
 
-        //Check field AtDate, UpdatedBy, UpdatedAt exists
+        //Check field ShortId exists
         await dbConnection.execute( strSQL );
 
         bSuccess = true;  //VERY IMPORTANT
@@ -32,15 +32,10 @@ export default class Migrate {
       }
       catch ( error ) {
 
-        //The field AtDate, UpdatedBy, UpdatedAt NOT exists. Must be created
+        //The field ShortId NOT exists. Must be created
 
-        strSQL = "DELETE FROM `bizDriverStatus`;" +  //<-- This is needed to apply NOT NULL field AtDate
-                 "ALTER TABLE `bizDriverStatus` " +
-                 "ADD COLUMN `AtDate` DATE NOT NULL AFTER `UserId`, " +
-                 "ADD COLUMN `UpdatedBy` VARCHAR(150) NULL AFTER `CreatedAt`, " +
-                 "ADD COLUMN `UpdatedAt` VARCHAR(30) NULL AFTER `UpdatedBy`, " +
-                 "DROP PRIMARY KEY, " +
-                 "ADD PRIMARY KEY (`UserId`, `AtDate`);"; //AtDate field need be a NOT NUL field to be part compose primary key
+        strSQL = "ALTER TABLE `bizDeliveryOrder`" +
+                 "ADD COLUMN `ShortId` VARCHAR(20) NULL COMMENT 'Short version from long id' AFTER `Id`";
 
         await dbConnection.query( strSQL );
 

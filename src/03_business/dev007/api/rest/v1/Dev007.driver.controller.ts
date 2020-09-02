@@ -17,7 +17,8 @@ import {
   //request,
   httpGet,
   httpPut,
-  httpPost
+  httpPost,
+  httpDelete
 } from "inversify-express-utils";
 import { inject } from "inversify";
 
@@ -34,6 +35,7 @@ import MiddlewareManager from "../../../../../02_system/common/managers/Middlewa
 import Dev007ServicesDriverController from "../../../services/Dev007Service.driver.controller";
 import Dev007ServicesDriverDeliveryOrderCreateController from "../../../services/Dev007Service.driver.delivery.order.create.controller";
 import Dev007ServicesDriverDeliveryOrderUpdateController from "../../../services/Dev007Service.driver.delivery.order.update.controller";
+import Dev007ServicesDriverDeliveryOrderImageController from "../../../services/Dev007Service.driver.delivery.order.image.controller";
 
 const debug = require( "debug" )( "Dev007.driver.controller" );
 
@@ -71,6 +73,10 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get delivery order info to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Create a new delivery order to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order", Action: "v1.business.dev007.driver.delivery.order.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Modify a delivery order to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get delivery order image list associated a delivery order id" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Add new delivery order image to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Modify delivery order image to the driver" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Delete delivery order image to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status", Action: "v1.business.dev007.driver.delivery.order.status", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/next", Action: "v1.business.dev007.driver.delivery.order.status.next", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the next status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/previous", Action: "v1.business.dev007.driver.delivery.order.status.previous", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the previous status the delivery order" },
@@ -347,7 +353,7 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    let userSessionStatus = context.UserSessionStatus;
+    //let userSessionStatus = context.UserSessionStatus;
 
     /*
                                  C.Id,
@@ -398,8 +404,9 @@ export default class Dev007DriverController {
 
     //Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )}' And
 
-    request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
-                             A.CanceledBy Is Null And
+    //( A.UserId = '${userSessionStatus.UserId}' And
+
+    request.query.where = `( A.CanceledBy Is Null And
                              A.CanceledAt Is Null And
                              A.DisabledAt Is Null And
                              A.DisabledAt Is Null And
@@ -430,12 +437,13 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    let userSessionStatus = context.UserSessionStatus;
+    //let userSessionStatus = context.UserSessionStatus;
 
     //Date( A.DeliveryAt ) = '${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )}' And
 
-    request.query.where = `( A.UserId = '${userSessionStatus.UserId}' And
-                             A.CanceledBy Is Null And
+    //( A.UserId = '${userSessionStatus.UserId}' And
+
+    request.query.where = `( A.CanceledBy Is Null And
                              A.CanceledAt Is Null And
                              A.DisabledAt Is Null And
                              A.DisabledAt Is Null And
@@ -545,6 +553,101 @@ export default class Dev007DriverController {
                                                                                                 response,
                                                                                                 null,
                                                                                                 context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/image",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getDeliveryOrderImage( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderImageController.getDeliveryOrderImageList( request,
+                                                                                                     response,
+                                                                                                     null,
+                                                                                                     context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/delivery/order/image",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async createDeliveryOrderImage( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderImageController.createDeliveryOrderImage( request,
+                                                                                                    response,
+                                                                                                    null,
+                                                                                                    context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/delivery/order/image",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async updateDeliveryOrderImage( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderImageController.updateDeliveryOrderImage( request,
+                                                                                                    response,
+                                                                                                    null,
+                                                                                                    context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpDelete(
+               "/delivery/order/image",
+               MiddlewareManager.middlewareSetContext,
+               MiddlewareManager.middlewareCheckIsAuthenticated,
+               MiddlewareManager.middlewareCheckIsAuthorized,
+             )
+  async deleteDeliveryOrderImage( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderImageController.deleteDeliveryOrderImage( request,
+                                                                                                    response,
+                                                                                                    null,
+                                                                                                    context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpGet(
+            "/delivery/order/status",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async getDeliveryOrderStatus( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverController.getDeliveryOrderStatus( request,
+                                                                                response,
+                                                                                null,
+                                                                                context.logger );
 
     response.status( result.StatusCode ).send( result );
 

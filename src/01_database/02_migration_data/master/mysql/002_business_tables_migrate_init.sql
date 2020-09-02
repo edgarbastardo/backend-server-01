@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `bizDriverRoute` (
 
 CREATE TABLE IF NOT EXISTS `bizDeliveryOrder` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
+  `ShortId` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Short version from long id',
   `Kind` smallint(6) NOT NULL COMMENT '0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route',
   `DriverRouteId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table bizDriverRoute on field Id',
   `DeliveryAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Indicate the date and time to made the delivery. Can be diferent/future of CreatedAt',

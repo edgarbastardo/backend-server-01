@@ -568,7 +568,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                Warnings: [],
                                Count: 1,
                                Data: [
-                                       bizDeliveryOrderInDB
+                                       modelData
                                      ]
                              }
 

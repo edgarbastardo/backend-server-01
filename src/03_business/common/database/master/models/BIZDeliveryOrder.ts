@@ -57,6 +57,11 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @Column( { type: DataType.STRING( 40 ) } )
   Id: string;
 
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 20 ), allowNull: false } )
+  ShortId: string;
+
   @Column( { type: DataType.SMALLINT, allowNull: false } )
   Kind: number;
 

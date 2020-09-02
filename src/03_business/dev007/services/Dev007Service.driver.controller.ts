@@ -2274,6 +2274,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
+      /*
       let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
                                                                                                                    null, //By default use the current date in the server
                                                                                                                    currentTransaction,
@@ -2326,6 +2327,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
       }
       else {
+        */
 
         let strSelectField = request.query.selectField;
 
@@ -2361,7 +2363,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
         strSQL = request.query.where ? strSQL + "( " + querystring.unescape( request.query.where ) + " )" : strSQL + "( 1 )";
 
-        //strSQL = strSQL + " And ( A.UserId = '" + userSessionStatus.UserId + "' )";
+        strSQL = strSQL + " And ( A.UserId = '" + userSessionStatus.UserId + "' )";
 
         strSQL = request.query.orderBy ? strSQL + " Order By " + request.query.orderBy: strSQL;
 
@@ -2546,7 +2548,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
         bApplyTransaction = true;
 
-      }
+      //}
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -2662,6 +2664,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
       let userSessionStatus = context.UserSessionStatus;
 
+      /*
       let bizDriverInDeliveryZoneInDB = await BIZDriverInDeliveryZoneService.getCurrentDeliveryZoneOfDriverAtDate( userSessionStatus.UserId,
                                                                                                                    null, //By default use the current date in the server
                                                                                                                    currentTransaction,
@@ -2714,6 +2717,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
       }
       else {
+        */
 
         let strSQL = DBConnectionManager.getStatement( "master",
                                                        "searchCountDeliveryOrder",
@@ -2726,13 +2730,13 @@ export default class Dev007ServicesDriverController extends BaseService {
 
         strSQL = request.query.where ? strSQL + "( " + querystring.unescape( request.query.where ) + " )" : strSQL + "( 1 )";
 
+        strSQL = strSQL + " And ( A.UserId = '" + userSessionStatus.UserId + "' )";
+
         const rows = await dbConnection.query( strSQL, {
                                                          raw: true,
                                                          type: QueryTypes.SELECT,
                                                          transaction: currentTransaction
                                                        } );
-
-        strSQL = strSQL + " And ( A.DeliveryZoneId = '" + bizDriverInDeliveryZoneInDB.DeliveryZoneId + "' )";
 
         //ANCHOR success user update
         result = {
@@ -2754,7 +2758,7 @@ export default class Dev007ServicesDriverController extends BaseService {
 
         bApplyTransaction = true;
 
-      }
+      //}
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -2945,8 +2949,8 @@ export default class Dev007ServicesDriverController extends BaseService {
 
             result = {
                        StatusCode: 200, //Ok
-                       Code: "SUCCESS_SEARCH",
-                       Message: await I18NManager.translate( strLanguage, "Success search." ),
+                       Code: "SUCCESS_GET_DELIVERY_ORDER",
+                       Message: await I18NManager.translate( strLanguage, "Success get delivery order data." ),
                        Mark: "CE887A144E10" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                        LogId: null,
                        IsError: false,
@@ -3163,12 +3167,10 @@ export default class Dev007ServicesDriverController extends BaseService {
 
   }
 
-
-  /*
-  static async updateDeliveryOrder( request: Request,
-                                    response: Response,
-                                    transaction: any,
-                                    logger: any ):Promise<any> {
+  static async getDeliveryOrderStatus( request: Request,
+                                       response: Response,
+                                       transaction: any,
+                                       logger: any ):Promise<any> {
 
     let result = null;
 
@@ -3203,7 +3205,7 @@ export default class Dev007ServicesDriverController extends BaseService {
                  StatusCode: 200, //Ok
                  Code: "SUCCESS_",
                  Message: await I18NManager.translate( strLanguage, "" ),
-                 Mark: "FF4608A768A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: "4736393C7AC7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -3236,9 +3238,9 @@ export default class Dev007ServicesDriverController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.updateDeliveryOrder.name;
+      sourcePosition.method = this.name + "." + this.getDeliveryOrderStatus.name;
 
-      const strMark = "30E905452E62" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "FDF3230E7D57" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -3294,7 +3296,6 @@ export default class Dev007ServicesDriverController extends BaseService {
     return result;
 
   }
-  */
 
   static async updateDeliveryOrderStatusNext( request: Request,
                                               response: Response,
