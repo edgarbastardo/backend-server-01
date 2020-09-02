@@ -27,3 +27,4 @@ tasks/output/undefined*
 tasks/undefined/
 config_backup/*
 command.json
+bot_config.json
