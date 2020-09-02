@@ -304,6 +304,395 @@ export default class GeoMapGoogle {
 
   }
 
+  static async calcDistanceAndTimeUsingLatAndLng( serviceOptions: any,
+                                                  strUnits: string, //Imperial, Metrics
+                                                  originPoint: {
+                                                                 latitude: string,
+                                                                 longitude: string
+                                                               }, //{ latitude: "1", longitude: "1" }
+                                                  destinationPointList: [
+                                                                          {
+                                                                            latitude: string,
+                                                                            longitude: string
+                                                                          }
+                                                                        ],
+                                                  bParseDistanceResponse: boolean,
+                                                  logger: any ): Promise<any> {
+
+    let result = [];
+
+    try {
+
+      const options = {
+                        method: 'GET',
+                      };
+
+      const strOrigins = originPoint.latitude.replace( ",", "." ) + "," + originPoint.longitude.replace( ",", "." );
+
+      let strDestinations = "";
+
+      for ( const point of destinationPointList ) {
+
+        const strToLatitude = point.latitude ? point.latitude: "";
+        const strToLongitude = point.longitude ? point.longitude: "";
+
+        if ( strToLatitude &&
+             strToLongitude ) {
+
+          if ( strDestinations ) {
+
+            strDestinations = strDestinations + "|" + strToLatitude.replace( ",", "." ) + "," + strToLongitude.replace( ",", "." );
+
+          }
+          else {
+
+            strDestinations = strToLatitude.replace( ",", "." ) + "," + strToLongitude.replace( ",", "." );
+
+          }
+
+        }
+
+      }
+
+      const distanceResult = await fetch( serviceOptions.host +
+                                          "?language=en" +
+                                          "&units=" + strUnits +
+                                          "&origins=" + strOrigins +
+                                          "&destinations=" + strDestinations +
+                                          "&key=" + serviceOptions.auth.api_key,
+                                          options );
+
+
+      if ( bParseDistanceResponse ) {
+
+        result = await GeoMapGoogle.parseDistanceAndTimeResponse( await distanceResult.json(), logger );
+
+      }
+      else {
+
+        result = await distanceResult.json();
+
+      }
+
+      if ( process.env.ENV === "dev" ) {
+
+        let debugMark = debug.extend( '8A40E9E8219B' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        debugMark( result );
+
+      }
+
+      //result = true;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.calcDistanceAndTimeUsingLatAndLng.name;
+
+      const strMark = "CB472510356B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async calcDistanceAndTimeUsingAddress( serviceOptions: any,
+                                                strUnits: string, //Imperial, Metrics
+                                                strOriginAddress: string,
+                                                destinationAddressList: string[],
+                                                bParseDistanceResponse: boolean,
+                                                logger: any ): Promise<any> {
+
+    let result = [];
+
+    try {
+
+      const options = {
+                        method: 'GET',
+                      };
+
+      let strDestinations = "";
+
+      for ( const strDestinationAddress of destinationAddressList ) {
+
+        if ( strDestinations ) {
+
+          strDestinations = strDestinations + "|" + strDestinationAddress;
+
+        }
+        else {
+
+          strDestinations = strDestinationAddress;
+
+        }
+
+      }
+
+      const distanceResult = await fetch( serviceOptions.host +
+                                          "?language=en" +
+                                          "&units=" + strUnits +
+                                          "&origins=" + strOriginAddress +
+                                          "&destinations=" + strDestinations +
+                                          "&key=" + serviceOptions.auth.api_key,
+                                          options );
+
+
+      if ( bParseDistanceResponse ) {
+
+        result = await GeoMapGoogle.parseDistanceAndTimeResponse( await distanceResult.json(), logger );
+
+      }
+      else {
+
+        result = await distanceResult.json();
+
+      }
+
+      if ( process.env.ENV === "dev" ) {
+
+        let debugMark = debug.extend( 'A894827D6E4A' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+        debugMark( result );
+
+      }
+
+      //result = true;
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.calcDistanceAndTimeUsingAddress.name;
+
+      const strMark = "1F3F39F27847" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  public static async parseDistanceAndTimeResponse( distanceDataList: any,
+                                                    logger: any ): Promise<any[]> {
+
+    let result = [];
+
+    try {
+
+      for ( let intOriginIndex = 0; intOriginIndex < distanceDataList.origin_addresses.length; intOriginIndex++ ) {
+
+        const strOrigin = distanceDataList.origin_addresses[ intOriginIndex ];
+
+        for ( let intDestinationIndex = 0; intDestinationIndex < distanceDataList.destination_addresses.length; intDestinationIndex++ ) {
+
+          const strDestination = distanceDataList.destination_addresses[ intDestinationIndex ];
+
+          const distanceAndTimeInfo = distanceDataList.rows[ intOriginIndex ].elements[ intDestinationIndex ];
+
+          if ( distanceAndTimeInfo.status === "OK" ) {
+
+            const routeInfo = {
+                                origin: strOrigin,
+                                destination: strDestination,
+                                ...distanceAndTimeInfo
+                              }
+
+            result.push( routeInfo );
+
+          }
+          else {
+
+            const routeInfo = {
+                                origin: "",
+                                destination: "",
+                                distance: {
+                                            text: "",
+                                            value: -1
+                                          },
+                                time: {
+                                        text: "",
+                                        value: -1
+                                      },
+                                status: distanceAndTimeInfo.status
+                              }
+
+            result.push( routeInfo );
+
+          }
+
+        }
+
+      }
+
+      /*
+      for ( let intIndex = 0; intIndex < distanceDataList.length; intIndex++ ) {
+
+        let geocodeData = distanceDataList[ intIndex ];
+
+        if ( geocodeData.results ) {
+
+          geocodeData = geocodeData.results[ 0 ];
+
+        }
+
+        let data = null;
+
+        if ( geocodeData.formatted_address ) {
+
+          data = {};
+
+          data.formattedAddress = geocodeData.formatted_address;
+
+          data.formattedAddressParts = data.formattedAddress.split( "," );
+
+        }
+
+        if ( geocodeData.address_components ) {
+
+          if ( !data ) {
+
+            data = {};
+
+          }
+
+          for ( const addressComponent of geocodeData.address_components ) {
+
+            if ( addressComponent.types ) {
+
+              for ( const addressComponentType of addressComponent.types ) {
+
+                if ( addressComponentType === "country" ) {
+
+                  data.country = addressComponent.long_name;
+                  data.countryShort = addressComponent.short_name;
+
+                }
+                else if ( addressComponentType === "administrative_area_level_1" ) {
+
+                  data.state = addressComponent.long_name;
+                  data.stateShort = addressComponent.short_name;
+
+                }
+                else if ( addressComponentType === "administrative_area_level_2" ) {
+
+                  data.county = addressComponent.long_name;
+                  data.countyShort = addressComponent.short_name;
+
+                }
+                else if ( addressComponentType === "locality" ) {
+
+                  data.locality = addressComponent.long_name;
+                  data.localityShort = addressComponent.short_name;
+
+                }
+                else if ( addressComponentType === "postal_code" ) {
+
+                  data.postalCode = addressComponent.long_name;
+
+                }
+                else if ( addressComponentType === "postal_code_suffix" ) {
+
+                  data.postalCodeSuffix = addressComponent.long_name;
+
+                }
+
+              }
+
+            }
+
+          }
+
+
+        }
+
+        if ( geocodeData.geometry &&
+             geocodeData.geometry.location ) {
+
+          if ( !data ) {
+
+            data = {};
+
+          }
+
+          data.latitude = geocodeData.geometry.location.lat;
+          data.longitude = geocodeData.geometry.location.lng;
+
+        }
+
+        if ( data ) {
+
+          result.push( data );
+
+        }
+
+      }
+      */
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.parseDistanceAndTimeResponse.name;
+
+      const strMark = "0457633EB007" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
   /*
     public static Map<String,Object> getGeocodeData( final JSONObject jsonGeocodeData,
                                                      final ILoggerExtended localLogger,

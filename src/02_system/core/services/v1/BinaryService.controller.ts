@@ -721,7 +721,7 @@ export default class BinaryServiceController extends BaseService {
       const util = require( "util" );
       const exec = util.promisify( require( "child_process" ).exec );
 
-      const strCommandIdentify = `identify -format '%w;%h" ${strFullPath}${strFileName}${strFileExtension}`;
+      const strCommandIdentify = `identify -format "%w;%h" ${strFullPath}${strFileName}${strFileExtension}`;
 
       const { stdout } = await exec( strCommandIdentify );
 
@@ -2737,28 +2737,32 @@ export default class BinaryServiceController extends BaseService {
 
       let strRequestPath = process.env.BINARY_DATA_SERVICE_FALLBACK_URI;
 
-      strRequestPath = strRequestPath.replace( "@__id__@", strId );
-      strRequestPath = strRequestPath.replace( "@__auth__@", process.env.BINARY_DATA_SERVICE_FALLBACK_AUTH );
-      strRequestPath = strRequestPath.replace( "@__thumbnail__@", strThumbnail );
+      if ( strRequestPath ) {
 
-      const downloadResult = await BinaryServiceController.callDownloadBinaryData( {},
-                                                                                   strRequestPath,
-                                                                                   {
-                                                                                     SavePath: strFullSavePath
-                                                                                   } );
+        strRequestPath = strRequestPath.replace( "@__id__@", strId );
+        strRequestPath = strRequestPath.replace( "@__auth__@", process.env.BINARY_DATA_SERVICE_FALLBACK_AUTH );
+        strRequestPath = strRequestPath.replace( "@__thumbnail__@", strThumbnail );
 
-      if ( downloadResult.output &&
-           downloadResult.output.status === 200 ) {
+        const downloadResult = await BinaryServiceController.callDownloadBinaryData( {},
+                                                                                    strRequestPath,
+                                                                                    {
+                                                                                      SavePath: strFullSavePath
+                                                                                    } );
 
-        const originExists = fs.existsSync( strFullSavePath + downloadResult.output.body.Name );
+        if ( downloadResult.output &&
+            downloadResult.output.status === 200 ) {
 
-        if ( originExists ) {
+          const originExists = fs.existsSync( strFullSavePath + downloadResult.output.body.Name );
 
-          fs.renameSync( strFullSavePath + downloadResult.output.body.Name, strFileToGet );
+          if ( originExists ) {
+
+            fs.renameSync( strFullSavePath + downloadResult.output.body.Name, strFileToGet );
+
+          }
+
+          bResult = true;
 
         }
-
-        bResult = true;
 
       }
 
