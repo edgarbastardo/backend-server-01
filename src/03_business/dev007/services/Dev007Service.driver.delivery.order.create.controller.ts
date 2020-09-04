@@ -495,84 +495,134 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                   if ( bizDeliveryOrderInDB &&
                        bizDeliveryOrderInDB instanceof Error === false ) {
 
-                    await BIZDeliveryOrderStatusService.createOrUpdate(
-                                                                        {
-                                                                          DeliveryOrderId: bizDeliveryOrderInDB.Id,
-                                                                          Code: bizDeliveryOrderStatusStepInDB.Code,
-                                                                          Description: bizDeliveryOrderStatusStepInDB.Description,
-                                                                          Tag: "#" + bizDeliveryOrderStatusStepInDB.Description + "#",
-                                                                          CreatedBy: userSessionStatus.UserName
-                                                                        },
-                                                                        true,
-                                                                        currentTransaction,
-                                                                        logger
-                                                                      );
+                    const bizDeliveryOrderStatusInDB = await BIZDeliveryOrderStatusService.createOrUpdate(
+                                                                                                           {
+                                                                                                             DeliveryOrderId: bizDeliveryOrderInDB.Id,
+                                                                                                             Code: bizDeliveryOrderStatusStepInDB.Code,
+                                                                                                             Description: bizDeliveryOrderStatusStepInDB.Description,
+                                                                                                             Tag: "#" + bizDeliveryOrderStatusStepInDB.Description + "#",
+                                                                                                             CreatedBy: userSessionStatus.UserName
+                                                                                                           },
+                                                                                                           true,
+                                                                                                           currentTransaction,
+                                                                                                           logger
+                                                                                                         );
 
-                    let modelData = ( bizDeliveryOrderInDB as any ).dataValues;
+                    if ( bizDeliveryOrderStatusInDB instanceof Error ) {
 
-                    const tempModelData = await BIZDeliveryOrder.convertFieldValues(
-                                                                                     {
-                                                                                       Data: modelData,
-                                                                                       FilterFields: 1,
-                                                                                       TimeZoneId: context.TimeZoneId,
-                                                                                       Include: [
-                                                                                                  {
-                                                                                                    model: BIZDriverRoute,
-                                                                                                  },
-                                                                                                  {
-                                                                                                    model: BIZOrigin,
-                                                                                                  },
-                                                                                                  {
-                                                                                                    model: BIZDestination,
-                                                                                                  },
-                                                                                                  {
-                                                                                                    model: SYSUser,
-                                                                                                  }
-                                                                                                ],
-                                                                                       Exclude: null,
-                                                                                                /*
-                                                                                                [
-                                                                                                  {
-                                                                                                     model: SYSUser
-                                                                                                  }
-                                                                                                ],
-                                                                                                */
-                                                                                       IncludeFields: {
-                                                                                                        "sysUser": [
-                                                                                                                     "Id",
-                                                                                                                     "Name"
-                                                                                                                   ]
-                                                                                                      },
-                                                                                       Logger: logger,
-                                                                                       ExtraInfo: {
-                                                                                                    Request: request,
-                                                                                                  }
-                                                                                     }
-                                                                                   );
+                      const error = bizDeliveryOrderStatusInDB as any;
 
-                    if ( tempModelData ) {
-
-                      modelData = tempModelData;
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "0BBC9ACB2D18" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: null,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: error.name,
+                                             Message: error.message,
+                                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
 
                     }
+                    else if ( !bizDeliveryOrderStatusInDB ) {
 
-                    //ANCHOR success user update
-                    result = {
-                               StatusCode: 200, //Ok
-                               Code: "SUCCESS_CREATE_DELIVERY_ORDER",
-                               Message: await I18NManager.translate( strLanguage, "" ),
-                               Mark: "564A78418432" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                               LogId: null,
-                               IsError: false,
-                               Errors: [],
-                               Warnings: [],
-                               Count: 1,
-                               Data: [
-                                       modelData
-                                     ]
-                             }
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Cannot create the next step in delivery order status table" ),
+                                 Mark: "3E42116D5303" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: null,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: "ERROR_DELIVERY_ORDER_STATUS_IN_DB_IS_NULL",
+                                             Message: await I18NManager.translate( strLanguage, "Cannot create the next step in delivery order status table" ),
+                                             Details: "bizDeliveryOrderStatusInDB is null"
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
 
-                    bApplyTransaction = true;
+                    }
+                    else {
+
+                      let modelData = ( bizDeliveryOrderInDB as any ).dataValues;
+
+                      const tempModelData = await BIZDeliveryOrder.convertFieldValues(
+                                                                                       {
+                                                                                         Data: modelData,
+                                                                                         FilterFields: 1,
+                                                                                         TimeZoneId: context.TimeZoneId,
+                                                                                         Include: [
+                                                                                                    {
+                                                                                                      model: BIZDriverRoute,
+                                                                                                    },
+                                                                                                    {
+                                                                                                      model: BIZOrigin,
+                                                                                                    },
+                                                                                                    {
+                                                                                                      model: BIZDestination,
+                                                                                                    },
+                                                                                                    {
+                                                                                                      model: SYSUser,
+                                                                                                    }
+                                                                                                  ],
+                                                                                         Exclude: null,
+                                                                                                   /*
+                                                                                                   [
+                                                                                                     {
+                                                                                                       model: SYSUser
+                                                                                                     }
+                                                                                                   ],
+                                                                                                   */
+                                                                                         IncludeFields: {
+                                                                                                          "sysUser": [
+                                                                                                                       "Id",
+                                                                                                                       "Name"
+                                                                                                                     ]
+                                                                                                        },
+                                                                                         Logger: logger,
+                                                                                         ExtraInfo: {
+                                                                                                      Request: request,
+                                                                                                    }
+                                                                                       }
+                                                                                     );
+
+                      if ( tempModelData ) {
+
+                        modelData = tempModelData;
+
+                      }
+
+                      //ANCHOR success user update
+                      result = {
+                                 StatusCode: 200, //Ok
+                                 Code: "SUCCESS_CREATE_DELIVERY_ORDER",
+                                 Message: await I18NManager.translate( strLanguage, "" ),
+                                 Mark: "564A78418432" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: null,
+                                 IsError: false,
+                                 Errors: [],
+                                 Warnings: [],
+                                 Count: 1,
+                                 Data: [
+                                         modelData
+                                       ]
+                               }
+
+                      bApplyTransaction = true;
+
+                    }
 
                   }
                   else {

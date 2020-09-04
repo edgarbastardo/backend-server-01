@@ -2650,31 +2650,31 @@ export default class UserInstantMessageServiceController {
       }
       else {
 
-        const strSelectField = SystemUtilities.createSelectAliasFromModels(
-                                                                            [
-                                                                              SYSUserSessionPresenceInRoom,
-                                                                              SYSUserSessionPresence,
-                                                                              SYSUserSessionStatus,
-                                                                              SYSUser,
-                                                                              SYSUserGroup,
-                                                                              SYSPerson,
-                                                                              SYSUserSessionDevice
-                                                                            ],
-                                                                            [
-                                                                              "A",
-                                                                              "B",
-                                                                              "C",
-                                                                              "D",
-                                                                              "E",
-                                                                              "F",
-                                                                              "G"
-                                                                            ]
-                                                                          );
+        const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                             [
+                                                                               SYSUserSessionPresenceInRoom,
+                                                                               SYSUserSessionPresence,
+                                                                               SYSUserSessionStatus,
+                                                                               SYSUser,
+                                                                               SYSUserGroup,
+                                                                               SYSPerson,
+                                                                               SYSUserSessionDevice
+                                                                             ],
+                                                                             [
+                                                                               "A",
+                                                                               "B",
+                                                                               "C",
+                                                                               "D",
+                                                                               "E",
+                                                                               "F",
+                                                                               "G"
+                                                                             ]
+                                                                           );
 
         let strSQL = DBConnectionManager.getStatement( "master",
                                                        "getUserSessionPresenceList",
                                                        {
-                                                         SelectFields: strSelectField,
+                                                         SelectFields: strSelectFields,
                                                        },
                                                        logger );
 

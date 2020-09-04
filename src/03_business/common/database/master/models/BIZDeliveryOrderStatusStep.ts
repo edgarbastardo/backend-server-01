@@ -74,6 +74,15 @@ export class BIZDeliveryOrderStatusStep extends Model<BIZDeliveryOrderStatusStep
   @Column( { type: DataType.STRING( 50 ), allowNull: false } )
   Description: string;
 
+  @Column( { type: DataType.STRING( 15 ), allowNull: true } )
+  BColor: string;
+
+  @Column( { type: DataType.STRING( 15 ), allowNull: true } )
+  FColor: string;
+
+  @Column( { type: DataType.STRING( 15 ), allowNull: true } )
+  Icon: string;
+
   @Column( { type: DataType.STRING( 512 ), allowNull: true } )
   Comment: string;
 

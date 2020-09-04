@@ -2214,23 +2214,23 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
 
       }
 
-      let userSessionStatus = context.UserSessionStatus;
+      //let userSessionStatus = context.UserSessionStatus;
 
-      const strSelectField = SystemUtilities.createSelectAliasFromModels(
-                                                                          [
-                                                                            BIZEstablishment,
-                                                                            BIZDeliveryZone
-                                                                          ],
-                                                                          [
-                                                                            "A",
-                                                                            "B"
-                                                                          ]
-                                                                        );
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             BIZEstablishment,
+                                                                             BIZDeliveryZone
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                             "B"
+                                                                           ]
+                                                                         );
 
       let strSQL = DBConnectionManager.getStatement( "master",
                                                      "searchEstablishment",
                                                      {
-                                                       SelectFields: strSelectField,
+                                                       SelectFields: strSelectFields,
                                                      },
                                                      logger );
 
@@ -2291,7 +2291,14 @@ export default class Dev007ServicesEstablishmentController extends BaseService {
                                                                            Data: currentRow,
                                                                            FilterFields: 1, //Force to remove fields like password and value
                                                                            TimeZoneId: context.TimeZoneId, //request.header( "timezoneid" ),
-                                                                           Include: null, //[ { model: SYSUser } ],
+                                                                           Include: [
+                                                                                      {
+                                                                                        model: BIZEstablishment
+                                                                                      },
+                                                                                      {
+                                                                                        model: BIZDeliveryZone
+                                                                                      }
+                                                                                    ],
                                                                            Exclude: null, //[ { model: SYSUser } ],
                                                                            Logger: logger,
                                                                            ExtraInfo: {

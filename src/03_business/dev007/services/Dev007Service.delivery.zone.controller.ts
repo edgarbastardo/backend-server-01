@@ -1908,21 +1908,21 @@ export default class Dev007ServicesDeliveryZoneController extends BaseService {
 
       }
 
-      let userSessionStatus = context.UserSessionStatus;
+      //let userSessionStatus = context.UserSessionStatus;
 
-      const strSelectField = SystemUtilities.createSelectAliasFromModels(
-                                                                          [
-                                                                            BIZDeliveryZone
-                                                                          ],
-                                                                          [
-                                                                            "A",
-                                                                          ]
-                                                                        );
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             BIZDeliveryZone
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                           ]
+                                                                         );
 
       let strSQL = DBConnectionManager.getStatement( "master",
                                                      "searchDeliveryZone",
                                                      {
-                                                       SelectFields: strSelectField,
+                                                       SelectFields: strSelectFields,
                                                      },
                                                      logger );
 

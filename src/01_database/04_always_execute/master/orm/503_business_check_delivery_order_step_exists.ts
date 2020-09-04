@@ -54,10 +54,25 @@ export default class Always {
                                                  Sequence: 0,
                                                  Code: 100,
                                                  Description: "New",
+                                                 BColor: null,
+                                                 FColor: null,
+                                                 Icon: null,
                                                  Tag: "#Delivery_Order_Status_Step#,#New#",
                                                  Comment: "Created from backend startup. New",
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: JSON.stringify(
+                                                                            {
+                                                                              Business: {
+
+                                                                                        },
+                                                                              Private: {
+                                                                                         Customer: {
+                                                                                                     Message: ""
+                                                                                                   }
+                                                                                       }
+                                                                            }
+                                                                          )
                                                },
                                                {
                                                  Id: "075ea056-ff2b-4c7f-9b26-ab78b82d7970",
@@ -68,10 +83,26 @@ export default class Always {
                                                  Sequence: 1,
                                                  Code: 200,
                                                  Description: "On Way",
-                                                 Tag: "#Delivery_Order_Status_Step#,#On_Way#",
+                                                 BColor: null,
+                                                 FColor: null,
+                                                 Icon: null,
+                                                 Tag: "#Delivery_Order_Status_Step#,#On_Way#,#Notify_To_Customer_SMS#",
                                                  Comment: "Created from backend startup. On Way",
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: JSON.stringify(
+                                                                            {
+                                                                              Business: {
+
+                                                                                        },
+                                                                              Private: {
+                                                                                         Customer: { //Delivery address: @_Delivery_Address_@\n
+                                                                                                     Message: "Delivery from @_Establishment_Name_@, is in the way. Aproximate time to arrival: @_Delivery_Time_@@__Message_Split__@" +
+                                                                                                              "Driver name: @_Driver_Name_@, @_Driver_Phone_@"
+                                                                                                   }
+                                                                                       }
+                                                                            }
+                                                                          )
                                                },
                                                {
                                                  Id: "4bbae43a-ddcd-4048-b7fb-a4c256e1991c",
@@ -82,10 +113,25 @@ export default class Always {
                                                  Sequence: 2,
                                                  Code: 300,
                                                  Description: "Delivered",
+                                                 BColor: null,
+                                                 FColor: null,
+                                                 Icon: null,
                                                  Tag: "#Delivery_Order_Status_Step#,#Delivered#",
                                                  Comment: "Created from backend startup. Delivered",
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: JSON.stringify(
+                                                                            {
+                                                                              Business: {
+
+                                                                                        },
+                                                                              Private: {
+                                                                                         Customer: {
+                                                                                                     Message: ""
+                                                                                                   }
+                                                                                       }
+                                                                            }
+                                                                          )
                                                },
                                                {
                                                  Id: "0bd98d9e-aa02-4d8b-931f-1baa553b3611",
@@ -96,10 +142,25 @@ export default class Always {
                                                  Sequence: 1000,
                                                  Code: 1000,
                                                  Description: "Canceled",
+                                                 BColor: null,
+                                                 FColor: null,
+                                                 Icon: null,
                                                  Tag: "#Delivery_Order_Status_Step#,#Canceled#",
                                                  Comment: "Created from backend startup. Canceled",
                                                  CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                  DisabledBy: "0", //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                                 ExtraData: JSON.stringify(
+                                                                            {
+                                                                              Business: {
+
+                                                                                        },
+                                                                              Private: {
+                                                                                         Customer: {
+                                                                                                     Message: ""
+                                                                                                   }
+                                                                                       }
+                                                                            }
+                                                                          )
                                                },
                                              ]
 
@@ -139,6 +200,7 @@ export default class Always {
             sysDeliveryOrderStatusStepInDB.Comment = deliveryOrderStatusStepToCreate.Comment;
             sysDeliveryOrderStatusStepInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
             sysDeliveryOrderStatusStepInDB.DisabledBy = deliveryOrderStatusStepToCreate.DisabledBy;
+            sysDeliveryOrderStatusStepInDB.ExtraData = deliveryOrderStatusStepToCreate.ExtraData;
 
             //await sysUserGroupInDB.save( { transaction: currentTransaction } );
 

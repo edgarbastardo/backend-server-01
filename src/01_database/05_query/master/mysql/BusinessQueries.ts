@@ -574,6 +574,96 @@ export default class BusinessQueries {
         }
 
       }
+      else if ( strName === "getDeliveryOrderInProgressStatusByDriverId" ) {
+
+        //In Progress status definition is = Not First (New), Not Last (Finished), Not Canceled
+        strResult = `Select
+                            ${params.SelectFields}
+                     From
+                            bizDeliveryOrder As A
+                            Inner Join
+                            bizDeliveryOrderStatusStep As B On
+                               B.Kind = A.Kind
+                               And
+                               B.Code = A.StatusCode
+                               And
+                               B.First = 0 -- Not the fist (New)
+                               And
+                               B.Last = 0 -- Not the last (Finished)
+                               And
+                               B.Canceled = 0 -- Not canceled
+                               And
+                               B.DisabledBy Is Null
+                               And
+                               B.DisabledAt Is Null
+                     Where
+                            A.UserId = '${params.DriverId}'`;
+
+        if ( process.env.ENV == "dev" ||
+             process.env.ENV == "test" ) {
+
+          strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
+
+        }
+
+      }
+      else if ( strName === "getDeliveryOrderCurrentStatusStepByKind" ) {
+
+        strResult = `Select
+                            ${params.SelectFields}
+                     From
+                            bizDeliveryOrderStatusStep As A
+                     Where
+                            A.Kind = ${params.Kind}
+                            And
+                            A.Sequence = ${params.Sequence}
+                     Order By
+                            A.Code
+                     Limit 1`;
+
+      }
+      else if ( strName === "getDeliveryOrderNextStatusStepByKind" ) {
+
+        strResult = `Select
+                            ${params.SelectFields}
+                     From
+                            bizDeliveryOrderStatusStep As A
+                     Where
+                            A.Kind = ${params.Kind}
+                            And
+                            A.Sequence > ${params.Sequence}
+                            And
+                            A.Canceled = 0
+                            And
+                            A.DisabledBy Is Null
+                            And
+                            A.DisabledAt Is Null
+                     Order By
+                            A.Code
+                     Limit 1`;
+
+      }
+      else if ( strName === "getDeliveryOrderPreviousStatusStepByKind" ) {
+
+        strResult = `Select
+                            ${params.SelectFields}
+                     From
+                            bizDeliveryOrderStatusStep As A
+                     Where
+                            A.Kind = ${params.Kind}
+                            And
+                            A.Sequence < ${params.Sequence}
+                            And
+                            A.Canceled = 0
+                            And
+                            A.DisabledBy Is Null
+                            And
+                            A.DisabledAt Is Null
+                  Order By
+                            A.Code
+                     Limit 1`;
+
+      }
 
     }
 

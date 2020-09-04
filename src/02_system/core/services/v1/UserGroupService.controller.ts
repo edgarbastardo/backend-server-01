@@ -2833,19 +2833,19 @@ export default class UserGroupServiceController {
 
       }
 
-      const strSelectField = SystemUtilities.createSelectAliasFromModels(
-                                                                          [
-                                                                            SYSUserGroup
-                                                                          ],
-                                                                          [
-                                                                            "A",
-                                                                          ]
-                                                                        );
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             SYSUserGroup
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                           ]
+                                                                         );
 
       let strSQL = DBConnectionManager.getStatement( "master",
                                                      "searchUserGroup",
                                                      {
-                                                       SelectFields: strSelectField,
+                                                       SelectFields: strSelectFields,
                                                      },
                                                      logger );
 

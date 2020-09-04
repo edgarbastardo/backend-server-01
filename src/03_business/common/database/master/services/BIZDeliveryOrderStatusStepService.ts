@@ -322,6 +322,120 @@ export default class BIZDeliveryOrderStatusStepService extends BaseService {
 
   }
 
+  static async getDeliveryOrderCurrentStatusStepByKind( intKind: number,
+                                                        intSequence: number,
+                                                        transaction: any,
+                                                        logger: any ): Promise<BIZDeliveryOrderStatusStep> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             BIZDeliveryOrderStatusStep
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                           ]
+                                                                         );
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getDeliveryOrderCurrentStatusStepByKind",
+                                                     {
+                                                       SelectFields: strSelectFields,
+                                                       Kind: intKind,
+                                                       Sequence: intSequence
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                          [
+                                                                                            BIZDeliveryOrderStatusStep
+                                                                                          ],
+                                                                                          [
+                                                                                            "A"
+                                                                                          ] );
+
+      result = transformedRows[ 0 ];
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDeliveryOrderCurrentStatusStepByKind.name;
+
+      const strMark = "311772DC6C8D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
   static async getDeliveryOrderStepByKind( intKind: number,
                                            bFirst: boolean,
                                            bLast: boolean,
@@ -400,6 +514,234 @@ export default class BIZDeliveryOrderStatusStepService extends BaseService {
       sourcePosition.method = this.name + "." + this.getDeliveryOrderStepByKind.name;
 
       const strMark = "BD5F8E1743DF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getDeliveryOrderNextStatusStepByKind( intKind: number,
+                                                     intSequence: number,
+                                                     transaction: any,
+                                                     logger: any ): Promise<BIZDeliveryOrderStatusStep> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             BIZDeliveryOrderStatusStep
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                           ]
+                                                                         );
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getDeliveryOrderNextStatusStepByKind",
+                                                     {
+                                                       SelectFields: strSelectFields,
+                                                       Kind: intKind,
+                                                       Sequence: intSequence
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                          [
+                                                                                            BIZDeliveryOrderStatusStep
+                                                                                          ],
+                                                                                          [
+                                                                                            "A"
+                                                                                          ] );
+
+      result = transformedRows[ 0 ];
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDeliveryOrderNextStatusStepByKind.name;
+
+      const strMark = "B882E4C1E34C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+      result = error;
+
+    }
+
+    return result;
+
+  }
+
+  static async getDeliveryOrderPreviousStatusStepByKind( intKind: number,
+                                                         intSequence: number,
+                                                         transaction: any,
+                                                         logger: any ): Promise<BIZDeliveryOrderStatusStep> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             BIZDeliveryOrderStatusStep
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                           ]
+                                                                         );
+
+      let strSQL = DBConnectionManager.getStatement( "master",
+                                                     "getDeliveryOrderPreviousStatusStepByKind",
+                                                     {
+                                                       SelectFields: strSelectFields,
+                                                       Kind: intKind,
+                                                       Sequence: intSequence
+                                                     },
+                                                     logger );
+
+      const rows = await dbConnection.query( strSQL,
+                                             {
+                                               raw: true,
+                                               type: QueryTypes.SELECT,
+                                               transaction: currentTransaction
+                                             } );
+
+      const transformedRows = SystemUtilities.transformRowValuesToSingleRootNestedObject( rows,
+                                                                                          [
+                                                                                            BIZDeliveryOrderStatusStep
+                                                                                          ],
+                                                                                          [
+                                                                                            "A"
+                                                                                          ] );
+
+      result = transformedRows[ 0 ];
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getDeliveryOrderPreviousStatusStepByKind.name;
+
+      const strMark = "8AA837925FCF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

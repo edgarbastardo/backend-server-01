@@ -36,6 +36,7 @@ import Dev007ServicesDriverController from "../../../services/Dev007Service.driv
 import Dev007ServicesDriverDeliveryOrderCreateController from "../../../services/Dev007Service.driver.delivery.order.create.controller";
 import Dev007ServicesDriverDeliveryOrderUpdateController from "../../../services/Dev007Service.driver.delivery.order.update.controller";
 import Dev007ServicesDriverDeliveryOrderImageController from "../../../services/Dev007Service.driver.delivery.order.image.controller";
+import Dev007ServicesDriverDeliveryOrderStatusController from "../../../services/Dev007Service.driver.delivery.order.status.controller";
 
 const debug = require( "debug" )( "Dev007.driver.controller" );
 
@@ -77,7 +78,7 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Add new delivery order image to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Modify delivery order image to the driver" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/image", Action: "v1.business.dev007.driver.delivery.order.image.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Delete delivery order image to the driver" },
-                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status", Action: "v1.business.dev007.driver.delivery.order.status", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current status the delivery order" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status", Action: "v1.business.dev007.driver.delivery.order.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/next", Action: "v1.business.dev007.driver.delivery.order.status.next", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the next status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/previous", Action: "v1.business.dev007.driver.delivery.order.status.previous", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the previous status the delivery order" },
                                 ]
@@ -644,48 +645,48 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007ServicesDriverController.getDeliveryOrderStatus( request,
-                                                                                response,
-                                                                                null,
-                                                                                context.logger );
+    const result = await Dev007ServicesDriverDeliveryOrderStatusController.getDeliveryOrderStatus( request,
+                                                                                                   response,
+                                                                                                   null,
+                                                                                                   context.logger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
-  @httpPut(
-            "/delivery/order/status/next",
-            MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated,
-            MiddlewareManager.middlewareCheckIsAuthorized,
-          )
+  @httpPost(
+             "/delivery/order/status/next",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
   async updateDeliveryOrderStatusNext( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007ServicesDriverController.updateDeliveryOrderStatusNext( request,
-                                                                                       response,
-                                                                                       null,
-                                                                                       context.logger );
+    const result = await Dev007ServicesDriverDeliveryOrderStatusController.updateDeliveryOrderStatusNext( request,
+                                                                                                          response,
+                                                                                                          null,
+                                                                                                          context.logger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
-  @httpPut(
-            "/delivery/order/status/previous",
-            MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated,
-            MiddlewareManager.middlewareCheckIsAuthorized,
-          )
+  @httpPost(
+             "/delivery/order/status/previous",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
   async updateDeliveryOrderStatusPrevious( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await Dev007ServicesDriverController.updateDeliveryOrderStatusPrevious( request,
-                                                                                           response,
-                                                                                           null,
-                                                                                           context.logger );
+    const result = await Dev007ServicesDriverDeliveryOrderStatusController.updateDeliveryOrderStatusPrevious( request,
+                                                                                                              response,
+                                                                                                              null,
+                                                                                                              context.logger );
 
     response.status( result.StatusCode ).send( result );
 

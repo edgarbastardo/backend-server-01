@@ -66,6 +66,12 @@ export class BIZDeliveryOrderStatus extends Model<BIZDeliveryOrderStatus> {
   @Column( { type: DataType.STRING( 50 ), allowNull: false } )
   Description: string;
 
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  Latitude: string;
+
+  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  Longitude: string;
+
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
   Tag: string;
 
