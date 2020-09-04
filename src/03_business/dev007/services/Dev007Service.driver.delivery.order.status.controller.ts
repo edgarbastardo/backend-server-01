@@ -878,14 +878,14 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
                     let strMessageToSendToCustomer = I18NManager.translateSync( strLanguage,
                                                                                 extraDataPrivate?.Customer?.Message );
 
-                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Establishment_Name_@", bizDeliveryOrderInDB.bizOrigin.Name );
-                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Address_@", bizDeliveryOrderInDB.bizDestination.Address );
+                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Establishment_Name__@", bizDeliveryOrderInDB.bizOrigin.Name );
+                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Address__@", bizDeliveryOrderInDB.bizDestination.Address );
 
-                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Driver_Name_@", userSessionStatus.FirstName + " " + userSessionStatus.LastName );
-                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Driver_Phone_@", userSessionStatus.Phone );
+                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Driver_Name__@", userSessionStatus.FirstName + " " + userSessionStatus.LastName );
+                    strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Driver_Phone__@", userSessionStatus.Phone );
 
-                    if ( strMessageToSendToCustomer.includes( "@_Delivery_Time_@" ) ||
-                         strMessageToSendToCustomer.includes( "@_Delivery_Distance_@" ) ) {
+                    if ( strMessageToSendToCustomer.includes( "@__Delivery_Time__@" ) ||
+                         strMessageToSendToCustomer.includes( "@__Delivery_Distance__@" ) ) {
 
                       if ( ( request.body.Latitude &&
                              request.body.Longitude ) ||
@@ -914,22 +914,22 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
 
                         if ( distanceInfo[ 0 ].status === "OK" ) {
 
-                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Distance_@", distanceInfo[ 0 ].distance.text );
-                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Time_@", distanceInfo[ 0 ].duration.text );
+                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Distance__@", distanceInfo[ 0 ].distance.text );
+                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Time__@", distanceInfo[ 0 ].duration.text );
 
                         }
                         else {
 
-                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Distance_@", "Unknown" );
-                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Time_@", "Unknown" );
+                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Distance__@", "Unknown" );
+                          strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Time__@", "Unknown" );
 
                         }
 
                       }
                       else {
 
-                        strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Time_@", "Unknown" );
-                        strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@_Delivery_Distance_@", "Unknown" );
+                        strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Time__@", "Unknown" );
+                        strMessageToSendToCustomer = strMessageToSendToCustomer.replace( "@__Delivery_Distance__@", "Unknown" );
 
                       }
 

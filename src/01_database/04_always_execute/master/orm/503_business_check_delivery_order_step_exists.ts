@@ -96,9 +96,9 @@ export default class Always {
 
                                                                                         },
                                                                               Private: {
-                                                                                         Customer: { //Delivery address: @_Delivery_Address_@\n
-                                                                                                     Message: "Delivery from @_Establishment_Name_@, is in the way. Aproximate time to arrival: @_Delivery_Time_@@__Message_Split__@" +
-                                                                                                              "Driver name: @_Driver_Name_@, @_Driver_Phone_@"
+                                                                                         Customer: { //Delivery address: @__Delivery_Address__@\n
+                                                                                                     Message: "Delivery from @__Establishment_Name__@, is in the way. Aproximate time to arrival: @__Delivery_Time__@@__Message_Split__@" +
+                                                                                                              "Driver name: @__Driver_Name__@, @__Driver_Phone__@"
                                                                                                    }
                                                                                        }
                                                                             }
