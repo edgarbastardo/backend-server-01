@@ -1502,7 +1502,8 @@ export default class CommonUtilities {
 
   }
 
-  public static trimArray( array: string[] ): string[] {
+  public static trimArray( array: string[],
+                           bAddEmpty: boolean = true ): string[] {
 
     let result = [];
 
@@ -1510,7 +1511,16 @@ export default class CommonUtilities {
 
       for ( const strItem of array ) {
 
-        result.push( strItem.trim() );
+        if ( bAddEmpty ) {
+
+          result.push( strItem.trim() );
+
+        }
+        else if ( strItem.trim() ) {
+
+          result.push( strItem.trim() );
+
+        }
 
       }
 
@@ -1525,17 +1535,28 @@ export default class CommonUtilities {
 
   }
 
-  public static trimArrayFromString( strArray: string ): string[] {
+  public static trimArrayFromString( strArray: string,
+                                     strSplit: string = ",",
+                                     bAddEmpty: boolean = true ): string[] {
 
     let result = [];
 
     try {
 
-      const temp = strArray.split( "," );
+      const temp = strArray.split( strSplit );
 
       for ( const strItem of temp ) {
 
-        result.push( strItem.trim() );
+        if ( bAddEmpty ) {
+
+          result.push( strItem.trim() );
+
+        }
+        else if ( strItem.trim() ) {
+
+          result.push( strItem.trim() );
+
+        }
 
       }
 

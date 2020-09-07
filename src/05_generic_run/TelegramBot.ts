@@ -6,6 +6,7 @@ import moment from "moment-timezone";
 import shell from "shelljs";
 
 import fs from "fs"; //Load the filesystem module
+//import path from "path";
 import cluster from "cluster";
 
 import Telegraf from "telegraf";
@@ -56,6 +57,12 @@ export default class TelegramBot {
       TelegramBot.currentInstance.start( ( ctx: any ) => {
 
         ctx.reply( "Bot is active and ready to receive commands" )
+
+      } );
+
+      TelegramBot.currentInstance.help( async ( ctx: any ) => {
+
+        await TelegramBot.handleHelpCommand( ctx, logger );
 
       } );
 
@@ -265,8 +272,8 @@ export default class TelegramBot {
   }
   */
 
-  static async parseResultFile( strFilePathResult: string,
-                                logger: any ) : Promise<string> {
+  static async parseResultFileBackupCommand( strFilePathResult: string,
+                                             logger: any ) : Promise<string> {
 
     let strResult = "";
 
@@ -276,41 +283,50 @@ export default class TelegramBot {
 
       const fileStream = fs.createReadStream( strFilePathResult );
 
-      const readLineInterface = readline.createInterface( {
+      const readLineInterface = readline.createInterface(
+                                                          {
                                                             input: fileStream,
                                                             crlfDelay: Infinity
-                                                          } );
-      // Note: we use the crlfDelay option to recognize all instances of CR LF
-      // ('\r\n') in input.txt as a single line break.
+                                                          }
+                                                        );
+
+      let strProgress = "0";
+      let strBackupFile = "";
 
       for await ( const strLine of readLineInterface ) {
 
-        // Each line in input.txt will be successively available here as `line`.
-        //console.log( `Line from file: ${strLine}` );
-
         if ( strLine.startsWith( "progress:" ) ) {
 
-          //TelegramBot.commandResult.set( strCommandId, "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ] );
-          strResult = "Error: Failed to copy:" + strLine.split( "Failed to copy:" )[ 1 ];
-          break;
+          const linePart = strLine.split( "," );
+
+          strProgress = linePart[ 1 ].replace( "%", "" ).trim();
 
         }
-        /*
-        else if ( strLine.includes( ": not found" ) ) {
+        else if ( strLine.startsWith( "backup:" ) ) {
 
-          //TelegramBot.commandResult.set( strCommandId, "Error: Not found" );
-          strResult = "Error: File not found";
-          break;
+          strBackupFile = strLine.replace( "backup:", "" ).trim().split( "/" );
 
-        }
-        else if ( strLine.includes( "backup:" ) ) {
-
-          //TelegramBot.commandResult.set( strCommandId, strLine );
-          strResult = strLine;
-          break;
+          strBackupFile = strBackupFile[ strBackupFile.length - 1 ];
 
         }
-        */
+        else if ( strLine.startsWith( "file:" ) ) {
+
+          strBackupFile = strLine.replace( "file:", "" ).trim().split( "/" );
+
+          strBackupFile = strBackupFile[ strBackupFile.length - 1 ];
+
+        }
+
+      }
+
+      if ( parseInt( strProgress ) === 100 ) {
+
+        strResult = "Success to upload the file. Backup file is " + strBackupFile;
+
+      }
+      else {
+
+        strResult = "Failed to upload the file. Backup file is " + strBackupFile;
 
       }
 
@@ -319,7 +335,96 @@ export default class TelegramBot {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.parseResultFile.name;
+      sourcePosition.method = this.name + "." + this.parseResultFileBackupCommand.name;
+
+      const strMark = "755E4D781AD5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+  static async parseResultFileUploadCommand( strFilePathResult: string,
+                                             logger: any ) : Promise<string> {
+
+    let strResult = "";
+
+    try {
+
+      const readline = require( "readline" );
+
+      const fileStream = fs.createReadStream( strFilePathResult );
+
+      const readLineInterface = readline.createInterface(
+                                                          {
+                                                            input: fileStream,
+                                                            crlfDelay: Infinity
+                                                          }
+                                                        );
+
+      let strProgress = "0";
+      let strBackupFile = "";
+
+      for await ( const strLine of readLineInterface ) {
+
+        if ( strLine.startsWith( "progress:" ) ) {
+
+          const linePart = strLine.split( "," );
+
+          strProgress = linePart[ 1 ].replace( "%", "" ).trim();
+
+        }
+        else if ( strLine.startsWith( "backup:" ) ) {
+
+          strBackupFile = strLine.replace( "backup:", "" ).trim().split( "/" );
+
+          strBackupFile = strBackupFile[ strBackupFile.length - 1 ];
+
+        }
+        else if ( strLine.startsWith( "file:" ) ) {
+
+          strBackupFile = strLine.replace( "file:", "" ).trim().split( "/" );
+
+          strBackupFile = strBackupFile[ strBackupFile.length - 1 ];
+
+        }
+
+      }
+
+      if ( parseInt( strProgress ) === 100 ) {
+
+        strResult = "Success to upload the file. Backup file is " + strBackupFile;
+
+      }
+      else {
+
+        strResult = "Failed to upload the file. Backup file is " + strBackupFile;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.parseResultFileBackupCommand.name;
 
       const strMark = "755E4D781AD5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -360,7 +465,7 @@ export default class TelegramBot {
 
       TelegramBot.strCommandRunning = strCommand;
 
-      let debugMark = debug.extend( "89852EE05993" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      //let debugMark = debug.extend( "89852EE05993" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
 
@@ -441,8 +546,8 @@ export default class TelegramBot {
             fs.appendFileSync( strShellOutDir + "/code.txt",
                                "" + shellCommandExecution.exitCode );
 
-            const strResult = await TelegramBot.parseResultFile( strShellOutDir + "/stdout.txt",
-                                                                 logger );
+            const strResult = await TelegramBot.parseResultFileBackupCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
 
             context.reply( "Finished command: " + strCommand + "\n" +
                            "Id: " + strCommandId + "\n" +
@@ -505,8 +610,8 @@ export default class TelegramBot {
             fs.appendFileSync( strShellOutDir + "/code.txt",
                                "" + shellCommandExecution.exitCode );
 
-            const strResult = await TelegramBot.parseResultFile( strShellOutDir + "/stdout.txt",
-                                                                 logger );
+            const strResult = await TelegramBot.parseResultFileBackupCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
 
             context.reply( "Finished command: " + strCommand + "\n" +
                            "Id: " + strCommandId + "\n" +
@@ -671,6 +776,91 @@ export default class TelegramBot {
 
   }
 
+  static async handleHelpCommand( context: any, logger: any ) {
+
+    try {
+
+      let debugMark = debug.extend( "54C6CB14379D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+
+      const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
+
+      debugMark( "From id: ", context.message.from.id );
+      debugMark( "From name: ", context.message.from.first_name );
+
+      debugMark( "Command date time: ", dateTimeFromCommand.format() );
+      debugMark( "Command: ", context.message.text );
+
+      let strReplyMessage = "";
+
+      const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
+
+      if ( SystemUtilities.isDateAndTimeBeforeAt( currentDateTime.format(), dateTimeFromCommand.format() ) ) {
+
+        if ( context.message.from.is_bot === false ) {
+
+          const commandList = Object.keys( TelegramBot.botConfig.help );
+
+          for ( let intIndex = 0; intIndex < commandList.length; intIndex++ ) {
+
+            const strCommand = commandList[ intIndex ]; //TelegramBot.botConfig.commands[ intIndex ];
+
+            strReplyMessage += strCommand + " => " + TelegramBot.botConfig.help[ strCommand ] + "\n";
+
+          }
+
+        }
+        else {
+
+          strReplyMessage = "Bot not allowed to run commands";
+
+        }
+
+      }
+      else {
+
+        strReplyMessage = "Command is old to 1 minute. Ignoring";
+
+      }
+
+      if ( strReplyMessage ) {
+
+        context.reply( strReplyMessage );
+        debugMark( strReplyMessage );
+
+      }
+
+    }
+    catch ( error ) {
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.handleHelpCommand.name;
+
+      const strMark = "5EA662A6D26F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( LoggerManager.mainLoggerInstance &&
+           typeof LoggerManager.mainLoggerInstance.error === "function" ) {
+
+        LoggerManager.mainLoggerInstance.error( error );
+
+      }
+
+    }
+
+  }
+
   static async handleStatusCommand( context: any, logger: any ) {
 
     try {
@@ -680,13 +870,12 @@ export default class TelegramBot {
       const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
 
       debugMark( "From id: ", context.message.from.id );
-      debugMark( "From id: ", context.message.from.id );
       debugMark( "From name: ", context.message.from.first_name );
 
       debugMark( "Command date time: ", dateTimeFromCommand.format() );
       debugMark( "Command: ", context.message.text );
 
-      let strRepplyMessage = "";
+      let strReplyMessage = "";
 
       const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
 
@@ -703,11 +892,11 @@ export default class TelegramBot {
             const strUserName = commandArgs[ 1 ];
             const strUserPassword = commandArgs[ 2 ];
 
-            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+            strReplyMessage = TelegramBot.validateUserAndPassword( strUserName,
                                                                     strUserPassword,
                                                                     logger );
 
-            if ( strRepplyMessage ) {
+            if ( strReplyMessage ) {
 
               bArgumentError = true;
 
@@ -717,42 +906,42 @@ export default class TelegramBot {
 
             if ( TelegramBot.commandResult.has( strCommandId ) === false ) {
 
-              strRepplyMessage = "Command id " + strCommandId + " not found";
+              strReplyMessage = "Command id " + strCommandId + " not found";
               bArgumentError = true;
 
             }
 
             if ( bArgumentError === false ) {
 
-              strRepplyMessage = TelegramBot.commandResult.get( strCommandId );
+              strReplyMessage = TelegramBot.commandResult.get( strCommandId );
 
             }
 
           }
           else {
 
-            strRepplyMessage = "status command arguments are: /status <user_name> <user_password> <command_id>";
+            strReplyMessage = "status command arguments are: /status <user_name> <user_password> <command_id>";
 
           }
 
         }
         else {
 
-          strRepplyMessage = "Bot not allowed to run commands";
+          strReplyMessage = "Bot not allowed to run commands";
 
         }
 
       }
       else {
 
-        strRepplyMessage = "Command is old to 1 minute. Ignoring";
+        strReplyMessage = "Command is old to 1 minute. Ignoring";
 
       }
 
-      if ( strRepplyMessage ) {
+      if ( strReplyMessage ) {
 
-        context.reply( strRepplyMessage );
-        debugMark( strRepplyMessage );
+        context.reply( strReplyMessage );
+        debugMark( strReplyMessage );
 
       }
 
@@ -797,22 +986,23 @@ export default class TelegramBot {
       const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
 
       debugMark( "From id: ", context.message.from.id );
-      debugMark( "From id: ", context.message.from.id );
       debugMark( "From name: ", context.message.from.first_name );
 
       debugMark( "Command date time: ", dateTimeFromCommand.format() );
       debugMark( "Command: ", context.message.text );
 
-      let strRepplyMessage = "";
+      let strReplyMessage = "";
 
       const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
 
       if ( SystemUtilities.isDateAndTimeBeforeAt( currentDateTime.format(), dateTimeFromCommand.format() ) ) {
 
         if ( !TelegramBot.strCommandRunning &&
-            context.message.from.is_bot === false ) {
+             context.message.from.is_bot === false ) {
 
-          const commandArgs = context.message.text.split( " " );
+          const commandArgs = CommonUtilities.trimArrayFromString( context.message.text,
+                                                                   " ",
+                                                                   false ); //.split( " " )
 
           if ( commandArgs.length === 5 ) {
 
@@ -821,21 +1011,23 @@ export default class TelegramBot {
             const strUserName = commandArgs[ 1 ];
             const strUserPassword = commandArgs[ 2 ];
 
-            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+            strReplyMessage = TelegramBot.validateUserAndPassword( strUserName,
                                                                     strUserPassword,
                                                                     logger );
 
-            if ( strRepplyMessage ) {
+            if ( strReplyMessage ) {
 
               bArgumentError = true;
 
             }
 
-            const strTarget = commandArgs[ 3 ];
+            const strTargetService = commandArgs[ 3 ]; //dropbox, gdrive, skydrive
 
-            if ( !TelegramBot.botConfig.database.backup.target.includes( strTarget ) ) { //this.validCommandBackupTarget.includes( strTarget ) === false ) {
+            const targetServiceList = TelegramBot.botConfig.backup ? Object.keys( TelegramBot.botConfig.backup ): [];
 
-              strRepplyMessage = "Invalid backup target name, valid target names are: " + TelegramBot.botConfig.database.backup.target.join( "," ); //this.validCommandBackupTarget.join( "," );
+            if ( targetServiceList.includes( strTargetService ) === false ) {
+
+              strReplyMessage = "Invalid remote service name.\nValid remote service names are:\n" + targetServiceList.join( "\n" );
 
               bArgumentError = true;
 
@@ -843,9 +1035,9 @@ export default class TelegramBot {
 
             const strDatabaseName = commandArgs[ 4 ];
 
-            if ( !TelegramBot.botConfig.database.backup.name.includes( strDatabaseName ) ) { //this.validCommandBackupDatabase.includes( strDatabase ) === false ) {
+            if ( TelegramBot.botConfig.backup[ strTargetService ].includes( strDatabaseName ) === false ) {
 
-              strRepplyMessage = "Invalid backup database name, valid database names are: " + TelegramBot.botConfig.database.backup.name.join( "," ); //this.validCommandBackupDatabase.join( "," );
+              strReplyMessage = "Invalid remote database name.\nValid remote database names are:\n" + TelegramBot.botConfig.backup[ strTargetService ].join( "\n" ); //this.validCommandBackupDatabase.join( "," );
               bArgumentError = true;
 
             }
@@ -870,7 +1062,7 @@ export default class TelegramBot {
                                                     "/backup",
                                                     logger );
 
-                strRepplyMessage = "Command running in background with id: " + strCommandId + ". To get the current command status use /status " + strUserName + " " + strUserPassword + " " + strCommandId;
+                strReplyMessage = "Command running in background with id: " + strCommandId + ".\nTo get the current command status use:\n/status " + strUserName + " " + strUserPassword + " " + strCommandId;
 
                 /*
                 strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
@@ -885,12 +1077,12 @@ export default class TelegramBot {
 
                 if ( shellCommandToExecute.code === 0 ) {
 
-                  strRepplyMessage = "Sucess make backup.";
+                  strReplyMessage = "Sucess make backup.";
 
                 }
                 else {
 
-                  strRepplyMessage = "Failed make backup.";
+                  strReplyMessage = "Failed make backup.";
 
                 }
                 */
@@ -910,7 +1102,7 @@ export default class TelegramBot {
               }
               else {
 
-                strRepplyMessage = "No shell command found.";
+                strReplyMessage = "No shell command found.";
 
               }
 
@@ -918,35 +1110,56 @@ export default class TelegramBot {
             }
 
           }
+          else if ( commandArgs[ commandArgs.length - 1 ] === "?" ) {
+
+            if ( commandArgs.length === 2 ) {
+
+              strReplyMessage = "Invalid user name.\nValid user names are:\n" + Object.keys( TelegramBot.botConfig.user ).join( "\n" );
+
+            }
+            else if ( commandArgs.length === 3 ) {
+
+              strReplyMessage = "Invalid password for the user:\n" + commandArgs[ commandArgs.length - 2 ];
+
+            }
+            else if ( commandArgs.length === 4 ) {
+
+              const targetServiceList = TelegramBot.botConfig.backup ? Object.keys( TelegramBot.botConfig.backup ): [];
+
+              strReplyMessage = "Invalid remote service name.\nValid remote service names are:\n" + targetServiceList.join( "\n" );
+
+            }
+
+          }
           else {
 
-            strRepplyMessage = "backup command arguments are: /backup <user_name> <user_password> <target> <database>";
+            strReplyMessage = "/backup command arguments are:\n/backup <user_name> <user_password> <remote_service> <remote_database>";
 
           }
 
         }
         else if ( context.message.from.is_bot ) {
 
-          strRepplyMessage = "Bot not allowed to run commands";
+          strReplyMessage = "Bot not allowed to run commands";
 
         }
         else {
 
-          strRepplyMessage = "Command " + TelegramBot.strCommandRunning + " already running";
+          strReplyMessage = "Command " + TelegramBot.strCommandRunning + " is running right now. Only one command at time is allowed.";
 
         }
 
       }
       else {
 
-        strRepplyMessage = "Command is old to 1 minute. Ignoring";
+        strReplyMessage = "Command is old to 1 minute. Ignoring";
 
       }
 
-      if ( strRepplyMessage ) {
+      if ( strReplyMessage ) {
 
-        context.reply( strRepplyMessage );
-        debugMark( strRepplyMessage );
+        context.reply( strReplyMessage );
+        debugMark( strReplyMessage );
 
       }
 
@@ -982,7 +1195,8 @@ export default class TelegramBot {
 
   }
 
-  static async handleRunUploadCommand( strCommandId: string,
+  static async handleRunUploadCommand( context: any,
+                                       strCommandId: string,
                                        strShellOutDir: string,
                                        strShellCommandToExecute: string,
                                        strCommand: string,
@@ -996,98 +1210,177 @@ export default class TelegramBot {
 
       TelegramBot.strCommandRunning = strCommand;
 
-      let debugMark = debug.extend( "0AE6DA4D8A0C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      //let debugMark = debug.extend( "EA024BCF254C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
 
       shell.mkdir( "-p", strShellOutDir );
 
-      /*
-      shell.exec( strShellCommandToExecute, function( intCode: number,
-                                                      strStdout: string,
-                                                      strStderr: string ) {
+      await new Promise( ( resolve, reject ) => {
 
-        fs.writeFileSync( strShellOutDir + "/code.txt", "" + intCode );
-        fs.writeFileSync( strShellOutDir + "/stdout.txt", strStdout );
-        fs.writeFileSync( strShellOutDir + "/stderr.txt", strStderr );
+        let strCurrentDate = "";
 
-        const strOutputError = TelegramBot.parseRCloneOutput( strStdout, true );
+        const shellCommandExecution = shell.exec( strShellCommandToExecute,
+                                                  {
+                                                    silent: true,
+                                                    async: true
+                                                  } );
 
-        const strStdOutput = TelegramBot.parseRCloneOutput( strStdout, false );
+        shellCommandExecution.stdout.on( "data", function( strData: string ) {
 
-        if ( strOutputError.startsWith( "Error: " ) ) {
+          const lines = strData.split( "@__EOL__@" );
 
-          TelegramBot.commandResult.set( strCommandId, "ERROR: Upload failed the file is " + strStdOutput.replace( "backup:", "" ) + "." );
+          for ( let intLineIndex = 0; intLineIndex < lines.length; intLineIndex++ ) {
 
-        }
-        else {
+            const strLine = lines[ intLineIndex ];
 
-          TelegramBot.commandResult.set( strCommandId, "SUCCESS: Upload success the file is " + strStdOutput.replace( "backup:", "" ) + "." );
+            if ( strLine.startsWith( "Current date: " ) ) {
 
-        }
+              let strDate = strLine.replace( "Current date: ", "" ).split( "-" );
 
-        //Remove the command from running
-        TelegramBot.strCommandRunning = "";
+              strCurrentDate = strDate[ 0 ] + "/" + strDate[ 1 ] + "/" + strDate[ 2 ] + " ";
 
-        debugMark( TelegramBot.commandResult.get( strCommandId ) );
+            }
 
-        / *
-        if ( intCode === 0 ) {
+            if ( strLine.trimLeft().startsWith( "@__OUTPUT_RCLONE__@" ) ) {
 
-          debugMark( "Sucess to run command." );
+              const subLines = strLine.replace( "@__OUTPUT_RCLONE__@", "" ).trimLeft().split( strCurrentDate );
 
-        }
-        else {
+              for ( let intSubLineIndex = 0; intSubLineIndex < subLines.length; intSubLineIndex++ ) {
 
-          debugMark( "Failed to run command." );
+                let strSubLine = subLines[ intSubLineIndex ].trim();
 
-        }
-        * /
+                if ( strSubLine ) {
+
+                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+
+                  if ( jsonData ) {
+
+                    const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", strJSON );
+
+                  }
+                  else {
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", "progress: " + strCurrentDate + strSubLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+                  }
+
+                }
+
+              }
+
+            }
+            else {
+
+              fs.appendFileSync( strShellOutDir + "/stdout.txt", strLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+            }
+
+          }
+
+        });
+
+        shellCommandExecution.stdout.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFileUploadCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "data", function( strData: string ) {
+
+          if ( strData.includes( "\n" ) ) {
+
+            const lines = strData.split( "\n" );
+
+            for ( const strLine of lines ) {
+
+              const jsonData = TelegramBot.parseJSON( strLine, null );
+
+              if ( jsonData ) {
+
+                const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strJSON + "\n" );
+
+              }
+              else {
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strLine.trim() + "\n" );
+
+              }
+
+            }
+
+          }
+          else if ( strData.endsWith( "\n" ) ) {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData );
+
+          }
+          else {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData + "\n" );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFileUploadCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
 
       });
-      */
-
-      /*
-      const shellCommandToExecute = shell.exec( strShellCommandToExecute );
-
-      fs.writeFileSync( strShellOutDir + "/code.txt", "" + shellCommandToExecute.code );
-      fs.writeFileSync( strShellOutDir + "/stdout.txt", shellCommandToExecute.stdout );
-      fs.writeFileSync( strShellOutDir + "/stderr.txt", shellCommandToExecute.stderr );
-
-      if ( shellCommandToExecute.code === 0 ) {
-
-        debugMark( "Sucess to run command." );
-
-      }
-      else {
-
-        debugMark( "Failed to run command." );
-
-      }
-      */
-
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 strCommand,
-                                                                 logger );
-                                                              */
 
     }
     catch ( error ) {
-
-      //Remove the command from running
-      TelegramBot.strCommandRunning = "";
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 strCommand,
-                                                                 logger );
-                                                              */
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = this.name + "." + this.handleRunUploadCommand.name;
 
-      const strMark = "EC4646EF8690" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "7800F1A4CA1A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1104,6 +1397,9 @@ export default class TelegramBot {
         LoggerManager.mainLoggerInstance.error( error );
 
       }
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
 
       TelegramBot.commandResult[ strCommandId ] = "ERROR: " + error.message;
 
@@ -1122,74 +1418,69 @@ export default class TelegramBot {
       const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
 
       debugMark( "From id: ", context.message.from.id );
-      debugMark( "From id: ", context.message.from.id );
       debugMark( "From name: ", context.message.from.first_name );
 
       debugMark( "Command date time: ", dateTimeFromCommand.format() );
       debugMark( "Command: ", context.message.text );
 
-      let strRepplyMessage = "";
+      let strReplyMessage = "";
 
       const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
 
       if ( SystemUtilities.isDateAndTimeBeforeAt( currentDateTime.format(), dateTimeFromCommand.format() ) ) {
 
         if ( !TelegramBot.strCommandRunning &&
-            context.message.from.is_bot === false ) {
+             context.message.from.is_bot === false ) {
 
-          const commandArgs = context.message.text.split( " " );
+          const commandArgs = CommonUtilities.trimArrayFromString( context.message.text,
+                                                                   " ",
+                                                                   false ); //.split( " " )
 
-          if ( commandArgs.length === 5 ) {
+          if ( commandArgs.length === 6 ) {
 
             let bArgumentError = false;
 
             const strUserName = commandArgs[ 1 ];
 
-            /*
-            if ( this.validUserName.includes( strUserName ) === false ) {
-
-              strRepplyMessage = "Invalid user name";
-              bArgumentError = true;
-
-            }
-            */
-
             const strUserPassword = commandArgs[ 2 ];
 
-            /*
-            if ( this.validUserPassword.includes( strUserPassword ) === false ) {
+            strReplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+                                                                   strUserPassword,
+                                                                   logger );
 
-              strRepplyMessage = "Invalid user password";
-              bArgumentError = true;
-
-            }
-            */
-
-            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
-                                                                    strUserPassword,
-                                                                    logger );
-
-            if ( strRepplyMessage ) {
+            if ( strReplyMessage ) {
 
               bArgumentError = true;
 
             }
 
-            const strTargetDropboxFolder = commandArgs[ 3 ];
+            const strTargetService = commandArgs[ 3 ]; //dropbox, gdrive, skydrive
 
-            if ( TelegramBot.botConfig.target.dropbox.folder.includes( strTargetDropboxFolder ) ) { //this.validCommandTargetDropboxFolder.includes( strTargetDropboxFolder ) === false ) {
+            const targetServiceList = TelegramBot.botConfig.upload ? Object.keys( TelegramBot.botConfig.upload ): [];
 
-              strRepplyMessage = "Invalid dropbox folder name, valid dropbox folder names are: " + TelegramBot.botConfig.target.dropbox.folder.join( "," ); //this.validCommandTargetDropboxFolder.join( "," );
+            if ( targetServiceList.includes( strTargetService ) === false ) {
+
+              strReplyMessage = "Invalid remote service name.\nValid remote service names are:\n" + targetServiceList.join( "\n" );
 
               bArgumentError = true;
 
             }
 
-            const strFileToupload = commandArgs[ 4 ];
+            const strTargetRemoteFolder = commandArgs[ 4 ];
+
+            if ( TelegramBot.botConfig.upload[ strTargetService ].includes( strTargetRemoteFolder ) === false ) {
+
+              strReplyMessage = "Invalid remote folder name.\nValid remote folder names are:\n" + TelegramBot.botConfig.upload[ strTargetService ].join( "\n" );
+
+              bArgumentError = true;
+
+            }
+
+            const strFileToupload = commandArgs[ 5 ];
 
             if ( !strFileToupload ) {
 
-              strRepplyMessage = "Invalid file name, cannot be empty.";
+              strReplyMessage = "Invalid file name. Cannot be empty and must be exists in the server backup folder.";
               bArgumentError = true;
 
             }
@@ -1198,25 +1489,65 @@ export default class TelegramBot {
 
               const command = TelegramBot.botConfig.command;
 
-              const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strTargetDropboxFolder + " " + strFileToupload;
-              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir + strUserName + "/";
+              const strShellCommandToExecute = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] ].command + " " + strTargetRemoteFolder + " " + strFileToupload;
+              let strShellOutDir = command[ commandArgs[ 0 ] + "_" + commandArgs[ 3 ] ].out_dir + strUserName + "/";
 
               if ( strShellCommandToExecute ) {
 
                 const strCommandId = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, logger );
 
-                TelegramBot.handleRunUploadCommand( strCommandId,
+                TelegramBot.handleRunUploadCommand( context,
+                                                    strCommandId,
                                                     strShellOutDir,
                                                     strShellCommandToExecute,
                                                     "/upload",
                                                     logger );
 
-                strRepplyMessage = "Command running in background with id: " + strCommandId + ". To get the current command status use /status " + strUserName + " " + strUserPassword + " " + strCommandId;
+                strReplyMessage = "Command running in background with id: " + strCommandId + ".\nTo get the current command status use:\n/status " + strUserName + " " + strUserPassword + " " + strCommandId;
 
               }
               else {
 
-                strRepplyMessage = "No shell command found.";
+                strReplyMessage = "No shell command found.";
+
+              }
+
+            }
+
+          }
+          else if ( commandArgs[ commandArgs.length - 1 ] === "?" ) {
+
+            if ( commandArgs.length === 2 ) {
+
+              strReplyMessage = "Invalid user name.\nValid user names are:\n" + Object.keys( TelegramBot.botConfig.user ).join( "\n" );
+
+            }
+            else if ( commandArgs.length === 3 ) {
+
+              strReplyMessage = "Invalid password for the user:\n" + commandArgs[ commandArgs.length - 2 ];
+
+            }
+            else if ( commandArgs.length === 4 ) {
+
+              const targetServiceList = TelegramBot.botConfig.upload ? Object.keys( TelegramBot.botConfig.upload ): [];
+
+              strReplyMessage = "Invalid remote service name.\nValid remote service names are:\n" + targetServiceList.join( "\n" );
+
+            }
+            else if ( commandArgs.length === 5 ) {
+
+              const targetServiceList = TelegramBot.botConfig.upload ? Object.keys( TelegramBot.botConfig.upload ): [];
+
+              const strTargetService = commandArgs[ commandArgs.length - 2 ];
+
+              if ( strTargetService ) {
+
+                strReplyMessage = "Invalid remote folder name.\nValid remote folder names are:\n" + TelegramBot.botConfig.upload[ strTargetService ].join( "\n" );
+
+              }
+              else {
+
+                strReplyMessage = "Invalid remote service name " + strTargetService +".\nValid remote service names are:\n" + targetServiceList.join( "\n" );
 
               }
 
@@ -1225,33 +1556,33 @@ export default class TelegramBot {
           }
           else {
 
-            strRepplyMessage = "backup command arguments are: /upload <user_name> <user_password> <remote_folder> <file>";
+            strReplyMessage = "/upload command arguments are:\n/upload <user_name> <user_password> <remote_service> <remote_folder> <remote_file>";
 
           }
 
         }
         else if ( context.message.from.is_bot ) {
 
-          strRepplyMessage = "Bot not allowed to run commands";
+          strReplyMessage = "Bot not allowed to run commands";
 
         }
         else {
 
-          strRepplyMessage = "Command " + TelegramBot.strCommandRunning + " already running";
+          strReplyMessage = "Command " + TelegramBot.strCommandRunning + " is running right now. Only one command at time is allowed.";
 
         }
 
       }
       else {
 
-        strRepplyMessage = "Command is old to 1 minute. Ignoring";
+        strReplyMessage = "Command is old to 1 minute. Ignoring";
 
       }
 
-      if ( strRepplyMessage ) {
+      if ( strReplyMessage ) {
 
-        context.reply( strRepplyMessage );
-        debugMark( strRepplyMessage );
+        context.reply( strReplyMessage );
+        debugMark( strReplyMessage );
 
       }
 
@@ -1260,11 +1591,6 @@ export default class TelegramBot {
 
       //Remove the command from running
       TelegramBot.strCommandRunning = "";
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 "/backup",
-                                                                logger );
-                                                              */
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
@@ -1292,7 +1618,8 @@ export default class TelegramBot {
 
   }
 
-  static async handleRunDeployCommand( strCommandId: string,
+  static async handleRunDeployCommand( context: any,
+                                       strCommandId: string,
                                        strShellOutDir: string,
                                        strShellCommandToExecute: string,
                                        strCommand: string,
@@ -1306,55 +1633,179 @@ export default class TelegramBot {
 
       TelegramBot.strCommandRunning = strCommand;
 
-      let debugMark = debug.extend( "B9E55F9CEBA4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      //let debugMark = debug.extend( "EA024BCF254C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-      //strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
+      strShellOutDir = strShellOutDir + "/" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_08 );
 
-      //shell.mkdir( "-p", strShellOutDir );
+      shell.mkdir( "-p", strShellOutDir );
 
-      /*
-      shell.exec( strShellCommandToExecute, function( intCode: number,
-                                                      strStdout: string,
-                                                      strStderr: string ) {
+      await new Promise( ( resolve, reject ) => {
 
-        fs.writeFileSync( strShellOutDir + "/code.txt", "" + intCode );
-        fs.writeFileSync( strShellOutDir + "/stdout.txt", strStdout );
-        fs.writeFileSync( strShellOutDir + "/stderr.txt", strStderr );
+        let strCurrentDate = "";
 
-        const strOutputError = TelegramBot.parseRCloneOutput( strStdout, true );
+        const shellCommandExecution = shell.exec( strShellCommandToExecute,
+                                                  {
+                                                    silent: true,
+                                                    async: true
+                                                  } );
 
-        const strStdOutput = TelegramBot.parseRCloneOutput( strStdout, false );
+        shellCommandExecution.stdout.on( "data", function( strData: string ) {
 
-        if ( strOutputError.startsWith( "Error: " ) ) {
+          /*
+          const lines = strData.split( "@__EOL__@" );
 
-          TelegramBot.commandResult.set( strCommandId, "ERROR: Deploy" );
+          for ( let intLineIndex = 0; intLineIndex < lines.length; intLineIndex++ ) {
 
-        }
-        else {
+            const strLine = lines[ intLineIndex ];
 
-          TelegramBot.commandResult.set( strCommandId, "SUCCESS: Deploy" );
+            if ( strLine.startsWith( "Current date: " ) ) {
 
-        }
+              let strDate = strLine.replace( "Current date: ", "" ).split( "-" );
 
-        //Remove the command from running
-        TelegramBot.strCommandRunning = "";
+              strCurrentDate = strDate[ 0 ] + "/" + strDate[ 1 ] + "/" + strDate[ 2 ] + " ";
 
-        debugMark( TelegramBot.commandResult.get( strCommandId ) );
+            }
+
+            if ( strLine.trimLeft().startsWith( "@__OUTPUT_RCLONE__@" ) ) {
+
+              const subLines = strLine.replace( "@__OUTPUT_RCLONE__@", "" ).trimLeft().split( strCurrentDate );
+
+              for ( let intSubLineIndex = 0; intSubLineIndex < subLines.length; intSubLineIndex++ ) {
+
+                let strSubLine = subLines[ intSubLineIndex ].trim();
+
+                if ( strSubLine ) {
+
+                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+
+                  if ( jsonData ) {
+
+                    const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", strJSON );
+
+                  }
+                  else {
+
+                    fs.appendFileSync( strShellOutDir + "/stdout.txt", "progress: " + strCurrentDate + strSubLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+                  }
+
+                }
+
+              }
+
+            }
+            else {
+
+              fs.appendFileSync( strShellOutDir + "/stdout.txt", strLine.trim() + ( intLineIndex + 1 < lines.length ? "\n": "" ) );
+
+            }
+
+          }
+          */
+
+        });
+
+        shellCommandExecution.stdout.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFileUploadCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "data", function( strData: string ) {
+
+          if ( strData.includes( "\n" ) ) {
+
+            const lines = strData.split( "\n" );
+
+            for ( const strLine of lines ) {
+
+              const jsonData = TelegramBot.parseJSON( strLine, null );
+
+              if ( jsonData ) {
+
+                const strJSON = JSON.stringify( jsonData, null, 2 )
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strJSON + "\n" );
+
+              }
+              else {
+
+                fs.appendFileSync( strShellOutDir + "/stderr.txt", strLine.trim() + "\n" );
+
+              }
+
+            }
+
+          }
+          else if ( strData.endsWith( "\n" ) ) {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData );
+
+          }
+          else {
+
+            fs.appendFileSync( strShellOutDir + "/stderr.txt", strData + "\n" );
+
+          }
+
+        });
+
+        shellCommandExecution.stderr.on( "close", async () => {
+
+          if ( TelegramBot.strCommandRunning ) {
+
+            TelegramBot.strCommandRunning = "";
+
+            fs.appendFileSync( strShellOutDir + "/code.txt",
+                               "" + shellCommandExecution.exitCode );
+
+            const strResult = await TelegramBot.parseResultFileUploadCommand( strShellOutDir + "/stdout.txt",
+                                                                              logger );
+
+            context.reply( "Finished command: " + strCommand + "\n" +
+                           "Id: " + strCommandId + "\n" +
+                           "Result: " + strResult );
+
+            TelegramBot.commandResult.set( strCommandId,
+                                           strResult );
+
+            resolve( true );
+
+          }
+
+        });
 
       });
-      */
 
     }
     catch ( error ) {
-
-      //Remove the command from running
-      TelegramBot.strCommandRunning = "";
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
       sourcePosition.method = this.name + "." + this.handleRunDeployCommand.name;
 
-      const strMark = "81351A32A654" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "66FA96313786" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -1371,6 +1822,9 @@ export default class TelegramBot {
         LoggerManager.mainLoggerInstance.error( error );
 
       }
+
+      //Remove the command from running
+      TelegramBot.strCommandRunning = "";
 
       TelegramBot.commandResult[ strCommandId ] = "ERROR: " + error.message;
 
@@ -1389,20 +1843,19 @@ export default class TelegramBot {
       const dateTimeFromCommand = moment.unix( context.message.date ).tz( CommonUtilities.getCurrentTimeZoneId() )
 
       debugMark( "From id: ", context.message.from.id );
-      debugMark( "From id: ", context.message.from.id );
       debugMark( "From name: ", context.message.from.first_name );
 
       debugMark( "Command date time: ", dateTimeFromCommand.format() );
       debugMark( "Command: ", context.message.text );
 
-      let strRepplyMessage = "";
+      let strReplyMessage = "";
 
       const currentDateTime = SystemUtilities.getCurrentDateAndTimeFromAndDecMinutes( SystemUtilities.getCurrentDateAndTime(), 1 );
 
       if ( SystemUtilities.isDateAndTimeBeforeAt( currentDateTime.format(), dateTimeFromCommand.format() ) ) {
 
         if ( !TelegramBot.strCommandRunning &&
-            context.message.from.is_bot === false ) {
+             context.message.from.is_bot === false ) {
 
           const commandArgs = context.message.text.split( " " );
 
@@ -1414,21 +1867,23 @@ export default class TelegramBot {
 
             const strUserPassword = commandArgs[ 2 ];
 
-            strRepplyMessage = TelegramBot.validateUserAndPassword( strUserName,
+            strReplyMessage = TelegramBot.validateUserAndPassword( strUserName,
                                                                     strUserPassword,
                                                                     logger );
 
-            if ( strRepplyMessage ) {
+            if ( strReplyMessage ) {
 
               bArgumentError = true;
 
             }
 
-            const strStageToDeploy = commandArgs[ 3 ]; //Stage
+            const strStageToDeploy = commandArgs[ 3 ]; //Stage. test01, prod01
 
-            if ( TelegramBot.botConfig.target.stage.name.includes( strStageToDeploy ) ) {
+            const targetStageList = TelegramBot.botConfig.deploy ? Object.keys( TelegramBot.botConfig.deploy ): [];
 
-              strRepplyMessage = "Invalid stage name, valid stage names are: " + TelegramBot.botConfig.target.stage.name.join( "," );
+            if ( targetStageList.includes( strStageToDeploy ) === false ) {
+
+              strReplyMessage = "Invalid stage name.\nValid stage names are:\n" + targetStageList.join( "\n" );
 
               bArgumentError = true;
 
@@ -1436,9 +1891,9 @@ export default class TelegramBot {
 
             const strProjectNameToDeploy = commandArgs[ 4 ]; //Project name to deploy
 
-            if ( TelegramBot.botConfig.target.deploy.name.includes( strProjectNameToDeploy ) ) {
+            if ( TelegramBot.botConfig.deploy[ strStageToDeploy ].includes( strProjectNameToDeploy ) ) {
 
-              strRepplyMessage = "Invalid project name, valid project names are: " + TelegramBot.botConfig.target.deploy.name.join( "," );
+              strReplyMessage = "Invalid project name.\nValid project names are:\n" + TelegramBot.botConfig.target.deploy.name.join( "\n" );
               bArgumentError = true;
 
             }
@@ -1447,25 +1902,26 @@ export default class TelegramBot {
 
               const command = TelegramBot.botConfig.command;
 
-              const strShellCommandToExecute = command[ commandArgs[ 0 ] ].command + " " + strStageToDeploy + " " + strProjectNameToDeploy;
-              let strShellOutDir = command[ commandArgs[ 0 ] ].out_dir + strUserName + "/";
+              const strShellCommandToExecute = command[ commandArgs[ 0 ] + "_" + commandArgs[ 1 ] + "_" + commandArgs[ 2 ] ].command + " " + strStageToDeploy + " " + strProjectNameToDeploy;
+              let strShellOutDir = command[ commandArgs[ 0 ] + "_" + commandArgs[ 1 ] + "_" + commandArgs[ 2 ] ].out_dir + strUserName + "/";
 
               if ( strShellCommandToExecute ) {
 
                 const strCommandId = SystemUtilities.hashString( SystemUtilities.getUUIDv4(), 1, logger );
 
-                TelegramBot.handleRunDeployCommand( strCommandId,
+                TelegramBot.handleRunDeployCommand( context,
+                                                    strCommandId,
                                                     strShellOutDir,
                                                     strShellCommandToExecute,
                                                     "/deploy",
                                                     logger );
 
-                strRepplyMessage = "Command running in background with id: " + strCommandId + ". To get the current command status use /status " + strUserName + " " + strUserPassword + " " + strCommandId;
+                strReplyMessage = "Command running in background with id: " + strCommandId + ".\nTo get the current command status use:\n/status " + strUserName + " " + strUserPassword + " " + strCommandId;
 
               }
               else {
 
-                strRepplyMessage = "No shell command found.";
+                strReplyMessage = "No shell command found.";
 
               }
 
@@ -1474,33 +1930,33 @@ export default class TelegramBot {
           }
           else {
 
-            strRepplyMessage = "backup command arguments are: /upload <user_name> <user_password> <remote_folder> <file>";
+            strReplyMessage = "/deploy command arguments are:\n/deploy <user_name> <user_password> <stage> <project_name>";
 
           }
 
         }
         else if ( context.message.from.is_bot ) {
 
-          strRepplyMessage = "Bot not allowed to run commands";
+          strReplyMessage = "Bot not allowed to run commands";
 
         }
         else {
 
-          strRepplyMessage = "Command " + TelegramBot.strCommandRunning + " already running";
+          strReplyMessage = "Command " + TelegramBot.strCommandRunning + " is running right now. Only one command at time is allowed.";
 
         }
 
       }
       else {
 
-        strRepplyMessage = "Command is old to 1 minute. Ignoring";
+        strReplyMessage = "Command is old to 1 minute. Ignoring";
 
       }
 
-      if ( strRepplyMessage ) {
+      if ( strReplyMessage ) {
 
-        context.reply( strRepplyMessage );
-        debugMark( strRepplyMessage );
+        context.reply( strReplyMessage );
+        debugMark( strReplyMessage );
 
       }
 
@@ -1509,11 +1965,6 @@ export default class TelegramBot {
 
       //Remove the command from running
       TelegramBot.strCommandRunning = "";
-      /*
-      TelegramBot.strCommandRunning = TelegramBot.removeCommand( TelegramBot.strCommandRunning,
-                                                                 "/backup",
-                                                                logger );
-                                                              */
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 

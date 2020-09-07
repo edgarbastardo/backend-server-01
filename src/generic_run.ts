@@ -157,6 +157,9 @@ export default class GeneriRun {
 
       //setInterval( ServerTask.handlerRunRask, 30000 ); //Every 30 seconds
 
+      //await TelegramBot.parseResultFileBackupCommand( "/usr/local/bin/custom_command/telegram/bot/commands/make-simple-backup-odin-from-02-prod01-container-upload-dropbox/dev007/2020-09-05T11-59-13-0700/stdout.txt",
+      //                                                LoggerManager.mainLoggerInstance );
+
       await TelegramBot.init( LoggerManager.mainLoggerInstance );
 
       //process.exit( 0 );
