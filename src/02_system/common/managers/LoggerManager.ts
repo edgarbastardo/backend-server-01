@@ -5,8 +5,6 @@ import { consoleFormat } from "winston-console-format";
 import os from "os";
 import fs from "fs";
 
-import info from "../../../../info.json";
-
 import safeStringify from "fast-safe-stringify";
 
 import CommonConstants from "../CommonConstants";
@@ -178,19 +176,24 @@ export default class LoggerManager {
               accessToken: process.env.ROLLBAR_API_KEY,
               captureUncaught: true,
               captureUnhandledRejections: true,
-              version: info.release,
+              version: SystemUtilities.info.release,
               captureIp: true,
 
               payload: {
 
-                environment: process.env.DEPLOY_TARGET,
-                context: process.env.DEPLOY_TARGET,
+                environment: process.env.ENV,
+                context: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+
                 client: {
+
                   javascript: {
+
                     source_map_enabled: true,
-                    code_version: info.release,
-                  },
-                },
+                    code_version: SystemUtilities.info.release,
+
+                  }
+
+                }
 
               }
 
@@ -212,7 +215,7 @@ export default class LoggerManager {
         process.env.LOG_TO.includes( "#file#" ) ? loggerTransports.push( new winston.transports.File( options.file ) ): null;
         process.env.LOG_TO.includes( "#screen#" ) ? loggerTransports.push( new winston.transports.Console( options.console ) ): null;
         process.env.LOG_TO.includes( "#papertrail#" ) && papertrailConnection ? loggerTransports.push( new PapertrailTransport( papertrailConnection, options.papertrail.config ) ): null;
-        process.env.LOG_TO.includes( "#rollbar#" ) && papertrailConnection ? loggerTransports.push( new RollbarTransport( options.rollbar.config, options.rollbar.level ) ): null;
+        process.env.LOG_TO.includes( "#rollbar#" ) ? loggerTransports.push( new RollbarTransport( { rollbarConfig: options.rollbar.config, level: options.rollbar.level } ) ): null; //
 
         if ( loggerTransports.length === 0 ) {
 
