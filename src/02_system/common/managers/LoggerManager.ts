@@ -5,6 +5,8 @@ import { consoleFormat } from "winston-console-format";
 import os from "os";
 import fs from "fs";
 
+import info from "../../../../info.json";
+
 import safeStringify from "fast-safe-stringify";
 
 import CommonConstants from "../CommonConstants";
@@ -13,6 +15,8 @@ import SystemUtilities from "../SystemUtilities";
 import CommonUtilities from "../CommonUtilities";
 
 import { PapertrailConnection, PapertrailTransport } from "../others/logs/winston/papertrail/winston-papertrail";
+
+import RollbarTransport from "winston-transport-rollbar-3";
 
 const debug = require( "debug" )( "LoggerManager" );
 
@@ -165,6 +169,35 @@ export default class LoggerManager {
 
             }
 
+          },
+
+          rollbar: {
+
+            config: {
+
+              accessToken: process.env.ROLLBAR_API_KEY,
+              captureUncaught: true,
+              captureUnhandledRejections: true,
+              version: info.release,
+              captureIp: true,
+
+              payload: {
+
+                environment: process.env.DEPLOY_TARGET,
+                context: process.env.DEPLOY_TARGET,
+                client: {
+                  javascript: {
+                    source_map_enabled: true,
+                    code_version: info.release,
+                  },
+                },
+
+              }
+
+            },
+
+            level: process.env.LOG_LEVEL
+
           }
 
         };
@@ -179,6 +212,7 @@ export default class LoggerManager {
         process.env.LOG_TO.includes( "#file#" ) ? loggerTransports.push( new winston.transports.File( options.file ) ): null;
         process.env.LOG_TO.includes( "#screen#" ) ? loggerTransports.push( new winston.transports.Console( options.console ) ): null;
         process.env.LOG_TO.includes( "#papertrail#" ) && papertrailConnection ? loggerTransports.push( new PapertrailTransport( papertrailConnection, options.papertrail.config ) ): null;
+        process.env.LOG_TO.includes( "#rollbar#" ) && papertrailConnection ? loggerTransports.push( new RollbarTransport( options.rollbar.config, options.rollbar.level ) ): null;
 
         if ( loggerTransports.length === 0 ) {
 
