@@ -162,24 +162,6 @@ export default class TelegramBot {
 
   }
 
-  static parseJSON( strJSONToParse: string, logger: any ): any {
-
-    let result = null;
-
-    try {
-
-      result = JSON.parse( strJSONToParse );
-
-    }
-    catch ( error ) {
-
-
-    }
-
-    return result;
-
-  }
-
   /*
   static removeCommand( commandList: string[],
                         strCommandToRemove: string,
@@ -507,7 +489,7 @@ export default class TelegramBot {
 
                 if ( strSubLine ) {
 
-                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+                  const jsonData = CommonUtilities.parseJSON( strSubLine, null, true );
 
                   if ( jsonData ) {
 
@@ -570,7 +552,7 @@ export default class TelegramBot {
 
             for ( const strLine of lines ) {
 
-              const jsonData = TelegramBot.parseJSON( strLine, null );
+              const jsonData = CommonUtilities.parseJSON( strLine, null, true );
 
               if ( jsonData ) {
 
@@ -1252,7 +1234,7 @@ export default class TelegramBot {
 
                 if ( strSubLine ) {
 
-                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+                  const jsonData = CommonUtilities.parseJSON( strSubLine, null, true );
 
                   if ( jsonData ) {
 
@@ -1315,7 +1297,7 @@ export default class TelegramBot {
 
             for ( const strLine of lines ) {
 
-              const jsonData = TelegramBot.parseJSON( strLine, null );
+              const jsonData = CommonUtilities.parseJSON( strLine, null, true );
 
               if ( jsonData ) {
 
@@ -1676,7 +1658,7 @@ export default class TelegramBot {
 
                 if ( strSubLine ) {
 
-                  const jsonData = TelegramBot.parseJSON( strSubLine, null );
+                  const jsonData = CommonUtilities.parseJSON( strSubLine, null, true );
 
                   if ( jsonData ) {
 
@@ -1740,7 +1722,7 @@ export default class TelegramBot {
 
             for ( const strLine of lines ) {
 
-              const jsonData = TelegramBot.parseJSON( strLine, null );
+              const jsonData = CommonUtilities.parseJSON( strLine, null, true );
 
               if ( jsonData ) {
 
