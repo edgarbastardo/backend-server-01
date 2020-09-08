@@ -107,7 +107,7 @@ export default class Always {
 
           const options = {
 
-            where: { Id: userToCreate.Id, Name: userToCreate.Name },
+            where: { Id: userToCreate.Id }, //, Name: userToCreate.Name },
             //individualHooks: true,
             transaction: currentTransaction,
 
