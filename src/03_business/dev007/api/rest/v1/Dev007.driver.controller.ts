@@ -81,6 +81,7 @@ export default class Dev007DriverController {
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status", Action: "v1.business.dev007.driver.delivery.order.status.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Get the current status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/next", Action: "v1.business.dev007.driver.delivery.order.status.next", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the next status the delivery order" },
                                   { Path: Dev007DriverController._BASE_PATH + "/delivery/order/status/previous", Action: "v1.business.dev007.driver.delivery.order.status.previous", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Move to the previous status the delivery order" },
+                                  { Path: Dev007DriverController._BASE_PATH + "/delivery/order/finish", Action: "v1.business.dev007.driver.delivery.order.finish", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Driver#,#Business_Manager#,#Administrator#", Roles: [ "Driver", "Administrator", "Business_Manager" ], Description: "Finish a order at administrative level" },
                                 ]
 
   _controllerLogger = null;
@@ -687,6 +688,25 @@ export default class Dev007DriverController {
                                                                                                               response,
                                                                                                               null,
                                                                                                               context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPost(
+             "/delivery/order/finish",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated,
+             MiddlewareManager.middlewareCheckIsAuthorized,
+           )
+  async deliveryOrderFinish( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await Dev007ServicesDriverDeliveryOrderStatusController.deliveryOrderFinish( request,
+                                                                                                response,
+                                                                                                null,
+                                                                                                context.logger );
 
     response.status( result.StatusCode ).send( result );
 

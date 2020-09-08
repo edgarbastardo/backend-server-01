@@ -24,6 +24,10 @@ import { BIZDeliveryOrderStatusStep } from "../../common/database/master/models/
 import GeoMapManager from "../../../02_system/common/managers/GeoMapManager";
 import BIZDriverInDeliveryZoneService from "../../common/database/master/services/BIZDriverInDeliveryZoneService";
 import NotificationManager from "../../../02_system/common/managers/NotificationManager";
+import BIZDeliveryOrderFinishService from "../../common/database/master/services/BIZDeliveryOrderFinishService";
+import { BIZDeliveryOrderFinish } from "../../common/database/master/models/BIZDeliveryOrderFinish";
+import { BIZDeliveryOrder } from "../../common/database/master/models/BIZDeliveryOrder";
+import BIZDeliveryOrderFinishCurrentService from "../../common/database/master/services/BIZDeliveryOrderFinishCurrentService";
 
 const debug = require( "debug" )( "Dev007ServicesDriverDeliveryOrderStatusController" );
 
@@ -244,8 +248,8 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
           //ANCHOR success user update
           result = {
                      StatusCode: 200, //Ok
-                     Code: "SUCCESS_",
-                     Message: await I18NManager.translate( strLanguage, "" ),
+                     Code: "SUCCESS_GET_DELIVERY_ORDER_STATUS",
+                     Message: await I18NManager.translate( strLanguage, "Sucess get delivery order status" ),
                      Mark: "4736393C7AC7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
@@ -858,7 +862,7 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
                   result = {
                              StatusCode: 200, //Ok
                              Code: "SUCCESS_UPDATE_STATUS_DELIVERY_ORDER",
-                             Message: await I18NManager.translate( strLanguage, "" ),
+                             Message: await I18NManager.translate( strLanguage, "Sucess update the delivery order status" ),
                              Mark: "95B95F628A81" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: false,
@@ -1566,11 +1570,10 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
 
                   }
 
-                  //ANCHOR success user update
                   result = {
                              StatusCode: 200, //Ok
                              Code: "SUCCESS_UPDATE_STATUS_DELIVERY_ORDER",
-                             Message: await I18NManager.translate( strLanguage, "" ),
+                             Message: await I18NManager.translate( strLanguage, "Sucess update the delivery order status" ),
                              Mark: "57637587D6E9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                              LogId: null,
                              IsError: false,
@@ -1621,6 +1624,511 @@ export default class Dev007ServicesDriverDeliveryOrderStatusController extends B
       sourcePosition.method = this.name + "." + this.updateDeliveryOrderStatusPrevious.name;
 
       const strMark = "E63937F552B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 LogId: error.LogId,
+                 Mark: strMark,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async deliveryOrderFinish( request: Request,
+                                    response: Response,
+                                    transaction: any,
+                                    logger: any ):Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context; //context is injected by MiddlewareManager.middlewareSetContext function
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      let userSessionStatus = context.UserSessionStatus;
+
+      let bizDeliveryOrderInDB = await BIZDeliveryOrderService.getById( request.body.DeliveryOrderId as string,
+                                                                        currentTransaction,
+                                                                        logger );
+
+      if ( bizDeliveryOrderInDB instanceof Error ) {
+
+        const error = bizDeliveryOrderInDB as any;
+
+        result = {
+                   StatusCode: 500, //Internal server error
+                   Code: "ERROR_UNEXPECTED",
+                   Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                   Mark: "1080F46C49B0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: error.name,
+                               Message: error.message,
+                               Details: await SystemUtilities.processErrorDetails( error ) //error
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( !bizDeliveryOrderInDB ) {
+
+        result = {
+                   StatusCode: 404, //Not found
+                   Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not found in database.", request.body.EstablishmentId ),
+                   Mark: "0B24A9807A8A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_DELIVERY_ORDER_NOT_FOUND",
+                               Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not found in database.", request.body.EstablishmentId ),
+                               Details: ""
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bizDeliveryOrderInDB.DisabledBy || bizDeliveryOrderInDB.DisabledAt ) {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_DELIVERY_ORDER_IS_DISABLED",
+                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Is disabled.", request.body.Id ),
+                   Mark: "6140BA9F621A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_DELIVERY_ORDER_IS_DISABLED",
+                               Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Is disabled.", request.body.Id ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bizDeliveryOrderInDB.CanceledBy || bizDeliveryOrderInDB.CanceledAt ) {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_DELIVERY_ORDER_IS_CANCELED",
+                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Is canceled.", request.body.Id ),
+                   Mark: "8F988B93BB3A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_DELIVERY_ORDER_IS_CANCELED",
+                               Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Is canceled.", request.body.Id ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else if ( bizDeliveryOrderInDB.UserId !== userSessionStatus.UserId ) {
+
+        result = {
+                   StatusCode: 403, //Fobidden
+                   Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
+                   Mark: "5AFE735C81B9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_DRIVER_NOT_ASSIGNED_TO_ORDER",
+                               Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not is not assigned to you.", request.body.Id ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                 }
+
+      }
+      else {
+
+        let deliveryOrderFinishRules = {
+                                         DeliveryOrderId: [ "required", "string", "min:36" ],
+                                         PaymentMethod: [ "required", "integer", "min:0" ],
+                                         GrandTotal: [ "required", "numeric", "min:0" ],
+                                         PaymentMethodTip: [ "required", "integer", "min:0" ],
+                                         Tip: [ "required", "numeric", "min:0" ],
+                                         PaperNumber: [ "present", "string" ],
+                                         Comment: [ "present", "string" ],
+                                         Latitude: [ "present", "string" ],
+                                         Longitude: [ "present", "string" ]
+                                       };
+
+        let validator = SystemUtilities.createCustomValidatorSync( request.body,
+                                                                   deliveryOrderFinishRules,
+                                                                   null,
+                                                                   logger );
+
+        if ( validator.passes() ) { //Validate request.body field values
+
+          let bizDeliveryOrderFinishCurrentInDB = await BIZDeliveryOrderFinishCurrentService.getByDeliveryOrderId( bizDeliveryOrderInDB.Id,
+                                                                                                                   currentTransaction,
+                                                                                                                   logger );
+
+          if ( !bizDeliveryOrderFinishCurrentInDB ||
+                bizDeliveryOrderFinishCurrentInDB.Tag?.includes( "#Revised#" ) === false ) {
+
+            const strTag = SystemUtilities.mergeTokens( bizDeliveryOrderFinishCurrentInDB?.Tag ? bizDeliveryOrderFinishCurrentInDB?.Tag: "",
+                                                        "#Driver#",
+                                                        true,
+                                                        logger );
+
+            const bizDeliveryOrderFinishInDB = await BIZDeliveryOrderFinishService.createOrUpdate(
+                                                                                                   {
+                                                                                                     DeliveryOrderId: bizDeliveryOrderInDB.Id,
+                                                                                                     PaymentMethod: request.body.PaymentMethod,
+                                                                                                     GrandTotal: request.body.GrandTotal,
+                                                                                                     PaymentMethodTip: request.body.PaymentMethodTip,
+                                                                                                     Tip: request.body.Tip,
+                                                                                                     PaperNumber: request.body.PaperNumber ? request.body.PaperNumber: null,
+                                                                                                     Comment: request.body.Comment ? request.body.Comment: null,
+                                                                                                     Tag: strTag,
+                                                                                                     Latitude: request.body.Latitude ? request.body.Latidude: null,
+                                                                                                     Longitude: request.body.Longitude ? request.body.Longitude: null,
+                                                                                                     CreatedBy: userSessionStatus.UserName
+                                                                                                   },
+                                                                                                   false,
+                                                                                                   currentTransaction,
+                                                                                                   logger
+                                                                                                 );
+
+            if ( bizDeliveryOrderFinishInDB instanceof Error ) {
+
+              const error = bizDeliveryOrderFinishInDB as any;
+
+              result = {
+                         StatusCode: 500, //Internal server error
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                         Mark: "C1EF0655AA6A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: error.name,
+                                     Message: error.message,
+                                     Details: await SystemUtilities.processErrorDetails( error ) //error
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else if ( !bizDeliveryOrderFinishInDB ) {
+
+              result = {
+                         StatusCode: 500, //Not found
+                         Code: "ERROR_UNEXPECTED",
+                         Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                         Mark: "7B6551C7F4DA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_DELIVERY_ORDER_FINISH_IS_NULL",
+                                     Message: await I18NManager.translate( strLanguage, "The delivery order finish is null" ),
+                                     Details: "bizDeliveryOrderFinishInDB is null"
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+            else {
+
+              bizDeliveryOrderFinishCurrentInDB = await BIZDeliveryOrderFinishCurrentService.createOrUpdate(
+                                                                                                             {
+                                                                                                               DeliveryOrderId: bizDeliveryOrderInDB.Id,
+                                                                                                               DeliveryOrderFinishId: bizDeliveryOrderFinishInDB.Id,
+                                                                                                               Tag: strTag,
+                                                                                                               CreatedBy: userSessionStatus.UserName,
+                                                                                                               UpdatedBy: userSessionStatus.UserName,
+                                                                                                             },
+                                                                                                             true,
+                                                                                                             currentTransaction,
+                                                                                                             logger
+                                                                                                           );
+
+              if ( bizDeliveryOrderFinishCurrentInDB instanceof Error ) {
+
+                const error = bizDeliveryOrderFinishCurrentInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "D42364611333" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( !bizDeliveryOrderFinishCurrentInDB ) {
+
+                result = {
+                           StatusCode: 500, //Not found
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "7B6551C7F4DA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: "ERROR_DELIVERY_ORDER_FINISH_CURRENT_IS_NULL",
+                                       Message: await I18NManager.translate( strLanguage, "The delivery order finish current is null" ),
+                                       Details: "bizDeliveryOrderFinishCurrentInDB is null"
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else {
+
+                let modelData = ( bizDeliveryOrderFinishInDB as any ).dataValues;
+
+                const tempModelData = await BIZDeliveryOrderFinish.convertFieldValues(
+                                                                                       {
+                                                                                         Data: modelData,
+                                                                                         FilterFields: 1,
+                                                                                         TimeZoneId: context.TimeZoneId,
+                                                                                         Include: null,
+                                                                                                   /*
+                                                                                                   [
+                                                                                                     {
+                                                                                                       model: BIZDriverRoute,
+                                                                                                     },
+                                                                                                     {
+                                                                                                       model: BIZOrigin,
+                                                                                                     },
+                                                                                                     {
+                                                                                                       model: BIZDestination,
+                                                                                                     },
+                                                                                                     {
+                                                                                                       model: SYSUser,
+                                                                                                     }
+                                                                                                   ],
+                                                                                                   */
+                                                                                         Exclude: [
+                                                                                                    {
+                                                                                                      model: BIZDeliveryOrder
+                                                                                                    }
+                                                                                                  ],
+                                                                                         IncludeFields: null,
+                                                                                         Logger: logger,
+                                                                                         ExtraInfo: {
+                                                                                                      Request: request,
+                                                                                                    }
+                                                                                       }
+                                                                                     );
+
+                if ( tempModelData ) {
+
+                  modelData = tempModelData;
+
+                }
+
+                result = {
+                           StatusCode: 200, //Ok
+                           Code: "SUCCESS_FINISH_DELIVERY_ORDER",
+                           Message: await I18NManager.translate( strLanguage, "Success finish delivery order" ),
+                           Mark: "B6490B611754" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: false,
+                           Errors: [],
+                           Warnings: [],
+                           Count: 1,
+                           Data: [
+                                   modelData
+                                 ]
+                         }
+
+                bApplyTransaction = true;
+
+              }
+
+            }
+
+          }
+          else {
+
+            result = {
+                       StatusCode: 403, //Fobidden
+                       Code: "ERROR_DRIVER_NOT_ALLOWED_TO_FINISH_DELIVERY_ORDER",
+                       Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not allowed to finish because is revised.", request.body.Id ),
+                       Mark: "A0F197A47196" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_DRIVER_NOT_ALLOWED_TO_FINISH_DELIVERY_ORDER",
+                                   Message: await I18NManager.translate( strLanguage, "The delivery order with id %s. Not allowed to finish because is revised.", request.body.Id ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 400, //Bad request
+                     Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                     Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                     Mark: "4AFA4A8E9E23" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_FIELD_VALUES_ARE_INVALID",
+                                 Message: await I18NManager.translate( strLanguage, "One or more field values are invalid" ),
+                                 Details: validator.errors.all()
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.deliveryOrderFinish.name;
+
+      const strMark = "A749DC1F60A2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

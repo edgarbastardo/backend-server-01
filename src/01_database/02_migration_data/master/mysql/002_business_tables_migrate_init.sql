@@ -182,6 +182,39 @@ CREATE TABLE IF NOT EXISTS `bizDeliveryOrderStatus` (
   CONSTRAINT `FK_bizDeliveryOrdStatus_DeliveryOrderId_From_bizDeliveryOrder_Id` FOREIGN KEY (`DeliveryOrderId`) REFERENCES `bizDeliveryOrder` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store the delivery status.';
 
+CREATE TABLE IF NOT EXISTS `bizDeliveryOrderFinish` (
+  `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
+  `DeliveryOrderId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDeliveryOrder on field Id',
+  `PaymentMethod` smallint(6) NOT NULL COMMENT '0 = Cash, 1 = Credit Card, 2 = Knock Knock, 3 = Uber -online internamente-, 4 = Mixed, 5 = Reposition',
+  `GrandTotal` decimal(10,2) NOT NULL COMMENT 'Grand total of the order',
+  `PaymentMethodTip` smallint(6) NOT NULL COMMENT '0 = Credit Card, 1 = Knock Knock, 2 = Mixed',
+  `Tip` decimal(10,2) NOT NULL COMMENT 'Tip amount',
+  `PaperNumber` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Teh order number in the ticket',
+  `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',
+  `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
+  `Latitude` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Current gps coordinate to the time of set status',
+  `Longitude` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Current gps coordinate to the time of set status',
+  `CreatedBy` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`Id`),
+  CONSTRAINT `FK_bizDeliveryOrdFinish_DeliveryOrderId_From_bizDeliveryOrder_Id` FOREIGN KEY (`DeliveryOrderId`) REFERENCES `bizDeliveryOrder` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store historical information about delivery order finish.';
+
+CREATE TABLE IF NOT EXISTS `bizDeliveryOrderFinishCurrent` (
+  `DeliveryOrderId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDeliveryOrder on field Id',
+  `DeliveryOrderFinishId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDeliveryOrderFinish on field Id',
+  `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Tag flags for multi purpose process.\n\nTags format is #tag# separated by ,\n\nExample:\n\n#tag01#,#tag02#,#my_tag03#,#super_tag04#,#other_tag05#',
+  `CreatedBy` varchar(75) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Name of user created the row.',
+  `CreatedAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Creation date and time of the row.',
+  `UpdatedBy` varchar(75) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of user updated the row.',
+  `UpdatedAt` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Date and time of last update to the row.',
+  `ExtraData` json DEFAULT NULL COMMENT 'Extra data information, generally in json format',
+  PRIMARY KEY (`DeliveryOrderId`),
+  CONSTRAINT `FK_bizDeliveryOrdFC_DeliveryOrderId_From_bizDeliveryOrder_Id` FOREIGN KEY (`DeliveryOrderId`) REFERENCES `bizDeliveryOrder` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_bizDeliveryOrdFC_DeliveryOrdFId_From_bizDeliveryOrder_Id` FOREIGN KEY (`DeliveryOrderFinishId`) REFERENCES `bizDeliveryOrderFinish` (`Id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Store information about LAST delivery order finish.';
+
 CREATE TABLE IF NOT EXISTS `bizDeliveryOrderStatusStep` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `Kind` smallint(6) NOT NULL COMMENT '0 = Driver on demand, 1 = Driver exclusive, 2 = Driver by route',
