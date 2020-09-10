@@ -69,7 +69,7 @@ export default class SystemConstants {
   static readonly _USER_SYSTEM_ADMINISTRATOR_01 = {
                                                     Id: "508a78a2-7906-4cb2-93ad-a7b0a80aa9a6",
                                                     GroupId: "c4d61857-482f-40a0-bcec-93206091d37f",
-                                                    Name: "admin01@system.net",
+                                                    Name: "s.admin01@system.net",
                                                     Password: "admin1.123456.",
                                                     Comment: "Default system administrator user 01",
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -78,7 +78,7 @@ export default class SystemConstants {
   static readonly _USER_SYSTEM_ADMINISTRATOR_02 = {
                                                     Id: "3d4cbe85-b41e-495b-8517-8fb5300f5d90",
                                                     GroupId: "c4d61857-482f-40a0-bcec-93206091d37f",
-                                                    Name: "admin02@system.net",
+                                                    Name: "s.admin02@system.net",
                                                     Password: "admin2.123456.",
                                                     Comment: "Default system administrator user 02",
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -87,7 +87,7 @@ export default class SystemConstants {
   static readonly _USER_SYSTEM_ADMINISTRATOR_03 = {
                                                     Id: "dee276f8-1a70-43f0-8879-0ab3907c5782",
                                                     GroupId: "c4d61857-482f-40a0-bcec-93206091d37f",
-                                                    Name: "admin03@system.net",
+                                                    Name: "s.admin03@system.net",
                                                     Password: "admin3.123456.",
                                                     Comment: "Default system administrator user 03",
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -96,7 +96,7 @@ export default class SystemConstants {
   static readonly _USER_SYSTEM_ADMINISTRATOR_04 = {
                                                     Id: "fa78bdd3-d024-4afe-a8c0-e3cd4428ff7e",
                                                     GroupId: "c4d61857-482f-40a0-bcec-93206091d37f",
-                                                    Name: "admin04@system.net",
+                                                    Name: "s.admin04@system.net",
                                                     Password: "admin4.123456.",
                                                     Comment: "Default system administrator user 04",
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -105,7 +105,7 @@ export default class SystemConstants {
   static readonly _USER_SYSTEM_ADMINISTRATOR_05 = {
                                                     Id: "50bdf5a6-8a70-4871-a952-d8ab42ca5759",
                                                     GroupId: "c4d61857-482f-40a0-bcec-93206091d37f",
-                                                    Name: "admin05@system.net",
+                                                    Name: "s.admin05@system.net",
                                                     Password: "admin5.123456.",
                                                     Comment: "Default system administrator user 05",
                                                     CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -115,7 +115,7 @@ export default class SystemConstants {
   static readonly _USER_BUSINESS_MANAGER_01 = {
                                                 Id: "092be78e-d953-441e-83e0-aca6bf200bba",
                                                 GroupId: "b385be19-23f7-4931-b1e4-875c218bd732",
-                                                Name: "bmanager01@system.net",
+                                                Name: "b.manager01@system.net",
                                                 Password: "bmanager1.123456.",
                                                 Comment: "Default business manager user 01",
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -124,7 +124,7 @@ export default class SystemConstants {
   static readonly _USER_BUSINESS_MANAGER_02 = {
                                                 Id: "12b1ec2c-eb97-48f6-bcdc-9b9555df8dbb",
                                                 GroupId: "b385be19-23f7-4931-b1e4-875c218bd732",
-                                                Name: "bmanager02@system.net",
+                                                Name: "b.manager02@system.net",
                                                 Password: "bmanager2.123456.",
                                                 Comment: "Default business manager user 02",
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -133,7 +133,7 @@ export default class SystemConstants {
   static readonly _USER_BUSINESS_MANAGER_03 = {
                                                 Id: "cadf8963-e978-4b70-a314-362bd4d0e9c5",
                                                 GroupId: "b385be19-23f7-4931-b1e4-875c218bd732",
-                                                Name: "bmanager03@system.net",
+                                                Name: "b.manager03@system.net",
                                                 Password: "bmanager3.123456.",
                                                 Comment: "Default business manager user 03",
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -142,7 +142,7 @@ export default class SystemConstants {
   static readonly _USER_BUSINESS_MANAGER_04 = {
                                                 Id: "c5be3916-5fc2-4d75-82aa-f6fe55e3d863",
                                                 GroupId: "b385be19-23f7-4931-b1e4-875c218bd732",
-                                                Name: "bmanager04@system.net",
+                                                Name: "b.manager04@system.net",
                                                 Password: "bmanager4.123456.",
                                                 Comment: "Default business manager user 04",
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
@@ -151,7 +151,7 @@ export default class SystemConstants {
   static readonly _USER_BUSINESS_MANAGER_05 = {
                                                 Id: "32f333dd-c960-44a7-b34e-b484147a9501",
                                                 GroupId: "b385be19-23f7-4931-b1e4-875c218bd732",
-                                                Name: "bmanager05@system.net",
+                                                Name: "b.manager05@system.net",
                                                 Password: "bmanager5.123456.",
                                                 Comment: "Default business manager user 05",
                                                 CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
