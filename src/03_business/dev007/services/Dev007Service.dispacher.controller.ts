@@ -525,6 +525,23 @@ export default class Dev007ServicesDispatcherController extends BaseService {
 
       }
 
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
     }
     catch ( error ) {
 
