@@ -332,7 +332,7 @@ export default class SYSUserSessionStatusService extends BaseService {
          const userSessionStatus = ( row as any ).dataValues;
 
          userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
-         userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime();
+         userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
 
          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                 userSessionStatus,

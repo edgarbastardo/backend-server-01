@@ -23,6 +23,7 @@ import UserOthersServiceController from "./UserOthersService.controller";
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
 import SYSActionTokenService from "../../../common/database/master/services/SYSActionTokenService";
+import HookManager from "../../../common/managers/HookManager";
 
 const debug = require( "debug" )( "UserPasswordServiceController" );
 
@@ -346,6 +347,24 @@ export default class UserPasswordServiceController {
                                                            logger
                                                          ) ) {
 
+                        const payload = {
+                                          SystemId: SystemUtilities.getSystemId(),
+                                          SystemName: process.env.APP_SERVER_DATA_NAME,
+                                          SubSystem: "Security",
+                                          Token: context.UserSessionStatus?.Token || "",
+                                          UserId: context.UserSessionStatus?.UserId || sysUserInDB?.Id || "",
+                                          UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
+                                          UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
+                                          Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          Data: {}
+                                        }
+
+                        HookManager.processHookHandlersInChain( "SystemEvent",
+                                                                payload,
+                                                                logger );
+
+                        /*
                         NotificationManager.publishOnTopic( "SystemEvent",
                                                             {
                                                               SystemId: SystemUtilities.getSystemId(),
@@ -360,6 +379,7 @@ export default class UserPasswordServiceController {
                                                               Data: {}
                                                             },
                                                             logger );
+                        */
 
                         result = {
                                    StatusCode: 200, //Ok
@@ -424,6 +444,23 @@ export default class UserPasswordServiceController {
                                                            logger
                                                          ) ) {
 
+                        const payload = {
+                                          SystemId: SystemUtilities.getSystemId(),
+                                          SystemName: process.env.APP_SERVER_DATA_NAME,
+                                          SubSystem: "Security",
+                                          Token: context.UserSessionStatus?.Token || "",
+                                          UserId: context.UserSessionStatus?.UserId || sysUserInDB?.Id || "",
+                                          UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
+                                          UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
+                                          Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          Data: {}
+                                        }
+
+                        HookManager.processHookHandlersInChain( "SystemEvent",
+                                                                payload,
+                                                                logger );
+                        /*
                         NotificationManager.publishOnTopic( "SystemEvent",
                                                             {
                                                               SystemId: SystemUtilities.getSystemId(),
@@ -438,6 +475,7 @@ export default class UserPasswordServiceController {
                                                               Data: {}
                                                             },
                                                             logger );
+                        */
 
                         result = {
                                    StatusCode: 200, //Ok
@@ -989,6 +1027,24 @@ export default class UserPasswordServiceController {
 
                       }
 
+                      const payload = {
+                                        SystemId: SystemUtilities.getSystemId(),
+                                        SystemName: process.env.APP_SERVER_DATA_NAME,
+                                        SubSystem: "Security",
+                                        Token: context.UserSessionStatus?.Token || "",
+                                        UserId: context.UserSessionStatus?.UserId || sysUserInDB?.Id || "",
+                                        UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
+                                        UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
+                                        Code: "SUCCESS_PASSWORD_CHANGE",
+                                        EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                        Data: {}
+                                      }
+
+                      HookManager.processHookHandlersInChain( "SystemEvent",
+                                                              payload,
+                                                              logger );
+
+                      /*
                       NotificationManager.publishOnTopic( "SystemEvent",
                                                           {
                                                             SystemId: SystemUtilities.getSystemId(),
@@ -1003,6 +1059,7 @@ export default class UserPasswordServiceController {
                                                             Data: {}
                                                           },
                                                           logger );
+                      */
 
                       result = {
                                  StatusCode: 200, //Ok

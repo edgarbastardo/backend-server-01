@@ -14,6 +14,8 @@ import CommonUtilities from "../CommonUtilities";
 
 import { PapertrailConnection, PapertrailTransport } from "../others/logs/winston/papertrail/winston-papertrail";
 
+import RollbarTransport from "winston-transport-rollbar-3";
+
 const debug = require( "debug" )( "LoggerManager" );
 
 require( "dotenv" ).config( { path: appRoot.path + "/.env.log" } );
@@ -165,6 +167,40 @@ export default class LoggerManager {
 
             }
 
+          },
+
+          rollbar: {
+
+            config: {
+
+              accessToken: process.env.ROLLBAR_API_KEY,
+              captureUncaught: true,
+              captureUnhandledRejections: true,
+              version: SystemUtilities.info.release,
+              captureIp: true,
+
+              payload: {
+
+                environment: process.env.ENV,
+                context: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+
+                client: {
+
+                  javascript: {
+
+                    source_map_enabled: true,
+                    code_version: SystemUtilities.info.release,
+
+                  }
+
+                }
+
+              }
+
+            },
+
+            level: process.env.LOG_LEVEL
+
           }
 
         };
@@ -179,6 +215,7 @@ export default class LoggerManager {
         process.env.LOG_TO.includes( "#file#" ) ? loggerTransports.push( new winston.transports.File( options.file ) ): null;
         process.env.LOG_TO.includes( "#screen#" ) ? loggerTransports.push( new winston.transports.Console( options.console ) ): null;
         process.env.LOG_TO.includes( "#papertrail#" ) && papertrailConnection ? loggerTransports.push( new PapertrailTransport( papertrailConnection, options.papertrail.config ) ): null;
+        process.env.LOG_TO.includes( "#rollbar#" ) ? loggerTransports.push( new RollbarTransport( { rollbarConfig: options.rollbar.config, level: options.rollbar.level } ) ): null; //
 
         if ( loggerTransports.length === 0 ) {
 
