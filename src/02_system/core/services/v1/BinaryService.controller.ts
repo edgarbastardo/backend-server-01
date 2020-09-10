@@ -24,18 +24,19 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import MiddlewareManager from "../../../common/managers/MiddlewareManager";
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import NotificationManager from "../../../common/managers/NotificationManager";
+//import NotificationManager from "../../../common/managers/NotificationManager";
+import HookManager from "../../../common/managers/HookManager";
 
 import BaseService from "../../../common/database/master/services/BaseService";
 import SYSConfigValueDataService from "../../../common/database/master/services/SYSConfigValueDataService";
 import SYSBinaryIndexService from "../../../common/database/master/services/SYSBinaryIndexService";
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
+import SYSUserSessionPersistentService from "../../../common/database/master/services/SYSUserSessionPersistentService";
 
 import { SYSUserGroup } from "../../../common/database/master/models/SYSUserGroup";
 import { SYSUser } from "../../../common/database/master/models/SYSUser";
 import { SYSBinaryIndex } from "../../../common/database/master/models/SYSBinaryIndex";
-import SYSUserSessionPersistentService from "../../../common/database/master/services/SYSUserSessionPersistentService";
 //import { AccessKind } from "../../../common/CommonConstants";
 
 const debug = require( "debug" )( "BinaryServiceController" );
@@ -4187,6 +4188,29 @@ export default class BinaryServiceController extends BaseService {
                     if ( sysBinaryIndexInDB &&
                          sysBinaryIndexInDB instanceof Error === false ) {
 
+                      const payload = {
+                                        SystemId: SystemUtilities.getSystemId(),
+                                        SystemName: process.env.APP_SERVER_DATA_NAME,
+                                        SubSystem: "BinaryService",
+                                        Token: context.UserSessionStatus.Token,
+                                        UserId: context.UserSessionStatus.UserId,
+                                        UserName: context.UserSessionStatus.UserName,
+                                        UserGroupId: context.UserSessionStatus.UserGroupId,
+                                        Code: "SUCCESS_BINARY_DATA_UPLOAD",
+                                        EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                        Data: {
+                                                Id: sysBinaryIndexInDB.Id,
+                                                FilePath: sysBinaryIndexInDB.FilePath,
+                                                FileName: sysBinaryIndexInDB.FileName,
+                                                Hash: sysBinaryIndexInDB.Hash
+                                              }
+                                      };
+
+                      HookManager.processHookHandlersInChain( "SystemEvent",
+                                                              payload,
+                                                              logger );
+
+                      /*
                       NotificationManager.publishOnTopic( "SystemEvent",
                                                           {
                                                             SystemId: SystemUtilities.getSystemId(),
@@ -4206,6 +4230,7 @@ export default class BinaryServiceController extends BaseService {
                                                                   }
                                                           },
                                                           logger );
+                      */
 
                       const metaData = ( sysBinaryIndexInDB as any ).dataValues;
 
@@ -6425,6 +6450,29 @@ export default class BinaryServiceController extends BaseService {
           }
           else if ( deleteResult === true ) {
 
+            const payload = {
+                              SystemId: SystemUtilities.getSystemId(),
+                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                              SubSystem: "BinaryService",
+                              Token: context.UserSessionStatus.Token,
+                              UserId: context.UserSessionStatus.UserId,
+                              UserName: context.UserSessionStatus.UserName,
+                              UserGroupId: context.UserSessionStatus.UserGroupId,
+                              Code: "SUCCESS_BINARY_DATA_DELETE",
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              Data: {
+                                      Id: sysBinaryIndexInDB.Id,
+                                      FilePath: sysBinaryIndexInDB.FilePath,
+                                      FileName: sysBinaryIndexInDB.FileName,
+                                      Hash: sysBinaryIndexInDB.Hash
+                                    }
+                            };
+
+            HookManager.processHookHandlersInChain( "SystemEvent",
+                                                    payload,
+                                                    logger );
+
+            /*
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
                                                   SystemId: SystemUtilities.getSystemId(),
@@ -6444,6 +6492,7 @@ export default class BinaryServiceController extends BaseService {
                                                         }
                                                 },
                                                 logger );
+            */
 
             result = {
                        StatusCode: 200, //Ok

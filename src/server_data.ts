@@ -31,6 +31,7 @@ import NotificationManager from "./02_system/common/managers/NotificationManager
 import SYSSystemEventLogService from "./02_system/common/database/master/services/SYSSystemEventLogService";
 //import PresenceManager from "./02_system/common/managers/PresenceManager";
 import InstantMessageServerManager from "./02_system/common/managers/InstantMessageServerManager";
+import HookManager from "./02_system/common/managers/HookManager";
 
 let debug = null; //require( "debug" )( "server" );
 
@@ -75,6 +76,42 @@ export default class App {
 
         debugMark( `To much HTTP worker process killed. Aborting main process execution.` );
 
+        const payload = {
+                          body: {
+                                  kind: "error",
+                                  text: "To much HTTP worker process killed. Aborting main process execution.",
+                                  fields: [
+                                            {
+                                              title: "Date",
+                                              value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Host",
+                                              value: SystemUtilities.getHostName(),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Application",
+                                              value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+                                              short: false
+                                            },
+                                            {
+                                              title: "Running from",
+                                              value: SystemUtilities.strBaseRunPath,
+                                              short: false
+                                            }
+                                          ],
+                                  footer: "56C402B90E51",
+                                    // `Date: ${SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 )}\nHost: ${SystemUtilities.getHostName()}\nApplication: ${process.env.APP_SERVER_DATA_NAME}\nRunning from: ${SystemUtilities.strBaseRunPath}`
+                                }
+                        }
+
+        HookManager.processHookHandlersInChain( "PublishToExternal",
+                                                payload,
+                                                logger );
+
+        /*
         await NotificationManager.publishToExternal(
                                                      {
                                                        body: {
@@ -108,6 +145,7 @@ export default class App {
                                                      },
                                                      LoggerManager.mainLoggerInstance
                                                    );
+                                                   */
 
         process.abort();
 
@@ -246,6 +284,41 @@ export default class App {
 
         debugMark( `To much JOB worker process killed. Aborting main process execution.` );
 
+        const payload = {
+                          body: {
+                                  kind: "error",
+                                  text: "To much JOB worker process killed. Aborting main process execution.",
+                                  fields: [
+                                            {
+                                              title: "Date",
+                                              value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Host",
+                                              value: SystemUtilities.getHostName(),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Application",
+                                              value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+                                              short: false
+                                            },
+                                            {
+                                              title: "Running from",
+                                              value: SystemUtilities.strBaseRunPath,
+                                              short: false
+                                            }
+                                          ],
+                                  footer: "4B6CC1C6B04B",
+                                }
+                        }
+
+        HookManager.processHookHandlersInChain( "PublishToExternal",
+                                                payload,
+                                                logger );
+
+        /*
         await NotificationManager.publishToExternal(
                                                      {
                                                        body: {
@@ -278,6 +351,7 @@ export default class App {
                                                      },
                                                      LoggerManager.mainLoggerInstance
                                                    );
+                                                   */
 
         process.abort();
 
@@ -537,6 +611,41 @@ export default class App {
           debugMark( "%s", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
           debugMark( `Check of health of database connections failed. Aborting main process execution.` );
 
+          const payload = {
+                            body: {
+                                    kind: "error",
+                                    text: "Check of health of database connections failed. Aborting main process execution.",
+                                    fields: [
+                                              {
+                                                title: "Date",
+                                                value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                                short: false
+                                              },
+                                              {
+                                                title: "Host",
+                                                value: SystemUtilities.getHostName(),
+                                                short: false
+                                              },
+                                              {
+                                                title: "Application",
+                                                value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+                                                short: false
+                                              },
+                                              {
+                                                title: "Running from",
+                                                value: SystemUtilities.strBaseRunPath,
+                                                short: false
+                                              }
+                                            ],
+                                    footer: "FA93D7C63EA9",
+                                  }
+                          }
+
+          HookManager.processHookHandlersInChain( "PublishToExternal",
+                                                  payload,
+                                                  LoggerManager.mainLoggerInstance );
+
+          /*
           await NotificationManager.publishToExternal(
                                                        {
                                                          body: {
@@ -569,6 +678,7 @@ export default class App {
                                                        },
                                                        LoggerManager.mainLoggerInstance
                                                      );
+                                                     */
 
           process.abort();
 
@@ -858,8 +968,46 @@ export default class App {
 
       //await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
 
+      await HookManager.init( {},
+                              LoggerManager.mainLoggerInstance );
+
       if ( cluster.isMaster ) {
 
+        const payload = {
+                          body: {
+                                  kind: "notification",
+                                  text: "Start running",
+                                  fields: [
+                                            {
+                                              title: "Date",
+                                              value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Host",
+                                              value: SystemUtilities.getHostName(),
+                                              short: false
+                                            },
+                                            {
+                                              title: "Application",
+                                              value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+                                              short: false
+                                            },
+                                            {
+                                              title: "Running from",
+                                              value: SystemUtilities.strBaseRunPath,
+                                              short: false
+                                            }
+                                          ],
+                                  footer: "CCDAB718266A",
+                                }
+                        }
+
+        HookManager.processHookHandlersInChain( "PublishToExternal",
+                                                payload,
+                                                LoggerManager.mainLoggerInstance );
+
+        /*
         await NotificationManager.publishToExternal(
                                                      {
                                                        body: {
@@ -892,6 +1040,7 @@ export default class App {
                                                      },
                                                      LoggerManager.mainLoggerInstance
                                                    );
+                                                   */
 
         if ( !cluster.settings.execArgv ) {
 
