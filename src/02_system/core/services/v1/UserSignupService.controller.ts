@@ -19,6 +19,7 @@ import NotificationManager from "../../../common/managers/NotificationManager";
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CipherManager from "../../../common/managers/CipherManager";
 import ApplicationServerDataManager from "../../../common/managers/ApplicationServerDataManager";
+import HookManager from "../../../common/managers/HookManager";
 
 import SecurityServiceController from "./SecurityService.controller";
 import UserOthersServiceController from "./UserOthersService.controller";
@@ -346,6 +347,24 @@ export default class UserSingupServiceController {
                                                              logger
                                                            ) ) {
 
+                          const payload = {
+                                            SystemId: SystemUtilities.getSystemId(),
+                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                            SubSystem: "UserSignup",
+                                            Token: "No apply",
+                                            UserId: "No apply",
+                                            UserName: signupData.Name,
+                                            UserGroupId: "No apply",
+                                            Code: "SUCCESS_USER_SIGNUP",
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            Data: {}
+                                          }
+
+                          HookManager.processHookHandlersInChain( "SystemEvent",
+                                                                  payload,
+                                                                  logger );
+
+                          /*
                           NotificationManager.publishOnTopic( "SystemEvent",
                                                               {
                                                                 SystemId: SystemUtilities.getSystemId(),
@@ -360,6 +379,7 @@ export default class UserSingupServiceController {
                                                                 Data: {}
                                                               },
                                                               logger );
+                          */
 
                           result = {
                                      StatusCode: 200, //Ok
@@ -385,6 +405,24 @@ export default class UserSingupServiceController {
                         }
                         else {
 
+                          const payload = {
+                                            SystemId: SystemUtilities.getSystemId(),
+                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                            SubSystem: "UserSignup",
+                                            Token: "No apply",
+                                            UserId: "No apply",
+                                            UserName: signupData.Name,
+                                            UserGroupId: "No apply",
+                                            Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            Data: {}
+                                          }
+
+                          HookManager.processHookHandlersInChain( "SystemEvent",
+                                                                  payload,
+                                                                  logger );
+
+                          /*
                           NotificationManager.publishOnTopic( "SystemEvent",
                                                               {
                                                                 SystemId: SystemUtilities.getSystemId(),
@@ -399,6 +437,7 @@ export default class UserSingupServiceController {
                                                                 Data: {}
                                                               },
                                                               logger );
+                          */
 
                           result = {
                                      StatusCode: 500, //Internal server error //ok
@@ -2032,6 +2071,24 @@ export default class UserSingupServiceController {
 
                           }
 
+                          const payload = {
+                                            SystemId: SystemUtilities.getSystemId(),
+                                            SystemName: process.env.APP_SERVER_DATA_NAME,
+                                            SubSystem: "UserSignup",
+                                            Token: "No apply",
+                                            UserId: sysUserSignupInDB.Id,
+                                            UserName: sysUserSignupInDB.Name,
+                                            UserGroupId: sysUserGroup.Id,
+                                            Code: "SUCCESS_USER_ACTIVATION",
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            Data: {}
+                                          }
+
+                          HookManager.processHookHandlersInChain( "SystemEvent",
+                                                                  payload,
+                                                                  logger );
+
+                          /*
                           NotificationManager.publishOnTopic( "SystemEvent",
                                                               {
                                                                 SystemId: SystemUtilities.getSystemId(),
@@ -2046,6 +2103,7 @@ export default class UserSingupServiceController {
                                                                 Data: {}
                                                               },
                                                               logger );
+                          */
 
                           result = {
                                      StatusCode: 200, //Ok

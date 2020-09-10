@@ -48,7 +48,7 @@ export default class InstantMessageServerRequestServiceV1 {
     }
     catch ( error ) {
 
-      const strMark = "4040EECD311D";
+      const strMark = "23D1C6AAEF3B";
 
       const debugMark = debug.extend( strMark );
 

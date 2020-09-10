@@ -547,7 +547,9 @@ export default class CommonUtilities {
 
   }
 
-  static includeObjectFields( dataObject: any, fieldNamesToInclude: string[], logger: any ): any {
+  static includeObjectFields( dataObject: any,
+                              fieldNamesToInclude: string[],
+                              logger: any ): any {
 
     let result = dataObject;
 
@@ -595,7 +597,9 @@ export default class CommonUtilities {
 
   }
 
-  static parseJSON( strJSONToParse: string, logger: any ): any {
+  static parseJSON( strJSONToParse: string,
+                    logger: any,
+                    bIgnoreError: boolean = false ): any {
 
     let result = {}; //Safe empty object
 
@@ -606,24 +610,28 @@ export default class CommonUtilities {
     }
     catch ( error ) {
 
-      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+      if ( bIgnoreError === false ) {
 
-      sourcePosition.method = this.name + "." + this.parseJSON.name;
+        const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      const strMark = "D72A94FD3E4B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+        sourcePosition.method = this.name + "." + this.parseJSON.name;
 
-      const debugMark = debug.extend( strMark );
+        const strMark = "D72A94FD3E4B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
-      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
-      debugMark( "Catched on: %O", sourcePosition );
+        const debugMark = debug.extend( strMark );
 
-      error.mark = strMark;
-      //error.logId = SystemUtilities.getUUIDv4();
+        debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+        debugMark( "Catched on: %O", sourcePosition );
 
-      if ( logger && typeof logger.error === "function" ) {
+        error.mark = strMark;
+        //error.logId = SystemUtilities.getUUIDv4();
 
-        error.catchedOn = sourcePosition;
-        logger.error( error );
+        if ( logger && typeof logger.error === "function" ) {
+
+          error.catchedOn = sourcePosition;
+          logger.error( error );
+
+        }
 
       }
 
@@ -1502,7 +1510,8 @@ export default class CommonUtilities {
 
   }
 
-  public static trimArray( array: string[] ): string[] {
+  public static trimArray( array: string[],
+                           bAddEmpty: boolean = true ): string[] {
 
     let result = [];
 
@@ -1510,7 +1519,16 @@ export default class CommonUtilities {
 
       for ( const strItem of array ) {
 
-        result.push( strItem.trim() );
+        if ( bAddEmpty ) {
+
+          result.push( strItem.trim() );
+
+        }
+        else if ( strItem.trim() ) {
+
+          result.push( strItem.trim() );
+
+        }
 
       }
 
@@ -1525,17 +1543,28 @@ export default class CommonUtilities {
 
   }
 
-  public static trimArrayFromString( strArray: string ): string[] {
+  public static trimArrayFromString( strArray: string,
+                                     strSplit: string = ",",
+                                     bAddEmpty: boolean = true ): string[] {
 
     let result = [];
 
     try {
 
-      const temp = strArray.split( "," );
+      const temp = strArray.split( strSplit );
 
       for ( const strItem of temp ) {
 
-        result.push( strItem.trim() );
+        if ( bAddEmpty ) {
+
+          result.push( strItem.trim() );
+
+        }
+        else if ( strItem.trim() ) {
+
+          result.push( strItem.trim() );
+
+        }
 
       }
 
