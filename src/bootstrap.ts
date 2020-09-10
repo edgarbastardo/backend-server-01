@@ -140,7 +140,7 @@ export default class App {
 
                 if ( strLocalFileContentHash !== strDownloadedFileContentHash ) {
 
-                  debugMark( "The downloaded file CRC32: %s and the local file CRC32: %s are NOT the same", strDownloadedFileContentHash, strLocalFileContentHash );
+                  debugMark( "+++++ The downloaded file CRC32: %s and the local file CRC32: %s are NOT the same +++++", strDownloadedFileContentHash, strLocalFileContentHash );
 
                   fs.mkdirSync( appRoot.path + "/config_backup/" + strDateTimeFromBackup,
                                 { recursive: true } );
@@ -153,12 +153,12 @@ export default class App {
                   fs.writeFileSync( appRoot.path + "/" + strFileToDownload,
                                     result.output.body );
 
-                  debugMark( "Overwrited the local file with the remote file content %s, CRC32: ", appRoot.path + "/" + strFileToDownload, strDownloadedFileContentHash );
+                  debugMark( "+++++ Overwrited the local file with the remote file content %s, CRC32: %s +++++", appRoot.path + "/" + strFileToDownload, strDownloadedFileContentHash );
 
                 }
                 else {
 
-                  debugMark( "The remote file and the local file are the same CRC32: %s", strLocalFileContentHash );
+                  debugMark( "===== The remote file and the local file are the same CRC32: %s =====", strLocalFileContentHash );
 
                 }
 
