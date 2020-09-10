@@ -185,7 +185,6 @@ export default class JobQueueManager {
 
       }
 
-
     }
     catch ( error ) {
 
