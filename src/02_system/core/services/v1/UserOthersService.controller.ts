@@ -2864,23 +2864,23 @@ export default class UserOthersServiceController {
 
       }
 
-      const strSelectField = SystemUtilities.createSelectAliasFromModels(
-                                                                          [
-                                                                            SYSUser,
-                                                                            SYSUserGroup,
-                                                                            SYSPerson
-                                                                          ],
-                                                                          [
-                                                                            "A",
-                                                                            "B",
-                                                                            "C"
-                                                                          ]
-                                                                        );
+      const strSelectFields = SystemUtilities.createSelectAliasFromModels(
+                                                                           [
+                                                                             SYSUser,
+                                                                             SYSUserGroup,
+                                                                             SYSPerson
+                                                                           ],
+                                                                           [
+                                                                             "A",
+                                                                             "B",
+                                                                             "C"
+                                                                           ]
+                                                                         );
 
       let strSQL = DBConnectionManager.getStatement( "master",
                                                      "searchUser",
                                                      {
-                                                       SelectFields: strSelectField,
+                                                       SelectFields: strSelectFields,
                                                      },
                                                      logger );
 

@@ -1492,6 +1492,10 @@ export default class SystemUtilities {
 
       try {
 
+        lockedResource = await CacheManager.getData( SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
+                                                     logger );
+
+        /*
         //We need write the shared resource and going to block temporally the write access
         lockedResource = await CacheManager.lockResource( undefined, //Default = CacheManager.currentInstance,
                                                           SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
@@ -1499,9 +1503,15 @@ export default class SystemUtilities {
                                                           options.tryLock, //1, //Only one try
                                                           undefined, //Default 5000 milliseconds
                                                           logger );
+        */
 
-        if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ||
+        if ( lockedResource === null || //CommonUtilities.isNotNullOrEmpty( lockedResource ) ||
              options.ForceUpdate ) { //Stay sure we had the resource locked or forced to updated is true
+
+          await CacheManager.setDataWithTTL( SystemConstants._LOCK_RESOURCE_UPDATE_SESSION_STATUS + strToken,
+                                             "1",
+                                             options.lockSeconds,
+                                             logger );
 
           let debugMark = debug.extend( "E9008B789BF0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
@@ -1608,6 +1618,7 @@ export default class SystemUtilities {
 
       }
 
+      /*
       //Release the write access for another process. VERY IMPORTANT!!!
       if ( CommonUtilities.isNotNullOrEmpty( lockedResource ) ) {
 
@@ -1615,6 +1626,7 @@ export default class SystemUtilities {
                                            logger );
 
       }
+      */
 
     }
 

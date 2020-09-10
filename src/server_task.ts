@@ -17,6 +17,7 @@ import NotificationManager from "./02_system/common/managers/NotificationManager
 import DBConnectionManager from "./02_system/common/managers/DBConnectionManager";
 import CacheManager from "./02_system/common/managers/CacheManager";
 import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
+import HookManager from "./02_system/common/managers/HookManager";
 
 let debug = require( "debug" )( "server_task@main_process" );
 
@@ -24,6 +25,24 @@ export default class App {
 
   static async handlerCleanExit() {
 
+    const payload = {
+                      SystemId: SystemUtilities.getSystemId(),
+                      SystemName: process.env.APP_SERVER_TASK_NAME,
+                      SubSystem: "Server",
+                      Token: "No apply",
+                      UserId: "No apply",
+                      UserName: "No apply",
+                      UserGroupId: "No apply",
+                      Code: "SERVER_TASK_SHUTDOWN",
+                      EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                      Data: {}
+                    };
+
+    await HookManager.processHookHandlersInChain( "SystemEvent",
+                                                  payload,
+                                                  LoggerManager.mainLoggerInstance );
+
+    /*
     await NotificationManager.publishOnTopic( "SystemEvent",
                                               {
                                                 SystemId: SystemUtilities.getSystemId(),
@@ -38,6 +57,7 @@ export default class App {
                                                 Data: {}
                                               },
                                               LoggerManager.mainLoggerInstance );
+    */
 
     if ( process.env.ENV !== "dev" ) {
 
@@ -131,9 +151,14 @@ export default class App {
 
       CacheManager.currentInstance = await CacheManager.create( LoggerManager.mainLoggerInstance );
 
-      await DBConnectionManager.connect( "*", LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
+      await DBConnectionManager.connect( "*",
+                                         LoggerManager.mainLoggerInstance ); //Init the connection to db using the orm
 
-      await DBConnectionManager.loadQueryStatement( "*", LoggerManager.mainLoggerInstance );
+      await DBConnectionManager.loadQueryStatement( "*",
+                                                    LoggerManager.mainLoggerInstance );
+
+      await HookManager.init( {},
+                              LoggerManager.mainLoggerInstance );
 
       process.on( "SIGTERM", async () => {
 
@@ -156,6 +181,41 @@ export default class App {
       await ApplicationServerTaskManager.create( {},
                                                  LoggerManager.mainLoggerInstance );
 
+      const payload = {
+                        body: {
+                                kind: "notification",
+                                text: "Start running",
+                                fields: [
+                                          {
+                                            title: "Date",
+                                            value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                            short: false
+                                          },
+                                          {
+                                            title: "Host",
+                                            value: SystemUtilities.getHostName(),
+                                            short: false
+                                          },
+                                          {
+                                            title: "Application",
+                                            value: process.env.APP_SERVER_TASK_NAME + "-" + process.env.DEPLOY_TARGET,
+                                            short: false
+                                          },
+                                          {
+                                            title: "Running from",
+                                            value: SystemUtilities.strBaseRunPath,
+                                            short: false
+                                          }
+                                        ],
+                                footer: "BB38437F5AE3",
+                              }
+                      }
+
+      HookManager.processHookHandlersInChain( "PublishToExternal",
+                                              payload,
+                                              LoggerManager.mainLoggerInstance );
+
+      /*
       await NotificationManager.publishToExternal(
                                                    {
                                                      body: {
@@ -188,6 +248,7 @@ export default class App {
                                                    },
                                                    LoggerManager.mainLoggerInstance
                                                  );
+                                                 */
 
       await ApplicationServerTaskManager.runTasks( {},
                                                    LoggerManager.mainLoggerInstance );
