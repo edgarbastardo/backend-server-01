@@ -785,10 +785,16 @@ export default class InstantMessageServerManager {
 
       let bIMManagerConnected = false;
 
-      const response = await InstantMessageServerRequestServiceV1.callSelectWorkerSocket(
-                                                                                          jsonServiceConfig.host_rest,
-                                                                                          headers,
-                                                                                        );
+      let response = null;
+
+      if ( jsonServiceConfig?.host_rest ) {
+
+        response = await InstantMessageServerRequestServiceV1.callSelectWorkerSocket(
+                                                                                      jsonServiceConfig.host_rest,
+                                                                                      headers,
+                                                                                    );
+
+      }
 
       let strWorker = null;
 
@@ -870,13 +876,17 @@ export default class InstantMessageServerManager {
 
       }
 
-      await InstantMessageServerRequestServiceV1.callDisconnectUser(
-                                                                    jsonServiceConfig.host_rest,
-                                                                    headers,
-                                                                    {
-                                                                      "Auth": strAuth
-                                                                    }
-                                                                  );
+      if ( jsonServiceConfig?.host_rest ) {
+
+        await InstantMessageServerRequestServiceV1.callDisconnectUser(
+                                                                       jsonServiceConfig.host_rest,
+                                                                       headers,
+                                                                       {
+                                                                         "Auth": strAuth
+                                                                       }
+                                                                     );
+
+      }
 
     }
     catch ( error ) {

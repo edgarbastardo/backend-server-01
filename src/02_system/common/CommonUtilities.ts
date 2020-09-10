@@ -547,7 +547,9 @@ export default class CommonUtilities {
 
   }
 
-  static includeObjectFields( dataObject: any, fieldNamesToInclude: string[], logger: any ): any {
+  static includeObjectFields( dataObject: any,
+                              fieldNamesToInclude: string[],
+                              logger: any ): any {
 
     let result = dataObject;
 
