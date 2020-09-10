@@ -29,7 +29,8 @@ import SYSUserService from "../../../common/database/master/services/SYSUserServ
 import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import CacheManager from "../../../common/managers/CacheManager";
 import I18NManager from "../../../common/managers/I18Manager";
-import NotificationManager from "../../../common/managers/NotificationManager";
+//import NotificationManager from "../../../common/managers/NotificationManager";
+import HookManager from "../../../common/managers/HookManager";
 import InstantMessageServerManager from "../../../common/managers/InstantMessageServerManager";
 
 //import SYSUserSessionPresenceService from "../../../common/database/master/services/SYSUserSessionPresenceService";
@@ -1170,6 +1171,27 @@ export default class SecurityServiceController {
 
           if ( userSessionStatus !== null ) {
 
+            const payload = {
+                              SystemId: SystemUtilities.getSystemId(),
+                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                              SubSystem: "Security",
+                              Token: userSessionStatusData.Token,
+                              UserId: userSessionStatusData.UserId,
+                              UserName: userSessionStatusData.UserName,
+                              UserGroupId: userSessionStatusData.UserGroupId,
+                              Code: !processOptions.useCustomResponse ||
+                                    processOptions.useCustomResponse === false ?
+                                    "SUCCESS_LOGIN":
+                                    processOptions.Code,
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              Data: {}
+                            }
+
+            HookManager.processHookHandlersInChain( "SystemEvent",
+                                                    payload,
+                                                    logger );
+
+            /*
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
                                                   SystemId: SystemUtilities.getSystemId(),
@@ -1187,6 +1209,7 @@ export default class SecurityServiceController {
                                                   Data: {}
                                                 },
                                                 logger );
+            */
 
             //userDataResponse.sysUserGroup = userGroupDataResponse;
             //userDataResponse.sysPerson = userPersonDataResponse;
@@ -1412,6 +1435,24 @@ export default class SecurityServiceController {
       }
       else {
 
+        const payload = {
+                          SystemId: SystemUtilities.getSystemId(),
+                          SystemName: process.env.APP_SERVER_DATA_NAME,
+                          SubSystem: "Security",
+                          Token: "No apply",
+                          UserId: "No apply",
+                          UserName: "No apply",
+                          UserGroupId: "No apply",
+                          Code: "ERROR_LOGIN_FAILED",
+                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                          Data: {}
+                        }
+
+        HookManager.processHookHandlersInChain( "SystemEvent",
+                                                payload,
+                                                logger );
+
+        /*
         NotificationManager.publishOnTopic( "SystemEvent",
                                             {
                                               SystemId: SystemUtilities.getSystemId(),
@@ -1426,6 +1467,7 @@ export default class SecurityServiceController {
                                               Data: {}
                                             },
                                             logger );
+        */
 
         result = {
                    StatusCode: 401, //Unauthorized
@@ -2165,6 +2207,24 @@ export default class SecurityServiceController {
                                                                                     logger );
             */
 
+            const payload = {
+                              SystemId: SystemUtilities.getSystemId(),
+                              SystemName: process.env.APP_SERVER_DATA_NAME,
+                              SubSystem: "Security",
+                              Token: userSessionStatus.Token,
+                              UserId: userSessionStatus.UserId,
+                              UserName: userSessionStatus.UserName,
+                              UserGroupId: userSessionStatus.UserGroupId,
+                              Code: "SUCCESS_LOGOUT",
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              Data: {}
+                            }
+
+            HookManager.processHookHandlersInChain( "SystemEvent",
+                                                    payload,
+                                                    logger );
+
+            /*
             NotificationManager.publishOnTopic( "SystemEvent",
                                                 {
                                                   SystemId: SystemUtilities.getSystemId(),
@@ -2179,6 +2239,7 @@ export default class SecurityServiceController {
                                                   Data: {}
                                                 },
                                                 logger );
+            */
 
             result = {
                        StatusCode: 200, //Ok
@@ -2432,6 +2493,24 @@ export default class SecurityServiceController {
 
     const userSessionStatus = context.UserSessionStatus;
 
+    const payload = {
+                      SystemId: SystemUtilities.getSystemId(),
+                      SystemName: process.env.APP_SERVER_DATA_NAME,
+                      SubSystem: "Security",
+                      Token: userSessionStatus.Token,
+                      UserId: userSessionStatus.UserId,
+                      UserName: userSessionStatus.UserName,
+                      UserGroupId: userSessionStatus.UserGroupId,
+                      Code: "SUCCESS_TOKEN_IS_VALID",
+                      EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                      Data: {}
+                    }
+
+    HookManager.processHookHandlersInChain( "SystemEvent",
+                                            payload,
+                                            logger );
+
+    /*
     NotificationManager.publishOnTopic( "SystemEvent",
                                         {
                                           SystemId: SystemUtilities.getSystemId(),
@@ -2446,6 +2525,7 @@ export default class SecurityServiceController {
                                           Data: {}
                                         },
                                         logger );
+    */
 
     const result = {
                      StatusCode: 200, //Ok
