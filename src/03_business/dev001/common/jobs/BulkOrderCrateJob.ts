@@ -22,7 +22,8 @@ import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 
 import RedisConnectionManager from "../../../../02_system/common/managers/RedisConnectionManager";
-import NotificationManager from "../../../../02_system/common/managers/NotificationManager";
+//import NotificationManager from "../../../../02_system/common/managers/NotificationManager";
+import HookManager from "../../../../02_system/common/managers/HookManager";
 import LoggerManager from "../../../../02_system/common/managers/LoggerManager";
 //import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
 import I18NManager from "../../../../02_system/common/managers/I18Manager";
@@ -44,8 +45,45 @@ export default class BulkOrderCreateJob {
                        strJobId: string,
                        strUserName: string,
                        strFileName: string,
+                       intSimulate: number,
                        strStatus: string ) {
 
+    const payload = {
+                      body: {
+                              kind: strKind,
+                              text: "Bulk order create job.\nJob: " + strJobId + "\nUser: " + strUserName + "\nFile: " + strFileName + "\nSimulate: " + intSimulate + "\nStatus: " + strStatus,
+                              fields: [
+                                        {
+                                          title: "Date",
+                                          value: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
+                                          short: false
+                                        },
+                                        {
+                                          title: "Host",
+                                          value: SystemUtilities.getHostName(),
+                                          short: false
+                                        },
+                                        {
+                                          title: "Application",
+                                          value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
+                                          short: false
+                                        },
+                                        {
+                                        title: "Running from",
+                                        value: SystemUtilities.strBaseRunPath,
+                                        short: false
+                                        }
+                                    ],
+                              footer: "787735A48D5F",
+                              // `Date: ${SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 )}\nHost: ${SystemUtilities.getHostName()}\nApplication: ${process.env.APP_SERVER_DATA_NAME}\nRunning from: ${SystemUtilities.strBaseRunPath}`
+                            }
+                    }
+
+    await HookManager.processHookHandlersInChain( "PublishToExternal",
+                                                  payload,
+                                                  LoggerManager.mainLoggerInstance );
+
+    /*
     await NotificationManager.publishToExternal(
                                                  {
                                                    body: {
@@ -79,6 +117,7 @@ export default class BulkOrderCreateJob {
                                                  },
                                                  LoggerManager.mainLoggerInstance
                                                );
+                                               */
 
   }
 
@@ -353,6 +392,7 @@ export default class BulkOrderCreateJob {
                          job.data.Id,
                          job.data.JobStartedBy,
                          job.data.FileName,
+                         job.data.Simulate,
                          "Job start running" );
 
             const strLanguage = job.data.Language;
@@ -660,6 +700,7 @@ export default class BulkOrderCreateJob {
                                job.data.Id,
                                job.data.JobStartedBy,
                                job.data.FileName,
+                               job.data.Simulate,
                                jsonStatusJob.Message );
 
                 }
@@ -686,6 +727,7 @@ export default class BulkOrderCreateJob {
                                job.data.Id,
                                job.data.JobStartedBy,
                                job.data.FileName,
+                               job.data.Simulate,
                                errorLines );
 
                 }
@@ -724,6 +766,7 @@ export default class BulkOrderCreateJob {
                              job.data.Id,
                              job.data.JobStartedBy,
                              job.data.FileName,
+                             job.data.Simulate,
                              strMessage );
 
               }
@@ -740,6 +783,7 @@ export default class BulkOrderCreateJob {
                              job.data.Id,
                              job.data.JobStartedBy,
                              job.data.FileName,
+                             job.data.Simulate,
                              strMessage );
 
               }
@@ -786,6 +830,7 @@ export default class BulkOrderCreateJob {
                            job.data.Id,
                            job.data.JobStartedBy,
                            job.data.FileName,
+                           job.data.Simulate,
                            error.message ? error.message : "No error message available" );
 
             }
