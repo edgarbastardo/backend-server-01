@@ -7,14 +7,14 @@ import fs from "fs";
 
 import safeStringify from "fast-safe-stringify";
 
+import { PapertrailConnection, PapertrailTransport } from "../others/logs/winston/papertrail/winston-papertrail";
+
+import RollbarTransport from "winston-transport-rollbar-3";
+
 import CommonConstants from "../CommonConstants";
 
 import SystemUtilities from "../SystemUtilities";
 import CommonUtilities from "../CommonUtilities";
-
-import { PapertrailConnection, PapertrailTransport } from "../others/logs/winston/papertrail/winston-papertrail";
-
-import RollbarTransport from "winston-transport-rollbar-3";
 
 const debug = require( "debug" )( "LoggerManager" );
 
