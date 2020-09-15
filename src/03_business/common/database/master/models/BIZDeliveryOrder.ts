@@ -81,10 +81,9 @@ export class BIZDeliveryOrder extends Model<BIZDeliveryOrder> {
   @ForeignKey( () => BIZOrigin )
   OriginId: string;
 
-  @NotNull
   @NotEmpty
   @IsUUID(4)
-  @Column( { type: DataType.STRING( 40 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 40 ), allowNull: true } )
   @ForeignKey( () => BIZDestination )
   DestinationId: string;
 

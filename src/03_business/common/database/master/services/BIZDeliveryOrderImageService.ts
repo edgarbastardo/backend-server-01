@@ -179,7 +179,7 @@ export default class BIZDeliveryOrderImageService extends BaseService {
 
       }
 
-      let bizDeliveryOrderImageInDB = await BIZDeliveryOrderImage.findOne( options );
+      result = await BIZDeliveryOrderImage.findOne( options );
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -189,7 +189,7 @@ export default class BIZDeliveryOrderImageService extends BaseService {
 
       }
 
-      result = bizDeliveryOrderImageInDB;
+      //result = bizDeliveryOrderImageInDB;
 
     }
     catch ( error ) {

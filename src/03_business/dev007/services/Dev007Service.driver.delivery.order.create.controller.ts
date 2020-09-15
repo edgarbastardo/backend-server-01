@@ -336,7 +336,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
                 }
 
-                if ( distanceInfo[ 0 ].status === "OK" ) {
+                if ( distanceInfo[ 0 ]?.status === "OK" ) {
 
                   if ( bizDriverInDeliveryZoneInDB.bizDeliveryZone.DistanceUnit === 0 ) { //Imperial / Miles
 
@@ -733,7 +733,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                          StatusCode: 500, //Internal server error
                          Code: "ERROR_UNEXPECTED",
                          Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
-                         Mark: "5C111C12FDE8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         Mark: "814EB2A0D426" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                          LogId: null,
                          IsError: true,
                          Errors: [
@@ -803,7 +803,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
       sourcePosition.method = this.name + "." + this.createDeliveryOrder.name;
 
-      const strMark = "4C85853903C1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "FCC8C87C5DD3" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

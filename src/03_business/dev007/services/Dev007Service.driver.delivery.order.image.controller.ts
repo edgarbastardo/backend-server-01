@@ -647,14 +647,14 @@ export default class Dev007ServicesDriverDeliveryOrderImageController extends Ba
           result = {
                      StatusCode: 404, //Not found
                      Code: "ERROR_DELIVERY_ORDER_IMAGE_NOT_FOUND",
-                     Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.DeliveryOrderId ),
+                     Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.Id ),
                      Mark: "E6C0E700654D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: true,
                      Errors: [
                                {
                                  Code: "ERROR_DELIVERY_ORDER_IMAGE_NOT_FOUND",
-                                 Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.DeliveryOrderId ),
+                                 Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.Id ),
                                  Details: ""
                                }
                              ],
@@ -929,7 +929,7 @@ export default class Dev007ServicesDriverDeliveryOrderImageController extends Ba
 
       let userSessionStatus = context.UserSessionStatus;
 
-      let bizDeliveryOrderImageInDB = await BIZDeliveryOrderImageService.getById( request.body.Id,
+      let bizDeliveryOrderImageInDB = await BIZDeliveryOrderImageService.getById( request.query.Id as string,
                                                                                   currentTransaction,
                                                                                   logger );
 
@@ -962,15 +962,15 @@ export default class Dev007ServicesDriverDeliveryOrderImageController extends Ba
         result = {
                    StatusCode: 404, //Not found
                    Code: "ERROR_DELIVERY_ORDER_IMAGE_NOT_FOUND",
-                   Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.DeliveryOrderId ),
+                   Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.query.Id ),
                    Mark: "56E68E11BB20" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                    LogId: null,
                    IsError: true,
                    Errors: [
                              {
                                Code: "ERROR_DELIVERY_ORDER_IMAGE_NOT_FOUND",
-                               Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.body.DeliveryOrderId ),
-                               Details: ""
+                               Message: await I18NManager.translate( strLanguage, "The delivery order image with id %s. Not found in database.", request.query.Id ),
+                               Details: "bizDeliveryOrderImageInDB is null"
                              }
                            ],
                    Warnings: [],

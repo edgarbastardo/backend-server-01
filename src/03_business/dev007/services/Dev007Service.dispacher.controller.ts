@@ -471,7 +471,8 @@ export default class Dev007ServicesDispatcherController extends BaseService {
                                      Altitude: lastPositionsInDB[ intIndex ].Altitude,
                                      Speed: lastPositionsInDB[ intIndex ].Speed,
                                      Code: lastPositionsInDB[ intIndex ].Code,
-                                     CreatedAt: lastPositionsInDB[ intIndex ].CreatedAt
+                                     CreatedAt: lastPositionsInDB[ intIndex ].CreatedAt,
+                                     RowNumber: lastPositionsInDB[ intIndex ].RowNumber,
                                    } );
 
           }

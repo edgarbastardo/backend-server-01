@@ -1,3 +1,5 @@
+import cluster from "cluster";
+
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 import CommonConstants from "../../../../02_system/common/CommonConstants";
 
@@ -7,6 +9,8 @@ const debug = require( 'debug' )( 'BusinessQueries' );
 import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 
 export default class BusinessQueries {
+
+  static debugMark = debug.extend( "397F458CD436" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
   static getStatement( strDialect: string,
                        strName: string,
@@ -24,47 +28,251 @@ export default class BusinessQueries {
       }
       else if ( strName === "getLastPositionByShortTokenB" ) {
 
-        strResult = `Select B.Accuracy As Accuracy, B.Latitude As Latitude, B.Longitude As Longitude, B.Altitude As Altitude, B.Speed As Speed From sysUserSessionStatus As A Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken Where A.ShortToken = '${params.ShortToken}' Order By B.CreatedAt Desc Limit ${params.Limit};`;
+        strResult = `Select
+                              B.Accuracy As Accuracy,
+                              B.Latitude As Latitude,
+                              B.Longitude As Longitude,
+                              B.Altitude As Altitude,
+                              B.Speed As Speed
+                     From
+                              sysUserSessionStatus As A
+                              Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken
+                     Where
+                              A.ShortToken = '${params.ShortToken}'
+                     Order By
+                              B.CreatedAt Desc Limit ${params.Limit};`;
 
       }
       else if ( strName === "getLastPositionBetween" ) {
 
+        /*
+        Select
+       Distinct( A.ShortToken )
+From
+       sysUserSessionStatus As A Inner Join
+       bizDriverPosition As B On B.ShortToken = A.ShortToken
+Where
+       A.LoggedOutBy Is Null -- Session not finished
+        And
+       A.LoggedOutAt Is Null -- Session not finished
+        And
+       Cast( B.CreatedAt As DateTime )
+          Between
+            Cast( '2020-09-11T17:28:08-07:00' As DateTime )
+          And
+            Cast( '2020-09-11T17:34:08-07:00' As DateTime )
+
+            Select
+                     *
+            From
+                     bizDriverPosition As A
+            Where
+                     A.ShortToken = 'e30e96b2bdf4'
+            Order By
+                     A.CreatedAt Desc
+            Limit 3
+
+
+Select B.*
+From
+       sysUserSessionStatus As A Inner Join
+       (
+         Select
+                  Z.*,
+                  @RowNumber := If ( @CurrentShortToken = Z.ShortToken, @RowNumber + 1, 1 ) As RowNumber,
+                  @CurrentShortToken := Z.ShortToken As CurrentShortToken
+         From
+                  bizDriverPosition As Z
+         Where
+                  Cast( Z.CreatedAt As DateTime )
+                  Between
+                    Cast( '2020-09-11T17:28:08-07:00' As DateTime )
+                  And
+                    Cast( '2020-09-11T17:34:08-07:00' As DateTime )
+         Order By
+                  Z.ShortToken, Z.CreatedAt Desc
+       ) As B On B.ShortToken = A.ShortToken
+Where
+       A.LoggedOutBy Is Null -- Session not finished
+       And
+       A.LoggedOutAt Is Null -- Session not finished
+       And
+       B.RowNumber <= 3
+
+            */
+
+            /*
+        strResult = `Select
+                               Z.*,
+                               @RowNumber := If ( @CurrentShortToken = Z.ShortToken, @RowNumber + 1, 1 ) As RowNumber,
+                               @CurrentShortToken := Z.ShortToken As CurrentShortToken
+                     From
+                               bizDriverPosition As Z
+                               -- ( SELECT @RowNumber := 0 ) As W
+                     Where
+                               Cast( Z.CreatedAt As DateTime )
+                               Between
+                                  Cast( '${params.StartDateTime}' As DateTime )
+                               And
+                                  Cast( '${params.EndDateTime}' As DateTime )
+                     Order By
+                               Z.ShortToken, Z.CreatedAt Desc`;
+                               */
+
+                               /*
+        strResult = `Select
+                               *
+                     From
+                               (
+                                 Select
+                                           A.*,
+                                           @RowNumber := If ( @CurrentShortToken = A.ShortToken, @RowNumber + 1, 1 ) As RowNumber,
+                                           @CurrentShortToken := A.ShortToken As CurrentShortToken
+                                 From
+                                           bizDriverPosition As A
+                                           Inner Join sysUserSessionStatus B On B.ShortToken = A.ShortToken
+                                           Inner Join bizDriverStatus As C On C.ShortToken = A.ShortToken,
+                                           ( Select @RowNumber := 0 ) As W1,
+                                           ( Select @CurrentShortToken := '' ) As W2
+                                 Where
+                                           Cast( A.CreatedAt As DateTime )
+                                             Between
+                                               Cast( '${params.StartDateTime}' As DateTime )
+                                             And
+                                               Cast( '${params.EndDateTime}' As DateTime )
+                                           And
+                                             B.LoggedOutBy Is Null -- Session not finished
+                                           And
+                                             B.LoggedOutAt Is Null -- Session not finished
+                                           And
+                                             C.Code <> 0 -- Working and Working (Finishing)
+                                 Order By
+                                           A.ShortToken, A.CreatedAt Desc
+                               ) As Z
+                     Where
+                               Z.RowNumber <= ${params.Limit}
+                     Order By
+                               Z.RowNumber`
+                               */
+
+        /* Not Work 1 */
+        strResult = `Select
+                            A.*
+                     From
+                            (
+                              Select
+                                       Z.*,
+                                       @RowNumber := If ( @CurrentShortToken = Z.ShortToken, @RowNumber + 1, 1 ) As RowNumber,
+                                       @CurrentShortToken := Z.ShortToken As CurrentShortToken
+                              From
+                                       bizDriverPosition As Z,
+                                       ( SELECT @RowNumber := 0 ) As V1,
+                                       ( SELECT @CurrentShortToken := '' ) As V2
+                              Where
+                                       Cast( Z.CreatedAt As DateTime )
+                                       Between
+                                         Cast( '${params.StartDateTime}' As DateTime )
+                                       And
+                                         Cast( '${params.EndDateTime}' As DateTime )
+                              Order By
+                                       Z.ShortToken, Z.CreatedAt Desc
+                            ) As A
+                            Inner Join sysUserSessionStatus As B On B.ShortToken = A.ShortToken
+                            Inner Join bizDriverStatus As C On C.ShortToken = A.ShortToken
+                     Where
+                              A.RowNumber <= ${params.Limit}
+                            And
+                              B.LoggedOutBy Is Null -- Session not finished
+                            And
+                              B.LoggedOutAt Is Null -- Session not finished
+                            And
+                              C.Code <> 0 -- Working and Working (Finishing)`;
+                            /* */
+
+        /*
         strResult = `Select
                             B.*
                      From
                             sysUserSessionStatus As A
-                            Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken
+                            -- Inner Join bizDriverPosition As B On B.ShortToken = A.ShortToken
+                            Inner Join
+                            (
+                              Select
+                                      *
+                              From
+                                      bizDriverPosition As Z
+                              Where
+                                      Cast( Z.CreatedAt As DateTime )
+                              Between
+                                        Cast( '${params.StartDateTime}' As DateTime )
+                                      And
+                                        Cast( '${params.EndDateTime}' As DateTime )
+                              Order By
+                                       Z.ShortToken,
+                                       Z.UserId,
+                                       Z.CreatedAt Desc
+      							          Limit ${params.Limit}
+			              				) As B On B.ShortToken = A.ShortToken
                             Inner Join bizDriverStatus As C On C.ShortToken = A.ShortToken
                      Where
-                            A.LoggedOutBy Is Null -- Session not finished
+                              A.LoggedOutBy Is Null -- Session not finished
                             And
-                            A.LoggedOutAt Is Null -- Session not finished
+                              A.LoggedOutAt Is Null -- Session not finished
                             -- And
-                            -- Cast( A.UpdatedAt As DateTime )
-                            --  Between
-                            --  Cast( '${params.StartDateTime}' As DateTime )
-                            --  And
-                            --  Cast( '${params.EndDateTime}' As DateTime )
-                            And
-                            Cast( B.CreatedAt As DateTime )
-                              Between
-                              Cast( '${params.StartDateTime}' As DateTime )
-                              And
-                              Cast( '${params.EndDateTime}' As DateTime )
-                            And
-                            C.Code <> 0 -- Working and Working (Finishing)
+                              -- Cast( A.UpdatedAt As DateTime )
+                              --  Between
+                              --  Cast( '${params.StartDateTime}' As DateTime )
+                              --  And
+                              --  Cast( '${params.EndDateTime}' As DateTime )
+                            -- And
+                              -- Cast( B.CreatedAt As DateTime )
+                              --  Between
+                              --  Cast( '${params.StartDateTime}' As DateTime )
+                              --  And
+                              --  Cast( '${params.EndDateTime}' As DateTime )
+                            -- And
+                            --  C.Code <> 0 -- Working and Working (Finishing)
+                            -- Group By
+                            --  B.ShortToken
+                            -- Having
+                            --  Count( B.ShortToken ) = ${params.Limit}
                             Order By
-                                A.ShortToken,
-                                A.UserId,
-                                B.CreatedAt Desc
-                            Limit ${params.Limit};`;
+                              A.ShortToken,
+                              A.UserId,
+                              B.CreatedAt Desc;`;
+                            //Limit ${params.Limit};`;
+        */
 
         if ( process.env.ENV == "dev" ||
              process.env.ENV == "test" ) {
 
           strResult = CommonUtilities.normalizeSQLWithMultiline( strResult );
 
+          BusinessQueries.debugMark( strResult );
+
         }
+
+      }
+      else if ( strName === "getActiveDriverInTimeWindow" ) {
+
+        strResult = `Select
+                             Distinct( A.ShortToken )
+                     From
+                             bizDriverPosition As A
+                             Inner Join sysUserSessionStatus As B On B.ShortToken = A.ShortToken
+                             Inner Join bizDriverStatus As C On C.ShortToken = A.ShortToken
+                     Where
+                             Cast( A.CreatedAt As DateTime )
+                               Between
+                                 Cast( '${params.StartDateTime}' As DateTime )
+                               And
+                                 Cast( '${params.EndDateTime}' As DateTime )
+                             And
+                               B.LoggedOutBy Is Null -- Session not finished
+                             And
+                               B.LoggedOutAt Is Null -- Session not finished
+							               And
+                               C.Code <> 0`
 
       }
       else if ( strName === "getLastPositionByUserId" ) {

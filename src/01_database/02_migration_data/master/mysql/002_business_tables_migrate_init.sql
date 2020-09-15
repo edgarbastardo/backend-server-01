@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `bizDeliveryOrder` (
   `DriverRouteId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table bizDriverRoute on field Id',
   `DeliveryAt` varchar(30) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Indicate the date and time to made the delivery. Can be diferent/future of CreatedAt',
   `OriginId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizOrigin on field Id',
-  `DestinationId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDestination on field Id',
+  `DestinationId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table bizDestination on field Id',
   `UserId` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Foreign key from table sysUser on field Id',
   `StatusSequence` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Last status sequence number of delivery',
   `StatusCode` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Last status code of delivery',
