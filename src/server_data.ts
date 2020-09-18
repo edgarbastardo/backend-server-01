@@ -187,9 +187,9 @@ export default class App {
         httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
           await App.httpWorkerProcessExit( httpWorker,
-                                                  strCode,
-                                                  strSignal,
-                                                  logger );
+                                           strCode,
+                                           strSignal,
+                                           logger );
 
         });
 
@@ -233,9 +233,9 @@ export default class App {
         httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
           await App.httpWorkerProcessExit( httpWorker,
-                                                  strCode,
-                                                  strSignal,
-                                                  logger );
+                                           strCode,
+                                           strSignal,
+                                           logger );
 
         });
 
@@ -394,9 +394,9 @@ export default class App {
         jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
           await App.jobWorkerProcessExit( jobWorker,
-                                                 strCode,
-                                                 strSignal,
-                                                 logger );
+                                          strCode,
+                                          strSignal,
+                                          logger );
 
         });
 
@@ -440,9 +440,9 @@ export default class App {
         jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
           await App.jobWorkerProcessExit( jobWorker,
-                                                 strCode,
-                                                 strSignal,
-                                                 logger );
+                                          strCode,
+                                          strSignal,
+                                          logger );
 
         });
 
@@ -944,7 +944,7 @@ export default class App {
       const strSQL = "Select a.tip, b.ticket, b.created_at From deliveries as a inner join orders as b on a.order_id=b.id Where b.establishment_id = '02a4ad90-e251-4ada-98a7-e84d6c9d49c8' And b.ticket = '#05054' And DATE( b.created_at ) = '2020-06-22'";
       //const strSQL = "Select NOW()";
 
-      const rows = await dbConnection.query( strSQL, {
+      const rows = await dbConnection.execute( strSQL, {
                                                       raw: true,
                                                       type: QueryTypes.SELECT,
                                                       transaction: null,
@@ -1130,9 +1130,9 @@ export default class App {
               httpWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
                 await App.httpWorkerProcessExit( httpWorker,
-                                                        strCode,
-                                                        strSignal,
-                                                        LoggerManager.mainLoggerInstance );
+                                                 strCode,
+                                                 strSignal,
+                                                 LoggerManager.mainLoggerInstance );
 
               });
 
@@ -1223,9 +1223,9 @@ export default class App {
               jobWorker.on( "exit", async ( strCode: any, strSignal: any ) => {
 
                 await App.jobWorkerProcessExit( jobWorker,
-                                                       strCode,
-                                                       strSignal,
-                                                       LoggerManager.mainLoggerInstance );
+                                                strCode,
+                                                strSignal,
+                                                LoggerManager.mainLoggerInstance );
 
               });
 
@@ -1247,7 +1247,7 @@ export default class App {
         if ( intHTTPWorkerProcessCount === 0 ) { //Launch the main to handle the http request
 
           await App.startServerListen( debugMark,
-                                              LoggerManager.mainLoggerInstance );
+                                       LoggerManager.mainLoggerInstance );
 
           /*
           const intPort = process.env.APP_SERVER_PORT || 9090;
@@ -1287,7 +1287,7 @@ export default class App {
       else if ( process.env.WORKER_KIND === "http_worker_process" ) {
 
         await App.startServerListen( debugMark,
-                                            LoggerManager.mainLoggerInstance );
+                                     LoggerManager.mainLoggerInstance );
 
         /*
         const intPort = process.env.APP_SERVER_PORT || 9090;
