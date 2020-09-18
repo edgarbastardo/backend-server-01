@@ -1,0 +1,12 @@
+
+extend type Query {
+
+  getDev798V1( Id: String! ): JSON!
+
+}
+
+extend type Mutation {
+
+  addDev798V1( Id: String! ): JSON!
+
+}
