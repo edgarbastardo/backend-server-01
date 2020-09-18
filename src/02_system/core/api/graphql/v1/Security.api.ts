@@ -13,8 +13,14 @@ export const resolvers = {
     loginV1: async ( obj: any, args: any, context: any, info: any ) => {
 
       return await SecurityServiceController.login( context,
-                                                    args.Username,
-                                                    args.Password,
+                                                    //args.Username,
+                                                    //args.Password,
+                                                    {
+                                                      body: {
+                                                              Username: args.Username,
+                                                              Password: args.Password
+                                                            }
+                                                    },
                                                     null,
                                                     context.Logger );
 

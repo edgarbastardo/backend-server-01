@@ -66,8 +66,8 @@ export default class ApplicationServerDataManager {
                                                                                                      logger );
       // The request handler must be the first middleware on the app
       //app.use( sentry.Handlers.requestHandler() );
-      app.use( express.json() );
-      app.use( express.urlencoded( { extended: false } ) );
+      app.use( express.json( { limit: 25 * 1024 * 1024 } ) );
+      app.use( express.urlencoded( { limit: 25 * 1024 * 1024, extended: false } ) );
       app.use( cors() );
       app.options( "*", cors() );
       app.use( compression() );
