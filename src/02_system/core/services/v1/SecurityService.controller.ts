@@ -1565,8 +1565,9 @@ export default class SecurityServiceController {
 
   //{ SourceIPAddress: string, FrontendId: string, Language?: string, TimeZoneId?: string }
   static async login( context: any,
-                      strUserName: string,
-                      strPassword: string,
+                      //strUserName: string,
+                      //strPassword: string,
+                      request: any,
                       transaction: any,
                       logger: any ): Promise<any> {
 
@@ -1577,6 +1578,14 @@ export default class SecurityServiceController {
     let bIsLocalTransaction = false;
 
     try {
+
+      await HookManager.processHookHandlersInChain( "PreLogin",
+                                                    {
+                                                      provider: "database",
+                                                      request: request,
+                                                      result: null
+                                                    },
+                                                    logger );
 
       const dbConnection = DBConnectionManager.getDBConnection( "master" );
 
@@ -1590,8 +1599,8 @@ export default class SecurityServiceController {
 
       result = await SecurityServiceController.processSessionStatus( context,
                                                                      { operation: "UserLogin" },
-                                                                     strUserName,
-                                                                     strPassword,
+                                                                     request.body.Username,
+                                                                     request.body.Password,
                                                                      null,
                                                                      currentTransaction,
                                                                      logger );
@@ -1665,6 +1674,14 @@ export default class SecurityServiceController {
 
     }
 
+    await HookManager.processHookHandlersInChain( "PostLogin",
+                                                  {
+                                                    provider: "database",
+                                                    request: request,
+                                                    result: result
+                                                  },
+                                                  logger );
+
     return result;
 
   }
@@ -1711,6 +1728,17 @@ export default class SecurityServiceController {
         const jsonResponse = await callResult.json();
 
         const strUserName = jsonResponse.email;
+
+        request.body.Username = strUserName;
+        request.body.Password = "";
+
+        await HookManager.processHookHandlersInChain( "PreLogin",
+                                                      {
+                                                        provider: "google",
+                                                        request: request,
+                                                        result: null
+                                                      },
+                                                      logger );
 
         result = await SecurityServiceController.processSessionStatus( context,
                                                                        {
@@ -1817,6 +1845,14 @@ export default class SecurityServiceController {
 
     }
 
+    await HookManager.processHookHandlersInChain( "PostLogin",
+                                                  {
+                                                    provider: "google",
+                                                    request: request,
+                                                    result: result
+                                                  },
+                                                  logger );
+
     return result;
 
   }
@@ -1875,6 +1911,17 @@ export default class SecurityServiceController {
       if ( jsonResponse ) {
 
         const strUserName = jsonResponse.email;
+
+        request.body.Username = strUserName;
+        request.body.Password = "";
+
+        await HookManager.processHookHandlersInChain( "PreLogin",
+                                                      {
+                                                        provider: "facebook",
+                                                        request: request,
+                                                        result: null
+                                                      },
+                                                      logger );
 
         result = await SecurityServiceController.processSessionStatus( context,
                                                                        {
@@ -1981,6 +2028,14 @@ export default class SecurityServiceController {
 
     }
 
+    await HookManager.processHookHandlersInChain( "PostLogin",
+                                                  {
+                                                    provider: "facebook",
+                                                    request: request,
+                                                    result: result
+                                                  },
+                                                  logger );
+
     return result;
 
   }
@@ -2008,6 +2063,17 @@ export default class SecurityServiceController {
         bIsLocalTransaction = true;
 
       }
+
+      request.body.Username = "";
+      request.body.Password = "";
+
+      await HookManager.processHookHandlersInChain( "PreLogin",
+                                                    {
+                                                      provider: "instagram",
+                                                      request: request,
+                                                      result: null
+                                                    },
+                                                    logger );
 
       /*
       result = await SecurityServiceController.processSessionStatus( context,
@@ -2088,6 +2154,14 @@ export default class SecurityServiceController {
 
     }
 
+    await HookManager.processHookHandlersInChain( "PostLogin",
+                                                  {
+                                                    provider: "instagram",
+                                                    request: request,
+                                                    result: result
+                                                  },
+                                                  logger );
+
     return result;
 
   }
@@ -2103,6 +2177,8 @@ export default class SecurityServiceController {
 
     let bIsLocalTransaction = false;
 
+    let userSessionStatus = null;
+
     try {
 
       const dbConnection = DBConnectionManager.getDBConnection( "master" );
@@ -2115,11 +2191,24 @@ export default class SecurityServiceController {
 
       }
 
-      let userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
-                                                                                             currentTransaction,
-                                                                                             logger ); //Find in the database
+      userSessionStatus = await SYSUserSessionStatusService.getUserSessionStatusByToken( strToken,
+                                                                                         currentTransaction,
+                                                                                         logger ); //Find in the database
 
       if ( CommonUtilities.isNotNullOrEmpty( userSessionStatus ) ) {
+
+        await HookManager.processHookHandlersInChain( "PreLogout",
+                                                      {
+                                                        provider: "database",
+                                                        request: {
+                                                                  body: {
+                                                                          Autorization: strToken,
+                                                                          Username: userSessionStatus.UserName
+                                                                        }
+                                                                },
+                                                        result: null
+                                                      },
+                                                      logger );
 
         if ( strToken.startsWith( "p:" ) === false ) {
 
@@ -2356,23 +2445,23 @@ export default class SecurityServiceController {
         else {
 
           result = {
-                      StatusCode: 400, //Bad request
-                      Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
-                      Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
-                      Mark: "2EA2C0E7ACEF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                      LogId: null,
-                      IsError: true,
-                      Errors: [
-                                {
-                                  Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
-                                  Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
-                                  Details: null
-                                }
-                              ],
-                      Warnings: [],
-                      Count: 0,
-                      Data: []
-                  };
+                     StatusCode: 400, //Bad request
+                     Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                     Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
+                     Mark: "2EA2C0E7ACEF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                                 Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made logout" ),
+                                 Details: null
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   };
 
         }
 
@@ -2468,6 +2557,19 @@ export default class SecurityServiceController {
       }
 
     }
+
+    await HookManager.processHookHandlersInChain( "PostLogout",
+                                                  {
+                                                    provider: "database",
+                                                    request: {
+                                                              body: {
+                                                                      Autorization: strToken,
+                                                                      Username: userSessionStatus? userSessionStatus.UserName: ""
+                                                                    }
+                                                            },
+                                                    result: result
+                                                  },
+                                                  logger );
 
     return result;
 
