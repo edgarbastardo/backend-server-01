@@ -30,6 +30,7 @@ import SystemUtilities from "../../../../common/SystemUtilities";
 import SYSRouteService from "../../../../common/database/master/services/SYSRouteService";
 import SecurityServiceController from "../../../services/v1/SecurityService.controller";
 import MiddlewareManager from "../../../../common/managers/MiddlewareManager";
+//import HookManager from "../../../../common/managers/HookManager";
 
 const debug = require( "debug" )( "Authentication.controller" );
 
@@ -131,8 +132,9 @@ export default class AuthenticationController {
     const context = ( request as any ).context; //Context is injected by the middleware middlewareSetContext
 
     const result = await SecurityServiceController.login( context,
-                                                          request.body.Username,
-                                                          request.body.Password,
+                                                          //request.body.Username,
+                                                          //request.body.Password,
+                                                          request,
                                                           null,
                                                           context.Logger );
 
