@@ -110,6 +110,14 @@ export default class SystemQueries {
         strResult = SqlString.format( `Select Count( A.Id ) As Count From sysPresenceRoom As A Inner Join sysUserSessionPresenceInRoom As B On B.RoomId = A.Id Where B.UserSessionPresenceId = ? Order By A.Name Desc`, params.PresenceId );
 
       }
+      else if ( strName = "getUserSessionDeviceByShortToken" ) {
+
+        strResult = `Select B.* From
+                       sysUserSessionStatus As A Inner Join
+                       sysUserSessionDevice As B On B.UserSessionStatusToken = A.Token
+                     Where A.ShortToken = ${params.ShortToken}`;
+
+      }
       else if ( strName === "getUserSessionPresenceList" ) {
 
         strResult = `Select ${params.SelectFields} From
