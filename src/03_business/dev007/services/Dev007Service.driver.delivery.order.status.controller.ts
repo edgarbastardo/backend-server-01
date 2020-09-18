@@ -19,7 +19,7 @@ import BaseService from "../../../02_system/common/database/master/services/Base
 import BIZDeliveryOrderService from "../../common/database/master/services/BIZDeliveryOrderService";
 import BIZDeliveryOrderStatusStepService from "../../common/database/master/services/BIZDeliveryOrderStatusStepService";
 import BIZDeliveryOrderStatusService from "../../common/database/master/services/BIZDeliveryOrderStatusService";
-import { BIZDeliveryOrderStatus } from "../../common/database/master/models/BIZDeliveryOrderStatus";
+//import { BIZDeliveryOrderStatus } from "../../common/database/master/models/BIZDeliveryOrderStatus";
 import { BIZDeliveryOrderStatusStep } from "../../common/database/master/models/BIZDeliveryOrderStatusStep";
 import GeoMapManager from "../../../02_system/common/managers/GeoMapManager";
 import BIZDriverInDeliveryZoneService from "../../common/database/master/services/BIZDriverInDeliveryZoneService";

@@ -442,9 +442,9 @@ export default class BIZDeliveryOrderService extends BaseService {
 
   }
 
-  static async getCountActiveOrderByDriverId( strDriverId: string,
-                                              transaction: any,
-                                              logger: any ): Promise<number> {
+  static async getCountActiveDeliveryOrdersByDriverId( strDriverId: string,
+                                                       transaction: any,
+                                                       logger: any ): Promise<number> {
 
     let intResult = -1;
 
@@ -493,7 +493,7 @@ export default class BIZDeliveryOrderService extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getCountActiveOrderByDriverId.name;
+      sourcePosition.method = this.name + "." + this.getCountActiveDeliveryOrdersByDriverId.name;
 
       const strMark = "56AE184C7541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

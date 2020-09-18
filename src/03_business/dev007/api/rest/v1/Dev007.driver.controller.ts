@@ -185,7 +185,6 @@ export default class Dev007DriverController {
 
     const context = ( request as any ).context;
 
-    //TODO check if driver had deliveries actives to set 1100 Working (Finishing)
     if ( request.body ) {
 
       request.body.Code = 0;

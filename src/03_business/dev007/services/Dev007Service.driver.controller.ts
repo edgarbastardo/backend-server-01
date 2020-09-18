@@ -34,6 +34,7 @@ import { BIZDeliveryOrder } from "../../common/database/master/models/BIZDeliver
 import { BIZDestination } from "../../common/database/master/models/BIZDestination";
 import { BIZOrigin } from "../../common/database/master/models/BIZOrigin";
 import { BIZDeliveryOrderStatusStep } from "../../common/database/master/models/BIZDeliveryOrderStatusStep";
+import BIZDeliveryOrderService from "../../common/database/master/services/BIZDeliveryOrderService";
 
 const debug = require( "debug" )( "Dev007ServicesDriverController" );
 
@@ -73,6 +74,19 @@ export default class Dev007ServicesDriverController extends BaseService {
       }
 
       let userSessionStatus = context.UserSessionStatus;
+
+      //Check if driver had deliveries actives to set 1100 Working (Finishing)
+      const intCountActiveDeliveryOrders = await BIZDeliveryOrderService.getCountActiveDeliveryOrdersByDriverId( userSessionStatus.UserId,
+                                                                                                                 currentTransaction,
+                                                                                                                 logger );
+
+      if ( intCountActiveDeliveryOrders > 0 &&
+           request.body.Code === 0 ) { //Try to do stop working
+
+        request.body.Code = 1100;
+        request.body.Description = "Working (Finishing)";
+
+      }
 
       let bizDriverStatusInDB = await BIZDriverStatusService.createOrUpdate(
                                                                              {

@@ -185,9 +185,9 @@ CREATE TABLE IF NOT EXISTS `bizDeliveryOrderStatus` (
 CREATE TABLE IF NOT EXISTS `bizDeliveryOrderFinish` (
   `Id` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Primary identifier GUID.',
   `DeliveryOrderId` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Foreign key from table bizDeliveryOrder on field Id',
-  `PaymentMethod` smallint(6) NOT NULL COMMENT '0 = Cash, 1 = Credit Card, 2 = Knock Knock, 3 = Uber -online internamente-, 4 = Mixed, 5 = Reposition',
+  `PaymentMethod` smallint(6) NOT NULL COMMENT '100 = Cash, 200 = Credit Card, 300 = Knock Knock, 400 = Uber -online internamente-, 500 = Mixed, 600 = Reposition',
   `GrandTotal` decimal(10,2) NOT NULL COMMENT 'Grand total of the order',
-  `PaymentMethodTip` smallint(6) NOT NULL COMMENT '0 = Credit Card, 1 = Knock Knock, 2 = Mixed',
+  `PaymentMethodTip` smallint(6) NOT NULL COMMENT '200 = Credit Card, 300 = Knock Knock, 500 = Mixed',
   `Tip` decimal(10,2) NOT NULL COMMENT 'Tip amount',
   `PaperNumber` varchar(40) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Teh order number in the ticket',
   `Comment` varchar(512) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'A comment that the user can edit using the user interface.',

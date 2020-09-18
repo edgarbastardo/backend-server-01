@@ -27,6 +27,7 @@ import { BIZDriverStatus } from "../../common/database/master/models/BIZDriverSt
 import SYSUserService from "../../../02_system/common/database/master/services/SYSUserService";
 import { SYSUserSessionDevice } from "../../../02_system/common/database/master/models/SYSUserSessionDevice";
 import SYSUserSessionDeviceService from "../../../02_system/common/database/master/services/SYSUserSessionDeviceService";
+import BIZDeliveryOrderService from "../../common/database/master/services/BIZDeliveryOrderService";
 
 const debug = require( "debug" )( "Dev007ServicesDispatcherController" );
 
@@ -444,10 +445,10 @@ export default class Dev007ServicesDispatcherController extends BaseService {
                                                                 currentTransaction,
                                                                 logger );
 
-              const sysUserSessionDeviceInDB = await SYSUserSessionDeviceService.getByToken( lastPositionsInDB[ intIndex ].ShortToken,
-                                                                                             null,
-                                                                                             currentTransaction,
-                                                                                             logger );
+              const sysUserSessionDeviceInDB = await SYSUserSessionDeviceService.getByShortToken( lastPositionsInDB[ intIndex ].ShortToken,
+                                                                                                  null,
+                                                                                                  currentTransaction,
+                                                                                                  logger );
 
               driver = {
                          SupportToken: lastPositionsInDB[ intIndex ].ShortToken,
@@ -1552,11 +1553,26 @@ export default class Dev007ServicesDispatcherController extends BaseService {
 
           if ( !driverStatus.StatusCode ) {
 
+            driverStatus.SupportToken = "";
             driverStatus.StatusCode = 0;
             driverStatus.StatusDescription = await I18NManager.translate( strLanguage, "Not working" );
             driverStatus.DeliveryZoneId = "";
             driverStatus.DeliveryZone = "";
             driverStatus.Device = "";
+            driverStatus.ActiveDeliveryOrders = 0;
+
+          }
+          else {
+
+            if ( driverStatus.StatusCode === 0 ) {
+
+              driverStatus.SupportToken = "";
+
+            }
+
+            driverStatus.ActiveDeliveryOrders =  await BIZDeliveryOrderService.getCountActiveDeliveryOrdersByDriverId( driverStatus.Id,
+                                                                                                                       currentTransaction,
+                                                                                                                       logger );
 
           }
 
@@ -1818,9 +1834,24 @@ export default class Dev007ServicesDispatcherController extends BaseService {
 
         }
 
-        bizDriverStatusInDB.Code = 0;
-        bizDriverStatusInDB.Description = "Not working";
-        bizDriverStatusInDB.UpdatedBy = userSessionStatus.UserName;
+        const intCountActiveDeliveryOrders = await BIZDeliveryOrderService.getCountActiveDeliveryOrdersByDriverId( request.body.UserId,
+                                                                                                                   currentTransaction,
+                                                                                                                   logger );
+
+        if ( intCountActiveDeliveryOrders === 0 ) {
+
+          bizDriverStatusInDB.Code = 0;
+          bizDriverStatusInDB.Description = "Not working";
+          bizDriverStatusInDB.UpdatedBy = userSessionStatus.UserName;
+
+        }
+        else {
+
+          bizDriverStatusInDB.Code = 1100;
+          bizDriverStatusInDB.Description = "Working (Finish)";
+          bizDriverStatusInDB.UpdatedBy = userSessionStatus.UserName;
+
+        }
 
         bizDriverStatusInDB = await BIZDriverStatusService.createOrUpdate(
                                                                            ( bizDriverStatusInDB as any ).dataValues,

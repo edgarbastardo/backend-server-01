@@ -141,9 +141,9 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
 
         if ( validator.passes() ) { //Validate request.body field values
 
-          const intCountActiveOrders = await BIZDeliveryOrderService.getCountActiveOrderByDriverId( userSessionStatus.UserId,
-                                                                                                    currentTransaction,
-                                                                                                    logger );
+          const intCountActiveDeliveryOrders = await BIZDeliveryOrderService.getCountActiveDeliveryOrdersByDriverId( userSessionStatus.UserId,
+                                                                                                                     currentTransaction,
+                                                                                                                     logger );
 
           const bizEstablishmentInDB = await BIZEstablishmentService.getById( request.body.EstablishmentId,
                                                                               currentTransaction,
@@ -239,7 +239,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                      }
 
           }
-          else if ( intCountActiveOrders + 1 > bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ) {
+          else if ( intCountActiveDeliveryOrders + 1 > bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ) {
 
             result = {
                        StatusCode: 400, //Bad request
@@ -253,7 +253,7 @@ export default class Dev007ServicesDriverDeliveryOrderCreateController extends B
                                    Code: "ERROR_MAXIMUM_DELIVERY_REACHED",
                                    Message: await I18NManager.translate( strLanguage, "The maximum %s of active deliveries had reached.", bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax ),
                                    Details: {
-                                              ActiveOrders: intCountActiveOrders,
+                                              ActiveOrders: intCountActiveDeliveryOrders,
                                               ActiveOrdersMaximum: bizDriverInDeliveryZoneInDB.bizDeliveryZone.DeliveryByDriverMax
                                             }
                                  }
