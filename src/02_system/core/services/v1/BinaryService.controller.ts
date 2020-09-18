@@ -3926,6 +3926,60 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
+      const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
+                                                                                                     logger );
+
+      if ( request.body.FileEncoded &&
+           request.body.FileEncodedKind ) {
+
+        //data:image/png;base64,iVBORw0KG...ASUVORK5CYII=
+        let strMimeType = request.body.FileEncodedKind.replace( "data:", "" ).replace( ";base64", "" );
+
+        let buffer = Buffer.from( request.body.FileEncoded, "base64" );
+
+        const strFileName = SystemUtilities.getUUIDv4() + ".data";
+
+        fs.writeFileSync( SystemUtilities.strBaseRootPath +
+                          "/temp/" +
+                          SystemUtilities.getHostName() +
+                          "/" +
+                          strFileName,
+                          buffer );
+
+        request.body.FileEncoded = null;
+        buffer = null;
+
+        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+
+        if ( fs.existsSync( strTempFullFilePath ) ) {
+
+          const intFileSize = fs.statSync( strTempFullFilePath )[ "size" ];
+
+          //const x = UploadedFile( ,  );
+          request.files = {
+
+                            File: {
+                                    data: Buffer.from( [ 0 ] ),
+                                    md5: await SystemUtilities.getFileHash( strTempFullFilePath,
+                                                                            "md5",
+                                                                            logger ),
+                                    mimetype: strMimeType,
+                                    //mimetype: SystemUtilities.getMimeType( strTempFullFilePath,
+                                    //                                       "image/jpeg",
+                                    //                                       logger ),
+                                    mv: null,
+                                    name: strFileName,
+                                    size: fs.statSync( strTempFullFilePath )[ "size" ],
+                                    tempFilePath: strTempFullFilePath,
+                                    truncated: intBinaryDataMaximumSize > 0 && intFileSize > intBinaryDataMaximumSize,
+                                  }
+
+                          } as any
+
+        }
+
+      }
+
       if ( request.files &&
            Object.keys( request.files ).length > 0 ) {
 
@@ -3949,9 +4003,9 @@ export default class BinaryServiceController extends BaseService {
 
             if ( allowedCategory.value === 1 ) {
 
-              if ( request.body.AccessKind >= 1 && request.body.AccessKind <= 3 ) {
+              if ( parseInt( request.body.AccessKind ) >= 1 && parseInt( request.body.AccessKind ) <= 3 ) {
 
-                if ( request.body.StorageKind >= 0 && request.body.StorageKind <= 1 ) {
+                if ( parseInt( request.body.StorageKind ) >= 0 && parseInt( request.body.StorageKind ) <= 1 ) {
 
                   const fileDetectedType = SystemUtilities.getMimeType( uploadedFile.tempFilePath,
                                                                         uploadedFile.mimetype,
@@ -4051,14 +4105,14 @@ export default class BinaryServiceController extends BaseService {
 
                     }
 
-                    if ( request.body.StorageKind === "0" ) { //Persistent
+                    if ( parseInt( request.body.StorageKind ) === 0 ) { //Persistent
 
                       strRelativePath = "persistent/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + strContextPath;
 
                       expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : null;
 
                     }
-                    else if ( request.body.Storagekind === "1" ) { //Temporal
+                    else if ( parseInt( request.body.Storagekind ) === 1 ) { //Temporal
 
                       strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + strContextPath;
 
@@ -4090,7 +4144,24 @@ export default class BinaryServiceController extends BaseService {
 
                     debugMark( "Moving file" );
 
-                    await uploadedFile.mv( strFullPath + strId + "." + fileDetectedType.ext + ".data" );
+                    if ( uploadedFile.mv ) {
+
+                      await uploadedFile.mv( strFullPath + strId + "." + fileDetectedType.ext + ".data" );
+
+                    }
+                    else {
+
+                      fs.mkdirSync( strFullPath, { recursive: true } );
+
+                      const moveFile = require('move-file');
+
+                      await moveFile( uploadedFile.tempFilePath,
+                                      strFullPath + strId + "." + fileDetectedType.ext + ".data" );
+
+                      //fs.renameSync( uploadedFile.tempFilePath,
+                      //               strFullPath + strId + "." + fileDetectedType.ext + ".data" );
+
+                    }
 
                     delete request.body.CreatedBy;
                     delete request.body.CreatedAt;
@@ -4236,7 +4307,14 @@ export default class BinaryServiceController extends BaseService {
 
                       metaData.ExtraData = extraData; //JSON.parse( metaData.ExtraData );
 
-                      fs.writeFileSync( strFullPath + strId + "." + fileDetectedType.ext + ".meta.json", JSON.stringify( metaData, null, 2 ) );
+                      fs.writeFileSync( strFullPath +
+                                        strId +
+                                        "." +
+                                        fileDetectedType.ext +
+                                        ".meta.json",
+                                        JSON.stringify( metaData,
+                                                        null,
+                                                        2 ) );
 
                       debugMark( "Success" );
 
@@ -4428,8 +4506,8 @@ export default class BinaryServiceController extends BaseService {
         }
         else {
 
-          const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
-                                                                                                         logger );
+          //const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
+          //                                                                                               logger );
 
           result = {
                      StatusCode: 413, //Request Entity Too Large
@@ -4597,6 +4675,60 @@ export default class BinaryServiceController extends BaseService {
 
       }
 
+      const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
+                                                                                                     logger );
+
+      if ( request.body.FileEncoded &&
+           request.body.FileEncodedKind ) {
+
+        //data:image/png;base64,iVBORw0KG...ASUVORK5CYII=
+        let strMimeType = request.body.FileEncodedKind.replace( "data:", "" ).replace( ";base64", "" );
+
+        let buffer = Buffer.from( request.body.FileEncoded, "base64" );
+
+        const strFileName = SystemUtilities.getUUIDv4() + ".data";
+
+        fs.writeFileSync( SystemUtilities.strBaseRootPath +
+                          "/temp/" +
+                          SystemUtilities.getHostName() +
+                          "/" +
+                          strFileName,
+                          buffer );
+
+        request.body.FileEncoded = null;
+        buffer = null;
+
+        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+
+        if ( fs.existsSync( strTempFullFilePath ) ) {
+
+          const intFileSize = fs.statSync( strTempFullFilePath )[ "size" ];
+
+          //const x = UploadedFile( ,  );
+          request.files = {
+
+                            File: {
+                                    data: Buffer.from( [] ),
+                                    md5: await SystemUtilities.getFileHash( strTempFullFilePath,
+                                                                            "md5",
+                                                                            logger ),
+                                    mimetype: strMimeType,
+                                    //mimetype: SystemUtilities.getMimeType( strTempFullFilePath,
+                                    //                                       "image/jpeg",
+                                    //                                       logger ),
+                                    mv: null,
+                                    name: strFileName,
+                                    size: intFileSize,
+                                    tempFilePath: strTempFullFilePath,
+                                    truncated: intBinaryDataMaximumSize > 0 && intFileSize > intBinaryDataMaximumSize,
+                                  }
+
+                          } as any;
+
+        }
+
+      }
+
       if ( request.files &&
            Object.keys( request.files ).length > 0 ) {
 
@@ -4676,8 +4808,8 @@ export default class BinaryServiceController extends BaseService {
         }
         else {
 
-          const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
-                                                                                                         logger );
+          //const intBinaryDataMaximumSize = await BinaryServiceController.getConfigBinaryDataMaximumSize( transaction,
+          //                                                                                               logger );
 
           result = {
                      StatusCode: 413, //Request Entity Too Large
@@ -5082,9 +5214,9 @@ export default class BinaryServiceController extends BaseService {
 
             if ( allowedCategory.value === 1 ) {
 
-              if ( request.body.AccessKind >= 1 && request.body.AccessKind <= 3 ) {
+              if ( parseInt( request.body.AccessKind ) >= 1 && parseInt( request.body.AccessKind ) <= 3 ) {
 
-                if ( request.body.StorageKind >= 0 && request.body.StorageKind <= 1 ) {
+                if ( parseInt( request.body.StorageKind ) >= 0 && parseInt( request.body.StorageKind ) <= 1 ) {
 
                   const strBasePath = await BinaryServiceController.getConfigBinaryDataBasePath( transaction,
                                                                                                  logger );
@@ -5126,12 +5258,12 @@ export default class BinaryServiceController extends BaseService {
                     if ( request.body.StorageKind !== sysBinaryIndexInDB.StorageKind ) {
 
                       //Move the binary data to to new folder according with the storage type
-                      updateStorageKindResult = await this.updateStorageKind( request.body.StorageKind,
-                                                                              strBasePath,
-                                                                              strFullPath,
-                                                                              sysBinaryIndexInDB,
-                                                                              //currentTransaction,
-                                                                              logger );
+                      updateStorageKindResult = await BinaryServiceController.updateStorageKind( request.body.StorageKind,
+                                                                                                 strBasePath,
+                                                                                                 strFullPath,
+                                                                                                 sysBinaryIndexInDB,
+                                                                                                 //currentTransaction,
+                                                                                                 logger );
 
                     }
                     else {
@@ -5250,7 +5382,14 @@ export default class BinaryServiceController extends BaseService {
 
                         }
 
-                        fs.writeFileSync( strFullPath + sysBinaryIndexInDB.Id + "." + fileDetectedType.ext + ".meta.json", JSON.stringify( modelData, null, 2 ) );
+                        fs.writeFileSync( strFullPath +
+                                          sysBinaryIndexInDB.Id +
+                                          "." +
+                                          fileDetectedType.ext +
+                                          ".meta.json",
+                                          JSON.stringify( modelData,
+                                                          null,
+                                                          2 ) );
 
                         const tempModelData = await SYSBinaryIndex.convertFieldValues(
                                                                                        {
@@ -6513,7 +6652,7 @@ export default class BinaryServiceController extends BaseService {
           else {
 
             result = {
-                       StatusCode: 500, //Ok
+                       StatusCode: 500, //Internal server error
                        Code: "ERROR_BINARY_DATA_DELETE",
                        Message: await I18NManager.translate( strLanguage, "Error in binary data delete." ),
                        Mark: "CDAC887D1CB4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
