@@ -15,22 +15,22 @@ import {
   //requestParam,
   //requestBody,
   //request,
-  httpGet
+  httpGet,
+  httpPost
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 
-import CommonConstants from '../../../../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
 //import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
-import MiddlewareManager from '../../../../../../02_system/common/managers/MiddlewareManager';
-import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
+import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 
-import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
+import SYSRouteService from '../../../../../02_system/common/database/master/services/SYSRouteService';
 
-//import Dev798ServicesController from '../../../../services/v1/Dev798Service.controller';
+import Dev798ServicesController from "../../../services/v1/Dev798Service.controller";
 
 const debug = require( 'debug' )( 'Dev798.controller' );
 
@@ -49,10 +49,10 @@ export default class Dev798Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev798/example";
+  static readonly _BASE_PATH = "/v1/business/dev798/odinv1";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev798Controller._BASE_PATH + "/", Action: "v1.business.dev798.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev798Controller._BASE_PATH + "/delivery/order", Action: "v1.business.dev798.odinv1.delivery.order.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Allow to create delivery order in odin v1 legacy database" },
                                 ]
 
   _controllerLogger = null;
@@ -88,7 +88,7 @@ export default class Dev798Controller {
 
       sourcePosition.method = Dev798Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "7E7D37A39A79" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "9F38503F083E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -110,40 +110,19 @@ export default class Dev798Controller {
 
   }
 
-  @httpGet(
-            "/",
-            MiddlewareManager.middlewareSetContext,
-            MiddlewareManager.middlewareCheckIsAuthenticated
-          )
-  async getDev000Example( request: Request, response: Response ) {
+  @httpPost(
+             "/",
+             MiddlewareManager.middlewareSetContext,
+             MiddlewareManager.middlewareCheckIsAuthenticated
+           )
+  async createDeliveryOrder( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    let strLanguage = context.Language;
-
-    const result = {
-                     StatusCode: 200, //Ok
-                     Code: 'SUCCESS_DEV798_EXAMPLE',
-                     Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                     Mark: '78B2E1117534' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
-                     LogId: null,
-                     IsError: false,
-                     Errors: [],
-                     Warnings: [],
-                     Count: 1,
-                     Data: [
-                             {
-                               Example: "Dev798"
-                             }
-                           ]
-                   };
-
-    /*
-    const result = await Dev798ServicesController.getDev798Example( request,
-                                                                    response,
-                                                                    null,
-                                                                    this._controllerLogger || context.Logger );
-                                                                    */
+    const result = await Dev798ServicesController.createDeliveryOrder( request,
+                                                                       response,
+                                                                       null,
+                                                                       this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
 
