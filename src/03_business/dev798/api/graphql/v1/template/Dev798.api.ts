@@ -17,7 +17,7 @@ export const resolvers = {
 
       const strLanguage = context.Language;
 
-      let debugMark = debug.extend( 'BB7111103C74' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      let debugMark = debug.extend( '<Change_Code>' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( "Resolver => %s", "getDev798" );
 
       return {

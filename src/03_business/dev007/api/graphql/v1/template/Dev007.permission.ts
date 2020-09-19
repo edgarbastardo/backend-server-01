@@ -40,7 +40,7 @@ export const roles = {
 
 export async function init( logger: any ): Promise<void> {
 
-  let debugMark = debug.extend( '421D3C0FA9C7' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+  let debugMark = debug.extend( '<Change_Code>' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
   debugMark( "Init called" );
 
 }
