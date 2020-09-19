@@ -25,7 +25,7 @@ export default class Dev798ServicesController extends BaseService {
 
   //Common business services
 
-  static async getDev798Example( request: Request,
+  static async createDeliveryOrder( request: Request,
                                  response: Response,
                                  transaction: any,
                                  logger: any ):Promise<any> {
@@ -102,7 +102,7 @@ export default class Dev798ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDev798Example.name;
+      sourcePosition.method = this.name + "." + this.createDeliveryOrder.name;
 
       const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
