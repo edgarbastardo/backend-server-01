@@ -16,8 +16,9 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 
 import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
-import BaseService from "../../../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../../../02_system/common/managers/I18Manager";
+
+import BaseService from "../../../../../02_system/common/database/master/services/BaseService";
 
 const debug = require( 'debug' )( 'Dev000ServicesController' );
 
