@@ -9,19 +9,19 @@ import MiddlewareManager from '../../../../../../02_system/common/managers/Middl
 
 //import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
-const debug = require( 'debug' )( 'Dev000.permission' );
+const debug = require( 'debug' )( 'Dev007.permission' );
 
 export const permissions = {
 
   Query: {
 
-    getDev000V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
+    getDev007V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
 
   },
 
   Mutation: {
 
-    addDev000V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
+    addDev007V1: and( MiddlewareManager.ruleCheckIsAuthenticated ), //allow,
 
   }
 
@@ -33,14 +33,14 @@ export const permissions = {
 
 export const roles = {
 
-  getDev000V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example query" },
-  addDev000V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example mutation" },
+  getDev007V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example query" },
+  addDev007V1: { AccessKind: 3, AllowTagAccess: "#Administrator#", Roles: [ "Administrator" ], Description: "Dev000 example mutation" },
 
 }
 
 export async function init( logger: any ): Promise<void> {
 
-  let debugMark = debug.extend( 'ED76FFF12487' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+  let debugMark = debug.extend( '421D3C0FA9C7' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
   debugMark( "Init called" );
 
 }

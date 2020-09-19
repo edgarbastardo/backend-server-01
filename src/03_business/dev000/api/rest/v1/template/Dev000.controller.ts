@@ -29,7 +29,7 @@ import MiddlewareManager from '../../../../../../02_system/common/managers/Middl
 
 import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
 
-import Dev000ServicesController from "../../../../services/v1/Dev000Service.controller";
+import Dev000ServicesController from "../../../../services/v1/template/Dev000Service.controller";
 
 const debug = require( 'debug' )( 'Dev000.controller' );
 

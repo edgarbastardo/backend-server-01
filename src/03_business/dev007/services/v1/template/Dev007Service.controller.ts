@@ -10,22 +10,22 @@ import {
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../../02_system/common/SystemContants";
-import CommonConstants from "../../../../02_system/common/CommonConstants";
+import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
-import SystemUtilities from "../../../../02_system/common/SystemUtilities";
-import CommonUtilities from "../../../../02_system/common/CommonUtilities";
+import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
+import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 
-import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
-import BaseService from "../../../../02_system/common/database/master/services/BaseService";
-import I18NManager from "../../../../02_system/common/managers/I18Manager";
+import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
+import BaseService from "../../../../../02_system/common/database/master/services/BaseService";
+import I18NManager from "../../../../../02_system/common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Dev000ServicesController' );
 
-export default class Dev000ServicesController extends BaseService {
+export default class Dev007ServicesController extends BaseService {
 
   //Common business services
 
-  static async getDev000Example( request: Request,
+  static async getDev007Example( request: Request,
                                  response: Response,
                                  transaction: any,
                                  logger: any ):Promise<any> {
@@ -60,9 +60,9 @@ export default class Dev000ServicesController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_DEV000_EXAMPLE',
+                 Code: 'SUCCESS_DEV007_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                 Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: 'F07F6E81AD1A' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -70,7 +70,7 @@ export default class Dev000ServicesController extends BaseService {
                  Count: 1,
                  Data: [
                          {
-                           Example: "Dev000"
+                           Example: "Dev007"
                          }
                        ]
                };
@@ -102,9 +102,9 @@ export default class Dev000ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDev000Example.name;
+      sourcePosition.method = this.name + "." + this.getDev007Example.name;
 
-      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "9A4795C59825" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

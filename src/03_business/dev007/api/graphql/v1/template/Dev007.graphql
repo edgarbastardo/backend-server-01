@@ -1,12 +1,12 @@
 
 extend type Query {
 
-  getDev000V1( Id: String! ): JSON!
+  getDev007V1( Id: String! ): JSON!
 
 }
 
 extend type Mutation {
 
-  addDev000V1( Id: String! ): JSON!
+  addDev007V1( Id: String! ): JSON!
 
 }

@@ -29,9 +29,9 @@ import MiddlewareManager from '../../../../../../02_system/common/managers/Middl
 
 import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
 
-import Dev000ServicesController from "../../../../services/v1/Dev000Service.controller";
+import Dev007ServicesController from "../../../../services/v1/template/Dev007Service.controller";
 
-const debug = require( 'debug' )( 'Dev000.controller' );
+const debug = require( 'debug' )( 'Dev007.controller' );
 
 //@injectable()
 @controller( process.env.SERVER_ROOT_PATH + Dev007Controller._BASE_PATH )
@@ -48,10 +48,10 @@ export default class Dev007Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev000/example";
+  static readonly _BASE_PATH = "/v1/business/dev007/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev000.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev007.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -139,7 +139,7 @@ export default class Dev007Controller {
                    };
                    */
 
-    const result = await Dev000ServicesController.getDev000Example( request,
+    const result = await Dev007ServicesController.getDev007Example( request,
                                                                     response,
                                                                     null,
                                                                     this._controllerLogger || context.Logger );

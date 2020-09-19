@@ -28,11 +28,11 @@ import SYSRouteService from '../../../../../02_system/common/database/master/ser
 import I18NManager from '../../../../../02_system/common/managers/I18Manager';
 import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 
-const debug = require( 'debug' )( 'Dev000.controller' );
+const debug = require( 'debug' )( 'Dev001.controller' );
 
 //@injectable()
-@controller( process.env.SERVER_ROOT_PATH + Dev000Controller._BASE_PATH )
-export default class Dev000Controller {
+@controller( process.env.SERVER_ROOT_PATH + Dev001Controller._BASE_PATH )
+export default class Dev001Controller {
 
   //AccessKind: 1 Public
   //AccessKind: 2 Authenticated
@@ -45,10 +45,10 @@ export default class Dev000Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/business/dev000/example";
+  static readonly _BASE_PATH = "/business/dev001/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev000Controller._BASE_PATH + "/", Action: "business.dev000.example", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev001Controller._BASE_PATH + "/", Action: "business.dev001.example", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -63,7 +63,7 @@ export default class Dev000Controller {
 
     try {
 
-      for ( let routeInfo of Dev000Controller._ROUTE_INFO ) {
+      for ( let routeInfo of Dev001Controller._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
@@ -82,7 +82,7 @@ export default class Dev000Controller {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = Dev000Controller.name + "." + this.registerInDataBase.name;
+      sourcePosition.method = Dev001Controller.name + "." + this.registerInDataBase.name;
 
       const strMark = "8A2FEACAB2BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -119,7 +119,7 @@ export default class Dev000Controller {
 
     const result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_DEV000_EXAMPLE',
+                     Code: 'SUCCESS_DEV001_EXAMPLE',
                      Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
                      Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
@@ -129,7 +129,7 @@ export default class Dev000Controller {
                      Count: 1,
                      Data: [
                              {
-                               Example: "Dev000"
+                               Example: "Dev001"
                              }
                            ]
                    };
