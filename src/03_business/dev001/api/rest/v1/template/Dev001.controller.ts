@@ -29,13 +29,13 @@ import MiddlewareManager from '../../../../../../02_system/common/managers/Middl
 
 import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
 
-import Dev007ServicesController from "../../../../services/v1/template/Dev007Service.controller";
+import Dev001ServicesController from "../../../../services/v1/template/Dev001Service.controller";
 
-const debug = require( 'debug' )( 'Dev007.controller' );
+const debug = require( 'debug' )( 'Dev001.controller' );
 
 //@injectable()
-@controller( process.env.SERVER_ROOT_PATH + Dev007Controller._BASE_PATH )
-export default class Dev007Controller {
+@controller( process.env.SERVER_ROOT_PATH + Dev001Controller._BASE_PATH )
+export default class Dev001Controller {
 
   //AccessKind: 1 Public
   //AccessKind: 2 Authenticated
@@ -48,10 +48,10 @@ export default class Dev007Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev007/example";
+  static readonly _BASE_PATH = "/v1/business/dev001/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev007.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev001Controller._BASE_PATH + "/", Action: "v1.business.dev001.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev001 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -66,7 +66,7 @@ export default class Dev007Controller {
 
     try {
 
-      for ( let routeInfo of Dev007Controller._ROUTE_INFO ) {
+      for ( let routeInfo of Dev001Controller._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
@@ -85,7 +85,7 @@ export default class Dev007Controller {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = Dev007Controller.name + "." + this.registerInDataBase.name;
+      sourcePosition.method = Dev001Controller.name + "." + this.registerInDataBase.name;
 
       const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
@@ -114,7 +114,7 @@ export default class Dev007Controller {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated
           )
-  async getDev007Example( request: Request, response: Response ) {
+  async getDev001Example( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
@@ -139,7 +139,7 @@ export default class Dev007Controller {
                    };
                    */
 
-    const result = await Dev007ServicesController.getDev007Example( request,
+    const result = await Dev001ServicesController.getDev001Example( request,
                                                                     response,
                                                                     null,
                                                                     this._controllerLogger || context.Logger );

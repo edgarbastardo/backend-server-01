@@ -14,15 +14,16 @@ import {
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../../02_system/common/SystemContants";
-import CommonConstants from "../../../02_system/common/CommonConstants";
+import CommonConstants from "../../../../02_system/common/CommonConstants";
 
-import SystemUtilities from "../../../02_system/common/SystemUtilities";
-import CommonUtilities from "../../../02_system/common/CommonUtilities";
+import SystemUtilities from "../../../../02_system/common/SystemUtilities";
+import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 
-import DBConnectionManager from "../../../02_system/common/managers/DBConnectionManager";
-import BaseService from "../../../02_system/common/database/master/services/BaseService";
-import I18NManager from "../../../02_system/common/managers/I18Manager";
-import JobQueueManager from "../../../02_system/common/managers/JobQueueManager";
+import DBConnectionManager from "../../../../02_system/common/managers/DBConnectionManager";
+import I18NManager from "../../../../02_system/common/managers/I18Manager";
+import JobQueueManager from "../../../../02_system/common/managers/JobQueueManager";
+
+import BaseService from "../../../../02_system/common/database/master/services/BaseService";
 
 const debug = require( "debug" )( "Dev001ServicesController" );
 

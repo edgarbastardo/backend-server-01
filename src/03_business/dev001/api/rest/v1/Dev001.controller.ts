@@ -30,7 +30,7 @@ import SYSRouteService from '../../../../../02_system/common/database/master/ser
 //import I18NManager from '../../../../02_system/common/managers/I18Manager';
 import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
 //import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
-import Dev001ServicesController from '../../../services/Dev001Service.controller';
+import Dev001ServicesController from '../../../services/v1/Dev001Service.controller';
 
 const debug = require( 'debug' )( 'Dev001.controller' );
 

@@ -20,13 +20,13 @@ import I18NManager from "../../../../../02_system/common/managers/I18Manager";
 
 import BaseService from "../../../../../02_system/common/database/master/services/BaseService";
 
-const debug = require( 'debug' )( 'Dev000ServicesController' );
+const debug = require( 'debug' )( 'Dev798ServicesController' );
 
 export default class Dev007ServicesController extends BaseService {
 
   //Common business services
 
-  static async getDev007Example( request: Request,
+  static async getDev798Example( request: Request,
                                  response: Response,
                                  transaction: any,
                                  logger: any ):Promise<any> {
@@ -61,7 +61,7 @@ export default class Dev007ServicesController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_DEV007_EXAMPLE',
+                 Code: 'SUCCESS_DEV798_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
                  Mark: '<Change_Code>' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
@@ -71,7 +71,7 @@ export default class Dev007ServicesController extends BaseService {
                  Count: 1,
                  Data: [
                          {
-                           Example: "Dev007"
+                           Example: "Dev798"
                          }
                        ]
                };
@@ -103,7 +103,7 @@ export default class Dev007ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getDev007Example.name;
+      sourcePosition.method = this.name + "." + this.getDev798Example.name;
 
       const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
