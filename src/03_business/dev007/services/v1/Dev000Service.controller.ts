@@ -19,16 +19,16 @@ import DBConnectionManager from '../../../../02_system/common/managers/DBConnect
 import BaseService from "../../../../02_system/common/database/master/services/BaseService";
 import I18NManager from "../../../../02_system/common/managers/I18Manager";
 
-const debug = require( 'debug' )( 'Dev798ServicesController' );
+const debug = require( 'debug' )( 'Dev000ServicesController' );
 
-export default class Dev798ServicesController extends BaseService {
+export default class Dev000ServicesController extends BaseService {
 
   //Common business services
 
-  static async createDeliveryOrder( request: Request,
-                                    response: Response,
-                                    transaction: any,
-                                    logger: any ):Promise<any> {
+  static async getDev000Example( request: Request,
+                                 response: Response,
+                                 transaction: any,
+                                 logger: any ):Promise<any> {
 
     let result = null;
 
@@ -60,7 +60,7 @@ export default class Dev798ServicesController extends BaseService {
 
       result = {
                  StatusCode: 200, //Ok
-                 Code: 'SUCCESS_DEV798_EXAMPLE',
+                 Code: 'SUCCESS_DEV000_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
                  Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
@@ -70,7 +70,7 @@ export default class Dev798ServicesController extends BaseService {
                  Count: 1,
                  Data: [
                          {
-                           Example: "Dev798"
+                           Example: "Dev000"
                          }
                        ]
                };
@@ -102,9 +102,9 @@ export default class Dev798ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.createDeliveryOrder.name;
+      sourcePosition.method = this.name + "." + this.getDev000Example.name;
 
-      const strMark = "71990E6BA49D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

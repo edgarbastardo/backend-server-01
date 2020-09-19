@@ -88,7 +88,7 @@ export default class Dev798Controller {
 
       sourcePosition.method = Dev798Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "75920EEEDD38" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "9F38503F083E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
