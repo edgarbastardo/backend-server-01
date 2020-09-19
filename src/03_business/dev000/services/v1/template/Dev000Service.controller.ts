@@ -62,7 +62,7 @@ export default class Dev000ServicesController extends BaseService {
                  StatusCode: 200, //Ok
                  Code: 'SUCCESS_DEV000_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                 Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: '<Change_Code>' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -104,7 +104,7 @@ export default class Dev000ServicesController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getDev000Example.name;
 
-      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

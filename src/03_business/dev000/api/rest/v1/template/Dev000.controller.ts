@@ -87,7 +87,7 @@ export default class Dev000Controller {
 
       sourcePosition.method = Dev000Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "8A2FEACAB2BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
