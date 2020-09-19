@@ -10,14 +10,14 @@ import {
 //import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 //import SystemConstants from "../../../02_system/common/SystemContants";
-import CommonConstants from "../../../../02_system/common/CommonConstants";
+import CommonConstants from "../../../../../02_system/common/CommonConstants";
 
-import SystemUtilities from "../../../../02_system/common/SystemUtilities";
-import CommonUtilities from "../../../../02_system/common/CommonUtilities";
+import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
+import CommonUtilities from "../../../../../02_system/common/CommonUtilities";
 
-import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
-import BaseService from "../../../../02_system/common/database/master/services/BaseService";
-import I18NManager from "../../../../02_system/common/managers/I18Manager";
+import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
+import BaseService from "../../../../../02_system/common/database/master/services/BaseService";
+import I18NManager from "../../../../../02_system/common/managers/I18Manager";
 
 const debug = require( 'debug' )( 'Dev000ServicesController' );
 
@@ -62,7 +62,7 @@ export default class Dev000ServicesController extends BaseService {
                  StatusCode: 200, //Ok
                  Code: 'SUCCESS_DEV000_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                 Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: '<Change_Code>' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],
@@ -104,7 +104,7 @@ export default class Dev000ServicesController extends BaseService {
 
       sourcePosition.method = this.name + "." + this.getDev000Example.name;
 
-      const strMark = "A92208DF733" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
