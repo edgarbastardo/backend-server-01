@@ -29,9 +29,9 @@ import MiddlewareManager from '../../../../../../02_system/common/managers/Middl
 
 import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
 
-import Dev000ServicesController from "../../../../services/v1/Dev000Service.controller";
+import Dev007ServicesController from "../../../../services/v1/template/Dev007Service.controller";
 
-const debug = require( 'debug' )( 'Dev000.controller' );
+const debug = require( 'debug' )( 'Dev007.controller' );
 
 //@injectable()
 @controller( process.env.SERVER_ROOT_PATH + Dev007Controller._BASE_PATH )
@@ -48,10 +48,10 @@ export default class Dev007Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev000/example";
+  static readonly _BASE_PATH = "/v1/business/dev007/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev000.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev007.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -87,7 +87,7 @@ export default class Dev007Controller {
 
       sourcePosition.method = Dev007Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "8A2FEACAB2BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -114,7 +114,7 @@ export default class Dev007Controller {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated
           )
-  async getDev000Example( request: Request, response: Response ) {
+  async getDev007Example( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
@@ -125,7 +125,7 @@ export default class Dev007Controller {
                      StatusCode: 200, //Ok
                      Code: 'SUCCESS_DEV000_EXAMPLE',
                      Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                     Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Mark: '<Change_Code>' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -139,7 +139,7 @@ export default class Dev007Controller {
                    };
                    */
 
-    const result = await Dev000ServicesController.getDev000Example( request,
+    const result = await Dev007ServicesController.getDev007Example( request,
                                                                     response,
                                                                     null,
                                                                     this._controllerLogger || context.Logger );

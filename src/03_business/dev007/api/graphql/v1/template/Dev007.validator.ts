@@ -4,13 +4,13 @@ import SystemUtilities from '../../../../../../02_system/common/SystemUtilities'
 import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
 //import { extensions } from 'sequelize/types/lib/utils/validator-extras';
 
-const debug = require( 'debug' )( 'Dev000.validator' );
+const debug = require( 'debug' )( 'Dev007.validator' );
 
 export const validators = {
 
   Query: {
 
-    getDev000V1: ( resolve: any, obj: any, args: any, context: any ) => {
+    getDev007V1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       const strLanguage = context.Language;
 
@@ -80,7 +80,7 @@ export const validators = {
 
   Mutation: {
 
-    addDev000V1: ( resolve: any, obj: any, args: any, context: any ) => {
+    addDev007V1: ( resolve: any, obj: any, args: any, context: any ) => {
 
       const strLanguage = context.Language;
 

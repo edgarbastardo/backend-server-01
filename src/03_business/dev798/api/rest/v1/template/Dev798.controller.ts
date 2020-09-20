@@ -19,20 +19,23 @@ import {
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 
-import CommonConstants from '../../../../../02_system/common/CommonConstants';
+import CommonConstants from '../../../../../../02_system/common/CommonConstants';
 
-import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
-import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+import CommonUtilities from '../../../../../../02_system/common/CommonUtilities';
+import SystemUtilities from '../../../../../../02_system/common/SystemUtilities';
 
-import SYSRouteService from '../../../../../02_system/common/database/master/services/SYSRouteService';
-import I18NManager from '../../../../../02_system/common/managers/I18Manager';
-import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
+//import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
+import MiddlewareManager from '../../../../../../02_system/common/managers/MiddlewareManager';
 
-const debug = require( 'debug' )( 'Dev000.controller' );
+import SYSRouteService from '../../../../../../02_system/common/database/master/services/SYSRouteService';
+
+import Dev798ServicesController from "../../../../services/v1/template/Dev798Service.controller";
+
+const debug = require( 'debug' )( 'Dev798.controller' );
 
 //@injectable()
-@controller( process.env.SERVER_ROOT_PATH + Dev000Controller._BASE_PATH )
-export default class Dev000Controller {
+@controller( process.env.SERVER_ROOT_PATH + Dev798Controller._BASE_PATH )
+export default class Dev798Controller {
 
   //AccessKind: 1 Public
   //AccessKind: 2 Authenticated
@@ -45,10 +48,10 @@ export default class Dev000Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/business/dev000/example";
+  static readonly _BASE_PATH = "/v1/business/dev798/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev000Controller._BASE_PATH + "/", Action: "business.dev000.example", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  { Path: Dev798Controller._BASE_PATH + "/", Action: "v1.business.dev798.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
                                 ]
 
   _controllerLogger = null;
@@ -63,7 +66,7 @@ export default class Dev000Controller {
 
     try {
 
-      for ( let routeInfo of Dev000Controller._ROUTE_INFO ) {
+      for ( let routeInfo of Dev798Controller._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
@@ -82,9 +85,9 @@ export default class Dev000Controller {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = Dev000Controller.name + "." + this.registerInDataBase.name;
+      sourcePosition.method = Dev798Controller.name + "." + this.registerInDataBase.name;
 
-      const strMark = "8A2FEACAB2BE" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "<Change_Code>" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -111,17 +114,18 @@ export default class Dev000Controller {
             MiddlewareManager.middlewareSetContext,
             MiddlewareManager.middlewareCheckIsAuthenticated
           )
-  async getDev000Example( request: Request, response: Response ) {
+  async getDev798Example( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
+    /*
     let strLanguage = context.Language;
 
     const result = {
                      StatusCode: 200, //Ok
-                     Code: 'SUCCESS_DEV000_EXAMPLE',
-                     Message: await I18NManager.translate( strLanguage, 'Sucess get the information' ),
-                     Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     Code: 'SUCCESS_DEV798_EXAMPLE',
+                     Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
+                     Mark: '<Change_Code>' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                      LogId: null,
                      IsError: false,
                      Errors: [],
@@ -129,10 +133,16 @@ export default class Dev000Controller {
                      Count: 1,
                      Data: [
                              {
-                               Example: "Dev000"
+                               Example: "Dev798"
                              }
                            ]
                    };
+                   */
+
+    const result = await Dev798ServicesController.getDev798Example( request,
+                                                                    response,
+                                                                    null,
+                                                                    this._controllerLogger || context.Logger );
 
     response.status( result.StatusCode ).send( result );
 
