@@ -62,7 +62,7 @@ export default class Dev798ServicesController extends BaseService {
                  StatusCode: 200, //Ok
                  Code: 'SUCCESS_DEV798_EXAMPLE',
                  Message: await I18NManager.translate( strLanguage, 'Success get the information' ),
-                 Mark: 'B1573D95F7DF' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                 Mark: 'AE017C2830B1' + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
                  LogId: null,
                  IsError: false,
                  Errors: [],

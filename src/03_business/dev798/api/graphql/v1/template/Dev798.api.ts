@@ -17,7 +17,7 @@ export const resolvers = {
 
       const strLanguage = context.Language;
 
-      let debugMark = debug.extend( 'BB7111103C74' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      let debugMark = debug.extend( '3A171EAF2B89' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( "Resolver => %s", "getDev798" );
 
       return {
@@ -36,7 +36,7 @@ export const resolvers = {
 
       const strLanguage = context.Language;
 
-      let debugMark = debug.extend( 'CCEA3BAE4A60' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+      let debugMark = debug.extend( '00F3D426EDD6' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
       debugMark( "Resolver => %s", "addDev798" );
 
       return {
