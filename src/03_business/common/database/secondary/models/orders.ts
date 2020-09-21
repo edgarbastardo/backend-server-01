@@ -66,13 +66,13 @@ export class orders extends Model<orders> {
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
   ticket: string;
 
-  @Column( { type: DataType.DOUBLE( 10, 2 ), allowNull: true } )
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
   amount1: number;
 
-  @Column( { type: DataType.DOUBLE( 10, 2 ), allowNull: true } )
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
   amount2: number;
 
-  @Column( { type: DataType.DOUBLE( 10, 2 ), allowNull: true } )
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
   original_amount: number;
 
   @Column( { type: DataType.DATE, allowNull: true } )
