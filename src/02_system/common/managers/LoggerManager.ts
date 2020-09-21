@@ -274,7 +274,7 @@ export default class LoggerManager {
 
             write: function( message: any, encoding: any ) {
 
-              if ( process.env.LOG_MORGAN_STREAM === "1" ) {
+              if ( process.env.LOG_STREAM === "1" ) {
 
                 // use the "info" log level so the output will be picked up by both transports (file and console)
                 result.info( message );
