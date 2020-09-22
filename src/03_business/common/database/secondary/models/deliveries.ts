@@ -18,10 +18,10 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "orders",
-  modelName: "orders"
+  tableName: "deliveries",
+  modelName: "deliveries"
 } )
-export class orders extends Model<orders> {
+export class deliveries extends Model<deliveries> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -53,67 +53,34 @@ export class orders extends Model<orders> {
   id: string;
 
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  user_id: string;
+  driver_id: string;
 
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  location_id: string;
+  order_id: string;
 
-  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  establishment_id: string;
-
-  @Column( { type: DataType.STRING( 36 ), allowNull: true } )
-  invoice_id: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  note: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  payment_method: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  payment_method1: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  payment_method2: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
-  status: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
-  state: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  ticket: string;
+  @Column( { type: DataType.INTEGER, allowNull: false } )
+  qualification: number;
+  
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  tip1: number;
 
   @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  amount1: number;
+  tip2: number;
 
   @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  amount2: number;
+  tip: number;
 
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  original_amount: number;
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method: string;
 
-  @Column( { type: DataType.DATEONLY, allowNull: true } )
-  want_delivery_date: string;
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method1: string;
 
-  @Column( { type: DataType.TIME, allowNull: true } )
-  want_delivery_time: string;
-
-  @Column( { type: DataType.TIME, allowNull: true } )
-  time_retirement: string;
-
-  @Column( { type: DataType.TIME, allowNull: true } )
-  time_arrival_driver: string;
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method2: string;
 
   @Column( { type: DataType.NOW, allowNull: true } )
-  time_accepted_by_the_driver: string;
-
-  @Column( { type: DataType.NOW, allowNull: true } )
-  time_collected_by_the_driver: string;
-
-  @Column( { type: DataType.NOW, allowNull: true } )
-  time_finish: string;
+  tip_validated_at: string;
 
   @Column( { type: DataType.NOW, allowNull: true } )
   created_at: string;
@@ -121,59 +88,8 @@ export class orders extends Model<orders> {
   @Column( { type: DataType.NOW, allowNull: true } )
   updated_at: string;
 
-  @Column( { type: DataType.NOW, allowNull: true } )
-  time_from_wait_by_the_driver: string;
-
-  @Column( { type: DataType.NOW, allowNull: true } )
-  time_from_wait_by_the_system: string;
-
-  @Column( { type: DataType.NOW, allowNull: true } )
-  time_in_which_the_driver_leaves_the_local: string;
-
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  fee: number;
-
-  @Column( { type: DataType.TIME, allowNull: true } )
-  delivered: string;
-
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  extra_miles: number;
-
-  @Column( { type: DataType.SMALLINT, allowNull: true } )
-  inspected: number;
-
-  @Column( { type: DataType.SMALLINT, allowNull: true } )
-  status_number: number;
-
-  @Column( { type: DataType.STRING( 100 ), allowNull: true } )
-  client_name: string;
-
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  fee_kk: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  extra_miles_driver_order: number;
-
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  order_miles_quantity: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  catering_type: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  qty_person_catering: number;
-
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  fee_driver_order: number;
-
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  fee_catering_order: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  qty_meals: number;
-
   @BeforeValidate
-  static beforeValidateHook( instance: orders, options: any ): void {
+  static beforeValidateHook( instance: deliveries, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

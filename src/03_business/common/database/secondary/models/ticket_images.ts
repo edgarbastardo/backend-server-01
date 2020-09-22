@@ -5,23 +5,23 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
-         BeforeUpdate,
-         BeforeCreate,
-         BeforeDestroy,
+         //BeforeUpdate,
+         //BeforeCreate,
+         //BeforeDestroy,
          //AfterFind,
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
-import SystemUtilities from "../../../../../../02_system/common/SystemUtilities";
+import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
-import SYSDatabaseLogService from "../../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
+//import SYSDatabaseLogService from "../../../../../02_system/common/database/master/services/SYSDatabaseLogService";
 
 @Table( {
   timestamps: false,
-  tableName: "bizExample",
-  modelName: "bizExample"
+  tableName: "ticket_images",
+  modelName: "ticket_images"
 } )
-export class BIZExample extends Model<BIZExample> {
+export class ticket_images extends Model<ticket_images> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -30,39 +30,37 @@ export class BIZExample extends Model<BIZExample> {
   }
 
   @PrimaryKey
-  @Column( { type: DataType.STRING( 40 ) } )
-  Id: string;
+  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
+  id: string;
 
-  @Column( { type: DataType.STRING( 75 ) } )
-  Name: string;
+  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
+  order_id: string;
 
-  @Column( { type: DataType.STRING( 512 ) } )
-  Comment: string;
+  @Column( { type: DataType.TEXT, allowNull: true } )
+  image: string;
 
-  @Column( { type: DataType.STRING( 150 ) } )
-  CreatedBy: string;
+  //@Column( { type: DataType.NOW } )
+  //created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
 
-  @Column( { type: DataType.STRING( 30 ) } )
-  CreatedAt: string;
+  @Column( { type: DataType.SMALLINT, allowNull: true } )
+  migrated: string;
 
-  @Column( { type: DataType.STRING( 150 ), allowNull: true } )
-  UpdatedBy: string;
+  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
+  url: string;
 
   @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  UpdatedAt: string;
-
-  @Column( { type: DataType.JSON, allowNull: true } )
-  ExtraData: string;
+  lock: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: BIZExample, options: any ): void {
+  static beforeValidateHook( instance: ticket_images, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 
   }
 
+  /*
   @BeforeCreate
-  static beforeCreateHook( instance: BIZExample, options: any ): void {
+  static beforeCreateHook( instance: TicketImages, options: any ): void {
 
     SystemUtilities.commonBeforeCreateHook( instance, options );
 
@@ -75,7 +73,7 @@ export class BIZExample extends Model<BIZExample> {
   }
 
   @BeforeUpdate
-  static beforeUpdateHook( instance: BIZExample, options: any ): void {
+  static beforeUpdateHook( instance: TicketImages, options: any ): void {
 
     const oldDataValues = { ...( instance as any )._previousDataValuess };
 
@@ -90,7 +88,7 @@ export class BIZExample extends Model<BIZExample> {
   }
 
   @BeforeDestroy
-  static beforeDestroyHook( instance: BIZExample, options: any ): void {
+  static beforeDestroyHook( instance: TicketImages, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );
 
@@ -101,10 +99,11 @@ export class BIZExample extends Model<BIZExample> {
                                              null );
 
   }
+  */
 
   public getPrimaryKey(): string[] {
 
-    return [ "Id" ];
+    return [ "id" ]; //Change here
 
   }
 
