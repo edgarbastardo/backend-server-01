@@ -25,7 +25,7 @@ export default class Dev798ServicesController extends BaseService {
 
   //Common business services
 
-  static async createDeliveryOrder( request: Request,
+  static async createTicketImage( request: Request,
                                     response: Response,
                                     transaction: any,
                                     logger: any ):Promise<any> {
@@ -55,6 +55,22 @@ export default class Dev798ServicesController extends BaseService {
         bIsLocalTransaction = true;
 
       }
+
+// aqui necesito el codigo para hacer post
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       //Custom logic code is here
 
@@ -102,7 +118,7 @@ export default class Dev798ServicesController extends BaseService {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.createDeliveryOrder.name;
+      sourcePosition.method = this.name + "." + this.createTicketImage.name;
 
       const strMark = "71990E6BA49D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 

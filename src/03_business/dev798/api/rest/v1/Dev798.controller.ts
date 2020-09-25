@@ -1,94 +1,109 @@
 import cluster from 'cluster';
-
-import {
-  //Router,
-  Request,
-  Response,
-  //NextFunction
-} from 'express';
-//import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
-import {
-  controller,
-  //httpGet,
-  //httpPost,
-  //response,
-  //requestParam,
-  //requestBody,
-  //request,
-  httpGet,
-  httpPost
-} from "inversify-express-utils";
-import { inject } from 'inversify';
-
 import CommonConstants from '../../../../../02_system/common/CommonConstants';
-
-import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
+import CommonUtilities from '../../../../../02_system/common/CommonUtilities'; 
+import { ticket_images as ticket_image } from '../../../../../03_business/common/database/secondary/models/ticket_images';
+import BaseService from '../../../../../02_system/common/database/master/services/BaseService';
+import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
+import SystemConstants from '../../../../../02_system/common/SystemContants';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
+import { id } from 'inversify';
 
-//import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
-import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
+//import { OriginalSequelize } from "sequelize"; //Original sequelize
+//import uuidv4 from 'uuid/v4';
 
-import SYSRouteService from '../../../../../02_system/common/database/master/services/SYSRouteService';
 
-import Dev798ServicesController from "../../../services/v1/Dev798Service.controller";
+const debug = require( 'debug' )( 'ticket_imagesService' );
 
-const debug = require( 'debug' )( 'Dev798.controller' );
+export default class ticket_imagesService extends BaseService {
 
-//@injectable()
-@controller( process.env.SERVER_ROOT_PATH + Dev798Controller._BASE_PATH )
-export default class Dev798Controller {
+  static readonly _ID = "ticket_imagesService";
 
-  //AccessKind: 1 Public
-  //AccessKind: 2 Authenticated
-  //AccessKind: 3 Role
+  static async createOrUpdate(
+                               strID:string,
+                               strOrderId: string,
+                               strImage: string,
+                               strMigrated: string,
+                               strURL: string,
+                               strLock: string,
+                               bUpdate: boolean,
+                               transaction: any,
+                               logger: any ): Promise<ticket_image> {
 
-  //RequestKind: 1 GET
-  //RequestKind: 2 POST
-  //RequestKind: 3 PUT
-  //RequestKind: 4 DELETE
+    let result = null;
 
-  static readonly _TO_IOC_CONTAINER = true;
+    let currentTransaction = transaction;
 
-  static readonly _BASE_PATH = "/v1/business/dev798/odinv1";
-
-  static readonly _ROUTE_INFO = [
-                                { Path: Dev798Controller._BASE_PATH + "/delivery/order", Action: "v1.business.dev798.odinv1.delivery.order.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Allow to create delivery order in odin v1 legacy database" },
-                                ]
-
-  _controllerLogger = null;
-
-  constructor( @inject( "appLogger" ) logger: any ) {
-
-    this._controllerLogger = logger;
-
-  }
-
-  async registerInDataBase( logger: any ) {
+    let bIsLocalTransaction = false;
 
     try {
 
-      for ( let routeInfo of Dev798Controller._ROUTE_INFO ) {
+      if ( currentTransaction === null ) {
 
-        await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
-                                                           routeInfo.RequestKind,
-                                                           routeInfo.Path, //Path
-                                                           routeInfo.Action,
-                                                           routeInfo.AllowTagAccess,
-                                                           routeInfo.Roles as any,
-                                                           routeInfo.Description,
-                                                           null,
-                                                           logger );
+        const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
 
       }
+
+      const options = {
+
+        where: { "Id": strID },
+        transaction: currentTransaction,
+
+      }
+
+      let ticket_imageInDB = await ticket_image.findOne( options );
+
+      if ( CommonUtilities.isNullOrEmpty( ticket_imageInDB ) ) {
+
+        ticket_imageInDB = await ticket_image.create(
+                                                      {
+                                                        order_id:strOrderId,
+                                                        image: strImage,
+                                                        migrated: strMigrated,
+                                                        url:strURL,
+                                                        lock:strLock,
+                                                        CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET
+                                                      },
+                                                      { transaction: currentTransaction }
+                                                    );
+
+      }
+      else if ( bUpdate ) {
+
+        ticket_imageInDB.order_id = strOrderId;
+        ticket_imageInDB.image = strImage;
+        ticket_imageInDB.migrated = strMigrated;
+        ticket_imageInDB.url = strURL;
+        ticket_imageInDB.lock = strLock;
+
+        await ticket_imageInDB.update( ( ticket_imageInDB as any ).dataValues,
+                                   options );
+
+        ticket_imageInDB = await ticket_image.findOne( options );
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+      result = ticket_imageInDB;
 
     }
     catch ( error ) {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = Dev798Controller.name + "." + this.registerInDataBase.name;
+      sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "9F38503F083E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "8D3BF98073F2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -106,25 +121,26 @@ export default class Dev798Controller {
 
       }
 
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+      result = error;
+
     }
 
-  }
-
-  @httpPost(
-             "/",
-             MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
-           )
-  async createDeliveryOrder( request: Request, response: Response ) {
-
-    const context = ( request as any ).context;
-
-    const result = await Dev798ServicesController.createDeliveryOrder( request,
-                                                                       response,
-                                                                       null,
-                                                                       this._controllerLogger || context.Logger );
-
-    response.status( result.StatusCode ).send( result );
+    return result;
 
   }
 
