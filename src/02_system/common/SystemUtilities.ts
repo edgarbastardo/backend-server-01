@@ -2612,6 +2612,13 @@ export default class SystemUtilities {
 
       //options.skip = [];
 
+      if ( instance.rawAttributes[ "id" ] &&
+           !instance.id ) {
+
+        instance.id = SystemUtilities.getUUIDv4();
+
+      }
+
       if ( instance.rawAttributes[ "Id" ] &&
            !instance.Id ) {
 
