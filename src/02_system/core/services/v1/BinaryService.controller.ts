@@ -3939,17 +3939,22 @@ export default class BinaryServiceController extends BaseService {
 
         const strFileName = SystemUtilities.getUUIDv4() + ".data";
 
-        fs.writeFileSync( SystemUtilities.strBaseRootPath +
-                          "/temp/" +
-                          SystemUtilities.getHostName() +
-                          "/" +
+        const strTempFilePath = SystemUtilities.strBaseRootPath +
+                                "/temp/" +
+                                SystemUtilities.getHostName() +
+                                "/";
+
+        fs.mkdirSync( strTempFilePath, { recursive: true } );
+
+        fs.writeFileSync( strTempFilePath +
                           strFileName,
                           buffer );
 
         request.body.FileEncoded = null;
         buffer = null;
 
-        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+        const strTempFullFilePath = strTempFilePath +
+                                    strFileName; //SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
 
         if ( fs.existsSync( strTempFullFilePath ) ) {
 
@@ -4688,17 +4693,22 @@ export default class BinaryServiceController extends BaseService {
 
         const strFileName = SystemUtilities.getUUIDv4() + ".data";
 
-        fs.writeFileSync( SystemUtilities.strBaseRootPath +
-                          "/temp/" +
-                          SystemUtilities.getHostName() +
-                          "/" +
+        const strTempFilePath = SystemUtilities.strBaseRootPath +
+                                "/temp/" +
+                                SystemUtilities.getHostName() +
+                                "/";
+
+        fs.mkdirSync( strTempFilePath, { recursive: true } );
+
+        fs.writeFileSync( strTempFilePath +
                           strFileName,
                           buffer );
 
         request.body.FileEncoded = null;
         buffer = null;
 
-        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+        const strTempFullFilePath = strTempFilePath +
+                                    strFileName; //SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
 
         if ( fs.existsSync( strTempFullFilePath ) ) {
 
