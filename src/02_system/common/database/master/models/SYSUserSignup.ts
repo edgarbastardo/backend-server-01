@@ -112,18 +112,18 @@ export class SYSUserSignup extends Model<SYSUserSignup> {
 
   @NotNull
   @NotEmpty
-  @Column( { type: DataType.STRING( 30 ), allowNull: false })
+  @Column( { type: DataType.STRING( 60 ), allowNull: false })
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @NotNull
   @NotEmpty
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   ExpireAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

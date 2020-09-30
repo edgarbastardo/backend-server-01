@@ -20,6 +20,7 @@ import { BuildOptions } from "sequelize/types";
 import { SYSUser } from "./SYSUser";
 import { SYSUserGroup } from "./SYSUserGroup";
 
+import CommonConstants from "../../../CommonConstants";
 import SystemConstants from "../../../SystemContants";
 
 //import CommonUtilities from "../../CommonUtilities";
@@ -97,19 +98,19 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   LoggedOutBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   LoggedOutAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )
@@ -143,7 +144,7 @@ export class SYSUserSessionStatus extends Model<SYSUserSessionStatus> {
 
     if ( !instance.UpdatedAt ) {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format();
+      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
     }
 

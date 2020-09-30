@@ -321,7 +321,7 @@ export default class SYSUserSessionStatusService extends BaseService {
           const currentValues = ( row as any ).dataValues;
 
           currentValues.LoggedOutBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-          currentValues.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+          currentValues.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
           ( options as any ).where = { UserId: strUserId, Token: currentValues.Token };
 
@@ -332,7 +332,7 @@ export default class SYSUserSessionStatusService extends BaseService {
          const userSessionStatus = ( row as any ).dataValues;
 
          userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
-         userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+         userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
          await SystemUtilities.createOrUpdateUserSessionStatus( userSessionStatus.Token,
                                                                 userSessionStatus,

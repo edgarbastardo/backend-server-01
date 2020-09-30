@@ -280,7 +280,7 @@ export default class UserPasswordServiceController {
                                                                                 "UserName",
                                                                                 logger );
 
-                  const strRecoverCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+                  const strRecoverCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 1, logger );
 
                   const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
@@ -291,7 +291,7 @@ export default class UserPasswordServiceController {
                                                                                        Token: strRecoverCode,
                                                                                        Status: 1,
                                                                                        CreatedBy: strUserName || sysUserInDB.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                                       ExpireAt: expireAt.format(),
+                                                                                       ExpireAt: expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                        ExtraData: JSON.stringify( { UserName: sysUserInDB.Name } )
                                                                                      },
                                                                                      false,
@@ -316,7 +316,7 @@ export default class UserPasswordServiceController {
                                                                                                     currentTransaction,
                                                                                                     logger );
 
-                      const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                      const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                                     context.TimeZoneId,
                                                                                                     CommonConstants._DATE_TIME_LONG_FORMAT_04,
                                                                                                     logger ): null;
@@ -356,7 +356,7 @@ export default class UserPasswordServiceController {
                                           UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                           UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                           Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
-                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                           Data: {}
                                         }
 
@@ -375,7 +375,7 @@ export default class UserPasswordServiceController {
                                                               UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                                               UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                                               Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_EMAIL",
-                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                               Data: {}
                                                             },
                                                             logger );
@@ -453,7 +453,7 @@ export default class UserPasswordServiceController {
                                           UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                           UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                           Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
-                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                           Data: {}
                                         }
 
@@ -471,7 +471,7 @@ export default class UserPasswordServiceController {
                                                               UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                                               UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                                               Code: "SUCCESS_SEND_RECOVER_PASSWORD_CODE_SMS",
-                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                               Data: {}
                                                             },
                                                             logger );
@@ -917,7 +917,7 @@ export default class UserPasswordServiceController {
                                                                                   logger );
 
                     sysUserInDB.Password = request.body.Password;
-                    sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
+                    sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
                     sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
                     const sysUserWithPasswordChanged = SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
@@ -1036,7 +1036,7 @@ export default class UserPasswordServiceController {
                                         UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                         UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                         Code: "SUCCESS_PASSWORD_CHANGE",
-                                        EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                        EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                         Data: {}
                                       }
 
@@ -1055,7 +1055,7 @@ export default class UserPasswordServiceController {
                                                             UserName: context.UserSessionStatus?.UserName || sysUserInDB?.Name || "",
                                                             UserGroupId: context.UserSessionStatus?.UserGroupId || sysUserInDB?.GroupId || "",
                                                             Code: "SUCCESS_PASSWORD_CHANGE",
-                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                             Data: {}
                                                           },
                                                           logger );

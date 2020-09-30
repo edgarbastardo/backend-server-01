@@ -1104,7 +1104,7 @@ export default class SecurityServiceController {
                                                       Role: strBusinessRolesMerged
                                                     },
                                           CreatedBy: processOptions.useSecondaryUserToCreatedBy === true && strSecondaryUser ? strSecondaryUser : strUserName, //SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                          CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format(): null,
+                                          CreatedAt: processOptions.updateCreatedAt === true ? SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null,
                                           UpdatedBy: !strSecondaryUser ? strUserName : strSecondaryUser, //SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET,
                                           UpdatedAt: null
                                         };
@@ -1183,7 +1183,7 @@ export default class SecurityServiceController {
                                     processOptions.useCustomResponse === false ?
                                     "SUCCESS_LOGIN":
                                     processOptions.Code,
-                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                               Data: {}
                             }
 
@@ -1205,7 +1205,7 @@ export default class SecurityServiceController {
                                                         processOptions.useCustomResponse === false ?
                                                         "SUCCESS_LOGIN":
                                                         processOptions.Code,
-                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                   Data: {}
                                                 },
                                                 logger );
@@ -1444,7 +1444,7 @@ export default class SecurityServiceController {
                           UserName: "No apply",
                           UserGroupId: "No apply",
                           Code: "ERROR_LOGIN_FAILED",
-                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                          EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                           Data: {}
                         }
 
@@ -1463,7 +1463,7 @@ export default class SecurityServiceController {
                                               UserName: "No apply",
                                               UserGroupId: "No apply",
                                               Code: "ERROR_LOGIN_FAILED",
-                                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                               Data: {}
                                             },
                                             logger );
@@ -2232,7 +2232,7 @@ export default class SecurityServiceController {
           userSessionStatus.SocketToken = null;
 
           userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
-          userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+          userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
           userSessionStatus = await SystemUtilities.createOrUpdateUserSessionStatus( strToken,
                                                                                      ( userSessionStatus as any ).dataValues,
@@ -2305,7 +2305,7 @@ export default class SecurityServiceController {
                               UserName: userSessionStatus.UserName,
                               UserGroupId: userSessionStatus.UserGroupId,
                               Code: "SUCCESS_LOGOUT",
-                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                               Data: {}
                             }
 
@@ -2324,7 +2324,7 @@ export default class SecurityServiceController {
                                                   UserName: userSessionStatus.UserName,
                                                   UserGroupId: userSessionStatus.UserGroupId,
                                                   Code: "SUCCESS_LOGOUT",
-                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                   Data: {}
                                                 },
                                                 logger );
@@ -2369,8 +2369,8 @@ export default class SecurityServiceController {
                                                                   Token: strToken,
                                                                   LoggedOutBy: UserInfo.Name,
                                                                   UpdatedBy: UserInfo.Name,
-                                                                  UpdatedAt: SystemUtilities.getCurrentDateAndTime().format(),
-                                                                  LoggedOutAt: SystemUtilities.getCurrentDateAndTime().format()
+                                                                  UpdatedAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
+                                                                  LoggedOutAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis )
                                                                 },
                                                                 true,
                                                                 null,
@@ -2604,7 +2604,7 @@ export default class SecurityServiceController {
                       UserName: userSessionStatus.UserName,
                       UserGroupId: userSessionStatus.UserGroupId,
                       Code: "SUCCESS_TOKEN_IS_VALID",
-                      EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                      EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                       Data: {}
                     }
 
@@ -2623,7 +2623,7 @@ export default class SecurityServiceController {
                                           UserName: userSessionStatus.UserName,
                                           UserGroupId: userSessionStatus.UserGroupId,
                                           Code: "SUCCESS_TOKEN_IS_VALID",
-                                          EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                          EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                           Data: {}
                                         },
                                         logger );

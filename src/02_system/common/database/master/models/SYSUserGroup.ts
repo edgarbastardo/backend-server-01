@@ -50,7 +50,7 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   Role: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   ExpireAt: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
@@ -62,19 +62,19 @@ export class SYSUserGroup extends Model<SYSUserGroup> {
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 60 ) } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   DisabledBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   DisabledAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )
