@@ -128,7 +128,7 @@ export default class SYSDatabaseLogService extends BaseService {
                                                               Table: strTable,
                                                               Data: ( instance as any ).dataValues,
                                                               CreatedBy: instance.CreatedBy,
-                                                              CreatedAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                              CreatedAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                               ExtraData: null
                                                             },
                                                             { transaction: currentTransaction }
@@ -185,7 +185,7 @@ export default class SYSDatabaseLogService extends BaseService {
                                                                 Table: strTable,
                                                                 Data: jsonDiff,
                                                                 CreatedBy: instance.CreatedBy,
-                                                                CreatedAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                CreatedAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                 ExtraData: null
                                                               },
                                                               { transaction: currentTransaction }

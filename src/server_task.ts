@@ -34,7 +34,7 @@ export default class App {
                       UserName: "No apply",
                       UserGroupId: "No apply",
                       Code: "SERVER_TASK_SHUTDOWN",
-                      EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                      EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                       Data: {}
                     };
 
@@ -53,7 +53,7 @@ export default class App {
                                                 UserName: "No apply",
                                                 UserGroupId: "No apply",
                                                 Code: "SERVER_TASK_SHUTDOWN",
-                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                 Data: {}
                                               },
                                               LoggerManager.mainLoggerInstance );

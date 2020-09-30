@@ -383,19 +383,19 @@ export default class SystemUtilities {
 
       if ( CommonUtilities.isNotNullOrEmpty( row.CreatedAt ) ) {
 
-        row.CreatedAt = moment( row.CreatedAt ).tz( strTimeZoneId ).format();
+        row.CreatedAt = moment( row.CreatedAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 
       if ( CommonUtilities.isNotNullOrEmpty( row.UpdatedAt ) ) {
 
-        row.UpdatedAt = moment( row.UpdatedAt ).tz( strTimeZoneId ).format();
+        row.UpdatedAt = moment( row.UpdatedAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 
       if ( CommonUtilities.isNotNullOrEmpty( row.DisabledAt ) ) {
 
-        row.DisabledAt = moment( row.DisabledAt ).tz( strTimeZoneId ).format();
+        row.DisabledAt = moment( row.DisabledAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 
@@ -1484,7 +1484,7 @@ export default class SystemUtilities {
 
       if ( options.updateAt ) {
 
-        userSessionStatus.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //Update to current date and time
+        userSessionStatus.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ); //Update to current date and time
 
       }
 
@@ -1676,7 +1676,7 @@ export default class SystemUtilities {
            !userSessionStatus.LoggedOutAt ) { //Not update if not needed
 
         userSessionStatus.LoggedOutBy = userSessionStatus.UserName; //UserInfo.Name;
-        userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format();
+        userSessionStatus.LoggedOutAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
         bUpdated = true; //Mark updated needed
 
@@ -2671,7 +2671,7 @@ export default class SystemUtilities {
         if ( instance.rawAttributes[ "CreatedAt" ] &&
              !instance.CreatedAt ) {
 
-          instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+          instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
         }
 
@@ -2718,7 +2718,7 @@ export default class SystemUtilities {
 
         if ( instance.rawAttributes[ "UpdatedAt" ] ) {
 
-          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ); //( instance as any )._previousDataValues.CreatedAt;
 
           / *
           const intIndexUpdatedAt = options.skip.indexOf( "UpdatedAt" );
@@ -2762,7 +2762,7 @@ export default class SystemUtilities {
 
           if ( instance.rawAttributes[ "DisabledAt" ] ) {
 
-            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
             / *
             const intIndexDisabledAt = options.skip.indexOf( "DisabledAt" );
@@ -2877,7 +2877,7 @@ export default class SystemUtilities {
 
             if ( instance.rawAttributes[ "DisabledAt" ] ) {
 
-              instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+              instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
             }
 
@@ -2957,7 +2957,7 @@ export default class SystemUtilities {
         if ( instance.rawAttributes[ "UpdatedAt" ] &&
              !options.notUpdateAt ) {
 
-          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //( instance as any )._previousDataValues.CreatedAt;
+          instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ); //( instance as any )._previousDataValues.CreatedAt;
 
         }
 
@@ -2991,7 +2991,7 @@ export default class SystemUtilities {
 
           if ( instance.rawAttributes[ "DisabledAt" ] ) {
 
-            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format();
+            instance.DisabledAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
           }
 

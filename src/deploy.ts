@@ -52,7 +52,7 @@ export default class App {
 
       }
 
-      info.release = SystemUtilities.getCurrentDateAndTime().format();
+      info.release = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       const strJSONInfoData = JSON.stringify( info, null, 2 );
 

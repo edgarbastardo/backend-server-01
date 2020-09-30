@@ -19,6 +19,8 @@ export enum HTTPMethod {
 
 export default class CommonConstants {
 
+  static readonly _DATE_TIME_LONG_FORMAT_ISO8601_Millis = "YYYY-MM-DDTHH:mm:ss.SSSZ";
+
   static readonly _DATE_TIME_LONG_FORMAT_01 = "YYYY-MM-DD HH:mm:ss.SSS ZZ";
   static readonly _DATE_TIME_LONG_FORMAT_02 = "YYYY-MM-DDTHH:mm:ss.SSS@ZZ";
   static readonly _DATE_TIME_LONG_FORMAT_03 = "YYYY-MM-DD HH:mm:ss ZZ";
@@ -28,6 +30,7 @@ export default class CommonConstants {
   static readonly _DATE_TIME_LONG_FORMAT_07 = "YYYY-MM-DDTHH-mm-ss-SSS@ZZ";
   static readonly _DATE_TIME_LONG_FORMAT_08 = "YYYY-MM-DDTHH-mm-ssZZ";
   static readonly _DATE_TIME_LONG_FORMAT_09 = "YYYY-MM-DD HH:mm:ss";
+  static readonly _DATE_TIME_LONG_FORMAT_10 = "";
 
   static readonly _PREFIX_CRYPTED = "crypted://";
   static readonly _PREFIX_RSA = "RSA://";

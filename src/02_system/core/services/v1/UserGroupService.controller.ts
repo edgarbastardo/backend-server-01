@@ -637,7 +637,7 @@ export default class UserGroupServiceController {
                                                                          {
                                                                            Name: request.body.Name,
                                                                            Comment: request.body.Comment,
-                                                                           ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
+                                                                           ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null,
                                                                            Role: strRoleToApply ? strRoleToApply : null, //resultCheckUserRoles.isAuthorizedAdmin && request.body.Role !== undefined ? request.body.Role: null,
                                                                            Tag: resultCheckUserGroupRoles.isAuthorizedAdmin && request.body.Tag ? request.body.Tag: null,
                                                                            ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
@@ -1206,7 +1206,7 @@ export default class UserGroupServiceController {
                                   request.body.Name: sysUserGroupInDB.Name;
           sysUserGroupInDB.Role = strRoleToApply ? strRoleToApply: null;
           sysUserGroupInDB.Tag = resultCheckUserRoles.isAuthorizedAdmin && request.body.Tag !== undefined ? request.body.Tag: sysUserGroupInDB.Tag;
-          sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): sysUserGroupInDB.ExpireAt;
+          sysUserGroupInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): sysUserGroupInDB.ExpireAt;
           sysUserGroupInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserGroupInDB.Comment;
           sysUserGroupInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
           sysUserGroupInDB.UpdatedAt = null;

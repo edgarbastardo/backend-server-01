@@ -751,7 +751,7 @@ export default class UserUpdateServiceController {
 
                   }
 
-                  sysUserInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null;
+                  sysUserInDB.ExpireAt = request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null;
                   sysUserInDB.Comment = request.body.Comment !== undefined ? request.body.Comment : sysUserInDB.Comment;
                   sysUserInDB.UpdatedBy = strUserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
                   sysUserInDB.UpdatedAt = null;

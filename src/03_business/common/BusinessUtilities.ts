@@ -17,19 +17,19 @@ export default class BusinessUtilities {
 
       if ( CommonUtilities.isNotNullOrEmpty( row.CreatedAt ) ) {
 
-        row.CreatedAt = moment( row.CreatedAt ).tz( strTimeZoneId ).format();
+        row.CreatedAt = moment( row.CreatedAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 
       if ( CommonUtilities.isNotNullOrEmpty( row.UpdatedAt ) ) {
 
-        row.UpdatedAt = moment( row.UpdatedAt ).tz( strTimeZoneId ).format();
+        row.UpdatedAt = moment( row.UpdatedAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 
       if ( CommonUtilities.isNotNullOrEmpty( row.DisabledAt ) ) {
 
-        row.DisabledAt = moment( row.DisabledAt ).tz( strTimeZoneId ).format();
+        row.DisabledAt = moment( row.DisabledAt ).tz( strTimeZoneId ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
       }
 

@@ -80,13 +80,13 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 60 ) } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @BeforeValidate
@@ -109,12 +109,12 @@ export class SYSDBMigratedData extends Model<SYSDBMigratedData> {
 
     if ( CommonUtilities.isNullOrEmpty( instance.CreatedAt ) ) {
 
-      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+      instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
     }
     else {
 
-      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format(); //new Date().toISOString();
+      instance.UpdatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ); //new Date().toISOString();
 
     }
     */

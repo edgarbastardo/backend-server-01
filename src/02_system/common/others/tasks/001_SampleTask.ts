@@ -109,7 +109,7 @@ export default class SampleTask_001 {
 
     const debugMark = debug.extend( strMark );
 
-    debugMark( "starting => " + SystemUtilities.getCurrentDateAndTime().format() );
+    debugMark( "starting => " + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ) );
 
     try {
 
@@ -173,7 +173,7 @@ export default class SampleTask_001 {
 
     }
 
-    debugMark( "finished => " + SystemUtilities.getCurrentDateAndTime().format() );
+    debugMark( "finished => " + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ) );
 
     return bResult;
 

@@ -314,7 +314,7 @@ export default class InstantMessageServerManager {
       if ( strAuth &&
            configData?.host_rest ) {
 
-        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 2, logger )
 
         const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( null,
                                                                                                           logger );
@@ -420,7 +420,7 @@ export default class InstantMessageServerManager {
       if ( strAuth &&
            configData?.host_rest ) {
 
-        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+        const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 2, logger )
 
         const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( null,
                                                                                                           logger );
@@ -771,7 +771,7 @@ export default class InstantMessageServerManager {
 
     try {
 
-      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 2, logger )
 
       const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( transaction,
                                                                                                         logger );
@@ -864,7 +864,7 @@ export default class InstantMessageServerManager {
 
     try {
 
-      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format(), 2, logger )
+      const strClientId = SystemUtilities.hashString( SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 2, logger )
 
       const jsonServiceConfig = await InstantMessageServerManager.getConfigInstantMessageServerService( transaction,
                                                                                                         logger );
