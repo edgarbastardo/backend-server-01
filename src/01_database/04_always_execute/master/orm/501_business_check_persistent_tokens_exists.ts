@@ -75,7 +75,7 @@ export default class Always {
                                                Token: process.env.FOREIGN_SYSTEM_04_TOKEN || "4",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_04_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_04_SOCKET_TOKEN || null,
-                                               Tag: "#Foreign_System#,#Instant_Message_Server_01#,#Callback#,#Proxy#",
+                                               Tag: "#Foreign_System#,#Foreign_System_04#,#Instant_Message_Server_01#,#Callback#,#Proxy#",
                                                Comment: "Authorization token (API KEY) for inbound requests (HOOK) from instant message server",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
