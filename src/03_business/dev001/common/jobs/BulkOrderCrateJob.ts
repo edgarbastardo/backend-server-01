@@ -9,7 +9,7 @@ import cluster from "cluster";
 
 import Queue from "bull";
 
-import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
+//import { QueryTypes } from "sequelize"; //Original sequelize //OriginalSequelize,
 
 import path from "path";
 import fs from "fs"; //Load the filesystem module
@@ -29,7 +29,7 @@ import LoggerManager from "../../../../02_system/common/managers/LoggerManager";
 import I18NManager from "../../../../02_system/common/managers/I18Manager";
 
 //import { Redis, Cluster } from "ioredis";
-import { OdinRequestServiceV1 } from "../../../common/services/OdinRequestServiceV1";
+import { OdinV1LegacyAPIRequestService } from "../../../common/services/OdinV1LegacyAPIRequestService";
 
 const debug = require( "debug" )( "BulkOrderCreateJob" );
 
@@ -422,13 +422,11 @@ export default class BulkOrderCreateJob {
                                   };
 
             const jsonOutputDetails = {
-
-              Row: intRow,
-              Kind: "regular",
-              Message: "Default",
-              Result: null
-
-            };
+                                        Row: intRow,
+                                        Kind: "regular",
+                                        Message: "Default",
+                                        Result: null
+                                      };
 
             fs.writeFileSync( strOutputJobFile, await I18NManager.translate( strLanguage, "Ok: JOB Id %s.\n", job.data.Id ) );
 
@@ -456,17 +454,13 @@ export default class BulkOrderCreateJob {
               fs.writeFileSync( strStatusJobFile, JSON.stringify( jsonStatusJob ) );
 
               const headers = {
-
-                "Content-Type": "application/json",
-                "Authorization": process.env.ODINV1_API_KEY_01
-
-              }
+                                "Content-Type": "application/json",
+                                "Authorization": process.env.ODIN_V1_API_KEY_01
+                              }
 
               const backend = {
-
-                url: [ job.data.Backend ]
-
-              }
+                                url: [ job.data.Backend ]
+                              }
 
               let createdAt = null;
 
@@ -532,9 +526,9 @@ export default class BulkOrderCreateJob {
 
                   fs.appendFileSync( strOutputJobFile, "Ok: " + jsonStatusJob.Message + "\n" );
 
-                  const result = await OdinRequestServiceV1.callCreateOrder( backend,
-                                                                             headers,
-                                                                             body ) as any;
+                  const result = await OdinV1LegacyAPIRequestService.callCreateOrder( backend,
+                                                                                      headers,
+                                                                                      body ) as any;
 
                   if ( result ) {
 

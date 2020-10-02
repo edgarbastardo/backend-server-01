@@ -1,9 +1,9 @@
 
 import fetch from "node-fetch";
 
-let debug = require( "debug" )( "OdinRequestServiceV1" );
+let debug = require( "debug" )( "OdinV1LegacyAPIRequestService" );
 
-export class OdinRequestServiceV1 {
+export class OdinV1LegacyAPIRequestService {
 
   static async callCreateOrder( backend: any,
                                 headers: any,
