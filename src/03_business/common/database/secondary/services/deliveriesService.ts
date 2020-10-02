@@ -33,7 +33,7 @@ export default class deliveriesService extends BaseService { //<= Change class n
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -127,7 +127,7 @@ export default class deliveriesService extends BaseService { //<= Change class n
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -241,7 +241,7 @@ export default class deliveriesService extends BaseService { //<= Change class n
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 

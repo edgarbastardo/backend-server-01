@@ -1,3 +1,4 @@
+import { integer } from "random-js";
 import {
          Model,
          Column,
@@ -5,12 +6,15 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         Unique,
+         NotEmpty,
+         NotNull
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
          //AfterFind,
        } from "sequelize-typescript";
-import { BuildOptions } from "sequelize/types";
+import { BuildOptions, INTEGER, IntegerDataType } from "sequelize/types";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
@@ -18,10 +22,10 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "drivers",
-  modelName: "drivers"
+  tableName: "establishments",
+  modelName: "establishments"
 } )
-export class drivers extends Model<drivers> {
+export class establishments extends Model<establishments> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -49,62 +53,99 @@ export class drivers extends Model<drivers> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   user_id: string;
 
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  zone: string;
+  @Column( { type: DataType.INTEGER, allowNull: true } )
+  ranking: number;
 
   @Column( { type: DataType.INTEGER, allowNull: true } )
-  status: number;
+  priority: number;
 
-  @Column( { type: DataType.INTEGER, allowNull: true } )
-  active: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: false } )
-  point_accumulated: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: false } )
-  deliveries_completed: number;
-
-  @Column( { type: DataType.INTEGER, allowNull: false } )
-  qualification: number;
-
-  @Column( { type: DataType.DATEONLY, allowNull: true } )
-  birthday: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  social_id: string;
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  fee: number;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   address: string;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  car_model: string;
+  zone: string;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  license_number: string;
-
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
-  insurance_expire_day: string;
-
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
-  registration_expire_day: string;
-
-  @Column( { type: DataType.TEXT, allowNull: true } )
-  selfie: string;
+  email: string;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  hear_about_us: string;
+  email1: string;
+
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  payableto: string;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  fee_rep: number;
+
+  @Column( { type: DataType.INTEGER, allowNull: true } )
+  fee_odin: number;
+
+  @Column( { type: DataType.INTEGER, allowNull: true } )
+  service: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  base_miles: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  fee_driver: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  fee_prepaid: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  fee_charged: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  extra_miles_driver: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  extra_miles_establishment: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 3 ), allowNull: true } )
+  tax: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 3 ), allowNull: true } )
+  percentage: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 3 ), allowNull: true } )
+  charge_card: number;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  created_at: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  updated_at: string;
+
+  @Column( { type: DataType.DECIMAL( 10, 3 ), allowNull: true } )
+  percentage_eat24: number;
+
+  @Column( { type: DataType.INTEGER, allowNull: true } )
+  DriversFijos: number;
+
+  @Column( { type: DataType.TINYINT, allowNull: true } )
+  miles_limited: number;
+
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  base_miles_driver: number;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   payment_method: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  bank_name: string;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   routing_number: string;
@@ -112,20 +153,8 @@ export class drivers extends Model<drivers> {
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   bank_account_number: string;
 
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  tax_information: string;
-
-  @Column( { type: DataType.TINYINT, allowNull: false } )
-  show_name : number;
-
-  @Column( { type: DataType.STRING, allowNull: false } )
-  created_at: string;
-
-  @Column( { type: DataType.STRING, allowNull: false } )
-  updated_at: string;
-
   @BeforeValidate
-  static beforeValidateHook( instance: drivers, options: any ): void {
+  static beforeValidateHook( instance: establishments, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

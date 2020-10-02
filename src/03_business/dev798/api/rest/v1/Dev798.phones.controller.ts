@@ -9,35 +9,26 @@ import {
 //import { Controller, Get, Post, Param, Delete, Body, Req, Res, UseBefore } from "routing-controllers";
 import {
   controller,
-  //httpGet,
-  //httpPost,
   //response,
   //requestParam,
   //requestBody,
   //request,
-  httpGet,
-  httpPost
+  httpPost,httpDelete
 } from "inversify-express-utils";
 import { inject } from 'inversify';
 
 import CommonConstants from '../../../../../02_system/common/CommonConstants';
-
 import CommonUtilities from '../../../../../02_system/common/CommonUtilities';
 import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
-
-//import I18NManager from '../../../../../../02_system/common/managers/I18Manager';
-import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
-
 import SYSRouteService from '../../../../../02_system/common/database/master/services/SYSRouteService';
+import MiddlewareManager from '../../../../../02_system/common/managers/MiddlewareManager';
+import Dev798ServicesPhoneController from '../../../services/v1/Dev798Service.phones.controller';
 
-import Dev798ServicesController from "../../../services/v1/Dev798Service.controller";
-import { Transaction } from 'sequelize';
-
-const debug = require( 'debug' )( 'Dev798.controller' );
+const debug = require( 'debug' )( 'Dev798.phones.controller' );
 
 //@injectable()
-@controller( process.env.SERVER_ROOT_PATH + Dev798Controller._BASE_PATH )
-export default class Dev798Controller {
+@controller( process.env.SERVER_ROOT_PATH + Dev798PhoneController._BASE_PATH )
+export default class Dev798PhoneController {
 
   //AccessKind: 1 Public
   //AccessKind: 2 Authenticated
@@ -50,10 +41,11 @@ export default class Dev798Controller {
 
   static readonly _TO_IOC_CONTAINER = true;
 
-  static readonly _BASE_PATH = "/v1/business/dev798/odinv1";
+  static readonly _BASE_PATH = "/v1/business/dev798/phone";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev798Controller._BASE_PATH + "/delivery/order", Action: ".v1.business.dev798.odinv1.delivery.order.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Allow to create delivery order in odin v1 legacy database" },
+                                  { Path: Dev798PhoneController._BASE_PATH, Action: "v1.business.dev798.odinv1.phone.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create new phone information" },
+                                  { Path: Dev798PhoneController._BASE_PATH, Action: "v1.business.dev798.odinv1.phone.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete phone information" },
                                 ]
 
   _controllerLogger = null;
@@ -68,7 +60,7 @@ export default class Dev798Controller {
 
     try {
 
-      for ( let routeInfo of Dev798Controller._ROUTE_INFO ) {
+      for ( let routeInfo of Dev798PhoneController._ROUTE_INFO ) {
 
         await SYSRouteService.createOrUpdateRouteAndRoles( routeInfo.AccessKind,
                                                            routeInfo.RequestKind,
@@ -87,9 +79,9 @@ export default class Dev798Controller {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = Dev798Controller.name + "." + this.registerInDataBase.name;
+      sourcePosition.method = Dev798PhoneController.name + "." + this.registerInDataBase.name;
 
-      const strMark = "9F38503F083E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "C506727D9BF9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -112,21 +104,43 @@ export default class Dev798Controller {
   }
 
   @httpPost(
-             "/delivery/order",
-             MiddlewareManager.middlewareSetContext,
-             MiddlewareManager.middlewareCheckIsAuthenticated
-           )
-  async createDeliveryOrder( request: Request, response: Response ) {
+            "",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+            MiddlewareManager.middlewareCheckIsAuthorized,
+          )
+  async createPhone( request: Request, response: Response ) {
 
     const context = ( request as any ).context;
 
-    const result = await Dev798ServicesController.createDeliveryOrder( request,
-                                                                       response,
-                                                                       null,
-                                                                       this._controllerLogger || context.Logger );
+    //let strLanguage = context.Language;
+
+    const result = await Dev798ServicesPhoneController.createPhone( request,
+                                                                        response,
+                                                                        null,
+                                                                        context.logger );
 
     response.status( result.StatusCode ).send( result );
 
   }
 
+
+ @httpDelete(
+    "",
+    MiddlewareManager.middlewareSetContext,
+    MiddlewareManager.middlewareCheckIsAuthenticated,
+    MiddlewareManager.middlewareCheckIsAuthorized,
+  )
+async deletePhone( request: Request, response: Response ) {
+
+const context = ( request as any ).context;
+
+const result = await Dev798ServicesPhoneController.deletePhone( request,
+                                                                    response,
+                                                                    null,
+                                                                    context.logger );
+
+response.status( result.StatusCode ).send( result );
+
+}
 }

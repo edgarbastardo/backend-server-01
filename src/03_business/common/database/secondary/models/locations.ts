@@ -85,13 +85,13 @@ export class locations extends Model<locations> {
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   address_type: string;
 
-  @Column( { type: DataType.NOW, allowNull: true } )
+  @Column( { type: DataType.STRING, allowNull: true } )
   deleted_at: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @Column( { type: DataType.STRING, allowNull: false } )
   created_at: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @Column( { type: DataType.STRING, allowNull: false } )
   updated_at: string;
 
   @BeforeValidate

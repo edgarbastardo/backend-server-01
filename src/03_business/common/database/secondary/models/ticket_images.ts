@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         Unique,
+         NotNull,
+         NotEmpty
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -30,16 +33,19 @@ export class ticket_images extends Model<ticket_images> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   order_id: string;
 
   @Column( { type: DataType.TEXT, allowNull: true } )
   image: string;
 
-  //@Column( { type: DataType.NOW } )
+  //@Column( { type: DataType.STRING } )
   //created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
 
   @Column( { type: DataType.SMALLINT, allowNull: true } )

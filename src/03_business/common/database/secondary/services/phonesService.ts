@@ -21,7 +21,7 @@ export default class phonesService extends BaseService { //<= Change class name 
   static readonly _ID = "phonesService"; //<= Change here for the right service name
 
   static async getById( strId: string,
-                        strTimeZoneId: string,
+                        // strTimeZoneId: string,
                         transaction: any,
                         logger: any ): Promise<phones> { //<= Change here for the right model name
 
@@ -33,7 +33,7 @@ export default class phonesService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -52,13 +52,13 @@ export default class phonesService extends BaseService { //<= Change class name 
 
       result = await phones.findOne( options ); //<= Change here for the right model name
 
-      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+      // if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
-        SystemUtilities.transformModelToTimeZone( result,
-                                                  strTimeZoneId,
-                                                  logger );
+      //   SystemUtilities.transformModelToTimeZone( result,
+      //                                             strTimeZoneId,
+      //                                             logger );
 
-      }
+      // }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -127,7 +127,7 @@ export default class phonesService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -241,7 +241,7 @@ export default class phonesService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 

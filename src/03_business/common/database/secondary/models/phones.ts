@@ -5,6 +5,8 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         Unique,
+         NotNull
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -49,16 +51,20 @@ export class phones extends Model<phones> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   phone: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
   created_at: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
   updated_at: string;
 
   @BeforeValidate

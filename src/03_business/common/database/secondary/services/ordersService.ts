@@ -33,7 +33,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -127,7 +127,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -160,6 +160,9 @@ export default class ordersService extends BaseService { //<= Change class name 
         if ( !createOrUpdateData.UpdatedBy ) {
 
           createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
 
         }
 
@@ -241,7 +244,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 

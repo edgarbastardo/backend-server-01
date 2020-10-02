@@ -1,3 +1,4 @@
+import { integer } from "random-js";
 import {
          Model,
          Column,
@@ -5,12 +6,15 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         Unique,
+         NotEmpty,
+         NotNull
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
          //AfterFind,
        } from "sequelize-typescript";
-import { BuildOptions } from "sequelize/types";
+import { BuildOptions, INTEGER, IntegerDataType } from "sequelize/types";
 
 import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
@@ -18,10 +22,10 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "deliveries",
-  modelName: "deliveries"
+  tableName: "users",
+  modelName: "users"
 } )
-export class deliveries extends Model<deliveries> {
+export class users extends Model<users> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
@@ -49,63 +53,95 @@ export class deliveries extends Model<deliveries> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
-  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  driver_id: string;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  first_name: string;
 
-  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  order_id: string;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  last_name: string;
 
-  @Column( { type: DataType.INTEGER, allowNull: false } )
-  qualification: number;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 45 ), allowNull: false } )
+  short_name: string;
 
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  tip1: number;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  phone: string;
 
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  tip2: number;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  email: string;
 
-  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
-  tip: number;
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
+  password: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  role: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  restriction: string;
+
+  @Column( { type: DataType.STRING( 1500 ), allowNull: true } )
+  session_id: string;
+
+  @Column( { type: DataType.STRING( 100 ), allowNull: true } )
+  remember_token: string;
+
+  @Column( { type: DataType.STRING( 1000 ), allowNull: true } )
+  auth_secret_token: string;
+
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
+  auth_public_token: string;
 
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  tip_method: string;
+  deleted_at: string;
 
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  tip_method1: string;
-
-  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
-  tip_method2: string;
-
-  @Column( { type: DataType.STRING, allowNull: true } )
-  tip_validated_at: string;
-
-  @Column( { type: DataType.STRING, allowNull: true } )
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   created_at: string;
 
-  @Column( { type: DataType.STRING, allowNull: true } )
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   updated_at: string;
 
-  @BeforeValidate
-  static beforeValidateHook( instance: deliveries, options: any ): void {
 
-    SystemUtilities.commonBeforeValidateHook( instance, options );
 
-  }
+@BeforeValidate
+static beforeValidateHook( instance: users, options: any ): void {
 
-  /*
-  @BeforeCreate
-  static beforeCreateHook( instance: TicketImages, options: any ): void {
+  SystemUtilities.commonBeforeValidateHook( instance, options );
 
-    SystemUtilities.commonBeforeCreateHook( instance, options );
+}
 
-    SYSDatabaseLogService.logTableOperation( "master",
-                                             "bizExample",
-                                             "create",
-                                             instance,
-                                             null );
+/*
+@BeforeCreate
+static beforeCreateHook( instance: TicketImages, options: any ): void {
+
+  SystemUtilities.commonBeforeCreateHook( instance, options );
+
+  SYSDatabaseLogService.logTableOperation( "master",
+                                            "bizExample",
+                                            "create",
+                                            instance,
+                                            null );
 
   }
 

@@ -12,18 +12,18 @@ import DBConnectionManager from '../../../../../02_system/common/managers/DBConn
 
 import BaseService from '../../../../../02_system/common/database/master/services/BaseService';
 
-import { drivers } from '../models/drivers';
+import { establishments } from '../models/establishments';
 
-const debug = require( 'debug' )( 'driversService' ); //<= Change here for the right service name
+const debug = require( 'debug' )( 'establishmentsService' ); //<= Change here for the right service name
 
-export default class driversService extends BaseService { //<= Change class name here use F2 key
+export default class establishmentsService extends BaseService { //<= Change class name here use F2 key
 
-  static readonly _ID = "driversService"; //<= Change here for the right service name
+  static readonly _ID = "establishmentsService"; //<= Change here for the right service name
 
-  static async getById( strId: string,
+  static async getByName( strName: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<drivers> { //<= Change here for the right model name
+                        logger: any ): Promise<establishments> { //<= Change here for the right model name
 
     let result = null;
 
@@ -45,12 +45,12 @@ export default class driversService extends BaseService { //<= Change class name
 
       const options = {
 
-        where: { "id": strId }, //<= Change here to right model field name
+        where: { "id": strName }, //<= Change here to right model field name
         transaction: currentTransaction,
 
       }
 
-      result = await drivers.findOne( options ); //<= Change here for the right model name
+      result = await establishments.findOne( options ); //<= Change here for the right model name
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -73,9 +73,9 @@ export default class driversService extends BaseService { //<= Change class name
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.getById.name;
+      sourcePosition.method = this.name + "." + this.getByName.name;
 
-      const strMark = "C0004CC2FDC4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "D76E3650291E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -117,7 +117,7 @@ export default class driversService extends BaseService { //<= Change class name
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<drivers> { //<= Change here for the right model name
+                               logger: any ): Promise<establishments> { //<= Change here for the right model name
 
     let result = null;
 
@@ -145,11 +145,11 @@ export default class driversService extends BaseService { //<= Change class name
                       }
 
       //      \/   Use F2 to rename this variable name
-      let driversInDB = await drivers.findOne( options ); //<= Change here for the right model name
+      let establishmentsInDB = await establishments.findOne( options ); //<= Change here for the right model name
 
-      if ( driversInDB === null ) {
+      if ( establishmentsInDB === null ) {
 
-        driversInDB = await drivers.create( //<= Change here for the right model name
+        establishmentsInDB = await establishments.create( //<= Change here for the right model name
                                           createOrUpdateData,
                                           { transaction: currentTransaction }
                                         );
@@ -161,12 +161,15 @@ export default class driversService extends BaseService { //<= Change class name
 
         //   createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
+        //   createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+
         // }
 
-        await driversInDB.update( createOrUpdateData,
+        await establishmentsInDB.update( createOrUpdateData,
                                      options );
 
-        driversInDB = await drivers.findOne( options ); //<= Change here for the right model name
+        establishmentsInDB = await establishments.findOne( options ); //<= Change here for the right model name
 
       }
 
@@ -178,7 +181,7 @@ export default class driversService extends BaseService { //<= Change class name
 
       }
 
-      result = driversInDB;
+      result = establishmentsInDB;
 
     }
     catch ( error ) {
@@ -187,7 +190,7 @@ export default class driversService extends BaseService { //<= Change class name
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "F8A52C11131A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "54838A5F1C01" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -229,7 +232,7 @@ export default class driversService extends BaseService { //<= Change class name
   }
 
                          //      \/   Use F2 to rename this variable name
-  static async deleteByModel( driver: drivers, //<= Change here for the right model name, aditional rename the parameter variable using F2
+  static async deleteByModel( order: establishments, //<= Change here for the right model name, aditional rename the parameter variable using F2
                               transaction: any,
                               logger: any ): Promise<Error|boolean> {
 
@@ -257,7 +260,7 @@ export default class driversService extends BaseService { //<= Change class name
 
       }
 
-      await driver.destroy( options ); //<= Change here for the right model name
+      await order.destroy( options ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -276,7 +279,7 @@ export default class driversService extends BaseService { //<= Change class name
 
       sourcePosition.method = this.name + "." + this.deleteByModel.name;
 
-      const strMark = "E80C3E219ED4" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "1DBF48B78541" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

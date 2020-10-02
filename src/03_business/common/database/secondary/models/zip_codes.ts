@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         Unique,
+         NotEmpty,
+         NotNull
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -49,16 +52,21 @@ export class zip_codes extends Model<zip_codes> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   zip_code: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
   created_at: string;
 
-  @Column( { type: DataType.NOW, allowNull: false } )
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
   updated_at: string;
 
   @BeforeValidate
