@@ -200,7 +200,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       DeliveryAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 )
+                       DeliveryAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
