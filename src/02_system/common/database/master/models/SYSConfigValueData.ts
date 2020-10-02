@@ -77,13 +77,13 @@ export class SYSConfigValueData extends Model<SYSConfigValueData> {
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 60 ) } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

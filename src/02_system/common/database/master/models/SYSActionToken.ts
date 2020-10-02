@@ -16,10 +16,11 @@ import {
        } from "sequelize-typescript";
 import { BuildOptions } from "sequelize/types";
 
-import CommonConstants from "../../../CommonConstants";
+//import CommonConstants from "../../../CommonConstants";
 
-import CommonUtilities from "../../../CommonUtilities";
+//import CommonUtilities from "../../../CommonUtilities";
 import SystemUtilities from "../../../SystemUtilities";
+
 import SYSDatabaseLogService from '../services/SYSDatabaseLogService';
 
 const debug = require( 'debug' )( 'SYSActionToken' );
@@ -59,16 +60,16 @@ export class SYSActionToken extends Model<SYSActionToken> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   ExpireAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

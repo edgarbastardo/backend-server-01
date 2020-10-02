@@ -1104,7 +1104,7 @@ export default class App {
                                                               networkLeader: {
                                                                                 Id: SystemUtilities.strNetworkId,
                                                                                 IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                                                From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
+                                                                                From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null
                                                                               }
                                                             }
                                                           );
@@ -1116,7 +1116,7 @@ export default class App {
                                      networkLeader: {
                                                       Id: SystemUtilities.strNetworkId,
                                                       IsLeader: SystemUtilities.bIsNetworkLeader,
-                                                      From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format(): null
+                                                      From: SystemUtilities.NetworkLeaderFrom ? SystemUtilities.NetworkLeaderFrom.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null
                                                     }
                                    }
                                  );

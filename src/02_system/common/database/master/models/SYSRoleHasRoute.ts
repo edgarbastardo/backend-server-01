@@ -51,7 +51,7 @@ export class SYSRoleHasRoute extends Model<SYSRoleHasRoute> {
   @Column( { type: DataType.STRING( 150 ) } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 60 ) } )
   CreatedAt: string;
 
   @BeforeValidate

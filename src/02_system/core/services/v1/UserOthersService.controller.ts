@@ -920,7 +920,7 @@ export default class UserOthersServiceController {
 
                 sysUserInDB.Password = strNewPassword;
                 sysUserInDB.ForceChangePassword = 0;
-                sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format();
+                sysUserInDB.PasswordSetAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
                 sysUserInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
                 const userWithPasswordChanged = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
