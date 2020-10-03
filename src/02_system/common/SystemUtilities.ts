@@ -271,6 +271,42 @@ export default class SystemUtilities {
 
   }
 
+  static getCurrentDateAndTimeIncSeconds( intSeconds: number ): any {
+
+    let result = null;
+
+    try {
+
+      result = moment().tz( CommonUtilities.getCurrentTimeZoneId() ).add( intSeconds, "seconds" );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
+  static getCurrentDateAndTimeDecSeconds( intSeconds: number ): any {
+
+    let result = null;
+
+    try {
+
+      result = moment().tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intSeconds, "seconds" ); //moment().format( CommonUtilities.getCurrentTimeZoneId() );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
   static getCurrentDateAndTimeIncMinutes( intMinutes: number ): any {
 
     let result = null;
