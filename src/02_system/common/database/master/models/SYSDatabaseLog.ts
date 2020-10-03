@@ -55,7 +55,7 @@ export class SYSDatabaseLog extends Model<SYSDatabaseLog> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

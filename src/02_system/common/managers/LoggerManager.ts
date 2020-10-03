@@ -53,8 +53,8 @@ export default class LoggerManager {
             colorize: false,
             format: winston.format.printf( ( info ) => {
 
-              //return `${SystemUtilities.getCurrentDateAndTime().format()}, ${JSON.stringify( info, null, 2 ) }`;
-              return `${SystemUtilities.getCurrentDateAndTime().format()}, ${safeStringify( info, null, 2 ) }`;
+              //return `${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis )}, ${JSON.stringify( info, null, 2 ) }`;
+              return `${SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis )}, ${safeStringify( info, null, 2 ) }`;
 
             } )
             //format: formatter

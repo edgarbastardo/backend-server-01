@@ -19,6 +19,7 @@ import { BuildOptions } from "sequelize/types";
 //import Hashes from 'jshashes';
 //import moment from "moment-timezone";
 
+import CommonConstants from "../../../CommonConstants";
 import SystemConstants from "../../../SystemContants";
 
 import SystemUtilities from "../../../SystemUtilities";
@@ -62,7 +63,7 @@ export class SYSSystemEventLog extends Model<SYSSystemEventLog> {
   @Column( { type: DataType.STRING( 75 ), allowNull: false } )
   Code: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   EventAt: string;
 
   @Column( { type: DataType.JSON, allowNull: false } )
@@ -71,7 +72,7 @@ export class SYSSystemEventLog extends Model<SYSSystemEventLog> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )
@@ -90,7 +91,7 @@ export class SYSSystemEventLog extends Model<SYSSystemEventLog> {
 
     }
 
-    instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format();
+    instance.CreatedAt = SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
   }
 

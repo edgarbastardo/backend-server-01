@@ -35,8 +35,6 @@ export default class Always {
 
       }
 
-      //Migration code here
-
       const userSessionPersistentEntries = [
                                              {
                                                Id: "23e0a6d8-4cc8-4cec-a2a7-7382539c1cd9",
@@ -44,7 +42,7 @@ export default class Always {
                                                Token: process.env.FOREIGN_SYSTEM_01_TOKEN || "1",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_01_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_01_SOCKET_TOKEN || null,
-                                               Tag: "#ForeignSystem#,#ForeignSystem01#,#Upload_Binary#,#Update_Binary#,#Search_Binary#,#Binary_Data_Allow_To_Define_Id#,#Binary_Data_Allow_To_Define_Date#",
+                                               Tag: "#Foreign_System#,#Foreign_System_01#,#Upload_Binary#,#Update_Binary#,#Search_Binary#,#Binary_Data_Allow_To_Define_Id#,#Binary_Data_Allow_To_Define_Date#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
@@ -55,7 +53,7 @@ export default class Always {
                                                Token: process.env.FOREIGN_SYSTEM_02_TOKEN || "2",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_02_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_02_SOCKET_TOKEN || null,
-                                               Tag: "#ForeignSystem#,#ForeignSystem02#",
+                                               Tag: "#Foreign_System#,#Foreign_System_02#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
@@ -66,23 +64,100 @@ export default class Always {
                                                Token: process.env.FOREIGN_SYSTEM_03_TOKEN || "3",
                                                BinaryDataToken: process.env.FOREIGN_SYSTEM_03_BINARY_DATA_TOKEN || null,
                                                SocketToken: process.env.FOREIGN_SYSTEM_03_SOCKET_TOKEN || null,
-                                               Tag: "#ForeignSystem#,#ForeignSystem03#",
+                                               Tag: "#Foreign_System#,#Foreign_System_03#",
                                                Comment: "Generic authorization token (API KEY)",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
                                              {
                                                Id: "047c0058-4d36-45da-b6c9-98e69e0bf831",
-                                               UserId: "75cc6129-ae0f-4f65-943a-ff6909317ff0", //IntantMessageServer01
-                                               Token: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_TOKEN || "1",
-                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_BINARY_DATA_TOKEN || null,
-                                               SocketToken: process.env.FOREIGN_SYSTEM_04_IM_MANAGER_HOOK_SOCKET_TOKEN || null,
-                                               Tag: "#ForeignSystem#,#InstantMessageServer01#,#Callback#,#Proxy#",
+                                               UserId: "e4f82a85-c800-47bc-bc3a-f6a427f3da02", //ForeignSystem04
+                                               Token: process.env.FOREIGN_SYSTEM_04_TOKEN || "4",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_04_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_04_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_04#,#Instant_Message_Server_01#,#Callback#,#Proxy#",
                                                Comment: "Authorization token (API KEY) for inbound requests (HOOK) from instant message server",
                                                CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
                                              },
-                                          ]
+                                             {
+                                               Id: "660f235f-66cd-4892-a866-89b86ea90303",
+                                               UserId: "4607413a-3dca-4a8a-9f2b-2fee3617a990", //ForeignSystem05
+                                               Token: process.env.FOREIGN_SYSTEM_05_TOKEN || "5",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_05_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_05_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_05#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "3dadb777-0eba-48a4-a2f1-9dc8edf7b5bb",
+                                               UserId: "73d2a3fd-0a93-4fde-84d3-e03033a7a8d7", //ForeignSystem06
+                                               Token: process.env.FOREIGN_SYSTEM_06_TOKEN || "6",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_06_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_06_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_06#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "0c01ad3a-b251-4e40-9f7e-40ae3716a64f",
+                                               UserId: "681a4b6f-fed2-44db-a126-df2b71cd9b87", //ForeignSystem07
+                                               Token: process.env.FOREIGN_SYSTEM_07_TOKEN || "7",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_07_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_07_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_07#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "a60b9319-9d25-49c2-b264-8df00b2d18db",
+                                               UserId: "cb3d02ac-9d51-4d46-b948-04e1375e146b", //ForeignSystem08
+                                               Token: process.env.FOREIGN_SYSTEM_08_TOKEN || "8",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_08_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_08_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_08#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "52b9b489-fe0f-4941-bf31-6ffdfc93f2b0",
+                                               UserId: "eab1f6a3-fa2b-44c7-bf84-8ba4aba093a1", //ForeignSystem09
+                                               Token: process.env.FOREIGN_SYSTEM_09_TOKEN || "9",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_09_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_09_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_09#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "70643d7c-5360-4b03-a81a-e9b6250efe8f",
+                                               UserId: "81d0ead1-00a8-4a05-a0e7-7a0191f04e0c", //ForeignSystem10
+                                               Token: process.env.FOREIGN_SYSTEM_10_TOKEN || "10",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_10_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_10_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_10#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                             {
+                                               Id: "35969dee-f2de-47b9-8e87-4a299f5e3637",
+                                               UserId: "75cc6129-ae0f-4f65-943a-ff6909317ff0", //ForeignSystem11
+                                               Token: process.env.FOREIGN_SYSTEM_11_TOKEN || "11",
+                                               BinaryDataToken: process.env.FOREIGN_SYSTEM_11_BINARY_DATA_TOKEN || null,
+                                               SocketToken: process.env.FOREIGN_SYSTEM_11_SOCKET_TOKEN || null,
+                                               Tag: "#Foreign_System#,#Foreign_System_11#",
+                                               Comment: "Generic authorization token (API KEY)",
+                                               CreatedBy: SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
+                                               DisabledBy: null //"1@" + SystemConstants._DISABLED_BY_BACKEND_SYSTEM_NET,
+                                             },
+                                           ]
 
       const loopUserSessionPersistentEntriesAsync = async () => {
 
@@ -109,16 +184,16 @@ export default class Always {
           else if ( !sysUserSessionPersistentInDB.Tag ||
                     sysUserSessionPersistentInDB.Tag.includes( "#Not_Update_On_Startup#" ) === false ) {
 
-            userSessionPersistentToCreate.UserId = sysUserSessionPersistentInDB.UserId;
-            userSessionPersistentToCreate.Token = sysUserSessionPersistentInDB.Token;
-            userSessionPersistentToCreate.BinaryDataToken = sysUserSessionPersistentInDB.BinaryDataToken;
-            userSessionPersistentToCreate.SocketToken = sysUserSessionPersistentInDB.SocketToken;
-            userSessionPersistentToCreate.Tag = sysUserSessionPersistentInDB.Tag;
-            userSessionPersistentToCreate.Comment = sysUserSessionPersistentInDB.Comment;
-            userSessionPersistentToCreate.UpdateBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-            userSessionPersistentToCreate.UpdateAt = null;
+            sysUserSessionPersistentInDB.UserId = userSessionPersistentToCreate.UserId;
+            sysUserSessionPersistentInDB.Token = userSessionPersistentToCreate.Token;
+            sysUserSessionPersistentInDB.BinaryDataToken = userSessionPersistentToCreate.BinaryDataToken || null;
+            sysUserSessionPersistentInDB.SocketToken = userSessionPersistentToCreate.SocketToken || null;
+            sysUserSessionPersistentInDB.Tag = userSessionPersistentToCreate.Tag || null;
+            sysUserSessionPersistentInDB.Comment = userSessionPersistentToCreate.Comment || null;
+            sysUserSessionPersistentInDB.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+            sysUserSessionPersistentInDB.UpdatedAt = null;
 
-            await sysUserSessionPersistentInDB.update( ( userSessionPersistentToCreate as any ).dataValues,
+            await sysUserSessionPersistentInDB.update( ( sysUserSessionPersistentInDB as any ).dataValues,
                                                        options );
 
           }

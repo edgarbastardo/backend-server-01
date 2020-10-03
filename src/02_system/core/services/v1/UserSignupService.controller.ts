@@ -291,7 +291,7 @@ export default class UserSingupServiceController {
                                                                                        Comment: CommonUtilities.isNotNullOrEmpty( signupData.Comment ) ? signupData.Comment : null,
                                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                        CreatedAt: null,
-                                                                                       ExpireAt: expireAt ? expireAt.format(): null
+                                                                                       ExpireAt: expireAt ? expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null
                                                                                      },
                                                                                      false,
                                                                                      currentTransaction,
@@ -315,7 +315,7 @@ export default class UserSingupServiceController {
                                                                                                        currentTransaction,
                                                                                                        logger );
 
-                        const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                        const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                                       context.TimeZoneId,
                                                                                                       CommonConstants._DATE_TIME_LONG_FORMAT_04,
                                                                                                       logger ): null;
@@ -356,7 +356,7 @@ export default class UserSingupServiceController {
                                             UserName: signupData.Name,
                                             UserGroupId: "No apply",
                                             Code: "SUCCESS_USER_SIGNUP",
-                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                             Data: {}
                                           }
 
@@ -375,7 +375,7 @@ export default class UserSingupServiceController {
                                                                 UserName: signupData.Name,
                                                                 UserGroupId: "No apply",
                                                                 Code: "SUCCESS_USER_SIGNUP",
-                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                 Data: {}
                                                               },
                                                               logger );
@@ -414,7 +414,7 @@ export default class UserSingupServiceController {
                                             UserName: signupData.Name,
                                             UserGroupId: "No apply",
                                             Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
-                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                             Data: {}
                                           }
 
@@ -433,7 +433,7 @@ export default class UserSingupServiceController {
                                                                 UserName: signupData.Name,
                                                                 UserGroupId: "No apply",
                                                                 Code: "ERROR_USER_SIGNUP_CANNOT_SEND_EMAIL",
-                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                 Data: {}
                                                               },
                                                               logger );
@@ -1897,7 +1897,7 @@ export default class UserSingupServiceController {
                                                                                  Name: sysUserSignupInDB.Name,
                                                                                  Role: strRole ? strRole: null,
                                                                                  Tag: strTag ? strTag: null,
-                                                                                 ExpireAt: expireAt ? expireAt.format(): null,
+                                                                                 ExpireAt: expireAt ? expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null,
                                                                                  CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                                  Comment: sysUserSignupInDB.Comment
                                                                                },
@@ -1977,7 +1977,7 @@ export default class UserSingupServiceController {
                                                                          Password: strPassword,
                                                                          Role: strRole ? strRole : null,
                                                                          Tag: strTag ? strTag : null,
-                                                                         ExpireAt: expireAt ? expireAt.format(): null,
+                                                                         ExpireAt: expireAt ? expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null,
                                                                          Comment: sysUserSignupInDB.Comment,
                                                                          CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                        },
@@ -2080,7 +2080,7 @@ export default class UserSingupServiceController {
                                             UserName: sysUserSignupInDB.Name,
                                             UserGroupId: sysUserGroup.Id,
                                             Code: "SUCCESS_USER_ACTIVATION",
-                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                            EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                             Data: {}
                                           }
 
@@ -2099,7 +2099,7 @@ export default class UserSingupServiceController {
                                                                 UserName: sysUserSignupInDB.Name,
                                                                 UserGroupId: sysUserGroup.Id,
                                                                 Code: "SUCCESS_USER_ACTIVATION",
-                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                                EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                 Data: {}
                                                               },
                                                               logger );

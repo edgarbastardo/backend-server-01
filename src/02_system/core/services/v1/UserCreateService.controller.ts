@@ -606,7 +606,7 @@ export default class UserCreateServiceController {
                                                                        ChangePasswordEvery: request.body.ChangePasswordEvery,
                                                                        SessionsLimit: request.body.SessionsLimit,
                                                                        ExtraData: request.body.Business ? CommonUtilities.jsonToString( { Business: request.body.Business }, logger ): null,
-                                                                       ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format(): null,
+                                                                       ExpireAt: request.body.ExpireAt ? SystemUtilities.getCurrentDateAndTimeFrom( request.body.ExpireAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ): null,
                                                                        Comment: request.body.Comment,
                                                                        CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
                                                                        CreatedAt: null,

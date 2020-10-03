@@ -3939,17 +3939,22 @@ export default class BinaryServiceController extends BaseService {
 
         const strFileName = SystemUtilities.getUUIDv4() + ".data";
 
-        fs.writeFileSync( SystemUtilities.strBaseRootPath +
-                          "/temp/" +
-                          SystemUtilities.getHostName() +
-                          "/" +
+        const strTempFilePath = SystemUtilities.strBaseRootPath +
+                                "/temp/" +
+                                SystemUtilities.getHostName() +
+                                "/";
+
+        fs.mkdirSync( strTempFilePath, { recursive: true } );
+
+        fs.writeFileSync( strTempFilePath +
                           strFileName,
                           buffer );
 
         request.body.FileEncoded = null;
         buffer = null;
 
-        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+        const strTempFullFilePath = strTempFilePath +
+                                    strFileName; //SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
 
         if ( fs.existsSync( strTempFullFilePath ) ) {
 
@@ -4116,7 +4121,7 @@ export default class BinaryServiceController extends BaseService {
 
                       strRelativePath = "temporal/" + strCategory + "/" + strDate + "/" + userSessionStatus.UserName + strContextPath;
 
-                      expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format();
+                      expireAt = SystemUtilities.isValidDateTime( request.body.ExpireAt ) ? request.body.ExpireAt : SystemUtilities.getCurrentDateAndTimeIncDays( 30 ).format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis );
 
                     }
 
@@ -4268,7 +4273,7 @@ export default class BinaryServiceController extends BaseService {
                                         UserName: context.UserSessionStatus.UserName,
                                         UserGroupId: context.UserSessionStatus.UserGroupId,
                                         Code: "SUCCESS_BINARY_DATA_UPLOAD",
-                                        EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                        EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                         Data: {
                                                 Id: sysBinaryIndexInDB.Id,
                                                 FilePath: sysBinaryIndexInDB.FilePath,
@@ -4292,7 +4297,7 @@ export default class BinaryServiceController extends BaseService {
                                                             UserName: context.UserSessionStatus.UserName,
                                                             UserGroupId: context.UserSessionStatus.UserGroupId,
                                                             Code: "SUCCESS_BINARY_DATA_UPLOAD",
-                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                            EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                             Data: {
                                                                     Id: sysBinaryIndexInDB.Id,
                                                                     FilePath: sysBinaryIndexInDB.FilePath,
@@ -4688,17 +4693,22 @@ export default class BinaryServiceController extends BaseService {
 
         const strFileName = SystemUtilities.getUUIDv4() + ".data";
 
-        fs.writeFileSync( SystemUtilities.strBaseRootPath +
-                          "/temp/" +
-                          SystemUtilities.getHostName() +
-                          "/" +
+        const strTempFilePath = SystemUtilities.strBaseRootPath +
+                                "/temp/" +
+                                SystemUtilities.getHostName() +
+                                "/";
+
+        fs.mkdirSync( strTempFilePath, { recursive: true } );
+
+        fs.writeFileSync( strTempFilePath +
                           strFileName,
                           buffer );
 
         request.body.FileEncoded = null;
         buffer = null;
 
-        const strTempFullFilePath = SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
+        const strTempFullFilePath = strTempFilePath +
+                                    strFileName; //SystemUtilities.strBaseRootPath + "/temp/" + strFileName;
 
         if ( fs.existsSync( strTempFullFilePath ) ) {
 
@@ -6598,7 +6608,7 @@ export default class BinaryServiceController extends BaseService {
                               UserName: context.UserSessionStatus.UserName,
                               UserGroupId: context.UserSessionStatus.UserGroupId,
                               Code: "SUCCESS_BINARY_DATA_DELETE",
-                              EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                              EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                               Data: {
                                       Id: sysBinaryIndexInDB.Id,
                                       FilePath: sysBinaryIndexInDB.FilePath,
@@ -6622,7 +6632,7 @@ export default class BinaryServiceController extends BaseService {
                                                   UserName: context.UserSessionStatus.UserName,
                                                   UserGroupId: context.UserSessionStatus.UserGroupId,
                                                   Code: "SUCCESS_BINARY_DATA_DELETE",
-                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format(),
+                                                  EventAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                   Data: {
                                                           Id: sysBinaryIndexInDB.Id,
                                                           FilePath: sysBinaryIndexInDB.FilePath,

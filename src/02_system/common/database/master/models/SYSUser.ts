@@ -92,13 +92,13 @@ export class SYSUser extends Model<SYSUser> {
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   Password: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   PasswordSetAt: string;
 
   @Column( { type: DataType.TEXT, allowNull: true } )
   Role: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   ExpireAt: string;
 
   @Column( { type: DataType.STRING( 1024 ), allowNull: true } )
@@ -114,19 +114,19 @@ export class SYSUser extends Model<SYSUser> {
 
   @NotNull
   @NotEmpty
-  @Column( { type: DataType.STRING( 30 ), allowNull: false })
+  @Column( { type: DataType.STRING( 60 ), allowNull: false })
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   DisabledBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   DisabledAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

@@ -876,7 +876,7 @@ export class DBMigrationManagerMYSQL {
 
                 const strFullPathCheckSum = SystemUtilities.hashString( strMigrationsFolder + "/" + strFileName, 2, null ); //Hashes.CRC32( strMigrationsFolder + "/" + strFileName ).toString( 16 );
 
-                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strMigrationsFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format() + "'";
+                const strValues = "'" + SystemUtilities.getUUIDv4() + "','" + os.hostname() + "','" + strMigrationsFolder + "','" + strFileName + "','" + strFullPathCheckSum + "','" + strContentCheckSum + "'," + ( bSuccess ? 1 : 0 ) + ",NULL,'backend@system.net','" + SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ) + "'";
 
                 const strSQL = `Insert Into sysDBMigratedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 
@@ -1071,7 +1071,7 @@ export class DBMigrationManagerMYSQL {
                                   strContentCheckSum + "'," +
                                   ( bSuccess ? 1 : 0 ) +
                                   ",NULL,'backend@system.net','" +
-                                  SystemUtilities.getCurrentDateAndTime().format() + "'";
+                                  SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ) + "'";
 
                 const strSQL = `Insert Into sysDBImportedData( Id, SystemId, FilePath, FileName, FullPathCheckSum, ContentCheckSum, Success, Comment, CreatedBy, CreatedAt ) Values( ${strValues} )`;
 

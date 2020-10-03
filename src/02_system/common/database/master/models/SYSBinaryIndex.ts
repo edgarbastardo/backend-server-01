@@ -50,7 +50,7 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   @Column( { type: DataType.TINYINT, allowNull: false } )
   StorageKind: number;
 
-  @Column( { type: DataType.STRING( 30 ) } )
+  @Column( { type: DataType.STRING( 60 ) } )
   ExpireAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
@@ -104,25 +104,25 @@ export class SYSBinaryIndex extends Model<SYSBinaryIndex> {
   @Column( { type: DataType.STRING( 150 ), allowNull: false } )
   CreatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: false } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   CreatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   UpdatedBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   UpdatedAt: string;
 
   @Column( { type: DataType.STRING( 150 ), allowNull: true } )
   DisabledBy: string;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   DisabledAt: string;
 
   @Column( { type: DataType.TINYINT, allowNull: false } )
   ProcessNeeded: number;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
+  @Column( { type: DataType.STRING( 60 ), allowNull: true } )
   ProcessStartedAt: string;
 
   @Column( { type: DataType.JSON, allowNull: true } )

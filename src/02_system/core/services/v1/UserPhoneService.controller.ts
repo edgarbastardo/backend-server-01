@@ -212,7 +212,7 @@ export default class UserPhoneServiceController {
                                                                               "UserName",
                                                                               logger );
 
-                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 1, logger );
 
                 const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
@@ -223,7 +223,7 @@ export default class UserPhoneServiceController {
                                                                                      Token: strChangeCode,
                                                                                      Status: 1,
                                                                                      CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                                     ExpireAt: expireAt.format(),
+                                                                                     ExpireAt: expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                      ExtraData: `{ "NewPhoneNumber": "${strWellFormattedPhoneNumberList}" }`
                                                                                    },
                                                                                    false,

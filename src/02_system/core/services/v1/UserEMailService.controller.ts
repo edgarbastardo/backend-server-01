@@ -209,7 +209,7 @@ export default class UserEMailServiceController {
                                                                               "UserName",
                                                                               logger );
 
-                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format(), 1, logger );
+                const strChangeCode = SystemUtilities.hashString( SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ), 1, logger );
 
                 const expireAt = SystemUtilities.getCurrentDateAndTimeIncMinutes( 60 );
 
@@ -220,7 +220,7 @@ export default class UserEMailServiceController {
                                                                                      Token: strChangeCode,
                                                                                      Status: 1,
                                                                                      CreatedBy: strUserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET,
-                                                                                     ExpireAt: expireAt.format(),
+                                                                                     ExpireAt: expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                      ExtraData: `{ "NewEMail": "${request.body.EMail}" }`
                                                                                    },
                                                                                    false,
@@ -243,7 +243,7 @@ export default class UserEMailServiceController {
                                                                                                  currentTransaction,
                                                                                                  logger );
 
-                  const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format(),
+                  const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                                 context.TimeZoneId,
                                                                                                 CommonConstants._DATE_TIME_LONG_FORMAT_04,
                                                                                                 logger ): null;
