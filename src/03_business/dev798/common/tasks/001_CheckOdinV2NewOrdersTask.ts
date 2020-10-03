@@ -1,5 +1,5 @@
 import cluster from 'cluster';
-
+import util from "util";
 /*
 import fs from 'fs';
 import os from 'os';
@@ -11,7 +11,7 @@ import FormData from 'form-data';
 import appRoot from 'app-root-path';
 */
 
-import parser from 'cron-parser';
+//import parser from 'cron-parser';
 
 import CommonConstants from '../../../../02_system/common/CommonConstants';
 //import SystemConstants from '../../../../02_system/common/SystemContants';
@@ -20,10 +20,11 @@ import CommonUtilities from "../../../../02_system/common/CommonUtilities";
 import SystemUtilities from "../../../../02_system/common/SystemUtilities";
 
 import DBConnectionManager from '../../../../02_system/common/managers/DBConnectionManager';
+import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
+import I18NManager from "../../../../02_system/common/managers/I18Manager";
+//import GeoMapManager from "../../../../02_system/common/managers/GeoMapManager"; //Google map api call manager. check en .env.secrets if not exist copy and rename .env.secrets.template to .env.secrets
 
 //import CommonRequestService from "../../../common/services/CommonRequestService";
-import NotificationManager from '../../../../02_system/common/managers/NotificationManager';
-import GeoMapManager from "../../../../02_system/common/managers/GeoMapManager"; //Google map api call manager. check en .env.secrets if not exist copy and rename .env.secrets.template to .env.secrets
 import OdinV2APIRequestService from "../../../common/services/OdinV2APIRequestService";
 
 let debug = require( 'debug' )( '001_CheckOdinV2NewOrdersTask' );
@@ -35,6 +36,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
   //public static minutesOfLastCleanPath: any = null;
 
   public static intRunNumber = 0;
+
+  public static lastExternalNotification = null;
 
   public async init( params: any, logger: any ): Promise<boolean> {
 
@@ -119,13 +122,49 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
   }
 
-  public async notifyError( logger: any ) {
+  public canNotifyToExternal( lastNotificationToExternal: any ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      if ( lastNotificationToExternal ) {
+
+        const currentDateAndTimeMinus30Seconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 30 );
+
+        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinus30Seconds.format(), lastNotificationToExternal.format() ) ) {
+
+          bResult = true;
+
+        }
+
+      }
+      else {
+
+        bResult = true;
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return bResult;
+
+  }
+
+  public async notifyToExternal( strKind: string = "error",
+                                 strMessage: string = "Error to get odin-v2 order to odin-v1.",
+                                 logger: any = null ) {
 
     await NotificationManager.publishToExternal(
                                                  {
                                                    body: {
-                                                           kind: "error",
-                                                           text: "Error to get odin-v2 order to odin-v1.",
+                                                           kind: strKind,
+                                                           text: strMessage,
                                                            fields: [
                                                                      {
                                                                        title: "Date",
@@ -181,6 +220,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       }
 
+      const strLanguage = "en_US";
+
       const debugMark = debug.extend( CheckOdinV2NewOrdersTask_001.intRunNumber + "-4946C11DC1AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "Running task..." );
@@ -207,8 +248,33 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                                        headers,
                                                                                        params );
 
-      if ( odinV2ReponseData.error === null &&
-           odinV2ReponseData.output?.status ) {
+      if ( !odinV2ReponseData ) {
+
+        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+          const strMessage = util.format( "No response data from odin-v2 backend" );
+
+          await this.notifyToExternal( "error", strMessage );
+
+          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+        }
+
+      }
+      else if ( odinV2ReponseData?.error ) {
+
+        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+          const strMessage = util.format( "Unexpected error [%s]", odinV2ReponseData?.error?.message );
+
+          await this.notifyToExternal( "error", strMessage );
+
+          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+        }
+
+      }
+      else if ( odinV2ReponseData?.error === null ) {
 
         if ( odinV2ReponseData.output?.status === 200 &&
              odinV2ReponseData.output?.body?.Data?.length > 0 ) {
@@ -244,7 +310,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
         }
         else {
 
-          debugMark( "WARNING: Unexpected response code %s from odin v2 backend...", odinV2ReponseData.output?.status );
+          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+            const strMessage = util.format( "Unexpected response code [%s] from odin v2 backend", odinV2ReponseData.output?.status );
+
+            debugMark( "WARNING: " + strMessage );
+
+            await this.notifyToExternal( "warning", strMessage );
+
+            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+          }
 
         }
 
