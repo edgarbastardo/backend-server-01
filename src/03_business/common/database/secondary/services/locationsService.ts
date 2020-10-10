@@ -114,6 +114,101 @@ export default class locationsService extends BaseService { //<= Change class na
 
   }
 
+  static async getByAddress( Address: string,
+                             strTimeZoneId: string,
+                             transaction: any,
+                             logger: any ): Promise<locations> { //<= Change here for the right model name
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "address": Address }, //<= Change here to right model field name
+        transaction: currentTransaction,
+
+      }
+
+      result = await locations.findOne( options ); //<= Change here for the right model name
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getByAddress.name;
+
+      const strMark = "629FB0EDC3A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,

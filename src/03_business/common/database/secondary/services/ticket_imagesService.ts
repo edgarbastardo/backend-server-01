@@ -21,6 +21,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
   static readonly _ID = "ticket_imagesService"; //<= Change here for the right service name
 
   static async getById( strId: string,
+                        strTimeZoneId: string,
                         transaction: any,
                         logger: any ): Promise<ticket_images> { //<= Change here for the right model name
 
@@ -50,6 +51,14 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
       }
 
       result = await ticket_images.findOne( options ); //<= Change here for the right model name
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "headers": {
+    "Authorization": "",
+    "Content-Type": "application/json",
+    "FrontendId": "ccc1",
+    "TimeZoneId": "America/Los_Angeles",
+    "Language": "en_US",
+    "BinaryDataToken": ""
+  },
+  "body": {
+    "Username": "noexistent@noexistent",
+    "Password": "1234567890"
+  },
+  "Test": "C908EC12AC83"
+}

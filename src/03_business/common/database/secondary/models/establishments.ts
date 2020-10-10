@@ -188,8 +188,15 @@ export class establishments extends Model<establishments> {
                                              oldDataValues );
 
   }
+*/
+  static async convertFieldValues( params: any ): Promise<any> {
 
-  @BeforeDestroy
+    return await SystemUtilities.commonConvertFieldValues( params );
+
+  }
+
+
+/*  @BeforeDestroy
   static beforeDestroyHook( instance: TicketImages, options: any ): void {
 
     SystemUtilities.commonBeforeDestroyHook( instance, options );

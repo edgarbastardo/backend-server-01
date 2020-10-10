@@ -21,6 +21,7 @@ export default class zip_codesService extends BaseService { //<= Change class na
   static readonly _ID = "zip_codesService"; //<= Change here for the right service name
 
   static async getById( strId: string,
+                        strTimeZoneId: string,
                         transaction: any,
                         logger: any ): Promise<zip_codes> { //<= Change here for the right model name
 
@@ -50,6 +51,14 @@ export default class zip_codesService extends BaseService { //<= Change class na
       }
 
       result = await zip_codes.findOne( options ); //<= Change here for the right model name
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

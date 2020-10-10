@@ -131,6 +131,12 @@ static beforeValidateHook( instance: users, options: any ): void {
 
 }
 
+static async convertFieldValues( params: any ): Promise<any> {
+
+  return await SystemUtilities.commonConvertFieldValues( params );
+
+}
+
 /*
 @BeforeCreate
 static beforeCreateHook( instance: TicketImages, options: any ): void {

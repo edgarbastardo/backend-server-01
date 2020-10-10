@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         NotEmpty,
+         NotNull,
+         Unique,
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -49,12 +52,17 @@ export class deliveries extends Model<deliveries> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   driver_id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   order_id: string;
 

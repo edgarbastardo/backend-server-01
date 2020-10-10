@@ -13,6 +13,9 @@ import DBConnectionManager from '../../../../../02_system/common/managers/DBConn
 import BaseService from '../../../../../02_system/common/database/master/services/BaseService';
 
 import { establishments } from '../models/establishments';
+import { users } from '../models/users';
+import { results } from 'inversify-express-utils';
+import usersService from './usersService';
 
 const debug = require( 'debug' )( 'establishmentsService' ); //<= Change here for the right service name
 
@@ -20,10 +23,10 @@ export default class establishmentsService extends BaseService { //<= Change cla
 
   static readonly _ID = "establishmentsService"; //<= Change here for the right service name
 
-  static async getByName( strName: string,
-                        strTimeZoneId: string,
-                        transaction: any,
-                        logger: any ): Promise<establishments> { //<= Change here for the right model name
+  static async getByName( Name: string,
+                          strTimeZoneId: string,
+                          transaction: any,
+                          logger: any ): Promise<establishments> { //<= Change here for the right model name
 
     let result = null;
 
@@ -43,28 +46,48 @@ export default class establishmentsService extends BaseService { //<= Change cla
 
       }
 
-      const options = {
-
-        where: { "id": strName }, //<= Change here to right model field name
-        transaction: currentTransaction,
-
-      }
-
-      result = await establishments.findOne( options ); //<= Change here for the right model name
-
-      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
-
-        SystemUtilities.transformModelToTimeZone( result,
-                                                  strTimeZoneId,
-                                                  logger );
-
-      }
+      let usersInDB = await usersService.getByFirstName( Name, null, logger ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
            bIsLocalTransaction ) {
 
-        await currentTransaction.commit();
+          await currentTransaction.commit();
+
+      }
+
+      if ( usersInDB === null ) {
+
+          console.log('error no hay user con ese nombre');
+
+      } else {
+
+        const options = {
+
+                          where: { "user_id": usersInDB.id }, //<= Change here to right model field name
+                          transaction: currentTransaction,
+
+                        }
+
+        result = await establishments.findOne( options ); //<= Change here for the right model name
+
+        if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+          SystemUtilities.transformModelToTimeZone( result,
+                                                    strTimeZoneId,
+                                                    logger );
+
+        }
+
+          if ( result === null ) {
+
+          console.log('no hay establishment con este nombre')
+
+        } else {
+
+          return result
+
+        }
 
       }
 
@@ -95,6 +118,100 @@ export default class establishmentsService extends BaseService { //<= Change cla
 
       if ( currentTransaction !== null &&
            bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+
+        catch ( error1 ) {
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async getByUserId( UsersId: string,
+                            strTimeZoneId: string,
+                            transaction: any,
+                            logger: any ): Promise<establishments> { //<= Change here for the right model name
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "user_id": UsersId }, //<= Change here to right model field name
+        transaction: currentTransaction,
+
+      }
+
+      result = await establishments.findOne( options ); //<= Change here for the right model name
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction !== null &&
+            currentTransaction.finished !== "rollback" &&
+            bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getByUserId.name;
+
+      const strMark = "83479CA2F7C9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+            bIsLocalTransaction ) {
 
         try {
 
@@ -150,24 +267,15 @@ export default class establishmentsService extends BaseService { //<= Change cla
       if ( establishmentsInDB === null ) {
 
         establishmentsInDB = await establishments.create( //<= Change here for the right model name
-                                          createOrUpdateData,
-                                          { transaction: currentTransaction }
-                                        );
+                                                          createOrUpdateData,
+                                                          { transaction: currentTransaction }
+                                                        );
 
       }
       else if ( bUpdate ) {
 
-        // if ( !createOrUpdateData.UpdatedBy ) {
-
-        //   createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-
-        //   createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
-
-
-        // }
-
         await establishmentsInDB.update( createOrUpdateData,
-                                     options );
+                                         options );
 
         establishmentsInDB = await establishments.findOne( options ); //<= Change here for the right model name
 
@@ -216,8 +324,8 @@ export default class establishmentsService extends BaseService { //<= Change cla
           await currentTransaction.rollback();
 
         }
-        catch ( error1 ) {
 
+        catch ( error1 ) {
 
         }
 
@@ -232,7 +340,7 @@ export default class establishmentsService extends BaseService { //<= Change cla
   }
 
                          //      \/   Use F2 to rename this variable name
-  static async deleteByModel( order: establishments, //<= Change here for the right model name, aditional rename the parameter variable using F2
+  static async deleteByModel( establisment: establishments, //<= Change here for the right model name, aditional rename the parameter variable using F2
                               transaction: any,
                               logger: any ): Promise<Error|boolean> {
 
@@ -260,7 +368,7 @@ export default class establishmentsService extends BaseService { //<= Change cla
 
       }
 
-      await order.destroy( options ); //<= Change here for the right model name
+      await establisment.destroy( options ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -305,8 +413,8 @@ export default class establishmentsService extends BaseService { //<= Change cla
           await currentTransaction.rollback();
 
         }
-        catch ( error1 ) {
 
+        catch ( error1 ) {
 
         }
 

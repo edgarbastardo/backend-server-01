@@ -1,0 +1,26 @@
+{
+  "status": 401,
+  "statusText": "Unauthorized",
+  "body": {
+    "StatusCode": 401,
+    "Code": "ERROR_LOGIN_FAILED",
+    "Message": "Login failed (Username and/or Password are invalid)",
+    "Mark": "22E89FB65D2B",
+    "LogId": null,
+    "IsError": true,
+    "Errors": [
+      {
+        "Code": "ERROR_LOGIN_FAILED",
+        "Message": "Login failed (Username and/or Password are invalid)",
+        "Details": null
+      }
+    ],
+    "Warnings": [],
+    "Count": 0,
+    "Data": []
+  },
+  "expected": {
+    "Code": "SUCCESS_LOGIN",
+    "Test": "EF56F748EC63"
+  }
+}

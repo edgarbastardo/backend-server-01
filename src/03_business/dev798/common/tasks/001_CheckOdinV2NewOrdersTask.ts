@@ -26,6 +26,13 @@ import I18NManager from "../../../../02_system/common/managers/I18Manager";
 
 //import CommonRequestService from "../../../common/services/CommonRequestService";
 import OdinV2APIRequestService from "../../../common/services/OdinV2APIRequestService";
+import usersService from '../../../common/database/secondary/services/usersService';
+import establishmentsService from '../../../common/database/secondary/services/establishmentsService';
+import locationsService from '../../../common/database/secondary/services/locationsService';
+import ordersService from '../../../common/database/secondary/services/ordersService';
+import { uuid4 } from 'random-js';
+import deliveriesService from '../../../common/database/secondary/services/deliveriesService';
+import ticket_imagesService from '../../../common/database/secondary/services/ticket_imagesService';
 
 let debug = require( 'debug' )( '001_CheckOdinV2NewOrdersTask' );
 
@@ -189,14 +196,14 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                    ],
                                                              footer: "8E4BBCB07EDF",
                                                          }
-                                                 },
-                                                 logger
-                                               );
+                                                        },
+                                                        logger
+                                                        );
 
-  }
+                                                      }
 
-  //This method run every from 8 to 15 seconds
-  public async runTask( params: any,
+                                                      //This method run every from 8 to 15 seconds
+                                                      public async runTask( params: any,
                         logger: any ): Promise<boolean> {
 
     let bResult = false;
@@ -235,22 +242,22 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         url: [ strOdinV2Url01 ]
                       }
 
-      const headers = {
+                      const headers = {
                         "Content-Type": "application/json",
                         "Authorization": strOdinV2APIKey01
                       }
 
-      const params = {
-                       DeliveryAt: SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                      const params = {
+                       DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
                                                                                        headers,
                                                                                        params );
 
-      if ( !odinV2ReponseData ) {
+                                                                                       if ( !odinV2ReponseData ) {
 
-        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+                                                                                         if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
 
           const strMessage = util.format( "No response data from odin-v2 backend" );
 
@@ -277,7 +284,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
       else if ( odinV2ReponseData?.error === null ) {
 
         if ( odinV2ReponseData.output?.status === 200 &&
-             odinV2ReponseData.output?.body?.Data?.length > 0 ) {
+          odinV2ReponseData.output?.body?.Data?.length > 0 ) {
 
           //Get the data json from response body
           const deliveryOrderData = odinV2ReponseData.output?.body?.Data[ 0 ];
@@ -286,11 +293,321 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           //The logic here
 
+          let orderInDB =  await ordersService.getById( deliveryOrderData.id,null,currentTransaction,logger ) as any;
+
+          if ( orderInDB === null ) {
+
+            let userInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,null,currentTransaction,logger ) as any;
+
+            if ( userInDB === null ) { //does not exist this user-establishment create a new
+
+              userInDB = await usersService.createOrUpdate(
+                                                                {
+                                                                  // id:,
+                                                                  // first_name:,
+                                                                  // last_name:,
+                                                                  // short_name:,
+                                                                  // phone:"",
+                                                                  // email:,
+                                                                  // password:"buscarclave", // no se tiene buscarla
+                                                                  // role:"restaurant",
+                                                                  // restriction:"",
+                                                                  // created_at:,
+                                                                  // updated_at:
+                                                                },
+                                                                null,
+                                                                currentTransaction,
+                                                                logger
+                                                              );
+
+            }
+
+            if ( userInDB instanceof Error === false ) {
+
+              let establishmentInDB = await establishmentsService.getByUserId( userInDB.id,null,currentTransaction,logger ) as any;
+
+              if ( establishmentInDB === null ) { //does not exist this establishment create a new
+
+                establishmentInDB = await establishmentsService.createOrUpdate(
+                                                                                {
+
+                                                                                },
+                                                                                null,
+                                                                                currentTransaction,
+                                                                                logger
+                                                                                );
+
+              }
+
+              if ( establishmentInDB instanceof Error === false ) {
+
+                let strAddressToFind = deliveryOrderData.bizDestination.FormattedAddress;
+
+                if ( strAddressToFind.indexOf( "," ) > 0 ) {
+
+                  strAddressToFind = strAddressToFind.substring( 0, strAddressToFind.indexOf(',') );
+
+                }
+
+                let locationInDB = await locationsService.getByAddress( strAddressToFind,null,currentTransaction,logger ) as any;
+
+                if ( locationInDB === null ) {  //does not exist this location create a new
+
+                  //verify zip_code if not exist create
+
+                  //verify_phone if not exist create
+
+                  locationInDB = await locationsService.createOrUpdate(
+                                                                        {
+
+                                                                        },
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger
+                                                                      ) as any;
+
+                }
+
+                if ( locationInDB instanceof Error === false ) {
+
+                  let QuantityOrderMiles = Math.round(deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter*0.062137)/100;
+
+                  let orderInDB = await ordersService.createOrUpdate(
+                                                                      {
+                                                                        id: deliveryOrderData.Id,
+                                                                        user_id: establishmentInDB.user_id,
+                                                                        location_id: locationInDB.id,
+                                                                        establishment_id: establishmentInDB.id,
+                                                                        payment_method: deliveryOrderData.Payments[0].bizPaymentMethod.Name,
+                                                                        payment_method1: "",
+                                                                        payment_method2: "",
+                                                                        status: "commited",
+                                                                        state: "done",
+                                                                        amount1: 0,
+                                                                        amount2: 0,
+                                                                        original_amount: deliveryOrderData.Payments[0].Amount,
+                                                                        created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                        updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                        fee: establishmentInDB.fee,
+                                                                        delivered: null,
+                                                                        want_delivery_date:"1980-01-16",
+                                                                        want_delivery_time:"00:00:00",
+                                                                        extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
+                                                                        inspected: 0,
+                                                                        status_number: null,
+                                                                        client_name: deliveryOrderData.bizDestination.Name,
+                                                                        extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
+                                                                        order_miles_quantity: QuantityOrderMiles,
+                                                                        catering_type: 0,
+                                                                        qty_person_catering: 0,
+                                                                        fee_driver_order: establishmentInDB.fee_driver,
+                                                                        fee_catering_order: 0,
+                                                                        qty_meals: 0
+                                                                      },
+                                                                      false,
+                                                                      currentTransaction,
+                                                                      logger
+                                                                      ) as any;
+
+                  if ( orderInDB instanceof Error === false ) {
+
+                    let deliveryInDB = await deliveriesService.createOrUpdate( {
+                                                                                  id: uuid4,
+                                                                                  order_id: orderInDB.user_id,
+                                                                                  driver_id: deliveryOrderData.UserId,
+                                                                                  establishment_id: establishmentInDB.id,
+                                                                                  qualification:0,
+                                                                                  tip1:0,
+                                                                                  tip2:0,
+                                                                                  tip:0,
+                                                                                  tip_method: deliveryOrderData.Payments[0].bizPaymentMethod.Name,
+                                                                                  tip_method1: "",
+                                                                                  tip_method2: "",
+                                                                                  tip_validated_at: "",
+                                                                                  created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                  updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                                },
+                                                                                false,
+                                                                                currentTransaction,
+                                                                                logger
+                                                                              ) as any;
+
+                    if ( deliveryInDB instanceof Error === false ) {
+
+                      let ticketImageInDB = await ticket_imagesService.createOrUpdate( {
+                                                                                      //   id: ,
+                                                                                      //   order_id: orderInDB.user_id,
+                                                                                      //   image:,
+                                                                                      //   migrated:,
+                                                                                      //   url:,
+                                                                                      //   lock:,
+                                                                                      //   created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                        },
+                                                                                        false,
+                                                                                        currentTransaction,
+                                                                                        logger
+                                                                                      ) as any;
+
+                      if ( ticketImageInDB instanceof Error === false ) {
+
+                        bApplyTransaction = true;
+
+                        bResult = true;
+
+                      }
+                      else { //error creation of ticketImage
+
+                        const error = ticketImageInDB as Error;
+
+                        const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                        debugMark( "ERROR: " + strMessage );
+
+                        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                          await this.notifyToExternal( "error", strMessage );
+
+                          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                        }
+
+                      }
+
+                    }
+                    else { //error creation of delivery
+
+                      const error = deliveryInDB as Error;
+
+                      const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                      debugMark( "ERROR: " + strMessage );
+
+                      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                        await this.notifyToExternal( "error", strMessage );
+
+                        CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                      }
+
+                    }
+
+                  }
+                  else { //error creation of order
+
+                    const error = orderInDB as Error;
+
+                    const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                    debugMark( "ERROR: " + strMessage );
+
+                    if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                      await this.notifyToExternal( "error", strMessage );
+
+                      CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                    }
+
+                  }
+
+                }
+                else { //error creation of location
+
+                  const error = locationInDB as Error;
+
+                  const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                  debugMark( "ERROR: " + strMessage );
+
+                  if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                    await this.notifyToExternal( "error", strMessage );
+
+                    CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                  }
+
+                }
+
+              }
+              else {  //error creation of establishment
+
+                const error = establishmentInDB as Error;
+
+                const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                debugMark( "ERROR: " + strMessage );
+
+                if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                  await this.notifyToExternal( "error", strMessage );
+
+                  CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                }
+
+              }
+
+            }
+            else { //error creation of user
+
+              const error = userInDB as Error;
+
+              const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+              debugMark( "ERROR: " + strMessage );
+
+              if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                await this.notifyToExternal( "error", strMessage );
+
+                CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+              }
+
+            }
+
+          }
+          else if ( orderInDB instanceof Error === false ) {
+
+            const error = orderInDB as Error;
+
+            const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+            debugMark( "ERROR: " + strMessage );
+
+            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+              await this.notifyToExternal( "error", strMessage );
+
+              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+            }
+
+          }
+          else {  //error order already exist
+
+            const strMessage = util.format( "The order with id [%s] already exists", deliveryOrderData.Id );
+
+            debugMark( "ERROR: " + strMessage );
+
+            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+              await this.notifyToExternal( "error", strMessage );
+
+              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+            }
+
+          }
+
           //Check deliveryOrderData.Id not exist in odin database in order table
 
           //Check the .env file the ENV variable, in local machine always must be in ENV=dev
           //if en develop you need move forward comment the next 2 lines and 239 line
-          if ( process.env.ENV === "prod" ||
+
+          /*if ( process.env.ENV === "prod" ||
                process.env.ENV === "test" ) {
 
             //The next call is required to make move forward to the next delivery order
@@ -301,7 +618,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                     } );
 
           } //Comment here too
-
+*/
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
 
@@ -310,11 +627,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
         }
         else {
 
+          const strMessage = util.format( "Unexpected response code [%s] from odin v2 backend", odinV2ReponseData.output?.status );
+
+          debugMark( "WARNING: " + strMessage );
+
           if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-            const strMessage = util.format( "Unexpected response code [%s] from odin v2 backend", odinV2ReponseData.output?.status );
-
-            debugMark( "WARNING: " + strMessage );
 
             await this.notifyToExternal( "warning", strMessage );
 

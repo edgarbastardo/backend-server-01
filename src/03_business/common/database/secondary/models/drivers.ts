@@ -5,6 +5,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
+         NotEmpty,
+         NotNull,
+         Unique,
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -49,9 +52,12 @@ export class drivers extends Model<drivers> {
   }
 
   @PrimaryKey
+  @Unique
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   id: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   user_id: string;
 
@@ -64,12 +70,18 @@ export class drivers extends Model<drivers> {
   @Column( { type: DataType.INTEGER, allowNull: true } )
   active: number;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
   point_accumulated: number;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
   deliveries_completed: number;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
   qualification: number;
 
@@ -88,10 +100,10 @@ export class drivers extends Model<drivers> {
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   license_number: string;
 
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
+  @Column( { type: DataType.DATEONLY, allowNull: true } )
   insurance_expire_day: string;
 
-  @Column( { type: DataType.DATEONLY, allowNull: false } )
+  @Column( { type: DataType.DATEONLY, allowNull: true } )
   registration_expire_day: string;
 
   @Column( { type: DataType.TEXT, allowNull: true } )
@@ -115,12 +127,18 @@ export class drivers extends Model<drivers> {
   @Column( { type: DataType.STRING( 255 ), allowNull: true } )
   tax_information: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.TINYINT, allowNull: false } )
   show_name : number;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING, allowNull: false } )
   created_at: string;
 
+  @NotNull
+  @NotEmpty
   @Column( { type: DataType.STRING, allowNull: false } )
   updated_at: string;
 
