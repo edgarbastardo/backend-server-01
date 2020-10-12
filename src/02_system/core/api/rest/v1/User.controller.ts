@@ -247,7 +247,8 @@ export default class UserController {
                                     AccessKind: 3,
                                     RequestKind: 2,
                                     AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L03#,#Create_User_L01#,#Create_User_L03#",
-                                    Roles: [ "Administrator",
+                                    Roles: [
+                                             "Administrator",
                                              "BManager_L99",
                                              "Master_L01",
                                              "Master_L03",
