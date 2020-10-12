@@ -24,14 +24,15 @@ import NetworkLeaderManager from "./02_system/common/managers/NetworkLeaderManag
 import JobQueueManager from "./02_system/common/managers/JobQueueManager";
 import I18NManager from "./02_system/common/managers/I18Manager";
 import NotificationManager from "./02_system/common/managers/NotificationManager";
+import InstantMessageServerManager from "./02_system/common/managers/InstantMessageServerManager";
+import HookManager from "./02_system/common/managers/HookManager";
+import RunnableModuleManager from "./02_system/common/managers/RunnableModuleManager";
+//import PresenceManager from "./02_system/common/managers/PresenceManager";
 //import InstantMenssageManager from "./02_system/common/managers/InstantMessageManager";
 //import NotificationManager from "./02_system/common/managers/NotificationManager";
 //import RedisConnectionManager from "./02_system/common/managers/RedisConnectionManager";
 
 import SYSSystemEventLogService from "./02_system/common/database/master/services/SYSSystemEventLogService";
-//import PresenceManager from "./02_system/common/managers/PresenceManager";
-import InstantMessageServerManager from "./02_system/common/managers/InstantMessageServerManager";
-import HookManager from "./02_system/common/managers/HookManager";
 
 let debug = null; //require( "debug" )( "server" );
 
@@ -968,8 +969,21 @@ export default class App {
 
       //await PresenceManager.loadFilters( LoggerManager.mainLoggerInstance );
 
+      await RunnableModuleManager.init( {},
+                                        LoggerManager.mainLoggerInstance );
+
+      //await RunnableModuleManager.launchRunnableModule( "Sample_Runnable",
+      //                                                  {},
+      //                                                  LoggerManager.mainLoggerInstance );
+
       await HookManager.init( {},
                               LoggerManager.mainLoggerInstance );
+
+      await HookManager.processHookHandlersInChain( "PreInitMain",
+                                                    {
+                                                      //Empty
+                                                    },
+                                                    LoggerManager.mainLoggerInstance );
 
       if ( cluster.isMaster ) {
 
@@ -1350,6 +1364,12 @@ export default class App {
                                       ApplicationServerDataManager.currentInstance );
 
       }
+
+      await HookManager.processHookHandlersInChain( "PostInitMain",
+                                                    {
+                                                      //Empty
+                                                    },
+                                                    LoggerManager.mainLoggerInstance );
 
     }
     catch ( error ) {

@@ -8,11 +8,11 @@ import CommonConstants from "../CommonConstants";
 import CommonUtilities from "../CommonUtilities";
 import SystemUtilities from "../SystemUtilities";
 
-const debug = require( "debug" )( "HookManager" );
+const debug = require( "debug" )( "RunnableModuleManager" );
 
-export default class HookManager {
+export default class RunnableModuleManager {
 
-  private static _hookChainList = {};
+  private static _runnableModuleList = {};
 
   static async _scan( strFullRootPath: any,
                       params: any,
@@ -40,12 +40,11 @@ export default class HookManager {
           if ( CommonUtilities.isNotNullOrEmpty( importModule ) &&
                CommonUtilities.isNotNullOrEmpty( importModule.default ) ) {
 
-            const hookHandler = new importModule.default();
+            const runnableModule = new importModule.default();
 
-            await HookManager.registerHookHandlerInChain( strLastFolderInPath,
-                                                          hookHandler,
-                                                          params,
-                                                          logger );
+            await RunnableModuleManager.registerRunnableModule( runnableModule,
+                                                                params,
+                                                                logger );
 
           }
 
@@ -73,9 +72,9 @@ export default class HookManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = HookManager.name + "." + this._scan.name;
+      sourcePosition.method = RunnableModuleManager.name + "." + this._scan.name;
 
-      const strMark = "4CAFEB16F364" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "1727500FA32C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -104,9 +103,9 @@ export default class HookManager {
 
     try {
 
-      HookManager._hookChainList = {};
+      RunnableModuleManager._runnableModuleList = {};
 
-      const pathToScan : any[] = JSON.parse( process.env.HOOKS_PATH_TO_SCAN );
+      const pathToScan : any[] = JSON.parse( process.env.RUNNABLES_PATH_TO_SCAN );
 
       for ( let intIndex = 0; intIndex < pathToScan.length; intIndex++ ) {
 
@@ -116,9 +115,9 @@ export default class HookManager {
 
           if ( fs.existsSync( strPath ) ) {
 
-            await HookManager._scan( strPath,
-                                     params,
-                                     logger );
+            await RunnableModuleManager._scan( strPath,
+                                               params,
+                                               logger );
 
           }
 
@@ -129,7 +128,7 @@ export default class HookManager {
 
           sourcePosition.method = this.name + "." + this.init.name;
 
-          const strMark = "96F5089A2E3B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+          const strMark = "745A45B72057" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
           const debugMark = debug.extend( strMark );
 
@@ -160,7 +159,7 @@ export default class HookManager {
 
       sourcePosition.method = this.name + "." + this.init.name;
 
-      const strMark = "CD996983F477" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "0B4ED4AF55AB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -184,47 +183,35 @@ export default class HookManager {
 
   }
 
-  static async registerHookHandlerInChain( strChain: string,
-                                           hookHandler: any,
-                                           params: any,
-                                           logger: any ): Promise<boolean> {
+  static async registerRunnableModule( runnableModule: any,
+                                       params: any,
+                                       logger: any ): Promise<boolean> {
 
     let bResult = false;
 
     try {
 
-      const debugMark = debug.extend( "9E5DF2FD6072" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      const debugMark = debug.extend( "002BFB496BDD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-      if ( hookHandler.name &&
-           hookHandler.process &&
-           hookHandler.init ) {
+      if ( runnableModule.name &&
+           runnableModule.run &&
+           runnableModule.init ) {
 
-        if ( await hookHandler.init( params, logger ) ) {
+        if ( await runnableModule.init( params, logger ) ) {
+
+          RunnableModuleManager._runnableModuleList[ runnableModule.name ] = runnableModule;
 
           if ( cluster.isMaster ) {
 
-            debugMark( "Added hook handler for the hook [%s] in the chain [%s]. In master process",
-                       hookHandler.name,
-                       strChain );
+            debugMark( "Added runnable module [%s]. In master process",
+                        runnableModule.name );
 
           }
           else {
 
-            debugMark( "Added hook handler for the hook [%s] in the chain [%s]. In worker process with id: [%s]",
-                       hookHandler.name,
-                       strChain,
-                       cluster.worker.id );
-
-          }
-
-          if ( !HookManager._hookChainList[ strChain ] ) {
-
-            HookManager._hookChainList[ strChain ] = [ hookHandler ];
-
-          }
-          else {
-
-            HookManager._hookChainList[ strChain ].push( hookHandler );
+            debugMark( "Added runnable module [%s]. In worker process with id: [%s]",
+                        runnableModule.name,
+                        cluster.worker.id );
 
           }
 
@@ -235,7 +222,7 @@ export default class HookManager {
       }
       else {
 
-        debugMark( "The hook handler not has process method and name field" );
+        debugMark( "The runnable module not has run method and name field" );
 
       }
 
@@ -244,9 +231,9 @@ export default class HookManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.registerHookHandlerInChain.name;
+      sourcePosition.method = this.name + "." + this.registerRunnableModule.name;
 
-      const strMark = "BCD4C72DC04D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "5045D011DE56" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -270,41 +257,28 @@ export default class HookManager {
 
   }
 
-  static async processHookHandlersInChain( strChain: string,
-                                           payload: any,
-                                           logger: any ): Promise<boolean> {
+  static async launchRunnableModule( strName: string,
+                                     payload: any,
+                                     logger: any ): Promise<boolean> {
 
     let bResult = false;
 
     try {
 
-      const debugMark = debug.extend( "998CC6E742CD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+      const debugMark = debug.extend( "B3C472E9E8F8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
-      if ( HookManager._hookChainList[ strChain ] ) {
+      if ( RunnableModuleManager._runnableModuleList[ strName ] ) {
 
-        const hookChainList = HookManager._hookChainList[ strChain ];
+        const runnableModule = RunnableModuleManager._runnableModuleList[ strName ];
 
-        payload[ "_process_results" ] = {};
-
-        for ( let intHookHandlerIndex = 0; intHookHandlerIndex < hookChainList.length; intHookHandlerIndex++ ) {
-
-          const hookHandler = hookChainList[ intHookHandlerIndex ];
-
-          const result = await hookHandler.process( intHookHandlerIndex,
-                                                    strChain,
-                                                    payload,
-                                                    logger );
-
-          payload[ "_process_results" ][ hookHandler.name ] = result;
-
-        }
-
-        bResult = true;
+        bResult = await runnableModule.run( strName,
+                                            payload,
+                                            logger );
 
       }
       else {
 
-        debugMark( "Chain name [%s] not found or not hook handler in the list (empty)", strChain );
+        debugMark( "The runnable module name [%s] not found in the list", strName );
 
       }
 
@@ -313,9 +287,9 @@ export default class HookManager {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = this.name + "." + this.processHookHandlersInChain.name;
+      sourcePosition.method = this.name + "." + this.launchRunnableModule.name;
 
-      const strMark = "D38BC61D5F75" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "08DFCBD31987" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

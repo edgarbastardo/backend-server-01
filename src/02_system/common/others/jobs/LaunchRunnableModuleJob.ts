@@ -15,14 +15,15 @@ import CommonUtilities from "../../CommonUtilities";
 import SystemUtilities from "../../SystemUtilities";
 import RedisConnectionManager from "../../managers/RedisConnectionManager";
 //import { Redis, Cluster } from 'ioredis';
+import RunnableModuleManager from "../../managers/RunnableModuleManager";
 
-const debug = require( 'debug' )( 'SampleJob' );
+const debug = require( 'debug' )( 'LaunchRunnableModuleJob' );
 
-export default class SampleJob {
+export default class LaunchRunnableModuleJob {
 
-  public readonly Name = "SampleJob";
+  public readonly Name = "LaunchRunnableModuleJob";
 
-  public sampleJobQueue: any;
+  public launchRunnableModuleJobQueue: any;
 
   //public static completedJobs = [];
 
@@ -88,18 +89,18 @@ export default class SampleJob {
                         };
 
         //Here your code of init
-        this.sampleJobQueue = new Queue(
-                                         this.Name,
-                                         options
-                                       );
+        this.launchRunnableModuleJobQueue = new Queue(
+                                                       this.Name,
+                                                       options
+                                                     );
 
         if ( process.env.WORKER_KIND === "job_worker_process" ) {
 
-          this.sampleJobQueue.process( ( job: any, done: any ) => {
+          this.launchRunnableModuleJobQueue.process( async ( job: any, done: any ) => {
 
             //if ( SampleJob.completedJobs.includes( jobData.id ) === false ) {
 
-              let debugMark = debug.extend( 'D8726991B32E' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+              let debugMark = debug.extend( 'F108CA2D95D8' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
 
               debugMark( "Start time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
               //debugMark( "Completed JOBS: %O", SampleJob.completedJobs );
@@ -107,6 +108,18 @@ export default class SampleJob {
               debugMark( "JOB id: [%s]", job.id );
               debugMark( "JOB data: %O", job.data );
 
+              job.data.Payload = {
+                                   Job: {
+                                          Id: job.id,
+                                          Token: job.queue.token
+                                        },
+                                   ...job.data.Payload
+                                 };
+
+              await RunnableModuleManager.launchRunnableModule( job.data.Name,
+                                                                job.data.Payload,
+                                                                job.data.Logger );
+              /*
               // n iterations before giving someone else a turn
               for ( let i = 1; i <= 35; i++ ) {
 
@@ -115,6 +128,7 @@ export default class SampleJob {
                 //console.log(`Iter ${i}`);
 
               }
+              */
 
               debugMark( "Finish time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
               job.data[ "completed" ] = true;
@@ -136,7 +150,7 @@ export default class SampleJob {
 
           } );
 
-          const debugMark = debug.extend( "6CDD18E1A4B6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
+          const debugMark = debug.extend( "ED0DCFF45545" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
           debugMark( "Registered process function for the job queue with name: %s, worker id: %s", this.Name, cluster.worker.id );
 
@@ -151,9 +165,9 @@ export default class SampleJob {
 
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
 
-      sourcePosition.method = SampleJob.name + "." + this.init.name;
+      sourcePosition.method = LaunchRunnableModuleJob.name + "." + this.init.name;
 
-      const strMark = "01CFA74A6BAC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "A7542914A103" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -179,7 +193,7 @@ export default class SampleJob {
 
   public getJob(): any {
 
-    return this.sampleJobQueue;
+    return this.launchRunnableModuleJobQueue;
 
   }
 

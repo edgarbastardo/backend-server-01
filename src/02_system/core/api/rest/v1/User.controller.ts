@@ -69,43 +69,478 @@ export default class UserController {
   static readonly _BASE_PATH = "/v1/system/user";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: UserController._BASE_PATH + "/signup", Action: "v1.system.user.signup", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account" },
-                                  { Path: UserController._BASE_PATH + "/signup/google", Action: "v1.system.user.signup.google", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using google account" },
-                                  { Path: UserController._BASE_PATH + "/signup/facebook", Action: "v1.system.user.signup.facebook", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using facebook account" },
-                                  { Path: UserController._BASE_PATH + "/signup/instagram", Action: "v1.system.user.signup.instagram", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Create new user account using instagram account" },
-                                  { Path: UserController._BASE_PATH + "/signup/activate", Action: "v1.system.user.signup.activate", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Activate signup user account" },
-                                  { Path: UserController._BASE_PATH + "/password/recover/code/send", Action: "v1.system.user.password.recover.code.send", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Send recover password code to registered user email or phone number" },
-                                  { Path: UserController._BASE_PATH + "/password/recover", Action: "v1.system.user.password.recover", AccessKind: 1, RequestKind: 2, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Set the password to user account using the password recover code" },
-                                  { Path: UserController._BASE_PATH + "/password/change", Action: "v1.system.user.password.change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set new password to user using the current password" }, //,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#ChangeUserPasswordL01#,#ChangeUserPasswordL02#,#ChangeUserPasswordL03#, , "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "ChangeUserPasswordL01", "ChangeUserPasswordL02", "ChangeUserPasswordL03"
-                                  { Path: UserController._BASE_PATH + "/email/change/code/send", Action: "v1.system.user.email.change.code.send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change email code to the new email. Using the current user password" },
-                                  { Path: UserController._BASE_PATH + "/email/change", Action: "v1.system.user.email.change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change email to the current user using the code" },
-                                  { Path: UserController._BASE_PATH + "/phone/change/code/send", Action: "v1.system.user.phone.change.code.send", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send change phone code to the phone number. Using the current user password" },
-                                  { Path: UserController._BASE_PATH + "/phone/change", Action: "v1.system.user.phone.change", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Change phone to the current user using the code" },
-                                  { Path: UserController._BASE_PATH + "/profile", Action: "v1.system.user.profile.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get information about the current user" },
-                                  { Path: UserController._BASE_PATH + "/profile", Action: "v1.system.user.profile.update", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set the information about the current user, like FirstName, LastName, BirthDate" },
-                                  { Path: UserController._BASE_PATH, Action: "v1.system.user.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Get_User_L01#,#Get_User_L02#,#Get_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Get_User_L01", "Get_User_L02", "Get_User_L03" ], Description: "Get the information for one user" },
-                                  { Path: UserController._BASE_PATH, Action: "v1.system.user.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L03#,#Create_User_L01#,#Create_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L03", "Create_User_L01", "Create_User_L03" ], Description: "Create new user information" },
-                                  { Path: UserController._BASE_PATH, Action: "v1.system.user.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_User_L01", "Update_User_L02", "Update_User_L03" ], Description: "Update existent user information" },
-                                  { Path: UserController._BASE_PATH + "/disable/bulk", Action: "v1.system.user.disable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_User_L01", "Update_User_L02", "Update_User_L03" ], Description: "Disable existent users in bulk" },
-                                  { Path: UserController._BASE_PATH + "/enable/bulk", Action: "v1.system.user.enable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_User_L01", "Update_User_L02", "Update_User_L03" ], Description: "Enable existent users in bulk" },
-                                  { Path: UserController._BASE_PATH + "/move/bulk", Action: "v1.system.user.move.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_User_L01", "Update_User_L02", "Update_User_L03" ], Description: "Move existent users to another user group in bulk" },
-                                  { Path: UserController._BASE_PATH, Action: "v1.system.user.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_User_L01#,#Delete_User_L02#,#Update_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Delete_User_L01", "Delete_User_L02", "Delete_User_L03" ], Description: "Delete the user information" },
-                                  { Path: UserController._BASE_PATH + "/bulk", Action: "v1.system.user.delete.bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_User_L01#,#Delete_User_L02#,#Delete_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Delete_User_L01", "Delete_User_L02", "Delete_User_L03" ], Description: "Delete the user information in bulk" },
-                                  { Path: UserController._BASE_PATH + "/search", Action: "v1.system.user.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_User_L01#,#Search_User_L02#,#Search_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Search_User_L01", "Search_User_L02", "Search_User_L03" ], Description: "Search for users information" },
-                                  { Path: UserController._BASE_PATH + "/search/count", Action: "v1.system.user.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_User_L01#,#Search_User_L02#,#Search_User_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Search_User_L01", "Search_User_L02", "Search_User_L03" ], Description: "Count search users information result" },
-                                  { Path: UserController._BASE_PATH + "/settings", Action: "v1.system.user.settings.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get settings for the current user" },
-                                  { Path: UserController._BASE_PATH + "/settings", Action: "v1.system.user.settings.set", AccessKind: 2, RequestKind: 3, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Set settings for the current user" },
-                                  { Path: UserController._BASE_PATH + "/routes", Action: "v1.system.user.routes.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get the routes allowed to current user" },
-                                  { Path: UserController._BASE_PATH + "/actions", Action: "v1.system.user.actions.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get the actions allowed" },
-                                  { Path: UserController._BASE_PATH + "/device", Action: "v1.system.user.device.register", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
-                                  { Path: UserController._BASE_PATH + "/device", Action: "v1.system.user.device.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Register device to allow to backend send push" },
-                                  { Path: UserController._BASE_PATH + "/push/message/test", Action: "v1.system.user.push.message.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send push test message" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create instant message authorization token" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/auth", Action: "v1.system.user.instant.message.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete and disconnect instant message authorization token" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/server/hook", Action: "v1.system.user.instant.message.server.hook", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Hook from instant message server action: ConnectToServer,DisconnectFromServer,JoinToChannel,LeaveChannel,SendMessage" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/socket/test", Action: "v1.system.user.instant.message.socket.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant test message using socket call" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/rest/test", Action: "v1.system.user.instant.message.rest.test", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Send instant test message using rest api call" },
-                                  { Path: UserController._BASE_PATH + "/instant/message/channel/members", Action: "v1.system.user.instant.message.channel.members.list", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#", Roles: [ "Administrator", "Business_Manager" ], Description: "Get channel members list" },
+                                  {
+                                    Path: UserController._BASE_PATH + "/signup",
+                                    Action: "v1.system.user.signup",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Create new user account"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/signup/google",
+                                    Action: "v1.system.user.signup.google",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Create new user account using google account"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/signup/facebook",
+                                    Action: "v1.system.user.signup.facebook",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Create new user account using facebook account"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/signup/instagram",
+                                    Action: "v1.system.user.signup.instagram",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Create new user account using instagram account"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/signup/activate",
+                                    Action: "v1.system.user.signup.activate",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Activate signup user account"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/password/recover/code/send",
+                                    Action: "v1.system.user.password.recover.code.send",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Send recover password code to registered user email or phone number"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/password/recover",
+                                    Action: "v1.system.user.password.recover",
+                                    AccessKind: 1,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Set the password to user account using the password recover code"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/password/change",
+                                    Action: "v1.system.user.password.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Set new password to user using the current password"
+                                  }, //,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#ChangeUserPasswordL01#,#ChangeUserPasswordL02#,#ChangeUserPasswordL03#, , "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "ChangeUserPasswordL01", "ChangeUserPasswordL02", "ChangeUserPasswordL03"
+                                  {
+                                    Path: UserController._BASE_PATH + "/email/change/code/send",
+                                    Action: "v1.system.user.email.change.code.send",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Send change email code to the new email. Using the current user password"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/email/change",
+                                    Action: "v1.system.user.email.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Change email to the current user using the code"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/phone/change/code/send",
+                                    Action: "v1.system.user.phone.change.code.send",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Send change phone code to the phone number. Using the current user password"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/phone/change",
+                                    Action: "v1.system.user.phone.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Change phone to the current user using the code"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/profile",
+                                    Action: "v1.system.user.profile.get",
+                                    AccessKind: 2,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Get information about the current user"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/profile",
+                                    Action: "v1.system.user.profile.update",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Set the information about the current user, like FirstName, LastName, BirthDate"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH,
+                                    Action: "v1.system.user.get",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Get_User_L01#,#Get_User_L02#,#Get_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Get_User_L01",
+                                             "Get_User_L02",
+                                             "Get_User_L03"
+                                           ],
+                                    Description: "Get the information for one user"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH,
+                                    Action: "v1.system.user.create",
+                                    AccessKind: 3,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L03#,#Create_User_L01#,#Create_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L03",
+                                             "Create_User_L01",
+                                             "Create_User_L03"
+                                           ],
+                                    Description: "Create new user information"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH,
+                                    Action: "v1.system.user.update",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_User_L01",
+                                             "Update_User_L02",
+                                             "Update_User_L03"
+                                           ],
+                                    Description: "Update existent user information"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/disable/bulk",
+                                    Action: "v1.system.user.disable.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_User_L01",
+                                             "Update_User_L02",
+                                             "Update_User_L03"
+                                           ],
+                                    Description: "Disable existent users in bulk"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/enable/bulk",
+                                    Action: "v1.system.user.enable.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_User_L01",
+                                             "Update_User_L02",
+                                             "Update_User_L03"
+                                           ],
+                                    Description: "Enable existent users in bulk"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/move/bulk",
+                                    Action: "v1.system.user.move.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_User_L01#,#Update_User_L02#,#Update_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_User_L01",
+                                             "Update_User_L02",
+                                             "Update_User_L03"
+                                           ],
+                                    Description: "Move existent users to another user group in bulk"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH,
+                                    Action: "v1.system.user.delete",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_User_L01#,#Delete_User_L02#,#Update_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Delete_User_L01",
+                                             "Delete_User_L02",
+                                             "Delete_User_L03"
+                                           ],
+                                    Description: "Delete the user information"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/bulk",
+                                    Action: "v1.system.user.delete.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_User_L01#,#Delete_User_L02#,#Delete_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Delete_User_L01",
+                                             "Delete_User_L02",
+                                             "Delete_User_L03"
+                                           ],
+                                    Description: "Delete the user information in bulk" },
+                                  {
+                                    Path: UserController._BASE_PATH + "/search",
+                                    Action: "v1.system.user.search",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_User_L01#,#Search_User_L02#,#Search_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Search_User_L01",
+                                             "Search_User_L02",
+                                             "Search_User_L03"
+                                           ],
+                                    Description: "Search for users information" },
+                                  {
+                                    Path: UserController._BASE_PATH + "/search/count",
+                                    Action: "v1.system.user.search.count",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_User_L01#,#Search_User_L02#,#Search_User_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Search_User_L01",
+                                             "Search_User_L02",
+                                             "Search_User_L03"
+                                           ],
+                                    Description: "Count search users information result" },
+                                  {
+                                    Path: UserController._BASE_PATH + "/settings",
+                                    Action: "v1.system.user.settings.get",
+                                    AccessKind: 2,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Get settings for the current user"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/settings",
+                                    Action: "v1.system.user.settings.set",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Set settings for the current user"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/routes",
+                                    Action: "v1.system.user.routes.get",
+                                    AccessKind: 2,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Get the routes allowed to current user"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/actions",
+                                    Action: "v1.system.user.actions.get",
+                                    AccessKind: 2,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Get the actions allowed"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/device",
+                                    Action: "v1.system.user.device.register",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Register device to allow to backend send push"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/device",
+                                    Action: "v1.system.user.device.delete",
+                                    AccessKind: 2,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Register device to allow to backend send push"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/push/message/test",
+                                    Action: "v1.system.user.push.message.test",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Send push test message"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/auth",
+                                    Action: "v1.system.user.instant.message.auth.create",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Create instant message authorization token"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/auth",
+                                    Action: "v1.system.user.instant.message.auth.delete",
+                                    AccessKind: 2,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Delete and disconnect instant message authorization token"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/server/hook",
+                                    Action: "v1.system.user.instant.message.server.hook",
+                                    AccessKind: 2,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Hook from instant message server action: ConnectToServer,DisconnectFromServer,JoinToChannel,LeaveChannel,SendMessage" },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/socket/test",
+                                    Action: "v1.system.user.instant.message.socket.test",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Send instant test message using socket call"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/rest/test",
+                                    Action: "v1.system.user.instant.message.rest.test",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Send instant test message using rest api call"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/instant/message/channel/members",
+                                    Action: "v1.system.user.instant.message.channel.members.list",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#",
+                                    Roles: [
+                                             "Administrator",
+                                             "Business_Manager"
+                                           ],
+                                    Description: "Get channel members list"
+                                  },
                                 ]
 
   _controllerLogger = null;
