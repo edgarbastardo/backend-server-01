@@ -1,6 +1,8 @@
-import NotificationManager from "../../../managers/NotificationManager";
-import SystemUtilities from "../../../SystemUtilities";
 import CommonConstants from "../../../CommonConstants";
+
+import SystemUtilities from "../../../SystemUtilities";
+
+import NotificationManager from "../../../managers/NotificationManager";
 import CacheManager from "../../../managers/CacheManager";
 
 export default class PostLoginPublishToSlack {

@@ -13,11 +13,12 @@ import CommonUtilities from "./02_system/common/CommonUtilities";
 import SystemUtilities from "./02_system/common/SystemUtilities";
 
 import LoggerManager from "./02_system/common/managers/LoggerManager";
-import NotificationManager from "./02_system/common/managers/NotificationManager";
+//import NotificationManager from "./02_system/common/managers/NotificationManager";
 import DBConnectionManager from "./02_system/common/managers/DBConnectionManager";
 import CacheManager from "./02_system/common/managers/CacheManager";
 import ApplicationServerTaskManager from "./02_system/common/managers/ApplicationServerTaskManager";
 import HookManager from "./02_system/common/managers/HookManager";
+import RunnableModuleManager from "./02_system/common/managers/RunnableModuleManager";
 
 let debug = require( "debug" )( "server_task@main_process" );
 
@@ -157,8 +158,17 @@ export default class App {
       await DBConnectionManager.loadQueryStatement( "*",
                                                     LoggerManager.mainLoggerInstance );
 
+      await RunnableModuleManager.init( {},
+                                        LoggerManager.mainLoggerInstance );
+
       await HookManager.init( {},
                               LoggerManager.mainLoggerInstance );
+
+      await HookManager.processHookHandlersInChain( "PreInitMain",
+                                                    {
+                                                      //Empty
+                                                    },
+                                                    LoggerManager.mainLoggerInstance );
 
       process.on( "SIGTERM", async () => {
 
@@ -249,6 +259,12 @@ export default class App {
                                                    LoggerManager.mainLoggerInstance
                                                  );
                                                  */
+
+      HookManager.processHookHandlersInChain( "PostInitMain",
+                                              {
+                                                //Empty
+                                              },
+                                              LoggerManager.mainLoggerInstance );
 
       await ApplicationServerTaskManager.runTasks( {},
                                                    LoggerManager.mainLoggerInstance );

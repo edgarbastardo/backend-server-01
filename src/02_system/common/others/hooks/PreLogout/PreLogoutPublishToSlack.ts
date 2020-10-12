@@ -1,6 +1,8 @@
-import NotificationManager from "../../../managers/NotificationManager";
-import SystemUtilities from "../../../SystemUtilities";
 import CommonConstants from "../../../CommonConstants";
+
+import SystemUtilities from "../../../SystemUtilities";
+
+import NotificationManager from "../../../managers/NotificationManager";
 
 export default class PreLogoutPublishToSlack {
 
