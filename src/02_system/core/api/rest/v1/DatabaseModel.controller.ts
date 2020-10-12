@@ -35,15 +35,101 @@ export default class DatabaseModelController {
   static readonly _BASE_PATH = "/v1/database/model";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name", Action: "v1.database.:name.get", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Get model data by id" }, //GET
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name/search", Action: "v1.database.:name.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Search model data" }, //GET
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name/search/count", Action: "v1.database.:name.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Search model data" }, //GET
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name", Action: "v1.database.:name.create", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Create new model data" }, //POST
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name/bulk", Action: "v1.database.:name.create.bulk", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Create new model data" }, //POST
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name", Action: "v1.database.:name.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Update model data" }, //PUT
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name/bulk", Action: "v1.database.:name.update.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Update model data" }, //PUT
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name", Action: "v1.database.:name.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Delete model data" }, //DELETE
-                                  { Path: DatabaseModelController._BASE_PATH + "/:name/bulk", Action: "v1.database.:name.delete.bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#@@Entity@@_Full#", Roles: [ "Administrator" ], Description: "Delete model data" }, //DELETE
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name",
+                                    Action: "v1.database.:name.get",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Get model data by id"
+                                  }, //GET
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name/search",
+                                    Action: "v1.database.:name.search",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Search model data"
+                                  }, //GET
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name/search/count",
+                                    Action: "v1.database.:name.search.count",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Basic#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Search model data"
+                                  }, //GET
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name",
+                                    Action: "v1.database.:name.create",
+                                    AccessKind: 3,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Create new model data" }, //POST
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name/bulk",
+                                    Action: "v1.database.:name.create.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Create new model data" }, //POST
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name",
+                                    Action: "v1.database.:name.update",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Update model data" }, //PUT
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name/bulk",
+                                    Action: "v1.database.:name.update.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Update model data"
+                                  }, //PUT
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name",
+                                    Action: "v1.database.:name.delete",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Delete model data" }, //DELETE
+                                  {
+                                    Path: DatabaseModelController._BASE_PATH + "/:name/bulk",
+                                    Action: "v1.database.:name.delete.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#@@Entity@@_Full#",
+                                    Roles: [
+                                             "Administrator"
+                                           ],
+                                    Description: "Delete model data"
+                                  }, //DELETE
                                 ]
 
   constructor( logger: any ) {
