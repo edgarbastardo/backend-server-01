@@ -220,6 +220,21 @@ test( `getCurrentDateAndTimeFromAndDecMinutes 002`, async () => {
 
 })
 
+test( `createSelectAliasFromFieldList`, async () => {
+
+  const strFieldList = `A.Id,
+                        A.BusinessKindCode,
+                        C.Name,
+                        C.Latitude,
+                        D.Address,
+                        D.Latitude`;
+
+  const selectFieldWithAlias = SystemUtilities.createSelectAliasFromFieldList( strFieldList, "A,C,D" );
+
+  expect( selectFieldWithAlias ).toEqual( "A.Id As A_Id,A.BusinessKindCode As A_BusinessKindCode,C.Name As C_Name,C.Latitude As C_Latitude,D.Address As D_Address,D.Latitude As D_Latitude" );
+
+})
+
 test( `isDateAndTimeBeforeDays 001`, async () => {
 
   const bIsBefore = SystemUtilities.isDateAndTimeBeforeAtDays( "2020-10-13 07:10:00", 1, "2020-10-13 07:10:00" );
