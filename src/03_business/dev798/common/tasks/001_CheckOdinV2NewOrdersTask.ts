@@ -33,6 +33,9 @@ import ordersService from '../../../common/database/secondary/services/ordersSer
 import { uuid4 } from 'random-js';
 import deliveriesService from '../../../common/database/secondary/services/deliveriesService';
 import ticket_imagesService from '../../../common/database/secondary/services/ticket_imagesService';
+import driversService from '../../../common/database/secondary/services/driversService';
+import { create } from 'archiver';
+import zip_codesService from '../../../common/database/secondary/services/zip_codesService';
 
 let debug = require( 'debug' )( '001_CheckOdinV2NewOrdersTask' );
 
@@ -255,15 +258,16 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                                        headers,
                                                                                        params );
 
-                                                                                       if ( !odinV2ReponseData ) {
 
-                                                                                         if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+      if ( !odinV2ReponseData ) {
 
-          const strMessage = util.format( "No response data from odin-v2 backend" );
+          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
 
-          await this.notifyToExternal( "error", strMessage );
+            const strMessage = util.format( "No response data from odin-v2 backend" );
 
-          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+            await this.notifyToExternal( "error", strMessage );
+
+            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
         }
 
@@ -297,11 +301,14 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           if ( orderInDB === null ) {
 
-            let userInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,null,currentTransaction,logger ) as any;
+            let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
+                                                                           null,
+                                                                           currentTransaction,
+                                                                           logger ) as any;
 
-            if ( userInDB === null ) { //does not exist this user-establishment create a new
+            if ( userEstablishmentInDB === null ) { //does not exist this user-establishment create a new
 
-              userInDB = await usersService.createOrUpdate(
+              /*userEstablishmentInDB = await usersService.createOrUpdate(
                                                                 {
                                                                   // id:,
                                                                   // first_name:,
@@ -319,16 +326,18 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                 currentTransaction,
                                                                 logger
                                                               );
+*/
+               userEstablishmentInDB = Error;
 
             }
 
-            if ( userInDB instanceof Error === false ) {
+            if ( userEstablishmentInDB instanceof Error === false ) {
 
-              let establishmentInDB = await establishmentsService.getByUserId( userInDB.id,null,currentTransaction,logger ) as any;
+              let establishmentInDB = await establishmentsService.getByUserId( userEstablishmentInDB.id,null,currentTransaction,logger ) as any;
 
               if ( establishmentInDB === null ) { //does not exist this establishment create a new
 
-                establishmentInDB = await establishmentsService.createOrUpdate(
+               /* establishmentInDB = await establishmentsService.createOrUpdate(
                                                                                 {
 
                                                                                 },
@@ -336,6 +345,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                                 currentTransaction,
                                                                                 logger
                                                                                 );
+*/            establishmentInDB = Error;
 
               }
 
@@ -352,6 +362,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                 let locationInDB = await locationsService.getByAddress( strAddressToFind,null,currentTransaction,logger ) as any;
 
                 if ( locationInDB === null ) {  //does not exist this location create a new
+
+                  let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
+
+                  "14250 SW 136th St, Miami, FL 33186, USA";
+                  let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,null,currentTransaction,logger ) as any;
 
                   //verify zip_code if not exist create
 
@@ -411,6 +426,74 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   if ( orderInDB instanceof Error === false ) {
 
+                    let driverInDB = await driversService.getById(deliveryOrderData.UserId,null,currentTransaction,logger) as any;
+
+                    if ( driverInDB === null  ) { //driver does not exist create it
+
+                      let userDriverInDB = await usersService.getById( deliveryOrderData.sysUser.Id,null,currentTransaction,logger ) as any;
+
+                      if ( userDriverInDB === null ) { //does not exist this user-driver create a new
+
+                        userDriverInDB = await usersService.createOrUpdate(
+                                                                          {
+                                                                            // id:,
+                                                                            // first_name:,
+                                                                            // last_name:,
+                                                                            // short_name:,
+                                                                            // phone:"",
+                                                                            // email:,
+                                                                            // password:"buscarclave", // no se tiene buscarla
+                                                                            // role:"restaurant",
+                                                                            // restriction:"",
+                                                                            // created_at:,
+                                                                            // updated_at:
+                                                                          },
+                                                                          null,
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        );
+
+                      }
+
+                      if ( userDriverInDB instanceof Error === false ) {
+
+                      driverInDB = await driversService.createOrUpdate( {
+                                                                        /*  id:, 'char(36)', 'NO', 'PRI', NULL, ''
+                                                                          user_id', 'char(36)', 'NO', 'MUL', NULL, ''
+                                                                          zone', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          status', 'int(11)', 'YES', '', NULL, ''
+                                                                          active', 'int(11)', 'YES', '', NULL, ''
+                                                                          points_accumulated', 'int(10) unsigned', 'NO', '', '0', ''
+                                                                          deliveries_completed', 'int(10) unsigned', 'NO', '', '0', ''
+                                                                          qualification', 'int(10) unsigned', 'NO', '', '0', ''
+                                                                          birthday', 'date', 'YES', '', NULL, ''
+                                                                          social_id', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          address', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          car_model', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          license_number', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          insurance_expire_day', 'date', 'YES', '', NULL, ''
+                                                                          registration_expire_day', 'date', 'YES', '', NULL, ''
+                                                                          selfie', 'mediumtext', 'YES', '', NULL, ''
+                                                                          hear_about_us', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          payment_method', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          bank_name', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          routing_number', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          bank_account_number', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          tax_information', 'varchar(255)', 'YES', '', NULL, ''
+                                                                          show_name', 'tinyint(1)', 'NO', '', '0', ''
+                                                                          created_at', 'timestamp', 'NO', '', '0000-00-00 00:00:00', ''
+                                                                          updated_at', 'timestamp', 'NO', '', '0000-00-00 00:00:00'*/
+                                                                        },
+                                                                        false,
+                                                                        currentTransaction,
+                                                                        logger);
+
+                    }
+
+                    if ( driverInDB instanceof Error === false ) {
+
+                    }
+
                     let deliveryInDB = await deliveriesService.createOrUpdate( {
                                                                                   id: uuid4,
                                                                                   order_id: orderInDB.user_id,
@@ -435,13 +518,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
                     if ( deliveryInDB instanceof Error === false ) {
 
                       let ticketImageInDB = await ticket_imagesService.createOrUpdate( {
-                                                                                      //   id: ,
-                                                                                      //   order_id: orderInDB.user_id,
-                                                                                      //   image:,
-                                                                                      //   migrated:,
-                                                                                      //   url:,
-                                                                                      //   lock:,
-                                                                                      //   created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                          id: deliveryOrderData.Images[0].Id,
+                                                                                          order_id: orderInDB.user_id,
+                                                                                          image: null,
+                                                                                          migrated: 2,
+                                                                                          url: "@__baseurl__@?id="+deliveryOrderData[0].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                          lock: null,
+                                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.Images[0].CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
                                                                                         },
                                                                                         false,
                                                                                         currentTransaction,
@@ -550,9 +633,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
               }
 
             }
-            else { //error creation of user
+            else { //error creation of user-establishment
 
-              const error = userInDB as Error;
+              const error = userEstablishmentInDB as Error;
 
               const strMessage = util.format( "Unexpected error [%s]", error?.message );
 
