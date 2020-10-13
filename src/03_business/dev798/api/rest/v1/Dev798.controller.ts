@@ -53,10 +53,18 @@ export default class Dev798Controller {
   static readonly _BASE_PATH = "/v1/business/dev798/odinv1";
 
   static readonly _ROUTE_INFO = [
-                                { Path: Dev798Controller._BASE_PATH + "/delivery/order", Action: ".v1.business.dev798.odinv1.delivery.order.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Allow to create delivery order in odin v1 legacy database" },
-                                { Path: Dev798Controller._BASE_PATH + "/delivery/establishment", Action: ".v1.business.dev798.odinv1.delivery.establishment.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get establishment data in odin v1 legacy database" },
-                                { Path: Dev798Controller._BASE_PATH + "/delivery/users", Action: ".v1.business.dev798.odinv1.delivery.users.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Get users data in odin v1 legacy database" },
-  ]
+                                  {
+                                    Path: Dev798Controller._BASE_PATH + "/delivery/order",
+                                    Action: "v1.business.dev798.odinv1.delivery.order.create",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Allow to create delivery order in odin v1 legacy database"
+                                  },
+                                ]
 
   _controllerLogger = null;
 

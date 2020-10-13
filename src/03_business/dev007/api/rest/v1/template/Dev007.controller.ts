@@ -51,7 +51,17 @@ export default class Dev007Controller {
   static readonly _BASE_PATH = "/v1/business/dev007/example";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: Dev007Controller._BASE_PATH + "/", Action: "v1.business.dev007.example.get", AccessKind: 2, RequestKind: 1, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Example dev000 end point" },
+                                  {
+                                    Path: Dev007Controller._BASE_PATH + "/",
+                                    Action: "v1.business.dev007.example.get",
+                                    AccessKind: 2,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Example dev000 end point"
+                                  },
                                 ]
 
   _controllerLogger = null;

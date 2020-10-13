@@ -54,18 +54,201 @@ export default class BinaryController {
   static readonly _BASE_PATH = "/v1/system/binary";
 
   static readonly _ROUTE_INFO = [
-                                  { Path: BinaryController._BASE_PATH + "/auth", Action: "v1.system.binary.auth.create", AccessKind: 2, RequestKind: 2, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Create a new auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/auth", Action: "v1.system.binary.auth.delete", AccessKind: 2, RequestKind: 4, AllowTagAccess: "#Authenticated#", Roles: [ "Authenticated" ], Description: "Delete the auth token for access to binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search", Action: "v1.system.binary.search", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_Binary#,#Search_Binary_L01#,#Search_Binary_L02#,#Search_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Search_Binary", "Search_Binary_L01", "Search_Binary_L02", "Search_Binary_L03" ], Description: "Search by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH + "/search/count", Action: "v1.system.binary.search.count", AccessKind: 3, RequestKind: 1, AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_Binary#,#Search_Binary_L01#,#Search_Binary_L02#,#Search_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Search_Binary", "Search_Binary_L01", "Search_Binary_L02", "Search_Binary_L03" ], Description: "Search count by meta of binary data" },
-                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.get", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary data from backend server" }, //,#Master_L01#,#Master_L02#,#Master_L03#,#Get_Binary_L01#,#Get_Binary_L02#,#Get_Binary_L03#,"Master_L01","Master_L02","Master_L03","Get_Binary_L01","Get_Binary_L02","Get_Binary_L03"
-                                  { Path: BinaryController._BASE_PATH + "/details", Action: "v1.system.binary.get.details", AccessKind: 1, RequestKind: 1, AllowTagAccess: "#Public#", Roles: [ "Public" ], Description: "Get binary meta data details from backend server" }, //,#Master_L01#,#Master_L02#,#Master_L03#,#Get_Binary_L01#,#Get_Binary_L02#,#Get_Binary_L03#,"Master_L01","Master_L02","Master_L03","Get_Binary_L01","Get_Binary_L02","Get_Binary_L03"
-                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.upload", AccessKind: 3, RequestKind: 2, AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Upload_Binary#", Roles: [ "Administrator", "Business_Manager", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Upload_Binary" ], Description: "Upload binary data to the backend server" },
-                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.update", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#", Roles: [ "Administrator", "Business_Manager", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_Binary", "Update_Binary_L01", "Update_Binary_L02", "Update_Binary_L03" ], Description: "Update the information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH + "/disable/bulk", Action: "v1.system.binary.disable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_Binary", "Update_Binary_L01", "Update_Binary_L02", "Update_Binary_L03" ], Description: "Disable existent information metadata binary data in bulk" },
-                                  { Path: BinaryController._BASE_PATH + "/enable/bulk", Action: "v1.system.binary.enable.bulk", AccessKind: 3, RequestKind: 3, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Update_Binary", "Update_Binary_L01", "Update_Binary_L02", "Update_Binary_L03" ], Description: "Enable existent information metadata binary data in bulk" },
-                                  { Path: BinaryController._BASE_PATH, Action: "v1.system.binary.delete", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#Business_Manager#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_Binary#,#Delete_Binary_L01#,#Delete_Binary_L02#,#Delete_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Delete_Binary", "Delete_Binary_L01", "Delete_Binary_L02", "Delete_Binary_L03" ], Description: "Delete the information metadata of binary data from backend server" },
-                                  { Path: BinaryController._BASE_PATH + "/bulk", Action: "v1.system.binary.delete.bulk", AccessKind: 3, RequestKind: 4, AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_Binary#,#Delete_Binary_L01#,#Delete_Binary_L02#,#Delete_Binary_L03#", Roles: [ "Administrator", "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "Delete_Binary", "Delete_Binary_L01", "Delete_Binary_L02", "Delete_Binary_L03" ], Description: "Delete the information metadata of binary data in bulk from backend server" },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/auth",
+                                    Action: "v1.system.binary.auth.create",
+                                    AccessKind: 2,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Create a new auth token for access to binary data"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/auth",
+                                    Action: "v1.system.binary.auth.delete",
+                                    AccessKind: 2,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Delete the auth token for access to binary data"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/search",
+                                    Action: "v1.system.binary.search",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_Binary#,#Search_Binary_L01#,#Search_Binary_L02#,#Search_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Search_Binary",
+                                             "Search_Binary_L01",
+                                             "Search_Binary_L02",
+                                             "Search_Binary_L03"
+                                           ],
+                                    Description: "Search by meta of binary data"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/search/count",
+                                    Action: "v1.system.binary.search.count",
+                                    AccessKind: 3,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Search_Binary#,#Search_Binary_L01#,#Search_Binary_L02#,#Search_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Search_Binary",
+                                             "Search_Binary_L01",
+                                             "Search_Binary_L02",
+                                             "Search_Binary_L03"
+                                           ],
+                                    Description: "Search count by meta of binary data"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH,
+                                    Action: "v1.system.binary.get",
+                                    AccessKind: 1,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Get binary data from backend server"
+                                  }, //,#Master_L01#,#Master_L02#,#Master_L03#,#Get_Binary_L01#,#Get_Binary_L02#,#Get_Binary_L03#,"Master_L01","Master_L02","Master_L03","Get_Binary_L01","Get_Binary_L02","Get_Binary_L03"
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/details",
+                                    Action: "v1.system.binary.get.details",
+                                    AccessKind: 1,
+                                    RequestKind: 1,
+                                    AllowTagAccess: "#Public#",
+                                    Roles: [
+                                             "Public"
+                                           ],
+                                    Description: "Get binary meta data details from backend server"
+                                  }, //,#Master_L01#,#Master_L02#,#Master_L03#,#Get_Binary_L01#,#Get_Binary_L02#,#Get_Binary_L03#,"Master_L01","Master_L02","Master_L03","Get_Binary_L01","Get_Binary_L02","Get_Binary_L03"
+                                  {
+                                    Path: BinaryController._BASE_PATH,
+                                    Action: "v1.system.binary.upload",
+                                    AccessKind: 3,
+                                    RequestKind: 2,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Upload_Binary#",
+                                    Roles: [
+                                             "Administrator",
+                                             "Business_Manager",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Upload_Binary"
+                                           ],
+                                    Description: "Upload binary data to the backend server"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH,
+                                    Action: "v1.system.binary.update",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "Business_Manager",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_Binary",
+                                             "Update_Binary_L01",
+                                             "Update_Binary_L02",
+                                             "Update_Binary_L03"
+                                           ],
+                                    Description: "Update the information metadata of binary data from backend server"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/disable/bulk",
+                                    Action: "v1.system.binary.disable.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_Binary",
+                                             "Update_Binary_L01",
+                                             "Update_Binary_L02",
+                                             "Update_Binary_L03"
+                                           ],
+                                    Description: "Disable existent information metadata binary data in bulk"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/enable/bulk",
+                                    Action: "v1.system.binary.enable.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Update_Binary#,#Update_Binary_L01#,#Update_Binary_L02#,#Update_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Update_Binary",
+                                             "Update_Binary_L01",
+                                             "Update_Binary_L02",
+                                             "Update_Binary_L03"
+                                           ],
+                                    Description: "Enable existent information metadata binary data in bulk"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH,
+                                    Action: "v1.system.binary.delete",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#Business_Manager#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_Binary#,#Delete_Binary_L01#,#Delete_Binary_L02#,#Delete_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Delete_Binary",
+                                             "Delete_Binary_L01",
+                                             "Delete_Binary_L02",
+                                             "Delete_Binary_L03"
+                                           ],
+                                    Description: "Delete the information metadata of binary data from backend server"
+                                  },
+                                  {
+                                    Path: BinaryController._BASE_PATH + "/bulk",
+                                    Action: "v1.system.binary.delete.bulk",
+                                    AccessKind: 3,
+                                    RequestKind: 4,
+                                    AllowTagAccess: "#Administrator#,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#Delete_Binary#,#Delete_Binary_L01#,#Delete_Binary_L02#,#Delete_Binary_L03#",
+                                    Roles: [
+                                             "Administrator",
+                                             "BManager_L99",
+                                             "Master_L01",
+                                             "Master_L02",
+                                             "Master_L03",
+                                             "Delete_Binary",
+                                             "Delete_Binary_L01",
+                                             "Delete_Binary_L02",
+                                             "Delete_Binary_L03"
+                                           ],
+                                    Description: "Delete the information metadata of binary data in bulk from backend server"
+                                  },
                                 ]
 
   _controllerLogger = null;
