@@ -7,6 +7,7 @@ import cluster from "cluster";
 import glob from "glob";
 
 import moment, { Moment } from "moment-timezone";
+
 import XXHash from "xxhashjs";
 //import  from "moment-timezone";
 import uuidv4 from "uuid/v4";
@@ -170,6 +171,94 @@ export default class SystemUtilities {
     try {
 
       bResult = strDateTime ? moment().tz( CommonUtilities.getCurrentTimeZoneId() ).isBefore( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
+  static isDateAndTimeBeforeAtDays( strAt: string, intDays: number, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const dateTime1 = moment( strAt ? strAt: undefined ).tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intDays, "days" );
+
+      const dateTime2 = moment( strDateTime ).tz( CommonUtilities.getCurrentTimeZoneId() );
+
+      bResult = strDateTime ? dateTime2.isSameOrAfter( dateTime1 ) && moment( strAt ).isSameOrAfter( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
+  static isDateAndTimeBeforeAtHours( strAt: string, intHours: number, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const dateTime1 = moment( strAt ? strAt: undefined ).tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intHours, "hours" );
+
+      const dateTime2 = moment( strDateTime ).tz( CommonUtilities.getCurrentTimeZoneId() );
+
+      bResult = strDateTime ? dateTime2.isSameOrAfter( dateTime1 ) && moment( strAt ).isSameOrAfter( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
+  static isDateAndTimeBeforeAtMinutes( strAt: string, intMinutes: number, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const dateTime1 = moment( strAt ? strAt: undefined ).tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intMinutes, "minutes" );
+
+      const dateTime2 = moment( strDateTime ).tz( CommonUtilities.getCurrentTimeZoneId() );
+
+      bResult = strDateTime ? dateTime2.isSameOrAfter( dateTime1 ) && moment( strAt ).isSameOrAfter( strDateTime ) : false;
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return bResult;
+
+  }
+
+  static isDateAndTimeBeforeAtSeconds( strAt: string, intSeconds: number, strDateTime: string ): boolean {
+
+    let bResult = false;
+
+    try {
+
+      const dateTime1 = moment( strAt ? strAt: undefined ).tz( CommonUtilities.getCurrentTimeZoneId() ).subtract( intSeconds, "seconds" );
+
+      const dateTime2 = moment( strDateTime ).tz( CommonUtilities.getCurrentTimeZoneId() );
+
+      bResult = strDateTime ? dateTime2.isSameOrAfter( dateTime1 ) && moment( strAt ).isSameOrAfter( strDateTime ) : false;
 
     }
     catch ( error ) {
