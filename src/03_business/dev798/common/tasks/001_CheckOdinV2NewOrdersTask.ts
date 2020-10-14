@@ -250,11 +250,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       if ( !odinV2ReponseData ) {
 
+        const strMessage = util.format( "No response data from odin-v2 backend" );
+
+        debugMark( "WARNING: " + strMessage );
+
         if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
 
-          const strMessage = util.format( "No response data from odin-v2 backend" );
-
-          await this.notifyToExternal( "error", strMessage );
+          await this.notifyToExternal( "warning", strMessage );
 
           CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
@@ -263,9 +265,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
       }
       else if ( odinV2ReponseData?.error ) {
 
-        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+        const strMessage = util.format( "Unexpected error [%s]", odinV2ReponseData?.error?.message );
 
-          const strMessage = util.format( "Unexpected error [%s]", odinV2ReponseData?.error?.message );
+        debugMark( "ERROR: " + strMessage );
+
+        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
 
           await this.notifyToExternal( "error", strMessage );
 
@@ -310,11 +314,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
         }
         else {
 
+          const strMessage = util.format( "Unexpected response code [%s] from odin v2 backend", odinV2ReponseData.output?.status );
+
+          debugMark( "WARNING: " + strMessage );
+
           if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-            const strMessage = util.format( "Unexpected response code [%s] from odin v2 backend", odinV2ReponseData.output?.status );
-
-            debugMark( "WARNING: " + strMessage );
 
             await this.notifyToExternal( "warning", strMessage );
 
