@@ -248,7 +248,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                                        headers,
                                                                                        params );
 
-      if ( !odinV2ReponseData ) {
+      if ( !odinV2ReponseData ||
+           ( !odinV2ReponseData.error &&
+             !odinV2ReponseData.output ) ) {
 
         const strMessage = util.format( "No response data from odin-v2 backend" );
 
