@@ -46,7 +46,7 @@ export default class establishmentsService extends BaseService { //<= Change cla
 
       }
 
-      let usersInDB = await usersService.getByFirstName( Name, null, logger ); //<= Change here for the right model name
+      let usersInDB = await usersService.getByFirstName( Name, null, currentTransaction, logger ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&

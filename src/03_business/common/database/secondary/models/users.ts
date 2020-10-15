@@ -63,37 +63,30 @@ export class users extends Model<users> {
   first_name: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   last_name: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 45 ), allowNull: false } )
   short_name: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   phone: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   email: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 60 ), allowNull: false } )
   password: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   role: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING( 255 ), allowNull: false } )
   restriction: string;
 

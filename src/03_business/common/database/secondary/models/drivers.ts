@@ -71,17 +71,14 @@ export class drivers extends Model<drivers> {
   active: number;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
-  point_accumulated: number;
+  points_accumulated: number;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
   deliveries_completed: number;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.INTEGER, allowNull: false } )
   qualification: number;
 
@@ -128,17 +125,14 @@ export class drivers extends Model<drivers> {
   tax_information: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.TINYINT, allowNull: false } )
   show_name : number;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING, allowNull: false } )
   created_at: string;
 
   @NotNull
-  @NotEmpty
   @Column( { type: DataType.STRING, allowNull: false } )
   updated_at: string;
 

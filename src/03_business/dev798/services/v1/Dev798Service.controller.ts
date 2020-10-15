@@ -66,7 +66,12 @@ export default class Dev798ServicesController extends BaseService {
 
       }
 
-      let usersInDB = await usersService.getByFirstName( request.body.bizOrigin.Name,null,transaction,logger ); //<= Change here for the right model name
+      let usersInDB = await usersService.getByFirstName(
+                                                         request.body.bizOrigin.Name,
+                                                         null,
+                                                         transaction,
+                                                         logger
+                                                        ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -101,7 +106,11 @@ export default class Dev798ServicesController extends BaseService {
 
       } else{
 
-        let establishmentInDB = await establishmentsService.getByName( request.body.bizOrigin.Name,null,transaction,logger ); //<= Change here for the right model name
+        let establishmentInDB = await establishmentsService.getByName( request.body.bizOrigin.Name,
+                                                                       null,
+                                                                       transaction,
+                                                                       logger
+                                                                      ); //<= Change here for the right model name
 
         if ( currentTransaction !== null &&
              currentTransaction.finished !== "rollback" &&
@@ -436,9 +445,12 @@ export default class Dev798ServicesController extends BaseService {
 
       //let userSessionStatus = context.UserSessionStatus;
 
-      let establishmentInDB = await establishmentsService.getByName( request.body.Name as string,
-                                                                        currentTransaction,
-                                                                        logger );
+      let establishmentInDB = await establishmentsService.getByName(
+                                                                    request.body.Name as string,
+                                                                    null,
+                                                                    currentTransaction,
+                                                                    logger
+                                                                   );
 
 
       if ( !establishmentInDB ) {
@@ -647,6 +659,7 @@ export default class Dev798ServicesController extends BaseService {
       //let userSessionStatus = context.UserSessionStatus;
 
       let UsersInDB = await usersService.getByFirstName( request.body.Name as string,
+                                                         null,
                                                          currentTransaction,
                                                          logger );
 
