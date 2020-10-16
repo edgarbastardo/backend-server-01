@@ -35,6 +35,7 @@ import ticket_imagesService from '../../../common/database/secondary/services/ti
 import driversService from '../../../common/database/secondary/services/driversService';
 import zip_codesService from '../../../common/database/secondary/services/zip_codesService';
 import phonesService from '../../../common/database/secondary/services/phonesService';
+import { DOUBLE } from 'sequelize/types';
 
 let debug = require( 'debug' )( '001_CheckOdinV2NewOrdersTask' );
 
@@ -250,7 +251,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
                       const params = {
-                       DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       DeliveryAt: "2020-10-16"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
@@ -452,7 +453,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                 if ( locationInDB instanceof Error === false ) {
 
-                  let QuantityOrderMiles = Math.round(deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter*0.062137)/100;
+                  let QuantityOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter*0.062137 ) / 100;
 
                   let tipPayment = [];
                   let orderPayment = [];
@@ -464,27 +465,28 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     if ( strId === "95638928-2c44-4689-b903-fb275703b674" ) {
 
-                        result = "cash"
+                      result = "cash"
 
                     }
-                    else if ("b7ec0892-e9b9-449e-bcb1-f20975846a9a") {
+                    else if ( strId === "b7ec0892-e9b9-449e-bcb1-f20975846a9a" ) {
 
-                        result = "credit"
-
-                    }
-                    else if ("e0959e93-dbcc-4640-8ae3-156f15d2acfc") {
-
-                        result = "sq"
+                      result = "credit"
 
                     }
-                    else if ("e03c8882-2a2e-4fa8-9889-05f9291467e2") {
+                    else if ( strId === "e0959e93-dbcc-4640-8ae3-156f15d2acfc" ) {
 
-                        result = "prepaid"
+                      result = "sq"
 
                     }
-                    else if ("fb1d9158-6393-4381-8214-5d8dc3e9d908") {
+                    else if ( strId === "e03c8882-2a2e-4fa8-9889-05f9291467e2" ) {
 
-                        result = "rep";
+                      result = "prepaid"
+
+                    }
+                    else if ( strId === "fb1d9158-6393-4381-8214-5d8dc3e9d908" ) {
+
+                      result = "rep";
+
                     }
 
                     return result;
@@ -493,14 +495,14 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   for ( var i = 0; i < payment.length; i++ ) {
 
-                    if ( payment[i].PayKind === 100 ) {
+                    if ( payment[ i ].PayKind === 100 ) {
 
-                      orderPayment.push( payment[i] );
+                      orderPayment.push( payment[ i ] );
 
                     }
-                    else if ( payment[i].PayKind === 200 ) {
+                    else if ( payment[ i ].PayKind === 200 ) {
 
-                      tipPayment.push( payment[i] );
+                      tipPayment.push( payment[ i ] );
 
                     }
 
@@ -517,22 +519,22 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     strPaymentMethod = "mixed";
 
-                    originalAmount = orderPayment[0].Amount + orderPayment[1].Amount;
+                    originalAmount = Number.parseFloat( orderPayment[ 0 ].Amount ) + Number.parseFloat( orderPayment[ 1 ].Amount);
 
-                    amount1 = orderPayment[0].Amount;
+                    amount1 = Number.parseFloat( orderPayment[ 0 ].Amount );
 
-                    amount2 = orderPayment[1].Amount;
+                    amount2 = Number.parseFloat( orderPayment[ 1 ].Amount );
 
-                    strPaymentMethod1 = paymentMethodforOdinV1( orderPayment[0].bizPaymentMethod.Id );
+                    strPaymentMethod1 = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
 
-                    strPaymentMethod2 = paymentMethodforOdinV1( orderPayment[1].bizPaymentMethod.Id );
+                    strPaymentMethod2 = paymentMethodforOdinV1( orderPayment[ 1 ].bizPaymentMethod.Id );
 
                   }
-                  else {
+                  else if ( orderPayment.length === 1 ){
 
-                    strPaymentMethod = paymentMethodforOdinV1( orderPayment[0].bizPaymentMethod.Id );
+                    strPaymentMethod = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
 
-                    originalAmount = orderPayment[0].Amount;
+                    originalAmount = Number.parseFloat( orderPayment[ 0 ].Amount );
 
                   }
 
@@ -549,18 +551,18 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                         state: "done",
                                                                         amount1: amount1,
                                                                         amount2: amount2,
-                                                                        original_amount: originalAmount,
+                                                                        original_amount: Math.round( originalAmount ),
                                                                         created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
                                                                         updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                        fee: establishmentInDB.fee,
+                                                                        fee: Number.parseFloat( establishmentInDB.fee ),
                                                                         delivered: null,
                                                                         want_delivery_date:"1980-01-16",
                                                                         want_delivery_time:"00:00:00",
-                                                                        extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
+                                                                        extra_miles: Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles ),
                                                                         inspected: 0,
                                                                         status_number: null,
                                                                         client_name: deliveryOrderData.bizDestination.Name,
-                                                                        extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
+                                                                        extra_miles_driver_order: Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles_driver ),
                                                                         order_miles_quantity: QuantityOrderMiles,
                                                                         catering_type: 0,
                                                                         qty_person_catering: 0,
@@ -673,21 +675,22 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         strTipMethod = "mixed";
 
-                        tip = tipPayment[0].Amount + tipPayment[1].Amount;
+                        tip = Number.parseFloat( tipPayment[ 0 ].Amount ) + Number.parseFloat( tipPayment[ 1 ].Amount );
 
-                        tip1 = tipPayment[0].Amount;
+                        tip1 = tipPayment[ 0 ].Amount;
 
-                        tip2 = tipPayment[1].Amount;
+                        tip2 = tipPayment[ 1 ].Amount;
 
-                        strTipMethod1 = paymentMethodforOdinV1( tipPayment[0].bizPaymentMethod.Id );
+                        strTipMethod1 = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
 
-                        strTipMethod2 = paymentMethodforOdinV1( tipPayment[1].bizPaymentMethod.Id );
+                        strTipMethod2 = paymentMethodforOdinV1( tipPayment[ 1 ].bizPaymentMethod.Id );
 
-                      } else {
+                      }
+                      else if (tipPayment.length === 1) {
 
-                        strTipMethod = paymentMethodforOdinV1( tipPayment[0].bizPaymentMethod.Id );
+                        strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
 
-                        tip = tipPayment[0].Amount;
+                        tip = tipPayment[ 0 ].Amount;
 
                       }
 
@@ -700,11 +703,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                                   qualification: 0,
                                                                                   tip1: tip1,
                                                                                   tip2: tip2,
-                                                                                  tip: tip,
+                                                                                  tip: Math.round( tip ),
                                                                                   tip_method: strTipMethod,
                                                                                   tip_method1: strTipMethod1,
                                                                                   tip_method2: strTipMethod2,
-                                                                                  // tip_validated_at: "",
                                                                                   created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
                                                                                   updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
                                                                                 },
@@ -716,13 +718,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       if ( deliveryInDB instanceof Error === false ) {
 
                       let ticketImageInDB = await ticket_imagesService.createOrUpdate( {
-                                                                                          id: deliveryOrderData.Images[0].Id,
+                                                                                          id: deliveryOrderData.Images[ 0 ].Id,
                                                                                           order_id: orderInDB.id,
                                                                                           image: null,
                                                                                           migrated: 2,
-                                                                                          url: "@__baseurl__@?id="+deliveryOrderData.Images[0].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                          url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
                                                                                           lock: null,
-                                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[ 0 ].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
                                                                                         },
                                                                                         false,
                                                                                         currentTransaction,

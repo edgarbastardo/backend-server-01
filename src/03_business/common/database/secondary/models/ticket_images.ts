@@ -45,8 +45,8 @@ export class ticket_images extends Model<ticket_images> {
   @Column( { type: DataType.TEXT, allowNull: true } )
   image: string;
 
-  //@Column( { type: DataType.STRING } )
-  //created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
+  @Column( { type: DataType.STRING } )
+  created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
 
   @Column( { type: DataType.SMALLINT, allowNull: true } )
   migrated: string;
