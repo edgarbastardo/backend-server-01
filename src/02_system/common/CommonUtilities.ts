@@ -1579,6 +1579,42 @@ export default class CommonUtilities {
 
   }
 
+  public static trimArrayFromStringB( strArray: string,
+                                      strSplit: string = ",",
+                                      bAddEmpty: boolean = true ): string {
+
+    let result = [];
+
+    try {
+
+      const temp = strArray.split( strSplit );
+
+      for ( const strItem of temp ) {
+
+        if ( bAddEmpty ) {
+
+          result.push( strItem.trim() );
+
+        }
+        else if ( strItem.trim() ) {
+
+          result.push( strItem.trim() );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return result.join( strSplit );
+
+  }
+
   public static addTag( strCurrentTagList: string, strTag: string ): string {
 
     let strResult = strCurrentTagList;
@@ -1615,11 +1651,71 @@ export default class CommonUtilities {
 
       if ( strCurrentTagList && strCurrentTagList.includes( strTag ) ) {
 
-        const regExp1 = new RegExp( `${strTag}(,)?`, "g" );
-        const regExp2 = new RegExp( `(,)?${strTag}`, "g" );
+        const regExp1 = new RegExp( `${strTag}`, "g" ); //(,)?
+        const regExp2 = new RegExp( `,,`, "g" );
 
         strResult = strCurrentTagList.replace( regExp1, "" );
         strResult = strResult.replace( regExp2, "" );
+
+        if ( strResult[ strResult.length - 1 ] === "," ) {
+
+          strResult = strResult.substr( 0, strResult.length - 1 );
+
+        }
+
+        if ( strResult[ 0 ] === "," ) {
+
+          strResult = strResult.substr( 1, strResult.length );
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      //
+
+    }
+
+    return strResult;
+
+  }
+
+
+  public static removeTagList( strCurrentTagList: string, strTagList: string ): string {
+
+    let strResult = strCurrentTagList;
+
+    try {
+
+      const tagList = strTagList.split( "," );
+
+      for ( let intIndexTag = 0; intIndexTag < tagList.length; intIndexTag++ ) {
+
+        const strTag = tagList[ intIndexTag ];
+
+        if ( strCurrentTagList && strCurrentTagList.includes( strTag ) ) {
+
+          const regExp1 = new RegExp( `${strTag}`, "g" ); //(,)?
+          const regExp2 = new RegExp( `,,`, "g" ); //(,)?
+
+          strResult = strCurrentTagList.replace( regExp1, "" );
+          strResult = strResult.replace( regExp2, "," );
+
+          if ( strResult[ strResult.length - 1 ] === "," ) {
+
+            strResult = strResult.substr( 0, strResult.length - 1 );
+
+          }
+
+          if ( strResult[ 0 ] === "," ) {
+
+            strResult = strResult.substr( 1, strResult.length );
+
+          }
+
+        }
 
       }
 
