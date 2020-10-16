@@ -912,20 +912,18 @@ export default class CheckOdinV2NewOrdersTask_001 {
           //Check the .env file the ENV variable, in local machine always must be in ENV=dev
           //if en develop you need move forward comment the next 2 lines and 239 line
 
-          /*
-          if ( process.env.ENV === "prod" ||
-               process.env.ENV === "test" ) {
+          //if ( process.env.ENV === "prod" ||
+          //     process.env.ENV === "test" ) {
 
             //The next call is required to make move forward to the next delivery order
             await OdinV2APIRequestService.callNewDeliveryOrderMark( backend,
                                                                     headers,
                                                                     {
-                                                                      Id: deliveryOrderData.Id //Mark the delivery order as processed
+                                                                      Id: deliveryOrderData.Id, //Mark the delivery order as processed
                                                                       Status: bResult ? 1: 0 //Success processed 1 = Confirmed, 0 = Not confirmed
                                                                     } );
 
-          } //Comment here too
-          */
+          //} //Comment here too
 
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
