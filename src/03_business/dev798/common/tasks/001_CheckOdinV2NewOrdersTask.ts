@@ -198,8 +198,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                    ],
                                                              footer: "8E4BBCB07EDF",
                                                          }
-                                                  },
-                                                  logger
+                                                 },
+                                                 logger
                                                );
 
                                                       }
