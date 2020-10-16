@@ -241,7 +241,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
       const strOdinV2APIKey01 = process.env.ODIN_V2_API_KEY_01; //check env.secrets file in the root of project
 
       const backend = {
-                        url: [ strOdinV2Url01 ]
+                        url: [
+                               strOdinV2Url01
+                             ]
                       }
 
       const headers = {
@@ -685,7 +687,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
 
-                        dblTip = tipPayment[ 0 ].Amount;
+                        dblTip = Number.parseFloat( tipPayment[ 0 ].Amount );
 
                       }
 
@@ -713,35 +715,54 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       if ( deliveryInDB instanceof Error === false ) {
 
-                      let ticketImageInDB = await ticket_imagesService.createOrUpdate(
-                                                                                       {
-                                                                                         id: deliveryOrderData.Images[ 0 ].Id,
-                                                                                         order_id: orderInDB.id,
-                                                                                         image: null,
-                                                                                         migrated: 2,
-                                                                                         url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
-                                                                                         lock: null,
-                                                                                         created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                       },
-                                                                                       false,
-                                                                                       currentTransaction,
-                                                                                       logger
-                                                                                     ) as any;
+                        let ticketImageInDB = await ticket_imagesService.createOrUpdate(
+                                                                                         {
+                                                                                           id: deliveryOrderData.Images[ 0 ].Id,
+                                                                                           order_id: orderInDB.id,
+                                                                                           image: null,
+                                                                                           migrated: 2,
+                                                                                           url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                           lock: null,
+                                                                                           created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                         },
+                                                                                         false,
+                                                                                         currentTransaction,
+                                                                                         logger
+                                                                                       ) as any;
 
-                      if ( ticketImageInDB instanceof Error === false ) {
+                        if ( ticketImageInDB instanceof Error === false ) {
 
-                        const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
+                          const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
 
-                        debugMark( "MESSAGE: " + strMessage );
+                          debugMark( "MESSAGE: " + strMessage );
 
-                        bApplyTransaction = true;
+                          bApplyTransaction = true;
 
-                        bResult = true;
+                          bResult = true;
+
+                        }
+                        else { //error creation of ticketImage
+
+                          const error = ticketImageInDB as Error;
+
+                          const strMessage = util.format( "Unexpected error [%s]", error?.message );
+
+                          debugMark( "ERROR: " + strMessage );
+
+                          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                            await this.notifyToExternal( "error", strMessage );
+
+                            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                          }
+
+                        }
 
                       }
-                      else { //error creation of ticketImage
+                      else { //error creation of delivery
 
-                        const error = ticketImageInDB as Error;
+                        const error = deliveryInDB as Error;
 
                         const strMessage = util.format( "Unexpected error [%s]", error?.message );
 
@@ -754,25 +775,6 @@ export default class CheckOdinV2NewOrdersTask_001 {
                           CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
                         }
-
-                      }
-
-                      }
-                      else { //error creation of delivery
-
-                      const error = deliveryInDB as Error;
-
-                      const strMessage = util.format( "Unexpected error [%s]", error?.message );
-
-                      debugMark( "ERROR: " + strMessage );
-
-                      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                        await this.notifyToExternal( "error", strMessage );
-
-                        CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                      }
 
                       }
 
@@ -910,7 +912,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
           //Check the .env file the ENV variable, in local machine always must be in ENV=dev
           //if en develop you need move forward comment the next 2 lines and 239 line
 
-          /*if ( process.env.ENV === "prod" ||
+          /*
+          if ( process.env.ENV === "prod" ||
                process.env.ENV === "test" ) {
 
             //The next call is required to make move forward to the next delivery order
@@ -923,6 +926,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           } //Comment here too
           */
+
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
 
