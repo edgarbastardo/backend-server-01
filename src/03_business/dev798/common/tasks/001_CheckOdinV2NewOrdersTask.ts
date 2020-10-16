@@ -339,8 +339,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
 
-                  strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf(', FL ') ,
-                                                                 strZipCodeToFind.lastIndexOf(', USA') );
+                  strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) ,
+                                                                 strZipCodeToFind.lastIndexOf( ", USA" ) );
 
                   let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,
                                                                          null,
@@ -492,14 +492,14 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   for ( let i = 0; i < payment.length; i++ ) {
 
-                    if ( payment[i].PayKind === 100 ) {
+                    if ( payment[ i ].PayKind === 100 ) {
 
-                      orderPayment.push( payment[i] );
+                      orderPayment.push( payment[ i ] );
 
                     }
-                    else if ( payment[i].PayKind === 200 ) {
+                    else if ( payment[ i ].PayKind === 200 ) {
 
-                      tipPayment.push( payment[i] );
+                      tipPayment.push( payment[ i ] );
 
                     }
 
