@@ -198,9 +198,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                    ],
                                                              footer: "8E4BBCB07EDF",
                                                          }
-                                                        },
-                                                        logger
-                                                        );
+                                                  },
+                                                  logger
+                                               );
 
                                                       }
 
@@ -244,14 +244,14 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         url: [ strOdinV2Url01 ]
                       }
 
-                      const headers = {
+      const headers = {
                         "Content-Type": "application/json",
                         "Authorization": strOdinV2APIKey01
                       }
 
-                      const params = {
-                        DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
-                      }
+      const params = {
+                       DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                     }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
                                                                                        headers,
@@ -465,22 +465,22 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       result = "cash"
 
                     }
-                    else if ("b7ec0892-e9b9-449e-bcb1-f20975846a9a") {
+                    else if ( strId === "b7ec0892-e9b9-449e-bcb1-f20975846a9a" ) {
 
                       result = "credit"
 
                     }
-                    else if ("e0959e93-dbcc-4640-8ae3-156f15d2acfc") {
+                    else if ( strId === "e0959e93-dbcc-4640-8ae3-156f15d2acfc" ) {
 
                       result = "sq"
 
                     }
-                    else if ("e03c8882-2a2e-4fa8-9889-05f9291467e2") {
+                    else if ( strId === "e03c8882-2a2e-4fa8-9889-05f9291467e2" ) {
 
                       result = "prepaid"
 
                     }
-                    else if ("fb1d9158-6393-4381-8214-5d8dc3e9d908") {
+                    else if ( strId === "fb1d9158-6393-4381-8214-5d8dc3e9d908" ) {
 
                       result = "rep";
 
