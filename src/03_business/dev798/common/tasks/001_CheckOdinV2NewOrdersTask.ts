@@ -202,10 +202,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                  logger
                                                );
 
-                                                      }
+  }
 
-                                                      //This method run every from 8 to 15 seconds
-                                                      public async runTask( params: any,
+  //This method run every from 8 to 15 seconds
+  public async runTask( params: any,
                         logger: any ): Promise<boolean> {
 
     let bResult = false;
@@ -922,7 +922,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                     } );
 
           } //Comment here too
-*/
+          */
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
 
