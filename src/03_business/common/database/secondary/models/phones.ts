@@ -6,8 +6,7 @@ import {
          DataType,
          BeforeValidate,
          Unique,
-         NotNull,
-         NotEmpty
+         NotNull
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -21,14 +20,33 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "ticket_images",
-  modelName: "ticket_images"
+  tableName: "phones",
+  modelName: "phones"
 } )
-export class ticket_images extends Model<ticket_images> {
+export class phones extends Model<phones> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
     super( values, options );
+
+    /*
+    if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
+
+      if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
+
+        this.Id = SystemUtilities.getUUIDv4();
+
+      }
+
+      if ( CommonUtilities.isNullOrEmpty( values.ShortId ) ||
+           values.ShortId === '0' ) {
+
+        this.ShortId = SystemUtilities.hashString( this.Id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
+
+      }
+
+    }
+    */
 
   }
 
@@ -38,27 +56,19 @@ export class ticket_images extends Model<ticket_images> {
   id: string;
 
   @NotNull
-  @NotEmpty
-  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
-  order_id: string;
+  @Column( { type: DataType.STRING( 255 ), allowNull: false } )
+  phone: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
-  image: string;
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
+  created_at: string;
 
-  @Column( { type: DataType.STRING } )
-  created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
-
-  @Column( { type: DataType.SMALLINT, allowNull: true } )
-  migrated: string;
-
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
-  url: string;
-
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  lock: string;
+  @NotNull
+  @Column( { type: DataType.STRING, allowNull: false } )
+  updated_at: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: ticket_images, options: any ): void {
+  static beforeValidateHook( instance: phones, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

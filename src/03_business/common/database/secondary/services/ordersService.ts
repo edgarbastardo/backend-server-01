@@ -33,7 +33,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -127,7 +127,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 
@@ -161,6 +161,9 @@ export default class ordersService extends BaseService { //<= Change class name 
 
           createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
+          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+
+
         }
 
         await ordersInDB.update( createOrUpdateData,
@@ -187,7 +190,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "E53E8086E898" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "CF5E35A3C91B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -241,7 +244,7 @@ export default class ordersService extends BaseService { //<= Change class name 
 
     try {
 
-      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
 
       if ( currentTransaction === null ) {
 

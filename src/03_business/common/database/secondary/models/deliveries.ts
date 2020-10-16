@@ -5,9 +5,9 @@ import {
          PrimaryKey,
          DataType,
          BeforeValidate,
-         Unique,
+         NotEmpty,
          NotNull,
-         NotEmpty
+         Unique,
          //BeforeUpdate,
          //BeforeCreate,
          //BeforeDestroy,
@@ -21,14 +21,33 @@ import SystemUtilities from "../../../../../02_system/common/SystemUtilities";
 
 @Table( {
   timestamps: false,
-  tableName: "ticket_images",
-  modelName: "ticket_images"
+  tableName: "deliveries",
+  modelName: "deliveries"
 } )
-export class ticket_images extends Model<ticket_images> {
+export class deliveries extends Model<deliveries> {
 
   constructor( values?: any, options?: BuildOptions ) {
 
     super( values, options );
+
+    /*
+    if ( CommonUtilities.isNotNullOrEmpty( values ) ) {
+
+      if ( CommonUtilities.isNullOrEmpty( values.Id ) ) {
+
+        this.Id = SystemUtilities.getUUIDv4();
+
+      }
+
+      if ( CommonUtilities.isNullOrEmpty( values.ShortId ) ||
+           values.ShortId === '0' ) {
+
+        this.ShortId = SystemUtilities.hashString( this.Id, 2, null ); //Hashes.CRC32( this.Id ).toString( 16 );
+
+      }
+
+    }
+    */
 
   }
 
@@ -40,25 +59,45 @@ export class ticket_images extends Model<ticket_images> {
   @NotNull
   @NotEmpty
   @Column( { type: DataType.STRING( 36 ), allowNull: false } )
+  driver_id: string;
+
+  @NotNull
+  @NotEmpty
+  @Column( { type: DataType.STRING( 36 ), allowNull: false } )
   order_id: string;
 
-  @Column( { type: DataType.TEXT, allowNull: true } )
-  image: string;
+  @Column( { type: DataType.INTEGER, allowNull: false } )
+  qualification: number;
 
-  @Column( { type: DataType.STRING } )
-  created_at: string; //This field has default CURRENT_TIMESTAMP, you not need send data
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  tip1: number;
 
-  @Column( { type: DataType.SMALLINT, allowNull: true } )
-  migrated: string;
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  tip2: number;
 
-  @Column( { type: DataType.STRING( 512 ), allowNull: true } )
-  url: string;
+  @Column( { type: DataType.DECIMAL( 10, 2 ), allowNull: true } )
+  tip: number;
 
-  @Column( { type: DataType.STRING( 30 ), allowNull: true } )
-  lock: string;
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method: string;
+
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method1: string;
+
+  @Column( { type: DataType.STRING( 255 ), allowNull: true } )
+  tip_method2: string;
+
+  @Column( { type: DataType.STRING, allowNull: true } )
+  tip_validated_at: string;
+
+  @Column( { type: DataType.STRING, allowNull: true } )
+  created_at: string;
+
+  @Column( { type: DataType.STRING, allowNull: true } )
+  updated_at: string;
 
   @BeforeValidate
-  static beforeValidateHook( instance: ticket_images, options: any ): void {
+  static beforeValidateHook( instance: deliveries, options: any ): void {
 
     SystemUtilities.commonBeforeValidateHook( instance, options );
 

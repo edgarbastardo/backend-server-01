@@ -10,20 +10,20 @@ import SystemUtilities from '../../../../../02_system/common/SystemUtilities';
 
 import DBConnectionManager from '../../../../../02_system/common/managers/DBConnectionManager';
 
-import { ticket_images } from "../models/ticket_images";
-
 import BaseService from '../../../../../02_system/common/database/master/services/BaseService';
 
-const debug = require( 'debug' )( 'ticket_imagesService' ); //<= Change here for the right service name
+import { locations } from '../models/locations';
 
-export default class ticket_imagesService extends BaseService { //<= Change class name here use F2 key
+const debug = require( 'debug' )( 'locationsService' ); //<= Change here for the right service name
 
-  static readonly _ID = "ticket_imagesService"; //<= Change here for the right service name
+export default class locationsService extends BaseService { //<= Change class name here use F2 key
+
+  static readonly _ID = "locationsService"; //<= Change here for the right service name
 
   static async getById( strId: string,
                         strTimeZoneId: string,
                         transaction: any,
-                        logger: any ): Promise<ticket_images> { //<= Change here for the right model name
+                        logger: any ): Promise<locations> { //<= Change here for the right model name
 
     let result = null;
 
@@ -50,7 +50,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       }
 
-      result = await ticket_images.findOne( options ); //<= Change here for the right model name
+      result = await locations.findOne( options ); //<= Change here for the right model name
 
       if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
 
@@ -75,7 +75,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       sourcePosition.method = this.name + "." + this.getById.name;
 
-      const strMark = "1DAB193769B5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "43221AB33F12" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -114,10 +114,105 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
   }
 
+  static async getByAddress( Address: string,
+                             strTimeZoneId: string,
+                             transaction: any,
+                             logger: any ): Promise<locations> { //<= Change here for the right model name
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    try {
+
+      const dbConnection = DBConnectionManager.getDBConnection( "secondary" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      const options = {
+
+        where: { "address": Address }, //<= Change here to right model field name
+        transaction: currentTransaction,
+
+      }
+
+      result = await locations.findOne( options ); //<= Change here for the right model name
+
+      if ( CommonUtilities.isValidTimeZone( strTimeZoneId ) ) {
+
+        SystemUtilities.transformModelToTimeZone( result,
+                                                  strTimeZoneId,
+                                                  logger );
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        await currentTransaction.commit();
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getByAddress.name;
+
+      const strMark = "629FB0EDC3A9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error1 ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
   static async createOrUpdate( createOrUpdateData: any,
                                bUpdate: boolean,
                                transaction: any,
-                               logger: any ): Promise<ticket_images> { //<= Change here for the right model name
+                               logger: any ): Promise<locations> { //<= Change here for the right model name
 
     let result = null;
 
@@ -145,28 +240,28 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
                       }
 
       //      \/   Use F2 to rename this variable name
-      let ticket_images_InDB = await ticket_images.findOne( options ); //<= Change here for the right model name
+      let locationsInDB = await locations.findOne( options ); //<= Change here for the right model name
 
-      if ( ticket_images_InDB === null ) {
+      if ( locationsInDB === null ) {
 
-        ticket_images_InDB = await ticket_images.create( //<= Change here for the right model name
-                                                     createOrUpdateData,
-                                                     { transaction: currentTransaction }
-                                                   );
+        locationsInDB = await locations.create( //<= Change here for the right model name
+                                          createOrUpdateData,
+                                          { transaction: currentTransaction }
+                                        );
 
       }
       else if ( bUpdate ) {
 
-        if ( !createOrUpdateData.UpdatedBy ) {
+        // if ( !createOrUpdateData.UpdatedBy ) {
 
-          createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
+        //   createOrUpdateData.UpdatedBy = SystemConstants._UPDATED_BY_BACKEND_SYSTEM_NET;
 
-        }
+        // }
 
-        await ticket_images_InDB.update( createOrUpdateData,
+        await locationsInDB.update( createOrUpdateData,
                                      options );
 
-        ticket_images_InDB = await ticket_images.findOne( options ); //<= Change here for the right model name
+        locationsInDB = await locations.findOne( options ); //<= Change here for the right model name
 
       }
 
@@ -178,7 +273,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       }
 
-      result = ticket_images_InDB;
+      result = locationsInDB;
 
     }
     catch ( error ) {
@@ -187,7 +282,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       sourcePosition.method = this.name + "." + this.createOrUpdate.name;
 
-      const strMark = "E53E8086E898" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "9BFF20D9720C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
@@ -228,8 +323,8 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
   }
 
-                          //      \/   Use F2 to rename this variable name
-  static async deleteByModel( ticket_image: ticket_images, //<= Change here for the right model name
+                         //      \/   Use F2 to rename this variable name
+  static async deleteByModel( location: locations, //<= Change here for the right model name, aditional rename the parameter variable using F2
                               transaction: any,
                               logger: any ): Promise<Error|boolean> {
 
@@ -257,7 +352,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       }
 
-      await ticket_image.destroy( options ); //<= Change here for the right model name
+      await location.destroy( options ); //<= Change here for the right model name
 
       if ( currentTransaction !== null &&
            currentTransaction.finished !== "rollback" &&
@@ -276,7 +371,7 @@ export default class ticket_imagesService extends BaseService { //<= Change clas
 
       sourcePosition.method = this.name + "." + this.deleteByModel.name;
 
-      const strMark = "5D1EE73662DA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+      const strMark = "B14FC70143BA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 
