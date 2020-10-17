@@ -253,7 +253,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       const params = {
                        Id: "", //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
-                       DeliveryAt: "2020-10-16"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       DeliveryAt: "2020-10-17"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
