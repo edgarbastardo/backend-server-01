@@ -35,10 +35,6 @@ import ticket_imagesService from '../../../common/database/secondary/services/ti
 import driversService from '../../../common/database/secondary/services/driversService';
 import zip_codesService from '../../../common/database/secondary/services/zip_codesService';
 import phonesService from '../../../common/database/secondary/services/phonesService';
-<<<<<<< HEAD
-import { DOUBLE } from 'sequelize/types';
-=======
->>>>>>> 0a4cfdb51553e550b55611b2c6e3e7de74c62a36
 
 let debug = require( 'debug' )( '001_CheckOdinV2NewOrdersTask' );
 
@@ -143,9 +139,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       if ( lastNotificationToExternal ) {
 
-        const currentDateAndTimeMinus30Seconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 30 );
+        const currentDateAndTimeMinusXSeconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 10 );
 
-        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinus30Seconds.format(), lastNotificationToExternal.format() ) ) {
+        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinusXSeconds.format(), lastNotificationToExternal.format() ) ) {
 
           bResult = true;
 
@@ -256,7 +252,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       Id: "", //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       DeliveryAt: "2020-10-16"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
@@ -314,110 +311,131 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           if ( orderInDB === null ) {
 
-            let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
-                                                                           null,
-                                                                           currentTransaction,
-                                                                           logger ) as any;
+            if ( deliveryOrderData.bizDestination.Tag.indexOf("#ADDRESS_ERROR#") === -1 ) {
 
-            if ( userEstablishmentInDB !== null ) {
-
-              let establishmentInDB = await establishmentsService.getByUserId( userEstablishmentInDB.id,
-                                                                               null,
-                                                                               currentTransaction,
-                                                                               logger ) as any;
-
-              if ( establishmentInDB !== null ) {
-
-                let strAddressToFind = deliveryOrderData.bizDestination.FormattedAddress;
-
-                if ( strAddressToFind.indexOf( "," ) > 0 ) {
-
-                  strAddressToFind = strAddressToFind.substring( 0, strAddressToFind.indexOf( "," ) );
-
-                }
-
-                let locationInDB = await locationsService.getByAddress( strAddressToFind,
-                                                                        null,
-                                                                        currentTransaction,
-                                                                        logger ) as any;
-
-                if ( locationInDB === null ) {  //does not exist this location create a new
-
-                  let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
-
-                  strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) ,
-                                                                 strZipCodeToFind.lastIndexOf( ", USA" ) );
-
-                  let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,
-                                                                         null,
-                                                                         currentTransaction,
-                                                                         logger ) as any;
-
-                  if ( zipCodeInDB = null ) {   //does not exit this zip_code create a new
-
-                    zipCodeInDB = await zip_codesService.createOrUpdate(
-                                                                         {
-                                                                           id: SystemUtilities.getUUIDv4(),
-                                                                           zip_code: strZipCodeToFind,
-                                                                           created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                           updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                         },
-                                                                         false,
-                                                                         currentTransaction,
-                                                                         logger
-                                                                       );
-                  }
-
-                  if ( zipCodeInDB instanceof Error === false ) {
-
-                    let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
-
-                    let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
-                                                                    null,
-                                                                    currentTransaction,
-                                                                    logger ) as any;
-
-                    if ( phoneInDB = null ) {   //does not exit this phone create a new
-
-                      phoneInDB = await phonesService.createOrUpdate(
-                                                                      {
-                                                                        id: SystemUtilities.getUUIDv4(),
-                                                                        phone: strPhoneToFind,
-                                                                        created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                        updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                      },
-                                                                      false,
-                                                                      currentTransaction,
-                                                                      logger
-                                                                    );
-                    }
-
-                    if ( phoneInDB instanceof Error === false ) {
-
-                      locationInDB = await locationsService.createOrUpdate(
-                                                                            {
-                                                                              id: SystemUtilities.getUUIDv4(),
-                                                                              user_id: establishmentInDB.user_id,
-                                                                              zip_code_id: zipCodeInDB.id,
-                                                                              phone_id: phoneInDB.id,
-                                                                              state: "Florida",
-                                                                              city: "Miami",
-                                                                              address: strAddressToFind,
-                                                                              description: "main",
-                                                                              address_status: "",
-                                                                              address_type: "residential",
-                                                                              created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                              updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                            },
+              let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
                                                                             null,
                                                                             currentTransaction,
-                                                                            logger
-                                                                          ) as any;
+                                                                            logger ) as any;
+
+              if ( userEstablishmentInDB !== null ) {
+
+                let establishmentInDB = await establishmentsService.getByUserId( userEstablishmentInDB.id,
+                                                                                null,
+                                                                                currentTransaction,
+                                                                                logger ) as any;
+
+                if ( establishmentInDB !== null ) {
+
+                  let strAddressToFind = deliveryOrderData.bizDestination.FormattedAddress;
+
+                  if ( strAddressToFind.indexOf( "," ) > 0 ) {
+
+                    strAddressToFind = strAddressToFind.substring( 0, strAddressToFind.indexOf( "," ) );
+
+                  }
+
+                  let locationInDB = await locationsService.getByAddress( strAddressToFind,
+                                                                          null,
+                                                                          currentTransaction,
+                                                                          logger ) as any;
+
+                  if ( locationInDB === null ) {  //does not exist this location create a new
+
+                    let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
+
+                    strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) ,
+                                                                  strZipCodeToFind.lastIndexOf( ", USA" ) );
+
+                    let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,
+                                                                          null,
+                                                                          currentTransaction,
+                                                                          logger ) as any;
+
+                    if ( zipCodeInDB = null ) {   //does not exit this zip_code create a new
+
+                      zipCodeInDB = await zip_codesService.createOrUpdate(
+                                                                          {
+                                                                            id: SystemUtilities.getUUIDv4(),
+                                                                            zip_code: strZipCodeToFind,
+                                                                            created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                            updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                          },
+                                                                          false,
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        );
+                    }
+
+                    if ( zipCodeInDB instanceof Error === false ) {
+
+                      let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
+
+                      let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
+                                                                      null,
+                                                                      currentTransaction,
+                                                                      logger ) as any;
+
+                      if ( phoneInDB = null ) {   //does not exit this phone create a new
+
+                        phoneInDB = await phonesService.createOrUpdate(
+                                                                        {
+                                                                          id: SystemUtilities.getUUIDv4(),
+                                                                          phone: strPhoneToFind,
+                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                          updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                        },
+                                                                        false,
+                                                                        currentTransaction,
+                                                                        logger
+                                                                      );
+                      }
+
+                      if ( phoneInDB instanceof Error === false ) {
+
+                        locationInDB = await locationsService.createOrUpdate(
+                                                                              {
+                                                                                id: SystemUtilities.getUUIDv4(),
+                                                                                user_id: establishmentInDB.user_id,
+                                                                                zip_code_id: zipCodeInDB.id,
+                                                                                phone_id: phoneInDB.id,
+                                                                                state: "Florida",
+                                                                                city: "Miami",
+                                                                                address: strAddressToFind,
+                                                                                description: "main",
+                                                                                address_status: "",
+                                                                                address_type: "residential",
+                                                                                created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                              },
+                                                                              null,
+                                                                              currentTransaction,
+                                                                              logger
+                                                                            ) as any;
+
+                      }
+                      else {  //error creating phone
+
+                        const error = phoneInDB as Error;
+
+                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
+                        debugMark( "ERROR: " + strMessage );
+
+                        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                          await this.notifyToExternal( "error", strMessage );
+
+                          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                        }
+
+                      }
 
                     }
-                    else {  //error creating phone
+                    else {  //error creating zip_code
 
-                      const error = phoneInDB as Error;
+                      const error = zipCodeInDB as Error;
 
                       const strMessage = util.format( "Unexpected error [%s]", error?.message );
 
@@ -434,321 +452,201 @@ export default class CheckOdinV2NewOrdersTask_001 {
                     }
 
                   }
-                  else {  //error creating zip_code
 
-                    const error = zipCodeInDB as Error;
+                  if ( locationInDB instanceof Error === false ) {
 
-                    const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                    let QuantityOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
 
-                    debugMark( "ERROR: " + strMessage );
+                    let tipPayment = [];
+                    let orderPayment = [];
+                    let payment = deliveryOrderData.Payments;
 
-                    if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+                    const paymentMethodforOdinV1 = ( strId: String ) => {
 
-                      await this.notifyToExternal( "error", strMessage );
+                      let result = "" ;
 
-                      CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+                      if ( strId === "95638928-2c44-4689-b903-fb275703b674" ) {
 
-                    }
+                        result = "cash"
 
-                  }
+                      }
+                      else if ( strId === "b7ec0892-e9b9-449e-bcb1-f20975846a9a" ) {
 
-                }
+                        result = "credit"
 
-                if ( locationInDB instanceof Error === false ) {
+                      }
+                      else if ( strId === "e0959e93-dbcc-4640-8ae3-156f15d2acfc" ) {
 
-                  let QuantityOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
+                        result = "sq"
 
-                  let tipPayment = [];
-                  let orderPayment = [];
-                  let payment = deliveryOrderData.Payments;
+                      }
+                      else if ( strId === "e03c8882-2a2e-4fa8-9889-05f9291467e2" ) {
 
-                  const paymentMethodforOdinV1 = ( strId: String ) => {
+                        result = "prepaid"
 
-                    let result = "" ;
+                      }
+                      else if ( strId === "fb1d9158-6393-4381-8214-5d8dc3e9d908" ) {
 
-                    if ( strId === "95638928-2c44-4689-b903-fb275703b674" ) {
+                        result = "rep";
 
-                      result = "cash"
+                      }
 
-                    }
-                    else if ( strId === "b7ec0892-e9b9-449e-bcb1-f20975846a9a" ) {
-
-                      result = "credit"
-
-                    }
-                    else if ( strId === "e0959e93-dbcc-4640-8ae3-156f15d2acfc" ) {
-
-                      result = "sq"
-
-                    }
-                    else if ( strId === "e03c8882-2a2e-4fa8-9889-05f9291467e2" ) {
-
-                      result = "prepaid"
-
-                    }
-                    else if ( strId === "fb1d9158-6393-4381-8214-5d8dc3e9d908" ) {
-
-                      result = "rep";
+                      return result;
 
                     }
 
-                    return result;
+                    for ( let i = 0; i < payment.length; i++ ) {
 
-                  }
+                      if ( payment[ i ].PayKind === 100 ) {
 
-                  for ( let i = 0; i < payment.length; i++ ) {
+                        orderPayment.push( payment[ i ] );
 
-                    if ( payment[ i ].PayKind === 100 ) {
+                      }
+                      else if ( payment[ i ].PayKind === 200 ) {
 
-                      orderPayment.push( payment[ i ] );
+                        tipPayment.push( payment[ i ] );
 
-                    }
-                    else if ( payment[ i ].PayKind === 200 ) {
-
-                      tipPayment.push( payment[ i ] );
+                      }
 
                     }
 
-                  }
+                    let strPaymentMethod = "";
+                    let strPaymentMethod1 = "";
+                    let strPaymentMethod2 = "";
+                    let dblOriginalAmount = 0;
+                    let dblAmount1 = 0;
+                    let dblAmount2 = 0;
 
-                  let strPaymentMethod = "";
-                  let strPaymentMethod1 = "";
-                  let strPaymentMethod2 = "";
-                  let dblOriginalAmount = 0;
-                  let dblAmount1 = 0;
-                  let dblAmount2 = 0;
+                    if ( orderPayment.length >= 2 ) {
 
-                  if ( orderPayment.length >= 2 ) {
+                      strPaymentMethod = "mixed";
 
-                    strPaymentMethod = "mixed";
+                      dblAmount1 = Number.parseFloat( orderPayment[ 0 ].Amount );
 
-                    dblAmount1 = Number.parseFloat( orderPayment[ 0 ].Amount );
+                      dblAmount2 = Number.parseFloat( orderPayment[ 1 ].Amount );
 
-                    dblAmount2 = Number.parseFloat( orderPayment[ 1 ].Amount );
+                      dblOriginalAmount = dblAmount1 + dblAmount2;
 
-                    dblOriginalAmount = dblAmount1 + dblAmount2;
+                      strPaymentMethod1 = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
 
-                    strPaymentMethod1 = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
+                      strPaymentMethod2 = paymentMethodforOdinV1( orderPayment[ 1 ].bizPaymentMethod.Id );
 
-                    strPaymentMethod2 = paymentMethodforOdinV1( orderPayment[ 1 ].bizPaymentMethod.Id );
+                    }
+                    else {
 
-                  }
-                  else {
+                      strPaymentMethod = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
 
-                    strPaymentMethod = paymentMethodforOdinV1( orderPayment[ 0 ].bizPaymentMethod.Id );
+                      dblOriginalAmount = orderPayment[ 0 ].Amount;
 
-                    dblOriginalAmount = orderPayment[ 0 ].Amount;
+                    }
 
-                  }
+                    let orderInDB = await ordersService.createOrUpdate(
+                                                                        {
+                                                                          id: deliveryOrderData.Id,
+                                                                          user_id: establishmentInDB.user_id,
+                                                                          location_id: locationInDB.id,
+                                                                          establishment_id: establishmentInDB.id,
+                                                                          payment_method: strPaymentMethod,
+                                                                          payment_method1: strPaymentMethod1,
+                                                                          payment_method2: strPaymentMethod2,
+                                                                          status: "commited",
+                                                                          state: "done",
+                                                                          amount1: dblAmount1,
+                                                                          amount2: dblAmount2,
+                                                                          original_amount: Math.round( dblOriginalAmount * 100 ) / 100,
+                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                          updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                          fee: establishmentInDB.fee,
+                                                                          delivered: null,
+                                                                          want_delivery_date:"1980-01-16",
+                                                                          want_delivery_time:"00:00:00",
+                                                                          extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
+                                                                          inspected: 0,
+                                                                          status_number: null,
+                                                                          client_name: deliveryOrderData.bizDestination.Name,
+                                                                          extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
+                                                                          order_miles_quantity: QuantityOrderMiles,
+                                                                          catering_type: 0,
+                                                                          qty_person_catering: 0,
+                                                                          fee_driver_order: establishmentInDB.fee_driver,
+                                                                          fee_catering_order: 0,
+                                                                          qty_meals: 0
+                                                                        },
+                                                                        false,
+                                                                        currentTransaction,
+                                                                        logger
+                                                                      ) as any;
 
-                  let orderInDB = await ordersService.createOrUpdate(
-                                                                      {
-                                                                        id: deliveryOrderData.Id,
-                                                                        user_id: establishmentInDB.user_id,
-                                                                        location_id: locationInDB.id,
-                                                                        establishment_id: establishmentInDB.id,
-                                                                        payment_method: strPaymentMethod,
-                                                                        payment_method1: strPaymentMethod1,
-                                                                        payment_method2: strPaymentMethod2,
-                                                                        status: "commited",
-                                                                        state: "done",
-                                                                        amount1: dblAmount1,
-                                                                        amount2: dblAmount2,
-                                                                        original_amount: dblOriginalAmount,
-                                                                        created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                        updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                        fee: establishmentInDB.fee,
-                                                                        delivered: null,
-                                                                        want_delivery_date:"1980-01-16",
-                                                                        want_delivery_time:"00:00:00",
-                                                                        extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
-                                                                        inspected: 0,
-                                                                        status_number: null,
-                                                                        client_name: deliveryOrderData.bizDestination.Name,
-                                                                        extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
-                                                                        order_miles_quantity: QuantityOrderMiles,
-                                                                        catering_type: 0,
-                                                                        qty_person_catering: 0,
-                                                                        fee_driver_order: establishmentInDB.fee_driver,
-                                                                        fee_catering_order: 0,
-                                                                        qty_meals: 0
-                                                                      },
-                                                                      false,
-                                                                      currentTransaction,
-                                                                      logger
-                                                                    ) as any;
+                    if ( orderInDB instanceof Error === false ) {
 
-                  if ( orderInDB instanceof Error === false ) {
+                      let driverInDB = await driversService.getById( deliveryOrderData.UserId,
+                                                                    null,
+                                                                    currentTransaction,
+                                                                    logger ) as any;
 
-                    let driverInDB = await driversService.getById( deliveryOrderData.UserId,
-                                                                   null,
-                                                                   currentTransaction,
-                                                                   logger ) as any;
+                      if ( driverInDB === null  ) { //driver does not exist create it
 
-                    if ( driverInDB === null  ) { //driver does not exist create it
+                        let userDriverInDB = await usersService.getById( deliveryOrderData.sysUser.Id,
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger ) as any;
 
-                      let userDriverInDB = await usersService.getById( deliveryOrderData.sysUser.Id,
-                                                                       null,
-                                                                       currentTransaction,
-                                                                       logger ) as any;
+                        if ( userDriverInDB === null ) { //does not exist this user-driver create a new
 
-                      if ( userDriverInDB === null ) { //does not exist this user-driver create a new
+                          let strPassword = deliveryOrderData.sysUser.Password;
 
-                        let strPassword = deliveryOrderData.sysUser.Password;
+                          strPassword =  strPassword.replace( "$2b$10$", "$2y$10$" );
 
-                        strPassword =  strPassword.replace( "$2b$10$", "$2y$10$" );
+                          let strShortName = deliveryOrderData.sysUser.sysPerson.FirstName?.substring( 0, 2 ) +
+                                            deliveryOrderData.sysUser.sysPerson.LastName?.substring( 0, 2 );
 
-                        let strShortName = deliveryOrderData.sysUser.sysPerson.FirstName?.substring( 0, 2 ) +
-                                           deliveryOrderData.sysUser.sysPerson.LastName?.substring( 0, 2 );
+                          userDriverInDB = await usersService.createOrUpdate(
+                                                                              {
+                                                                                id: deliveryOrderData.sysUser.Id,
+                                                                                first_name: deliveryOrderData.sysUser.sysPerson.FirstName,
+                                                                                last_name: deliveryOrderData.sysUser.sysPerson.LastName,
+                                                                                short_name: strShortName,
+                                                                                phone: deliveryOrderData.sysUser.sysPerson.Phone,
+                                                                                email: deliveryOrderData.sysUser.Name,
+                                                                                password: strPassword,
+                                                                                role: "driver",
+                                                                                restriction: "",
+                                                                                created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                              },
+                                                                              null,
+                                                                              currentTransaction,
+                                                                              logger
+                                                                            );
 
-                        userDriverInDB = await usersService.createOrUpdate(
+                        }
+
+                        if ( userDriverInDB instanceof Error === false ) {
+
+                          driverInDB = await driversService.createOrUpdate(
                                                                             {
                                                                               id: deliveryOrderData.sysUser.Id,
-                                                                              first_name: deliveryOrderData.sysUser.sysPerson.FirstName,
-                                                                              last_name: deliveryOrderData.sysUser.sysPerson.LastName,
-                                                                              short_name: strShortName,
-                                                                              phone: deliveryOrderData.sysUser.sysPerson.Phone,
-                                                                              email: deliveryOrderData.sysUser.Name,
-                                                                              password: strPassword,
-                                                                              role: "driver",
-                                                                              restriction: "",
+                                                                              user_id: deliveryOrderData.sysUser.Id,
+                                                                              status: 0,
+                                                                              active: 1,
+                                                                              points_accumulated: 0,
+                                                                              deliveries_completed: 0,
+                                                                              qualification: 0,
+                                                                              show_name: 1,
                                                                               created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
                                                                               updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
                                                                             },
-                                                                            null,
+                                                                            false,
                                                                             currentTransaction,
                                                                             logger
                                                                           );
 
-                      }
-
-                      if ( userDriverInDB instanceof Error === false ) {
-
-                        driverInDB = await driversService.createOrUpdate(
-                                                                          {
-                                                                            id: deliveryOrderData.sysUser.Id,
-                                                                            user_id: deliveryOrderData.sysUser.Id,
-                                                                            status: 0,
-                                                                            active: 1,
-                                                                            points_accumulated: 0,
-                                                                            deliveries_completed: 0,
-                                                                            qualification: 0,
-                                                                            show_name: 1,
-                                                                            created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                            updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                          },
-                                                                          false,
-                                                                          currentTransaction,
-                                                                          logger
-                                                                        );
-
-                      }
-                      else {  //error creation of user-driver
-
-                        const error = userDriverInDB as Error;
-
-                        const strMessage = util.format( "Unexpected error [%s]", error?.message );
-
-                        debugMark( "ERROR: " + strMessage );
-
-                        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                          await this.notifyToExternal( "error", strMessage );
-
-                          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
                         }
+                        else {  //error creation of user-driver
 
-                      }
+                          const error = userDriverInDB as Error;
 
-                    }
-
-                    if ( driverInDB instanceof Error === false ) {
-
-                      let strTipMethod = "";
-                      let strTipMethod1 = "";
-                      let strTipMethod2 = "";
-                      let dblTip = 0;
-                      let dblTip1 = 0;
-                      let dblTip2 = 0;
-
-                      if ( tipPayment.length >= 2 ) {
-
-                        strTipMethod = "mixed";
-
-                        dblTip1 = Number.parseFloat( tipPayment[ 0 ].Amount );
-
-                        dblTip2 = Number.parseFloat( tipPayment[ 1 ].Amount );
-
-                        dblTip = dblTip1 + dblTip2;
-
-                        strTipMethod1 = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
-
-                        strTipMethod2 = paymentMethodforOdinV1( tipPayment[ 1 ].bizPaymentMethod.Id );
-
-                      }
-                      else if ( tipPayment[ 0 ].length{
-
-                        strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
-
-                        dblTip = Number.parseFloat( tipPayment[ 0 ].Amount );
-
-                      }
-
-                      let deliveryInDB = await deliveriesService.createOrUpdate(
-                                                                                 {
-                                                                                   id: SystemUtilities.getUUIDv4(),
-                                                                                   order_id: orderInDB.id,
-                                                                                   driver_id: driverInDB.id,
-                                                                                   establishment_id: establishmentInDB.id,
-                                                                                   qualification: 0,
-                                                                                   tip1: dblTip1,
-                                                                                   tip2: dblTip2,
-                                                                                   tip: dblTip,
-                                                                                   tip_method: strTipMethod,
-                                                                                   tip_method1: strTipMethod1,
-                                                                                   tip_method2: strTipMethod2,
-                                                                                   created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                   updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                                 },
-                                                                                 false,
-                                                                                 currentTransaction,
-                                                                                 logger
-                                                                               ) as any;
-
-                      if ( deliveryInDB instanceof Error === false ) {
-
-                        let ticketImageInDB = await ticket_imagesService.createOrUpdate(
-                                                                                         {
-                                                                                           id: deliveryOrderData.Images[ 0 ].Id,
-                                                                                           order_id: orderInDB.id,
-                                                                                           image: null,
-                                                                                           migrated: 2,
-                                                                                           url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
-                                                                                           lock: null,
-                                                                                           created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                         },
-                                                                                         false,
-                                                                                         currentTransaction,
-                                                                                         logger
-                                                                                       ) as any;
-
-                        if ( ticketImageInDB instanceof Error === false ) {
-
-                          const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
-
-                          debugMark( "MESSAGE: " + strMessage );
-
-                          bApplyTransaction = true;
-
-                          bResult = true;
-
-                        }
-                        else { //error creation of ticketImage
-
-                          const error = ticketImageInDB as Error;
-
-                          const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                          const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                           debugMark( "ERROR: " + strMessage );
 
@@ -763,11 +661,131 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         }
 
                       }
-                      else { //error creation of delivery
 
-                        const error = deliveryInDB as Error;
+                      if ( driverInDB instanceof Error === false ) {
 
-                        const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                        let strTipMethod = "";
+                        let strTipMethod1 = "";
+                        let strTipMethod2 = "";
+                        let dblTip = 0;
+                        let dblTip1 = 0;
+                        let dblTip2 = 0;
+
+                        if ( tipPayment.length >= 2 ) {
+
+                          strTipMethod = "mixed";
+
+                          dblTip1 = Number.parseFloat( tipPayment[ 0 ].Amount );
+
+                          dblTip2 = Number.parseFloat( tipPayment[ 1 ].Amount );
+
+                          dblTip = dblTip1 + dblTip2;
+
+                          strTipMethod1 = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
+
+                          strTipMethod2 = paymentMethodforOdinV1( tipPayment[ 1 ].bizPaymentMethod.Id );
+
+                        }
+                        else if ( tipPayment.length === 1 ) {
+
+                          strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
+
+                          dblTip = Number.parseFloat( tipPayment[ 0 ].Amount );
+
+                        }
+
+                        let deliveryInDB = await deliveriesService.createOrUpdate(
+                                                                                  {
+                                                                                    id: SystemUtilities.getUUIDv4(),
+                                                                                    order_id: orderInDB.id,
+                                                                                    driver_id: driverInDB.id,
+                                                                                    establishment_id: establishmentInDB.id,
+                                                                                    qualification: 0,
+                                                                                    tip1: dblTip1,
+                                                                                    tip2: dblTip2,
+                                                                                    tip: dblTip,
+                                                                                    tip_method: strTipMethod,
+                                                                                    tip_method1: strTipMethod1,
+                                                                                    tip_method2: strTipMethod2,
+                                                                                    created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                    updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                                  },
+                                                                                  false,
+                                                                                  currentTransaction,
+                                                                                  logger
+                                                                                ) as any;
+
+                        if ( deliveryInDB instanceof Error === false ) {
+
+                          let ticketImageInDB = await ticket_imagesService.createOrUpdate(
+                                                                                          {
+                                                                                            id: deliveryOrderData.Images[ 0 ].Id,
+                                                                                            order_id: orderInDB.id,
+                                                                                            image: null,
+                                                                                            migrated: 2,
+                                                                                            url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                            lock: null,
+                                                                                            created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                          },
+                                                                                          false,
+                                                                                          currentTransaction,
+                                                                                          logger
+                                                                                        ) as any;
+
+                          if ( ticketImageInDB instanceof Error === false ) {
+
+                            const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
+
+                            debugMark( "MESSAGE: " + strMessage );
+
+                            bApplyTransaction = true;
+
+                            bResult = true;
+
+                          }
+                          else { //error creation of ticketImage
+
+                            const error = ticketImageInDB as Error;
+
+                            const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
+                            debugMark( "ERROR: " + strMessage );
+
+                            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                              await this.notifyToExternal( "error", strMessage );
+
+                              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                            }
+
+                          }
+
+                        }
+                        else { //error creation of delivery
+
+                          const error = deliveryInDB as Error;
+
+                          const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
+                          debugMark( "ERROR: " + strMessage );
+
+                          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+                            await this.notifyToExternal( "error", strMessage );
+
+                            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+                          }
+
+                        }
+
+                      }
+                      else {  //error creation of driver
+
+                        const error = driverInDB as Error;
+
+                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                         debugMark( "ERROR: " + strMessage );
 
@@ -782,11 +800,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
                     }
-                    else {  //error creation of driver
+                    else { //error creation of order
 
-                      const error = driverInDB as Error;
+                      const error = orderInDB as Error;
 
-                      const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                      const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                       debugMark( "ERROR: " + strMessage );
 
@@ -801,11 +819,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                     }
 
                   }
-                  else { //error creation of order
+                  else { //error creation of location
 
-                    const error = orderInDB as Error;
+                    const error = locationInDB as Error;
 
-                    const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                    const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                     debugMark( "ERROR: " + strMessage );
 
@@ -820,11 +838,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                   }
 
                 }
-                else { //error creation of location
+                else {  //error establishment does not exist
 
-                  const error = locationInDB as Error;
+                  // const error = establishmentInDB as Error;
 
-                  const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                  const strMessage = util.format( "The establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
 
                   debugMark( "ERROR: " + strMessage );
 
@@ -839,11 +857,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                 }
 
               }
-              else {  //error establishment does not exist
+              else { //error user-establishment does not exist
 
-                // const error = establishmentInDB as Error;
+                // const error = userEstablishmentInDB as Error;
 
-                const strMessage = util.format( "The establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
+                const strMessage = util.format( "The user for establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
 
                 debugMark( "ERROR: " + strMessage );
 
@@ -857,12 +875,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
               }
 
+
             }
-            else { //error user-establishment does not exist
+            else {
 
-              // const error = userEstablishmentInDB as Error;
-
-              const strMessage = util.format( "The user for establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
+              const strMessage = util.format( "The delivery order with id [%s]. Has #Address_Error# tag.", deliveryOrderData.Id );
 
               debugMark( "ERROR: " + strMessage );
 
@@ -875,13 +892,12 @@ export default class CheckOdinV2NewOrdersTask_001 {
               }
 
             }
-
           }
           else if ( orderInDB instanceof Error ) {
 
             const error = orderInDB as Error;
 
-            const strMessage = util.format( "Unexpected error [%s]", error?.message );
+            const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
             debugMark( "ERROR: " + strMessage );
 
@@ -915,20 +931,20 @@ export default class CheckOdinV2NewOrdersTask_001 {
           //Check the .env file the ENV variable, in local machine always must be in ENV=dev
           //if en develop you need move forward comment the next 2 lines and 239 line
 
-          /*
-          if ( process.env.ENV === "prod" ||
-               process.env.ENV === "test" ) {
+
+          // if ( process.env.ENV === "prod" ||
+              //  process.env.ENV === "test" ) {
 
             //The next call is required to make move forward to the next delivery order
             await OdinV2APIRequestService.callNewDeliveryOrderMark( backend,
                                                                     headers,
                                                                     {
-                                                                      Id: deliveryOrderData.Id //Mark the delivery order as processed
+                                                                      Id: deliveryOrderData.Id, //Mark the delivery order as processed
                                                                       Status: bResult ? 1: 0 //Success processed 1 = Confirmed, 0 = Not confirmed
                                                                     } );
 
-          } //Comment here too
-          */
+          // } //Comment here too
+
 
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
