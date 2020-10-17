@@ -37,7 +37,7 @@ export default class OdinV2APIRequestService {
 
       };
 
-      const strRequestURL = backend.url[ 0 ] + "/v1/business/dev007/export/delivery/order?DeliveryAt=" + params.DeliveryAt;
+      const strRequestURL = backend.url[ 0 ] + "/v1/business/dev007/export/delivery/order?DeliveryAt=" + params.DeliveryAt + "&Id=" + params.Id;
 
       const callResult = await fetch( strRequestURL,
                                       options );

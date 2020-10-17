@@ -139,9 +139,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       if ( lastNotificationToExternal ) {
 
-        const currentDateAndTimeMinus30Seconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 30 );
+        const currentDateAndTimeMinusXSeconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 10 );
 
-        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinus30Seconds.format(), lastNotificationToExternal.format() ) ) {
+        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinusXSeconds.format(), lastNotificationToExternal.format() ) ) {
 
           bResult = true;
 
@@ -252,7 +252,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       DeliveryAt: "2020-10-03"// SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       Id: "", //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       DeliveryAt: "2020-10-03" // SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
@@ -415,7 +416,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       const error = phoneInDB as Error;
 
-                      const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                      const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                       debugMark( "ERROR: " + strMessage );
 
@@ -434,7 +435,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     const error = zipCodeInDB as Error;
 
-                    const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                    const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                     debugMark( "ERROR: " + strMessage );
 
@@ -643,7 +644,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         const error = userDriverInDB as Error;
 
-                        const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                         debugMark( "ERROR: " + strMessage );
 
@@ -745,7 +746,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                           const error = ticketImageInDB as Error;
 
-                          const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                          const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                           debugMark( "ERROR: " + strMessage );
 
@@ -764,7 +765,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         const error = deliveryInDB as Error;
 
-                        const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                         debugMark( "ERROR: " + strMessage );
 
@@ -783,7 +784,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       const error = driverInDB as Error;
 
-                      const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                      const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                       debugMark( "ERROR: " + strMessage );
 
@@ -802,7 +803,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     const error = orderInDB as Error;
 
-                    const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                    const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                     debugMark( "ERROR: " + strMessage );
 
@@ -821,7 +822,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   const error = locationInDB as Error;
 
-                  const strMessage = util.format( "Unexpected error [%s]", error?.message );
+                  const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
                   debugMark( "ERROR: " + strMessage );
 
@@ -878,7 +879,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             const error = orderInDB as Error;
 
-            const strMessage = util.format( "Unexpected error [%s]", error?.message );
+            const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
 
             debugMark( "ERROR: " + strMessage );
 
