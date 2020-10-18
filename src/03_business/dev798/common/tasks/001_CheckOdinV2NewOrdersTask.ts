@@ -3,8 +3,11 @@ import util from "util";
 /*
 import fs from 'fs';
 import os from 'os';
+
 import rimraf from "rimraf";
+
 import FormData from 'form-data';
+
 import appRoot from 'app-root-path';
 */
 
@@ -91,24 +94,38 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
     /*
     let bResult = false;
+
     try {
+
       bResult = true;
+
     }
     catch ( error ) {
+
       const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
       sourcePosition.method = CheckOdinV2NewOrdersTask_001.name + "." + this.canRunTask.name;
+
       const strMark = "86BB90554265" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
       const debugMark = debug.extend( strMark );
+
       debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
       debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
       debugMark( "Catched on: %O", sourcePosition );
+
       error.mark = strMark;
       error.logId = SystemUtilities.getUUIDv4();
+
       if ( logger && typeof logger.error === "function" ) {
+
         error.catchedOn = sourcePosition;
         logger.error( error );
+
       }
+
     }
+
     return bResult;
     */
 
@@ -461,11 +478,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         /*
                         const error = phoneInDB as Error;
+
                         const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                         debugMark( "ERROR: " + strMessage );
+
                         if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                           await this.notifyToExternal( "error", strMessage );
+
                           CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                         }
                         */
 
@@ -480,11 +503,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       /*
                       const error = zipCodeInDB as Error;
+
                       const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                       debugMark( "ERROR: " + strMessage );
+
                       if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                         await this.notifyToExternal( "error", strMessage );
+
                         CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                       }
                       */
 
@@ -689,11 +718,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                           /*
                           const error = userDriverInDB as Error;
+
                           const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                           debugMark( "ERROR: " + strMessage );
+
                           if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                             await this.notifyToExternal( "error", strMessage );
+
                             CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                           }
                           */
 
@@ -790,11 +825,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                             /*
                             const error = ticketImageInDB as Error;
+
                             const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                             debugMark( "ERROR: " + strMessage );
+
                             if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                               await this.notifyToExternal( "error", strMessage );
+
                               CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                             }
                             */
 
@@ -809,11 +850,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                           /*
                           const error = deliveryInDB as Error;
+
                           const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                           debugMark( "ERROR: " + strMessage );
+
                           if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                             await this.notifyToExternal( "error", strMessage );
+
                             CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                           }
                           */
 
@@ -828,11 +875,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         /*
                         const error = driverInDB as Error;
+
                         const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                         debugMark( "ERROR: " + strMessage );
+
                         if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                           await this.notifyToExternal( "error", strMessage );
+
                           CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                         }
                         */
 
@@ -847,11 +900,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       /*
                       const error = orderInDB as Error;
+
                       const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                       debugMark( "ERROR: " + strMessage );
+
                       if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                         await this.notifyToExternal( "error", strMessage );
+
                         CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                       }
                       */
 
@@ -866,11 +925,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     /*
                     const error = locationInDB as Error;
+
                     const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
                     debugMark( "ERROR: " + strMessage );
+
                     if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
                       await this.notifyToExternal( "error", strMessage );
+
                       CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
                     }
                     */
 
@@ -961,11 +1026,17 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             /*
             const error = orderInDB as Error;
+
             const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
+
             debugMark( "ERROR: " + strMessage );
+
             if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
               await this.notifyToExternal( "error", strMessage );
+
               CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
             }
             */
 
