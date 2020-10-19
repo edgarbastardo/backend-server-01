@@ -48,13 +48,41 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
   public static lastExternalNotification = null;
 
+  public static deliveryOrdersId = [];
+
+  static processNextDeliveryOrderId(): string {
+
+    let strResult = null;
+
+    if ( CheckOdinV2NewOrdersTask_001.deliveryOrdersId?.length > 0 ) {
+
+      strResult = CheckOdinV2NewOrdersTask_001.deliveryOrdersId[ 0 ];
+
+      if ( !strResult.trim() ) {
+
+        strResult = null;
+
+      }
+
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersId.splice( 0, 1 ); //Delete the first Id in the array
+
+    }
+
+    return strResult;
+
+  }
+
   public async init( params: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
 
     try {
 
-        bResult = true;
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersId = CommonUtilities.parseJSON( process.env.DELIVERY_ORDER_AT || "[]",
+                                                                                 null,
+                                                                                 true );
+
+      bResult = true;
 
     }
     catch ( error ) {
@@ -293,8 +321,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       Id: "", //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
-                       DeliveryAt: "2020-10-16" // SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       Id: CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId(), //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       DeliveryAt: process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
