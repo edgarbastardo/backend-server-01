@@ -48,13 +48,41 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
   public static lastExternalNotification = null;
 
+  public static deliveryOrdersId = [];
+
+  static processNextDeliveryOrderId(): string {
+
+    let strResult = null;
+
+    if ( CheckOdinV2NewOrdersTask_001.deliveryOrdersId?.length > 0 ) {
+
+      strResult = CheckOdinV2NewOrdersTask_001.deliveryOrdersId[ 0 ];
+
+      if ( !strResult.trim() ) {
+
+        strResult = null;
+
+      }
+
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersId.splice( 0, 1 ); //Delete the first Id in the array
+
+    }
+
+    return strResult;
+
+  }
+
   public async init( params: any, logger: any ): Promise<boolean> {
 
     let bResult = false;
 
     try {
 
-        bResult = true;
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersId = CommonUtilities.parseJSON( process.env.DELIVERY_ORDER_AT || "[]",
+                                                                                 null,
+                                                                                 true );
+
+      bResult = true;
 
     }
     catch ( error ) {
@@ -272,11 +300,24 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       //const strLanguage = "en_US";
 
+      const strDeliveryOrderId = CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId();
+
+      const strDeliveryAt = process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 );
+
       const debugMark = debug.extend( CheckOdinV2NewOrdersTask_001.intRunNumber + "-4946C11DC1AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "Running task..." );
 
-      debugMark( "Checking for new delivery orders in odin v2 backend..." );
+      if ( !strDeliveryOrderId ) {
+
+        debugMark( "Checking for new delivery orders in odin v2 backend at date [%s]...", strDeliveryAt );
+
+      }
+      else {
+
+        debugMark( "Checking for the delivery order with id [%s] in odin v2 backend...", strDeliveryOrderId );
+
+      }
 
       const strOdinV2Url01 = process.env.ODIN_V2_URL_01; //check env.secrets file in the root of project. if not exists copy env.secrets.template and rename to env.secrets
       const strOdinV2APIKey01 = process.env.ODIN_V2_API_KEY_01; //check env.secrets file in the root of project
@@ -293,8 +334,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       Id: "", //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
-                       DeliveryAt: "2020-10-16" // SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       Id: strDeliveryOrderId, //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       DeliveryAt: strDeliveryAt //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
