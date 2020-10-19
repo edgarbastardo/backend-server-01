@@ -1126,7 +1126,33 @@ export default class CheckOdinV2NewOrdersTask_001 {
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
 
-          debugMark( "No new delivery orders found in odin v2 backend..." );
+          if ( !strDeliveryOrderId ) {
+
+            debugMark( "No new delivery orders found in odin v2 backend..." );
+
+          }
+          else {
+
+            const strMessage = util.format( "Delivery order with id [%s] not found in odin v2 backend...", strDeliveryOrderId );
+
+            debugMark( "WARNING: " + strMessage );
+
+            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+
+              if ( logger &&
+                   logger.warning === "function" ) {
+
+                logger.warning( strMessage );
+
+              }
+
+              await this.notifyToExternal( "warning", strMessage );
+
+              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+
+            }
+
+          }
 
         }
         else {
