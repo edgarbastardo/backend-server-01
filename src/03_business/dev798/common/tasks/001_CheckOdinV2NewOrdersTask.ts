@@ -300,11 +300,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       //const strLanguage = "en_US";
 
+      const strDeliveryAt = process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 );
+
       const debugMark = debug.extend( CheckOdinV2NewOrdersTask_001.intRunNumber + "-4946C11DC1AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "Running task..." );
 
-      debugMark( "Checking for new delivery orders in odin v2 backend..." );
+      debugMark( "Checking for new delivery orders in odin v2 backend at date [%s]...", strDeliveryAt );
 
       const strOdinV2Url01 = process.env.ODIN_V2_URL_01; //check env.secrets file in the root of project. if not exists copy env.secrets.template and rename to env.secrets
       const strOdinV2APIKey01 = process.env.ODIN_V2_API_KEY_01; //check env.secrets file in the root of project
@@ -322,7 +324,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       const params = {
                        Id: CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId(), //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
-                       DeliveryAt: process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 ) //2020-10-02
+                       DeliveryAt: strDeliveryAt //2020-10-02
                      }
 
       const odinV2ReponseData = await OdinV2APIRequestService.callGetNewDeliveryOrder( backend,
