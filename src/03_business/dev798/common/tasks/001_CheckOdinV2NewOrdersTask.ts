@@ -300,13 +300,24 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       //const strLanguage = "en_US";
 
+      const strDeliveryOrderId = CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId();
+
       const strDeliveryAt = process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 );
 
       const debugMark = debug.extend( CheckOdinV2NewOrdersTask_001.intRunNumber + "-4946C11DC1AA" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ) );
 
       debugMark( "Running task..." );
 
-      debugMark( "Checking for new delivery orders in odin v2 backend at date [%s]...", strDeliveryAt );
+      if ( !strDeliveryOrderId ) {
+
+        debugMark( "Checking for new delivery orders in odin v2 backend at date [%s]...", strDeliveryAt );
+
+      }
+      else {
+
+        debugMark( "Checking for the delivery order with id [%s] in odin v2 backend...", strDeliveryOrderId );
+
+      }
 
       const strOdinV2Url01 = process.env.ODIN_V2_URL_01; //check env.secrets file in the root of project. if not exists copy env.secrets.template and rename to env.secrets
       const strOdinV2APIKey01 = process.env.ODIN_V2_API_KEY_01; //check env.secrets file in the root of project
@@ -323,7 +334,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       Id: CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId(), //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       Id: strDeliveryOrderId, //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
                        DeliveryAt: strDeliveryAt //2020-10-02
                      }
 
