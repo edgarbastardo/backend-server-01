@@ -13,7 +13,7 @@ import appRoot from 'app-root-path';
 
 //import parser from 'cron-parser';
 
-import CommonConstants from '../../../../02_system/common/CommonConstants';
+import CommonConstants from "../../../../02_system/common/CommonConstants";
 //import SystemConstants from '../../../../02_system/common/SystemContants';
 
 import CommonUtilities from "../../../../02_system/common/CommonUtilities";
@@ -200,6 +200,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
         }
 
+        if ( process.env.ENV === "dev" ||
+             process.env.ENV === "test" ) {
+
+          debugMark( "Notify to external? [%s],", bResult );
+
+        }
+
       }
       else {
 
@@ -258,6 +265,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
   }
 
   public async formatMessageError01( strDeliveryOrderId: string,
+                                     lastExported: any,
                                      error: any,
                                      logger: any ) {
 
@@ -269,7 +277,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       debugMark( strMessage );
 
-      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
+      if ( this.canNotifyToExternal( lastExported ?
+                                     SystemUtilities.getCurrentDateAndTimeFrom( lastExported ):
+                                     CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                     lastExported !== null ) ) {
 
         if ( logger &&
              logger.error === "function" ) {
@@ -543,6 +554,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         bUpdateDeliveryOrderExportedMark = true;
 
                         await this.formatMessageError01( deliveryOrderData.Id,
+                                                         deliveryOrderData.LastExported,
                                                          phoneInDB as Error,
                                                          logger );
 
@@ -554,6 +566,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       bUpdateDeliveryOrderExportedMark = true;
 
                       await this.formatMessageError01( deliveryOrderData.Id,
+                                                       deliveryOrderData.LastExported,
                                                        zipCodeInDB as Error,
                                                        logger );
 
@@ -755,6 +768,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                           bUpdateDeliveryOrderExportedMark = true;
 
                           await this.formatMessageError01( deliveryOrderData.Id,
+                                                           deliveryOrderData.LastExported,
                                                            userDriverInDB as Error,
                                                            logger );
 
@@ -850,6 +864,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                             bUpdateDeliveryOrderExportedMark = true;
 
                             await this.formatMessageError01( deliveryOrderData.Id,
+                                                             deliveryOrderData.LastExported,
                                                              ticketImageInDB as Error,
                                                              logger );
 
@@ -861,6 +876,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                           bUpdateDeliveryOrderExportedMark = true;
 
                           await this.formatMessageError01( deliveryOrderData.Id,
+                                                           deliveryOrderData.LastExported,
                                                            deliveryInDB as Error,
                                                            logger );
 
@@ -872,6 +888,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         bUpdateDeliveryOrderExportedMark = true;
 
                         await this.formatMessageError01( deliveryOrderData.Id,
+                                                         deliveryOrderData.LastExported,
                                                          driverInDB as Error,
                                                          logger );
 
@@ -883,6 +900,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       bUpdateDeliveryOrderExportedMark = true;
 
                       await this.formatMessageError01( deliveryOrderData.Id,
+                                                       deliveryOrderData.LastExported,
                                                        orderInDB as Error,
                                                        logger );
 
@@ -894,6 +912,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                     bUpdateDeliveryOrderExportedMark = true;
 
                     await this.formatMessageError01( deliveryOrderData.Id,
+                                                     deliveryOrderData.LastExported,
                                                      locationInDB as Error,
                                                      logger );
 
@@ -906,7 +925,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   debugMark( "ERROR: " + strMessage );
 
-                  if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
+                  if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+                                                 SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+                                                 CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                                 deliveryOrderData.LastExported !== null ) ) {
 
                     if ( logger &&
                          logger.error === "function" ) {
@@ -931,7 +953,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                 debugMark( "ERROR: " + strMessage );
 
-                if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
+                if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+                                               SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+                                               CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                               deliveryOrderData.LastExported !== null ) ) {
 
                   if ( logger &&
                        logger.error === "function" ) {
@@ -984,6 +1009,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
             bUpdateDeliveryOrderExportedMark = true;
 
             await this.formatMessageError01( deliveryOrderData.Id,
+                                             deliveryOrderData.LastExported,
                                              orderInDB as Error,
                                              logger );
 
@@ -994,7 +1020,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             debugMark( "ERROR: " + strMessage );
 
-            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
+            if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+                                           SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+                                           CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                           deliveryOrderData.LastExported !== null ) ) {
 
               if ( logger &&
                    logger.error === "function" ) {
