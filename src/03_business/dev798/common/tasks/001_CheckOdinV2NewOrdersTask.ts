@@ -159,17 +159,42 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
   }
 
-  public canNotifyToExternal( lastNotificationToExternal: any ): boolean {
+  public canNotifyToExternal( lastNotificationToExternal: any,
+                              bLongPeriod: boolean ): boolean {
 
     let bResult = false;
 
     try {
 
+      const strMark = "F1640D7BD75E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
       if ( lastNotificationToExternal ) {
 
-        const currentDateAndTimeMinusXSeconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 10 );
+        let currentDateAndTimeMinusXSeconds = null;
 
-        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinusXSeconds.format(), lastNotificationToExternal.format() ) ) {
+        if ( bLongPeriod ) {
+
+          currentDateAndTimeMinusXSeconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 60 * 30 );
+
+        }
+        else {
+
+          currentDateAndTimeMinusXSeconds = SystemUtilities.getCurrentDateAndTimeDecSeconds( 10 );
+
+        }
+
+        if ( process.env.ENV === "dev" ||
+             process.env.ENV === "test" ) {
+
+          debugMark( "Long period? [%s],", bLongPeriod );
+          debugMark( "Current date and time minus 10 seconds is [%s]", currentDateAndTimeMinusXSeconds.format() );
+          debugMark( "Last notification to external is [%s]", lastNotificationToExternal?.format() );
+
+        }
+
+        if ( SystemUtilities.isDateAndTimeAfterAt( currentDateAndTimeMinusXSeconds?.format(), lastNotificationToExternal.format() ) ) {
 
           bResult = true;
 
@@ -244,7 +269,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       debugMark( strMessage );
 
-      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
         if ( logger &&
              logger.error === "function" ) {
@@ -350,7 +375,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
         debugMark( "WARNING: " + strMessage );
 
-        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
           if ( logger &&
                logger.warning === "function" ) {
@@ -372,7 +397,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
         debugMark( "ERROR: " + strMessage );
 
-        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
           if ( logger &&
                logger.error === "function" ) {
@@ -392,6 +417,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
         if ( odinV2ReponseData.output?.status === 200 &&
              odinV2ReponseData.output?.body?.Data?.length > 0 ) {
+
+          let bUpdateDeliveryOrderExportedMark = false;
 
           //Get the data json from response body
           const deliveryOrderData = odinV2ReponseData.output?.body?.Data[ 0 ];
@@ -513,50 +540,22 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
                       else {  //error creating phone
 
+                        bUpdateDeliveryOrderExportedMark = true;
+
                         await this.formatMessageError01( deliveryOrderData.Id,
                                                          phoneInDB as Error,
                                                          logger );
-
-                        /*
-                        const error = phoneInDB as Error;
-
-                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                        debugMark( "ERROR: " + strMessage );
-
-                        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                          await this.notifyToExternal( "error", strMessage );
-
-                          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                        }
-                        */
 
                       }
 
                     }
                     else {  //error creating zip_code
 
+                      bUpdateDeliveryOrderExportedMark = true;
+
                       await this.formatMessageError01( deliveryOrderData.Id,
                                                        zipCodeInDB as Error,
                                                        logger );
-
-                      /*
-                      const error = zipCodeInDB as Error;
-
-                      const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                      debugMark( "ERROR: " + strMessage );
-
-                      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                        await this.notifyToExternal( "error", strMessage );
-
-                        CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                      }
-                      */
 
                     }
 
@@ -753,25 +752,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                         }
                         else {  //error creation of user-driver
 
+                          bUpdateDeliveryOrderExportedMark = true;
+
                           await this.formatMessageError01( deliveryOrderData.Id,
                                                            userDriverInDB as Error,
                                                            logger );
-
-                          /*
-                          const error = userDriverInDB as Error;
-
-                          const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                          debugMark( "ERROR: " + strMessage );
-
-                          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                            await this.notifyToExternal( "error", strMessage );
-
-                            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                          }
-                          */
 
                         }
 
@@ -857,141 +842,71 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                             bResult = true;
 
+                            bUpdateDeliveryOrderExportedMark = true;
+
                           }
                           else { //error creation of ticketImage
+
+                            bUpdateDeliveryOrderExportedMark = true;
 
                             await this.formatMessageError01( deliveryOrderData.Id,
                                                              ticketImageInDB as Error,
                                                              logger );
-
-                            /*
-                            const error = ticketImageInDB as Error;
-
-                            const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                            debugMark( "ERROR: " + strMessage );
-
-                            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                              await this.notifyToExternal( "error", strMessage );
-
-                              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                            }
-                            */
 
                           }
 
                         }
                         else { //error creation of delivery
 
+                          bUpdateDeliveryOrderExportedMark = true;
+
                           await this.formatMessageError01( deliveryOrderData.Id,
                                                            deliveryInDB as Error,
                                                            logger );
-
-                          /*
-                          const error = deliveryInDB as Error;
-
-                          const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                          debugMark( "ERROR: " + strMessage );
-
-                          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                            await this.notifyToExternal( "error", strMessage );
-
-                            CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                          }
-                          */
 
                         }
 
                       }
                       else {  //error creation of driver
 
+                        bUpdateDeliveryOrderExportedMark = true;
+
                         await this.formatMessageError01( deliveryOrderData.Id,
                                                          driverInDB as Error,
                                                          logger );
-
-                        /*
-                        const error = driverInDB as Error;
-
-                        const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                        debugMark( "ERROR: " + strMessage );
-
-                        if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                          await this.notifyToExternal( "error", strMessage );
-
-                          CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                        }
-                        */
 
                       }
 
                     }
                     else { //error creation of order
 
+                      bUpdateDeliveryOrderExportedMark = true;
+
                       await this.formatMessageError01( deliveryOrderData.Id,
                                                        orderInDB as Error,
                                                        logger );
-
-                      /*
-                      const error = orderInDB as Error;
-
-                      const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                      debugMark( "ERROR: " + strMessage );
-
-                      if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                        await this.notifyToExternal( "error", strMessage );
-
-                        CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                      }
-                      */
 
                     }
 
                   }
                   else { //error creation of location
 
+                    bUpdateDeliveryOrderExportedMark = true;
+
                     await this.formatMessageError01( deliveryOrderData.Id,
                                                      locationInDB as Error,
                                                      logger );
-
-                    /*
-                    const error = locationInDB as Error;
-
-                    const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-                    debugMark( "ERROR: " + strMessage );
-
-                    if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-                      await this.notifyToExternal( "error", strMessage );
-
-                      CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-                    }
-                    */
 
                   }
 
                 }
                 else {  //error establishment does not exist
 
-                  // const error = establishmentInDB as Error;
-
                   const strMessage = util.format( "The establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
 
                   debugMark( "ERROR: " + strMessage );
 
-                  if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+                  if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
                     if ( logger &&
                          logger.error === "function" ) {
@@ -1002,6 +917,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     await this.notifyToExternal( "error", strMessage );
 
+                    bUpdateDeliveryOrderExportedMark = true;
                     CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
                   }
@@ -1011,13 +927,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
               }
               else { //error user-establishment does not exist
 
-                // const error = userEstablishmentInDB as Error;
-
                 const strMessage = util.format( "The user for establishment with name [%s]. Not found in database.", deliveryOrderData.bizEstablishment.Name );
 
                 debugMark( "ERROR: " + strMessage );
 
-                if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+                if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
                   if ( logger &&
                        logger.error === "function" ) {
@@ -1028,6 +942,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                   await this.notifyToExternal( "error", strMessage );
 
+                  bUpdateDeliveryOrderExportedMark = true;
                   CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
                 }
@@ -1041,7 +956,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
               debugMark( "ERROR: " + strMessage );
 
-              if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+              if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+                                             SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+                                             CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                             deliveryOrderData.LastExported !== null ) ) {
 
                 if ( logger &&
                      logger.error === "function" ) {
@@ -1052,6 +970,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                 await this.notifyToExternal( "error", strMessage );
 
+                bUpdateDeliveryOrderExportedMark = true;
+
                 CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
               }
@@ -1061,25 +981,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
           }
           else if ( orderInDB instanceof Error ) {
 
+            bUpdateDeliveryOrderExportedMark = true;
+
             await this.formatMessageError01( deliveryOrderData.Id,
                                              orderInDB as Error,
                                              logger );
-
-            /*
-            const error = orderInDB as Error;
-
-            const strMessage = util.format( "Unexpected error [%s]. To process the delivery order with id [%s]", error?.message, deliveryOrderData.Id );
-
-            debugMark( "ERROR: " + strMessage );
-
-            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
-
-              await this.notifyToExternal( "error", strMessage );
-
-              CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
-
-            }
-            */
 
           }
           else {  //error order already exist
@@ -1088,7 +994,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             debugMark( "ERROR: " + strMessage );
 
-            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
               if ( logger &&
                    logger.error === "function" ) {
@@ -1099,29 +1005,26 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
               await this.notifyToExternal( "error", strMessage );
 
+              bUpdateDeliveryOrderExportedMark = true;
+
               CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
             }
 
           }
 
-          //Check deliveryOrderData.Id not exist in odin database in order table
+          if ( !deliveryOrderData.LastExported ||
+               bUpdateDeliveryOrderExportedMark ) {
 
-          //Check the .env file the ENV variable, in local machine always must be in ENV=dev
-          //if en develop you need move forward comment the next 2 lines and 239 line
+            //The next call is required to make move forward to the next delivery order
+            await OdinV2APIRequestService.callNewDeliveryOrderMark( backend,
+                                                                    headers,
+                                                                    {
+                                                                      Id: deliveryOrderData.Id, //Mark the delivery order as processed
+                                                                      Status: bResult ? 1: 0 //Success processed 1 = Confirmed, 0 = Not confirmed
+                                                                    } );
 
-          //if ( process.env.ENV === "prod" ||
-          //     process.env.ENV === "test" ) {
-
-          //The next call is required to make move forward to the next delivery order
-          await OdinV2APIRequestService.callNewDeliveryOrderMark( backend,
-                                                                  headers,
-                                                                  {
-                                                                    Id: deliveryOrderData.Id, //Mark the delivery order as processed
-                                                                    Status: bResult ? 1: 0 //Success processed 1 = Confirmed, 0 = Not confirmed
-                                                                  } );
-
-          //} //Comment here too
+          }
 
         }
         else if ( odinV2ReponseData.output?.status === 404 ) {
@@ -1137,7 +1040,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             debugMark( "WARNING: " + strMessage );
 
-            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+            if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
               if ( logger &&
                    logger.warning === "function" ) {
@@ -1161,7 +1064,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           debugMark( "WARNING: " + strMessage );
 
-          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification ) ) {
+          if ( this.canNotifyToExternal( CheckOdinV2NewOrdersTask_001.lastExternalNotification, false ) ) {
 
             if ( logger &&
                  logger.warning === "function" ) {
