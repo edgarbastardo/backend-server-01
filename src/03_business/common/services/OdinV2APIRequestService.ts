@@ -44,6 +44,11 @@ export default class OdinV2APIRequestService {
         strRequestURL = strRequestURL + "&Id=" + params.Id;
 
       }
+      else if ( params.ShortId ) {
+
+        strRequestURL = strRequestURL + "&ShortId=" + params.Id;
+
+      }
 
       const callResult = await fetch( strRequestURL,
                                       options );
