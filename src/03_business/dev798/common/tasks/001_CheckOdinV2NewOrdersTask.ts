@@ -102,9 +102,13 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
     try {
 
-      CheckOdinV2NewOrdersTask_001.deliveryOrdersId = CommonUtilities.parseJSON( process.env.DELIVERY_ORDER_AT || "[]",
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersId = CommonUtilities.parseJSON( process.env.DELIVERY_ORDERS_ID || "[]",
                                                                                  null,
                                                                                  true );
+
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersShortId = CommonUtilities.parseJSON( process.env.DELIVERY_ORDERS_SHORT_ID || "[]",
+                                                                                      null,
+                                                                                      true );
 
       bResult = true;
 
