@@ -445,7 +445,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
           if ( !orderInDB ) {
 
-            if ( deliveryOrderData.bizDestination.Tag?.indexOf( "#ADDRESS_ERROR#" ) === -1 ) {
+            if ( !deliveryOrderData.bizDestination.Tag ||
+                 deliveryOrderData.bizDestination.Tag?.indexOf( "#ADDRESS_ERROR#" ) === -1 ) {
 
               let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
                                                                              null,
@@ -478,7 +479,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
 
-                    strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) ,
+                    strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) +5 ,
                                                                    strZipCodeToFind.lastIndexOf( ", USA" ) );
 
                     let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,
@@ -486,7 +487,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                            currentTransaction,
                                                                            logger ) as any;
 
-                    if ( zipCodeInDB = null ) {   //does not exit this zip_code create a new
+                    if ( zipCodeInDB === null ) {   //does not exit this zip_code create a new
 
                       zipCodeInDB = await zip_codesService.createOrUpdate(
                                                                            {
@@ -506,12 +507,18 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
 
+                      while ( strPhoneToFind?.indexOf( "-" ) !== -1) {
+
+                        strPhoneToFind = strPhoneToFind.replace( "-", "" );
+
+                      }
+
                       let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
                                                                       null,
                                                                       currentTransaction,
                                                                       logger ) as any;
 
-                      if ( phoneInDB = null ) {   //does not exit this phone create a new
+                      if ( phoneInDB === null ) {   //does not exit this phone create a new
 
                         phoneInDB = await phonesService.createOrUpdate(
                                                                         {
@@ -661,6 +668,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     }
 
+                    let dblExtraMiles = QuantityOrderMiles - establishmentInDB.base_miles > 0 ? Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles ) : 0;
+
+                    let dblExtraMilesDriver = QuantityOrderMiles - establishmentInDB.base_miles_driver > 0 ? Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles_driver ) : 0;
+
                     let orderInDB = await ordersService.createOrUpdate(
                                                                         {
                                                                           id: deliveryOrderData.Id,
@@ -681,11 +692,11 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                           delivered: null,
                                                                           want_delivery_date:"1980-01-16",
                                                                           want_delivery_time:"00:00:00",
-                                                                          extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
+                                                                          extra_miles: dblExtraMiles,
                                                                           inspected: 0,
                                                                           status_number: null,
                                                                           client_name: deliveryOrderData.bizDestination.Name,
-                                                                          extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
+                                                                          extra_miles_driver_order: dblExtraMilesDriver,
                                                                           order_miles_quantity: QuantityOrderMiles,
                                                                           catering_type: 0,
                                                                           qty_person_catering: 0,
