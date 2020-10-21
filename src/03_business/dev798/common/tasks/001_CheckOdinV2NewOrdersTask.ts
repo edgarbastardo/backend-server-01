@@ -50,6 +50,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
   public static deliveryOrdersId = [];
 
+  public static deliveryOrdersShortId = [];
+
   static processNextDeliveryOrderId(): string {
 
     let strResult = null;
@@ -65,6 +67,28 @@ export default class CheckOdinV2NewOrdersTask_001 {
       }
 
       CheckOdinV2NewOrdersTask_001.deliveryOrdersId.splice( 0, 1 ); //Delete the first Id in the array
+
+    }
+
+    return strResult;
+
+  }
+
+  static processNextDeliveryOrderShortId(): string {
+
+    let strResult = null;
+
+    if ( CheckOdinV2NewOrdersTask_001.deliveryOrdersShortId?.length > 0 ) {
+
+      strResult = CheckOdinV2NewOrdersTask_001.deliveryOrdersShortId[ 0 ];
+
+      if ( !strResult.trim() ) {
+
+        strResult = null;
+
+      }
+
+      CheckOdinV2NewOrdersTask_001.deliveryOrdersShortId.splice( 0, 1 ); //Delete the first Id in the array
 
     }
 
@@ -334,9 +358,15 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
       }
 
-      //const strLanguage = "en_US";
-
       const strDeliveryOrderId = CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderId();
+
+      let strDeliveryOrderShortId = null;
+
+      if ( !strDeliveryOrderId ) {
+
+        strDeliveryOrderShortId = CheckOdinV2NewOrdersTask_001.processNextDeliveryOrderShortId();
+
+      }
 
       const strDeliveryAt = process.env.DELIVERY_ORDER_AT || SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_10 );
 
@@ -370,7 +400,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
                       }
 
       const params = {
-                       Id: strDeliveryOrderId, //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over DeliveryAt param
+                       Id: strDeliveryOrderId, //Force to fetch specific delivery order id from odin v2 backend this parameter has priority over ShortId, DeliveryAt param
+                       ShortId: strDeliveryOrderShortId, //Force to fetch specific delivery order short id from odin v2 backend this parameter has priority over DeliveryAt param
                        DeliveryAt: strDeliveryAt //2020-10-02
                      }
 
