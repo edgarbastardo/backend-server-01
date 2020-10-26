@@ -1302,15 +1302,59 @@ export default class NotificationManager {
 
     let bResult = false;
 
-    const transportExternal = CommonUtilities.trimArrayFromString( process.env.NOTIFICATION_TRANSPORT_EXTERNAL );
+    try {
 
-    for ( const strTransportExternal of transportExternal ) {
+      const transportExternalProviderList = CommonUtilities.parseJSON( process.env.NOTIFICATION_TRANSPORT_EXTERNAL_PROVIDER, null, true ) || { "@__default__@": [] };
 
-      if ( await this.send( strTransportExternal, dataToPublish, logger ) ) {
+      if ( dataToPublish.default === undefined ||
+           dataToPublish.default ) {
 
-        bResult = true;
+        const transportExternalList = transportExternalProviderList[ "@__default__@" ] || []; //CommonUtilities.trimArrayFromString( process.env.NOTIFICATION_TRANSPORT_EXTERNAL );
+
+        for ( const strTransportExternal of transportExternalList ) {
+
+          if ( await this.send( strTransportExternal, dataToPublish, logger ) ) {
+
+            bResult = true;
+
+          }
+
+        }
 
       }
+
+      if ( dataToPublish.transport ) {
+
+        const transportExternalList = Object.keys( dataToPublish.transport );
+
+        for ( const strTransportExternal of transportExternalList ) {
+
+          const realTransportExternalList = transportExternalProviderList[ strTransportExternal ];
+
+          for ( const strRealTransportExternal of realTransportExternalList ) {
+
+            for ( const strChannel of dataToPublish.transport[ strTransportExternal ] ) {
+
+              dataToPublish[ "channel" ] = strChannel;
+
+              if ( await this.send( strRealTransportExternal, dataToPublish, logger ) ) {
+
+                bResult = true;
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+
 
     }
 
