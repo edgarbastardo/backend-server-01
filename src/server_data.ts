@@ -1014,47 +1014,21 @@ export default class App {
                                             }
                                           ],
                                   footer: "CCDAB718266A",
-                                }
+                                },
+        //                  default: false,
+        //                  transport: {
+        //                               "NProvider02": [ "#fetch-delivery-order-from-odin-v2" ]
+        //                             }
                         }
 
         HookManager.processHookHandlersInChain( "PublishToExternal",
                                                 payload,
                                                 LoggerManager.mainLoggerInstance );
 
-        /*
-        await NotificationManager.publishToExternal(
-                                                     {
-                                                       body: {
-                                                               kind: "notification",
-                                                               text: "Start running",
-                                                               fields: [
-                                                                         {
-                                                                           title: "Date",
-                                                                           value: SystemUtilities.startRun.format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ),
-                                                                           short: false
-                                                                         },
-                                                                         {
-                                                                           title: "Host",
-                                                                           value: SystemUtilities.getHostName(),
-                                                                           short: false
-                                                                         },
-                                                                         {
-                                                                           title: "Application",
-                                                                           value: process.env.APP_SERVER_DATA_NAME + "-" + process.env.DEPLOY_TARGET,
-                                                                           short: false
-                                                                         },
-                                                                         {
-                                                                           title: "Running from",
-                                                                           value: SystemUtilities.strBaseRunPath,
-                                                                           short: false
-                                                                         }
-                                                                       ],
-                                                               footer: "CCDAB718266A",
-                                                             }
-                                                     },
-                                                     LoggerManager.mainLoggerInstance
-                                                   );
-                                                   */
+        //await NotificationManager.publishToExternal(
+        //                                             payload,
+        //                                             LoggerManager.mainLoggerInstance
+        //                                           );
 
         if ( !cluster.settings.execArgv ) {
 

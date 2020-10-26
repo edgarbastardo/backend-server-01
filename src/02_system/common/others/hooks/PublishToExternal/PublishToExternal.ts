@@ -1,8 +1,8 @@
 import NotificationManager from "../../../managers/NotificationManager";
 
-export default class PublishToSlack {
+export default class PublishToExternal {
 
-  public name = "PublishToSlack";
+  public name = "PublishToExternal";
 
   public async init( params: any,
                      logger: any ): Promise<boolean> {
