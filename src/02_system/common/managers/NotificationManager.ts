@@ -1325,11 +1325,11 @@ export default class NotificationManager {
 
       if ( dataToPublish.transport ) {
 
-        const transportExternalList = Object.keys( dataToPublish.transport );
+        const transportExternalList = Object.keys( dataToPublish.transport ) || [];
 
         for ( const strTransportExternal of transportExternalList ) {
 
-          const realTransportExternalList = transportExternalProviderList[ strTransportExternal ];
+          const realTransportExternalList = transportExternalProviderList[ strTransportExternal ] || [];
 
           for ( const strRealTransportExternal of realTransportExternalList ) {
 
