@@ -285,7 +285,12 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                      }
                                                                    ],
                                                              footer: "8E4BBCB07EDF",
-                                                         }
+                                                         },
+                                                   transport: {
+                                                                "NProvider02": [
+                                                                                 "#fetch-delivery-order-from-odin-v2"
+                                                                               ]
+                                                              }
                                                  },
                                                  logger
                                                );
