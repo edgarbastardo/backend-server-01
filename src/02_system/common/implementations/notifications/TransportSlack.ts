@@ -28,24 +28,35 @@ export default class TransportSlack {
 
     try {
 
-      let strWebHook = transportOptions.target.web_hooks[ messageOptions.channel ];
+      let webHook = transportOptions.target.web_hooks[ messageOptions.channel ];
 
-      if ( !strWebHook ) {
+      if ( !webHook ) {
 
-        strWebHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
-
-      }
-
-      if ( strWebHook === null ||
-           strWebHook === undefined ) {
-
-        strWebHook = transportOptions.target.web_hooks[ "@__default__@" ];
+        webHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
 
       }
 
-      if ( strWebHook ) {
+      if ( webHook === null ||
+           webHook === undefined ) {
 
-        const toList = CommonUtilities.trimArray( strWebHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+        webHook = transportOptions.target.web_hooks[ "@__default__@" ];
+
+      }
+
+      if ( webHook ) {
+
+        let toList = [];
+
+        if ( typeof( webHook ) === "string" ) {
+
+          toList = CommonUtilities.trimArray( webHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+
+        }
+        else if ( Array.isArray( webHook ) ) {
+
+          toList = webHook;
+
+        }
 
         for ( const strTo of toList ) {
 
@@ -111,6 +122,9 @@ export default class TransportSlack {
 
             const options = {
                               method: 'POST',
+                              headers: {
+                                         "Content-Type": "application/json"
+                                       },
                               body: JSON.stringify( notification ) //JSON.stringify( { text: messageOptions.body.text } )
                             };
 

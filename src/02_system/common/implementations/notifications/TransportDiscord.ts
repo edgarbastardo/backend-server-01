@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 
+import fetch from 'node-fetch';
 
 import CommonConstants from "../../CommonConstants";
 
@@ -19,6 +20,52 @@ export default class TransportDiscord {
 
   }
 
+  static transformColor( strHexColor: string ): number {
+
+    let intResult = 0;
+
+    try {
+
+      intResult = Number.parseInt( strHexColor.replace( "#", "0x" ) );
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return intResult;
+
+  }
+
+  static transformFields( fields: [any] ): any {
+
+    let result = [];
+
+    try {
+
+      for ( let intIndex = 0; intIndex < fields.length; intIndex++ ) {
+
+        const field = {
+                        name: fields[ intIndex ].title,
+                        value: fields[ intIndex ].value,
+                        inline: fields[ intIndex ].short || false
+                      };
+
+        result.push( field );
+
+      }
+
+    }
+    catch ( error ) {
+
+
+    }
+
+    return result;
+
+  }
+
   static async send( transportOptions: any,
                      messageOptions: any,
                      logger: any ): Promise<boolean> {
@@ -27,30 +74,97 @@ export default class TransportDiscord {
 
     try {
 
-      let strWebHook = transportOptions.target.web_hooks[ messageOptions.channel ];
+      let webHook = transportOptions.target.web_hooks[ messageOptions.channel ];
 
-      if ( !strWebHook ) {
+      if ( !webHook ) {
 
-        strWebHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
-
-      }
-
-      if ( strWebHook === null ||
-           strWebHook === undefined ) {
-
-        strWebHook = transportOptions.target.web_hooks[ "@__default__@" ];
+        webHook = transportOptions.target.web_hooks[ "#" + messageOptions.body.kind ]; // "@__default__@" ];
 
       }
 
-      if ( strWebHook ) {
+      if ( webHook === null ||
+           webHook === undefined ) {
 
-        const toList = CommonUtilities.trimArray( strWebHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+        webHook = transportOptions.target.web_hooks[ "@__default__@" ];
+
+      }
+
+      if ( webHook ) {
+
+        let toList = [];
+
+        if ( typeof( webHook ) === "string" ) {
+
+          toList = CommonUtilities.trimArray( webHook.split( "," ) ); //CommonUtilities.trimArray( transportOptions.to.split( "," ) );
+
+        }
+        else if ( Array.isArray( webHook ) ) {
+
+          toList = webHook;
+
+        }
 
         for ( const strTo of toList ) {
 
           if ( strTo && strTo.trim()  ) {
 
-            //Not implemented yet
+            let notificationKind = { color: null, title: null };
+
+            if ( messageOptions.body.kind === "notification" ) {
+
+              notificationKind.color = "#36a64f";
+              notificationKind.title = ":bell: Notification";
+
+            }
+            else if ( messageOptions.body.kind === "warning" ) {
+
+              notificationKind.color = "#ffff00";
+              notificationKind.title = ":warning: Warning";
+
+            }
+            else if ( messageOptions.body.kind === "error" ) {
+
+              notificationKind.color = "#ff4000";
+              notificationKind.title = ":red_circle: Error";
+
+            }
+
+            const notification = {
+                                   "username": "Notification System",
+                                   "embeds": [
+                                               {
+                                                 "title": notificationKind.title, //":warning: Warning",
+                                                 "color": `${this.transformColor( notificationKind.color )}`, //"#ffff00", //"#36a64f",
+                                                 "description": messageOptions.body.text,
+                                                 "fields": this.transformFields( messageOptions.body.fields ),
+                                                 "footer": {
+                                                             "text": messageOptions.body.footer
+                                                           }
+                                               }
+                                             ]
+                                 };
+
+            const options = {
+                              method: 'POST',
+                              headers: {
+                                         "Content-Type": "application/json"
+                                       },
+                              body: JSON.stringify( notification ) //JSON.stringify( { text: messageOptions.body.text } )
+                            };
+
+            const result = await fetch( strTo, options );
+
+            if ( process.env.ENV === "dev" && result.ok ) {
+
+              //const json = await result.json();
+              //const body = result.body;
+
+              let debugMark = debug.extend( '1BF68150CC99' + ( cluster.worker && cluster.worker.id ? '-' + cluster.worker.id : '' ) );
+              debugMark( "Ok published to discord" );
+              //debugMark( json );
+              //debugMark( body );
+
+            }
 
           }
 
