@@ -519,7 +519,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       let strZipCodeToFind = deliveryOrderData.bizDestination.FormattedAddress;
 
-                    strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) +5 ,
+                      strZipCodeToFind = strZipCodeToFind.substring( strZipCodeToFind.lastIndexOf( ", FL " ) +5 ,
                                                                    strZipCodeToFind.lastIndexOf( ", USA" ) );
 
                       let zipCodeInDB = await zip_codesService.getByZipCode( strZipCodeToFind,
@@ -547,18 +547,54 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
 
-                      while ( strPhoneToFind?.indexOf( "-" ) !== -1) {
+                        while ( strPhoneToFind?.indexOf( "-" ) !== -1) {
 
-                        strPhoneToFind = strPhoneToFind.replace( "-", "" );
+                          strPhoneToFind = strPhoneToFind.replace( "-", "" );
 
-                      }
+                        }
 
-                      let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
-                                                                      null,
-                                                                      currentTransaction,
-                                                                      logger ) as any;
+                        let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
+                                                                        null,
+                                                                        currentTransaction,
+                                                                        logger ) as any;
 
-                      if ( phoneInDB === null ) {   //does not exit this phone create a new
+                        if ( phoneInDB === null ) {   //does not exit this phone create a new
+
+                          phoneInDB = await phonesService.createOrUpdate(
+                                                                          {
+                                                                            id: SystemUtilities.getUUIDv4(),
+                                                                            phone: strPhoneToFind,
+                                                                            created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                            updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                          },
+                                                                          false,
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        );
+
+                        }
+
+                        if ( phoneInDB instanceof Error === false ) {
+
+                          locationInDB = await locationsService.createOrUpdate(
+                                                                                {
+                                                                                  id: SystemUtilities.getUUIDv4(),
+                                                                                  user_id: establishmentInDB.user_id,
+                                                                                  zip_code_id: zipCodeInDB.id,
+                                                                                  phone_id: phoneInDB.id,
+                                                                                  state: "Florida",
+                                                                                  city: "Miami",
+                                                                                  address: strAddressToFind,
+                                                                                  description: "main",
+                                                                                  address_status: "",
+                                                                                  address_type: "residential",
+                                                                                  created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                  updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                                },
+                                                                                null,
+                                                                                currentTransaction,
+                                                                                logger
+                                                                              ) as any;
 
                         }
                         else {  //error creating phone
@@ -566,9 +602,9 @@ export default class CheckOdinV2NewOrdersTask_001 {
                           bUpdateDeliveryOrderExportedMark = true;
 
                           await this.formatMessageError01( deliveryOrderData.Id,
-                                                           deliveryOrderData.LastExported,
-                                                           phoneInDB as Error,
-                                                           logger );
+                                                            deliveryOrderData.LastExported,
+                                                            phoneInDB as Error,
+                                                            logger );
 
                         }
 
@@ -686,7 +722,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                           payment_method: strPaymentMethod,
                                                                           payment_method1: strPaymentMethod1,
                                                                           payment_method2: strPaymentMethod2,
-                                                                          status: "commited",
+                                                                          status: "committed",
                                                                           state: "done",
                                                                           amount1: dblAmount1,
                                                                           amount2: dblAmount2,
