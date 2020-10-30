@@ -158,6 +158,17 @@ export default class UserController {
                                     Description: "Set new password to user using the current password"
                                   }, //,#BManager_L99#,#Master_L01#,#Master_L02#,#Master_L03#,#ChangeUserPasswordL01#,#ChangeUserPasswordL02#,#ChangeUserPasswordL03#, , "BManager_L99", "Master_L01", "Master_L02", "Master_L03", "ChangeUserPasswordL01", "ChangeUserPasswordL02", "ChangeUserPasswordL03"
                                   {
+                                    Path: UserController._BASE_PATH + "/name/change",
+                                    Action: "v1.system.user.name.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Set new name to user using the current password"
+                                  },
+                                  {
                                     Path: UserController._BASE_PATH + "/email/change/code/send",
                                     Action: "v1.system.user.email.change.code.send",
                                     AccessKind: 2,
@@ -180,6 +191,17 @@ export default class UserController {
                                     Description: "Change email to the current user using the code"
                                   },
                                   {
+                                    Path: UserController._BASE_PATH + "/email/simple/change",
+                                    Action: "v1.system.user.email.simple.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Change email to the current user using the current password"
+                                  },
+                                  {
                                     Path: UserController._BASE_PATH + "/phone/change/code/send",
                                     Action: "v1.system.user.phone.change.code.send",
                                     AccessKind: 2,
@@ -200,6 +222,17 @@ export default class UserController {
                                              "Authenticated"
                                            ],
                                     Description: "Change phone to the current user using the code"
+                                  },
+                                  {
+                                    Path: UserController._BASE_PATH + "/phone/simple/change",
+                                    Action: "v1.system.user.phone.simple.change",
+                                    AccessKind: 2,
+                                    RequestKind: 3,
+                                    AllowTagAccess: "#Authenticated#",
+                                    Roles: [
+                                             "Authenticated"
+                                           ],
+                                    Description: "Change phone to the current user using the current pasword"
                                   },
                                   {
                                     Path: UserController._BASE_PATH + "/profile",
@@ -853,6 +886,23 @@ export default class UserController {
 
   }
 
+  @httpPut(
+            "/name/change",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+          )
+  async nameChange( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserOthersServiceController.nameChange( request,
+                                                                 null,
+                                                                 this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpPost(
              "/email/change/code/send",
              MiddlewareManager.middlewareSetContext,
@@ -887,6 +937,23 @@ export default class UserController {
 
   }
 
+  @httpPut(
+            "/email/simple/change",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+          )
+  async emailSimpleChange( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserEMailServiceController.emailSimpleChange( request,
+                                                                       null,
+                                                                       this._controllerLogger || context.logger);
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
   @httpPost(
              "/phone/change/code/send",
              MiddlewareManager.middlewareSetContext,
@@ -916,6 +983,23 @@ export default class UserController {
     const result = await UserPhoneServiceController.phoneNumberChange( request,
                                                                        null,
                                                                        this._controllerLogger || context.logger );
+
+    response.status( result.StatusCode ).send( result );
+
+  }
+
+  @httpPut(
+            "/phone/simple/change",
+            MiddlewareManager.middlewareSetContext,
+            MiddlewareManager.middlewareCheckIsAuthenticated,
+          )
+  async phoneNumberSimpleChange( request: Request, response: Response ) {
+
+    const context = ( request as any ).context;
+
+    const result = await UserPhoneServiceController.phoneNumberSimpleChange( request,
+                                                                             null,
+                                                                             this._controllerLogger || context.logger );
 
     response.status( result.StatusCode ).send( result );
 

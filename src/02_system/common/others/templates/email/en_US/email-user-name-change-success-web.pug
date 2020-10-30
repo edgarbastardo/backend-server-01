@@ -5,14 +5,14 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible", content="ie=edge")
     style
-        include ./email-user-password-change-web.css
+        include ./email-user-email-change-success-web.css
   body
-      h2 USER PASSWORD CHANGE SUCCESS
-      p Hello!. This email is for your password change for the user account #[strong #{user_name}]
+      h2 USER NAME CHANGE SUCCESS
+      p Hello!. This email is for your user name change for the user account #[strong #{user_name}]
       p Your account information is:
       h3 User: #[strong #{user_name}]
-      h3 Password: #[strong #{user_password}]
-      p Remember use it in the next login.
+      h3 EMail: #[strong #{user_email}]
+      h3 Phone: #[strong #{user_phone}]
       p To made login #[a(href=`${web_app_url}`) #{web_app_url}]
       p If you not recognize this email please ignore and archive it.
       p #[strong #{company_name}]
