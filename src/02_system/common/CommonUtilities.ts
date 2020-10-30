@@ -1182,7 +1182,8 @@ export default class CommonUtilities {
 
   }
 
-  public static formatPhoneNumber( strPhoneNumber: string ): string {
+  public static formatPhoneNumber( strPhoneNumber: string,
+                                   bAddInternationPrefix?: boolean ): string {
 
     let strResult = "";
 
@@ -1196,9 +1197,18 @@ export default class CommonUtilities {
 
       if ( match ) {
 
-        const strInternationalCode = ( !match[ 1 ] ? "1" : match[ 1 ] );
+        if ( bAddInternationPrefix ) {
 
-        strResult = [ strInternationalCode, "-", match[ 2 ], "-", match[ 3 ], "-", match[ 4 ] ].join( "" );
+          let strInternationalCode = ( !match[ 1 ] ? "1" : match[ 1 ] );
+
+          strResult = [ strInternationalCode, "-", match[ 2 ], "-", match[ 3 ], "-", match[ 4 ] ].join( "" );
+
+        }
+        else {
+
+          strResult = [ match[ 2 ], "-", match[ 3 ], "-", match[ 4 ] ].join( "" );
+
+        }
 
       }
 

@@ -18,7 +18,7 @@ import DBConnectionManager from "../../../common/managers/DBConnectionManager";
 import ApplicationServerDataManager from "../../../common/managers/ApplicationServerDataManager";
 
 import SecurityServiceController from "./SecurityService.controller";
-import UserOthersServiceController from "./UserOthersService.controller";
+//import UserOthersServiceController from "./UserOthersService.controller";
 
 import SYSUserService from "../../../common/database/master/services/SYSUserService";
 import SYSUserGroupService from "../../../common/database/master/services/SYSUserGroupService";
@@ -304,17 +304,17 @@ export default class UserPasswordServiceController {
 
                     if ( strTransport === "email" ) {
 
-                      const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                                              logger );
+                      const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                   logger );
 
-                      const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                    currentTransaction,
-                                                                                                    logger ) ? "web" : "mobile";
+                      const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                         currentTransaction,
+                                                                                         logger ) ? "web" : "mobile";
 
-                      const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                    "url",
-                                                                                                    currentTransaction,
-                                                                                                    logger );
+                      const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                         "url",
+                                                                                         currentTransaction,
+                                                                                         logger );
 
                       const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                                     context.TimeZoneId,
@@ -964,17 +964,17 @@ export default class UserPasswordServiceController {
                       if ( sysUserInDB.sysPerson &&
                            CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) ) {
 
-                        const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                                                 logger );
+                        const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                     logger );
 
-                        const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                       currentTransaction,
-                                                                                                       logger ) ? "web" : "mobile";
+                        const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                           currentTransaction,
+                                                                                           logger ) ? "web" : "mobile";
 
-                        const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                       "url",
-                                                                                                       currentTransaction,
-                                                                                                       logger );
+                        const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                           "url",
+                                                                                           currentTransaction,
+                                                                                           logger );
 
                         if ( await NotificationManager.send(
                                                              "email",
