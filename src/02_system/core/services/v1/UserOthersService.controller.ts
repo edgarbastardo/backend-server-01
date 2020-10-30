@@ -207,6 +207,7 @@ export default class UserOthersServiceController {
 
   }
 
+  /*
   static async getConfigGeneralDefaultInformation( transaction: any,
                                                    logger: any ): Promise<any> {
 
@@ -271,6 +272,7 @@ export default class UserOthersServiceController {
     return result;
 
   }
+  */
 
   static async getConfigSignupProcess( strKind: string,
                                        transaction: any,
@@ -352,6 +354,7 @@ export default class UserOthersServiceController {
 
   }
 
+  /*
   static async getConfigFrontendRules( strFrontendId: string,
                                        strFieldName: string,
                                        transaction: any,
@@ -529,6 +532,7 @@ export default class UserOthersServiceController {
     return bResult;
 
   }
+  */
 
   //ANCHOR checkUserRoleLevel
   static checkUserRoleLevel( userSessionStatus: any,
@@ -970,7 +974,7 @@ export default class UserOthersServiceController {
 
                     if ( userSessionStatusUpdated instanceof Error ) {
 
-                      const error = userWithPasswordChanged as any;
+                      const error = userSessionStatusUpdated as any;
 
                       warnings.push(
                                     {
@@ -1007,30 +1011,30 @@ export default class UserOthersServiceController {
 
                   bApplyTransaction = true;
 
-                  if ( sysUserInDB.SYSPerson &&
-                       CommonUtilities.isValidEMailList( sysUserInDB.SYSPerson.EMail ) ) {
+                  if ( sysUserInDB.sysPerson &&
+                       CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) ) {
 
-                    const configData = await this.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                      logger );
+                    const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                 logger );
 
-                    const strTemplateKind = await this.isWebFrontendClient( context.FrontendId,
-                                                                            currentTransaction,
-                                                                            logger ) ? "web" : "mobile";
+                    const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                       currentTransaction,
+                                                                                       logger ) ? "web" : "mobile";
 
-                    const strWebAppURL = await this.getConfigFrontendRules( context.FrontendId,
-                                                                            "url",
-                                                                            currentTransaction,
-                                                                            logger );
+                    const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                       "url",
+                                                                                       currentTransaction,
+                                                                                       logger );
 
                     await NotificationManager.send(
                                                     "email",
                                                     {
                                                       from: configData[ "no_response_email" ] || "no-response@no-response.com",
-                                                      to: sysUserInDB.SYSPerson.EMail,
+                                                      to: sysUserInDB.sysPerson.EMail,
                                                       subject: await I18NManager.translate( strLanguage, "USER PASSWORD CHANGE SUCCESS" ),
                                                       body: {
                                                               kind: "template",
-                                                              file: `email-user-password-change-${strTemplateKind}.pug`,
+                                                              file: `email-user-password-change-success-${strTemplateKind}.pug`,
                                                               language: context.Language,
                                                               variables: {
                                                                            user_name: sysUserInDB.Name,
@@ -1197,6 +1201,758 @@ export default class UserOthersServiceController {
       sourcePosition.method = this.name + "." + this.passwordChange.name;
 
       const strMark = "987FA955F3CC" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async nameChange( request: Request,
+                           transaction: any,
+                           logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let bCheckCurrentPassword = true;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      if ( context.Authorization.startsWith( "p:" ) === false ) {
+
+        // ANCHOR user name change
+        let userSessionStatus = context.UserSessionStatus;
+
+        //let bIsNotAuthorized = false;
+
+        let resultCheckUserRoles = null;
+
+        let bUpdateSessionStatus = true;
+
+        let sysUserInDB = null;
+
+        if ( request.body.User ||
+             request.body.UserId ) {
+
+          if ( request.body.UserId ) {
+
+            sysUserInDB = await SYSUserService.getById( request.body.UserId,
+                                                        null,
+                                                        currentTransaction,
+                                                        logger );
+
+          }
+          else {
+
+            sysUserInDB = await SYSUserService.getByName( request.body.User,
+                                                          null,
+                                                          currentTransaction,
+                                                          logger );
+
+          }
+
+          resultCheckUserRoles = this.checkUserRoleLevel( userSessionStatus,
+                                                          sysUserInDB,
+                                                          "ChangeUserName",
+                                                          logger );
+
+          if ( resultCheckUserRoles.isAuthorizedAdmin ||
+               resultCheckUserRoles.isAuthorizedL03 ||
+               resultCheckUserRoles.isAuthorizedL02 ||
+               resultCheckUserRoles.isAuthorizedL01 ) {
+
+            bUpdateSessionStatus = false;
+            bCheckCurrentPassword = false;
+
+          }
+          else {
+
+            resultCheckUserRoles.isNotAuthorized = true;
+
+          }
+
+        }
+        else {
+
+          //Force to read from DB the user session status. To try to get more fresh version possible
+          userSessionStatus = await SystemUtilities.getUserSessionStatus( context.Authorization,
+                                                                          context,
+                                                                          false,    //No update at field
+                                                                          true,     //Force from db
+                                                                          currentTransaction,
+                                                                          logger );
+
+          sysUserInDB = await SYSUserService.getById( userSessionStatus.UserId,
+                                                      null,
+                                                      currentTransaction,
+                                                      logger );
+
+        }
+
+        if ( resultCheckUserRoles &&
+             resultCheckUserRoles.isNotAuthorized ) {
+
+          result = {
+                     StatusCode: 403, //Forbidden
+                     Code: "ERROR_CANNOT_CHANGE_NAME",
+                     Message: await I18NManager.translate( strLanguage, "Not allowed to change the name to the user %s", sysUserInDB.Name ),
+                     Mark: "DB000A84A617" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_CANNOT_CHANGE_NAME",
+                                 Message: await I18NManager.translate( strLanguage, "Not allowed to change the name to the user %s", sysUserInDB.Name ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+        else if ( sysUserInDB != null &&
+                  sysUserInDB instanceof Error === false ) {
+
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "32FEF425E8FB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "91658E4F8600" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot recover your password", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
+                       Mark: "E531328C6D41" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot recover your password", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
+                       Mark: "D17A4CBAB219" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot recover your password", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( new RegExp( "^[a-zA-Z0-9\#\@\.\_\-]+$", "g" ).test( request.body.NewName ) === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_NAME_NOT_VALID_CHARS",
+                       Message: await I18NManager.translate( strLanguage, "The new name [%s] contains invalid chars.", request.body.NewName ),
+                       Mark: "48C2CDC01F2E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_NAME_NOT_VALID_CHARS",
+                                   Message: await I18NManager.translate( strLanguage, "The new name [%s] contains invalid chars.", request.body.NewName ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( request.body.NewName === sysUserInDB.Name ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_NAME_NOT_VALID_IS_SAME",
+                       Message: await I18NManager.translate( strLanguage, "The new name [%s] is invalid. Is the same to the current name", sysUserInDB.Name ),
+                       Mark: "C636BAD12725" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_NAME_NOT_VALID_IS_SAME",
+                                   Message: await I18NManager.translate( strLanguage, "The new name [%s] is invalid. Is the same to the current name", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( bCheckCurrentPassword === false ||
+                 await bcrypt.compare( strCurrentPassword, sysUserInDB.Password ) ) {
+
+              const sysUserNewNameInDB = await SYSUserService.getByName( request.body.NewName || "",
+                                                                         null,
+                                                                         currentTransaction,
+                                                                         logger );
+
+              if ( sysUserNewNameInDB instanceof Error ) {
+
+                const error = sysUserNewNameInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "4D40C5331AE0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: error.logId,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.Message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( sysUserNewNameInDB ) {
+
+                result = {
+                           StatusCode: 400, //Bad request
+                           Code: "ERROR_NEW_NAME_NOT_VALID_IS_ALREADY_USED",
+                           Message: await I18NManager.translate( strLanguage, "The new name [%s] is invalid. Is already in use", sysUserInDB.Name ),
+                           Mark: "73935F697041" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: "ERROR_NEW_NAME_NOT_VALID_IS_ALREADY_USED",
+                                       Message: await I18NManager.translate( strLanguage, "The new name [%s] is invalid. Is already in use", sysUserInDB.Name ),
+                                       Details: null
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else {
+
+                sysUserInDB.Name = request.body.NewName;
+                sysUserInDB.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+
+                const userWithNameChanged = await SYSUserService.createOrUpdate( ( sysUserInDB as any ).dataValues,
+                                                                                 true,
+                                                                                 currentTransaction,
+                                                                                 logger );
+
+                if ( userWithNameChanged !== null &&
+                     userWithNameChanged instanceof Error === false ) {
+
+                  const bChangePersonEmail = request.body.ChangePersonEMail === 1 &&
+                                             CommonUtilities.isValidEMailList( request.body.NewName );
+
+                  if ( bChangePersonEmail ) {
+
+                    let sysPersonInDB = userWithNameChanged.sysPerson;
+
+                    if ( !sysPersonInDB ) {
+
+                      sysPersonInDB = await SYSPersonService.createOrUpdate( {
+                                                                               Id: sysUserInDB.Id,
+                                                                               FirstName: sysUserInDB.Name,
+                                                                               EMail: request.body.NewEMail
+                                                                             },
+                                                                             true,
+                                                                             currentTransaction,
+                                                                             logger );
+
+                      sysUserInDB = await SYSUserService.createOrUpdate( {
+                                                                           Id: sysUserInDB.Id,
+                                                                           PersonId: sysPersonInDB.Id
+                                                                         },
+                                                                         true,
+                                                                         currentTransaction,
+                                                                         logger );
+
+                    }
+                    else {
+
+                      sysPersonInDB.EMail = request.body.NewName;
+
+                      sysPersonInDB = await SYSPersonService.createOrUpdate( ( sysPersonInDB as any ).dataValues,
+                                                                             true,
+                                                                             currentTransaction,
+                                                                             logger );
+
+                    }
+
+                    if ( sysUserInDB instanceof Error ) {
+
+                      const error = sysUserInDB as any;
+
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "EBBBB6A20117" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: error.logId,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: error.name,
+                                             Message: error.Message,
+                                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+
+                    }
+                    else if ( sysPersonInDB instanceof Error ) {
+
+                      const error = sysPersonInDB as any;
+
+                      result = {
+                                 StatusCode: 500, //Internal server error
+                                 Code: "ERROR_UNEXPECTED",
+                                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                                 Mark: "7C800E2B4CCD" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                                 LogId: error.logId,
+                                 IsError: true,
+                                 Errors: [
+                                           {
+                                             Code: error.name,
+                                             Message: error.Message,
+                                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                                           }
+                                         ],
+                                 Warnings: [],
+                                 Count: 0,
+                                 Data: []
+                               }
+                    }
+
+                  }
+
+                  if ( !result ) {
+
+                    const warnings = [];
+
+                    if ( userWithNameChanged.sysPerson &&
+                         CommonUtilities.isValidPhoneNumberList( userWithNameChanged.sysPerson.Phone ) &&
+                         request.body.NotifyBySMS === 1 ) {
+
+                      if ( await NotificationManager.send(
+                                                           "sms",
+                                                           {
+                                                             to: userWithNameChanged.sysPerson.Phone,
+                                                             //context: "AMERICA/NEW_YORK",
+                                                             foreign_data: `{ "user": ${sysUserInDB.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                             //device_id: "*",
+                                                             body: {
+                                                                     kind: "self",
+                                                                     text: await I18NManager.translate( strLanguage, bChangePersonEmail ? "User email change to [%s] success!": "User name change [%s] success!", userWithNameChanged.Name )
+                                                                   }
+                                                           },
+                                                           logger
+                                                         ) === false ) {
+
+                        warnings.push(
+                                       {
+                                         Code: "WARNING_CANNOT_SEND_SMS",
+                                         Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                         Details: {
+                                                    Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                                  }
+                                       }
+                                     );
+
+                      }
+
+                    }
+
+                    if ( bUpdateSessionStatus ) {
+
+                      userSessionStatus.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+
+                      //ANCHOR update the session
+                      const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
+                                                                                                              userSessionStatus,
+                                                                                                              {
+                                                                                                                updateAt: true,        //Update the field updatedAt
+                                                                                                                setRoles: false,       //Set roles?
+                                                                                                                groupRoles: null,      //User group roles
+                                                                                                                userRoles: null,       //User roles
+                                                                                                                forceUpdate: true,     //Force update?
+                                                                                                                tryLock: 3,            //Only 1 try
+                                                                                                                lockSeconds: 3 * 1000, //Second
+                                                                                                              },
+                                                                                                              currentTransaction,
+                                                                                                              logger );
+
+                      if ( userSessionStatusUpdated instanceof Error ) {
+
+                        const error = userSessionStatusUpdated as any;
+
+                        warnings.push(
+                                       {
+                                         Code: error.name,
+                                         Message: error.message,
+                                         Details: await SystemUtilities.processErrorDetails( error )
+                                       }
+                                     );
+
+                        warnings.push(
+                                       {
+                                         Code: "WARNING_FAILED_UPDATE_USER_DATA_SESSION",
+                                         Message: await I18NManager.translate( strLanguage, "Failed to update the user session status. You are required to close the session and start another" ),
+                                         Details: null
+                                       }
+                                     );
+
+                      }
+
+                    }
+
+                    result = {
+                               StatusCode: 200, //Ok
+                               Code: "SUCCESS_NAME_CHANGE",
+                               Message: await I18NManager.translate( strLanguage, "Success to change the user name. Remember use it in the next login" ),
+                               Mark: "7EDFA51E6C3A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                               LogId: null,
+                               IsError: false,
+                               Errors: [],
+                               Warnings: warnings,
+                               Count: 0,
+                               Data: []
+                             }
+
+                    bApplyTransaction = true;
+
+                    if ( userWithNameChanged?.sysPerson &&
+                         CommonUtilities.isValidEMailList( userWithNameChanged.sysPerson.EMail ) &&
+                         request.body.NotifyByEMail === 1 ) {
+
+                      const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                   logger );
+
+                      const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                         currentTransaction,
+                                                                                         logger ) ? "web" : "mobile";
+
+                      const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                         "url",
+                                                                                         currentTransaction,
+                                                                                         logger );
+
+                      await NotificationManager.send(
+                                                      "email",
+                                                      {
+                                                        from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                        to: userWithNameChanged.sysPerson.EMail,
+                                                        subject: await I18NManager.translate( strLanguage, bChangePersonEmail ? "USER EMAIL CHANGE SUCCESS": "USER NAME CHANGE SUCCESS" ),
+                                                        body: {
+                                                                kind: "template",
+                                                                file: bChangePersonEmail ? `email-user-email-change-success-${strTemplateKind}.pug`: `email-user-name-change-success-${strTemplateKind}.pug`,
+                                                                language: context.Language,
+                                                                variables: {
+                                                                             user_name: sysUserInDB.Name,
+                                                                             user_email: CommonUtilities.maskEMailList( userWithNameChanged.sysPerson.EMail ),
+                                                                             user_phone: CommonUtilities.maskPhoneList( userWithNameChanged.sysPerson.Phone ),
+                                                                             web_app_url: strWebAppURL,
+                                                                             ... configData
+                                                                           }
+                                                                //kind: "embedded",
+                                                                //text: "Hello",
+                                                                //html: "<b>Hello</b>"
+                                                              }
+                                                      },
+                                                      logger
+                                                    );
+
+                    }
+
+                  }
+
+                }
+                else if ( userWithNameChanged instanceof Error ) {
+
+                  const error = userWithNameChanged as any;
+
+                  result = {
+                             StatusCode: 500, //Internal server error
+                             Code: "ERROR_UNEXPECTED",
+                             Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                             Mark: "B0EC4C607C33" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                             LogId: error.logId,
+                             IsError: true,
+                             Errors: [
+                                       {
+                                         Code: error.name,
+                                         Message: error.Message,
+                                         Details: await SystemUtilities.processErrorDetails( error ) //error
+                                       }
+                                     ],
+                             Warnings: [],
+                             Count: 0,
+                             Data: []
+                           }
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "867F6D601E4C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                     Mark: "3E0DD48FB9CF" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made change password" ),
+                   Mark: "E19CD297807F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change password" ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.nameChange.name;
+
+      const strMark = "5C772A577A29" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

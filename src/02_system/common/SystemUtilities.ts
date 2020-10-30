@@ -43,6 +43,7 @@ import SYSUserSessionStatusService from "./database/master/services/SYSUserSessi
 import SYSUserSessionPersistentService from "./database/master/services/SYSUserSessionPersistentService";
 import SYSRoleService from "./database/master/services/SYSRoleService";
 import SYSUserSessionDeviceService from "./database/master/services/SYSUserSessionDeviceService";
+import SYSConfigValueDataService from "./database/master/services/SYSConfigValueDataService";
 
 import { SYSUserSessionStatus } from "./database/master/models/SYSUserSessionStatus";
 //import { SYSUserSessionDevice } from "./database/master/models/SYSUserSessionDevice";
@@ -4390,6 +4391,250 @@ export default class SystemUtilities {
     }
 
     return result;
+
+  }
+
+  static async getConfigGeneralDefaultInformation( transaction: any,
+                                                   logger: any ): Promise<any> {
+
+    let result = null;
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_General_Default_Information.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
+
+        result = jsonConfigData !== null ? jsonConfigData : null;
+        bSet = true;
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
+
+        result = jsonConfigData !== null ? jsonConfigData : null;
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigGeneralDefaultInformation.name;
+
+      const strMark = "08E4E489430A" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+
+  static async getConfigFrontendRules( strFrontendId: string,
+                                       strFieldName: string,
+                                       transaction: any,
+                                       logger: any ): Promise<string> {
+
+    let strResult = "";
+
+    try {
+
+      const configData = await SYSConfigValueDataService.getConfigValueData( SystemConstants._CONFIG_ENTRY_Frontend_Rules.Id,
+                                                                             SystemConstants._USER_BACKEND_SYSTEM_NET_NAME,
+                                                                             transaction,
+                                                                             logger );
+
+      let bSet = false;
+
+      if ( CommonUtilities.isNotNullOrEmpty( configData.Value ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Value,
+                                                          logger );
+
+        if ( jsonConfigData[ "#" + strFrontendId + "#" ] &&
+             jsonConfigData[ "#" + strFrontendId + "#" ][ strFieldName ] ) {
+
+          strResult = jsonConfigData[ "#" + strFrontendId + "#" ][ strFieldName ];
+          bSet = true;
+
+        }
+        else if ( jsonConfigData[ "@__default__@" ] &&
+                  jsonConfigData[ "@__default__@" ][ strFieldName ] ) {
+
+          strResult = jsonConfigData[ "@__default__@" ][ strFieldName ];
+          bSet = true;
+
+        }
+
+      }
+
+      if ( bSet === false &&
+          CommonUtilities.isNotNullOrEmpty( configData.Default ) ) {
+
+        const jsonConfigData = CommonUtilities.parseJSON( configData.Default,
+                                                          logger );
+
+        if ( jsonConfigData[ "@__default__@" ] &&
+             jsonConfigData[ "@__default__@" ].tag ) {
+
+          strResult = jsonConfigData[ "@__default__@" ].tag;
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.getConfigFrontendRules.name;
+
+      const strMark = "B7DACA6CCE2F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return strResult;
+
+  }
+
+  static async isWebFrontendClient( strFrontendId: string,
+                                    transaction: any,
+                                    logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const strTag = await this.getConfigFrontendRules( strFrontendId,
+                                                        "tag",
+                                                        transaction,
+                                                        logger );
+
+      bResult = strTag.includes( "#web#" );
+
+    }
+    catch ( error ) {
+
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.isWebFrontendClient.name;
+
+      const strMark = "08A795BE10E0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
+
+  }
+
+  static async isMobileFrontendClient( strFrontendId: string,
+                                       transaction: any,
+                                       logger: any ): Promise<boolean> {
+
+    let bResult = false;
+
+    try {
+
+      const strTag = await this.getConfigFrontendRules( strFrontendId,
+                                                        "tag",
+                                                        transaction,
+                                                        logger );
+
+      bResult = strTag.includes( "#mobile#" );
+
+    }
+    catch ( error ) {
+
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.isWebFrontendClient.name;
+
+      const strMark = "08A795BE10E0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+    }
+
+    return bResult;
 
   }
 
