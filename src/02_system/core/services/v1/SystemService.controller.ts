@@ -105,6 +105,8 @@ export default class SystemServiceController {
 
 
       const data = {
+                     env: process.env.ENV,
+                     deployTarget: process.env.DEPLOY_TARGET,
                      app: process.env.APP_PROJECT_NAME,
                      appServerDataName: process.env.APP_SERVER_DATA_NAME,
                      appServerTaskName: process.env.APP_SERVER_TASK_NAME,
