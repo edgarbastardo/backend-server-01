@@ -736,8 +736,8 @@ export default class BinaryServiceController extends BaseService {
         const intImageWidth = imageSize[ 0 ];
         const intImageHeight = imageSize[ 1 ];
 
-        result.original.size.width = imageSize[ 0 ];
-        result.original.size.height = imageSize[ 1 ];
+        result.original.size.width = parseInt( imageSize[ 0 ] ) || 0;
+        result.original.size.height = parseInt( imageSize[ 1 ] ) || 0;
 
         for ( let intIndex = 0; intIndex < thumbnailFactor.length; intIndex++ ) {
 
