@@ -527,7 +527,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                              currentTransaction,
                                                                              logger ) as any;
 
-                      if ( zipCodeInDB = null ) {   //does not exit this zip_code create a new
+                      if ( zipCodeInDB === null ) {   //does not exit this zip_code create a new
 
                         zipCodeInDB = await zip_codesService.createOrUpdate(
                                                                              {
@@ -547,12 +547,18 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
 
+                        while ( strPhoneToFind?.indexOf( "-" ) !== -1 ) {
+
+                          strPhoneToFind = strPhoneToFind.replace( "-", "" );
+
+                        }
+
                         let phoneInDB = await phonesService.getByPhone( strPhoneToFind,
                                                                         null,
                                                                         currentTransaction,
                                                                         logger ) as any;
 
-                        if ( phoneInDB = null ) {   //does not exit this phone create a new
+                        if ( phoneInDB === null ) {   //does not exit this phone create a new
 
                           phoneInDB = await phonesService.createOrUpdate(
                                                                           {
@@ -565,6 +571,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                           currentTransaction,
                                                                           logger
                                                                         );
+
                         }
 
                         if ( phoneInDB instanceof Error === false ) {
@@ -617,7 +624,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     if ( locationInDB instanceof Error === false ) {
 
-                      let QuantityOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
+                      let dblOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
 
                       let tipPayment = [];
                       let orderPayment = [];
@@ -702,6 +709,10 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       }
 
+                      let dblExtraMiles = dblOrderMiles - establishmentInDB.base_miles > 0 ? Math.ceil( dblOrderMiles - establishmentInDB.base_miles ): 0;
+
+                      let dblExtraMilesDriver = dblOrderMiles - establishmentInDB.base_miles_driver > 0 ? Math.ceil( dblOrderMiles - establishmentInDB.base_miles_driver ): 0;
+
                       let orderInDB = await ordersService.createOrUpdate(
                                                                           {
                                                                             id: deliveryOrderData.Id,
@@ -711,7 +722,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                             payment_method: strPaymentMethod,
                                                                             payment_method1: strPaymentMethod1,
                                                                             payment_method2: strPaymentMethod2,
-                                                                            status: "commited",
+                                                                            status: "committed",
                                                                             state: "done",
                                                                             amount1: dblAmount1,
                                                                             amount2: dblAmount2,
@@ -722,12 +733,12 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                             delivered: null,
                                                                             want_delivery_date:"1980-01-16",
                                                                             want_delivery_time:"00:00:00",
-                                                                            extra_miles: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles),
+                                                                            extra_miles: dblExtraMiles,
                                                                             inspected: 0,
                                                                             status_number: null,
                                                                             client_name: deliveryOrderData.bizDestination.Name,
-                                                                            extra_miles_driver_order: Math.ceil(QuantityOrderMiles-establishmentInDB.base_miles_driver),
-                                                                            order_miles_quantity: QuantityOrderMiles,
+                                                                            extra_miles_driver_order: dblExtraMilesDriver,
+                                                                            order_miles_quantity: dblOrderMiles,
                                                                             catering_type: 0,
                                                                             qty_person_catering: 0,
                                                                             fee_driver_order: establishmentInDB.fee_driver,
