@@ -709,7 +709,7 @@ export default class BinaryServiceController extends BaseService {
                                   thumbnailFactor: number[],
                                   logger: any ): Promise<any> {
 
-    let result = { value: 0, thumbnail: [] };
+    let result = { value: 0, thumbnail: [], original: { size: { width: 0, height: 0 } } };
 
     try {
 
@@ -735,6 +735,9 @@ export default class BinaryServiceController extends BaseService {
 
         const intImageWidth = imageSize[ 0 ];
         const intImageHeight = imageSize[ 1 ];
+
+        result.original.size.width = parseInt( imageSize[ 0 ] ) || 0;
+        result.original.size.height = parseInt( imageSize[ 1 ] ) || 0;
 
         for ( let intIndex = 0; intIndex < thumbnailFactor.length; intIndex++ ) {
 
@@ -4226,6 +4229,9 @@ export default class BinaryServiceController extends BaseService {
                     const extraData = {
                                         Thumbnail: thumbnailData && thumbnailData.thumbnail ? thumbnailData.thumbnail : [],
                                         Process: processData && processData.process ? processData.process : [],
+                                        Original: {
+                                                    Size: thumbnailData && thumbnailData.original ? thumbnailData?.original.size: null
+                                                  }
                                       };
 
                     const binaryIndexData = {
