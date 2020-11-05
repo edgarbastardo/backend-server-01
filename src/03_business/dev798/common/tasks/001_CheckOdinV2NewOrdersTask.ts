@@ -527,7 +527,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                              currentTransaction,
                                                                              logger ) as any;
 
-                    if ( zipCodeInDB === null ) {   //does not exit this zip_code create a new
+                      if ( zipCodeInDB === null ) {   //does not exit this zip_code create a new
 
                         zipCodeInDB = await zip_codesService.createOrUpdate(
                                                                              {
@@ -547,7 +547,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                         let strPhoneToFind = deliveryOrderData.bizDestination.Phone;
 
-                        while ( strPhoneToFind?.indexOf( "-" ) !== -1) {
+                        while ( strPhoneToFind?.indexOf( "-" ) !== -1 ) {
 
                           strPhoneToFind = strPhoneToFind.replace( "-", "" );
 
@@ -624,7 +624,7 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     if ( locationInDB instanceof Error === false ) {
 
-                      let QuantityOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
+                      let dblOrderMiles = Math.round( deliveryOrderData.bizDestination.ExtraData.Business.Finish.Distance.DistanceMeter * 0.062137 ) / 100;
 
                       let tipPayment = [];
                       let orderPayment = [];
@@ -709,46 +709,46 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                     }
 
-                    let dblExtraMiles = QuantityOrderMiles - establishmentInDB.base_miles > 0 ? Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles ) : 0;
+                      let dblExtraMiles = dblOrderMiles - establishmentInDB.base_miles > 0 ? Math.ceil( dblOrderMiles - establishmentInDB.base_miles ): 0;
 
-                    let dblExtraMilesDriver = QuantityOrderMiles - establishmentInDB.base_miles_driver > 0 ? Math.ceil( QuantityOrderMiles - establishmentInDB.base_miles_driver ) : 0;
+                      let dblExtraMilesDriver = dblOrderMiles - establishmentInDB.base_miles_driver > 0 ? Math.ceil( dblOrderMiles - establishmentInDB.base_miles_driver ): 0;
 
-                    let orderInDB = await ordersService.createOrUpdate(
-                                                                        {
-                                                                          id: deliveryOrderData.Id,
-                                                                          user_id: establishmentInDB.user_id,
-                                                                          location_id: locationInDB.id,
-                                                                          establishment_id: establishmentInDB.id,
-                                                                          payment_method: strPaymentMethod,
-                                                                          payment_method1: strPaymentMethod1,
-                                                                          payment_method2: strPaymentMethod2,
-                                                                          status: "committed",
-                                                                          state: "done",
-                                                                          amount1: dblAmount1,
-                                                                          amount2: dblAmount2,
-                                                                          original_amount: Math.round( dblOriginalAmount * 100 ) / 100,
-                                                                          created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                          updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                          fee: establishmentInDB.fee,
-                                                                          delivered: null,
-                                                                          want_delivery_date:"1980-01-16",
-                                                                          want_delivery_time:"00:00:00",
-                                                                          extra_miles: dblExtraMiles,
-                                                                          inspected: 0,
-                                                                          status_number: null,
-                                                                          client_name: deliveryOrderData.bizDestination.Name,
-                                                                          extra_miles_driver_order: dblExtraMilesDriver,
-                                                                          order_miles_quantity: QuantityOrderMiles,
-                                                                          catering_type: 0,
-                                                                          qty_person_catering: 0,
-                                                                          fee_driver_order: establishmentInDB.fee_driver,
-                                                                          fee_catering_order: 0,
-                                                                          qty_meals: 0
-                                                                        },
-                                                                        false,
-                                                                        currentTransaction,
-                                                                        logger
-                                                                      ) as any;
+                      let orderInDB = await ordersService.createOrUpdate(
+                                                                          {
+                                                                            id: deliveryOrderData.Id,
+                                                                            user_id: establishmentInDB.user_id,
+                                                                            location_id: locationInDB.id,
+                                                                            establishment_id: establishmentInDB.id,
+                                                                            payment_method: strPaymentMethod,
+                                                                            payment_method1: strPaymentMethod1,
+                                                                            payment_method2: strPaymentMethod2,
+                                                                            status: "committed",
+                                                                            state: "done",
+                                                                            amount1: dblAmount1,
+                                                                            amount2: dblAmount2,
+                                                                            original_amount: Math.round( dblOriginalAmount * 100 ) / 100,
+                                                                            created_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                            updated_at: SystemUtilities.getCurrentDateAndTimeFrom(deliveryOrderData.CreatedAt).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                            fee: establishmentInDB.fee,
+                                                                            delivered: null,
+                                                                            want_delivery_date:"1980-01-16",
+                                                                            want_delivery_time:"00:00:00",
+                                                                            extra_miles: dblExtraMiles,
+                                                                            inspected: 0,
+                                                                            status_number: null,
+                                                                            client_name: deliveryOrderData.bizDestination.Name,
+                                                                            extra_miles_driver_order: dblExtraMilesDriver,
+                                                                            order_miles_quantity: dblOrderMiles,
+                                                                            catering_type: 0,
+                                                                            qty_person_catering: 0,
+                                                                            fee_driver_order: establishmentInDB.fee_driver,
+                                                                            fee_catering_order: 0,
+                                                                            qty_meals: 0
+                                                                          },
+                                                                          false,
+                                                                          currentTransaction,
+                                                                          logger
+                                                                        ) as any;
 
                       if ( orderInDB instanceof Error === false ) {
 

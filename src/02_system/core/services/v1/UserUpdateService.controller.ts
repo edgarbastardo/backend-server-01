@@ -776,17 +776,17 @@ export default class UserUpdateServiceController {
                       if ( transportList.includes( "email" ) ) {
 
                         //ANCHOR send email success
-                        const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                                                 logger );
+                        const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                     logger );
 
-                        const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                       currentTransaction,
-                                                                                                       logger ) ? "web" : "mobile";
+                        const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                           currentTransaction,
+                                                                                           logger ) ? "web" : "mobile";
 
-                        const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                       "url",
-                                                                                                       currentTransaction,
-                                                                                                       logger );
+                        const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                           "url",
+                                                                                           currentTransaction,
+                                                                                           logger );
 
                         if ( await NotificationManager.send(
                                                              "email",

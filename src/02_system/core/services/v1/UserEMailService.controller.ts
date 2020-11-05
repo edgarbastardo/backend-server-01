@@ -29,7 +29,6 @@ export default class UserEMailServiceController {
 
   static readonly _ID = "UserEMailServiceController";
 
-
   static async emailChangeCodeSend( request: Request,
                                     transaction: any,
                                     logger: any ): Promise<any> {
@@ -231,17 +230,17 @@ export default class UserEMailServiceController {
                 if ( sysActionToken &&
                     sysActionToken instanceof Error === false ) {
 
-                  const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                                           logger );
+                  const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                               logger );
 
-                  const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                 currentTransaction,
-                                                                                                 logger ) ? "web" : "mobile";
+                  const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                     currentTransaction,
+                                                                                     logger ) ? "web" : "mobile";
 
-                  const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                 "url",
-                                                                                                 currentTransaction,
-                                                                                                 logger );
+                  const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                     "url",
+                                                                                     currentTransaction,
+                                                                                     logger );
 
                   const strExpireAtInTimeZone = expireAt ? SystemUtilities.transformToTimeZone( expireAt.format( CommonConstants._DATE_TIME_LONG_FORMAT_ISO8601_Millis ),
                                                                                                 context.TimeZoneId,
@@ -860,17 +859,17 @@ export default class UserEMailServiceController {
 
                     }
 
-                    const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
-                                                                                                             logger );
+                    const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                                 logger );
 
-                    const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                   currentTransaction,
-                                                                                                   logger ) ? "web" : "mobile";
+                    const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                       currentTransaction,
+                                                                                       logger ) ? "web" : "mobile";
 
-                    const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                   "url",
-                                                                                                   currentTransaction,
-                                                                                                   logger );
+                    const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                       "url",
+                                                                                       currentTransaction,
+                                                                                       logger );
 
                     if ( await NotificationManager.send(
                                                          "email",
@@ -885,6 +884,7 @@ export default class UserEMailServiceController {
                                                                    variables: {
                                                                                 user_name: sysUserInDB.Name,
                                                                                 user_email: CommonUtilities.maskEMailList( jsonExtraData.NewEMail ),
+                                                                                user_phone: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone ),
                                                                                 web_app_url: strWebAppURL,
                                                                                 ... configData
                                                                               }
@@ -1074,6 +1074,572 @@ export default class UserEMailServiceController {
       sourcePosition.method = this.name + "." + this.emailChange.name;
 
       const strMark = "00CBBF80A7C0" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  static async emailSimpleChange( request: Request,
+                                  transaction: any,
+                                  logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      if ( context.Authorization.startsWith( "p:" ) === false ) {
+
+        let userSessionStatus = context.UserSessionStatus;
+
+        let bUpdateSessionStatus = true;
+
+        let sysUserInDB = await SYSUserService.getById( userSessionStatus.UserId,
+                                                        null,
+                                                        currentTransaction,
+                                                        logger );
+
+        if ( sysUserInDB != null &&
+             sysUserInDB instanceof Error === false ) {
+
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "32FEF425E8FB" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "91658E4F8600" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the email", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", sysUserInDB.Name ),
+                       Mark: "E531328C6D41" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the email", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", sysUserInDB.Name ),
+                       Mark: "D17A4CBAB219" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the email", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( CommonUtilities.isValidEMailList( request.body.NewEMail ) === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_EMAIL_NOT_VALID_CHARS",
+                       Message: await I18NManager.translate( strLanguage, "The new email(s) [%s] contains invalid chars.", request.body.NewName ),
+                       Mark: "48C2CDC01F2E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_EMAIL_NOT_VALID_CHARS",
+                                   Message: await I18NManager.translate( strLanguage, "The new email(s) [%s] contains invalid chars.", request.body.NewName ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( request.body.NewEMail === sysUserInDB?.sysPerson?.EMail ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_EMAIL_NOT_VALID_IS_SAME",
+                       Message: await I18NManager.translate( strLanguage, "The new email(s) [%s] is invalid. Is the same to the current name", request.body.NewEMail ),
+                       Mark: "A8C2BC58DCB6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_EMAIL_NOT_VALID_IS_SAME",
+                                   Message: await I18NManager.translate( strLanguage, "The new email(s) [%s] is invalid. Is the same to the current name", request.body.NewEMail ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( await bcrypt.compare( strCurrentPassword, sysUserInDB.Password ) ) {
+
+              let sysPersonInDB = sysUserInDB.sysPerson;
+
+              if ( !sysPersonInDB ) {
+
+                sysPersonInDB = await SYSPersonService.createOrUpdate( {
+                                                                         Id: sysUserInDB.Id,
+                                                                         FirstName: sysUserInDB.Name,
+                                                                         EMail: request.body.NewEMail
+                                                                       },
+                                                                       true,
+                                                                       currentTransaction,
+                                                                       logger );
+
+                sysUserInDB = await SYSUserService.createOrUpdate( {
+                                                                     Id: sysUserInDB.Id,
+                                                                     PersonId: sysPersonInDB.Id
+                                                                   },
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger );
+
+              }
+              else {
+
+                sysPersonInDB.EMail = request.body.NewEMail;
+
+                sysPersonInDB = await SYSPersonService.createOrUpdate( ( sysPersonInDB as any ).dataValues,
+                                                                       true,
+                                                                       currentTransaction,
+                                                                       logger );
+
+              }
+
+              if ( sysUserInDB instanceof Error ) {
+
+                const error = sysUserInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "459B932C0EC6" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: error.logId,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.Message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( sysPersonInDB instanceof Error ) {
+
+                const error = sysPersonInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "39ED433D86A8" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: error.logId,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.Message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+              }
+              else {
+
+                const warnings = [];
+
+                if ( sysUserInDB.sysPerson &&
+                     CommonUtilities.isValidPhoneNumberList( sysUserInDB.sysPerson.Phone ) &&
+                     request.body.NotifyBySMS === 1 ) {
+
+                  if ( await NotificationManager.send(
+                                                       "sms",
+                                                       {
+                                                         to: sysUserInDB.sysPerson.Phone,
+                                                         //context: "AMERICA/NEW_YORK",
+                                                         foreign_data: `{ "user": ${sysUserInDB.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                         //device_id: "*",
+                                                         body: {
+                                                                 kind: "self",
+                                                                 text: await I18NManager.translate( strLanguage, "Email change to [%s] success!", sysUserInDB.sysPerson.EMail )
+                                                               }
+                                                       },
+                                                       logger
+                                                     ) === false ) {
+
+                    warnings.push(
+                                   {
+                                     Code: "WARNING_CANNOT_SEND_SMS",
+                                     Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                     Details: {
+                                                Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                              }
+                                   }
+                                 );
+
+                  }
+
+                }
+
+                if ( bUpdateSessionStatus ) {
+
+                  userSessionStatus.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+
+                  //ANCHOR update the session
+                  const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
+                                                                                                          userSessionStatus,
+                                                                                                          {
+                                                                                                            updateAt: true,        //Update the field updatedAt
+                                                                                                            setRoles: false,       //Set roles?
+                                                                                                            groupRoles: null,      //User group roles
+                                                                                                            userRoles: null,       //User roles
+                                                                                                            forceUpdate: true,     //Force update?
+                                                                                                            tryLock: 3,            //Only 1 try
+                                                                                                            lockSeconds: 3 * 1000, //Second
+                                                                                                          },
+                                                                                                          currentTransaction,
+                                                                                                          logger );
+
+                  if ( userSessionStatusUpdated instanceof Error ) {
+
+                    const error = userSessionStatusUpdated as any;
+
+                    warnings.push(
+                                    {
+                                      Code: error.name,
+                                      Message: error.message,
+                                      Details: await SystemUtilities.processErrorDetails( error )
+                                    }
+                                  );
+
+                    warnings.push(
+                                    {
+                                      Code: "WARNING_FAILED_UPDATE_USER_DATA_SESSION",
+                                      Message: await I18NManager.translate( strLanguage, "Failed to update the user session status. You are required to close the session and start another" ),
+                                      Details: null
+                                    }
+                                  );
+
+                  }
+
+                }
+
+                result = {
+                            StatusCode: 200, //Ok
+                            Code: "SUCCESS_EMAIL_CHANGE",
+                            Message: await I18NManager.translate( strLanguage, "Success to change the user email." ),
+                            Mark: "1D5A028EE4D1" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                            LogId: null,
+                            IsError: false,
+                            Errors: [],
+                            Warnings: warnings,
+                            Count: 0,
+                            Data: []
+                          }
+
+                bApplyTransaction = true;
+
+                if ( sysUserInDB.sysPerson &&
+                     CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) &&
+                     request.body.NotifyByEMail === 1 ) {
+
+                  const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                               logger );
+
+                  const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                     currentTransaction,
+                                                                                     logger ) ? "web" : "mobile";
+
+                  const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                     "url",
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+                  await NotificationManager.send(
+                                                  "email",
+                                                  {
+                                                    from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                    to: sysUserInDB.sysPerson.EMail,
+                                                    subject: await I18NManager.translate( strLanguage, "USER EMAIL CHANGE SUCCESS" ),
+                                                    body: {
+                                                            kind: "template",
+                                                            file: `email-user-email-change-success-${strTemplateKind}.pug`,
+                                                            language: context.Language,
+                                                            variables: {
+                                                                          user_name: sysUserInDB.Name,
+                                                                          user_email: CommonUtilities.maskEMailList( sysUserInDB.sysPerson.EMail ),
+                                                                          user_phone: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone ),
+                                                                          web_app_url: strWebAppURL,
+                                                                          ... configData
+                                                                        }
+                                                            //kind: "embedded",
+                                                            //text: "Hello",
+                                                            //html: "<b>Hello</b>"
+                                                          }
+                                                  },
+                                                  logger
+                                                );
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "867F6D601E4C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                     Mark: "59B5AB7F8094" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made change password" ),
+                   Mark: "B829C8F41202" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change password" ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.emailSimpleChange.name;
+
+      const strMark = "D0558C292157" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
 
       const debugMark = debug.extend( strMark );
 

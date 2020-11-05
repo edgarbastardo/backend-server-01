@@ -325,11 +325,12 @@ export default class UserCreateServiceController {
             else if ( !sysUserGroupInDB &&
                       request.body.sysUserGroup.Create === false ) {
 
-              const strMessage = await UserOthersServiceController.getMessageUserGroup( strLanguage, {
-                                                                                                       Id: request.body.sysUserGroup.Id,
-                                                                                                       ShortId: request.body.sysUserGroup.ShortId,
-                                                                                                       Name: request.body.sysUserGroup.Name
-                                                                                                     } );
+              const strMessage = await UserOthersServiceController.getMessageUserGroup( strLanguage,
+                                                                                        {
+                                                                                          Id: request.body.sysUserGroup.Id,
+                                                                                          ShortId: request.body.sysUserGroup.ShortId,
+                                                                                          Name: request.body.sysUserGroup.Name
+                                                                                        } );
 
               result = {
                          StatusCode: 404, //Not found
@@ -629,17 +630,17 @@ export default class UserCreateServiceController {
                       if ( transportList.includes( "email" ) ) {
 
                         //ANCHOR send email success
-                        const configData = await UserOthersServiceController.getConfigGeneralDefaultInformation( currentTransaction,
+                        const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
                                                                                                                  logger );
 
-                        const strTemplateKind = await UserOthersServiceController.isWebFrontendClient( context.FrontendId,
-                                                                                                       currentTransaction,
-                                                                                                       logger ) ? "web" : "mobile";
+                        const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                           currentTransaction,
+                                                                                           logger ) ? "web" : "mobile";
 
-                        const strWebAppURL = await UserOthersServiceController.getConfigFrontendRules( context.FrontendId,
-                                                                                                       "url",
-                                                                                                       currentTransaction,
-                                                                                                       logger );
+                        const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                           "url",
+                                                                                           currentTransaction,
+                                                                                           logger );
 
                         if ( await NotificationManager.send(
                                                              "email",

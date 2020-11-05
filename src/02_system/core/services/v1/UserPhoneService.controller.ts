@@ -1086,4 +1086,572 @@ export default class UserPhoneServiceController {
 
   }
 
+  static async phoneNumberSimpleChange( request: Request,
+                                        transaction: any,
+                                        logger: any ): Promise<any> {
+
+    let result = null;
+
+    let currentTransaction = transaction;
+
+    let bIsLocalTransaction = false;
+
+    let bApplyTransaction = false;
+
+    let strLanguage = "";
+
+    try {
+
+      const context = ( request as any ).context;
+
+      strLanguage = context.Language;
+
+      const dbConnection = DBConnectionManager.getDBConnection( "master" );
+
+      if ( currentTransaction === null ) {
+
+        currentTransaction = await dbConnection.transaction();
+
+        bIsLocalTransaction = true;
+
+      }
+
+      if ( context.Authorization.startsWith( "p:" ) === false ) {
+
+        let userSessionStatus = context.UserSessionStatus;
+
+        let bUpdateSessionStatus = true;
+
+        let sysUserInDB = await SYSUserService.getById( userSessionStatus.UserId,
+                                                        null,
+                                                        currentTransaction,
+                                                        logger );
+
+        if ( sysUserInDB != null &&
+             sysUserInDB instanceof Error === false ) {
+
+          if ( await SYSUserGroupService.checkDisabledByName( sysUserInDB.sysUserGroup.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "52F70409298B" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is disabled. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserGroupService.checkExpiredByName( sysUserInDB.sysUserGroup.Name,
+                                                                  currentTransaction,
+                                                                  logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_GROUP_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                       Mark: "D999FB446F2D" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_GROUP_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user group %s is expired. You cannot change the phone number", sysUserInDB.sysUserGroup.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkDisabledByName( sysUserInDB.Name,
+                                                              currentTransaction,
+                                                              logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_DISABLED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
+                       Mark: "F07A0A4BCBF2" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_DISABLED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is disabled. You cannot change the phone number", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( await SYSUserService.checkExpiredByName( sysUserInDB.Name,
+                                                             currentTransaction,
+                                                             logger ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_USER_EXPIRED",
+                       Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
+                       Mark: "522D4BD0D80E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_USER_EXPIRED",
+                                   Message: await I18NManager.translate( strLanguage, "The user %s is expired. You cannot change the phone number", sysUserInDB.Name ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( CommonUtilities.isValidPhoneNumberList( request.body.NewPhone ) === false ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_PHONE_NOT_VALID_CHARS",
+                       Message: await I18NManager.translate( strLanguage, "The new phone(s) [%s] contains invalid chars.", request.body.NewName ),
+                       Mark: "F03C7889143F" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_PHONE_NOT_VALID_CHARS",
+                                   Message: await I18NManager.translate( strLanguage, "The new phone(s) [%s] contains invalid chars.", request.body.NewName ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else if ( request.body.NewPhone.replace( new RegExp( "-", "g" ), "" ) === sysUserInDB?.sysPerson?.Phone?.replace( new RegExp( "-", "g" ), "" ) ) {
+
+            result = {
+                       StatusCode: 400, //Bad request
+                       Code: "ERROR_NEW_PHONE_NOT_VALID_IS_SAME",
+                       Message: await I18NManager.translate( strLanguage, "The new phones(s) [%s] is invalid. Is the same to the current name", request.body.NewEMail ),
+                       Mark: "BCBF0ED3E2A5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                       LogId: null,
+                       IsError: true,
+                       Errors: [
+                                 {
+                                   Code: "ERROR_NEW_PHONE_NOT_VALID_IS_SAME",
+                                   Message: await I18NManager.translate( strLanguage, "The new phones(s) [%s] is invalid. Is the same to the current name", request.body.NewEMail ),
+                                   Details: null
+                                 }
+                               ],
+                       Warnings: [],
+                       Count: 0,
+                       Data: []
+                     }
+
+          }
+          else {
+
+            const strCurrentPassword = request.body.CurrentPassword;
+
+            if ( await bcrypt.compare( strCurrentPassword, sysUserInDB.Password ) ) {
+
+              request.body.NewPhone = CommonUtilities.formatPhoneNumber( request.body.NewPhone );
+
+              let sysPersonInDB = sysUserInDB.sysPerson;
+
+              if ( !sysPersonInDB ) {
+
+                sysPersonInDB = await SYSPersonService.createOrUpdate( {
+                                                                         Id: sysUserInDB.Id,
+                                                                         FirstName: sysUserInDB.Name,
+                                                                         Phone: request.body.NewPhone
+                                                                       },
+                                                                       true,
+                                                                       currentTransaction,
+                                                                       logger );
+
+                sysUserInDB = await SYSUserService.createOrUpdate( {
+                                                                     Id: sysUserInDB.Id,
+                                                                     PersonId: sysPersonInDB.Id
+                                                                   },
+                                                                   true,
+                                                                   currentTransaction,
+                                                                   logger );
+
+              }
+              else {
+
+                sysPersonInDB.Phone = request.body.NewPhone;
+
+                sysPersonInDB = await SYSPersonService.createOrUpdate( ( sysPersonInDB as any ).dataValues,
+                                                                       true,
+                                                                       currentTransaction,
+                                                                       logger );
+
+              }
+
+              if ( sysUserInDB instanceof Error ) {
+
+                const error = sysUserInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "3F88066B6F1C" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: error.logId,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.Message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+
+              }
+              else if ( sysPersonInDB instanceof Error ) {
+
+                const error = sysPersonInDB as any;
+
+                result = {
+                           StatusCode: 500, //Internal server error
+                           Code: "ERROR_UNEXPECTED",
+                           Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                           Mark: "9E789C86434E" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: error.logId,
+                           IsError: true,
+                           Errors: [
+                                     {
+                                       Code: error.name,
+                                       Message: error.Message,
+                                       Details: await SystemUtilities.processErrorDetails( error ) //error
+                                     }
+                                   ],
+                           Warnings: [],
+                           Count: 0,
+                           Data: []
+                         }
+              }
+              else {
+
+                const warnings = [];
+
+                if ( sysUserInDB.sysPerson &&
+                     CommonUtilities.isValidPhoneNumberList( sysUserInDB.sysPerson.Phone ) &&
+                     request.body.NotifyBySMS === 1 ) {
+
+                  if ( await NotificationManager.send(
+                                                       "sms",
+                                                       {
+                                                         to: sysUserInDB.sysPerson.Phone,
+                                                         //context: "AMERICA/NEW_YORK",
+                                                         foreign_data: `{ "user": ${sysUserInDB.Name || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET}  }`,
+                                                         //device_id: "*",
+                                                         body: {
+                                                                 kind: "self",
+                                                                 text: await I18NManager.translate( strLanguage, "Phone number change to [%s] success!", sysUserInDB.sysPerson.Phone )
+                                                               }
+                                                       },
+                                                       logger
+                                                     ) === false ) {
+
+                    warnings.push(
+                                   {
+                                     Code: "WARNING_CANNOT_SEND_SMS",
+                                     Message: await I18NManager.translate( strLanguage, "Cannot send the notification sms to the user" ),
+                                     Details: {
+                                                Reason: await I18NManager.translate( strLanguage, "The transport returned false" )
+                                              }
+                                   }
+                                 );
+
+                  }
+
+                }
+
+                if ( bUpdateSessionStatus ) {
+
+                  userSessionStatus.UpdatedBy = userSessionStatus.UserName || SystemConstants._CREATED_BY_BACKEND_SYSTEM_NET;
+
+                  //ANCHOR update the session
+                  const userSessionStatusUpdated = await SystemUtilities.createOrUpdateUserSessionStatus( context.Authorization,
+                                                                                                          userSessionStatus,
+                                                                                                          {
+                                                                                                            updateAt: true,        //Update the field updatedAt
+                                                                                                            setRoles: false,       //Set roles?
+                                                                                                            groupRoles: null,      //User group roles
+                                                                                                            userRoles: null,       //User roles
+                                                                                                            forceUpdate: true,     //Force update?
+                                                                                                            tryLock: 3,            //Only 1 try
+                                                                                                            lockSeconds: 3 * 1000, //Second
+                                                                                                          },
+                                                                                                          currentTransaction,
+                                                                                                          logger );
+
+                  if ( userSessionStatusUpdated instanceof Error ) {
+
+                    const error = userSessionStatusUpdated as any;
+
+                    warnings.push(
+                                    {
+                                      Code: error.name,
+                                      Message: error.message,
+                                      Details: await SystemUtilities.processErrorDetails( error )
+                                    }
+                                  );
+
+                    warnings.push(
+                                    {
+                                      Code: "WARNING_FAILED_UPDATE_USER_DATA_SESSION",
+                                      Message: await I18NManager.translate( strLanguage, "Failed to update the user session status. You are required to close the session and start another" ),
+                                      Details: null
+                                    }
+                                  );
+
+                  }
+
+                }
+
+                result = {
+                           StatusCode: 200, //Ok
+                           Code: "SUCCESS_PHONE_NUMBER_CHANGE",
+                           Message: await I18NManager.translate( strLanguage, "Success to change the user phone number." ),
+                           Mark: "CBD884BE0D54" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                           LogId: null,
+                           IsError: false,
+                           Errors: [],
+                           Warnings: warnings,
+                           Count: 0,
+                           Data: []
+                         }
+
+                bApplyTransaction = true;
+
+                if ( sysUserInDB.sysPerson &&
+                     CommonUtilities.isValidEMailList( sysUserInDB.sysPerson.EMail ) &&
+                     request.body.NotifyByEMail === 1 ) {
+
+                  const configData = await SystemUtilities.getConfigGeneralDefaultInformation( currentTransaction,
+                                                                                               logger );
+
+                  const strTemplateKind = await SystemUtilities.isWebFrontendClient( context.FrontendId,
+                                                                                     currentTransaction,
+                                                                                     logger ) ? "web" : "mobile";
+
+                  const strWebAppURL = await SystemUtilities.getConfigFrontendRules( context.FrontendId,
+                                                                                     "url",
+                                                                                     currentTransaction,
+                                                                                     logger );
+
+                  await NotificationManager.send(
+                                                  "email",
+                                                  {
+                                                    from: configData[ "no_response_email" ] || "no-response@no-response.com",
+                                                    to: sysUserInDB.sysPerson.EMail,
+                                                    subject: await I18NManager.translate( strLanguage, "USER PHONE NUMBER CHANGE SUCCESS" ),
+                                                    body: {
+                                                            kind: "template",
+                                                            file: `email-user-phone-change-success-${strTemplateKind}.pug`,
+                                                            language: context.Language,
+                                                            variables: {
+                                                                         user_name: sysUserInDB.Name,
+                                                                         user_email: CommonUtilities.maskEMailList( sysUserInDB.sysPerson.EMail ),
+                                                                         user_phone: CommonUtilities.maskPhoneList( sysUserInDB.sysPerson.Phone ),
+                                                                         web_app_url: strWebAppURL,
+                                                                         ... configData
+                                                                       }
+                                                            //kind: "embedded",
+                                                            //text: "Hello",
+                                                            //html: "<b>Hello</b>"
+                                                          }
+                                                  },
+                                                  logger
+                                                );
+
+                }
+
+              }
+
+            }
+            else {
+
+              result = {
+                         StatusCode: 401, //Unauthorized
+                         Code: "ERROR_WRONG_PASSWORD",
+                         Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                         Mark: "#73D358#5449E7" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                         LogId: null,
+                         IsError: true,
+                         Errors: [
+                                   {
+                                     Code: "ERROR_WRONG_PASSWORD",
+                                     Message: await I18NManager.translate( strLanguage, "Your current password not match" ),
+                                     Details: null,
+                                   }
+                                 ],
+                         Warnings: [],
+                         Count: 0,
+                         Data: []
+                       }
+
+            }
+
+          }
+
+        }
+        else {
+
+          result = {
+                     StatusCode: 404, //Not found
+                     Code: "ERROR_USER_NOT_FOUND",
+                     Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                     Mark: "71B7B828DDE5" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                     LogId: null,
+                     IsError: true,
+                     Errors: [
+                               {
+                                 Code: "ERROR_USER_NOT_FOUND",
+                                 Message: await I18NManager.translate( strLanguage, "The user %s not found in database", userSessionStatus.UserName ),
+                                 Details: null,
+                               }
+                             ],
+                     Warnings: [],
+                     Count: 0,
+                     Data: []
+                   }
+
+        }
+
+      }
+      else {
+
+        result = {
+                   StatusCode: 400, //Bad request
+                   Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                   Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot made change password" ),
+                   Mark: "2E59BB547964" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" ),
+                   LogId: null,
+                   IsError: true,
+                   Errors: [
+                             {
+                               Code: "ERROR_AUTHORIZATION_TOKEN_IS_PERSISTENT",
+                               Message: await I18NManager.translate( strLanguage, "Authorization token provided is persistent. You cannot change password" ),
+                               Details: null
+                             }
+                           ],
+                   Warnings: [],
+                   Count: 0,
+                   Data: []
+                };
+
+      }
+
+      if ( currentTransaction !== null &&
+           currentTransaction.finished !== "rollback" &&
+           bIsLocalTransaction ) {
+
+        if ( bApplyTransaction ) {
+
+          await currentTransaction.commit();
+
+        }
+        else {
+
+          await currentTransaction.rollback();
+
+        }
+
+      }
+
+    }
+    catch ( error ) {
+
+      const sourcePosition = CommonUtilities.getSourceCodePosition( 1 );
+
+      sourcePosition.method = this.name + "." + this.phoneNumberSimpleChange.name;
+
+      const strMark = "2BC6948C43D9" + ( cluster.worker && cluster.worker.id ? "-" + cluster.worker.id : "" );
+
+      const debugMark = debug.extend( strMark );
+
+      debugMark( "Error message: [%s]", error.message ? error.message : "No error message available" );
+      debugMark( "Error time: [%s]", SystemUtilities.getCurrentDateAndTime().format( CommonConstants._DATE_TIME_LONG_FORMAT_01 ) );
+      debugMark( "Catched on: %O", sourcePosition );
+
+      error.mark = strMark;
+      error.logId = SystemUtilities.getUUIDv4();
+
+      if ( logger && typeof logger.error === "function" ) {
+
+        error.catchedOn = sourcePosition;
+        logger.error( error );
+
+      }
+
+      result = {
+                 StatusCode: 500, //Internal server error
+                 Code: "ERROR_UNEXPECTED",
+                 Message: await I18NManager.translate( strLanguage, "Unexpected error. Please read the server log for more details." ),
+                 Mark: strMark,
+                 LogId: error.logId,
+                 IsError: true,
+                 Errors: [
+                           {
+                             Code: error.name,
+                             Message: error.message,
+                             Details: await SystemUtilities.processErrorDetails( error ) //error
+                           }
+                         ],
+                 Warnings: [],
+                 Count: 0,
+                 Data: []
+               };
+
+      if ( currentTransaction !== null &&
+           bIsLocalTransaction ) {
+
+        try {
+
+          await currentTransaction.rollback();
+
+        }
+        catch ( error ) {
+
+
+        }
+
+      }
+
+    }
+
+    return result;
+
+  }
+
 }
