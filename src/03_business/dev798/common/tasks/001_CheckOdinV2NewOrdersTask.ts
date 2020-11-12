@@ -485,8 +485,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             if ( !orderInDB ) {
 
-              if ( !deliveryOrderData.bizDestination.Tag ||
-                   deliveryOrderData.bizDestination.Tag.indexOf( "#ADDRESS_ERROR#" ) === -1 ) {
+              // if ( !deliveryOrderData.bizDestination.Tag ||
+              //      deliveryOrderData.bizDestination.Tag.indexOf( "#ADDRESS_ERROR#" ) === -1 ) {
 
                 let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
                                                                                null,
@@ -883,42 +883,54 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                           if ( deliveryInDB instanceof Error === false ) {
 
-                            let ticketImageInDB = await ticket_imagesService.createOrUpdate(
-                                                                                             {
-                                                                                               id: deliveryOrderData.Images[ 0 ].Id,
-                                                                                               order_id: orderInDB.id,
-                                                                                               image: null,
-                                                                                               migrated: 2,
-                                                                                               url: "@__baseurl__@?id="+deliveryOrderData.Images[ 0 ].Image+"&auth=@__auth__@&thumbnail=0",
-                                                                                               lock: null,
-                                                                                               created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[0].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                             },
-                                                                                             false,
-                                                                                             currentTransaction,
-                                                                                             logger
-                                                                                           ) as any;
+                            let intImages = deliveryOrderData.Images.length - 1;
 
-                            if ( ticketImageInDB instanceof Error === false ) {
+                            for ( let i = 0 ; i <= intImages; i++) {
 
-                              const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
+                              let ticketImageInDB = await ticket_imagesService.createOrUpdate(
+                                                                                              {
+                                                                                                id: deliveryOrderData.Images[ i ].Id,
+                                                                                                order_id: orderInDB.id,
+                                                                                                image: null,
+                                                                                                migrated: 2,
+                                                                                                url: "@__baseurl__@?id="+deliveryOrderData.Images[ i ].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                                lock: null,
+                                                                                                created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[i].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                              },
+                                                                                              false,
+                                                                                              currentTransaction,
+                                                                                              logger
+                                                                                            ) as any;
 
-                              debugMark( "MESSAGE: " + strMessage );
+                              if ( ticketImageInDB instanceof Error === false ) {
 
-                              bApplyTransaction = true;
+                                if ( i === intImages ) {
 
-                              bResult = true;
+                                  const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
 
-                              bUpdateDeliveryOrderExportedMark = true;
+                                  debugMark( "MESSAGE: " + strMessage );
 
-                            }
-                            else { //error creation of ticketImage
+                                  bApplyTransaction = true;
 
-                              bUpdateDeliveryOrderExportedMark = true;
+                                  bResult = true;
 
-                              await this.formatMessageError01( deliveryOrderData.Id,
-                                                               deliveryOrderData.LastExported,
-                                                               ticketImageInDB as Error,
-                                                               logger );
+                                  bUpdateDeliveryOrderExportedMark = true;
+
+                                }
+
+                              }
+                              else { //error creation of ticketImage
+
+                                i = intImages;
+
+                                bUpdateDeliveryOrderExportedMark = true;
+
+                                await this.formatMessageError01( deliveryOrderData.Id,
+                                                                deliveryOrderData.LastExported,
+                                                                ticketImageInDB as Error,
+                                                                logger );
+
+                              }
 
                             }
 
@@ -1026,34 +1038,34 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                 }
 
-              }
-              else {
+              // }
+              // else {
 
-                const strMessage = util.format( "The delivery order with id [%s]. Has #Address_Error# tag.", deliveryOrderData.Id );
+              //   const strMessage = util.format( "The delivery order with id [%s]. Has #Address_Error# tag.", deliveryOrderData.Id );
 
-                debugMark( "ERROR: " + strMessage );
+              //   debugMark( "ERROR: " + strMessage );
 
-                if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
-                                               SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
-                                               CheckOdinV2NewOrdersTask_001.lastExternalNotification,
-                                               deliveryOrderData.LastExported !== null ) ) {
+              //   if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+              //                                  SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+              //                                  CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+              //                                  deliveryOrderData.LastExported !== null ) ) {
 
-                  if ( logger &&
-                       logger.error === "function" ) {
+              //     if ( logger &&
+              //          logger.error === "function" ) {
 
-                    logger.error( new Error( strMessage ) );
+              //       logger.error( new Error( strMessage ) );
 
-                  }
+              //     }
 
-                  await this.notifyToExternal( "error", strMessage );
+              //     await this.notifyToExternal( "error", strMessage );
 
-                  bUpdateDeliveryOrderExportedMark = true;
+              //     bUpdateDeliveryOrderExportedMark = true;
 
-                  CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+              //     CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
-                }
+              //   }
 
-              }
+              // }
 
             }
             else if ( orderInDB instanceof Error ) {
