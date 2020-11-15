@@ -752,49 +752,49 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                       if ( orderInDB instanceof Error === false ) {
 
-                        let driverInDB = await driversService.getById( deliveryOrderData.UserId,
-                                                                       null,
-                                                                       currentTransaction,
-                                                                       logger ) as any;
+                        let userDriverInDB = await usersService.getByEmail( deliveryOrderData.sysUser.Name,
+                                                                            null,
+                                                                            currentTransaction,
+                                                                            logger ) as any;
 
-                        if ( driverInDB === null ) { //driver does not exist create it
+                        if ( userDriverInDB === null ) { //does not exist this user-driver create a new
 
-                          let userDriverInDB = await usersService.getById( deliveryOrderData.sysUser.Id,
-                                                                           null,
-                                                                           currentTransaction,
-                                                                           logger ) as any;
+                          let strPassword = deliveryOrderData.sysUser.Password;
 
-                          if ( userDriverInDB === null ) { //does not exist this user-driver create a new
+                          strPassword =  strPassword.replace( "$2b$10$", "$2y$10$" );
 
-                            let strPassword = deliveryOrderData.sysUser.Password;
+                          let strShortName = deliveryOrderData.sysUser.sysPerson.FirstName?.substring( 0, 2 ) +
+                                             deliveryOrderData.sysUser.sysPerson.LastName?.substring( 0, 2 );
 
-                            strPassword =  strPassword.replace( "$2b$10$", "$2y$10$" );
+                          userDriverInDB = await usersService.createOrUpdate(
+                                                                              {
+                                                                                id: deliveryOrderData.sysUser.Id,
+                                                                                first_name: deliveryOrderData.sysUser.sysPerson.FirstName,
+                                                                                last_name: deliveryOrderData.sysUser.sysPerson.LastName,
+                                                                                short_name: strShortName,
+                                                                                phone: deliveryOrderData.sysUser.sysPerson.Phone,
+                                                                                email: deliveryOrderData.sysUser.Name,
+                                                                                password: strPassword,
+                                                                                role: "driver",
+                                                                                restriction: "",
+                                                                                created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                              },
+                                                                              null,
+                                                                              currentTransaction,
+                                                                              logger
+                                                                            );
 
-                            let strShortName = deliveryOrderData.sysUser.sysPerson.FirstName?.substring( 0, 2 ) +
-                                               deliveryOrderData.sysUser.sysPerson.LastName?.substring( 0, 2 );
+                        }
 
-                            userDriverInDB = await usersService.createOrUpdate(
-                                                                                {
-                                                                                  id: deliveryOrderData.sysUser.Id,
-                                                                                  first_name: deliveryOrderData.sysUser.sysPerson.FirstName,
-                                                                                  last_name: deliveryOrderData.sysUser.sysPerson.LastName,
-                                                                                  short_name: strShortName,
-                                                                                  phone: deliveryOrderData.sysUser.sysPerson.Phone,
-                                                                                  email: deliveryOrderData.sysUser.Name,
-                                                                                  password: strPassword,
-                                                                                  role: "driver",
-                                                                                  restriction: "",
-                                                                                  created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                  updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                                },
-                                                                                null,
-                                                                                currentTransaction,
-                                                                                logger
-                                                                              );
+                        if ( userDriverInDB instanceof Error === false ) {
 
-                          }
+                          let driverInDB = await driversService.getByUserId( userDriverInDB.id,
+                                                                             null,
+                                                                             currentTransaction,
+                                                                             logger ) as any;
 
-                          if ( userDriverInDB instanceof Error === false ) {
+                          if ( driverInDB === null ) { //driver does not exist create it
 
                             driverInDB = await driversService.createOrUpdate(
                                                                               {
@@ -815,145 +815,145 @@ export default class CheckOdinV2NewOrdersTask_001 {
                                                                             );
 
                           }
-                          else {  //error creation of user-driver
 
-                            bUpdateDeliveryOrderExportedMark = true;
+                          if ( driverInDB instanceof Error === false ) {
 
-                            await this.formatMessageError01( deliveryOrderData.Id,
-                                                             deliveryOrderData.LastExported,
-                                                             userDriverInDB as Error,
-                                                             logger );
+                            let strTipMethod = "";
+                            let strTipMethod1 = "";
+                            let strTipMethod2 = "";
+                            let dblTip = 0;
+                            let dblTip1 = 0;
+                            let dblTip2 = 0;
 
-                          }
+                            if ( tipPayment.length >= 2 ) {
 
-                        }
+                              strTipMethod = "mixed";
 
-                        if ( driverInDB instanceof Error === false ) {
+                              dblTip1 = Number.parseFloat( tipPayment[ 0 ].Amount );
 
-                          let strTipMethod = "";
-                          let strTipMethod1 = "";
-                          let strTipMethod2 = "";
-                          let dblTip = 0;
-                          let dblTip1 = 0;
-                          let dblTip2 = 0;
+                              dblTip2 = Number.parseFloat( tipPayment[ 1 ].Amount );
 
-                          if ( tipPayment.length >= 2 ) {
+                              dblTip = dblTip1 + dblTip2;
 
-                            strTipMethod = "mixed";
+                              strTipMethod1 = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
 
-                            dblTip1 = Number.parseFloat( tipPayment[ 0 ].Amount );
+                              strTipMethod2 = paymentMethodforOdinV1( tipPayment[ 1 ].bizPaymentMethod.Id );
 
-                            dblTip2 = Number.parseFloat( tipPayment[ 1 ].Amount );
+                            }
+                            else if ( tipPayment.length === 1 ) {
 
-                            dblTip = dblTip1 + dblTip2;
+                              strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
 
-                            strTipMethod1 = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
+                              dblTip = Number.parseFloat( tipPayment[ 0 ].Amount );
 
-                            strTipMethod2 = paymentMethodforOdinV1( tipPayment[ 1 ].bizPaymentMethod.Id );
+                            }
 
-                          }
-                          else if ( tipPayment.length === 1 ) {
+                            let deliveryInDB = await deliveriesService.createOrUpdate(
+                                                                                      {
+                                                                                        id: SystemUtilities.getUUIDv4(),
+                                                                                        order_id: orderInDB.id,
+                                                                                        driver_id: driverInDB.id,
+                                                                                        establishment_id: establishmentInDB.id,
+                                                                                        qualification: 0,
+                                                                                        tip1: dblTip1,
+                                                                                        tip2: dblTip2,
+                                                                                        tip: dblTip,
+                                                                                        tip_method: strTipMethod,
+                                                                                        tip_method1: strTipMethod1,
+                                                                                        tip_method2: strTipMethod2,
+                                                                                        created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                        updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
+                                                                                      },
+                                                                                      false,
+                                                                                      currentTransaction,
+                                                                                      logger
+                                                                                    ) as any;
 
-                            strTipMethod = paymentMethodforOdinV1( tipPayment[ 0 ].bizPaymentMethod.Id );
+                            if ( deliveryInDB instanceof Error === false ) {
 
-                            dblTip = Number.parseFloat( tipPayment[ 0 ].Amount );
+                              let intImages = deliveryOrderData.Images.length - 1;
 
-                          }
+                              for ( let i = 0 ; i <= intImages; i++) {
 
-                          let deliveryInDB = await deliveriesService.createOrUpdate(
-                                                                                     {
-                                                                                       id: SystemUtilities.getUUIDv4(),
-                                                                                       order_id: orderInDB.id,
-                                                                                       driver_id: driverInDB.id,
-                                                                                       establishment_id: establishmentInDB.id,
-                                                                                       qualification: 0,
-                                                                                       tip1: dblTip1,
-                                                                                       tip2: dblTip2,
-                                                                                       tip: dblTip,
-                                                                                       tip_method: strTipMethod,
-                                                                                       tip_method1: strTipMethod1,
-                                                                                       tip_method2: strTipMethod2,
-                                                                                       created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                       updated_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 )
-                                                                                     },
-                                                                                     false,
-                                                                                     currentTransaction,
-                                                                                     logger
-                                                                                   ) as any;
+                                let ticketImageInDB = await ticket_imagesService.createOrUpdate(
+                                                                                                {
+                                                                                                  id: deliveryOrderData.Images[ i ].Id,
+                                                                                                  order_id: orderInDB.id,
+                                                                                                  image: null,
+                                                                                                  migrated: 2,
+                                                                                                  url: "@__baseurl__@?id="+deliveryOrderData.Images[ i ].Image+"&auth=@__auth__@&thumbnail=0",
+                                                                                                  lock: null,
+                                                                                                  created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[i].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
+                                                                                                },
+                                                                                                false,
+                                                                                                currentTransaction,
+                                                                                                logger
+                                                                                              ) as any;
 
-                          if ( deliveryInDB instanceof Error === false ) {
+                                if ( ticketImageInDB instanceof Error === false ) {
 
-                            let intImages = deliveryOrderData.Images.length - 1;
+                                  if ( i === intImages ) {
 
-                            for ( let i = 0 ; i <= intImages; i++) {
+                                    const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
 
-                              let ticketImageInDB = await ticket_imagesService.createOrUpdate(
-                                                                                              {
-                                                                                                id: deliveryOrderData.Images[ i ].Id,
-                                                                                                order_id: orderInDB.id,
-                                                                                                image: null,
-                                                                                                migrated: 2,
-                                                                                                url: "@__baseurl__@?id="+deliveryOrderData.Images[ i ].Image+"&auth=@__auth__@&thumbnail=0",
-                                                                                                lock: null,
-                                                                                                created_at: SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.Images[i].CreatedAt ).format( CommonConstants._DATE_TIME_LONG_FORMAT_05 ),
-                                                                                              },
-                                                                                              false,
-                                                                                              currentTransaction,
-                                                                                              logger
-                                                                                            ) as any;
+                                    debugMark( "MESSAGE: " + strMessage );
 
-                              if ( ticketImageInDB instanceof Error === false ) {
+                                    bApplyTransaction = true;
 
-                                if ( i === intImages ) {
+                                    bResult = true;
 
-                                  const strMessage = util.format( "Sucess import delivery order with id [%s]", deliveryOrderData.Id );
+                                    bUpdateDeliveryOrderExportedMark = true;
 
-                                  debugMark( "MESSAGE: " + strMessage );
+                                  }
 
-                                  bApplyTransaction = true;
+                                }
+                                else { //error creation of ticketImage
 
-                                  bResult = true;
+                                  i = intImages;
 
                                   bUpdateDeliveryOrderExportedMark = true;
+
+                                  await this.formatMessageError01( deliveryOrderData.Id,
+                                                                  deliveryOrderData.LastExported,
+                                                                  ticketImageInDB as Error,
+                                                                  logger );
 
                                 }
 
                               }
-                              else { //error creation of ticketImage
 
-                                i = intImages;
+                            }
+                            else { //error creation of delivery
 
-                                bUpdateDeliveryOrderExportedMark = true;
+                              bUpdateDeliveryOrderExportedMark = true;
 
-                                await this.formatMessageError01( deliveryOrderData.Id,
-                                                                deliveryOrderData.LastExported,
-                                                                ticketImageInDB as Error,
-                                                                logger );
-
-                              }
+                              await this.formatMessageError01( deliveryOrderData.Id,
+                                                              deliveryOrderData.LastExported,
+                                                              deliveryInDB as Error,
+                                                              logger );
 
                             }
 
                           }
-                          else { //error creation of delivery
+                          else {  //error creation of driver
 
                             bUpdateDeliveryOrderExportedMark = true;
 
                             await this.formatMessageError01( deliveryOrderData.Id,
-                                                             deliveryOrderData.LastExported,
-                                                             deliveryInDB as Error,
-                                                             logger );
+                                                            deliveryOrderData.LastExported,
+                                                            driverInDB as Error,
+                                                            logger );
 
                           }
 
                         }
-                        else {  //error creation of driver
+                        else {  //error creation of user-driver
 
                           bUpdateDeliveryOrderExportedMark = true;
 
                           await this.formatMessageError01( deliveryOrderData.Id,
                                                            deliveryOrderData.LastExported,
-                                                           driverInDB as Error,
+                                                           userDriverInDB as Error,
                                                            logger );
 
                         }
