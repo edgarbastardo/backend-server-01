@@ -485,8 +485,8 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
             if ( !orderInDB ) {
 
-              // if ( !deliveryOrderData.bizDestination.Tag ||
-              //      deliveryOrderData.bizDestination.Tag.indexOf( "#ADDRESS_ERROR#" ) === -1 ) {
+              if ( !deliveryOrderData.bizDestination.Tag ||
+                   deliveryOrderData.bizDestination.Tag.indexOf( "#TEST#" ) === -1 ) {
 
                 let userEstablishmentInDB = await usersService.getByFirstName( deliveryOrderData.bizOrigin.Name,
                                                                                null,
@@ -1038,34 +1038,34 @@ export default class CheckOdinV2NewOrdersTask_001 {
 
                 }
 
-              // }
-              // else {
+              }
+              else {
 
-              //   const strMessage = util.format( "The delivery order with id [%s]. Has #Address_Error# tag.", deliveryOrderData.Id );
+                const strMessage = util.format( "The delivery order with id [%s]. Has #TEST# tag.", deliveryOrderData.Id );
 
-              //   debugMark( "ERROR: " + strMessage );
+                debugMark( "ERROR: " + strMessage );
 
-              //   if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
-              //                                  SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
-              //                                  CheckOdinV2NewOrdersTask_001.lastExternalNotification,
-              //                                  deliveryOrderData.LastExported !== null ) ) {
+                if ( this.canNotifyToExternal( deliveryOrderData.LastExported ?
+                                               SystemUtilities.getCurrentDateAndTimeFrom( deliveryOrderData.LastExported ):
+                                               CheckOdinV2NewOrdersTask_001.lastExternalNotification,
+                                               deliveryOrderData.LastExported !== null ) ) {
 
-              //     if ( logger &&
-              //          logger.error === "function" ) {
+                  if ( logger &&
+                       logger.error === "function" ) {
 
-              //       logger.error( new Error( strMessage ) );
+                    logger.error( new Error( strMessage ) );
 
-              //     }
+                  }
 
-              //     await this.notifyToExternal( "error", strMessage );
+                  await this.notifyToExternal( "error", strMessage );
 
-              //     bUpdateDeliveryOrderExportedMark = true;
+                  bUpdateDeliveryOrderExportedMark = true;
 
-              //     CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
+                  CheckOdinV2NewOrdersTask_001.lastExternalNotification = SystemUtilities.getCurrentDateAndTime();
 
-              //   }
+                }
 
-              // }
+              }
 
             }
             else if ( orderInDB instanceof Error ) {
